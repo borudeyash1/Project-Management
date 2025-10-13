@@ -1,0 +1,1782 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Proxima — Projects, Payroll, Planner &amp; Tracking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <!-- Tailwind via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="antialiased bg-[#F7F9FC] text-[#111827] font-[Inter] selection:bg-[#0B5FFF]/10" style="--primary:#0B5FFF; --primary-700:#084CD6; --primary-100:#E8F0FF; --teal:#13B6A8; --purple:#7C58FF; --bg:#F7F9FC; --surface:#FFFFFF; --border:#E6E9EF; --text:#111827; --text-secondary:#6B7280; --muted:#9CA3AF; --success:#16A34A; --warning:#F59E0B; --error:#DC2626; --info:#0EA5E9;">
+    <!-- Toasts -->
+    <div id="toasts" class="fixed top-4 right-4 z-[100] space-y-3"></div>
+
+    <!-- Modals -->
+    <!-- Create Workspace Wizard -->
+    <div id="modalCreateWorkspace" class="hidden fixed inset-0 z-50 items-center justify-center">
+      <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="toggleModal('modalCreateWorkspace', false)"></div>
+      <div class="relative w-full max-w-2xl bg-white rounded-xl border border-[var(--border)] shadow-xl">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-md" style="background: var(--primary-100)"></div>
+            <h2 class="text-[22px] tracking-tight font-semibold">Create Workspace</h2>
+          </div>
+          <button class="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" onclick="toggleModal('modalCreateWorkspace', false)">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="px-6 pt-5 pb-1">
+          <!-- Stepper -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <div id="cwStep1Dot" class="h-6 w-6 rounded-full flex items-center justify-center text-white text-xs" style="background: var(--primary)">1</div>
+              <span class="text-sm text-[color:var(--text-secondary)]">Details</span>
+            </div>
+            <div class="h-px flex-1 bg-[var(--border)]"></div>
+            <div class="flex items-center gap-2">
+              <div id="cwStep2Dot" class="h-6 w-6 rounded-full flex items-center justify-center text-xs text-slate-600 bg-slate-100">2</div>
+              <span class="text-sm text-[color:var(--text-secondary)]">Verify</span>
+            </div>
+            <div class="h-px flex-1 bg-[var(--border)]"></div>
+            <div class="flex items-center gap-2">
+              <div id="cwStep3Dot" class="h-6 w-6 rounded-full flex items-center justify-center text-xs text-slate-600 bg-slate-100">3</div>
+              <span class="text-sm text-[color:var(--text-secondary)]">Payment</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-6 pb-6">
+          <!-- Step 1 -->
+          <div id="cwStep1" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium block mb-1">Workspace Name</label>
+              <input id="cwName" type="text" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="e.g., NovaTech Studio">
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">Workspace Type</label>
+              <select id="cwType" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <option>Company</option>
+                <option>Agency</option>
+                <option>Startup</option>
+                <option>Personal</option>
+                <option>Non-profit</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="text-sm font-medium block mb-1">Description</label>
+              <textarea id="cwDesc" rows="3" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Summary of goals, scope, and purpose"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">Organization</label>
+              <input id="cwOrg" type="text" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Organization name">
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">Contact Email</label>
+              <input id="cwEmail" type="email" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="name@company.com">
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">Logo/Icon</label>
+              <div class="flex items-center gap-3">
+                <div id="cwLogoPreview" class="h-10 w-10 rounded-lg border border-[var(--border)] bg-slate-50 flex items-center justify-center text-slate-500">
+                  <i data-lucide="image-plus" class="w-5 h-5"></i>
+                </div>
+                <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 cursor-pointer">
+                  <i data-lucide="upload" class="w-4 h-4"></i>
+                  <span class="text-sm">Upload</span>
+                  <input type="file" class="hidden" onchange="showToast('Logo uploaded', 'success')">
+                </label>
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">Region Visibility</label>
+              <select multiple="" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <option>Global</option>
+                <option>United States</option>
+                <option>India</option>
+                <option>Europe</option>
+                <option>APAC</option>
+              </select>
+              <p class="text-xs text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+            </div>
+          </div>
+          <!-- Step 2 -->
+          <div id="cwStep2" class="hidden">
+            <div class="grid grid-cols-1 gap-4">
+              <p class="text-sm text-slate-600">We sent a 6-digit code to <span class="font-medium" id="cwEmailPreview">your email</span>. Enter it below to verify ownership.</p>
+              <div class="grid grid-cols-6 gap-2">
+                <input maxlength="1" class="cw-otp w-full aspect-square text-center rounded-lg border border-[var(--border)] text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <input maxlength="1" class="cw-otp w-full aspect-square text-center rounded-lg border border-[var(--border)] text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <input maxlength="1" class="cw-otp w-full aspect-square text-center rounded-lg border border-[var(--border)] text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <input maxlength="1" class="cw-otp w-full aspect-square text-center rounded-lg border border-[var(--border)] text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <input maxlength="1" class="cw-otp w-full aspect-square text-center rounded-lg border border-[var(--border)] text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                <input maxlength="1" class="cw-otp w-full aspect-square text-center rounded-lg border border-[var(--border)] text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+              </div>
+              <div class="flex items-center justify-between">
+                <button class="text-sm text-slate-600 hover:text-slate-800 hover:underline" onclick="showToast('Code resent', 'info')">Resend code</button>
+                <label class="inline-flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                  <input type="checkbox" class="peer sr-only">
+                  <span class="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-[var(--primary)]">
+                    <span class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
+                  </span>
+                  Trust this device
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- Step 3 -->
+          <div id="cwStep3" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="rounded-lg border border-[var(--border)] p-4 bg-slate-50">
+                <p class="text-sm text-slate-600 mb-2">Scan the QR to pay the setup fee</p>
+                <div class="aspect-square rounded-lg border border-dashed border-[var(--border)] bg-white flex items-center justify-center">
+                  <div class="text-center">
+                    <i data-lucide="qr-code" class="w-14 h-14 mx-auto text-slate-500"></i>
+                    <p class="text-xs text-slate-500 mt-2">Static amount</p>
+                  </div>
+                </div>
+              </div>
+              <div class="rounded-lg border border-[var(--border)] p-4 bg-white">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-slate-600">Workspace</span>
+                  <span id="cwSummaryName" class="text-sm font-medium">-</span>
+                </div>
+                <div class="flex items-center justify-between mt-2">
+                  <span class="text-sm text-slate-600">Type</span>
+                  <span id="cwSummaryType" class="text-sm font-medium">-</span>
+                </div>
+                <div class="flex items-center justify-between mt-2">
+                  <span class="text-sm text-slate-600">Setup Fee</span>
+                  <span class="text-sm font-semibold tracking-tight">$49.00</span>
+                </div>
+                <div class="flex items-center gap-2 mt-4 text-xs text-slate-500">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  <span>Secure payment. Auto-invoice via email.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-6 py-4 border-t border-[var(--border)] flex items-center justify-between">
+          <button id="cwPrev" class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="cwPrev()" disabled="">Back</button>
+          <div class="flex items-center gap-3">
+            <button class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="toggleModal('modalCreateWorkspace', false)">Cancel</button>
+            <button id="cwNext" class="px-4 py-2 rounded-lg text-white text-sm shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2" style="background: var(--primary)" onclick="cwNext()">Continue</button>
+            <button id="cwCreate" class="hidden px-4 py-2 rounded-lg text-white text-sm shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2" style="background: var(--primary)" onclick="finishWorkspace()">Create Workspace</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing modal -->
+    <div id="modalPricing" class="hidden fixed inset-0 z-50 items-center justify-center">
+      <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="toggleModal('modalPricing', false)"></div>
+      <div class="relative w-full max-w-3xl bg-white rounded-xl border border-[var(--border)] shadow-xl overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+          <h3 class="text-[22px] tracking-tight font-semibold">Upgrade to unlock views</h3>
+          <button class="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" onclick="toggleModal('modalPricing', false)">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="grid md:grid-cols-3 gap-4 p-6">
+          <div class="rounded-lg border border-[var(--border)] p-4 bg-white">
+            <div class="flex items-center gap-2">
+              <i data-lucide="list-checks" class="w-5 h-5 text-[var(--primary)]"></i>
+              <h4 class="font-semibold tracking-tight">Starter</h4>
+            </div>
+            <p class="text-sm text-slate-600 mt-2">List view, reminders, basic reports.</p>
+            <div class="mt-4">
+              <span class="text-2xl font-semibold tracking-tight">$0</span>
+              <span class="text-sm text-slate-500">/mo</span>
+            </div>
+            <button class="mt-4 w-full px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Free plan active', 'info')">Current</button>
+          </div>
+          <div class="rounded-lg border border-[var(--border)] p-4 bg-white ring-1 ring-[var(--primary)]">
+            <div class="flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-5 h-5 text-[var(--purple)]"></i>
+              <h4 class="font-semibold tracking-tight">Pro</h4>
+            </div>
+            <p class="text-sm text-slate-600 mt-2">Kanban, Calendar, Gantt, analytics.</p>
+            <div class="mt-4">
+              <span class="text-2xl font-semibold tracking-tight">$9</span>
+              <span class="text-sm text-slate-500">/user/mo</span>
+            </div>
+            <button class="mt-4 w-full px-3 py-2 rounded-lg text-white hover:opacity-95 text-sm" style="background: var(--primary)" onclick="showToast('Free trial started', 'success'); toggleModal('modalPricing', false);">Start free trial</button>
+            <p class="text-xs text-slate-500 mt-2">7-day free trial. No card required.</p>
+          </div>
+          <div class="rounded-lg border border-[var(--border)] p-4 bg-white">
+            <div class="flex items-center gap-2">
+              <i data-lucide="building-2" class="w-5 h-5 text-[var(--teal)]"></i>
+              <h4 class="font-semibold tracking-tight">Business</h4>
+            </div>
+            <p class="text-sm text-slate-600 mt-2">SSO, permissions, advanced reporting.</p>
+            <div class="mt-4">
+              <span class="text-2xl font-semibold tracking-tight">$19</span>
+              <span class="text-sm text-slate-500">/user/mo</span>
+            </div>
+            <button class="mt-4 w-full px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('We’ll reach out shortly', 'success')">Contact sales</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Add menu -->
+    <div id="quickAddMenu" class="hidden absolute z-40 top-14 right-24 w-64 bg-white border border-[var(--border)] rounded-lg shadow-lg p-2">
+      <button class="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm" onclick="showToast('New task', 'info')">
+        <i data-lucide="check-square" class="w-4 h-4"></i>
+        New Task
+      </button>
+      <button class="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm" onclick="showToast('New project', 'info')">
+        <i data-lucide="folder-plus" class="w-4 h-4"></i>
+        New Project
+      </button>
+      <button class="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm" onclick="showToast('New client', 'info')">
+        <i data-lucide="contact-round" class="w-4 h-4"></i>
+        New Client
+      </button>
+    </div>
+
+    <!-- Login/Register -->
+    <section id="pageAuth" class="min-h-screen flex">
+      <div class="hidden lg:flex w-1/2 bg-white border-r border-[var(--border)] relative">
+        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&amp;w=1200&amp;auto=format&amp;fit=crop" alt="" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
+        <div class="relative p-10 mt-auto mb-10">
+          <div class="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-lg px-3 py-2 border border-[var(--border)] mb-4">
+            <i data-lucide="rocket" class="w-4 h-4 text-[var(--primary)]"></i>
+            <span class="text-xs text-slate-700">Projects, Payroll, Planner — unified</span>
+          </div>
+          <h1 class="text-3xl md:text-4xl tracking-tight font-semibold text-white">Plan, track, and pay — all in one place</h1>
+          <p class="text-white/80 mt-3 max-w-lg">Workspaces, roles, analytics, and automations for teams of any size.</p>
+        </div>
+      </div>
+
+      <div class="flex-1 flex items-center justify-center p-6">
+        <div class="w-full max-w-md">
+          <div class="flex items-center gap-3 mb-8">
+            <div class="h-9 w-9 rounded-md flex items-center justify-center text-white font-semibold tracking-tight" style="background: var(--primary)">PX</div>
+            <div>
+              <div class="text-base font-semibold tracking-tight">Proxima</div>
+              <div class="text-xs text-slate-500">Project &amp; Payroll Suite</div>
+            </div>
+          </div>
+
+          <div class="flex bg-white border border-[var(--border)] rounded-lg p-1 mb-6">
+            <button id="authTabLogin" class="flex-1 px-3 py-2 rounded-md text-sm font-medium bg-[var(--primary-100)] text-[color:var(--text)]" onclick="setAuthTab('login')">Login</button>
+            <button id="authTabRegister" class="flex-1 px-3 py-2 rounded-md text-sm text-slate-600 hover:text-slate-900" onclick="setAuthTab('register')">Register</button>
+          </div>
+
+          <!-- Login -->
+          <form id="loginForm" class="bg-white border border-[var(--border)] rounded-xl p-5 space-y-4">
+            <div>
+              <label class="text-sm font-medium block mb-1">Email or Username</label>
+              <input type="text" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="you@company.com">
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-sm font-medium">Password</label>
+                <button class="text-xs text-slate-600 hover:text-slate-900" type="button">Forgot?</button>
+              </div>
+              <input type="password" class="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="••••••••">
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input type="checkbox" class="peer sr-only">
+                <span class="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-[var(--primary)]">
+                  <span class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
+                </span>
+                Remember me
+              </label>
+              <div class="text-xs text-slate-500">SSO enabled</div>
+            </div>
+
+            <button type="button" class="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm" style="background: var(--primary)" onclick="showSection('dashboard'); showToast('Welcome back', 'success')">
+              Continue
+            </button>
+
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-[var(--border)]"></div>
+              </div>
+              <div class="relative flex justify-center">
+                <span class="bg-white px-3 text-xs text-slate-500">or</span>
+              </div>
+            </div>
+
+            <button type="button" class="w-full px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm flex items-center justify-center gap-2" onclick="showSection('dashboard'); showToast('Signed in with Google', 'success')">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="h-4 w-4">
+              Continue with Google
+            </button>
+          </form>
+
+          <!-- Register -->
+          <form id="registerForm" class="hidden bg-white border border-[var(--border)] rounded-xl p-5 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-medium block mb-1">Full Name</label>
+                <input type="text" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Jane Cooper">
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-1">Username</label>
+                <input type="text" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="janecooper">
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-1">Email</label>
+                <input type="email" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="name@company.com">
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-1">Contact Number</label>
+                <input type="tel" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="+1 555 0100">
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-1">Password</label>
+                <input type="password" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="••••••••">
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-1">Confirm Password</label>
+                <input type="password" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="••••••••">
+              </div>
+            </div>
+
+            <label class="flex items-start gap-3 text-sm text-slate-700 cursor-pointer">
+              <span class="mt-0.5 h-5 w-5 rounded-md border border-[var(--border)] flex items-center justify-center bg-white hover:bg-slate-50" onclick="toggleCheck(this)"><i data-lucide="check" class="w-4 h-4 opacity-0"></i></span>
+              <span>Agree to Terms and Conditions</span>
+            </label>
+            <label class="flex items-start gap-3 text-sm text-slate-700 cursor-pointer">
+              <span class="mt-0.5 h-5 w-5 rounded-md border border-[var(--border)] flex items-center justify-center bg-white hover:bg-slate-50" onclick="toggleCheck(this)"><i data-lucide="check" class="w-4 h-4 opacity-0"></i></span>
+              <span>Agree to Privacy Policy</span>
+            </label>
+
+            <button type="button" class="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm" style="background: var(--primary)" onclick="showToast('Verification email sent', 'success')">
+              Register
+            </button>
+            <p class="text-xs text-slate-500">After registration, check your email for a verification code or confirmation link.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Frame -->
+    <section id="appFrame" class="hidden min-h-screen">
+      <!-- Top Navbar -->
+      <header class="sticky top-0 z-30 bg-white border-b border-[var(--border)]">
+        <div class="h-14 flex items-center justify-between px-3 sm:px-4">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button class="h-8 w-8 rounded-md flex items-center justify-center text-white font-semibold tracking-tight shadow-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2" style="background: var(--primary)" onclick="showSection('dashboard')">PX</button>
+            <div class="hidden sm:block">
+              <div class="text-sm font-semibold tracking-tight">Proxima</div>
+              <div id="modeIndicator" class="text-[11px] text-slate-500">Personal Mode</div>
+            </div>
+            <div class="hidden md:flex items-center gap-2 ml-4">
+              <div class="relative w-72">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+                <input type="text" class="w-full rounded-lg border border-[var(--border)] bg-[var(--primary-100)]/50 pl-9 pr-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Search projects, tasks, people...">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 sm:gap-2">
+            <button class="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm" style="background: var(--primary)" onclick="toggleQuickAdd()">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              Quick add
+            </button>
+            <button class="relative p-2 rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" onclick="showToast('No new notifications', 'info')">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+              <span class="absolute top-1 right-1 h-2 w-2 rounded-full" style="background: var(--primary)"></span>
+            </button>
+            <div class="relative">
+              <button id="userBtn" class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&amp;w=200&amp;auto=format&amp;fit=crop" class="h-7 w-7 rounded-full object-cover">
+                <span class="hidden sm:block text-sm">Alex</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500"></i>
+              </button>
+              <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg p-2">
+                <button class="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm" onclick="showToast('Profile', 'info')"><i data-lucide="user" class="w-4 h-4"></i>Profile</button>
+                <button class="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm" onclick="showToast('Settings', 'info')"><i data-lucide="settings" class="w-4 h-4"></i>Settings</button>
+                <button class="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-red-50 text-red-600 text-sm" onclick="showSection('login')"><i data-lucide="log-out" class="w-4 h-4"></i>Logout</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="flex min-h-[calc(100vh-56px)]">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 border-r border-[var(--border)] bg-white hidden md:flex flex-col transition-all">
+          <div class="p-3">
+            <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="toggleSidebar()">
+              <span>Collapse</span>
+              <i data-lucide="chevrons-left-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <nav class="px-2 pb-4">
+            <div class="text-[10px] uppercase tracking-wider text-slate-500 px-2 mb-2">Main</div>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" data-target="dashboard" onclick="showSection('dashboard')">
+              <i data-lucide="layout-grid" class="w-5 h-5 text-slate-600"></i>
+              <span>Dashboard</span>
+            </button>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" data-target="dashboard" onclick="scrollToAnchor('projectsList')">
+              <i data-lucide="kanban" class="w-5 h-5 text-slate-600"></i>
+              <span>Projects</span>
+            </button>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="scrollToAnchor('planner')">
+              <i data-lucide="calendar" class="w-5 h-5 text-slate-600"></i>
+              <span>Planner</span>
+            </button>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="scrollToAnchor('tracker')">
+              <i data-lucide="target" class="w-5 h-5 text-slate-600"></i>
+              <span>Tracker</span>
+            </button>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="scrollToAnchor('reminders')">
+              <i data-lucide="bell-clock" class="w-5 h-5 text-slate-600"></i>
+              <span>Reminders</span>
+            </button>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="scrollToAnchor('calendar')">
+              <i data-lucide="calendar-days" class="w-5 h-5 text-slate-600"></i>
+              <span>Calendar</span>
+            </button>
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500 px-2 mt-4 mb-2">Account</div>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="showToast('Settings', 'info')">
+              <i data-lucide="settings" class="w-5 h-5 text-slate-600"></i>
+              <span>Settings</span>
+            </button>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="toggleModal('modalPricing', true)">
+              <i data-lucide="badge-dollar-sign" class="w-5 h-5 text-slate-600"></i>
+              <span>Pricing</span>
+            </button>
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500 px-2 mt-4 mb-2">Workspaces</div>
+            <button class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm" onclick="showSection('workspace')">
+              <i data-lucide="briefcase" class="w-5 h-5 text-slate-600"></i>
+              <span>Discover &amp; Join</span>
+            </button>
+            <div id="joinedWorkspacesSidebar" class="mt-1 space-y-1">
+              <!-- Filled dynamically when workspace is created/joined -->
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Content -->
+        <main class="flex-1">
+          <!-- Dashboard -->
+          <div id="pageDashboard" class="p-4 sm:p-6 space-y-6">
+            <!-- Welcome + KPI -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              <div class="lg:col-span-8">
+                <div class="bg-white border border-[var(--border)] rounded-xl p-5">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h2 class="text-[22px] tracking-tight font-semibold">Good afternoon, Alex</h2>
+                      <p class="text-sm text-slate-600 mt-1">Here’s what’s happening with your work today</p>
+                    </div>
+                    <div class="hidden md:flex items-center gap-2">
+                      <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="toggleModal('modalCreateWorkspace', true)"><i data-lucide="building" class="w-4 h-4 mr-1 inline-block"></i>Create workspace</button>
+                      <button class="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95" style="background: var(--primary)" onclick="toggleQuickAdd()"><i data-lucide="plus" class="w-4 h-4 mr-1 inline-block"></i>New</button>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+                    <div class="rounded-lg border border-[var(--border)] p-4">
+                      <div class="text-xs text-slate-500">Active projects</div>
+                      <div class="text-xl font-semibold tracking-tight mt-1">12</div>
+                      <div class="text-xs text-green-600 mt-1 flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>+2 this week</div>
+                    </div>
+                    <div class="rounded-lg border border-[var(--border)] p-4">
+                      <div class="text-xs text-slate-500">Tasks due</div>
+                      <div class="text-xl font-semibold tracking-tight mt-1">26</div>
+                      <div class="text-xs text-orange-600 mt-1 flex items-center gap-1"><i data-lucide="timer" class="w-3.5 h-3.5"></i>5 overdue</div>
+                    </div>
+                    <div class="rounded-lg border border-[var(--border)] p-4">
+                      <div class="text-xs text-slate-500">This week’s hours</div>
+                      <div class="text-xl font-semibold tracking-tight mt-1">38.5</div>
+                      <div class="text-xs text-slate-500 mt-1">Timesheet synced</div>
+                    </div>
+                    <div class="rounded-lg border border-[var(--border)] p-4">
+                      <div class="text-xs text-slate-500">Payroll status</div>
+                      <div class="text-xl font-semibold tracking-tight mt-1">$24,380</div>
+                      <div class="text-xs text-emerald-600 mt-1 flex items-center gap-1"><i data-lucide="badge-check" class="w-3.5 h-3.5"></i>Ready</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="lg:col-span-4">
+                <div class="bg-white border border-[var(--border)] rounded-xl p-5">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-[18px] tracking-tight font-semibold">Upcoming deadlines</h3>
+                    <button class="text-sm text-slate-600 hover:text-slate-900">View all</button>
+                  </div>
+                  <div class="mt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm font-medium">Marketing site launch</div>
+                        <div class="text-xs text-slate-500">Due today • 5:00 PM</div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200">High</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm font-medium">Payroll approval</div>
+                        <div class="text-xs text-slate-500">Due tomorrow • 11:00 AM</div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">On track</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm font-medium">Onboarding docs</div>
+                        <div class="text-xs text-slate-500">Fri • 3:00 PM</div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Medium</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white border border-[var(--border)] rounded-xl p-5 mt-4">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-[18px] tracking-tight font-semibold">Payroll &amp; Timesheets</h3>
+                    <button class="text-sm text-slate-600 hover:text-slate-900">Open</button>
+                  </div>
+                  <div class="mt-3">
+                    <div class="h-2 w-full bg-slate-100 rounded-full">
+                      <div class="h-2 rounded-full" style="width:70%; background: var(--primary)"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-500 mt-2">
+                      <span>70% approved</span>
+                      <span>Cycle ends in 3d</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Projects list with gated tabs -->
+            <div id="projectsList" class="bg-white border border-[var(--border)] rounded-xl">
+              <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+                <div>
+                  <h3 class="text-[18px] tracking-tight font-semibold">Projects</h3>
+                  <p class="text-xs text-slate-500">Manage and track your work</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="hidden md:flex items-center gap-2">
+                    <div class="relative">
+                      <i data-lucide="search" class="w-4 h-4 absolute left-2 top-2.5 text-slate-400"></i>
+                      <input type="text" class="w-48 rounded-lg border border-[var(--border)] bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Search projects...">
+                    </div>
+                    <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm"><i data-lucide="sliders-horizontal" class="w-4 h-4 mr-1 inline-block"></i>Filters</button>
+                    <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm"><i data-lucide="arrow-up-down" class="w-4 h-4 mr-1 inline-block"></i>Sort</button>
+                  </div>
+                  <button class="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95" style="background: var(--primary)" onclick="showToast('New project', 'info')"><i data-lucide="folder-plus" class="w-4 h-4 mr-1 inline-block"></i>Add Project</button>
+                </div>
+              </div>
+
+              <div class="px-3 pt-3">
+                <div class="inline-flex items-center gap-2 p-1 bg-slate-50 border border-[var(--border)] rounded-lg">
+                  <button class="px-3 py-1.5 rounded-md bg-white border border-[var(--border)] text-sm">List</button>
+                  <button class="group px-3 py-1.5 rounded-md text-sm text-slate-500 inline-flex items-center gap-1" onclick="toggleModal('modalPricing', true)">
+                    <i data-lucide="kanban" class="w-4 h-4 text-slate-400"></i>Kanban
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+                  </button>
+                  <button class="group px-3 py-1.5 rounded-md text-sm text-slate-500 inline-flex items-center gap-1" onclick="toggleModal('modalPricing', true)">
+                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>Calendar
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+                  </button>
+                  <button class="group px-3 py-1.5 rounded-md text-sm text-slate-500 inline-flex items-center gap-1" onclick="toggleModal('modalPricing', true)">
+                    <i data-lucide="gantt-chart" class="w-4 h-4 text-slate-400"></i>Gantt
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-3 sm:p-5">
+                <div class="overflow-auto">
+                  <table class="min-w-full text-sm">
+                    <thead class="text-slate-600">
+                      <tr class="border-b border-[var(--border)]">
+                        <th class="text-left font-medium py-2 pr-3">Project</th>
+                        <th class="text-left font-medium py-2 pr-3">Client</th>
+                        <th class="text-left font-medium py-2 pr-3">Status</th>
+                        <th class="text-left font-medium py-2 pr-3">Due</th>
+                        <th class="text-left font-medium py-2 pr-3">Assignees</th>
+                        <th class="text-right font-medium py-2 pl-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[var(--border)]">
+                      <tr class="hover:bg-slate-50">
+                        <td class="py-3 pr-3">
+                          <div class="font-medium">NovaTech Website</div>
+                          <div class="text-xs text-slate-500">Marketing • High priority</div>
+                        </td>
+                        <td class="py-3 pr-3">NovaTech</td>
+                        <td class="py-3 pr-3">
+                          <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Active</span>
+                        </td>
+                        <td class="py-3 pr-3">Oct 25</td>
+                        <td class="py-3 pr-3">
+                          <div class="flex -space-x-2">
+                            <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                            <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                            <div class="h-7 w-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs text-slate-600">+3</div>
+                          </div>
+                        </td>
+                        <td class="py-3 pl-3 text-right">
+                          <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50" onclick="enterWorkspace('NovaTech'); enterProject('NovaTech Website')">Visit</button>
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-slate-50">
+                        <td class="py-3 pr-3">
+                          <div class="font-medium">Mobile App</div>
+                          <div class="text-xs text-slate-500">Development • Medium</div>
+                        </td>
+                        <td class="py-3 pr-3">Acme</td>
+                        <td class="py-3 pr-3">
+                          <span class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-[var(--border)]">On Hold</span>
+                        </td>
+                        <td class="py-3 pr-3">Nov 10</td>
+                        <td class="py-3 pr-3">
+                          <div class="flex -space-x-2">
+                            <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                            <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                          </div>
+                        </td>
+                        <td class="py-3 pl-3 text-right">
+                          <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50" onclick="enterWorkspace('Acme'); enterProject('Mobile App')">Visit</button>
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-slate-50">
+                        <td class="py-3 pr-3">
+                          <div class="font-medium">HR Policy Revamp</div>
+                          <div class="text-xs text-slate-500">HR • Low</div>
+                        </td>
+                        <td class="py-3 pr-3">Internal</td>
+                        <td class="py-3 pr-3">
+                          <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">Completed</span>
+                        </td>
+                        <td class="py-3 pr-3">Sep 18</td>
+                        <td class="py-3 pr-3">
+                          <div class="flex -space-x-2">
+                            <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                          </div>
+                        </td>
+                        <td class="py-3 pl-3 text-right">
+                          <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50" onclick="enterWorkspace('Internal'); enterProject('HR Policy Revamp')">Visit</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Planner & Tracker -->
+            <div id="planner" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              <div class="lg:col-span-8 bg-white border border-[var(--border)] rounded-xl p-5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Personal Planner</h3>
+                  <div class="flex items-center gap-2">
+                    <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm">Today</button>
+                    <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)">Add</button>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                  <div class="rounded-lg border border-[var(--border)] p-3">
+                    <div class="flex items-center justify-between">
+                      <div class="text-sm font-medium">Write Q4 goals</div>
+                      <button class="text-slate-500 hover:text-slate-900"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500">Due: Today 5:00 PM</div>
+                    <div class="mt-3 flex items-center gap-2">
+                      <button class="task-check h-5 w-5 rounded-md border border-[var(--border)] flex items-center justify-center hover:bg-slate-50" onclick="toggleCheck(this)"><i data-lucide="check" class="w-4 h-4 opacity-0"></i></button>
+                      <span class="text-sm">Mark complete</span>
+                    </div>
+                  </div>
+                  <div class="rounded-lg border border-[var(--border)] p-3">
+                    <div class="flex items-center justify-between">
+                      <div class="text-sm font-medium">1:1 with PM</div>
+                      <button class="text-slate-500 hover:text-slate-900"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500">Tomorrow 10:00 AM</div>
+                    <div class="mt-3 flex items-center gap-2">
+                      <span class="text-xs px-2 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200">Meeting</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="tracker" class="lg:col-span-4 bg-white border border-[var(--border)] rounded-xl p-5">
+                <h3 class="text-[18px] tracking-tight font-semibold">Goals &amp; Habits</h3>
+                <div class="mt-4 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-sm font-medium">Ship website</div>
+                      <div class="text-xs text-slate-500">Progress</div>
+                    </div>
+                    <div class="w-40">
+                      <div class="h-2 bg-slate-100 rounded-full">
+                        <div class="h-2 rounded-full" style="width:56%; background: var(--primary)"></div>
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-1 text-right">56%</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-sm font-medium">Daily standup</div>
+                      <div class="text-xs text-slate-500">Habit</div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                      <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                      <span class="h-2.5 w-2.5 rounded-full bg-slate-200"></span>
+                      <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                      <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reminders & Calendar anchors -->
+            <div id="reminders" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              <div id="calendar" class="lg:col-span-8 bg-white border border-[var(--border)] rounded-xl p-5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Calendar</h3>
+                  <div class="flex items-center gap-2">
+                    <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm">Week</button>
+                    <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm">Month</button>
+                    <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)">Add event</button>
+                  </div>
+                </div>
+                <div class="mt-4 grid grid-cols-7 gap-2 text-center">
+                  <div class="text-xs text-slate-500">Mon</div>
+                  <div class="text-xs text-slate-500">Tue</div>
+                  <div class="text-xs text-slate-500">Wed</div>
+                  <div class="text-xs text-slate-500">Thu</div>
+                  <div class="text-xs text-slate-500">Fri</div>
+                  <div class="text-xs text-slate-500">Sat</div>
+                  <div class="text-xs text-slate-500">Sun</div>
+                  <div class="col-span-7 h-40 rounded-lg border border-[var(--border)] bg-slate-50 flex items-center justify-center text-slate-500">Calendar placeholder</div>
+                </div>
+              </div>
+              <div class="lg:col-span-4 bg-white border border-[var(--border)] rounded-xl p-5">
+                <h3 class="text-[18px] tracking-tight font-semibold">Reminders</h3>
+                <div class="mt-4 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <button class="task-check h-5 w-5 rounded-md border border-[var(--border)] flex items-center justify-center hover:bg-slate-50" onclick="toggleCheck(this)"><i data-lucide="check" class="w-4 h-4 opacity-0"></i></button>
+                      <div>
+                        <div class="text-sm font-medium">Submit timesheet</div>
+                        <div class="text-xs text-slate-500">Today • 6:00 PM</div>
+                      </div>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">Critical</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Workspaces: Discover & Join -->
+          <div id="pageWorkspaceDiscover" class="hidden p-4 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-[22px] tracking-tight font-semibold">Workspaces</h2>
+                <p class="text-sm text-slate-600">Search, filter, and join workspaces</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="toggleModal('modalCreateWorkspace', true)"><i data-lucide="plus" class="w-4 h-4 mr-1 inline-block"></i>Create</button>
+                <div class="hidden sm:block">
+                  <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+                    <input type="text" class="w-72 rounded-lg border border-[var(--border)] bg-white pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Search workspace...">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="px-3 py-1.5 rounded-full border border-[var(--border)] bg-[var(--primary-100)] text-sm">All</button>
+              <button class="px-3 py-1.5 rounded-full border border-[var(--border)] hover:bg-slate-50 text-sm">Public</button>
+              <button class="px-3 py-1.5 rounded-full border border-[var(--border)] hover:bg-slate-50 text-sm">Private</button>
+              <button class="px-3 py-1.5 rounded-full border border-[var(--border)] hover:bg-slate-50 text-sm">Region: US</button>
+              <button class="px-3 py-1.5 rounded-full border border-[var(--border)] hover:bg-slate-50 text-sm">Industry: Tech</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Workspace card -->
+              <div class="bg-white border border-[var(--border)] rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight" style="background: var(--primary)">NT</div>
+                    <div>
+                      <div class="font-medium">NovaTech</div>
+                      <div class="text-xs text-slate-500">32 members • Public</div>
+                    </div>
+                  </div>
+                  <button class="p-2 rounded-md hover:bg-slate-50"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+                <p class="text-sm text-slate-600 mt-3">Design &amp; development studio. We build web experiences.</p>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex -space-x-2">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1621619856624-42fd193a0661?w=1080&amp;q=80">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <div class="h-7 w-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs text-slate-600">+30</div>
+                  </div>
+                  <button class="px-3 py-1.5 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="joinWorkspace(this, 'NovaTech')">Send join request</button>
+                </div>
+              </div>
+              <div class="bg-white border border-[var(--border)] rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight bg-slate-900">AC</div>
+                    <div>
+                      <div class="font-medium">Acme Corp</div>
+                      <div class="text-xs text-stext-slate-500">24 members • Private</div>
+                    </div>
+                  </div>
+                  <button class="p-2 rounded-md hover:bg-slate-50"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+                <p class="text-sm text-slate-600 mt-3">Enterprise solutions and mobile platforms for retail and logistics.</p>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex -space-x-2">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <div class="h-7 w-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs text-slate-600">+22</div>
+                  </div>
+                  <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="joinWorkspace(this, 'Acme Corp')">Request access</button>
+                </div>
+              </div>
+
+              <div class="bg-white border border-[var(--border)] rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight" style="background: var(--teal)">GL</div>
+                    <div>
+                      <div class="font-medium">GreenLeaf Labs</div>
+                      <div class="text-xs text-slate-500">14 members • Public</div>
+                    </div>
+                  </div>
+                  <button class="p-2 rounded-md hover:bg-slate-50"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+                <p class="text-sm text-slate-600 mt-3">Climate tech R&amp;D — sensors, dashboards, and IoT analytics.</p>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex -space-x-2">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <div class="h-7 w-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs text-slate-600">+12</div>
+                  </div>
+                  <button class="px-3 py-1.5 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="joinWorkspace(this, 'GreenLeaf Labs')">Join</button>
+                </div>
+              </div>
+
+              <div class="bg-white border border-[var(--border)] rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight" style="background: var(--purple)">QA</div>
+                    <div>
+                      <div class="font-medium">Quantum Analytics</div>
+                      <div class="text-xs text-slate-500">51 members • Private</div>
+                    </div>
+                  </div>
+                  <button class="p-2 rounded-md hover:bg-slate-50"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+                <p class="text-sm text-slate-600 mt-3">Data science consultancy — BI, ML pipelines, and ops.</p>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex -space-x-2">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    <div class="h-7 w-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs text-slate-600">+49</div>
+                  </div>
+                  <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="joinWorkspace(this, 'Quantum Analytics')">Request access</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4">
+              <div class="text-xs text-slate-500">Showing 4 results</div>
+              <div class="flex items-center gap-1">
+                <button class="px-3 py-1.5 rounded-md border border-[var(--border)] hover:bg-slate-50 text-sm">Previous</button>
+                <button class="px-3 py-1.5 rounded-md text-white text-sm" style="background: var(--primary)">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Workspace Owner View -->
+          <div id="pageWorkspaceOwner" class="hidden p-4 sm:p-6 space-y-4">
+            <div class="bg-white border border-[var(--border)] rounded-xl p-4 sm:p-5">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div id="workspaceAvatar" class="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight" style="background: var(--primary)">WS</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h2 id="workspaceOwnerName" class="text-[20px] sm:text-[22px] font-semibold tracking-tight">Workspace</h2>
+                      <span id="workspaceRolePill" class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Owner</span>
+                    </div>
+                    <div class="text-xs text-slate-500">You are viewing the workspace area</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Invite sent', 'success')"><i data-lucide="user-plus" class="w-4 h-4 mr-1 inline-block"></i>Invite</button>
+                  <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="createProjectFromWorkspace()"><i data-lucide="folder-plus" class="w-4 h-4 mr-1 inline-block"></i>New project</button>
+                </div>
+              </div>
+
+              <div class="mt-4 border-t border-[var(--border)] pt-4">
+                <div class="flex flex-wrap items-center gap-2">
+                  <button class="wsc-tab px-3 py-1.5 rounded-md bg-[var(--primary-100)] text-sm" data-tab="wsOverview" onclick="setWsTab('wsOverview')">Overview</button>
+                  <button class="wsc-tab px-3 py-1.5 rounded-md hover:bg-slate-50 border border-[var(--border)] text-sm" data-tab="wsMembers" onclick="setWsTab('wsMembers')">Members</button>
+                  <button class="wsc-tab px-3 py-1.5 rounded-md hover:bg-slate-50 border border-[var(--border)] text-sm" data-tab="wsProjects" onclick="setWsTab('wsProjects')">Projects</button>
+                  <button class="wsc-tab px-3 py-1.5 rounded-md hover:bg-slate-50 border border-[var(--border)] text-sm" data-tab="wsRequests" onclick="setWsTab('wsRequests')">Requests</button>
+                  <button class="wsc-tab px-3 py-1.5 rounded-md hover:bg-slate-50 border border-[var(--border)] text-sm" data-tab="wsSettings" onclick="setWsTab('wsSettings')">Settings</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="wsOverview" class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+              <div class="xl:col-span-8 bg-white border border-[var(--border)] rounded-xl p-5">
+                <h3 class="text-[18px] tracking-tight font-semibold">Analytics</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                  <div class="rounded-lg border border-[var(--border)] p-4">
+                    <div class="text-xs text-slate-500">Active projects</div>
+                    <div class="text-xl font-semibold tracking-tight mt-1">7</div>
+                    <div class="h-2 w-full bg-slate-100 rounded-full mt-2">
+                      <div class="h-2 rounded-full" style="width:60%; background: var(--primary)"></div>
+                    </div>
+                  </div>
+                  <div class="rounded-lg border border-[var(--border)] p-4">
+                    <div class="text-xs text-slate-500">Utilization</div>
+                    <div class="text-xl font-semibold tracking-tight mt-1">72%</div>
+                    <div class="h-2 w-full bg-slate-100 rounded-full mt-2">
+                      <div class="h-2 rounded-full bg-emerald-500" style="width:72%"></div>
+                    </div>
+                  </div>
+                  <div class="rounded-lg border border-[var(--border)] p-4">
+                    <div class="text-xs text-slate-500">Burn rate</div>
+                    <div class="text-xl font-semibold tracking-tight mt-1">$18.4k</div>
+                    <div class="text-[11px] text-orange-600 mt-1 flex items-center gap-1"><i data-lucide="flame" class="w-3.5 h-3.5"></i>+4% MoM</div>
+                  </div>
+                  <div class="rounded-lg border border-[var(--border)] p-4">
+                    <div class="text-xs text-slate-500">Revenue (MTD)</div>
+                    <div class="text-xl font-semibold tracking-tight mt-1">$42.7k</div>
+                    <div class="text-[11px] text-emerald-600 mt-1 flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>+9% MoM</div>
+                  </div>
+                </div>
+                <div class="mt-5">
+                  <div class="h-48 rounded-lg border border-[var(--border)] bg-slate-50 flex items-center justify-center text-slate-500">Chart placeholder</div>
+                </div>
+              </div>
+              <div class="xl:col-span-4 bg-white border border-[var(--border)] rounded-xl p-5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Upcoming milestones</h3>
+                  <button class="text-sm text-slate-600 hover:text-slate-900">View</button>
+                </div>
+                <div class="mt-4 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-sm font-medium">Site handoff</div>
+                      <div class="text-xs text-slate-500">Oct 28</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">NovaTech</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-sm font-medium">Payroll cycle close</div>
+                      <div class="text-xs text-slate-500">Oct 30</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">Internal</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="wsMembers" class="hidden bg-white border border-[var(--border)] rounded-xl p-5">
+              <div class="flex items-center justify-between">
+                <h3 class="text-[18px] tracking-tight font-semibold">Members</h3>
+                <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Invite dialog coming soon', 'info')">Invite</button>
+              </div>
+              <div class="mt-4 overflow-auto">
+                <table class="min-w-full text-sm">
+                  <thead class="text-slate-600">
+                    <tr class="border-b border-[var(--border)]">
+                      <th class="text-left font-medium py-2 pr-3">Name</th>
+                      <th class="text-left font-medium py-2 pr-3">Role</th>
+                      <th class="text-left font-medium py-2 pr-3">Email</th>
+                      <th class="text-right font-medium py-2 pl-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[var(--border)]">
+                    <tr>
+                      <td class="py-3 pr-3">
+                        <div class="flex items-center gap-2">
+                          <img class="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                          <div>
+                            <div class="font-medium">Alex Johnson</div>
+                            <div class="text-xs text-slate-500">@alex</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-3 pr-3"><span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Owner</span></td>
+                      <td class="py-3 pr-3">alex@proxima.app</td>
+                      <td class="py-3 pl-3 text-right">
+                        <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50">Manage</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-3 pr-3">
+                        <div class="flex items-center gap-2">
+                          <img class="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                          <div>
+                            <div class="font-medium">Priya Patel</div>
+                            <div class="text-xs text-slate-500">@priya</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-3 pr-3"><span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Admin</span></td>
+                      <td class="py-3 pr-3">priya@proxima.app</td>
+                      <td class="py-3 pl-3 text-right">
+                        <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50">Manage</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="wsProjects" class="hidden bg-white border border-[var(--border)] rounded-xl p-5">
+              <div class="flex items-center justify-between">
+                <h3 class="text-[18px] tracking-tight font-semibold">Projects</h3>
+                <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="createProjectFromWorkspace()"><i data-lucide="folder-plus" class="w-4 h-4 mr-1 inline-block"></i>New project</button>
+              </div>
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                <div class="rounded-lg border border-[var(--border)] p-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="font-medium">NovaTech Website</div>
+                      <div class="text-xs text-slate-500">Active • Due Oct 25</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Active</span>
+                  </div>
+                  <div class="flex items-center justify-between mt-3">
+                    <div class="flex -space-x-2">
+                      <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                      <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    </div>
+                    <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="enterProject('NovaTech Website')">Open</button>
+                  </div>
+                </div>
+                <div class="rounded-lg border border-[var(--border)] p-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="font-medium">Mobile App</div>
+                      <div class="text-xs text-slate-500">On Hold • Due Nov 10</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-[var(--border)]">On Hold</span>
+                  </div>
+                  <div class="flex items-center justify-between mt-3">
+                    <div class="flex -space-x-2">
+                      <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                      <img class="h-7 w-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                    </div>
+                    <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="enterProject('Mobile App')">Open</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="wsRequests" class="hidden grid grid-cols-1 xl:grid-cols-12 gap-4">
+              <div class="xl:col-span-7 bg-white border border-[var(--border)] rounded-xl p-5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Workload &amp; deadline requests</h3>
+                  <button class="text-sm text-slate-600 hover:text-slate-900" onclick="showToast('Auto-approve toggled', 'info')">Auto-approve rules</button>
+                </div>
+                <div class="mt-4 space-y-3">
+                  <div class="rounded-lg border border-[var(--border)] p-3">
+                    <div class="flex items-start justify-between">
+                      <div class="flex items-start gap-3">
+                        <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                        <div>
+                          <div class="text-sm"><span class="font-medium">Priya</span> requested a due date change for task “Final QA pass”.</div>
+                          <div class="text-xs text-slate-500 mt-1">Requested: Oct 27 → Oct 30 • Reason: QA environment delays</div>
+                        </div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200">Deadline</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-3 justify-end">
+                      <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Declined', 'error')">Decline</button>
+                      <button class="px-3 py-1.5 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="showToast('Approved', 'success')">Approve</button>
+                    </div>
+                  </div>
+                  <div class="rounded-lg border border-[var(--border)] p-3">
+                    <div class="flex items-start justify-between">
+                      <div class="flex items-start gap-3">
+                        <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                        <div>
+                          <div class="text-sm"><span class="font-medium">Alex</span> requested workload rebalance for “Sprint 18 tasks”.</div>
+                          <div class="text-xs text-slate-500 mt-1">Reduce from 8 to 6 tasks • Reason: PTO on Friday</div>
+                        </div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Workload</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-3 justify-end">
+                      <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Rescheduled to next sprint', 'info')">Reschedule</button>
+                      <button class="px-3 py-1.5 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="showToast('Approved', 'success')">Approve</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="xl:col-span-5 bg-white border border-[var(--border)] rounded-xl p-5">
+                <h3 class="text-[18px] tracking-tight font-semibold">Capacity overview</h3>
+                <div class="mt-4 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm">Design</div>
+                    <div class="w-40">
+                      <div class="h-2 bg-slate-100 rounded-full">
+                        <div class="h-2 rounded-full bg-emerald-500" style="width:64%"></div>
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-1 text-right">64% utilized</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm">Engineering</div>
+                    <div class="w-40">
+                      <div class="h-2 bg-slate-100 rounded-full">
+                        <div class="h-2 rounded-full bg-orange-500" style="width:88%"></div>
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-1 text-right">88% utilized</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm">QA</div>
+                    <div class="w-40">
+                      <div class="h-2 bg-slate-100 rounded-full">
+                        <div class="h-2 rounded-full bg-blue-500" style="width:42%"></div>
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-1 text-right">42% utilized</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="wsSettings" class="hidden bg-white border border-[var(--border)] rounded-xl p-5">
+              <h3 class="text-[18px] tracking-tight font-semibold">Settings</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label class="text-sm font-medium block mb-1">Workspace name</label>
+                  <input id="wsSettingsName" type="text" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Workspace name">
+                </div>
+                <div>
+                  <label class="text-sm font-medium block mb-1">Default visibility</label>
+                  <select class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
+                    <option>Private</option>
+                    <option>Public</option>
+                  </select>
+                </div>
+                <div class="md:col-span-2">
+                  <label class="text-sm font-medium block mb-1">About</label>
+                  <textarea rows="3" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Workspace description"></textarea>
+                </div>
+              </div>
+              <div class="mt-4 flex items-center gap-2">
+                <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Changes discarded', 'info')">Discard</button>
+                <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="showToast('Saved', 'success')">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project View -->
+          <div id="pageProject" class="hidden p-4 sm:p-6 space-y-4">
+            <div class="bg-white border border-[var(--border)] rounded-xl p-4 sm:p-5">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <div class="text-xs text-slate-500"><button class="hover:underline" onclick="enterWorkspace(currentWorkspace)"><span id="projectWorkspaceName">Workspace</span></button> • Project</div>
+                  <div class="flex items-center gap-2 mt-1">
+                    <h2 id="projectTitle" class="text-[20px] sm:text-[22px] font-semibold tracking-tight">Project</h2>
+                    <span id="projectStatus" class="text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Active</span>
+                  </div>
+                  <div class="text-xs text-slate-500 mt-1">Due <span id="projectDue">Oct 25</span></div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Shared', 'success')"><i data-lucide="share-2" class="w-4 h-4 mr-1 inline-block"></i>Share</button>
+                  <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="showToast('Changes saved', 'success')"><i data-lucide="save" class="w-4 h-4 mr-1 inline-block"></i>Save</button>
+                </div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap items-center gap-2">
+                <button class="px-3 py-1.5 rounded-md bg-[var(--primary-100)] text-sm">List</button>
+                <button class="px-3 py-1.5 rounded-md inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900" onclick="toggleModal('modalPricing', true)"><i data-lucide="kanban" class="w-4 h-4"></i>Kanban<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                <button class="px-3 py-1.5 rounded-md inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900" onclick="toggleModal('modalPricing', true)"><i data-lucide="calendar" class="w-4 h-4"></i>Calendar<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                <button class="px-3 py-1.5 rounded-md inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900" onclick="toggleModal('modalPricing', true)"><i data-lucide="gantt-chart" class="w-4 h-4"></i>Gantt<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                <button class="ml-auto px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Exported', 'success')"><i data-lucide="download" class="w-4 h-4 mr-1 inline-block"></i>Export</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+              <div class="xl:col-span-8 bg-white border border-[var(--border)] rounded-xl p-5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Tasks</h3>
+                  <div class="flex items-center gap-2">
+                    <div class="relative">
+                      <i data-lucide="search" class="w-4 h-4 absolute left-2 top-2.5 text-slate-400"></i>
+                      <input type="text" class="w-56 rounded-lg border border-[var(--border)] bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" placeholder="Search tasks...">
+                    </div>
+                    <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm"><i data-lucide="filter" class="w-4 h-4 mr-1 inline-block"></i>Filter</button>
+                  </div>
+                </div>
+                <div class="mt-3 overflow-auto">
+                  <table class="min-w-full text-sm">
+                    <thead class="text-slate-600">
+                      <tr class="border-b border-[var(--border)]">
+                        <th class="text-left font-medium py-2 pr-3">Task</th>
+                        <th class="text-left font-medium py-2 pr-3">Assignee</th>
+                        <th class="text-left font-medium py-2 pr-3">Status</th>
+                        <th class="text-left font-medium py-2 pr-3">Due</th>
+                        <th class="text-right font-medium py-2 pl-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[var(--border)]">
+                      <tr class="hover:bg-slate-50">
+                        <td class="py-3 pr-3">
+                          <button class="text-left font-medium hover:underline" onclick="openTaskDrawer('Design hero section')">Design hero section</button>
+                          <div class="text-xs text-slate-500">NovaTech Website • UI</div>
+                        </td>
+                        <td class="py-3 pr-3">
+                          <div class="flex items-center gap-2">
+                            <img class="h-6 w-6 rounded-full" src="https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                            <span>Sam</span>
+                          </div>
+                        </td>
+                        <td class="py-3 pr-3">
+                          <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">In Progress</span>
+                        </td>
+                        <td class="py-3 pr-3">Oct 20</td>
+                        <td class="py-3 pl-3 text-right">
+                          <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50" onclick="openTaskDrawer('Design hero section')">Details</button>
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-slate-50">
+                        <td class="py-3 pr-3">
+                          <button class="text-left font-medium hover:underline" onclick="openTaskDrawer('Implement responsive grid')">Implement responsive grid</button>
+                          <div class="text-xs text-slate-500">NovaTech Website • Frontend</div>
+                        </td>
+                        <td class="py-3 pr-3">
+                          <div class="flex items-center gap-2">
+                            <img class="h-6 w-6 rounded-full" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                            <span>Priya</span>
+                          </div>
+                        </td>
+                        <td class="py-3 pr-3">
+                          <span class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-[var(--border)]">Backlog</span>
+                        </td>
+                        <td class="py-3 pr-3">Oct 23</td>
+                        <td class="py-3 pl-3 text-right">
+                          <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50" onclick="openTaskDrawer('Implement responsive grid')">Details</button>
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-slate-50">
+                        <td class="py-3 pr-3">
+                          <button class="text-left font-medium hover:underline" onclick="openTaskDrawer('Final QA pass')">Final QA pass</button>
+                          <div class="text-xs text-slate-500">NovaTech Website • QA</div>
+                        </td>
+                        <td class="py-3 pr-3">
+                          <div class="flex items-center gap-2">
+                            <img class="h-6 w-6 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                            <span>Alex</span>
+                          </div>
+                        </td>
+                        <td class="py-3 pr-3">
+                          <span class="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200">At Risk</span>
+                        </td>
+                        <td class="py-3 pr-3">Oct 27</td>
+                        <td class="py-3 pl-3 text-right">
+                          <button class="px-2 py-1 rounded-md border border-[var(--border)] hover:bg-slate-50" onclick="openTaskDrawer('Final QA pass')">Details</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="xl:col-span-4 space-y-4">
+                <div class="bg-white border border-[var(--border)] rounded-xl p-5">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-[18px] tracking-tight font-semibold">Milestones</h3>
+                    <button class="text-sm text-slate-600 hover:text-slate-900">View all</button>
+                  </div>
+                  <div class="mt-3 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm font-medium">M1: Design complete</div>
+                        <div class="text-xs text-slate-500">Oct 20</div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">On track</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm font-medium">M2: Dev complete</div>
+                        <div class="text-xs text-slate-500">Oct 24</div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Planned</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white border border-[var(--border)] rounded-xl p-5">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Progress</h3>
+                  <div class="mt-3">
+                    <div class="h-2 w-full bg-slate-100 rounded-full">
+                      <div class="h-2 rounded-full" style="width:58%; background: var(--primary)"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-500 mt-2">
+                      <span>58% done</span>
+                      <span>6/10 tasks</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white border border-[var(--border)] rounded-xl p-5">
+                  <h3 class="text-[18px] tracking-tight font-semibold">Timeline</h3>
+                  <div class="mt-3 h-32 rounded-lg border border-[var(--border)] bg-slate-50 flex items-center justify-center text-slate-500">Mini calendar</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- Task Drawer -->
+    <div id="taskDrawer" class="hidden fixed inset-0 z-50">
+      <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="toggleTaskDrawer(false)"></div>
+      <div class="absolute right-0 top-0 h-full w-full max-w-lg bg-white border-l border-[var(--border)] shadow-2xl flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+          <div>
+            <div class="text-xs text-slate-500">Task</div>
+            <h3 id="taskTitle" class="text-[18px] tracking-tight font-semibold">Task title</h3>
+          </div>
+          <button class="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" onclick="toggleTaskDrawer(false)"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-5 overflow-auto flex-1 space-y-5">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-slate-500">Status</label>
+              <select class="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
+                <option>Backlog</option>
+                <option selected="">In Progress</option>
+                <option>Blocked</option>
+                <option>Done</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-slate-500">Due date</label>
+              <input type="date" class="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="text-xs text-slate-500">Assignees</label>
+              <div class="mt-1 flex -space-x-2">
+                <img class="h-8 w-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                <img class="h-8 w-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                <button class="h-8 w-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs text-slate-600">+1</button>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-slate-500">Priority</label>
+              <select class="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
+                <option>Low</option>
+                <option selected="">Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-500">Description</label>
+            <textarea rows="4" class="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm" placeholder="Add details, context, and links..."></textarea>
+          </div>
+
+          <div class="rounded-lg border border-[var(--border)] p-3 bg-slate-50">
+            <div class="text-xs text-slate-500 mb-2">Quick actions</div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-white text-sm" onclick="toggleModal('modalRequestChange', true)"><i data-lucide="calendar-plus" class="w-4 h-4 mr-1 inline-block"></i>Request deadline change</button>
+              <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-white text-sm" onclick="toggleModal('modalRequestChange', true)"><i data-lucide="workflow" class="w-4 h-4 mr-1 inline-block"></i>Request workload change</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium mb-2">Activity</div>
+            <div class="space-y-3">
+              <div class="flex items-start gap-2">
+                <img class="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                <div class="bg-white border border-[var(--border)] rounded-lg px-3 py-2">
+                  <div class="text-xs text-slate-500">Sam • 2h ago</div>
+                  <div class="text-sm">Pushed updated hero illustrations.</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-2">
+                <img class="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&amp;w=100&amp;auto=format&amp;fit=crop">
+                <div class="bg-white border border-[var(--border)] rounded-lg px-3 py-2">
+                  <div class="text-xs text-slate-500">Alex • 1h ago</div>
+                  <div class="text-sm">Marked status as In Progress.</div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+              <input type="text" class="flex-1 rounded-lg border border-[var(--border)] px-3 py-2 text-sm" placeholder="Write a comment...">
+              <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="showToast('Comment added', 'success')">Send</button>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between">
+          <div class="text-xs text-slate-500">Changes auto-saved</div>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="showToast('Task duplicated', 'info')">Duplicate</button>
+            <button class="px-3 py-1.5 rounded-lg text-white text-sm hover:opacity-95" style="background: var(--error)" onclick="showToast('Task archived', 'warning')">Archive</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Change Modal -->
+    <div id="modalRequestChange" class="hidden fixed inset-0 z-50 items-center justify-center">
+      <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="toggleModal('modalRequestChange', false)"></div>
+      <div class="relative w-full max-w-lg bg-white rounded-xl border border-[var(--border)] shadow-xl">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+          <h3 class="text-[18px] font-semibold tracking-tight">Request change</h3>
+          <button class="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]" onclick="toggleModal('modalRequestChange', false)"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="text-sm font-medium block mb-1">Type</label>
+            <select class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
+              <option>Deadline change</option>
+              <option>Workload change</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="text-sm font-medium block mb-1">From</label>
+              <input type="date" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">To</label>
+              <input type="date" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="text-sm font-medium block mb-1">Reason</label>
+            <textarea rows="3" class="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm" placeholder="Provide context..."></textarea>
+          </div>
+          <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+            <input type="checkbox" class="peer sr-only">
+            <span class="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-[var(--primary)]">
+              <span class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
+            </span>
+            Notify stakeholders
+          </label>
+        </div>
+        <div class="px-5 py-3 border-t border-[var(--border)] flex items-center justify-end gap-2">
+          <button class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-slate-50 text-sm" onclick="toggleModal('modalRequestChange', false)">Cancel</button>
+          <button class="px-3 py-2 rounded-lg text-white text-sm" style="background: var(--primary)" onclick="toggleModal('modalRequestChange', false); showToast('Request submitted', 'success')">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      // Global state
+      let currentWorkspace = 'NovaTech';
+      let currentProject = 'NovaTech Website';
+      let cwStep = 1;
+
+      // Helper to render icons after DOM changes
+      function renderIcons() {
+        setTimeout(() => {
+          if (window.lucide && lucide.createIcons) lucide.createIcons();
+        }, 0);
+      }
+
+      // Toasts
+      function showToast(message, type = 'info') {
+        const colors = {
+          success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          error: 'bg-rose-50 text-rose-700 border-rose-200',
+          warning: 'bg-amber-50 text-amber-700 border-amber-200',
+          info: 'bg-sky-50 text-sky-700 border-sky-200'
+        };
+        const icons = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+        const wrap = document.getElementById('toasts');
+        const el = document.createElement('div');
+        el.className = `flex items-center gap-2 px-3 py-2 rounded-lg border shadow-sm ${colors[type]} animate-[fadeIn_.2s_ease]`;
+        el.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4"></i><span class="text-sm">${message}</span>`;
+        wrap.appendChild(el);
+        renderIcons();
+        setTimeout(() => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(-4px)';
+          setTimeout(() => el.remove(), 250);
+        }, 2800);
+      }
+
+      // Section routing
+      function showSection(key) {
+        const pageAuth = document.getElementById('pageAuth');
+        const app = document.getElementById('appFrame');
+        // Map keys to pages
+        const pages = {
+          dashboard: 'pageDashboard',
+          workspace: 'pageWorkspaceDiscover',
+          workspaceOwner: 'pageWorkspaceOwner',
+          project: 'pageProject'
+        };
+        if (key === 'login') {
+          pageAuth.classList.remove('hidden');
+          app.classList.add('hidden');
+          return;
+        }
+        // default to app
+        pageAuth.classList.add('hidden');
+        app.classList.remove('hidden');
+
+        // hide all pages
+        Object.values(pages).forEach(id => document.getElementById(id).classList.add('hidden'));
+        // show selected
+        const sel = pages[key] || pages.dashboard;
+        document.getElementById(sel).classList.remove('hidden');
+
+        // Update nav state (optional)
+        renderIcons();
+      }
+
+      // Auth tabs
+      function setAuthTab(tab) {
+        const loginBtn = document.getElementById('authTabLogin');
+        const registerBtn = document.getElementById('authTabRegister');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        if (tab === 'login') {
+          loginBtn.classList.add('bg-[var(--primary-100)]', 'text-[color:var(--text)]');
+          registerBtn.classList.remove('bg-[var(--primary-100)]');
+          loginForm.classList.remove('hidden');
+          registerForm.classList.add('hidden');
+        } else {
+          registerBtn.classList.add('bg-[var(--primary-100)]', 'text-[color:var(--text)]');
+          loginBtn.classList.remove('bg-[var(--primary-100)]');
+          registerForm.classList.remove('hidden');
+          loginForm.classList.add('hidden');
+        }
+        renderIcons();
+      }
+
+      // Sidebar collapse
+      function toggleSidebar() {
+        const aside = document.getElementById('sidebar');
+        const collapsed = aside.classList.contains('w-16');
+        const labels = aside.querySelectorAll('nav .nav-link span');
+        if (collapsed) {
+          aside.classList.remove('w-16');
+          aside.classList.add('w-64');
+          labels.forEach(s => s.classList.remove('hidden'));
+        } else {
+          aside.classList.remove('w-64');
+          aside.classList.add('w-16');
+          labels.forEach(s => s.classList.add('hidden'));
+        }
+      }
+
+      // User menu
+      document.getElementById('userBtn').addEventListener('click', () => {
+        document.getElementById('userMenu').classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        const btn = document.getElementById('userBtn');
+        const menu = document.getElementById('userMenu');
+        if (!btn.contains(e.target) && !menu.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      });
+
+      // Quick add
+      function toggleQuickAdd() {
+        document.getElementById('quickAddMenu').classList.toggle('hidden');
+      }
+      document.addEventListener('click', (e) => {
+        const qa = document.getElementById('quickAddMenu');
+        if (!qa.contains(e.target) && !e.target.closest('[onclick*="toggleQuickAdd"]')) {
+          qa.classList.add('hidden');
+        }
+      });
+
+      // Modals
+      function toggleModal(id, show = true) {
+        const m = document.getElementById(id);
+        if (show) {
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        } else {
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+        }
+        renderIcons();
+      }
+
+      // Create Workspace Wizard
+      function setCwStep(step) {
+        cwStep = step;
+        // sections
+        ['cwStep1','cwStep2','cwStep3'].forEach((id, idx) => {
+          document.getElementById(id).classList.toggle('hidden', idx !== step - 1);
+        });
+        // dots
+        document.getElementById('cwStep1Dot').style.background = step >= 1 ? 'var(--primary)' : '';
+        document.getElementById('cwStep1Dot').classList.toggle('text-white', step >= 1);
+        document.getElementById('cwStep2Dot').style.background = step >= 2 ? 'var(--primary)' : 'rgb(241 245 249)';
+        document.getElementById('cwStep2Dot').classList.toggle('text-white', step >= 2);
+        document.getElementById('cwStep3Dot').style.background = step >= 3 ? 'var(--primary)' : 'rgb(241 245 249)';
+        document.getElementById('cwStep3Dot').classList.toggle('text-white', step >= 3);
+        // buttons
+        document.getElementById('cwPrev').disabled = step === 1;
+        document.getElementById('cwNext').classList.toggle('hidden', step === 3);
+        document.getElementById('cwCreate').classList.toggle('hidden', step !== 3);
+        // OTP focus
+        if (step === 2) {
+          const inputs = Array.from(document.querySelectorAll('.cw-otp'));
+          inputs.forEach((input, i) => {
+            input.value = '';
+            input.addEventListener('input', () => {
+              if (input.value && i < inputs.length - 1) inputs[i + 1].focus();
+            });
+          });
+          inputs[0].focus();
+          document.getElementById('cwEmailPreview').textContent = document.getElementById('cwEmail').value || 'your email';
+        }
+        if (step === 3) {
+          document.getElementById('cwSummaryName').textContent = document.getElementById('cwName').value || '-';
+          document.getElementById('cwSummaryType').textContent = document.getElementById('cwType').value || '-';
+        }
+      }
+      function cwNext() {
+        if (cwStep === 1) {
+          const name = document.getElementById('cwName').value.trim();
+          const email = document.getElementById('cwEmail').value.trim();
+          if (!name || !email) {
+            showToast('Please enter name and contact email', 'warning');
+            return;
+          }
+          setCwStep(2);
+          return;
+        }
+        if (cwStep === 2) setCwStep(3);
+      }
+      function cwPrev() {
+        if (cwStep > 1) setCwStep(cwStep - 1);
+      }
+      function finishWorkspace() {
+        const name = document.getElementById('cwName').value || 'Workspace';
+        const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        currentWorkspace = name;
+        // Sidebar item
+        const item = document.createElement('button');
+        item.className = 'w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm';
+        item.innerHTML = `<i data-lucide="building-2" class="w-5 h-5 text-slate-600"></i><span>${name}</span>`;
+        item.onclick = () => enterWorkspace(name);
+        document.getElementById('joinedWorkspacesSidebar').appendChild(item);
+        renderIcons();
+        // Update owner page
+        document.getElementById('workspaceOwnerName').textContent = name;
+        document.getElementById('workspaceAvatar').textContent = initials;
+        document.getElementById('workspaceRolePill').textContent = 'Owner';
+        document.getElementById('workspaceRolePill').className = 'text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+        document.getElementById('modeIndicator').textContent = `Workspace Mode — ${name}`;
+        toggleModal('modalCreateWorkspace', false);
+        setCwStep(1);
+        showToast('Workspace created', 'success');
+        showSection('workspaceOwner');
+      }
+
+      // Join workspace
+      function joinWorkspace(btn, name) {
+        btn.disabled = true;
+        btn.classList.add('opacity-60');
+        btn.textContent = 'Joined';
+        // Sidebar
+        const item = document.createElement('button');
+        item.className = 'w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[var(--primary-100)]/60 text-sm';
+        item.innerHTML = `<i data-lucide="building-2" class="w-5 h-5 text-slate-600"></i><span>${name}</span>`;
+        item.onclick = () => enterWorkspace(name);
+        document.getElementById('joinedWorkspacesSidebar').appendChild(item);
+        renderIcons();
+        // Navigate
+        enterWorkspace(name);
+        showToast(`Joined ${name}`, 'success');
+      }
+
+      // Enter workspace and project
+      function enterWorkspace(name) {
+        currentWorkspace = name || currentWorkspace;
+        const initials = currentWorkspace.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        document.getElementById('workspaceOwnerName').textContent = currentWorkspace;
+        document.getElementById('workspaceAvatar').textContent = initials;
+        document.getElementById('workspaceRolePill').textContent = 'Member';
+        document.getElementById('workspaceRolePill').className = 'text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200';
+        document.getElementById('modeIndicator').textContent = `Workspace Mode — ${currentWorkspace}`;
+        showSection('workspaceOwner');
+      }
+      function enterProject(name) {
+        currentProject = name || currentProject;
+        document.getElementById('projectTitle').textContent = currentProject;
+        document.getElementById('projectWorkspaceName').textContent = currentWorkspace;
+        document.getElementById('projectDue').textContent = 'Oct 25';
+        document.getElementById('projectStatus').textContent = 'Active';
+        document.getElementById('projectStatus').className = 'text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200';
+        showSection('project');
+      }
+      function createProjectFromWorkspace() {
+        enterProject('New Project');
+        showToast('Project draft created', 'success');
+      }
+
+      // Anchor scrolling within dashboard
+      function scrollToAnchor(id) {
+        showSection('dashboard');
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      }
+
+      // Checks
+      function toggleCheck(el) {
+        const icon = el.querySelector('i');
+        if (!icon) return;
+        const isOn = icon.classList.contains('opacity-100');
+        icon.classList.toggle('opacity-100', !isOn);
+        icon.classList.toggle('opacity-0', isOn);
+        el.classList.toggle('bg-emerald-50', !isOn);
+        el.classList.toggle('border-emerald-200', !isOn);
+      }
+
+      // Task drawer
+      function openTaskDrawer(title) {
+        document.getElementById('taskTitle').textContent = title || 'Task';
+        toggleTaskDrawer(true);
+      }
+      function toggleTaskDrawer(show) {
+        const d = document.getElementById('taskDrawer');
+        if (show) {
+          d.classList.remove('hidden');
+        } else {
+          d.classList.add('hidden');
+        }
+        renderIcons();
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        renderIcons();
+        showSection('login'); // Start on auth
+        setCwStep(1);
+      });
+    </script>
+  
+</body></html>
