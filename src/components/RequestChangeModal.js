@@ -42,7 +42,7 @@ const RequestChangeModal = () => {
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <h3 className="text-[18px] font-semibold tracking-tight">Request change</h3>
           <button 
-            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
             onClick={toggleModal}
           >
             <X className="w-5 h-5" />
@@ -102,7 +102,7 @@ const RequestChangeModal = () => {
               onChange={handleInputChange}
               className="peer sr-only" 
             />
-            <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-primary">
+            <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-yellow-500">
               <span className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
             </span>
             Notify stakeholders
@@ -116,7 +116,7 @@ const RequestChangeModal = () => {
             Cancel
           </button>
           <button 
-            className="px-3 py-2 rounded-lg text-white text-sm bg-primary"
+            className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
             onClick={handleSubmit}
           >
             Submit

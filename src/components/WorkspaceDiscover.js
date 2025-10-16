@@ -13,17 +13,21 @@ const WorkspaceDiscover = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: modalName });
   };
 
-  const joinWorkspace = (name) => {
-    const newWorkspace = {
-      name,
-      initials: name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
-      type: 'Member'
-    };
-    
-    dispatch({ type: 'ADD_WORKSPACE', payload: newWorkspace });
-    dispatch({ type: 'SET_WORKSPACE', payload: name });
-    dispatch({ type: 'SET_SECTION', payload: 'workspaceOwner' });
-    showToast(`Joined ${name}`, 'success');
+  const joinWorkspace = (name, isPublic) => {
+    if (isPublic) {
+      const newWorkspace = {
+        name,
+        initials: name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+        type: 'Member'
+      };
+      dispatch({ type: 'ADD_WORKSPACE', payload: newWorkspace });
+      dispatch({ type: 'SET_WORKSPACE', payload: name });
+      dispatch({ type: 'SET_SECTION', payload: 'workspaceMember' });
+      showToast(`Joined ${name}`, 'success');
+    } else {
+      dispatch({ type: 'ADD_PENDING_REQUEST', payload: { name, requestedAt: new Date().toISOString() } });
+      showToast('Join request sent. Awaiting approval.', 'info');
+    }
   };
 
   const allWorkspaces = [
@@ -33,7 +37,7 @@ const WorkspaceDiscover = () => {
       members: 32,
       type: 'Public',
       description: 'Design & development studio. We build web experiences.',
-      color: 'bg-primary',
+      color: 'bg-yellow-500',
       avatars: [
         'https://images.unsplash.com/photo-1621619856624-42fd193a0661?w=1080&q=80',
         'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=100&auto=format&fit=crop'
@@ -118,7 +122,7 @@ const WorkspaceDiscover = () => {
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               <input 
                 type="text" 
-                className="w-72 rounded-lg border border-border bg-white pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                className="w-72 rounded-lg border border-border bg-white pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                 placeholder="Search workspace..."
                 value={query}
                 onChange={(e)=>{ setQuery(e.target.value); setPage(1); }}
@@ -132,7 +136,7 @@ const WorkspaceDiscover = () => {
         {['All','Public','Private'].map(f => (
           <button 
             key={f}
-            className={`px-3 py-1.5 rounded-full border text-sm ${typeFilter===f?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`}
+            className={`px-3 py-1.5 rounded-full border text-sm ${typeFilter===f?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`}
             onClick={()=>setFilter(f)}
           >
             {f}
@@ -177,10 +181,10 @@ const WorkspaceDiscover = () => {
               <button 
                 className={`px-3 py-1.5 rounded-lg text-sm ${
                   workspace.type === 'Public' 
-                    ? 'text-white bg-primary' 
+                    ? 'text-white bg-yellow-500' 
                     : 'border border-border hover:bg-slate-50'
                 }`}
-                onClick={() => joinWorkspace(workspace.name)}
+                onClick={() => joinWorkspace(workspace.name, workspace.type === 'Public')}
               >
                 {workspace.type === 'Public' ? 'Join' : 'Request access'}
               </button>
@@ -194,7 +198,7 @@ const WorkspaceDiscover = () => {
         <div className="flex items-center gap-1">
           <button className="px-3 py-1.5 rounded-md border border-border hover:bg-slate-50 text-sm" disabled={page===1} onClick={()=>setPage(p=>Math.max(1,p-1))}>Previous</button>
           <span className="text-xs text-slate-500 px-2">{page}/{totalPages}</span>
-          <button className="px-3 py-1.5 rounded-md text-white text-sm bg-primary disabled:opacity-50" disabled={page===totalPages} onClick={()=>setPage(p=>Math.min(totalPages,p+1))}>Next</button>
+          <button className="px-3 py-1.5 rounded-md text-white text-sm bg-yellow-500 disabled:opacity-50" disabled={page===totalPages} onClick={()=>setPage(p=>Math.min(totalPages,p+1))}>Next</button>
         </div>
       </div>
     </div>
