@@ -25,13 +25,7 @@ const Sidebar = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: modalName });
   };
 
-  const scrollToAnchor = (id) => {
-    dispatch({ type: 'SET_SECTION', payload: 'dashboard' });
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  };
+  const go = (section) => dispatch({ type: 'SET_SECTION', payload: section });
 
   const enterWorkspace = (name) => {
     dispatch({ type: 'SET_WORKSPACE', payload: name });
@@ -60,35 +54,35 @@ const Sidebar = () => {
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('projectsList')}
+          onClick={() => go('projects')}
         >
           <Kanban className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Projects</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('planner')}
+          onClick={() => go('planner')}
         >
           <Calendar className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Planner</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('tracker')}
+          onClick={() => go('tracker')}
         >
           <Target className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Tracker</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('reminders')}
+          onClick={() => go('reminders')}
         >
           <Bell className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Reminders</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('calendar')}
+          onClick={() => go('reminders')}
         >
           <CalendarDays className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Calendar</span>

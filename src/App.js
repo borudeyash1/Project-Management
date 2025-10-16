@@ -7,6 +7,10 @@ import Dashboard from './components/Dashboard';
 import WorkspaceDiscover from './components/WorkspaceDiscover';
 import WorkspaceOwner from './components/WorkspaceOwner';
 import Project from './components/Project';
+import ProjectsListSection from './components/ProjectsListSection';
+import PlannerSection from './components/PlannerSection';
+import RemindersCalendarSection from './components/RemindersCalendarSection';
+import TrackerSection from './components/TrackerSection';
 import CreateWorkspaceModal from './components/CreateWorkspaceModal';
 import PricingModal from './components/PricingModal';
 import TaskDrawer from './components/TaskDrawer';
@@ -31,6 +35,10 @@ function AppContent() {
             <Sidebar />
             <main className="flex-1">
               {state.currentSection === 'dashboard' && <Dashboard />}
+              {state.currentSection === 'projects' && <ProjectsListSection />}
+              {state.currentSection === 'planner' && <PlannerSection />}
+              {state.currentSection === 'tracker' && <TrackerSection />}
+              {state.currentSection === 'reminders' && <RemindersCalendarSection />}
               {state.currentSection === 'workspace' && <WorkspaceDiscover />}
               {state.currentSection === 'workspaceOwner' && <WorkspaceOwner />}
               {state.currentSection === 'project' && <Project />}
