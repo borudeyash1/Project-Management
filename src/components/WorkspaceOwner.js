@@ -45,6 +45,21 @@ const WorkspaceOwner = () => {
 
   const isOwner = getWorkspaceRole() === 'Owner';
 
+  // Derived workspace stats (prototype-calculated from global state)
+  const totalProjects = state.projects.length;
+  const activeProjects = state.projects.filter(p => p.status === 'Active').length;
+  const completedProjects = state.projects.filter(p => p.status === 'Completed').length;
+  const totalTasks = state.tasks.length;
+  const inProgressTasks = state.tasks.filter(t => t.status === 'In Progress').length;
+  const backlogTasks = state.tasks.filter(t => t.status === 'Backlog').length;
+
+  // Mock monthly series for charts (kept static to preserve visual styling)
+  const monthlyRevenue = [22, 28, 31, 26, 35, 38, 42, 47, 44, 49, 53, 57];
+  const monthlyBurn = [12, 14, 15, 16, 17, 17, 18, 18, 17, 19, 20, 21];
+
+  const maxRev = Math.max(...monthlyRevenue) || 1;
+  const maxBurn = Math.max(...monthlyBurn) || 1;
+
   return (
     <div className="p-4 sm:p-6 space-y-4">
       <div className="bg-white border border-border rounded-xl p-4 sm:p-5">
@@ -201,6 +216,48 @@ const WorkspaceOwner = () => {
                   <div className="text-xs text-slate-500">Oct 30</div>
                 </div>
                 <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">Internal</span>
+              </div>
+            </div>
+          </div>
+          {/* Simple inline charts - keep styling consistent with placeholders */}
+          <div className="xl:col-span-8 bg-white border border-border rounded-xl p-5">
+            <h3 className="text-[18px] tracking-tight font-semibold">Performance</h3>
+            <div className="grid md:grid-cols-2 gap-3 mt-4">
+              {/* Revenue sparkline */}
+              <div className="rounded-lg border border-border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium">Revenue trend</div>
+                  <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">MTD ${monthlyRevenue[monthlyRevenue.length - 1]}k</span>
+                </div>
+                <div className="mt-3 h-20 flex items-end gap-1">
+                  {monthlyRevenue.map((v, i) => (
+                    <div key={i} className="flex-1 bg-primary-100 rounded-sm" style={{ height: `${(v / maxRev) * 100}%` }} />
+                  ))}
+                </div>
+              </div>
+              {/* Burn sparkline */}
+              <div className="rounded-lg border border-border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium">Burn rate</div>
+                  <span className="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-200">MoM +4%</span>
+                </div>
+                <div className="mt-3 h-20 flex items-end gap-1">
+                  {monthlyBurn.map((v, i) => (
+                    <div key={i} className="flex-1 bg-orange-200 rounded-sm" style={{ height: `${(v / maxBurn) * 100}%` }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+              <div className="rounded-lg border border-border p-4">
+                <div className="text-xs text-slate-500">Projects</div>
+                <div className="text-xl font-semibold tracking-tight mt-1">{totalProjects}</div>
+                <div className="text-[11px] text-slate-500 mt-1">{activeProjects} active • {completedProjects} done</div>
+              </div>
+              <div className="rounded-lg border border-border p-4">
+                <div className="text-xs text-slate-500">Tasks</div>
+                <div className="text-xl font-semibold tracking-tight mt-1">{totalTasks}</div>
+                <div className="text-[11px] text-slate-500 mt-1">{inProgressTasks} in progress • {backlogTasks} backlog</div>
               </div>
             </div>
           </div>

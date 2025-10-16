@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Plus, Search, MoreHorizontal } from 'lucide-react';
 
@@ -26,7 +26,7 @@ const WorkspaceDiscover = () => {
     showToast(`Joined ${name}`, 'success');
   };
 
-  const workspaces = [
+  const allWorkspaces = [
     {
       name: 'NovaTech',
       initials: 'NT',
@@ -77,6 +77,27 @@ const WorkspaceDiscover = () => {
     }
   ];
 
+  // Local UI state: search, type filter, pagination (prototype)
+  const [query, setQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+
+  const filtered = useMemo(() => {
+    let list = allWorkspaces;
+    if (typeFilter !== 'All') list = list.filter(w => w.type === typeFilter);
+    if (query.trim()) {
+      const q = query.trim().toLowerCase();
+      list = list.filter(w => w.name.toLowerCase().includes(q) || w.description.toLowerCase().includes(q));
+    }
+    return list;
+  }, [allWorkspaces, query, typeFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const current = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  const setFilter = (val) => { setTypeFilter(val); setPage(1); };
+
   return (
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -99,6 +120,8 @@ const WorkspaceDiscover = () => {
                 type="text" 
                 className="w-72 rounded-lg border border-border bg-white pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
                 placeholder="Search workspace..."
+                value={query}
+                onChange={(e)=>{ setQuery(e.target.value); setPage(1); }}
               />
             </div>
           </div>
@@ -106,15 +129,21 @@ const WorkspaceDiscover = () => {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <button className="px-3 py-1.5 rounded-full border border-border bg-primary-100 text-sm">All</button>
-        <button className="px-3 py-1.5 rounded-full border border-border hover:bg-slate-50 text-sm">Public</button>
-        <button className="px-3 py-1.5 rounded-full border border-border hover:bg-slate-50 text-sm">Private</button>
+        {['All','Public','Private'].map(f => (
+          <button 
+            key={f}
+            className={`px-3 py-1.5 rounded-full border text-sm ${typeFilter===f?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`}
+            onClick={()=>setFilter(f)}
+          >
+            {f}
+          </button>
+        ))}
         <button className="px-3 py-1.5 rounded-full border border-border hover:bg-slate-50 text-sm">Region: US</button>
         <button className="px-3 py-1.5 rounded-full border border-border hover:bg-slate-50 text-sm">Industry: Tech</button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        {workspaces.map((workspace, index) => (
+        {current.map((workspace, index) => (
           <div key={index} className="bg-white border border-border rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -161,10 +190,11 @@ const WorkspaceDiscover = () => {
       </div>
 
       <div className="flex items-center justify-between mt-4">
-        <div className="text-xs text-slate-500">Showing 4 results</div>
+        <div className="text-xs text-slate-500">Showing {current.length} of {filtered.length}</div>
         <div className="flex items-center gap-1">
-          <button className="px-3 py-1.5 rounded-md border border-border hover:bg-slate-50 text-sm">Previous</button>
-          <button className="px-3 py-1.5 rounded-md text-white text-sm bg-primary">Next</button>
+          <button className="px-3 py-1.5 rounded-md border border-border hover:bg-slate-50 text-sm" disabled={page===1} onClick={()=>setPage(p=>Math.max(1,p-1))}>Previous</button>
+          <span className="text-xs text-slate-500 px-2">{page}/{totalPages}</span>
+          <button className="px-3 py-1.5 rounded-md text-white text-sm bg-primary disabled:opacity-50" disabled={page===totalPages} onClick={()=>setPage(p=>Math.min(totalPages,p+1))}>Next</button>
         </div>
       </div>
     </div>
