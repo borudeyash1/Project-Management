@@ -40,7 +40,7 @@ const Header = () => {
       <div className="h-14 flex items-center justify-between px-3 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3">
           <button 
-            className="h-8 w-8 rounded-md flex items-center justify-center text-white font-semibold tracking-tight shadow-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 bg-primary"
+            className="h-8 w-8 rounded-md flex items-center justify-center text-white font-semibold tracking-tight shadow-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 bg-yellow-500"
             onClick={() => dispatch({ type: 'SET_SECTION', payload: 'dashboard' })}
           >
             PX
@@ -56,27 +56,42 @@ const Header = () => {
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               <input 
                 type="text" 
-                className="w-full rounded-lg border border-border bg-primary-100/50 pl-9 pr-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                className="w-full rounded-lg border border-border bg-yellow-100/50 pl-9 pr-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                 placeholder="Search projects, tasks, people..."
               />
             </div>
+            <select 
+              className="rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+              value={state.mode || 'Personal'}
+              onChange={(e)=>{
+                const val = e.target.value; 
+                dispatch({ type: 'SET_MODE', payload: val });
+                if (val === 'Personal') dispatch({ type: 'SET_SECTION', payload: 'dashboard' });
+                else { dispatch({ type: 'SET_WORKSPACE', payload: val }); dispatch({ type: 'SET_SECTION', payload: 'workspaceOwner' }); }
+              }}
+            >
+              <option value="Personal">Personal mode</option>
+              {state.workspaces.map(w => (
+                <option key={w.name} value={w.name}>{w.name}</option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">
           <button 
-            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm bg-primary"
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm bg-yellow-500"
             onClick={() => setShowQuickAdd(!showQuickAdd)}
           >
             <Plus className="w-4 h-4" />
             Quick add
           </button>
           <button 
-            className="relative p-2 rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="relative p-2 rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
             onClick={() => showToast('No new notifications', 'info')}
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary"></span>
+            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-yellow-500"></span>
           </button>
           <div className="relative" ref={userMenuRef}>
             <button 

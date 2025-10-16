@@ -86,7 +86,7 @@ const Project = () => {
               Share
             </button>
             <button 
-              className="px-3 py-2 rounded-lg text-white text-sm bg-primary"
+              className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
               onClick={() => showToast('Changes saved', 'success')}
             >
               <Save className="w-4 h-4 mr-1 inline-block" />
@@ -96,7 +96,7 @@ const Project = () => {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button className="px-3 py-1.5 rounded-md bg-primary-100 text-sm">List</button>
+          <button className="px-3 py-1.5 rounded-md bg-yellow-100 text-sm">List</button>
           <button 
             className="px-3 py-1.5 rounded-md inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900"
             onClick={() => toggleModal('pricing')}
@@ -140,7 +140,7 @@ const Project = () => {
                 <Search className="w-4 h-4 absolute left-2 top-2.5 text-slate-400" />
                 <input 
                   type="text" 
-                  className="w-56 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                  className="w-56 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                   placeholder="Search tasks..."
                 />
               </div>
@@ -227,7 +227,7 @@ const Project = () => {
             <h3 className="text-[18px] tracking-tight font-semibold">Progress</h3>
             <div className="mt-3">
               <div className="h-2 w-full bg-slate-100 rounded-full">
-                <div className="h-2 rounded-full bg-primary" style={{width: '58%'}}></div>
+                <div className="h-2 rounded-full bg-yellow-500" style={{width: '58%'}}></div>
               </div>
               <div className="flex justify-between text-xs text-slate-500 mt-2">
                 <span>58% done</span>

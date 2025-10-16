@@ -92,11 +92,11 @@ const CreateWorkspaceModal = () => {
       <div className="relative w-full max-w-2xl bg-white rounded-xl border border-border shadow-xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-md bg-primary-100"></div>
+            <div className="h-8 w-8 rounded-md bg-yellow-100"></div>
             <h2 className="text-[22px] tracking-tight font-semibold">Create Workspace</h2>
           </div>
           <button 
-            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
             onClick={toggleModal}
           >
             <X className="w-5 h-5" />
@@ -109,7 +109,7 @@ const CreateWorkspaceModal = () => {
             <div className="flex items-center gap-2">
               <div 
                 className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${
-                  state.cwStep >= 1 ? 'text-white bg-primary' : 'text-slate-600 bg-slate-100'
+                  state.cwStep >= 1 ? 'text-white bg-yellow-500' : 'text-slate-600 bg-slate-100'
                 }`}
               >
                 1
@@ -120,7 +120,7 @@ const CreateWorkspaceModal = () => {
             <div className="flex items-center gap-2">
               <div 
                 className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${
-                  state.cwStep >= 2 ? 'text-white bg-primary' : 'text-slate-600 bg-slate-100'
+                  state.cwStep >= 2 ? 'text-white bg-yellow-500' : 'text-slate-600 bg-slate-100'
                 }`}
               >
                 2
@@ -131,7 +131,7 @@ const CreateWorkspaceModal = () => {
             <div className="flex items-center gap-2">
               <div 
                 className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${
-                  state.cwStep >= 3 ? 'text-white bg-primary' : 'text-slate-600 bg-slate-100'
+                  state.cwStep >= 3 ? 'text-white bg-yellow-500' : 'text-slate-600 bg-slate-100'
                 }`}
               >
                 3
@@ -152,7 +152,7 @@ const CreateWorkspaceModal = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                   placeholder="e.g., NovaTech Studio"
                 />
               </div>
@@ -162,7 +162,7 @@ const CreateWorkspaceModal = () => {
                   name="type"
                   value={formData.type}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                 >
                   <option>Company</option>
                   <option>Agency</option>
@@ -178,7 +178,7 @@ const CreateWorkspaceModal = () => {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="3"
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                   placeholder="Summary of goals, scope, and purpose"
                 />
               </div>
@@ -189,7 +189,7 @@ const CreateWorkspaceModal = () => {
                   name="organization"
                   value={formData.organization}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                   placeholder="Organization name"
                 />
               </div>
@@ -200,7 +200,7 @@ const CreateWorkspaceModal = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                   placeholder="name@company.com"
                 />
               </div>
@@ -223,7 +223,7 @@ const CreateWorkspaceModal = () => {
                   multiple
                   value={formData.regions}
                   onChange={handleRegionChange}
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                 >
                   <option>Global</option>
                   <option>United States</option>
@@ -247,7 +247,7 @@ const CreateWorkspaceModal = () => {
                   <input
                     key={i}
                     maxLength="1"
-                    className="w-full aspect-square text-center rounded-lg border border-border text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="w-full aspect-square text-center rounded-lg border border-border text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                   />
                 ))}
               </div>
@@ -260,7 +260,7 @@ const CreateWorkspaceModal = () => {
                 </button>
                 <label className="inline-flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
                   <input type="checkbox" className="peer sr-only" />
-                  <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-primary">
+                  <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-yellow-500">
                     <span className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
                   </span>
                   Trust this device
@@ -320,14 +320,14 @@ const CreateWorkspaceModal = () => {
             </button>
             {state.cwStep < 3 ? (
               <button 
-                className="px-4 py-2 rounded-lg text-white text-sm shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 bg-primary"
+                className="px-4 py-2 rounded-lg text-white text-sm shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 bg-yellow-500"
                 onClick={cwNext}
               >
                 Continue
               </button>
             ) : (
               <button 
-                className="px-4 py-2 rounded-lg text-white text-sm shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 bg-primary"
+                className="px-4 py-2 rounded-lg text-white text-sm shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 bg-yellow-500"
                 onClick={finishWorkspace}
               >
                 Create Workspace

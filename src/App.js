@@ -39,8 +39,9 @@ function AppContent() {
               {state.currentSection === 'planner' && <PlannerSection />}
               {state.currentSection === 'tracker' && <TrackerSection />}
               {state.currentSection === 'reminders' && <RemindersCalendarSection />}
-              {state.currentSection === 'workspace' && <WorkspaceDiscover />}
-              {state.currentSection === 'workspaceOwner' && <WorkspaceOwner />}
+                  {state.currentSection === 'workspace' && <WorkspaceDiscover />}
+                  {state.currentSection === 'workspaceOwner' && <WorkspaceOwner />}
+                  {state.currentSection === 'workspaceMember' && <WorkspaceOwner />}
               {state.currentSection === 'project' && <Project />}
             </main>
           </div>
