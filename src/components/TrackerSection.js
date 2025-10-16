@@ -47,7 +47,7 @@ const TrackerSection = () => {
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-slate-500" />
             {['Today','This Week','This Month'].map(w => (
-              <button key={w} className={`px-3 py-1.5 rounded-md border text-sm ${window===w?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`} onClick={()=>setWindow(w)}>{w}</button>
+              <button key={w} className={`px-3 py-1.5 rounded-md border text-sm ${window===w?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`} onClick={()=>setWindow(w)}>{w}</button>
             ))}
           </div>
         </div>
@@ -86,7 +86,7 @@ const TrackerSection = () => {
           <div className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-slate-500" />
             {['All','To Do','In Progress','Done','Backlog'].map(s => (
-              <button key={s} className={`px-3 py-1.5 rounded-md border text-sm ${status===s?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`} onClick={()=>setStatus(s)}>{s}</button>
+              <button key={s} className={`px-3 py-1.5 rounded-md border text-sm ${status===s?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`} onClick={()=>setStatus(s)}>{s}</button>
             ))}
           </div>
         </div>
@@ -120,17 +120,45 @@ const TrackerSection = () => {
         </div>
       </div>
 
-      {/* Trend mini chart (static bars for prototype) */}
+      {/* Velocity chart (weekly bars with average) */}
       <div className="bg-white border border-border rounded-xl p-5">
         <div className="flex items-center justify-between">
           <div className="text-sm font-medium inline-flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Velocity</div>
-          <div className="text-xs text-slate-500">Story points / week (demo)</div>
+          <div className="text-xs text-slate-500">Story points per week (demo)</div>
         </div>
-        <div className="mt-3 h-24 flex items-end gap-1">
-          {[3,5,4,7,6,8,9].map((v,i)=> (
-            <div key={i} className={`flex-1 rounded-sm ${i%2? 'bg-sky-300':'bg-emerald-300'}`} style={{height:`${v*10}%`}} />
-          ))}
-        </div>
+        {(() => {
+          const weeks = [
+            { label: 'W-7', points: 12 },
+            { label: 'W-6', points: 18 },
+            { label: 'W-5', points: 15 },
+            { label: 'W-4', points: 22 },
+            { label: 'W-3', points: 19 },
+            { label: 'W-2', points: 25 },
+            { label: 'W-1', points: 28 },
+            { label: 'Now', points: 24 },
+          ];
+          const max = Math.max(...weeks.map(w => w.points)) || 1;
+          const avg = Math.round(weeks.reduce((s,w)=>s+w.points,0)/weeks.length);
+          return (
+            <div className="mt-4">
+              <div className="relative h-40 border border-border rounded-lg p-3">
+                {/* average line */}
+                <div className="absolute left-3 right-3" style={{bottom: `${(avg/max)*100}%`}}>
+                  <div className="h-[2px] bg-slate-300/80"></div>
+                  <div className="text-[10px] text-slate-500 mt-1">Avg {avg} pts</div>
+                </div>
+                <div className="h-full flex items-end gap-3">
+                  {weeks.map((w,i)=> (
+                    <div key={i} className="flex-1 flex flex-col items-center justify-end">
+                      <div className={`w-full rounded-sm ${i%2? 'bg-sky-400':'bg-emerald-500'}`} style={{height:`${(w.points/max)*100}%`}} title={`${w.label}: ${w.points} pts`}></div>
+                      <div className="text-[10px] text-slate-500 mt-1">{w.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

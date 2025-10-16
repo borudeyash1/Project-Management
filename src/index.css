@@ -12,7 +12,7 @@
 
 @layer utilities {
   .selection-bg-primary {
-    @apply selection:bg-primary/10;
+    @apply selection:bg-yellow-200;
   }
 }
 

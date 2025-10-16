@@ -37,7 +37,7 @@ const ProjectsListSection = () => {
                 <Search className="w-4 h-4 absolute left-2 top-2.5 text-slate-400" />
                 <input 
                   type="text" 
-                  className="w-48 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                  className="w-48 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                   placeholder="Search projects..."
                 />
               </div>
@@ -51,7 +51,7 @@ const ProjectsListSection = () => {
               </button>
             </div>
             <button 
-              className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-primary"
+              className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
               onClick={() => showToast('New project', 'info')}
             >
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />

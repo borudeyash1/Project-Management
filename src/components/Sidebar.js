@@ -54,7 +54,10 @@ const Sidebar = () => {
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => go('projects')}
+          onClick={() => {
+            showToast('Projects is a Pro feature. Please upgrade to continue.', 'warning');
+            toggleModal('pricing');
+          }}
         >
           <Kanban className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Projects</span>

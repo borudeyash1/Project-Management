@@ -65,7 +65,7 @@ const WorkspaceOwner = () => {
       <div className="bg-white border border-border rounded-xl p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight bg-primary">
+            <div className="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
               {getWorkspaceInitials()}
             </div>
             <div>
@@ -91,7 +91,7 @@ const WorkspaceOwner = () => {
               Invite
             </button>
             <button 
-              className="px-3 py-2 rounded-lg text-white text-sm bg-primary"
+              className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
               onClick={createProjectFromWorkspace}
             >
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />
@@ -105,7 +105,7 @@ const WorkspaceOwner = () => {
             <button 
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === 'wsOverview' 
-                  ? 'bg-primary-100' 
+                  ? 'bg-yellow-100' 
                   : 'hover:bg-slate-50 border border-border'
               }`}
               onClick={() => setActiveTab('wsOverview')}
@@ -115,7 +115,7 @@ const WorkspaceOwner = () => {
             <button 
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === 'wsMembers' 
-                  ? 'bg-primary-100' 
+                  ? 'bg-yellow-100' 
                   : 'hover:bg-slate-50 border border-border'
               }`}
               onClick={() => setActiveTab('wsMembers')}
@@ -125,7 +125,7 @@ const WorkspaceOwner = () => {
             <button 
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === 'wsProjects' 
-                  ? 'bg-primary-100' 
+                  ? 'bg-yellow-100' 
                   : 'hover:bg-slate-50 border border-border'
               }`}
               onClick={() => setActiveTab('wsProjects')}
@@ -135,7 +135,7 @@ const WorkspaceOwner = () => {
             <button 
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === 'wsRequests' 
-                  ? 'bg-primary-100' 
+                  ? 'bg-yellow-100' 
                   : 'hover:bg-slate-50 border border-border'
               }`}
               onClick={() => setActiveTab('wsRequests')}
@@ -145,7 +145,7 @@ const WorkspaceOwner = () => {
             <button 
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === 'wsSettings' 
-                  ? 'bg-primary-100' 
+                  ? 'bg-yellow-100' 
                   : 'hover:bg-slate-50 border border-border'
               }`}
               onClick={() => setActiveTab('wsSettings')}
@@ -166,7 +166,7 @@ const WorkspaceOwner = () => {
                 <div className="text-xs text-slate-500">Active projects</div>
                 <div className="text-xl font-semibold tracking-tight mt-1">7</div>
                 <div className="h-2 w-full bg-slate-100 rounded-full mt-2">
-                  <div className="h-2 rounded-full bg-primary" style={{width: '60%'}}></div>
+                  <div className="h-2 rounded-full bg-yellow-500" style={{width: '60%'}}></div>
                 </div>
               </div>
               <div className="rounded-lg border border-border p-4">
@@ -231,7 +231,7 @@ const WorkspaceOwner = () => {
                 </div>
                 <div className="mt-3 h-20 flex items-end gap-1">
                   {monthlyRevenue.map((v, i) => (
-                    <div key={i} className="flex-1 bg-primary-100 rounded-sm" style={{ height: `${(v / maxRev) * 100}%` }} />
+                    <div key={i} className="flex-1 bg-yellow-100 rounded-sm" style={{ height: `${(v / maxRev) * 100}%` }} />
                   ))}
                 </div>
               </div>
@@ -335,7 +335,7 @@ const WorkspaceOwner = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-[18px] tracking-tight font-semibold">Projects</h3>
             <button 
-              className="px-3 py-2 rounded-lg text-white text-sm bg-primary"
+              className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
               onClick={createProjectFromWorkspace}
             >
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />
@@ -422,7 +422,7 @@ const WorkspaceOwner = () => {
                     Decline
                   </button>
                   <button 
-                    className="px-3 py-1.5 rounded-lg text-white text-sm bg-primary"
+                    className="px-3 py-1.5 rounded-lg text-white text-sm bg-yellow-500"
                     onClick={() => showToast('Approved', 'success')}
                   >
                     Approve
@@ -448,7 +448,7 @@ const WorkspaceOwner = () => {
                     Reschedule
                   </button>
                   <button 
-                    className="px-3 py-1.5 rounded-lg text-white text-sm bg-primary"
+                    className="px-3 py-1.5 rounded-lg text-white text-sm bg-yellow-500"
                     onClick={() => showToast('Approved', 'success')}
                   >
                     Approve
@@ -501,14 +501,14 @@ const WorkspaceOwner = () => {
               <label className="text-sm font-medium block mb-1">Workspace name</label>
               <input 
                 type="text" 
-                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                 placeholder="Workspace name"
                 defaultValue={state.currentWorkspace}
               />
             </div>
             <div>
               <label className="text-sm font-medium block mb-1">Default visibility</label>
-              <select className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+              <select className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500">
                 <option>Private</option>
                 <option>Public</option>
               </select>
@@ -517,7 +517,7 @@ const WorkspaceOwner = () => {
               <label className="text-sm font-medium block mb-1">About</label>
               <textarea 
                 rows="3" 
-                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                 placeholder="Workspace description"
               />
             </div>
@@ -530,7 +530,7 @@ const WorkspaceOwner = () => {
               Discard
             </button>
             <button 
-              className="px-3 py-2 rounded-lg text-white text-sm bg-primary"
+              className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
               onClick={() => showToast('Saved', 'success')}
             >
               Save

@@ -189,9 +189,9 @@ const PlannerSection = () => {
               <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm inline-flex items-center gap-1">
                 <RefreshCw className="w-4 h-4" /> Sync
               </button>
-              <button className={`px-3 py-2 rounded-lg border border-border text-sm ${viewMode==='daily'?'bg-primary-100':''}`} onClick={() => setViewMode('daily')}>Daily</button>
-              <button className={`px-3 py-2 rounded-lg border border-border text-sm ${viewMode==='weekly'?'bg-primary-100':''}`} onClick={() => setViewMode('weekly')}>Weekly</button>
-              <button className={`px-3 py-2 rounded-lg border border-border text-sm ${viewMode==='monthly'?'bg-primary-100':''}`} onClick={() => setViewMode('monthly')}>Monthly</button>
+              <button className={`px-3 py-2 rounded-lg border border-border text-sm ${viewMode==='daily'?'bg-yellow-100':''}`} onClick={() => setViewMode('daily')}>Daily</button>
+              <button className={`px-3 py-2 rounded-lg border border-border text-sm ${viewMode==='weekly'?'bg-yellow-100':''}`} onClick={() => setViewMode('weekly')}>Weekly</button>
+              <button className={`px-3 py-2 rounded-lg border border-border text-sm ${viewMode==='monthly'?'bg-yellow-100':''}`} onClick={() => setViewMode('monthly')}>Monthly</button>
             </div>
           </div>
           {/* Mini calendar widget (static grid for prototype) */}
@@ -200,7 +200,7 @@ const PlannerSection = () => {
               <div key={d} className="text-xs text-slate-500">{d}</div>
             ))}
             {Array.from({length: 28}).map((_,i) => (
-              <button key={i} className={`h-10 rounded-lg border text-xs ${i===12?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`}>{i+1}</button>
+              <button key={i} className={`h-10 rounded-lg border text-xs ${i===12?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`}>{i+1}</button>
             ))}
           </div>
         </div>
@@ -320,7 +320,7 @@ const PlannerSection = () => {
             <div className="text-xs text-slate-500 mb-2">By Priority</div>
             <div className="flex flex-wrap gap-2">
               {['All','High','Medium','Low'].map((p)=> (
-                <button key={p} className={`px-2.5 py-1.5 rounded-full border text-xs ${filterPriority===p?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`} onClick={()=>setFilterPriority(p)}>{p}</button>
+                <button key={p} className={`px-2.5 py-1.5 rounded-full border text-xs ${filterPriority===p?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`} onClick={()=>setFilterPriority(p)}>{p}</button>
               ))}
             </div>
           </div>
@@ -336,7 +336,7 @@ const PlannerSection = () => {
             <div className="text-xs text-slate-500 mb-2">By Tag</div>
             <div className="flex flex-wrap gap-2">
               {['All','UI','Backend','QA','Docs'].map((t)=> (
-                <button key={t} className={`px-2.5 py-1.5 rounded-full border text-xs inline-flex items-center gap-1 ${filterTag===t?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`} onClick={()=>setFilterTag(t)}><Tag className="w-3.5 h-3.5" /> {t}</button>
+                <button key={t} className={`px-2.5 py-1.5 rounded-full border text-xs inline-flex items-center gap-1 ${filterTag===t?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`} onClick={()=>setFilterTag(t)}><Tag className="w-3.5 h-3.5" /> {t}</button>
               ))}
             </div>
           </div>
@@ -344,7 +344,7 @@ const PlannerSection = () => {
             <div className="text-xs text-slate-500 mb-2">By Status</div>
             <div className="flex flex-wrap gap-2">
               {['All','To Do','In Progress','Done'].map((s)=> (
-                <button key={s} className={`px-2.5 py-1.5 rounded-full border text-xs ${filterStatus===s?'bg-primary-100 border-primary':'border-border hover:bg-slate-50'}`} onClick={()=>setFilterStatus(s)}>{s}</button>
+                <button key={s} className={`px-2.5 py-1.5 rounded-full border text-xs ${filterStatus===s?'bg-yellow-100 border-yellow-400':'border-border hover:bg-slate-50'}`} onClick={()=>setFilterStatus(s)}>{s}</button>
               ))}
             </div>
           </div>
@@ -357,8 +357,8 @@ const PlannerSection = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-[18px] tracking-tight font-semibold">Focus & Productivity</h3>
             <div className="flex items-center gap-2">
-              <button className={`px-3 py-2 rounded-lg border border-border text-sm inline-flex items-center gap-1 ${focusMode?'bg-primary-100':''}`} onClick={()=>setFocusMode(!focusMode)}><Focus className="w-4 h-4" /> Focus Mode</button>
-              <button className={`px-3 py-2 rounded-lg border border-border text-sm inline-flex items-center gap-1 ${pomodoroRunning?'bg-primary-100':''}`} onClick={()=>setPomodoroRunning(!pomodoroRunning)}><Timer className="w-4 h-4" /> Pomodoro</button>
+              <button className={`px-3 py-2 rounded-lg border border-border text-sm inline-flex items-center gap-1 ${focusMode?'bg-yellow-100':''}`} onClick={()=>setFocusMode(!focusMode)}><Focus className="w-4 h-4" /> Focus Mode</button>
+              <button className={`px-3 py-2 rounded-lg border border-border text-sm inline-flex items-center gap-1 ${pomodoroRunning?'bg-yellow-100':''}`} onClick={()=>setPomodoroRunning(!pomodoroRunning)}><Timer className="w-4 h-4" /> Pomodoro</button>
             </div>
           </div>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -378,7 +378,7 @@ const PlannerSection = () => {
               <div className="text-sm font-medium">Progress Tracker</div>
               <div className="mt-3">
                 <div className="h-2 w-full bg-slate-100 rounded-full">
-                  <div className="h-2 rounded-full bg-primary" style={{width:'58%'}}></div>
+                  <div className="h-2 rounded-full bg-yellow-500" style={{width:'58%'}}></div>
                 </div>
                 <div className="flex justify-between text-xs text-slate-500 mt-2">
                   <span>58% done</span>

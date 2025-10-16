@@ -23,6 +23,8 @@ const initialState = {
     collapsed: false
   },
   workspaces: [],
+  pendingWorkspaceRequests: [],
+  mode: 'Personal',
   projects: [
     {
       id: 1,
@@ -99,6 +101,8 @@ function appReducer(state, action) {
       return { ...state, currentWorkspace: action.payload };
     case 'SET_PROJECT':
       return { ...state, currentProject: action.payload };
+    case 'SET_MODE':
+      return { ...state, mode: action.payload };
     case 'SET_CW_STEP':
       return { ...state, cwStep: action.payload };
     case 'ADD_TOAST':
@@ -143,6 +147,8 @@ function appReducer(state, action) {
       };
     case 'ADD_WORKSPACE':
       return { ...state, workspaces: [...state.workspaces, action.payload] };
+    case 'ADD_PENDING_REQUEST':
+      return { ...state, pendingWorkspaceRequests: [...state.pendingWorkspaceRequests, action.payload] };
     default:
       return state;
   }
