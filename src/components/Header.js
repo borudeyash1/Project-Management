@@ -88,7 +88,7 @@ const Header = () => {
           </button>
           <button 
             className="relative p-2 rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
-            onClick={() => showToast('No new notifications', 'info')}
+            onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'notifications' })}
           >
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-yellow-500"></span>
@@ -110,14 +110,14 @@ const Header = () => {
               <div className="absolute right-0 mt-2 w-48 bg-white border border-border rounded-lg shadow-lg p-2">
                 <button 
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm"
-                  onClick={() => showToast('Profile', 'info')}
+                  onClick={() => dispatch({ type: 'SET_SECTION', payload: 'profile' })}
                 >
                   <User className="w-4 h-4" />
                   Profile
                 </button>
                 <button 
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm"
-                  onClick={() => showToast('Settings', 'info')}
+                  onClick={() => dispatch({ type: 'SET_SECTION', payload: 'settings' })}
                 >
                   <Settings className="w-4 h-4" />
                   Settings
@@ -143,21 +143,21 @@ const Header = () => {
         >
           <button 
             className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm"
-            onClick={() => showToast('New task', 'info')}
+            onClick={() => toggleModal('taskDetails')}
           >
             <div className="w-4 h-4">☑️</div>
             New Task
           </button>
           <button 
             className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm"
-            onClick={() => showToast('New project', 'info')}
+            onClick={() => toggleModal('createProject')}
           >
             <div className="w-4 h-4">📁</div>
             New Project
           </button>
           <button 
             className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50 text-sm"
-            onClick={() => showToast('New client', 'info')}
+            onClick={() => toggleModal('client')}
           >
             <div className="w-4 h-4">👤</div>
             New Client

@@ -25,9 +25,7 @@ const WorkspaceOwner = () => {
   };
 
   const createProjectFromWorkspace = () => {
-    dispatch({ type: 'SET_PROJECT', payload: 'New Project' });
-    dispatch({ type: 'SET_SECTION', payload: 'project' });
-    showToast('Project draft created', 'success');
+    dispatch({ type: 'TOGGLE_MODAL', payload: 'createProject' });
   };
 
   const enterProject = (name) => {
@@ -85,7 +83,7 @@ const WorkspaceOwner = () => {
           <div className="flex items-center gap-2">
             <button 
               className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm"
-              onClick={() => showToast('Invite sent', 'success')}
+              onClick={() => toggleModal('inviteEmployee')}
             >
               <UserPlus className="w-4 h-4 mr-1 inline-block" />
               Invite
@@ -144,6 +142,46 @@ const WorkspaceOwner = () => {
             </button>
             <button 
               className={`px-3 py-1.5 rounded-md text-sm ${
+                activeTab === 'wsClients' 
+                  ? 'bg-yellow-100' 
+                  : 'hover:bg-slate-50 border border-border'
+              }`}
+              onClick={() => setActiveTab('wsClients')}
+            >
+              Clients
+            </button>
+            <button 
+              className={`px-3 py-1.5 rounded-md text-sm ${
+                activeTab === 'wsEmployees' 
+                  ? 'bg-yellow-100' 
+                  : 'hover:bg-slate-50 border border-border'
+              }`}
+              onClick={() => setActiveTab('wsEmployees')}
+            >
+              Employees
+            </button>
+            <button 
+              className={`px-3 py-1.5 rounded-md text-sm ${
+                activeTab === 'wsRequests' 
+                  ? 'bg-yellow-100' 
+                  : 'hover:bg-slate-50 border border-border'
+              }`}
+              onClick={() => setActiveTab('wsRequests')}
+            >
+              Requests
+            </button>
+            <button 
+              className={`px-3 py-1.5 rounded-md text-sm ${
+                activeTab === 'wsAdvertise' 
+                  ? 'bg-yellow-100' 
+                  : 'hover:bg-slate-50 border border-border'
+              }`}
+              onClick={() => setActiveTab('wsAdvertise')}
+            >
+              Advertise
+            </button>
+            <button 
+              className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === 'wsSettings' 
                   ? 'bg-yellow-100' 
                   : 'hover:bg-slate-50 border border-border'
@@ -151,6 +189,16 @@ const WorkspaceOwner = () => {
               onClick={() => setActiveTab('wsSettings')}
             >
               Settings
+            </button>
+            <button 
+              className={`px-3 py-1.5 rounded-md text-sm ${
+                activeTab === 'wsCollaborate' 
+                  ? 'bg-yellow-100' 
+                  : 'hover:bg-slate-50 border border-border'
+              }`}
+              onClick={() => setActiveTab('wsCollaborate')}
+            >
+              Collaborate
             </button>
           </div>
         </div>
@@ -415,15 +463,15 @@ const WorkspaceOwner = () => {
                   <span className="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200">Deadline</span>
                 </div>
                 <div className="flex items-center gap-2 mt-3 justify-end">
-                  <button 
-                    className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm"
-                    onClick={() => showToast('Declined', 'error')}
-                  >
+                <button 
+                  className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm"
+                  onClick={() => {/* decline logic placeholder: remove or mark declined in real app */}}
+                >
                     Decline
                   </button>
                   <button 
                     className="px-3 py-1.5 rounded-lg text-white text-sm bg-yellow-500"
-                    onClick={() => showToast('Approved', 'success')}
+                    onClick={() => {/* approve logic placeholder */}}
                   >
                     Approve
                   </button>
@@ -441,15 +489,15 @@ const WorkspaceOwner = () => {
                   <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Workload</span>
                 </div>
                 <div className="flex items-center gap-2 mt-3 justify-end">
-                  <button 
-                    className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm"
-                    onClick={() => showToast('Rescheduled to next sprint', 'info')}
-                  >
+                <button 
+                  className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm"
+                  onClick={() => {/* reschedule logic placeholder */}}
+                >
                     Reschedule
                   </button>
                   <button 
                     className="px-3 py-1.5 rounded-lg text-white text-sm bg-yellow-500"
-                    onClick={() => showToast('Approved', 'success')}
+                    onClick={() => {/* approve logic placeholder */}}
                   >
                     Approve
                   </button>
@@ -492,6 +540,270 @@ const WorkspaceOwner = () => {
         </div>
       )}
 
+      {/* Clients Tab */}
+      {activeTab === 'wsClients' && (
+        <div className="bg-white border border-border rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[18px] tracking-tight font-semibold">Clients</h3>
+            <button 
+              className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
+              onClick={() => toggleModal('client')}
+            >
+              <UserPlus className="w-4 h-4 mr-1 inline-block" />
+              Add Client
+            </button>
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold bg-blue-500">
+                  NT
+                </div>
+                <div>
+                  <div className="font-medium">NovaTech</div>
+                  <div className="text-xs text-slate-500">3 active projects</div>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <button className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm flex-1" onClick={() => toggleModal('client')}>
+                  View Projects
+                </button>
+                <button className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm" onClick={() => toggleModal('client')}>
+                  Edit
+                </button>
+              </div>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold bg-emerald-500">
+                  AC
+                </div>
+                <div>
+                  <div className="font-medium">Alpha Corp</div>
+                  <div className="text-xs text-slate-500">1 active project</div>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <button className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm flex-1" onClick={() => toggleModal('client')}>
+                  View Projects
+                </button>
+                <button className="px-3 py-1.5 rounded-lg border border-border hover:bg-slate-50 text-sm" onClick={() => toggleModal('client')}>
+                  Edit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Employees Tab */}
+      {activeTab === 'wsEmployees' && (
+        <div className="bg-white border border-border rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[18px] tracking-tight font-semibold">Employees</h3>
+            <div className="flex items-center gap-2">
+            <button 
+              className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm"
+              onClick={() => toggleModal('inviteEmployee')}
+            >
+                <UserPlus className="w-4 h-4 mr-1 inline-block" />
+                Invite Employee
+              </button>
+              <button 
+                className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
+                onClick={() => showToast('Manual request dialog opened', 'info')}
+              >
+                Manual Request
+              </button>
+            </div>
+          </div>
+          <div className="mt-4 overflow-auto">
+            <table className="min-w-full text-sm">
+              <thead className="text-slate-600">
+                <tr className="border-b border-border">
+                  <th className="text-left font-medium py-2 pr-3">Name</th>
+                  <th className="text-left font-medium py-2 pr-3">Role</th>
+                  <th className="text-left font-medium py-2 pr-3">Email</th>
+                  <th className="text-left font-medium py-2 pr-3">Projects</th>
+                  <th className="text-right font-medium py-2 pl-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                <tr>
+                  <td className="py-3 pr-3">
+                    <div className="flex items-center gap-2">
+                      <img className="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Alex" />
+                      <div>
+                        <div className="font-medium">Alex Johnson</div>
+                        <div className="text-xs text-slate-500">@alex</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 pr-3">
+                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Owner</span>
+                  </td>
+                  <td className="py-3 pr-3">alex@proxima.app</td>
+                  <td className="py-3 pr-3">3 projects</td>
+                  <td className="py-3 pl-3 text-right">
+                    <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50">Manage</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-3">
+                    <div className="flex items-center gap-2">
+                      <img className="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=100&auto=format&fit=crop" alt="Priya" />
+                      <div>
+                        <div className="font-medium">Priya Patel</div>
+                        <div className="text-xs text-slate-500">@priya</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 pr-3">
+                    <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Project Manager</span>
+                  </td>
+                  <td className="py-3 pr-3">priya@proxima.app</td>
+                  <td className="py-3 pr-3">2 projects</td>
+                  <td className="py-3 pl-3 text-right">
+                    <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50">Manage</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-3">
+                    <div className="flex items-center gap-2">
+                      <img className="h-7 w-7 rounded-full" src="https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&w=100&auto=format&fit=crop" alt="Sam" />
+                      <div>
+                        <div className="font-medium">Sam Wilson</div>
+                        <div className="text-xs text-slate-500">@sam</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 pr-3">
+                    <span className="text-xs px-2 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200">Developer</span>
+                  </td>
+                  <td className="py-3 pr-3">sam@proxima.app</td>
+                  <td className="py-3 pr-3">1 project</td>
+                  <td className="py-3 pl-3 text-right">
+                    <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50">Manage</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Advertise Tab */}
+      {activeTab === 'wsAdvertise' && (
+        <div className="bg-white border border-border rounded-xl p-5">
+          <h3 className="text-[18px] tracking-tight font-semibold">Promote Your Workspace</h3>
+          <div className="mt-4 space-y-4">
+            <div className="rounded-lg border border-border p-4">
+              <h4 className="font-medium mb-2">Social Media Promotion</h4>
+              <p className="text-sm text-slate-600 mb-3">Share your workspace on social platforms to attract new members.</p>
+              <div className="flex items-center gap-2">
+                <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">
+                  Share on LinkedIn
+                </button>
+                <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">
+                  Share on Twitter
+                </button>
+                <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">
+                  Copy Link
+                </button>
+              </div>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <h4 className="font-medium mb-2">Workspace Visibility</h4>
+              <p className="text-sm text-slate-600 mb-3">Make your workspace discoverable in our public directory.</p>
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" className="rounded border-border" defaultChecked />
+                  <span className="text-sm">Show in public directory</span>
+                </label>
+              </div>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <h4 className="font-medium mb-2">Invite Codes</h4>
+              <p className="text-sm text-slate-600 mb-3">Generate invite codes for easy sharing.</p>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  className="flex-1 rounded-lg border border-border px-3 py-2 text-sm" 
+                  value="PROXIMA2024" 
+                  readOnly 
+                />
+                <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">
+                  Copy
+                </button>
+                <button className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500">
+                  Generate New
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Collaborate Tab */}
+      {activeTab === 'wsCollaborate' && (
+        <div className="bg-white border border-border rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[18px] tracking-tight font-semibold">Collaborators</h3>
+            <button 
+              className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
+              onClick={() => showToast('Add collaborator dialog opened', 'info')}
+            >
+              <UserPlus className="w-4 h-4 mr-1 inline-block" />
+              Add Collaborator
+            </button>
+          </div>
+          <div className="mt-4 space-y-3">
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=100&auto=format&fit=crop" alt="Priya" />
+                  <div>
+                    <div className="font-medium">Priya Patel</div>
+                    <div className="text-xs text-slate-500">priya@proxima.app</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select className="rounded-lg border border-border px-3 py-1 text-sm">
+                    <option>Full Access</option>
+                    <option>Limited Access</option>
+                    <option>Read Only</option>
+                  </select>
+                  <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50 text-sm">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&w=100&auto=format&fit=crop" alt="Sam" />
+                  <div>
+                    <div className="font-medium">Sam Wilson</div>
+                    <div className="text-xs text-slate-500">sam@proxima.app</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select className="rounded-lg border border-border px-3 py-1 text-sm">
+                    <option>Limited Access</option>
+                    <option>Full Access</option>
+                    <option>Read Only</option>
+                  </select>
+                  <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50 text-sm">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Settings Tab */}
       {activeTab === 'wsSettings' && (
         <div className="bg-white border border-border rounded-xl p-5">
@@ -512,6 +824,52 @@ const WorkspaceOwner = () => {
                 <option>Private</option>
                 <option>Public</option>
               </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">Region</label>
+              <select className="w-full rounded-lg border border-border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500">
+                <option>Global</option>
+                <option>North America</option>
+                <option>Europe</option>
+                <option>Asia Pacific</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">Calendar Sync</label>
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input type="checkbox" className="peer sr-only" defaultChecked />
+                <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-yellow-500">
+                  <span className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
+                </span>
+                Enable Google Calendar sync
+              </label>
+            </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">Theme Color</label>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-yellow-500 border-2 border-white shadow-sm"></div>
+                <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white shadow-sm"></div>
+                <div className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white shadow-sm"></div>
+                <div className="w-6 h-6 rounded-full bg-purple-500 border-2 border-white shadow-sm"></div>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">Custom Roles</label>
+              <div className="rounded-lg border border-border p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">
+                    Project Manager • Can create/edit projects, manage team
+                  </div>
+                  <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50 text-sm">Edit</button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">
+                    Accountant • Can view payroll, export reports
+                  </div>
+                  <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50 text-sm">Edit</button>
+                </div>
+                <button className="w-full px-3 py-2 rounded-lg border border-dashed border-border hover:bg-slate-50 text-sm">Add Role</button>
+              </div>
             </div>
             <div className="md:col-span-2">
               <label className="text-sm font-medium block mb-1">About</label>

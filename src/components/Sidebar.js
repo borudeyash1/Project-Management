@@ -94,7 +94,14 @@ const Sidebar = () => {
         <div className="text-[10px] uppercase tracking-wider text-slate-500 px-2 mt-4 mb-2">Account</div>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => showToast('Settings', 'info')}
+          onClick={() => go('profile')}
+        >
+          <Briefcase className="w-5 h-5 text-slate-600" />
+          <span className={state.sidebar.collapsed ? 'hidden' : ''}>Profile</span>
+        </button>
+        <button 
+          className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
+          onClick={() => go('settings')}
         >
           <Settings className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Settings</span>
@@ -105,6 +112,14 @@ const Sidebar = () => {
         >
           <BadgeDollarSign className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Pricing</span>
+        </button>
+
+        <button 
+          className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
+          onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'payroll' })}
+        >
+          <BadgeDollarSign className="w-5 h-5 text-slate-600" />
+          <span className={state.sidebar.collapsed ? 'hidden' : ''}>Payroll</span>
         </button>
 
         <div className="text-[10px] uppercase tracking-wider text-slate-500 px-2 mt-4 mb-2">Workspaces</div>

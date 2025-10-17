@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { X, Upload, QrCode, ShieldCheck } from 'lucide-react';
+import { X, Upload, QrCode, ShieldCheck, CheckCircle, Clock } from 'lucide-react';
 
 const CreateWorkspaceModal = () => {
   const { state, dispatch } = useApp();
@@ -13,9 +13,59 @@ const CreateWorkspaceModal = () => {
     logo: null,
     regions: []
   });
+  const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [paymentVerified, setPaymentVerified] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(0);
 
   const showToast = (message, type = 'info') => {
     dispatch({ type: 'ADD_TOAST', payload: { message, type } });
+  };
+
+  // OTP Timer effect
+  useEffect(() => {
+    let interval;
+    if (otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer(timer => timer - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [otpTimer]);
+
+  const sendOTP = () => {
+    if (!formData.email) {
+      showToast('Please enter email first', 'error');
+      return;
+    }
+    setOtpSent(true);
+    setOtpTimer(60); // 60 seconds timer
+    showToast(`OTP sent to ${formData.email}`, 'success');
+  };
+
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) return;
+    const newOtp = [...otpCode];
+    newOtp[index] = value;
+    setOtpCode(newOtp);
+    
+    // Auto-focus next input
+    if (value && index < 5) {
+      const nextInput = document.querySelector(`input[data-index="${index + 1}"]`);
+      if (nextInput) nextInput.focus();
+    }
+    
+    // Check if OTP is complete
+    if (newOtp.every(digit => digit !== '') && newOtp.join('') === '123456') {
+      setOtpVerified(true);
+      showToast('OTP verified successfully', 'success');
+    }
+  };
+
+  const verifyPayment = () => {
+    setPaymentVerified(true);
+    showToast('Payment verified successfully', 'success');
   };
 
   const handleInputChange = (e) => {
@@ -54,10 +104,17 @@ const CreateWorkspaceModal = () => {
         showToast('Please enter name and contact email', 'warning');
         return;
       }
+      sendOTP();
       setCwStep(2);
       return;
     }
-    if (state.cwStep === 2) setCwStep(3);
+    if (state.cwStep === 2) {
+      if (!otpVerified) {
+        showToast('Please verify OTP first', 'warning');
+        return;
+      }
+      setCwStep(3);
+    }
   };
 
   const cwPrev = () => {
@@ -65,6 +122,11 @@ const CreateWorkspaceModal = () => {
   };
 
   const finishWorkspace = () => {
+    if (!paymentVerified) {
+      showToast('Please complete payment first', 'warning');
+      return;
+    }
+    
     const initials = formData.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const newWorkspace = {
       name: formData.name,
@@ -76,7 +138,7 @@ const CreateWorkspaceModal = () => {
     dispatch({ type: 'SET_WORKSPACE', payload: formData.name });
     dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' });
     setCwStep(1);
-    showToast('Workspace created', 'success');
+    showToast('Workspace created successfully', 'success');
     dispatch({ type: 'SET_SECTION', payload: 'workspaceOwner' });
   };
 
@@ -239,24 +301,57 @@ const CreateWorkspaceModal = () => {
           {/* Step 2 */}
           {state.cwStep === 2 && (
             <div className="grid grid-cols-1 gap-4">
-              <p className="text-sm text-slate-600">
-                We sent a 6-digit code to <span className="font-medium">{formData.email || 'your email'}</span>. Enter it below to verify ownership.
-              </p>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <ShieldCheck className="w-5 h-5 text-yellow-600" />
+                  <span className="text-sm font-medium">Email Verification</span>
+                </div>
+                <p className="text-sm text-slate-600">
+                  We sent a 6-digit code to <span className="font-medium">{formData.email}</span>. Enter it below to verify ownership.
+                </p>
+              </div>
+              
               <div className="grid grid-cols-6 gap-2">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
+                {[0, 1, 2, 3, 4, 5].map((i) => (
                   <input
                     key={i}
+                    data-index={i}
                     maxLength="1"
-                    className="w-full aspect-square text-center rounded-lg border border-border text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+                    value={otpCode[i]}
+                    onChange={(e) => handleOtpChange(i, e.target.value)}
+                    className={`w-full aspect-square text-center rounded-lg border text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 ${
+                      otpVerified ? 'border-emerald-500 bg-emerald-50' : 'border-border'
+                    }`}
+                    disabled={otpVerified}
                   />
                 ))}
               </div>
+              
+              {otpVerified && (
+                <div className="flex items-center justify-center gap-2 text-emerald-600">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Email verified successfully</span>
+                </div>
+              )}
+              
               <div className="flex items-center justify-between">
                 <button 
-                  className="text-sm text-slate-600 hover:text-slate-800 hover:underline"
-                  onClick={() => showToast('Code resent', 'info')}
+                  className="text-sm text-slate-600 hover:text-slate-800 hover:underline disabled:opacity-50"
+                  onClick={() => {
+                    if (otpTimer === 0) {
+                      sendOTP();
+                    }
+                  }}
+                  disabled={otpTimer > 0}
                 >
-                  Resend code
+                  {otpTimer > 0 ? (
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      Resend in {otpTimer}s
+                    </span>
+                  ) : (
+                    'Resend code'
+                  )}
                 </button>
                 <label className="inline-flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
                   <input type="checkbox" className="peer sr-only" />
@@ -273,13 +368,29 @@ const CreateWorkspaceModal = () => {
           {state.cwStep === 3 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-lg border border-border p-4 bg-slate-50">
-                <p className="text-sm text-slate-600 mb-2">Scan the QR to pay the setup fee</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-slate-600">Scan the QR to pay the setup fee</p>
+                  {paymentVerified && (
+                    <div className="flex items-center gap-1 text-emerald-600">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-xs font-medium">Paid</span>
+                    </div>
+                  )}
+                </div>
                 <div className="aspect-square rounded-lg border border-dashed border-border bg-white flex items-center justify-center">
                   <div className="text-center">
                     <QrCode className="w-14 h-14 mx-auto text-slate-500" />
-                    <p className="text-xs text-slate-500 mt-2">Static amount</p>
+                    <p className="text-xs text-slate-500 mt-2">$49.00</p>
                   </div>
                 </div>
+                {!paymentVerified && (
+                  <button 
+                    className="w-full mt-3 px-3 py-2 rounded-lg text-white text-sm bg-yellow-500 hover:bg-yellow-600"
+                    onClick={verifyPayment}
+                  >
+                    Simulate Payment
+                  </button>
+                )}
               </div>
               <div className="rounded-lg border border-border p-4 bg-white">
                 <div className="flex items-center justify-between">
@@ -298,6 +409,15 @@ const CreateWorkspaceModal = () => {
                   <ShieldCheck className="w-4 h-4" />
                   <span>Secure payment. Auto-invoice via email.</span>
                 </div>
+                {paymentVerified && (
+                  <div className="mt-3 p-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                    <div className="flex items-center gap-2 text-emerald-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Payment completed</span>
+                    </div>
+                    <p className="text-xs text-emerald-600 mt-1">Invoice sent to {formData.email}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -39,12 +39,19 @@ const PlannerSection = () => {
     { id: 7, title: 'Refactor auth module', due: 'Wed', priority: 'Low', status: 'Backlog', pinned: false, recurring: false, tags: ['Backend'] },
     { id: 8, title: 'Polish animations', due: 'Today', priority: 'Low', status: 'To Do', pinned: false, recurring: false, tags: ['UI'] },
     { id: 9, title: 'Customer interview', due: 'Thu', priority: 'Medium', status: 'In Progress', pinned: false, recurring: true, tags: ['Research'] },
-    { id: 10, title: 'Security review', due: 'Next week', priority: 'High', status: 'To Do', pinned: false, recurring: false, tags: ['Security'] }
+    { id: 10, title: 'Security review', due: 'Next week', priority: 'High', status: 'To Do', pinned: false, recurring: false, tags: ['Security'] },
+    { id: 11, title: 'Sync calendar', due: 'Today', priority: 'Low', status: 'To Do', pinned: false, recurring: false, tags: ['Ops'] },
+    { id: 12, title: 'Draft release notes', due: 'Fri', priority: 'Medium', status: 'In Progress', pinned: false, recurring: false, tags: ['Docs'] },
+    { id: 13, title: 'Bug triage', due: 'Today', priority: 'High', status: 'Backlog', pinned: false, recurring: true, tags: ['Bug'] },
+    { id: 14, title: 'Design QA checklist', due: 'Thu', priority: 'Medium', status: 'To Do', pinned: false, recurring: false, tags: ['QA'] },
+    { id: 15, title: 'Improve lighthouse score', due: 'Next week', priority: 'High', status: 'To Do', pinned: true, recurring: false, tags: ['Frontend'] }
   ]);
   const [checklist, setChecklist] = useState([
     { id: 'c1', text: 'Confirm stakeholder list', done: false },
     { id: 'c2', text: 'Draft OKRs', done: true },
     { id: 'c3', text: 'Book sprint demo', done: false },
+    { id: 'c4', text: 'Create test plan', done: false },
+    { id: 'c5', text: 'Sync with marketing', done: false },
   ]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [filterPriority, setFilterPriority] = useState('All');
