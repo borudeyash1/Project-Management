@@ -38,6 +38,9 @@ const WorkspaceDiscover = () => {
       type: 'Public',
       description: 'Design & development studio. We build web experiences.',
       color: 'bg-yellow-500',
+      category: 'Technology',
+      location: 'San Francisco, CA',
+      founded: '2020',
       avatars: [
         'https://images.unsplash.com/photo-1621619856624-42fd193a0661?w=1080&q=80',
         'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=100&auto=format&fit=crop'
@@ -50,6 +53,9 @@ const WorkspaceDiscover = () => {
       type: 'Private',
       description: 'Enterprise solutions and mobile platforms for retail and logistics.',
       color: 'bg-slate-900',
+      category: 'Enterprise',
+      location: 'New York, NY',
+      founded: '2018',
       avatars: [
         'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=100&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=100&auto=format&fit=crop'
@@ -61,7 +67,10 @@ const WorkspaceDiscover = () => {
       members: 14,
       type: 'Public',
       description: 'Climate tech R&D — sensors, dashboards, and IoT analytics.',
-      color: 'bg-teal',
+      color: 'bg-emerald-500',
+      category: 'Climate Tech',
+      location: 'Austin, TX',
+      founded: '2021',
       avatars: [
         'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=100&auto=format&fit=crop'
@@ -73,10 +82,43 @@ const WorkspaceDiscover = () => {
       members: 51,
       type: 'Private',
       description: 'Data science consultancy — BI, ML pipelines, and ops.',
-      color: 'bg-purple',
+      color: 'bg-purple-500',
+      category: 'Data Science',
+      location: 'Seattle, WA',
+      founded: '2019',
       avatars: [
         'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=100&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop'
+      ]
+    },
+    {
+      name: 'Creative Studio',
+      initials: 'CS',
+      members: 18,
+      type: 'Public',
+      description: 'Full-service creative agency specializing in branding and digital marketing.',
+      color: 'bg-pink-500',
+      category: 'Creative',
+      location: 'Los Angeles, CA',
+      founded: '2022',
+      avatars: [
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop'
+      ]
+    },
+    {
+      name: 'FinTech Solutions',
+      initials: 'FS',
+      members: 67,
+      type: 'Private',
+      description: 'Financial technology platform for modern banking and payments.',
+      color: 'bg-blue-500',
+      category: 'FinTech',
+      location: 'Chicago, IL',
+      founded: '2017',
+      avatars: [
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop'
       ]
     }
   ];
@@ -84,18 +126,43 @@ const WorkspaceDiscover = () => {
   // Local UI state: search, type filter, pagination (prototype)
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('name');
   const [page, setPage] = useState(1);
   const pageSize = 6;
 
   const filtered = useMemo(() => {
     let list = allWorkspaces;
+    
+    // Type filter
     if (typeFilter !== 'All') list = list.filter(w => w.type === typeFilter);
+    
+    // Category filter
+    if (categoryFilter !== 'All') list = list.filter(w => w.category === categoryFilter);
+    
+    // Search filter
     if (query.trim()) {
       const q = query.trim().toLowerCase();
-      list = list.filter(w => w.name.toLowerCase().includes(q) || w.description.toLowerCase().includes(q));
+      list = list.filter(w => 
+        w.name.toLowerCase().includes(q) || 
+        w.description.toLowerCase().includes(q) ||
+        w.category.toLowerCase().includes(q) ||
+        w.location.toLowerCase().includes(q)
+      );
     }
+    
+    // Sort
+    list.sort((a, b) => {
+      switch (sortBy) {
+        case 'name': return a.name.localeCompare(b.name);
+        case 'members': return b.members - a.members;
+        case 'founded': return b.founded - a.founded;
+        default: return 0;
+      }
+    });
+    
     return list;
-  }, [allWorkspaces, query, typeFilter]);
+  }, [allWorkspaces, query, typeFilter, categoryFilter, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const current = filtered.slice((page - 1) * pageSize, page * pageSize);
@@ -133,6 +200,7 @@ const WorkspaceDiscover = () => {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
+        {/* Type Filter */}
         {['All','Public','Private'].map(f => (
           <button 
             key={f}
@@ -142,8 +210,32 @@ const WorkspaceDiscover = () => {
             {f}
           </button>
         ))}
-        <button className="px-3 py-1.5 rounded-full border border-border hover:bg-slate-50 text-sm">Region: US</button>
-        <button className="px-3 py-1.5 rounded-full border border-border hover:bg-slate-50 text-sm">Industry: Tech</button>
+        
+        {/* Category Filter */}
+        <select 
+          className="px-3 py-1.5 rounded-full border border-border text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+          value={categoryFilter}
+          onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
+        >
+          <option value="All">All Categories</option>
+          <option value="Technology">Technology</option>
+          <option value="Enterprise">Enterprise</option>
+          <option value="Climate Tech">Climate Tech</option>
+          <option value="Data Science">Data Science</option>
+          <option value="Creative">Creative</option>
+          <option value="FinTech">FinTech</option>
+        </select>
+        
+        {/* Sort Filter */}
+        <select 
+          className="px-3 py-1.5 rounded-full border border-border text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="name">Sort by Name</option>
+          <option value="members">Sort by Members</option>
+          <option value="founded">Sort by Founded</option>
+        </select>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -159,11 +251,39 @@ const WorkspaceDiscover = () => {
                   <div className="text-xs text-slate-500">{workspace.members} members • {workspace.type}</div>
                 </div>
               </div>
-              <button className="p-2 rounded-md hover:bg-slate-50">
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs px-2 py-1 rounded-full border ${
+                  workspace.type === 'Public' 
+                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
+                    : 'bg-slate-50 text-slate-600 border-slate-200'
+                }`}>
+                  {workspace.type}
+                </span>
+                <button className="p-2 rounded-md hover:bg-slate-50">
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <p className="text-sm text-slate-600 mt-3">{workspace.description}</p>
+            
+            <div className="mt-3">
+              <p className="text-sm text-slate-600">{workspace.description}</p>
+              <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                <span>📍 {workspace.location}</span>
+                <span>🏢 Founded {workspace.founded}</span>
+                <span className={`px-2 py-0.5 rounded-full ${
+                  workspace.category === 'Technology' ? 'bg-blue-50 text-blue-600' :
+                  workspace.category === 'Enterprise' ? 'bg-purple-50 text-purple-600' :
+                  workspace.category === 'Climate Tech' ? 'bg-emerald-50 text-emerald-600' :
+                  workspace.category === 'Data Science' ? 'bg-indigo-50 text-indigo-600' :
+                  workspace.category === 'Creative' ? 'bg-pink-50 text-pink-600' :
+                  workspace.category === 'FinTech' ? 'bg-green-50 text-green-600' :
+                  'bg-slate-50 text-slate-600'
+                }`}>
+                  {workspace.category}
+                </span>
+              </div>
+            </div>
+            
             <div className="flex items-center justify-between mt-4">
               <div className="flex -space-x-2">
                 {workspace.avatars.map((avatar, idx) => (
@@ -181,7 +301,7 @@ const WorkspaceDiscover = () => {
               <button 
                 className={`px-3 py-1.5 rounded-lg text-sm ${
                   workspace.type === 'Public' 
-                    ? 'text-white bg-yellow-500' 
+                    ? 'text-white bg-yellow-500 hover:bg-yellow-600' 
                     : 'border border-border hover:bg-slate-50'
                 }`}
                 onClick={() => joinWorkspace(workspace.name, workspace.type === 'Public')}
