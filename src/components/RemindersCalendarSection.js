@@ -11,6 +11,10 @@ const RemindersCalendarSection = () => {
     { id: 6, title: 'Database backup audit', at: new Date(Date.now()+2*60*60*1000), type: 'Task', project: 'Ops', priority: 'High', recurring: true, status: 'Active' },
     { id: 7, title: 'Legal contract renewal', at: new Date(Date.now()+10*24*60*60*1000), type: 'Custom', project: 'Legal', priority: 'Medium', recurring: false, status: 'Active' },
     { id: 8, title: 'Design review', at: new Date(Date.now()+5*24*60*60*1000), type: 'Event', project: 'Website', priority: 'Low', recurring: false, status: 'Active' },
+    { id: 9, title: 'Incident drill', at: new Date(Date.now()+6*24*60*60*1000), type: 'Event', project: 'SRE', priority: 'High', recurring: false, status: 'Active' },
+    { id: 10, title: 'Customer webinar', at: new Date(Date.now()+12*24*60*60*1000), type: 'Event', project: 'Marketing', priority: 'Medium', recurring: false, status: 'Active' },
+    { id: 11, title: 'Renew SSL', at: new Date(Date.now()+14*24*60*60*1000), type: 'Task', project: 'Ops', priority: 'High', recurring: false, status: 'Active' },
+    { id: 12, title: 'Design system sync', at: new Date(Date.now()+9*24*60*60*1000), type: 'Event', project: 'Website', priority: 'Low', recurring: true, status: 'Active' },
   ]);
   const [filters, setFilters] = useState({ date: 'Today', type: 'All', project: 'All', status: 'Active', startDate: '', endDate: '' });
   const [form, setForm] = useState({ title: '', date: '', time: '', repeat: 'None', type: 'Task', project: '', priority: 'Medium', channel: 'In-app' });
