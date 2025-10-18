@@ -76,7 +76,7 @@ const Dashboard = () => {
                   Create workspace
                 </button>
                 <button 
-                  className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-primary"
+                  className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
                   onClick={() => showToast('Quick add', 'info')}
                 >
                   <Plus className="w-4 h-4 mr-1 inline-block" />
@@ -154,7 +154,7 @@ const Dashboard = () => {
             </div>
             <div className="mt-3">
               <div className="h-2 w-full bg-slate-100 rounded-full">
-                <div className="h-2 rounded-full bg-primary" style={{width: '70%'}}></div>
+                <div className="h-2 rounded-full bg-yellow-500" style={{width: '70%'}}></div>
               </div>
               <div className="flex justify-between text-xs text-slate-500 mt-2">
                 <span>70% approved</span>
@@ -178,7 +178,7 @@ const Dashboard = () => {
                 <Search className="w-4 h-4 absolute left-2 top-2.5 text-slate-400" />
                 <input 
                   type="text" 
-                  className="w-48 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+                  className="w-48 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
                   placeholder="Search projects..."
                 />
               </div>
@@ -192,7 +192,7 @@ const Dashboard = () => {
               </button>
             </div>
             <button 
-              className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-primary"
+              className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
               onClick={() => showToast('New project', 'info')}
             >
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />
@@ -305,7 +305,7 @@ const Dashboard = () => {
             <h3 className="text-[18px] tracking-tight font-semibold">Personal Planner</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">Today</button>
-              <button className="px-3 py-2 rounded-lg text-white text-sm bg-primary">Add</button>
+              <button className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500">Add</button>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
@@ -351,7 +351,7 @@ const Dashboard = () => {
               </div>
               <div className="w-40">
                 <div className="h-2 bg-slate-100 rounded-full">
-                  <div className="h-2 rounded-full bg-primary" style={{width: '56%'}}></div>
+                <div className="h-2 rounded-full bg-yellow-500" style={{width: '56%'}}></div>
                 </div>
                 <div className="text-[11px] text-slate-500 mt-1 text-right">56%</div>
               </div>
