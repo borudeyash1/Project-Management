@@ -53,7 +53,7 @@ const Auth = () => {
         <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
         <div className="relative p-10 mt-auto mb-10">
           <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-lg px-3 py-2 border border-border mb-4">
-            <div className="w-4 h-4 text-primary">🚀</div>
+            <div className="w-4 h-4 text-yellow-600">🚀</div>
             <span className="text-xs text-slate-700">Projects, Payroll, Planner — unified</span>
           </div>
           <h1 className="text-3xl md:text-4xl tracking-tight font-semibold text-white">
@@ -68,7 +68,7 @@ const Auth = () => {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="flex items-center gap-3 mb-8">
-            <div className="h-9 w-9 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-primary">
+            <div className="h-9 w-9 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
               PX
             </div>
             <div>
@@ -81,7 +81,7 @@ const Auth = () => {
             <button
               className={`flex-1 px-3 py-2 rounded-md text-sm font-medium ${
                 authTab === 'login' 
-                  ? 'bg-primary-100 text-text' 
+                  ? 'bg-yellow-100 text-text' 
                   : 'text-slate-600 hover:text-slate-900'
               }`}
               onClick={() => setAuthTab('login')}
@@ -91,7 +91,7 @@ const Auth = () => {
             <button
               className={`flex-1 px-3 py-2 rounded-md text-sm ${
                 authTab === 'register' 
-                  ? 'bg-primary-100 text-text' 
+                  ? 'bg-yellow-100 text-text' 
                   : 'text-slate-600 hover:text-slate-900'
               }`}
               onClick={() => setAuthTab('register')}
@@ -110,7 +110,7 @@ const Auth = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                   placeholder="you@company.com"
                 />
               </div>
@@ -127,7 +127,7 @@ const Auth = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full rounded-lg border border-border bg-white px-3 py-2 pr-10 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="w-full rounded-lg border border-border bg-white px-3 py-2 pr-10 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
                     placeholder="••••••••"
                   />
                   <button
@@ -143,7 +143,7 @@ const Auth = () => {
               <div className="flex items-center justify-between">
                 <label className="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                   <input type="checkbox" className="peer sr-only" />
-                  <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-primary">
+                  <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-yellow-500">
                     <span className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
                   </span>
                   Remember me

@@ -8,10 +8,65 @@ const initialState = {
   currentProject: 'NovaTech Website',
   cwStep: 1,
   toasts: [],
+  subscription: {
+    isPro: false,
+    trialEndsAt: null
+  },
+  roles: {
+    currentUserRole: 'Member', // WorkspaceOwner | ProjectManager | Member
+    permissions: {
+      canCreateProject: true,
+      canManageEmployees: false,
+      canViewPayroll: false,
+      canExportReports: true
+    }
+  },
   modals: {
     createWorkspace: false,
+    createProject: false,
+    workloadDeadline: false,
+    taskDetails: false,
+    taskRating: false,
+    polls: false,
+    leaderboard: false,
+    payroll: false,
+    exportReports: false,
+    manageProject: false,
+    documentsHub: false,
+    timesheet: false,
+    inviteEmployee: false,
+    client: false,
     pricing: false,
-    requestChange: false
+    requestChange: false,
+    notifications: false
+  },
+  userProfile: {
+    fullName: 'Alex Johnson',
+    email: 'alex@example.com',
+    phone: '+1 555-0102',
+    designation: 'Product Manager',
+    department: 'Product',
+    location: 'Remote',
+    about: 'Loves building delightful product experiences.',
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop'
+  },
+  settings: {
+    themeColor: 'yellow',
+    darkMode: false,
+    notifications: {
+      inApp: true,
+      email: true,
+      push: false
+    },
+    calendar: {
+      syncGoogle: false,
+      syncOutlook: false,
+      defaultView: 'month'
+    },
+    privacy: {
+      profileVisibility: 'workspace', // public | workspace | private
+      twoFactorAuth: false
+    }
   },
   taskDrawer: {
     isOpen: false,
@@ -22,7 +77,18 @@ const initialState = {
   sidebar: {
     collapsed: false
   },
-  workspaces: [],
+  workspaces: [
+    { name: 'NovaTech', type: 'Owner', employees: 24, region: 'Global' },
+    { name: 'Alpha Corp', type: 'Member', employees: 52, region: 'North America' },
+    { name: 'BetaSoft', type: 'Member', employees: 31, region: 'Europe' },
+    { name: 'Gamma Studios', type: 'Member', employees: 18, region: 'Asia Pacific' },
+    { name: 'Delta Labs', type: 'Member', employees: 43, region: 'Global' },
+    { name: 'Epsilon Ventures', type: 'Member', employees: 12, region: 'Europe' },
+    { name: 'Zeta Digital', type: 'Member', employees: 67, region: 'North America' },
+    { name: 'Omega Systems', type: 'Member', employees: 39, region: 'Asia Pacific' }
+  ],
+  pendingWorkspaceRequests: [],
+  mode: 'Personal',
   projects: [
     {
       id: 1,
@@ -99,6 +165,8 @@ function appReducer(state, action) {
       return { ...state, currentWorkspace: action.payload };
     case 'SET_PROJECT':
       return { ...state, currentProject: action.payload };
+    case 'SET_MODE':
+      return { ...state, mode: action.payload };
     case 'SET_CW_STEP':
       return { ...state, cwStep: action.payload };
     case 'ADD_TOAST':
@@ -141,8 +209,30 @@ function appReducer(state, action) {
           collapsed: !state.sidebar.collapsed 
         } 
       };
+    case 'ADD_PROJECT':
+      return { ...state, projects: [...state.projects, action.payload] };
+    case 'ADD_TASK':
+      return { ...state, tasks: [...state.tasks, action.payload] };
     case 'ADD_WORKSPACE':
       return { ...state, workspaces: [...state.workspaces, action.payload] };
+    case 'ADD_PENDING_REQUEST':
+      return { ...state, pendingWorkspaceRequests: [...state.pendingWorkspaceRequests, action.payload] };
+    case 'UPDATE_PROFILE':
+      return { ...state, userProfile: { ...state.userProfile, ...action.payload } };
+    case 'UPDATE_SETTINGS':
+      return { ...state, settings: { ...state.settings, ...action.payload } };
+    case 'UPDATE_SETTINGS_NESTED': {
+      const { path, value } = action.payload; // e.g., path: ['notifications', 'email']
+      const newSettings = { ...state.settings };
+      let cursor = newSettings;
+      for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        cursor[key] = { ...cursor[key] };
+        cursor = cursor[key];
+      }
+      cursor[path[path.length - 1]] = value;
+      return { ...state, settings: newSettings };
+    }
     default:
       return state;
   }
