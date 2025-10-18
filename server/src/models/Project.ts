@@ -14,19 +14,16 @@ const projectSchema = new Schema<IProject>({
     maxlength: [1000, 'Description cannot exceed 1000 characters']
   },
   workspace: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Workspace',
+    type: String,
     required: true
   },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  createdBy: {
+    type: String,
     required: true
   },
-  members: [{
+  teamMembers: [{
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
       required: true
     },
     role: {
@@ -83,7 +80,7 @@ const projectSchema = new Schema<IProject>({
   dueDate: {
     type: Date
   },
-  endDate: {
+  completedDate: {
     type: Date
   },
   budget: {
@@ -129,28 +126,6 @@ const projectSchema = new Schema<IProject>({
       default: true
     }
   },
-  metrics: {
-    totalTasks: {
-      type: Number,
-      default: 0
-    },
-    completedTasks: {
-      type: Number,
-      default: 0
-    },
-    overdueTasks: {
-      type: Number,
-      default: 0
-    },
-    totalTimeSpent: {
-      type: Number,
-      default: 0
-    },
-    averageTaskCompletionTime: {
-      type: Number,
-      default: 0
-    }
-  },
   isActive: {
     type: Boolean,
     default: true
@@ -161,31 +136,30 @@ const projectSchema = new Schema<IProject>({
 
 // Indexes
 projectSchema.index({ workspace: 1 });
-projectSchema.index({ owner: 1 });
-projectSchema.index({ 'members.user': 1 });
+projectSchema.index({ createdBy: 1 });
+projectSchema.index({ 'teamMembers.user': 1 });
 projectSchema.index({ status: 1 });
 projectSchema.index({ priority: 1 });
 projectSchema.index({ dueDate: 1 });
 
 // Virtual for completion percentage
 projectSchema.virtual('completionPercentage').get(function() {
-  if (this.metrics.totalTasks === 0) return 0;
-  return Math.round((this.metrics.completedTasks / this.metrics.totalTasks) * 100);
+  return this.progress || 0;
 });
 
 // Virtual for member count
-projectSchema.virtual('memberCount').get(function() {
-  return this.members.length;
+projectSchema.virtual('teamMemberCount').get(function() {
+  return this.teamMembers.length;
 });
 
-// Method to add member
-projectSchema.methods.addMember = function(userId: string, role: string = 'member') {
-  const existingMember = this.members.find(member => 
+// Method to add team member
+projectSchema.methods.addTeamMember = function(userId: string, role: string = 'member') {
+  const existingMember = this.teamMembers.find((member: any) => 
     member.user.toString() === userId.toString()
   );
   
   if (!existingMember) {
-    this.members.push({
+    this.teamMembers.push({
       user: userId,
       role: role
     });
@@ -194,17 +168,17 @@ projectSchema.methods.addMember = function(userId: string, role: string = 'membe
   return this.save();
 };
 
-// Method to remove member
-projectSchema.methods.removeMember = function(userId: string) {
-  this.members = this.members.filter(member => 
+// Method to remove team member
+projectSchema.methods.removeTeamMember = function(userId: string) {
+  this.teamMembers = this.teamMembers.filter((member: any) => 
     member.user.toString() !== userId.toString()
   );
   return this.save();
 };
 
-// Method to update member role
+// Method to update team member role
 projectSchema.methods.updateMemberRole = function(userId: string, role: string) {
-  const member = this.members.find(member => 
+  const member = this.teamMembers.find((member: any) => 
     member.user.toString() === userId.toString()
   );
   
@@ -215,16 +189,16 @@ projectSchema.methods.updateMemberRole = function(userId: string, role: string) 
   return this.save();
 };
 
-// Method to check if user is member
-projectSchema.methods.isMember = function(userId: string) {
-  return this.members.some(member => 
+// Method to check if user is team member
+projectSchema.methods.isTeamMember = function(userId: string) {
+  return this.teamMembers.some((member: any) => 
     member.user.toString() === userId.toString()
   );
 };
 
 // Method to check if user has permission
 projectSchema.methods.hasPermission = function(userId: string, permission: string) {
-  const member = this.members.find(member => 
+  const member = this.teamMembers.find((member: any) => 
     member.user.toString() === userId.toString()
   );
   
@@ -238,11 +212,7 @@ projectSchema.methods.hasPermission = function(userId: string, permission: strin
 
 // Method to update progress
 projectSchema.methods.updateProgress = function() {
-  if (this.metrics.totalTasks === 0) {
-    this.progress = 0;
-  } else {
-    this.progress = Math.round((this.metrics.completedTasks / this.metrics.totalTasks) * 100);
-  }
+  // Progress is already set, just save
   return this.save();
 };
 
@@ -250,7 +220,7 @@ projectSchema.methods.updateProgress = function() {
 projectSchema.methods.toJSON = function() {
   const projectObject = this.toObject();
   projectObject.completionPercentage = this.completionPercentage;
-  projectObject.memberCount = this.memberCount;
+  projectObject.teamMemberCount = this.teamMemberCount;
   return projectObject;
 };
 

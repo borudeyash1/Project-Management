@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
   Building, 
@@ -18,11 +19,19 @@ import {
   Check,
   Target,
   Bell,
-  CalendarDays
+  CalendarDays,
+  BarChart3,
+  Users,
+  FileText,
+  Home,
+  LayoutDashboard
 } from 'lucide-react';
+import ChatbotButton from './ChatbotButton';
 
 const Dashboard: React.FC = () => {
   const { state, dispatch } = useApp();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('overview');
 
   const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
     dispatch({ type: 'ADD_TOAST', payload: { message, type } });
@@ -56,32 +65,197 @@ const Dashboard: React.FC = () => {
     e.currentTarget.classList.toggle('border-emerald-200', !isOn);
   };
 
+  // Get current page based on route
+  const getCurrentPage = () => {
+    const path = location.pathname;
+    if (path === '/home') return 'home';
+    if (path === '/dashboard') return 'dashboard';
+    if (path === '/projects') return 'projects';
+    if (path === '/planner') return 'planner';
+    if (path === '/tracker') return 'tracker';
+    if (path === '/reminders') return 'reminders';
+    if (path === '/workspace') return 'workspace';
+    if (path === '/reports') return 'reports';
+    if (path === '/team') return 'team';
+    if (path === '/goals') return 'goals';
+    return 'home';
+  };
+
+  const currentPage = getCurrentPage();
+
+  // Tab configuration for different pages
+  const getTabsForPage = (page: string) => {
+    switch (page) {
+      case 'home':
+        return [
+          { id: 'overview', label: 'Overview', icon: Home },
+          { id: 'recent', label: 'Recent', icon: Timer },
+          { id: 'favorites', label: 'Favorites', icon: Target }
+        ];
+      case 'dashboard':
+        return [
+          { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+          { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+          { id: 'activity', label: 'Activity', icon: Bell }
+        ];
+      case 'projects':
+        return [
+          { id: 'list', label: 'List', icon: FileText },
+          { id: 'kanban', label: 'Kanban', icon: Kanban },
+          { id: 'calendar', label: 'Calendar', icon: Calendar },
+          { id: 'gantt', label: 'Gantt', icon: GanttChart }
+        ];
+      case 'reports':
+        return [
+          { id: 'overview', label: 'Overview', icon: BarChart3 },
+          { id: 'productivity', label: 'Productivity', icon: TrendingUp },
+          { id: 'time', label: 'Time Tracking', icon: Timer },
+          { id: 'team', label: 'Team', icon: Users }
+        ];
+      case 'team':
+        return [
+          { id: 'members', label: 'Members', icon: Users },
+          { id: 'roles', label: 'Roles', icon: Target },
+          { id: 'performance', label: 'Performance', icon: BarChart3 }
+        ];
+      case 'goals':
+        return [
+          { id: 'personal', label: 'Personal', icon: Target },
+          { id: 'team', label: 'Team', icon: Users },
+          { id: 'company', label: 'Company', icon: Building }
+        ];
+      default:
+        return [{ id: 'overview', label: 'Overview', icon: Home }];
+    }
+  };
+
+  const tabs = getTabsForPage(currentPage);
+
   return (
     <div className="p-4 sm:p-6 space-y-6">
-      {/* Welcome + KPI */}
+      {/* Page Header with Tabs */}
+      <div className="bg-white border border-border rounded-xl">
+        <div className="px-5 py-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900 capitalize">
+                {currentPage === 'home' ? 'Home' : 
+                 currentPage === 'dashboard' ? 'Dashboard' :
+                 currentPage === 'projects' ? 'Projects' :
+                 currentPage === 'planner' ? 'Planner' :
+                 currentPage === 'tracker' ? 'Tracker' :
+                 currentPage === 'reminders' ? 'Reminders' :
+                 currentPage === 'workspace' ? 'Workspace' :
+                 currentPage === 'reports' ? 'Reports' :
+                 currentPage === 'team' ? 'Team' :
+                 currentPage === 'goals' ? 'Goals' : 'Dashboard'}
+              </h1>
+              <p className="text-sm text-slate-600 mt-1">
+                {currentPage === 'home' ? 'Welcome back! Here\'s your overview' :
+                 currentPage === 'dashboard' ? 'Monitor your productivity and progress' :
+                 currentPage === 'projects' ? 'Manage and track your projects' :
+                 currentPage === 'planner' ? 'Plan your tasks and schedule' :
+                 currentPage === 'tracker' ? 'Track your time and habits' :
+                 currentPage === 'reminders' ? 'Stay on top of important deadlines' :
+                 currentPage === 'workspace' ? 'Collaborate with your team' :
+                 currentPage === 'reports' ? 'Analyze your performance and insights' :
+                 currentPage === 'team' ? 'Manage your team and collaboration' :
+                 currentPage === 'goals' ? 'Set and track your goals' : 'Dashboard overview'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm"
+                onClick={() => toggleModal('createWorkspace')}
+              >
+                <Building className="w-4 h-4 mr-1 inline-block" />
+                Create workspace
+              </button>
+              <button 
+                className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
+                onClick={() => showToast('Quick add', 'info')}
+              >
+                <Plus className="w-4 h-4 mr-1 inline-block" />
+                New
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="px-5 py-3">
+          <div className="flex space-x-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-yellow-100 text-yellow-900 border border-yellow-200'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Route-specific content based on current page and active tab */}
+      {currentPage === 'home' && (
+        <HomeContent activeTab={activeTab} />
+      )}
+
+      {currentPage === 'dashboard' && (
+        <DashboardContent activeTab={activeTab} />
+      )}
+
+      {currentPage === 'projects' && (
+        <ProjectsContent activeTab={activeTab} />
+      )}
+
+      {currentPage === 'reports' && (
+        <ReportsContent activeTab={activeTab} />
+      )}
+
+      {currentPage === 'team' && (
+        <TeamContent activeTab={activeTab} />
+      )}
+
+      {currentPage === 'goals' && (
+        <GoalsContent activeTab={activeTab} />
+      )}
+
+      {/* Default content for other pages */}
+      {(currentPage === 'planner' || currentPage === 'tracker' || currentPage === 'reminders' || currentPage === 'workspace') && (
+        <DefaultContent currentPage={currentPage} activeTab={activeTab} />
+      )}
+
+      {/* AI Chatbot Button */}
+      <ChatbotButton />
+    </div>
+  );
+};
+
+// Home Content Component
+const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { state } = useApp();
+
+  if (activeTab === 'overview') {
+    return (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Welcome + KPI */}
         <div className="lg:col-span-8">
           <div className="bg-white border border-border rounded-xl p-5">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-[22px] tracking-tight font-semibold">Good afternoon, {state.userProfile.fullName.split(' ')[0]}</h2>
                 <p className="text-sm text-slate-600 mt-1">Here's what's happening with your work today</p>
-              </div>
-              <div className="hidden md:flex items-center gap-2">
-                <button 
-                  className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm"
-                  onClick={() => toggleModal('createWorkspace')}
-                >
-                  <Building className="w-4 h-4 mr-1 inline-block" />
-                  Create workspace
-                </button>
-                <button 
-                  className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
-                  onClick={() => showToast('Quick add', 'info')}
-                >
-                  <Plus className="w-4 h-4 mr-1 inline-block" />
-                  New
-                </button>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
@@ -138,35 +312,112 @@ const Dashboard: React.FC = () => {
                 </div>
                 <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">On track</span>
               </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-medium">Onboarding docs</div>
-                  <div className="text-xs text-slate-500">Fri • 3:00 PM</div>
-                </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Medium</span>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white border border-border rounded-xl p-5 mt-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[18px] tracking-tight font-semibold">Payroll & Timesheets</h3>
-              <button className="text-sm text-slate-600 hover:text-slate-900">Open</button>
-            </div>
-            <div className="mt-3">
-              <div className="h-2 w-full bg-slate-100 rounded-full">
-                <div className="h-2 rounded-full bg-yellow-500" style={{width: '70%'}}></div>
-              </div>
-              <div className="flex justify-between text-xs text-slate-500 mt-2">
-                <span>70% approved</span>
-                <span>Cycle ends in 3d</span>
-              </div>
             </div>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Projects list with gated tabs */}
-      <div id="projectsList" className="bg-white border border-border rounded-xl">
+  if (activeTab === 'recent') {
+    return (
+      <div className="bg-white border border-border rounded-xl p-5">
+        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium">Created new project "Website Redesign"</div>
+              <div className="text-xs text-slate-500">2 hours ago</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
+            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+              <Check className="w-4 h-4 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium">Completed task "Update user interface"</div>
+              <div className="text-xs text-slate-500">4 hours ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4">Favorites</h3>
+      <div className="text-slate-500">No favorites yet. Star items to add them here.</div>
+    </div>
+  );
+};
+
+// Dashboard Content Component
+const DashboardContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  if (activeTab === 'overview') {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8">
+          <div className="bg-white border border-border rounded-xl p-5">
+            <h3 className="text-lg font-semibold mb-4">Project Overview</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg border border-border">
+                <div className="text-sm text-slate-500">Total Projects</div>
+                <div className="text-2xl font-semibold">12</div>
+              </div>
+              <div className="p-4 rounded-lg border border-border">
+                <div className="text-sm text-slate-500">Active Tasks</div>
+                <div className="text-2xl font-semibold">47</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="lg:col-span-4">
+          <div className="bg-white border border-border rounded-xl p-5">
+            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+            <div className="space-y-2">
+              <button className="w-full text-left p-3 rounded-lg border border-border hover:bg-slate-50">
+                <div className="font-medium">Create new project</div>
+                <div className="text-sm text-slate-500">Start a new project</div>
+              </button>
+              <button className="w-full text-left p-3 rounded-lg border border-border hover:bg-slate-50">
+                <div className="font-medium">Add task</div>
+                <div className="text-sm text-slate-500">Create a new task</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (activeTab === 'analytics') {
+    return (
+      <div className="bg-white border border-border rounded-xl p-5">
+        <h3 className="text-lg font-semibold mb-4">Analytics</h3>
+        <div className="text-slate-500">Analytics dashboard coming soon...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4">Activity Feed</h3>
+      <div className="text-slate-500">Recent activity will appear here...</div>
+    </div>
+  );
+};
+
+// Projects Content Component
+const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { state } = useApp();
+
+  if (activeTab === 'list') {
+    return (
+      <div className="bg-white border border-border rounded-xl">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div>
             <h3 className="text-[18px] tracking-tight font-semibold">Projects</h3>
@@ -191,42 +442,9 @@ const Dashboard: React.FC = () => {
                 Sort
               </button>
             </div>
-            <button 
-              className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
-              onClick={() => showToast('New project', 'info')}
-            >
+            <button className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500">
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />
               Add Project
-            </button>
-          </div>
-        </div>
-
-        <div className="px-3 pt-3">
-          <div className="inline-flex items-center gap-2 p-1 bg-slate-50 border border-border rounded-lg">
-            <button className="px-3 py-1.5 rounded-md bg-white border border-border text-sm">List</button>
-            <button 
-              className="group px-3 py-1.5 rounded-md text-sm text-slate-500 inline-flex items-center gap-1"
-              onClick={() => toggleModal('pricing')}
-            >
-              <Kanban className="w-4 h-4 text-slate-400" />
-              Kanban
-              <Lock className="w-3.5 h-3.5 text-slate-400" />
-            </button>
-            <button 
-              className="group px-3 py-1.5 rounded-md text-sm text-slate-500 inline-flex items-center gap-1"
-              onClick={() => toggleModal('pricing')}
-            >
-              <Calendar className="w-4 h-4 text-slate-400" />
-              Calendar
-              <Lock className="w-3.5 h-3.5 text-slate-400" />
-            </button>
-            <button 
-              className="group px-3 py-1.5 rounded-md text-sm text-slate-500 inline-flex items-center gap-1"
-              onClick={() => toggleModal('pricing')}
-            >
-              <GanttChart className="w-4 h-4 text-slate-400" />
-              Gantt
-              <Lock className="w-3.5 h-3.5 text-slate-400" />
             </button>
           </div>
         </div>
@@ -280,13 +498,7 @@ const Dashboard: React.FC = () => {
                       </div>
                     </td>
                     <td className="py-3 pl-3 text-right">
-                      <button 
-                        className="px-2 py-1 rounded-md border border-border hover:bg-slate-50"
-                        onClick={() => {
-                          enterWorkspace(project.client || '');
-                          enterProject(project.name);
-                        }}
-                      >
+                      <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50">
                         Visit
                       </button>
                     </td>
@@ -297,125 +509,86 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Planner & Tracker */}
-      <div id="planner" className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div className="lg:col-span-8 bg-white border border-border rounded-xl p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[18px] tracking-tight font-semibold">Personal Planner</h3>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">Today</button>
-              <button className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500">Add</button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-            <div className="rounded-lg border border-border p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">Write Q4 goals</div>
-                <button className="text-slate-500 hover:text-slate-900">
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="mt-2 text-xs text-slate-500">Due: Today 5:00 PM</div>
-              <div className="mt-3 flex items-center gap-2">
-                <button 
-                  className="task-check h-5 w-5 rounded-md border border-border flex items-center justify-center hover:bg-slate-50"
-                  onClick={toggleCheck}
-                >
-                  <Check className="w-4 h-4 opacity-0" />
-                </button>
-                <span className="text-sm">Mark complete</span>
-              </div>
-            </div>
-            <div className="rounded-lg border border-border p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">1:1 with PM</div>
-                <button className="text-slate-500 hover:text-slate-900">
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="mt-2 text-xs text-slate-500">Tomorrow 10:00 AM</div>
-              <div className="mt-3 flex items-center gap-2">
-                <span className="text-xs px-2 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200">Meeting</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="tracker" className="lg:col-span-4 bg-white border border-border rounded-xl p-5">
-          <h3 className="text-[18px] tracking-tight font-semibold">Goals & Habits</h3>
-          <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium">Ship website</div>
-                <div className="text-xs text-slate-500">Progress</div>
-              </div>
-              <div className="w-40">
-                <div className="h-2 bg-slate-100 rounded-full">
-                <div className="h-2 rounded-full bg-yellow-500" style={{width: '56%'}}></div>
-                </div>
-                <div className="text-[11px] text-slate-500 mt-1 text-right">56%</div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium">Daily standup</div>
-                <div className="text-xs text-slate-500">Habit</div>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                <span className="h-2.5 w-2.5 rounded-full bg-slate-200"></span>
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-              </div>
-            </div>
-          </div>
-        </div>
+  if (activeTab === 'kanban') {
+    return (
+      <div className="bg-white border border-border rounded-xl p-5">
+        <h3 className="text-lg font-semibold mb-4">Kanban Board</h3>
+        <div className="text-slate-500">Kanban board coming soon...</div>
       </div>
+    );
+  }
 
-      {/* Reminders & Calendar anchors */}
-      <div id="reminders" className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div id="calendar" className="lg:col-span-8 bg-white border border-border rounded-xl p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[18px] tracking-tight font-semibold">Calendar</h3>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">Week</button>
-              <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">Month</button>
-              <button className="px-3 py-2 rounded-lg text-white text-sm bg-primary">Add event</button>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-7 gap-2 text-center">
-            <div className="text-xs text-slate-500">Mon</div>
-            <div className="text-xs text-slate-500">Tue</div>
-            <div className="text-xs text-slate-500">Wed</div>
-            <div className="text-xs text-slate-500">Thu</div>
-            <div className="text-xs text-slate-500">Fri</div>
-            <div className="text-xs text-slate-500">Sat</div>
-            <div className="text-xs text-slate-500">Sun</div>
-            <div className="col-span-7 h-40 rounded-lg border border-border bg-slate-50 flex items-center justify-center text-slate-500">Calendar placeholder</div>
-          </div>
-        </div>
-        <div className="lg:col-span-4 bg-white border border-border rounded-xl p-5">
-          <h3 className="text-[18px] tracking-tight font-semibold">Reminders</h3>
-          <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button 
-                  className="task-check h-5 w-5 rounded-md border border-border flex items-center justify-center hover:bg-slate-50"
-                  onClick={toggleCheck}
-                >
-                  <Check className="w-4 h-4 opacity-0" />
-                </button>
-                <div>
-                  <div className="text-sm font-medium">Submit timesheet</div>
-                  <div className="text-xs text-slate-500">Today • 6:00 PM</div>
-                </div>
-              </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">Critical</span>
-            </div>
-          </div>
-        </div>
+  if (activeTab === 'calendar') {
+    return (
+      <div className="bg-white border border-border rounded-xl p-5">
+        <h3 className="text-lg font-semibold mb-4">Project Calendar</h3>
+        <div className="text-slate-500">Project calendar coming soon...</div>
       </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4">Gantt Chart</h3>
+      <div className="text-slate-500">Gantt chart coming soon...</div>
+    </div>
+  );
+};
+
+// Reports Content Component
+const ReportsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4">
+        {activeTab === 'overview' ? 'Reports Overview' :
+         activeTab === 'productivity' ? 'Productivity Reports' :
+         activeTab === 'time' ? 'Time Tracking Reports' :
+         activeTab === 'team' ? 'Team Reports' : 'Reports'}
+      </h3>
+      <div className="text-slate-500">Reports dashboard coming soon...</div>
+    </div>
+  );
+};
+
+// Team Content Component
+const TeamContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4">
+        {activeTab === 'members' ? 'Team Members' :
+         activeTab === 'roles' ? 'Roles & Permissions' :
+         activeTab === 'performance' ? 'Team Performance' : 'Team'}
+      </h3>
+      <div className="text-slate-500">Team management coming soon...</div>
+    </div>
+  );
+};
+
+// Goals Content Component
+const GoalsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4">
+        {activeTab === 'personal' ? 'Personal Goals' :
+         activeTab === 'team' ? 'Team Goals' :
+         activeTab === 'company' ? 'Company Goals' : 'Goals'}
+      </h3>
+      <div className="text-slate-500">Goals tracking coming soon...</div>
+    </div>
+  );
+};
+
+// Default Content Component
+const DefaultContent: React.FC<{ currentPage: string; activeTab: string }> = ({ currentPage, activeTab }) => {
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <h3 className="text-lg font-semibold mb-4 capitalize">
+        {currentPage} - {activeTab}
+      </h3>
+      <div className="text-slate-500">Content for {currentPage} page coming soon...</div>
     </div>
   );
 };
