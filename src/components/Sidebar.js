@@ -25,13 +25,7 @@ const Sidebar = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: modalName });
   };
 
-  const scrollToAnchor = (id) => {
-    dispatch({ type: 'SET_SECTION', payload: 'dashboard' });
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  };
+  const go = (section) => dispatch({ type: 'SET_SECTION', payload: section });
 
   const enterWorkspace = (name) => {
     dispatch({ type: 'SET_WORKSPACE', payload: name });
@@ -60,35 +54,38 @@ const Sidebar = () => {
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('projectsList')}
+          onClick={() => {
+            showToast('Projects is a Pro feature. Please upgrade to continue.', 'warning');
+            toggleModal('pricing');
+          }}
         >
           <Kanban className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Projects</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('planner')}
+          onClick={() => go('planner')}
         >
           <Calendar className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Planner</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('tracker')}
+          onClick={() => go('tracker')}
         >
           <Target className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Tracker</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('reminders')}
+          onClick={() => go('reminders')}
         >
           <Bell className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Reminders</span>
         </button>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => scrollToAnchor('calendar')}
+          onClick={() => go('reminders')}
         >
           <CalendarDays className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Calendar</span>
@@ -97,7 +94,14 @@ const Sidebar = () => {
         <div className="text-[10px] uppercase tracking-wider text-slate-500 px-2 mt-4 mb-2">Account</div>
         <button 
           className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
-          onClick={() => showToast('Settings', 'info')}
+          onClick={() => go('profile')}
+        >
+          <Briefcase className="w-5 h-5 text-slate-600" />
+          <span className={state.sidebar.collapsed ? 'hidden' : ''}>Profile</span>
+        </button>
+        <button 
+          className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
+          onClick={() => go('settings')}
         >
           <Settings className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Settings</span>
@@ -108,6 +112,14 @@ const Sidebar = () => {
         >
           <BadgeDollarSign className="w-5 h-5 text-slate-600" />
           <span className={state.sidebar.collapsed ? 'hidden' : ''}>Pricing</span>
+        </button>
+
+        <button 
+          className="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-100/60 text-sm"
+          onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'payroll' })}
+        >
+          <BadgeDollarSign className="w-5 h-5 text-slate-600" />
+          <span className={state.sidebar.collapsed ? 'hidden' : ''}>Payroll</span>
         </button>
 
         <div className="text-[10px] uppercase tracking-wider text-slate-500 px-2 mt-4 mb-2">Workspaces</div>

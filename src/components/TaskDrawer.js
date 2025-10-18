@@ -37,7 +37,7 @@ const TaskDrawer = () => {
             <h3 className="text-[18px] tracking-tight font-semibold">{state.taskDrawer.title}</h3>
           </div>
           <button 
-            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
             onClick={toggleTaskDrawer}
           >
             <X className="w-5 h-5" />
@@ -133,7 +133,7 @@ const TaskDrawer = () => {
                 onChange={(e) => setComment(e.target.value)}
               />
               <button 
-                className="px-3 py-2 rounded-lg text-white text-sm bg-primary"
+                className="px-3 py-2 rounded-lg text-white text-sm bg-yellow-500"
                 onClick={handleSendComment}
               >
                 <Send className="w-4 h-4" />

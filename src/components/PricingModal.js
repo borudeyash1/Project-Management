@@ -22,7 +22,7 @@ const PricingModal = () => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h3 className="text-[22px] tracking-tight font-semibold">Upgrade to unlock views</h3>
           <button 
-            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            className="p-2 rounded-md hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
             onClick={toggleModal}
           >
             <X className="w-5 h-5" />
@@ -31,7 +31,7 @@ const PricingModal = () => {
         <div className="grid md:grid-cols-3 gap-4 p-6">
           <div className="rounded-lg border border-border p-4 bg-white">
             <div className="flex items-center gap-2">
-              <ListChecks className="w-5 h-5 text-primary" />
+              <ListChecks className="w-5 h-5 text-yellow-600" />
               <h4 className="font-semibold tracking-tight">Starter</h4>
             </div>
             <p className="text-sm text-slate-600 mt-2">List view, reminders, basic reports.</p>
@@ -46,7 +46,7 @@ const PricingModal = () => {
               Current
             </button>
           </div>
-          <div className="rounded-lg border border-border p-4 bg-white ring-1 ring-primary">
+          <div className="rounded-lg border border-border p-4 bg-white ring-1 ring-yellow-500">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-purple" />
               <h4 className="font-semibold tracking-tight">Pro</h4>
@@ -57,7 +57,7 @@ const PricingModal = () => {
               <span className="text-sm text-slate-500">/user/mo</span>
             </div>
             <button 
-              className="mt-4 w-full px-3 py-2 rounded-lg text-white hover:opacity-95 text-sm bg-primary"
+              className="mt-4 w-full px-3 py-2 rounded-lg text-white hover:opacity-95 text-sm bg-yellow-500"
               onClick={() => {
                 showToast('Free trial started', 'success');
                 toggleModal();
