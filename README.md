@@ -1,122 +1,181 @@
-# Proxima - Project Management React Application
+# Proxima Project Management Suite
 
-A comprehensive project management application built with React, featuring authentication, workspaces, project tracking, and task management.
-
-## Features
-
-- **Authentication System**: Login and registration with form validation
-- **Dashboard**: Overview with KPIs, project lists, and upcoming deadlines
-- **Workspace Management**: Create, join, and manage workspaces
-- **Project Tracking**: Detailed project views with tasks and milestones
-- **Task Management**: Task drawer with status updates and comments
-- **Responsive Design**: Mobile-friendly interface with Tailwind CSS
-- **Interactive Modals**: Create workspace wizard, pricing plans, and request forms
-- **Real-time Notifications**: Toast notifications for user feedback
-
-## Technology Stack
-
-- **React 18**: Modern React with hooks and context
-- **Tailwind CSS**: Utility-first CSS framework
-- **Lucide React**: Beautiful icon library
-- **Context API**: State management without external libraries
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Start the development server:
-```bash
-npm start
-```
-
-3. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-This builds the app for production to the `build` folder.
+A comprehensive project management application built with React (TypeScript) frontend and Node.js (TypeScript) backend.
 
 ## Project Structure
 
 ```
-src/
-├── components/           # React components
-│   ├── Auth.js          # Authentication forms
-│   ├── Dashboard.js     # Main dashboard
-│   ├── Header.js        # Top navigation
-│   ├── Sidebar.js       # Side navigation
-│   ├── WorkspaceDiscover.js  # Workspace discovery
-│   ├── WorkspaceOwner.js     # Workspace management
-│   ├── Project.js       # Project details
-│   ├── CreateWorkspaceModal.js  # Workspace creation
-│   ├── PricingModal.js  # Pricing plans
-│   ├── TaskDrawer.js    # Task details drawer
-│   ├── RequestChangeModal.js  # Request forms
-│   └── ToastContainer.js # Notification system
-├── context/
-│   └── AppContext.js    # Global state management
-├── App.js              # Main application component
-├── index.js            # Application entry point
-└── index.css           # Global styles
+proxima-project-management/
+├── client/                 # React TypeScript Frontend
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── context/        # React context providers
+│   │   ├── types/          # TypeScript type definitions
+│   │   ├── services/       # API service layer
+│   │   ├── hooks/          # Custom React hooks
+│   │   └── utils/          # Utility functions
+│   ├── public/             # Static assets
+│   └── package.json
+├── server/                 # Node.js TypeScript Backend
+│   ├── src/
+│   │   ├── controllers/    # Route controllers
+│   │   ├── models/         # Database models
+│   │   ├── routes/         # API routes
+│   │   ├── middleware/     # Express middleware
+│   │   ├── types/          # TypeScript type definitions
+│   │   ├── utils/          # Utility functions
+│   │   └── config/         # Configuration files
+│   └── package.json
+└── README.md
 ```
 
-## Key Features Implementation
+## Features
 
-### State Management
-- Global state managed with React Context and useReducer
-- Centralized state for user authentication, workspaces, projects, and UI state
+### Frontend (Client)
+- **React 18** with TypeScript
+- **React Router** for navigation
+- **Tailwind CSS** for styling
+- **Lucide React** for icons
+- **Context API** for state management
+- **Responsive design** for all screen sizes
 
-### Component Architecture
-- Modular component structure for maintainability
-- Reusable components with proper prop handling
-- Conditional rendering based on application state
+### Backend (Server)
+- **Node.js** with TypeScript
+- **Express.js** web framework
+- **MongoDB** with Mongoose ODM
+- **JWT** authentication
+- **bcryptjs** for password hashing
+- **Express Validator** for input validation
+- **Helmet** for security
+- **CORS** for cross-origin requests
+- **Rate limiting** for API protection
 
-### Styling
-- Tailwind CSS for consistent design system
-- Custom CSS variables for theming
-- Responsive design with mobile-first approach
+## Getting Started
 
-### User Experience
-- Smooth transitions and animations
-- Interactive modals and drawers
-- Toast notifications for user feedback
-- Form validation and error handling
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (local or cloud instance)
+- npm or yarn
 
-## Available Scripts
+### Installation
 
-- `npm start` - Runs the app in development mode
-- `npm test` - Launches the test runner
-- `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App (one-way operation)
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd proxima-project-management
+   ```
 
-## Browser Support
+2. **Install client dependencies**
+   ```bash
+   cd client
+   npm install
+   ```
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+3. **Install server dependencies**
+   ```bash
+   cd ../server
+   npm install
+   ```
+
+4. **Environment Setup**
+   
+   Create a `.env` file in the server directory:
+   ```env
+   NODE_ENV=development
+   PORT=5000
+   FRONTEND_URL=http://localhost:3000
+   MONGODB_URI=mongodb://localhost:27017/proxima
+   JWT_SECRET=your-super-secret-jwt-key-here
+   JWT_EXPIRE=7d
+   JWT_REFRESH_SECRET=your-refresh-secret-key-here
+   JWT_REFRESH_EXPIRE=30d
+   ```
+
+### Running the Application
+
+1. **Start the backend server**
+   ```bash
+   cd server
+   npm run dev
+   ```
+   Server will run on http://localhost:5000
+
+2. **Start the frontend client**
+   ```bash
+   cd client
+   npm start
+   ```
+   Client will run on http://localhost:3000
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `POST /api/auth/refresh` - Refresh access token
+- `GET /api/auth/me` - Get current user
+
+### Users
+- `GET /api/users/profile` - Get user profile
+- `PUT /api/users/profile` - Update user profile
+- `PUT /api/users/settings` - Update user settings
+- `DELETE /api/users/account` - Delete user account
+
+### Workspaces
+- `GET /api/workspaces` - Get user workspaces
+- `GET /api/workspaces/:id` - Get workspace details
+- `POST /api/workspaces` - Create workspace
+- `PUT /api/workspaces/:id` - Update workspace
+- `DELETE /api/workspaces/:id` - Delete workspace
+
+### Projects
+- `GET /api/projects` - Get projects
+- `GET /api/projects/:id` - Get project details
+- `POST /api/projects` - Create project
+- `PUT /api/projects/:id` - Update project
+- `DELETE /api/projects/:id` - Delete project
+
+### Tasks
+- `GET /api/tasks` - Get tasks
+- `GET /api/tasks/:id` - Get task details
+- `POST /api/tasks` - Create task
+- `PUT /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
+
+## Development
+
+### TypeScript Configuration
+Both client and server are configured with TypeScript for type safety and better development experience.
+
+### Code Structure
+- **Components**: Reusable UI components with TypeScript interfaces
+- **Context**: Global state management using React Context API
+- **Services**: API communication layer with error handling
+- **Types**: Shared TypeScript interfaces between client and server
+- **Middleware**: Express middleware for authentication, validation, and error handling
+
+### Database Models
+- **User**: User accounts with authentication and profile information
+- **Workspace**: Team workspaces with member management
+- **Project**: Projects within workspaces with team assignments
+- **Task**: Tasks within projects with comments, attachments, and time tracking
+
+## Security Features
+- JWT-based authentication
+- Password hashing with bcrypt
+- Input validation and sanitization
+- Rate limiting
+- CORS configuration
+- Helmet security headers
+- Protected routes with role-based access control
 
 ## Contributing
-
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
+4. Add tests if applicable
 5. Submit a pull request
 
 ## License
-
-This project is licensed under the MIT License.
+This project is licensed under the ISC License.

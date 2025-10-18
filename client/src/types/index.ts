@@ -1,0 +1,437 @@
+// User Types
+export interface User {
+  _id: string;
+  fullName: string;
+  email: string;
+  username: string;
+  phone?: string;
+  designation?: string;
+  department?: string;
+  location?: string;
+  about?: string;
+  avatarUrl?: string;
+  isEmailVerified: boolean;
+  lastLogin?: Date;
+  isActive: boolean;
+  subscription: UserSubscription;
+  settings: UserSettings;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserSubscription {
+  isPro: boolean;
+  trialEndsAt?: Date;
+  plan: 'free' | 'pro' | 'enterprise';
+}
+
+export interface UserSettings {
+  themeColor: 'yellow' | 'blue' | 'green' | 'purple' | 'red';
+  darkMode: boolean;
+  notifications: {
+    inApp: boolean;
+    email: boolean;
+    push: boolean;
+  };
+  calendar: {
+    syncGoogle: boolean;
+    syncOutlook: boolean;
+    defaultView: 'month' | 'week' | 'day';
+  };
+  privacy: {
+    profileVisibility: 'public' | 'workspace' | 'private';
+    twoFactorAuth: boolean;
+  };
+}
+
+// Workspace Types
+export interface Workspace {
+  _id: string;
+  name: string;
+  description?: string;
+  type: 'personal' | 'team' | 'enterprise';
+  region?: string;
+  owner: string;
+  members: WorkspaceMember[];
+  settings: WorkspaceSettings;
+  subscription: WorkspaceSubscription;
+  isActive: boolean;
+  memberCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WorkspaceMember {
+  user: string;
+  role: 'owner' | 'admin' | 'manager' | 'member';
+  permissions: {
+    canCreateProject: boolean;
+    canManageEmployees: boolean;
+    canViewPayroll: boolean;
+    canExportReports: boolean;
+    canManageWorkspace: boolean;
+  };
+  joinedAt: Date;
+  status: 'active' | 'pending' | 'suspended';
+}
+
+export interface WorkspaceSettings {
+  isPublic: boolean;
+  allowMemberInvites: boolean;
+  requireApprovalForJoining: boolean;
+  defaultProjectPermissions: {
+    canCreate: boolean;
+    canManage: boolean;
+    canView: boolean;
+  };
+}
+
+export interface WorkspaceSubscription {
+  plan: 'free' | 'pro' | 'enterprise';
+  maxMembers: number;
+  maxProjects: number;
+  features: {
+    advancedAnalytics: boolean;
+    customFields: boolean;
+    apiAccess: boolean;
+    prioritySupport: boolean;
+  };
+}
+
+// Project Types
+export interface Project {
+  _id: string;
+  name: string;
+  description?: string;
+  client?: string;
+  workspace: string;
+  createdBy: string;
+  status: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  category?: string;
+  startDate?: Date;
+  dueDate?: Date;
+  completedDate?: Date;
+  budget?: {
+    estimated?: number;
+    actual?: number;
+    currency: string;
+  };
+  progress: number;
+  teamMembers: ProjectTeamMember[];
+  milestones: Milestone[];
+  tags: string[];
+  attachments: Attachment[];
+  settings: ProjectSettings;
+  isActive: boolean;
+  teamMemberCount: number;
+  completedTasksCount: number;
+  totalTasksCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProjectTeamMember {
+  user: string;
+  role: 'project-manager' | 'developer' | 'designer' | 'tester' | 'analyst' | 'member';
+  permissions: {
+    canManageTasks: boolean;
+    canManageTeam: boolean;
+    canViewReports: boolean;
+    canManageProject: boolean;
+  };
+  joinedAt: Date;
+}
+
+export interface Milestone {
+  _id: string;
+  name: string;
+  description?: string;
+  dueDate: Date;
+  completedDate?: Date;
+  status: 'pending' | 'in-progress' | 'completed' | 'overdue';
+  createdBy: string;
+}
+
+export interface ProjectSettings {
+  isPublic: boolean;
+  allowMemberInvites: boolean;
+  timeTracking: {
+    enabled: boolean;
+    requireApproval: boolean;
+  };
+  notifications: {
+    taskUpdates: boolean;
+    milestoneReminders: boolean;
+    deadlineAlerts: boolean;
+  };
+}
+
+// Task Types
+export interface Task {
+  _id: string;
+  title: string;
+  description?: string;
+  project: string;
+  workspace: string;
+  createdBy: string;
+  assignee?: string;
+  status: 'todo' | 'in-progress' | 'completed' | 'cancelled' | 'on-hold';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  category?: string;
+  type: 'task' | 'bug' | 'feature' | 'epic' | 'story' | 'subtask';
+  startDate?: Date;
+  dueDate?: Date;
+  completedDate?: Date;
+  estimatedHours?: number;
+  actualHours: number;
+  progress: number;
+  subtasks: Subtask[];
+  dependencies: TaskDependency[];
+  comments: TaskComment[];
+  attachments: Attachment[];
+  tags: string[];
+  watchers: string[];
+  timeEntries: TimeEntry[];
+  customFields: CustomField[];
+  settings: TaskSettings;
+  isActive: boolean;
+  subtaskCompletionPercentage: number;
+  totalTimeLogged: number;
+  commentCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Subtask {
+  _id: string;
+  title: string;
+  status: 'todo' | 'in-progress' | 'completed';
+  assignee?: string;
+  dueDate?: Date;
+  completedDate?: Date;
+  createdBy: string;
+}
+
+export interface TaskDependency {
+  task: string;
+  type: 'blocks' | 'blocked-by' | 'relates-to';
+}
+
+export interface TaskComment {
+  _id: string;
+  content: string;
+  author: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isEdited: boolean;
+}
+
+export interface TimeEntry {
+  _id: string;
+  user: string;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number;
+  description?: string;
+  isApproved: boolean;
+  approvedBy?: string;
+  approvedAt?: Date;
+}
+
+export interface CustomField {
+  name: string;
+  value: any;
+  type: 'text' | 'number' | 'date' | 'boolean' | 'select' | 'multiselect';
+}
+
+export interface TaskSettings {
+  isPublic: boolean;
+  allowComments: boolean;
+  allowTimeTracking: boolean;
+  requireApproval: boolean;
+}
+
+// Attachment Type
+export interface Attachment {
+  _id?: string;
+  filename: string;
+  originalName: string;
+  path: string;
+  size: number;
+  mimeType: string;
+  uploadedBy: string;
+  uploadedAt: Date;
+}
+
+// API Response Types
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data?: T;
+  error?: string;
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+// Auth Types
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface RegisterRequest {
+  fullName: string;
+  username: string;
+  email: string;
+  contactNumber?: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+// App State Types
+export interface AppState {
+  currentSection: string;
+  currentWorkspace: string;
+  currentProject: string;
+  cwStep: number;
+  toasts: Toast[];
+  subscription: UserSubscription;
+  roles: {
+    currentUserRole: string;
+    permissions: {
+      canCreateProject: boolean;
+      canManageEmployees: boolean;
+      canViewPayroll: boolean;
+      canExportReports: boolean;
+    };
+  };
+  modals: {
+    createWorkspace: boolean;
+    createProject: boolean;
+    workloadDeadline: boolean;
+    taskDetails: boolean;
+    taskRating: boolean;
+    polls: boolean;
+    leaderboard: boolean;
+    payroll: boolean;
+    exportReports: boolean;
+    manageProject: boolean;
+    documentsHub: boolean;
+    timesheet: boolean;
+    inviteEmployee: boolean;
+    client: boolean;
+    pricing: boolean;
+    requestChange: boolean;
+    notifications: boolean;
+  };
+  userProfile: User;
+  settings: UserSettings;
+  taskDrawer: {
+    isOpen: boolean;
+    title: string;
+  };
+  quickAddMenu: boolean;
+  userMenu: boolean;
+  sidebar: {
+    collapsed: boolean;
+  };
+  workspaces: Workspace[];
+  pendingWorkspaceRequests: any[];
+  mode: string;
+  projects: Project[];
+  tasks: Task[];
+}
+
+export interface Toast {
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  id?: string;
+}
+
+// Route Types
+export interface RouteConfig {
+  path: string;
+  component: React.ComponentType<any>;
+  exact?: boolean;
+  protected?: boolean;
+  roles?: string[];
+}
+
+// Form Types
+export interface FormField {
+  name: string;
+  label: string;
+  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox' | 'date';
+  required?: boolean;
+  placeholder?: string;
+  options?: { value: string; label: string }[];
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: RegExp;
+    message?: string;
+  };
+}
+
+// Filter and Search Types
+export interface FilterOptions {
+  status?: string[];
+  priority?: string[];
+  assignee?: string[];
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  tags?: string[];
+}
+
+export interface SortOptions {
+  field: string;
+  direction: 'asc' | 'desc';
+}
+
+// Dashboard Types
+export interface DashboardStats {
+  activeProjects: number;
+  tasksDue: number;
+  weeklyHours: number;
+  payrollStatus: {
+    amount: number;
+    status: string;
+  };
+}
+
+export interface UpcomingDeadline {
+  id: string;
+  title: string;
+  dueDate: Date;
+  priority: string;
+  status: string;
+}
+
+// Notification Types
+export interface Notification {
+  _id: string;
+  type: 'task' | 'project' | 'workspace' | 'system';
+  title: string;
+  message: string;
+  read: boolean;
+  userId: string;
+  relatedId?: string;
+  createdAt: Date;
+}
