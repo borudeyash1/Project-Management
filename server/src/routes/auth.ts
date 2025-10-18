@@ -8,7 +8,8 @@ import {
   getCurrentUser,
   forgotPassword,
   resetPassword,
-  verifyEmail
+  verifyEmail,
+  googleAuth
 } from '@/controllers/authController';
 import { authenticate, authenticateRefresh } from '@/middleware/auth';
 import { validateRequest } from '@/middleware/validation';
@@ -79,9 +80,29 @@ const resetPasswordValidation = [
     })
 ];
 
+const googleAuthValidation = [
+  body('id')
+    .notEmpty()
+    .withMessage('Google user ID is required'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Valid email is required'),
+  body('name')
+    .notEmpty()
+    .withMessage('Name is required'),
+  body('accessToken')
+    .notEmpty()
+    .withMessage('Google access token is required'),
+  body('idToken')
+    .notEmpty()
+    .withMessage('Google ID token is required')
+];
+
 // Routes
 router.post('/register', registerValidation, validateRequest, register);
 router.post('/login', loginValidation, validateRequest, login);
+router.post('/google', googleAuthValidation, validateRequest, googleAuth);
 router.post('/logout', authenticate, logout);
 router.post('/refresh', authenticateRefresh, refreshToken);
 router.get('/me', authenticate, getCurrentUser);

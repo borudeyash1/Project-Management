@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
   LayoutDashboard,
@@ -10,7 +11,12 @@ import {
   User,
   Building,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Home,
+  BarChart3,
+  Users,
+  FileText,
+  Target
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -23,8 +29,16 @@ interface SidebarItem {
 
 const Sidebar: React.FC = () => {
   const { state, dispatch } = useApp();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const sidebarItems: SidebarItem[] = [
+    {
+      id: 'home',
+      label: 'Home',
+      icon: Home,
+      path: '/home'
+    },
     {
       id: 'dashboard',
       label: 'Dashboard',
@@ -60,6 +74,24 @@ const Sidebar: React.FC = () => {
       label: 'Workspace',
       icon: Building,
       path: '/workspace'
+    },
+    {
+      id: 'reports',
+      label: 'Reports',
+      icon: BarChart3,
+      path: '/reports'
+    },
+    {
+      id: 'team',
+      label: 'Team',
+      icon: Users,
+      path: '/team'
+    },
+    {
+      id: 'goals',
+      label: 'Goals',
+      icon: Target,
+      path: '/goals'
     }
   ];
 
@@ -79,11 +111,13 @@ const Sidebar: React.FC = () => {
   ];
 
   const handleItemClick = (item: SidebarItem) => {
+    navigate(item.path);
     dispatch({ type: 'SET_SECTION', payload: item.id });
   };
 
-  const isActive = (itemId: string) => {
-    return state.currentSection === itemId;
+  const isActive = (item: SidebarItem) => {
+    return location.pathname === item.path || 
+           (item.path !== '/home' && location.pathname.startsWith(item.path));
   };
 
   return (
@@ -95,7 +129,7 @@ const Sidebar: React.FC = () => {
         <nav className="flex-1 p-4 space-y-2">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.id);
+            const active = isActive(item);
             
             return (
               <button
@@ -123,7 +157,7 @@ const Sidebar: React.FC = () => {
         <div className="p-4 border-t border-border space-y-2">
           {bottomItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.id);
+            const active = isActive(item);
             
             return (
               <button

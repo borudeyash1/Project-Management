@@ -28,6 +28,73 @@ const testUsers = [
     subscription: {
       isPro: false,
       plan: 'free'
+    },
+    profile: {
+      jobTitle: 'Product Manager',
+      company: 'TechCorp',
+      industry: 'Technology',
+      experience: 'senior',
+      skills: [
+        { name: 'Product Management', level: 'expert', category: 'management' },
+        { name: 'Agile', level: 'advanced', category: 'management' },
+        { name: 'User Research', level: 'intermediate', category: 'analytical' }
+      ],
+      workPreferences: {
+        workStyle: 'collaborative',
+        communicationStyle: 'direct',
+        timeManagement: 'structured',
+        preferredWorkingHours: { start: '09:00', end: '17:00' },
+        timezone: 'UTC'
+      },
+      personality: {
+        workingStyle: 'results-driven',
+        stressLevel: 'medium',
+        motivationFactors: ['growth', 'impact', 'challenge']
+      },
+      goals: {
+        shortTerm: [
+          { description: 'Launch new product feature', priority: 'high' }
+        ],
+        longTerm: [
+          { description: 'Become VP of Product', priority: 'high' }
+        ],
+        careerAspirations: 'Lead product strategy for a major tech company'
+      },
+      learning: {
+        interests: ['AI/ML', 'Data Analytics', 'Leadership'],
+        currentLearning: [
+          { topic: 'Machine Learning', progress: 30, startDate: new Date() }
+        ]
+      },
+      productivity: {
+        peakHours: [
+          { start: '09:00', end: '11:00', dayOfWeek: 'monday' },
+          { start: '09:00', end: '11:00', dayOfWeek: 'tuesday' },
+          { start: '09:00', end: '11:00', dayOfWeek: 'wednesday' },
+          { start: '09:00', end: '11:00', dayOfWeek: 'thursday' },
+          { start: '09:00', end: '11:00', dayOfWeek: 'friday' }
+        ],
+        taskPreferences: {
+          preferredTaskTypes: ['analytical', 'collaborative'],
+          taskComplexity: 'mixed',
+          deadlineSensitivity: 'moderate'
+        },
+        workEnvironment: {
+          preferredEnvironment: 'moderate',
+          collaborationPreference: 'high'
+        }
+      },
+      aiPreferences: {
+        assistanceLevel: 'comprehensive',
+        preferredSuggestions: ['task-prioritization', 'time-estimation', 'resource-allocation'],
+        communicationStyle: 'friendly',
+        notificationPreferences: {
+          taskReminders: true,
+          deadlineAlerts: true,
+          productivityInsights: true,
+          skillRecommendations: true
+        }
+      }
     }
   },
   {
@@ -45,6 +112,73 @@ const testUsers = [
     subscription: {
       isPro: true,
       plan: 'pro'
+    },
+    profile: {
+      jobTitle: 'Senior UI/UX Designer',
+      company: 'DesignStudio',
+      industry: 'Technology',
+      experience: 'senior',
+      skills: [
+        { name: 'Figma', level: 'expert', category: 'technical' },
+        { name: 'User Research', level: 'advanced', category: 'analytical' },
+        { name: 'Prototyping', level: 'expert', category: 'creative' }
+      ],
+      workPreferences: {
+        workStyle: 'collaborative',
+        communicationStyle: 'creative',
+        timeManagement: 'flexible',
+        preferredWorkingHours: { start: '10:00', end: '18:00' },
+        timezone: 'PST'
+      },
+      personality: {
+        workingStyle: 'creative',
+        stressLevel: 'low',
+        motivationFactors: ['autonomy', 'creativity', 'impact']
+      },
+      goals: {
+        shortTerm: [
+          { description: 'Complete design system', priority: 'high' }
+        ],
+        longTerm: [
+          { description: 'Lead design team', priority: 'medium' }
+        ],
+        careerAspirations: 'Become a design leader in a major tech company'
+      },
+      learning: {
+        interests: ['Design Systems', 'Accessibility', 'Animation'],
+        currentLearning: [
+          { topic: 'Advanced Figma', progress: 60, startDate: new Date() }
+        ]
+      },
+      productivity: {
+        peakHours: [
+          { start: '10:00', end: '12:00', dayOfWeek: 'monday' },
+          { start: '10:00', end: '12:00', dayOfWeek: 'tuesday' },
+          { start: '10:00', end: '12:00', dayOfWeek: 'wednesday' },
+          { start: '10:00', end: '12:00', dayOfWeek: 'thursday' },
+          { start: '10:00', end: '12:00', dayOfWeek: 'friday' }
+        ],
+        taskPreferences: {
+          preferredTaskTypes: ['creative', 'collaborative'],
+          taskComplexity: 'mixed',
+          deadlineSensitivity: 'flexible'
+        },
+        workEnvironment: {
+          preferredEnvironment: 'quiet',
+          collaborationPreference: 'medium'
+        }
+      },
+      aiPreferences: {
+        assistanceLevel: 'moderate',
+        preferredSuggestions: ['task-prioritization', 'skill-development'],
+        communicationStyle: 'creative',
+        notificationPreferences: {
+          taskReminders: true,
+          deadlineAlerts: false,
+          productivityInsights: true,
+          skillRecommendations: true
+        }
+      }
     }
   },
   {
@@ -53,60 +187,95 @@ const testUsers = [
     username: 'mikerodriguez',
     password: 'mike123',
     phone: '+1 555-0104',
-    designation: 'Senior Developer',
+    designation: 'Full Stack Developer',
     department: 'Engineering',
-    location: 'New York',
-    about: 'Full-stack developer with 8+ years of experience.',
+    location: 'Austin',
+    about: 'Passionate about building scalable web applications.',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
     isEmailVerified: true,
     subscription: {
       isPro: false,
       plan: 'free'
-    }
-  },
-  {
-    fullName: 'Emily Davis',
-    email: 'emily@example.com',
-    username: 'emilydavis',
-    password: 'emily123',
-    phone: '+1 555-0105',
-    designation: 'Project Manager',
-    department: 'Operations',
-    location: 'Chicago',
-    about: 'Experienced in managing complex projects and cross-functional teams.',
-    avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop',
-    isEmailVerified: true,
-    subscription: {
-      isPro: true,
-      plan: 'enterprise'
-    }
-  },
-  {
-    fullName: 'David Kim',
-    email: 'david@example.com',
-    username: 'davidkim',
-    password: 'david123',
-    phone: '+1 555-0106',
-    designation: 'DevOps Engineer',
-    department: 'Engineering',
-    location: 'Seattle',
-    about: 'Specialized in cloud infrastructure and automation.',
-    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop',
-    isEmailVerified: true,
-    subscription: {
-      isPro: false,
-      plan: 'free'
+    },
+    profile: {
+      jobTitle: 'Senior Full Stack Developer',
+      company: 'DevCorp',
+      industry: 'Technology',
+      experience: 'senior',
+      skills: [
+        { name: 'JavaScript', level: 'expert', category: 'technical' },
+        { name: 'React', level: 'expert', category: 'technical' },
+        { name: 'Node.js', level: 'advanced', category: 'technical' },
+        { name: 'Problem Solving', level: 'expert', category: 'analytical' }
+      ],
+      workPreferences: {
+        workStyle: 'independent',
+        communicationStyle: 'direct',
+        timeManagement: 'deadline-driven',
+        preferredWorkingHours: { start: '08:00', end: '16:00' },
+        timezone: 'CST'
+      },
+      personality: {
+        workingStyle: 'detail-oriented',
+        stressLevel: 'medium',
+        motivationFactors: ['challenge', 'growth', 'autonomy']
+      },
+      goals: {
+        shortTerm: [
+          { description: 'Learn TypeScript', priority: 'high' }
+        ],
+        longTerm: [
+          { description: 'Become Tech Lead', priority: 'high' }
+        ],
+        careerAspirations: 'Lead engineering teams and build innovative products'
+      },
+      learning: {
+        interests: ['TypeScript', 'Microservices', 'DevOps'],
+        currentLearning: [
+          { topic: 'TypeScript', progress: 40, startDate: new Date() }
+        ]
+      },
+      productivity: {
+        peakHours: [
+          { start: '08:00', end: '10:00', dayOfWeek: 'monday' },
+          { start: '08:00', end: '10:00', dayOfWeek: 'tuesday' },
+          { start: '08:00', end: '10:00', dayOfWeek: 'wednesday' },
+          { start: '08:00', end: '10:00', dayOfWeek: 'thursday' },
+          { start: '08:00', end: '10:00', dayOfWeek: 'friday' }
+        ],
+        taskPreferences: {
+          preferredTaskTypes: ['technical', 'analytical'],
+          taskComplexity: 'complex',
+          deadlineSensitivity: 'strict'
+        },
+        workEnvironment: {
+          preferredEnvironment: 'quiet',
+          collaborationPreference: 'low'
+        }
+      },
+      aiPreferences: {
+        assistanceLevel: 'minimal',
+        preferredSuggestions: ['time-estimation', 'deadline-optimization'],
+        communicationStyle: 'technical',
+        notificationPreferences: {
+          taskReminders: true,
+          deadlineAlerts: true,
+          productivityInsights: false,
+          skillRecommendations: true
+        }
+      }
     }
   }
 ];
 
-// Test workspaces
+// Sample workspaces
 const testWorkspaces = [
   {
-    name: 'NovaTech Solutions',
-    description: 'Leading software development company focused on innovative solutions.',
+    name: 'Acme Corp',
+    description: 'Main workspace for Acme Corporation',
     type: 'enterprise',
-    region: 'North America',
+    region: 'US',
+    owner: null, // Will be set after user creation
     members: [],
     settings: {
       isPublic: false,
@@ -114,7 +283,7 @@ const testWorkspaces = [
       requireApprovalForJoining: false,
       defaultProjectPermissions: {
         canCreate: true,
-        canManage: false,
+        canManage: true,
         canView: true
       }
     },
@@ -128,21 +297,24 @@ const testWorkspaces = [
         apiAccess: true,
         prioritySupport: true
       }
-    }
+    },
+    isActive: true,
+    memberCount: 0
   },
   {
-    name: 'Creative Studio',
-    description: 'A creative agency specializing in branding and digital marketing.',
+    name: 'Design Team',
+    description: 'Workspace for the design team',
     type: 'team',
-    region: 'North America',
+    region: 'US',
+    owner: null, // Will be set after user creation
     members: [],
     settings: {
-      isPublic: true,
+      isPublic: false,
       allowMemberInvites: true,
-      requireApprovalForJoining: true,
+      requireApprovalForJoining: false,
       defaultProjectPermissions: {
         canCreate: true,
-        canManage: true,
+        canManage: false,
         canView: true
       }
     },
@@ -152,91 +324,53 @@ const testWorkspaces = [
       maxProjects: 20,
       features: {
         advancedAnalytics: true,
-        customFields: false,
+        customFields: true,
         apiAccess: false,
         prioritySupport: false
       }
-    }
+    },
+    isActive: true,
+    memberCount: 0
   }
 ];
 
-// Test projects
+// Sample projects
 const testProjects = [
   {
-    name: 'NovaTech Website Redesign',
-    description: 'Complete overhaul of the company website for better user experience and modern aesthetics.',
-    client: 'NovaTech Internal',
+    name: 'Website Redesign',
+    description: 'Complete redesign of the company website',
+    client: 'Acme Corp',
+    workspace: null, // Will be set after workspace creation
+    createdBy: null, // Will be set after user creation
     status: 'active',
     priority: 'high',
     category: 'Web Development',
-    startDate: new Date('2024-09-01'),
-    dueDate: new Date('2024-12-31'),
+    startDate: new Date('2024-01-01'),
+    dueDate: new Date('2024-03-31'),
     budget: {
       estimated: 50000,
+      actual: 25000,
       currency: 'USD'
     },
-    progress: 75,
+    progress: 50,
     teamMembers: [],
     milestones: [
       {
-        name: 'Design Approval',
-        dueDate: new Date('2024-09-30'),
+        name: 'Design Phase Complete',
+        description: 'All designs approved and ready for development',
+        dueDate: new Date('2024-02-15'),
         status: 'completed',
-        createdBy: ''
+        createdBy: null
       },
       {
-        name: 'Frontend Development Complete',
-        dueDate: new Date('2024-11-15'),
+        name: 'Development Phase',
+        description: 'Frontend and backend development',
+        dueDate: new Date('2024-03-15'),
         status: 'in-progress',
-        createdBy: ''
+        createdBy: null
       }
     ],
-    tags: ['website', 'redesign', 'UI/UX'],
-    attachments: [],
-    settings: {
-      isPublic: false,
-      allowMemberInvites: true,
-      timeTracking: {
-        enabled: true,
-        requireApproval: true
-      },
-      notifications: {
-        taskUpdates: true,
-        milestoneReminders: true,
-        deadlineAlerts: true
-      }
-    }
-  },
-  {
-    name: 'Mobile App Development',
-    description: 'Building a cross-platform mobile application for project management.',
-    client: 'TechCorp',
-    status: 'active',
-    priority: 'medium',
-    category: 'Mobile Development',
-    startDate: new Date('2024-10-01'),
-    dueDate: new Date('2025-03-31'),
-    budget: {
-      estimated: 80000,
-      currency: 'USD'
-    },
-    progress: 30,
-    teamMembers: [],
-    milestones: [
-      {
-        name: 'UI/UX Design Complete',
-        dueDate: new Date('2024-11-30'),
-        status: 'in-progress',
-        createdBy: ''
-      },
-      {
-        name: 'MVP Development',
-        dueDate: new Date('2025-01-31'),
-        status: 'pending',
-        createdBy: ''
-      }
-    ],
-    tags: ['mobile', 'react-native', 'app'],
+    tags: ['website', 'redesign', 'frontend'],
     attachments: [],
     settings: {
       isPublic: false,
@@ -250,144 +384,162 @@ const testProjects = [
         milestoneReminders: true,
         deadlineAlerts: true
       }
-    }
+    },
+    isActive: true,
+    teamMemberCount: 0,
+    completedTasksCount: 5,
+    totalTasksCount: 15
+  },
+  {
+    name: 'Mobile App Development',
+    description: 'Native mobile app for iOS and Android',
+    client: 'TechStart Inc',
+    workspace: null, // Will be set after workspace creation
+    createdBy: null, // Will be set after user creation
+    status: 'planning',
+    priority: 'medium',
+    category: 'Mobile Development',
+    startDate: new Date('2024-02-01'),
+    dueDate: new Date('2024-06-30'),
+    budget: {
+      estimated: 100000,
+      actual: 0,
+      currency: 'USD'
+    },
+    progress: 10,
+    teamMembers: [],
+    milestones: [
+      {
+        name: 'Project Planning',
+        description: 'Complete project requirements and planning',
+        dueDate: new Date('2024-02-28'),
+        status: 'in-progress',
+        createdBy: null
+      }
+    ],
+    tags: ['mobile', 'app', 'ios', 'android'],
+    attachments: [],
+    settings: {
+      isPublic: false,
+      allowMemberInvites: true,
+      timeTracking: {
+        enabled: true,
+        requireApproval: true
+      },
+      notifications: {
+        taskUpdates: true,
+        milestoneReminders: true,
+        deadlineAlerts: true
+      }
+    },
+    isActive: true,
+    teamMemberCount: 0,
+    completedTasksCount: 1,
+    totalTasksCount: 8
   }
 ];
 
-// Test tasks
+// Sample tasks
 const testTasks = [
   {
-    title: 'Design hero section',
+    title: 'Design Homepage Layout',
+    description: 'Create wireframes and mockups for the new homepage',
+    project: null, // Will be set after project creation
+    workspace: null, // Will be set after workspace creation
+    createdBy: null, // Will be set after user creation
+    assignee: null, // Will be set after user creation
     status: 'in-progress',
     priority: 'high',
+    category: 'Design',
     type: 'task',
-    dueDate: new Date('2024-10-20'),
-    estimatedHours: 8,
-    actualHours: 0,
-    progress: 60,
-    subtasks: [],
+    startDate: new Date('2024-01-15'),
+    dueDate: new Date('2024-02-01'),
+    estimatedHours: 16,
+    actualHours: 8,
+    progress: 50,
+    subtasks: [
+      {
+        title: 'Create wireframes',
+        status: 'completed',
+        assignee: null,
+        dueDate: new Date('2024-01-20'),
+        createdBy: null
+      },
+      {
+        title: 'Design mockups',
+        status: 'in-progress',
+        assignee: null,
+        dueDate: new Date('2024-02-01'),
+        createdBy: null
+      }
+    ],
     dependencies: [],
-    comments: [],
+    comments: [
+      {
+        content: 'Great start on the wireframes!',
+        author: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isEdited: false
+      }
+    ],
     attachments: [],
-    tags: ['UI'],
+    tags: ['design', 'homepage', 'wireframes'],
     watchers: [],
     timeEntries: [],
     customFields: [],
     settings: {
-      isPublic: false,
+      isPublic: true,
       allowComments: true,
       allowTimeTracking: true,
       requireApproval: false
-    }
+    },
+    isActive: true,
+    subtaskCompletionPercentage: 50,
+    totalTimeLogged: 8,
+    commentCount: 1
   },
   {
-    title: 'Implement user authentication',
-    status: 'pending',
+    title: 'Implement User Authentication',
+    description: 'Set up secure user authentication system',
+    project: null, // Will be set after project creation
+    workspace: null, // Will be set after workspace creation
+    createdBy: null, // Will be set after user creation
+    assignee: null, // Will be set after user creation
+    status: 'todo',
     priority: 'high',
-    type: 'task',
-    dueDate: new Date('2024-10-25'),
-    estimatedHours: 12,
+    category: 'Development',
+    type: 'feature',
+    startDate: new Date('2024-02-01'),
+    dueDate: new Date('2024-02-15'),
+    estimatedHours: 24,
     actualHours: 0,
     progress: 0,
     subtasks: [],
     dependencies: [],
     comments: [],
     attachments: [],
-    tags: ['backend', 'auth'],
+    tags: ['authentication', 'security', 'backend'],
     watchers: [],
     timeEntries: [],
     customFields: [],
     settings: {
-      isPublic: false,
+      isPublic: true,
       allowComments: true,
       allowTimeTracking: true,
       requireApproval: false
-    }
-  },
-  {
-    title: 'Create project dashboard',
-    status: 'completed',
-    priority: 'medium',
-    type: 'task',
-    dueDate: new Date('2024-10-15'),
-    estimatedHours: 6,
-    actualHours: 6,
-    progress: 100,
-    subtasks: [],
-    dependencies: [],
-    comments: [],
-    attachments: [],
-    tags: ['frontend', 'dashboard'],
-    watchers: [],
-    timeEntries: [],
-    customFields: [],
-    settings: {
-      isPublic: false,
-      allowComments: true,
-      allowTimeTracking: true,
-      requireApproval: false
-    }
+    },
+    isActive: true,
+    subtaskCompletionPercentage: 0,
+    totalTimeLogged: 0,
+    commentCount: 0
   }
 ];
 
-// Test teams
-const testTeams = [
-  {
-    name: 'Frontend Team',
-    description: 'Responsible for user interface and user experience development.',
-    members: [],
-    settings: {
-      isPublic: true,
-      allowMemberInvites: true,
-      requireApproval: false
-    }
-  },
-  {
-    name: 'Backend Team',
-    description: 'Handles server-side development and database management.',
-    members: [],
-    settings: {
-      isPublic: true,
-      allowMemberInvites: true,
-      requireApproval: false
-    }
-  }
-];
-
-// Test payroll entries
-const testPayroll = [
-  {
-    employee: '',
-    period: {
-      startDate: new Date('2024-10-01'),
-      endDate: new Date('2024-10-31')
-    },
-    salary: {
-      base: 5000,
-      currency: 'USD'
-    },
-    hours: {
-      regular: 160,
-      overtime: 0
-    },
-    deductions: {
-      tax: 1000,
-      insurance: 200,
-      other: 0
-    },
-    netPay: 3800,
-    status: 'pending',
-    paymentMethod: 'direct-deposit'
-  }
-];
-
+// Connect to MongoDB
 async function connectDB() {
   try {
-    const mongoUri = process.env.MONGODB_URI;
-    if (!mongoUri) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
-    }
-    
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/proxima';
     await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB');
   } catch (error) {
@@ -396,7 +548,8 @@ async function connectDB() {
   }
 }
 
-async function clearDatabase() {
+// Clear existing data
+async function clearData() {
   try {
     await User.deleteMany({});
     await Workspace.deleteMany({});
@@ -406,234 +559,151 @@ async function clearDatabase() {
     await Payroll.deleteMany({});
     console.log('🗑️  Cleared existing data');
   } catch (error) {
-    console.error('❌ Error clearing database:', error);
+    console.error('❌ Error clearing data:', error);
   }
 }
 
-async function seedUsers() {
+// Hash passwords
+async function hashPasswords(users: any[]) {
+  return Promise.all(users.map(async (user) => {
+    const hashedPassword = await bcrypt.hash(user.password, 12);
+    return { ...user, password: hashedPassword };
+  }));
+}
+
+// Create users
+async function createUsers() {
   try {
-    console.log('👥 Creating test users...');
-    
-    const createdUsers = [];
-    for (const userData of testUsers) {
-      const user = new User(userData);
-      await user.save();
-      createdUsers.push(user);
-      console.log(`✅ Created user: ${user.fullName} (${user.email})`);
-      console.log(`   Username: ${user.username}`);
-      console.log(`   Password: ${userData.password}`);
-      console.log(`   Hashed Password: ${(user as any).password}`);
-      console.log('');
-    }
-    
-    return createdUsers;
+    const hashedUsers = await hashPasswords(testUsers);
+    const users = await User.insertMany(hashedUsers);
+    console.log(`👥 Created ${users.length} users`);
+    return users;
   } catch (error) {
     console.error('❌ Error creating users:', error);
-    return [];
+    throw error;
   }
 }
 
-async function seedWorkspaces(users: any[]) {
+// Create workspaces
+async function createWorkspaces(users: any[]) {
   try {
-    console.log('🏢 Creating test workspaces...');
-    
-    const createdWorkspaces = [];
-    for (let i = 0; i < testWorkspaces.length; i++) {
-      const workspaceData: any = { ...testWorkspaces[i] };
-      workspaceData.owner = users[0]._id; // First user is owner
-      
-      // Add members to workspace
-      workspaceData.members = users.slice(0, 3).map((user, index) => ({
-        user: user._id,
-        role: index === 0 ? 'owner' : 'member',
-        permissions: {
-          canCreateProject: true,
-          canManageEmployees: index === 0,
-          canViewPayroll: index === 0,
-          canExportReports: true,
-          canManageWorkspace: index === 0
-        },
-        joinedAt: new Date(),
-        status: 'active'
-      }));
-      
-      const workspace = new Workspace(workspaceData);
-      await workspace.save();
-      createdWorkspaces.push(workspace);
-      console.log(`✅ Created workspace: ${workspace.name}`);
-    }
-    
+    const workspaces = testWorkspaces.map((workspace, index) => ({
+      ...workspace,
+      owner: users[0]._id, // Alex is the owner
+      members: [
+        {
+          user: users[0]._id,
+          role: 'owner',
+          permissions: {
+            canCreateProject: true,
+            canManageEmployees: true,
+            canViewPayroll: true,
+            canExportReports: true,
+            canManageWorkspace: true
+          },
+          joinedAt: new Date(),
+          status: 'active'
+        }
+      ],
+      memberCount: 1
+    }));
+
+    const createdWorkspaces = await Workspace.insertMany(workspaces);
+    console.log(`🏢 Created ${createdWorkspaces.length} workspaces`);
     return createdWorkspaces;
   } catch (error) {
     console.error('❌ Error creating workspaces:', error);
-    return [];
+    throw error;
   }
 }
 
-async function seedProjects(users: any[], workspaces: any[]) {
+// Create projects
+async function createProjects(users: any[], workspaces: any[]) {
   try {
-    console.log('📋 Creating test projects...');
-    
-    const createdProjects = [];
-    for (let i = 0; i < testProjects.length; i++) {
-      const projectData = { ...testProjects[i] };
-      projectData.workspace = workspaces[0]._id;
-      projectData.createdBy = users[0]._id;
-      
-      // Add team members to project
-      projectData.teamMembers = users.slice(0, 2).map((user, index) => ({
-        user: user._id,
-        role: index === 0 ? 'project-manager' : 'developer',
-        permissions: {
-          canManageTasks: true,
-          canManageTeam: index === 0,
-          canViewReports: true,
-          canManageProject: index === 0
-        },
-        joinedAt: new Date()
-      }));
-      
-      // Update milestone createdBy
-      projectData.milestones = projectData.milestones.map((milestone: any) => ({
-        ...milestone,
-        createdBy: users[0]._id
-      }));
-      
-      const project = new Project(projectData);
-      await project.save();
-      createdProjects.push(project);
-      console.log(`✅ Created project: ${project.name}`);
-    }
-    
+    const projects = testProjects.map((project, index) => ({
+      ...project,
+      workspace: workspaces[0]._id,
+      createdBy: users[0]._id,
+      teamMembers: [
+        {
+          user: users[0]._id,
+          role: 'project-manager',
+          permissions: {
+            canManageTasks: true,
+            canManageTeam: true,
+            canViewReports: true,
+            canManageProject: true
+          },
+          joinedAt: new Date()
+        }
+      ],
+      teamMemberCount: 1
+    }));
+
+    const createdProjects = await Project.insertMany(projects);
+    console.log(`📁 Created ${createdProjects.length} projects`);
     return createdProjects;
   } catch (error) {
     console.error('❌ Error creating projects:', error);
-    return [];
+    throw error;
   }
 }
 
-async function seedTasks(users: any[], projects: any[], workspaces: any[]) {
+// Create tasks
+async function createTasks(users: any[], workspaces: any[], projects: any[]) {
   try {
-    console.log('📝 Creating test tasks...');
-    
-    const createdTasks = [];
-    for (let i = 0; i < testTasks.length; i++) {
-      const taskData = { ...testTasks[i] };
-      taskData.project = projects[0]._id;
-      taskData.workspace = workspaces[0]._id;
-      taskData.createdBy = users[0]._id;
-      taskData.assignee = users[i % users.length]._id;
-      
-      const task = new Task(taskData);
-      await task.save();
-      createdTasks.push(task);
-      console.log(`✅ Created task: ${task.title}`);
-    }
-    
+    const tasks = testTasks.map((task, index) => ({
+      ...task,
+      project: projects[0]._id,
+      workspace: workspaces[0]._id,
+      createdBy: users[0]._id,
+      assignee: users[index % users.length]._id
+    }));
+
+    const createdTasks = await Task.insertMany(tasks);
+    console.log(`📋 Created ${createdTasks.length} tasks`);
     return createdTasks;
   } catch (error) {
     console.error('❌ Error creating tasks:', error);
-    return [];
+    throw error;
   }
 }
 
-async function seedTeams(users: any[], workspaces: any[]) {
+// Main seed function
+async function seed() {
   try {
-    console.log('👥 Creating test teams...');
+    console.log('🌱 Starting database seeding...');
     
-    const createdTeams = [];
-    for (let i = 0; i < testTeams.length; i++) {
-      const teamData = { ...testTeams[i] };
-      teamData.workspace = workspaces[0]._id;
-      teamData.createdBy = users[0]._id;
-      
-      // Add members to team
-      teamData.members = users.slice(0, 2).map((user) => ({
-        user: user._id,
-        role: 'member',
-        joinedAt: new Date(),
-        status: 'active'
-      }));
-      
-      const team = new Team(teamData);
-      await team.save();
-      createdTeams.push(team);
-      console.log(`✅ Created team: ${team.name}`);
-    }
-    
-    return createdTeams;
-  } catch (error) {
-    console.error('❌ Error creating teams:', error);
-    return [];
-  }
-}
-
-async function seedPayroll(users: any[]) {
-  try {
-    console.log('💰 Creating test payroll entries...');
-    
-    const createdPayroll = [];
-    for (let i = 0; i < testPayroll.length; i++) {
-      const payrollData = { ...testPayroll[i] };
-      payrollData.employee = users[0]._id;
-      payrollData.createdBy = users[0]._id;
-      
-      const payroll = new Payroll(payrollData);
-      await payroll.save();
-      createdPayroll.push(payroll);
-      console.log(`✅ Created payroll entry for: ${users[0].fullName}`);
-    }
-    
-    return createdPayroll;
-  } catch (error) {
-    console.error('❌ Error creating payroll entries:', error);
-    return [];
-  }
-}
-
-async function seedDatabase() {
-  try {
-    console.log('🌱 Starting database seeding...\n');
-    
-    // Connect to database
     await connectDB();
+    await clearData();
     
-    // Clear existing data
-    await clearDatabase();
+    const users = await createUsers();
+    const workspaces = await createWorkspaces(users);
+    const projects = await createProjects(users, workspaces);
+    const tasks = await createTasks(users, workspaces, projects);
     
-    // Seed data in order
-    const users = await seedUsers();
-    const workspaces = await seedWorkspaces(users);
-    const projects = await seedProjects(users, workspaces);
-    const tasks = await seedTasks(users, projects, workspaces);
-    const teams = await seedTeams(users, workspaces);
-    const payroll = await seedPayroll(users);
+    console.log('✅ Database seeding completed successfully!');
+    console.log('\n📊 Summary:');
+    console.log(`👥 Users: ${users.length}`);
+    console.log(`🏢 Workspaces: ${workspaces.length}`);
+    console.log(`📁 Projects: ${projects.length}`);
+    console.log(`📋 Tasks: ${tasks.length}`);
     
-    console.log('\n🎉 Database seeding completed successfully!');
-    console.log('\n📋 Test User Credentials:');
-    console.log('========================');
-    testUsers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.fullName}`);
-      console.log(`   Email: ${user.email}`);
-      console.log(`   Username: ${user.username}`);
-      console.log(`   Password: ${user.password}`);
-      console.log('');
-    });
+    console.log('\n🔑 Test User Credentials:');
+    console.log('Alex Johnson - alex@example.com / password123');
+    console.log('Sarah Chen - sarah@example.com / sarah123');
+    console.log('Mike Rodriguez - mike@example.com / mike123');
     
-    console.log('🔗 You can now test the application with these credentials!');
-    
+    process.exit(0);
   } catch (error) {
     console.error('❌ Seeding failed:', error);
-  } finally {
-    await mongoose.connection.close();
-    console.log('🔌 Database connection closed');
-    process.exit(0);
+    process.exit(1);
   }
 }
 
-// Run the seeding function
+// Run the seed function
 if (require.main === module) {
-  seedDatabase();
+  seed();
 }
 
-export default seedDatabase;
+export default seed;

@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import User from '@/models/User';
 import { AuthenticatedRequest, ApiResponse, AuthResponse, LoginRequest, RegisterRequest, JWTPayload } from '@/types';
+
+// Initialize Google OAuth2 client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT token
 const generateToken = (userId: string): string => {
@@ -17,7 +21,7 @@ const generateRefreshToken = (userId: string): string => {
 // Register user
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fullName, username, email, contactNumber, password }: RegisterRequest = req.body;
+    const { fullName, username, email, contactNumber, password, profile }: RegisterRequest = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -32,13 +36,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Create user
+    // Create user with enhanced profile data
     const user = new User({
       fullName,
       username,
       email,
       contactNumber,
-      password
+      password,
+      profile: profile || {}
     });
 
     // Generate email verification token
@@ -324,6 +329,149 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({
       success: false,
       message: 'Internal server error'
+    });
+  }
+};
+
+// Google OAuth authentication
+export const googleAuth = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, name, email, imageUrl, accessToken, idToken } = req.body;
+
+    // Verify Google ID token
+    let ticket;
+    try {
+      ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+    } catch (error) {
+      console.error('Google token verification failed:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Invalid Google token'
+      });
+      return;
+    }
+
+    const payload = ticket.getPayload();
+    if (!payload || payload.email !== email) {
+      res.status(400).json({
+        success: false,
+        message: 'Google token verification failed'
+      });
+      return;
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user with Google data
+      const username = email.split('@')[0] + '_' + Math.random().toString(36).substr(2, 5);
+      
+      user = new User({
+        fullName: name,
+        username,
+        email,
+        avatarUrl: imageUrl,
+        isEmailVerified: true,
+        profile: {
+          jobTitle: '',
+          company: '',
+          experience: 'mid',
+          skills: [],
+          workPreferences: {
+            workStyle: 'mixed',
+            communicationStyle: 'direct',
+            timeManagement: 'structured',
+            preferredWorkingHours: {
+              start: '09:00',
+              end: '17:00'
+            },
+            timezone: 'UTC'
+          },
+          personality: {
+            traits: [],
+            workingStyle: 'results-driven',
+            stressLevel: 'medium',
+            motivationFactors: ['growth', 'challenge']
+          },
+          goals: {
+            shortTerm: [],
+            longTerm: [],
+            careerAspirations: ''
+          },
+          learning: {
+            interests: [],
+            currentLearning: [],
+            certifications: []
+          },
+          productivity: {
+            peakHours: [],
+            taskPreferences: {
+              preferredTaskTypes: [],
+              taskComplexity: 'mixed',
+              deadlineSensitivity: 'moderate'
+            },
+            workEnvironment: {
+              preferredEnvironment: 'moderate',
+              collaborationPreference: 'medium'
+            }
+          },
+          aiPreferences: {
+            assistanceLevel: 'moderate',
+            preferredSuggestions: ['task-prioritization', 'time-estimation'],
+            communicationStyle: 'friendly',
+            notificationPreferences: {
+              taskReminders: true,
+              deadlineAlerts: true,
+              productivityInsights: true,
+              skillRecommendations: true
+            }
+          }
+        }
+      });
+
+      await user.save();
+    } else {
+      // Update existing user with Google data if needed
+      if (!user.avatarUrl && imageUrl) {
+        user.avatarUrl = imageUrl;
+      }
+      if (!user.isEmailVerified) {
+        user.isEmailVerified = true;
+      }
+      await user.save();
+    }
+
+    // Update last login
+    user.lastLogin = new Date();
+
+    // Generate tokens
+    const jwtAccessToken = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+    
+    // Save refresh token
+    user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
+    await user.save();
+
+    const response: ApiResponse<AuthResponse> = {
+      success: true,
+      message: 'Google authentication successful',
+      data: {
+        user: user.toJSON() as any,
+        accessToken: jwtAccessToken,
+        refreshToken
+      }
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Google authentication error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during Google authentication'
     });
   }
 };

@@ -24,14 +24,12 @@ const workspaceSchema = new Schema<IWorkspace>({
     maxlength: [50, 'Region cannot exceed 50 characters']
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true
   },
   members: [{
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
       required: true
     },
     role: {
@@ -147,12 +145,12 @@ workspaceSchema.index({ name: 1 });
 
 // Virtual for member count
 workspaceSchema.virtual('memberCount').get(function() {
-  return this.members.filter(member => member.status === 'active').length;
+  return this.members.filter((member: any) => member.status === 'active').length;
 });
 
 // Method to add member
 workspaceSchema.methods.addMember = function(userId: string, role: string = 'member') {
-  const existingMember = this.members.find(member => 
+  const existingMember = this.members.find((member: any) => 
     member.user.toString() === userId.toString()
   );
   
@@ -172,7 +170,7 @@ workspaceSchema.methods.addMember = function(userId: string, role: string = 'mem
 
 // Method to remove member
 workspaceSchema.methods.removeMember = function(userId: string) {
-  this.members = this.members.filter(member => 
+  this.members = this.members.filter((member: any) => 
     member.user.toString() !== userId.toString()
   );
   return this.save();
@@ -180,7 +178,7 @@ workspaceSchema.methods.removeMember = function(userId: string) {
 
 // Method to update member role
 workspaceSchema.methods.updateMemberRole = function(userId: string, role: string) {
-  const member = this.members.find(member => 
+  const member = this.members.find((member: any) => 
     member.user.toString() === userId.toString()
   );
   
@@ -193,14 +191,14 @@ workspaceSchema.methods.updateMemberRole = function(userId: string, role: string
 
 // Method to check if user is member
 workspaceSchema.methods.isMember = function(userId: string) {
-  return this.members.some(member => 
+  return this.members.some((member: any) => 
     member.user.toString() === userId.toString() && member.status === 'active'
   );
 };
 
 // Method to check if user has permission
 workspaceSchema.methods.hasPermission = function(userId: string, permission: string) {
-  const member = this.members.find(member => 
+  const member = this.members.find((member: any) => 
     member.user.toString() === userId.toString() && member.status === 'active'
   );
   

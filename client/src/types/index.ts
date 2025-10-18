@@ -15,6 +15,98 @@ export interface User {
   isActive: boolean;
   subscription: UserSubscription;
   settings: UserSettings;
+  // Enhanced profile information for AI-powered insights
+  profile?: {
+    // Professional Information
+    jobTitle?: string;
+    company?: string;
+    industry?: string;
+    experience?: 'entry' | 'junior' | 'mid' | 'senior' | 'lead' | 'executive';
+    skills?: Array<{
+      name: string;
+      level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+      category: 'technical' | 'soft' | 'management' | 'creative' | 'analytical';
+    }>;
+    workPreferences?: {
+      workStyle?: 'collaborative' | 'independent' | 'mixed';
+      communicationStyle?: 'direct' | 'diplomatic' | 'analytical' | 'creative';
+      timeManagement?: 'structured' | 'flexible' | 'deadline-driven' | 'spontaneous';
+      preferredWorkingHours?: {
+        start: string;
+        end: string;
+      };
+      timezone?: string;
+    };
+    // Personal Information for AI insights
+    personality?: {
+      traits?: Array<{
+        name: string;
+        score: number;
+      }>;
+      workingStyle?: 'detail-oriented' | 'big-picture' | 'process-focused' | 'results-driven';
+      stressLevel?: 'low' | 'medium' | 'high';
+      motivationFactors?: Array<'recognition' | 'autonomy' | 'challenge' | 'security' | 'growth' | 'impact'>;
+    };
+    // Goals and Aspirations
+    goals?: {
+      shortTerm?: Array<{
+        description: string;
+        targetDate?: Date;
+        priority?: 'low' | 'medium' | 'high';
+      }>;
+      longTerm?: Array<{
+        description: string;
+        targetDate?: Date;
+        priority?: 'low' | 'medium' | 'high';
+      }>;
+      careerAspirations?: string;
+    };
+    // Learning and Development
+    learning?: {
+      interests?: string[];
+      currentLearning?: Array<{
+        topic: string;
+        progress?: number;
+        startDate?: Date;
+        targetCompletion?: Date;
+      }>;
+      certifications?: Array<{
+        name: string;
+        issuer: string;
+        dateEarned?: Date;
+        expiryDate?: Date;
+      }>;
+    };
+    // Productivity and Work Patterns
+    productivity?: {
+      peakHours?: Array<{
+        start: string;
+        end: string;
+        dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+      }>;
+      taskPreferences?: {
+        preferredTaskTypes?: Array<'creative' | 'analytical' | 'administrative' | 'collaborative' | 'technical'>;
+        taskComplexity?: 'simple' | 'moderate' | 'complex' | 'mixed';
+        deadlineSensitivity?: 'flexible' | 'moderate' | 'strict';
+      };
+      workEnvironment?: {
+        preferredEnvironment?: 'quiet' | 'moderate' | 'busy' | 'flexible';
+        collaborationPreference?: 'high' | 'medium' | 'low' | 'mixed';
+      };
+    };
+    // AI Assistant Preferences
+    aiPreferences?: {
+      assistanceLevel?: 'minimal' | 'moderate' | 'comprehensive';
+      preferredSuggestions?: Array<'task-prioritization' | 'time-estimation' | 'resource-allocation' | 'deadline-optimization' | 'skill-development'>;
+      communicationStyle?: 'formal' | 'casual' | 'technical' | 'friendly';
+      notificationPreferences?: {
+        taskReminders?: boolean;
+        deadlineAlerts?: boolean;
+        productivityInsights?: boolean;
+        skillRecommendations?: boolean;
+      };
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -295,12 +387,107 @@ export interface RegisterRequest {
   contactNumber?: string;
   password: string;
   confirmPassword: string;
+  // Enhanced profile information
+  profile?: {
+    jobTitle?: string;
+    company?: string;
+    industry?: string;
+    experience?: 'entry' | 'junior' | 'mid' | 'senior' | 'lead' | 'executive';
+    skills?: Array<{
+      name: string;
+      level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+      category: 'technical' | 'soft' | 'management' | 'creative' | 'analytical';
+    }>;
+    workPreferences?: {
+      workStyle?: 'collaborative' | 'independent' | 'mixed';
+      communicationStyle?: 'direct' | 'diplomatic' | 'analytical' | 'creative';
+      timeManagement?: 'structured' | 'flexible' | 'deadline-driven' | 'spontaneous';
+      preferredWorkingHours?: {
+        start: string;
+        end: string;
+      };
+      timezone?: string;
+    };
+    personality?: {
+      traits?: Array<{
+        name: string;
+        score: number;
+      }>;
+      workingStyle?: 'detail-oriented' | 'big-picture' | 'process-focused' | 'results-driven';
+      stressLevel?: 'low' | 'medium' | 'high';
+      motivationFactors?: Array<'recognition' | 'autonomy' | 'challenge' | 'security' | 'growth' | 'impact'>;
+    };
+    goals?: {
+      shortTerm?: Array<{
+        description: string;
+        targetDate?: Date;
+        priority?: 'low' | 'medium' | 'high';
+      }>;
+      longTerm?: Array<{
+        description: string;
+        targetDate?: Date;
+        priority?: 'low' | 'medium' | 'high';
+      }>;
+      careerAspirations?: string;
+    };
+    learning?: {
+      interests?: string[];
+      currentLearning?: Array<{
+        topic: string;
+        progress?: number;
+        startDate?: Date;
+        targetCompletion?: Date;
+      }>;
+      certifications?: Array<{
+        name: string;
+        issuer: string;
+        dateEarned?: Date;
+        expiryDate?: Date;
+      }>;
+    };
+    productivity?: {
+      peakHours?: Array<{
+        start: string;
+        end: string;
+        dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+      }>;
+      taskPreferences?: {
+        preferredTaskTypes?: Array<'creative' | 'analytical' | 'administrative' | 'collaborative' | 'technical'>;
+        taskComplexity?: 'simple' | 'moderate' | 'complex' | 'mixed';
+        deadlineSensitivity?: 'flexible' | 'moderate' | 'strict';
+      };
+      workEnvironment?: {
+        preferredEnvironment?: 'quiet' | 'moderate' | 'busy' | 'flexible';
+        collaborationPreference?: 'high' | 'medium' | 'low' | 'mixed';
+      };
+    };
+    aiPreferences?: {
+      assistanceLevel?: 'minimal' | 'moderate' | 'comprehensive';
+      preferredSuggestions?: Array<'task-prioritization' | 'time-estimation' | 'resource-allocation' | 'deadline-optimization' | 'skill-development'>;
+      communicationStyle?: 'formal' | 'casual' | 'technical' | 'friendly';
+      notificationPreferences?: {
+        taskReminders?: boolean;
+        deadlineAlerts?: boolean;
+        productivityInsights?: boolean;
+        skillRecommendations?: boolean;
+      };
+    };
+  };
 }
 
 export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface GoogleAuthRequest {
+  id: string;
+  name: string;
+  email: string;
+  imageUrl: string;
+  accessToken: string;
+  idToken: string;
 }
 
 // App State Types

@@ -79,7 +79,7 @@ app.use('*', (req, res) => {
 });
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://borudeyash1:%40Tatya24%40@cluster0.rx04y6n.mongodb.net/Project_management', {
+mongoose.connect(process.env.MONGODB_URI || '', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 } as any)

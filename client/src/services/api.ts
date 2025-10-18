@@ -27,16 +27,27 @@ class ApiService {
     };
 
     try {
+      console.log(`Making API request to: ${url}`);
       const response = await fetch(url, config);
-      const data = await response.json();
-
+      
       if (!response.ok) {
-        throw new Error(data.message || 'An error occurred');
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          console.warn('Could not parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
 
+      const data = await response.json();
       return data;
     } catch (error) {
       console.error('API request failed:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Unable to connect to server. Please check if the server is running on ' + this.baseURL);
+      }
       throw error;
     }
   }
@@ -95,6 +106,19 @@ class ApiService {
 
   async getCurrentUser(): Promise<User> {
     const response = await this.request<User>('/auth/me');
+    return response.data!;
+  }
+
+  async googleAuth(googleUserData: any): Promise<AuthResponse> {
+    const response = await this.request<AuthResponse>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify(googleUserData),
+    });
+
+    if (response.data) {
+      this.setToken(response.data.accessToken);
+    }
+
     return response.data!;
   }
 
