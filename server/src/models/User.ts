@@ -56,6 +56,251 @@ const userSchema = new Schema<IUser>({
     trim: true,
     maxlength: [500, 'About cannot exceed 500 characters']
   },
+  // Enhanced profile information for AI-powered insights
+  profile: {
+    // Professional Information
+    jobTitle: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Job title cannot exceed 100 characters']
+    },
+    company: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Company name cannot exceed 100 characters']
+    },
+    industry: {
+      type: String,
+      trim: true,
+      maxlength: [50, 'Industry cannot exceed 50 characters']
+    },
+    experience: {
+      type: String,
+      enum: ['entry', 'junior', 'mid', 'senior', 'lead', 'executive'],
+      default: 'mid'
+    },
+    skills: [{
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      level: {
+        type: String,
+        enum: ['beginner', 'intermediate', 'advanced', 'expert'],
+        default: 'intermediate'
+      },
+      category: {
+        type: String,
+        enum: ['technical', 'soft', 'management', 'creative', 'analytical'],
+        default: 'technical'
+      }
+    }],
+    workPreferences: {
+      workStyle: {
+        type: String,
+        enum: ['collaborative', 'independent', 'mixed'],
+        default: 'mixed'
+      },
+      communicationStyle: {
+        type: String,
+        enum: ['direct', 'diplomatic', 'analytical', 'creative'],
+        default: 'direct'
+      },
+      timeManagement: {
+        type: String,
+        enum: ['structured', 'flexible', 'deadline-driven', 'spontaneous'],
+        default: 'structured'
+      },
+      preferredWorkingHours: {
+        start: {
+          type: String,
+          default: '09:00'
+        },
+        end: {
+          type: String,
+          default: '17:00'
+        }
+      },
+      timezone: {
+        type: String,
+        default: 'UTC'
+      }
+    },
+    // Personal Information for AI insights
+    personality: {
+      traits: [{
+        name: {
+          type: String,
+          required: true
+        },
+        score: {
+          type: Number,
+          min: 1,
+          max: 10,
+          required: true
+        }
+      }],
+      workingStyle: {
+        type: String,
+        enum: ['detail-oriented', 'big-picture', 'process-focused', 'results-driven'],
+        default: 'results-driven'
+      },
+      stressLevel: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        default: 'medium'
+      },
+      motivationFactors: [{
+        type: String,
+        enum: ['recognition', 'autonomy', 'challenge', 'security', 'growth', 'impact']
+      }]
+    },
+    // Goals and Aspirations
+    goals: {
+      shortTerm: [{
+        description: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        targetDate: Date,
+        priority: {
+          type: String,
+          enum: ['low', 'medium', 'high'],
+          default: 'medium'
+        }
+      }],
+      longTerm: [{
+        description: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        targetDate: Date,
+        priority: {
+          type: String,
+          enum: ['low', 'medium', 'high'],
+          default: 'medium'
+        }
+      }],
+      careerAspirations: {
+        type: String,
+        trim: true,
+        maxlength: [500, 'Career aspirations cannot exceed 500 characters']
+      }
+    },
+    // Learning and Development
+    learning: {
+      interests: [{
+        type: String,
+        trim: true
+      }],
+      currentLearning: [{
+        topic: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        progress: {
+          type: Number,
+          min: 0,
+          max: 100,
+          default: 0
+        },
+        startDate: Date,
+        targetCompletion: Date
+      }],
+      certifications: [{
+        name: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        issuer: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        dateEarned: Date,
+        expiryDate: Date
+      }]
+    },
+    // Productivity and Work Patterns
+    productivity: {
+      peakHours: [{
+        start: String,
+        end: String,
+        dayOfWeek: {
+          type: String,
+          enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        }
+      }],
+      taskPreferences: {
+        preferredTaskTypes: [{
+          type: String,
+          enum: ['creative', 'analytical', 'administrative', 'collaborative', 'technical']
+        }],
+        taskComplexity: {
+          type: String,
+          enum: ['simple', 'moderate', 'complex', 'mixed'],
+          default: 'mixed'
+        },
+        deadlineSensitivity: {
+          type: String,
+          enum: ['flexible', 'moderate', 'strict'],
+          default: 'moderate'
+        }
+      },
+      workEnvironment: {
+        preferredEnvironment: {
+          type: String,
+          enum: ['quiet', 'moderate', 'busy', 'flexible'],
+          default: 'moderate'
+        },
+        collaborationPreference: {
+          type: String,
+          enum: ['high', 'medium', 'low', 'mixed'],
+          default: 'medium'
+        }
+      }
+    },
+    // AI Assistant Preferences
+    aiPreferences: {
+      assistanceLevel: {
+        type: String,
+        enum: ['minimal', 'moderate', 'comprehensive'],
+        default: 'moderate'
+      },
+      preferredSuggestions: [{
+        type: String,
+        enum: ['task-prioritization', 'time-estimation', 'resource-allocation', 'deadline-optimization', 'skill-development']
+      }],
+      communicationStyle: {
+        type: String,
+        enum: ['formal', 'casual', 'technical', 'friendly'],
+        default: 'friendly'
+      },
+      notificationPreferences: {
+        taskReminders: {
+          type: Boolean,
+          default: true
+        },
+        deadlineAlerts: {
+          type: Boolean,
+          default: true
+        },
+        productivityInsights: {
+          type: Boolean,
+          default: true
+        },
+        skillRecommendations: {
+          type: Boolean,
+          default: true
+        }
+      }
+    }
+  },
   avatarUrl: {
     type: String,
     trim: true

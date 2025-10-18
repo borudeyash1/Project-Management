@@ -6,6 +6,8 @@ import { LoginRequest, RegisterRequest } from '../types';
 import { apiService } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
+import EnhancedRegistration from './EnhancedRegistration';
+import { googleAuthService } from '../config/googleAuth';
 
 const Auth: React.FC = () => {
   const { dispatch } = useApp();
@@ -105,8 +107,41 @@ const Auth: React.FC = () => {
     }
   };
 
-  const handleGoogleAuth = () => {
-    showToast('Google authentication not implemented yet', 'info');
+  const handleGoogleAuth = async () => {
+    try {
+      setLoading(true);
+      
+      // Initialize Google Auth if not already done
+      await googleAuthService.initializeGapi();
+      
+      // Sign in with Google
+      const googleUser = await googleAuthService.signInWithGoogle();
+      
+      // Send Google user data to backend for authentication
+      const response = await apiService.googleAuth({
+        id: googleUser.id,
+        name: googleUser.name,
+        email: googleUser.email,
+        imageUrl: googleUser.imageUrl,
+        accessToken: googleUser.accessToken,
+        idToken: googleUser.idToken
+      });
+      
+      // Store tokens in localStorage
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+      
+      // Update user profile in context
+      dispatch({ type: 'SET_USER', payload: response.user });
+      
+      showToast('Successfully signed in with Google!', 'success');
+      navigate('/home');
+    } catch (error: any) {
+      console.error('Google authentication error:', error);
+      showToast(error.message || 'Google authentication failed', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const switchToRegister = () => {
@@ -116,6 +151,11 @@ const Auth: React.FC = () => {
   const switchToLogin = () => {
     navigate('/login');
   };
+
+  // If on register route, show enhanced registration
+  if (location.pathname === '/register') {
+    return <EnhancedRegistration />;
+  }
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'}`}>
