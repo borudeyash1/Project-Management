@@ -1,0 +1,92 @@
+import express from 'express';
+import { body } from 'express-validator';
+import { 
+  register, 
+  login, 
+  logout, 
+  refreshToken, 
+  getCurrentUser,
+  forgotPassword,
+  resetPassword,
+  verifyEmail
+} from '@/controllers/authController';
+import { authenticate, authenticateRefresh } from '@/middleware/auth';
+import { validateRequest } from '@/middleware/validation';
+
+const router = express.Router();
+
+// Validation rules
+const registerValidation = [
+  body('fullName')
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Full name must be between 2 and 100 characters'),
+  body('username')
+    .trim()
+    .isLength({ min: 3, max: 30 })
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username must be 3-30 characters and contain only letters, numbers, and underscores'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Password confirmation does not match password');
+      }
+      return true;
+    }),
+  body('contactNumber')
+    .optional()
+    .matches(/^\+?[\d\s\-\(\)]+$/)
+    .withMessage('Please provide a valid phone number')
+];
+
+const loginValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+];
+
+const forgotPasswordValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email')
+];
+
+const resetPasswordValidation = [
+  body('token')
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Password confirmation does not match password');
+      }
+      return true;
+    })
+];
+
+// Routes
+router.post('/register', registerValidation, validateRequest, register);
+router.post('/login', loginValidation, validateRequest, login);
+router.post('/logout', authenticate, logout);
+router.post('/refresh', authenticateRefresh, refreshToken);
+router.get('/me', authenticate, getCurrentUser);
+router.post('/forgot-password', forgotPasswordValidation, validateRequest, forgotPassword);
+router.post('/reset-password', resetPasswordValidation, validateRequest, resetPassword);
+router.get('/verify-email/:token', verifyEmail);
+
+export default router;

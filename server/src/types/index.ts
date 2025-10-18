@@ -1,0 +1,467 @@
+import { Request } from 'express';
+import { Document } from 'mongoose';
+
+// User Types
+export interface IUser extends Document {
+  _id: string;
+  fullName: string;
+  email: string;
+  username: string;
+  phone?: string;
+  designation?: string;
+  department?: string;
+  location?: string;
+  about?: string;
+  avatarUrl?: string;
+  isEmailVerified: boolean;
+  emailVerificationToken?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  refreshTokens: Array<{
+    token: string;
+    createdAt: Date;
+  }>;
+  lastLogin?: Date;
+  isActive: boolean;
+  subscription: {
+    isPro: boolean;
+    trialEndsAt?: Date;
+    plan: 'free' | 'pro' | 'enterprise';
+  };
+  settings: {
+    themeColor: 'yellow' | 'blue' | 'green' | 'purple' | 'red';
+    darkMode: boolean;
+    notifications: {
+      inApp: boolean;
+      email: boolean;
+      push: boolean;
+    };
+    calendar: {
+      syncGoogle: boolean;
+      syncOutlook: boolean;
+      defaultView: 'month' | 'week' | 'day';
+    };
+    privacy: {
+      profileVisibility: 'public' | 'workspace' | 'private';
+      twoFactorAuth: boolean;
+    };
+  };
+  comparePassword(candidatePassword: string): Promise<boolean>;
+  generateRefreshToken(): string;
+  removeRefreshToken(token: string): void;
+  toJSON(): any;
+}
+
+// Workspace Types
+export interface IWorkspace extends Document {
+  _id: string;
+  name: string;
+  description?: string;
+  type: 'personal' | 'team' | 'enterprise';
+  region?: string;
+  owner: string;
+  members: Array<{
+    user: string;
+    role: 'owner' | 'admin' | 'manager' | 'member';
+    permissions: {
+      canCreateProject: boolean;
+      canManageEmployees: boolean;
+      canViewPayroll: boolean;
+      canExportReports: boolean;
+      canManageWorkspace: boolean;
+    };
+    joinedAt: Date;
+    status: 'active' | 'pending' | 'suspended';
+  }>;
+  settings: {
+    isPublic: boolean;
+    allowMemberInvites: boolean;
+    requireApprovalForJoining: boolean;
+    defaultProjectPermissions: {
+      canCreate: boolean;
+      canManage: boolean;
+      canView: boolean;
+    };
+  };
+  subscription: {
+    plan: 'free' | 'pro' | 'enterprise';
+    maxMembers: number;
+    maxProjects: number;
+    features: {
+      advancedAnalytics: boolean;
+      customFields: boolean;
+      apiAccess: boolean;
+      prioritySupport: boolean;
+    };
+  };
+  isActive: boolean;
+  memberCount: number;
+  addMember(userId: string, role?: string): Promise<IWorkspace>;
+  removeMember(userId: string): Promise<IWorkspace>;
+  updateMemberRole(userId: string, role: string): Promise<IWorkspace>;
+  isMember(userId: string): boolean;
+  hasPermission(userId: string, permission: string): boolean;
+  toJSON(): any;
+}
+
+// Project Types
+export interface IProject extends Document {
+  _id: string;
+  name: string;
+  description?: string;
+  client?: string;
+  workspace: string;
+  createdBy: string;
+  status: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  category?: string;
+  startDate?: Date;
+  dueDate?: Date;
+  completedDate?: Date;
+  budget?: {
+    estimated?: number;
+    actual?: number;
+    currency: string;
+  };
+  progress: number;
+  teamMembers: Array<{
+    user: string;
+    role: 'project-manager' | 'developer' | 'designer' | 'tester' | 'analyst' | 'member';
+    permissions: {
+      canManageTasks: boolean;
+      canManageTeam: boolean;
+      canViewReports: boolean;
+      canManageProject: boolean;
+    };
+    joinedAt: Date;
+  }>;
+  milestones: Array<{
+    _id: string;
+    name: string;
+    description?: string;
+    dueDate: Date;
+    completedDate?: Date;
+    status: 'pending' | 'in-progress' | 'completed' | 'overdue';
+    createdBy: string;
+  }>;
+  tags: string[];
+  attachments: Array<{
+    filename: string;
+    originalName: string;
+    path: string;
+    size: number;
+    mimeType: string;
+    uploadedBy: string;
+    uploadedAt: Date;
+  }>;
+  settings: {
+    isPublic: boolean;
+    allowMemberInvites: boolean;
+    timeTracking: {
+      enabled: boolean;
+      requireApproval: boolean;
+    };
+    notifications: {
+      taskUpdates: boolean;
+      milestoneReminders: boolean;
+      deadlineAlerts: boolean;
+    };
+  };
+  isActive: boolean;
+  teamMemberCount: number;
+  completedTasksCount: number;
+  totalTasksCount: number;
+  addTeamMember(userId: string, role?: string): Promise<IProject>;
+  removeTeamMember(userId: string): Promise<IProject>;
+  isTeamMember(userId: string): boolean;
+  hasPermission(userId: string, permission: string): boolean;
+  addMilestone(milestoneData: any, userId: string): Promise<IProject>;
+  updateMilestone(milestoneId: string, updateData: any): Promise<IProject>;
+  deleteMilestone(milestoneId: string): Promise<IProject>;
+  toJSON(): any;
+}
+
+// Task Types
+export interface ITask extends Document {
+  _id: string;
+  title: string;
+  description?: string;
+  project: string;
+  workspace: string;
+  createdBy: string;
+  assignee?: string;
+  status: 'todo' | 'in-progress' | 'completed' | 'cancelled' | 'on-hold';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  category?: string;
+  type: 'task' | 'bug' | 'feature' | 'epic' | 'story' | 'subtask';
+  startDate?: Date;
+  dueDate?: Date;
+  completedDate?: Date;
+  estimatedHours?: number;
+  actualHours: number;
+  progress: number;
+  subtasks: Array<{
+    _id: string;
+    title: string;
+    status: 'todo' | 'in-progress' | 'completed';
+    assignee?: string;
+    dueDate?: Date;
+    completedDate?: Date;
+    createdBy: string;
+  }>;
+  dependencies: Array<{
+    task: string;
+    type: 'blocks' | 'blocked-by' | 'relates-to';
+  }>;
+  comments: Array<{
+    _id: string;
+    content: string;
+    author: string;
+    createdAt: Date;
+    updatedAt: Date;
+    isEdited: boolean;
+  }>;
+  attachments: Array<{
+    filename: string;
+    originalName: string;
+    path: string;
+    size: number;
+    mimeType: string;
+    uploadedBy: string;
+    uploadedAt: Date;
+  }>;
+  tags: string[];
+  watchers: string[];
+  timeEntries: Array<{
+    _id: string;
+    user: string;
+    startTime: Date;
+    endTime?: Date;
+    duration?: number;
+    description?: string;
+    isApproved: boolean;
+    approvedBy?: string;
+    approvedAt?: Date;
+  }>;
+  customFields: Array<{
+    name: string;
+    value: any;
+    type: 'text' | 'number' | 'date' | 'boolean' | 'select' | 'multiselect';
+  }>;
+  settings: {
+    isPublic: boolean;
+    allowComments: boolean;
+    allowTimeTracking: boolean;
+    requireApproval: boolean;
+  };
+  isActive: boolean;
+  subtaskCompletionPercentage: number;
+  totalTimeLogged: number;
+  commentCount: number;
+  addSubtask(subtaskData: any, userId: string): Promise<ITask>;
+  updateSubtask(subtaskId: string, updateData: any): Promise<ITask>;
+  deleteSubtask(subtaskId: string): Promise<ITask>;
+  addComment(content: string, userId: string): Promise<ITask>;
+  updateComment(commentId: string, content: string, userId: string): Promise<ITask>;
+  deleteComment(commentId: string, userId: string): Promise<ITask>;
+  addTimeEntry(timeEntryData: any, userId: string): Promise<ITask>;
+  approveTimeEntry(timeEntryId: string, approverId: string): Promise<ITask>;
+  addWatcher(userId: string): Promise<ITask>;
+  removeWatcher(userId: string): Promise<ITask>;
+  toJSON(): any;
+}
+
+// API Response Types
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data?: T;
+  error?: string;
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+// Auth Types
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface RegisterRequest {
+  fullName: string;
+  username: string;
+  email: string;
+  contactNumber?: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface AuthResponse {
+  user: IUser;
+  accessToken: string;
+  refreshToken: string;
+}
+
+// Request Types
+export interface AuthenticatedRequest extends Request {
+  user?: IUser;
+  workspace?: IWorkspace;
+  project?: IProject;
+  workspaceMember?: any;
+  projectMember?: any;
+  refreshToken?: string;
+}
+
+// JWT Payload
+export interface JWTPayload {
+  userId: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+}
+
+// File Upload Types
+export interface FileUpload {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  destination: string;
+  filename: string;
+  path: string;
+  buffer: Buffer;
+}
+
+// Query Types
+export interface QueryOptions {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  filter?: Record<string, any>;
+  search?: string;
+}
+
+// Dashboard Types
+export interface DashboardStats {
+  activeProjects: number;
+  tasksDue: number;
+  weeklyHours: number;
+  payrollStatus: {
+    amount: number;
+    status: string;
+  };
+}
+
+// Notification Types
+export interface INotification extends Document {
+  _id: string;
+  type: 'task' | 'project' | 'workspace' | 'system';
+  title: string;
+  message: string;
+  read: boolean;
+  userId: string;
+  relatedId?: string;
+  createdAt: Date;
+}
+
+// Error Types
+export interface AppError extends Error {
+  statusCode?: number;
+  isOperational?: boolean;
+}
+
+// Middleware Types
+export interface MiddlewareFunction {
+  (req: AuthenticatedRequest, res: any, next: any): void | Promise<void>;
+}
+
+// Team Types
+export interface ITeam extends Document {
+  _id: string;
+  name: string;
+  description?: string;
+  workspace: string;
+  leader: string;
+  members: Array<{
+    user: string;
+    role: 'leader' | 'senior' | 'member' | 'intern';
+    joinedAt: Date;
+    status: 'active' | 'inactive' | 'on-leave';
+  }>;
+  skills: string[];
+  isActive: boolean;
+  memberCount: number;
+  addMember(userId: string, role?: string): Promise<ITeam>;
+  removeMember(userId: string): Promise<ITeam>;
+  updateMemberRole(userId: string, role: string): Promise<ITeam>;
+  toJSON(): any;
+}
+
+// Payroll Types
+export interface IPayroll extends Document {
+  _id: string;
+  employee: string;
+  workspace: string;
+  period: {
+    startDate: Date;
+    endDate: Date;
+    month: number;
+    year: number;
+  };
+  salary: {
+    baseSalary: number;
+    hourlyRate?: number;
+    overtimeRate?: number;
+  };
+  hours: {
+    regularHours: number;
+    overtimeHours: number;
+    totalHours: number;
+  };
+  earnings: {
+    regularPay: number;
+    overtimePay: number;
+    bonuses: number;
+    commissions: number;
+    totalEarnings: number;
+  };
+  deductions: {
+    taxes: {
+      federal: number;
+      state: number;
+      local: number;
+    };
+    insurance: {
+      health: number;
+      dental: number;
+      vision: number;
+    };
+    retirement: number;
+    other: number;
+    totalDeductions: number;
+  };
+  netPay: number;
+  status: 'draft' | 'pending' | 'approved' | 'paid' | 'cancelled';
+  paymentMethod: 'direct-deposit' | 'check' | 'cash';
+  paymentDate?: Date;
+  notes?: string;
+  isActive: boolean;
+  calculateTotals(): Promise<IPayroll>;
+  approve(): Promise<IPayroll>;
+  markAsPaid(paymentDate: Date): Promise<IPayroll>;
+  toJSON(): any;
+}
+
+// Controller Types
+export interface ControllerFunction {
+  (req: AuthenticatedRequest, res: any): Promise<void>;
+}
