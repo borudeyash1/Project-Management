@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
+import WorkspaceModeSwitcher from './WorkspaceModeSwitcher';
 import { 
   Search, 
   Bell, 
@@ -50,6 +51,9 @@ const Header: React.FC = () => {
             <div className="text-xs text-slate-500">Project & Payroll Suite</div>
           </div>
         </div>
+        
+        {/* Workspace Mode Switcher */}
+        <WorkspaceModeSwitcher />
       </div>
 
       <div className="flex items-center gap-3">

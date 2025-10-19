@@ -139,6 +139,52 @@ class ApiService {
     return response.data!;
   }
 
+  async getProfile(): Promise<any> {
+    const response = await this.request<any>('/users/profile');
+    return response.data!;
+  }
+
+  async getSettings(): Promise<any> {
+    const response = await this.request<any>('/users/settings');
+    return response.data!;
+  }
+
+  async changePassword(passwordData: { currentPassword: string; newPassword: string }): Promise<void> {
+    await this.request('/users/change-password', {
+      method: 'POST',
+      body: JSON.stringify(passwordData),
+    });
+  }
+
+  async addAddress(addressData: any): Promise<void> {
+    await this.request('/users/addresses', {
+      method: 'POST',
+      body: JSON.stringify(addressData),
+    });
+  }
+
+  async addPaymentMethod(paymentData: any): Promise<void> {
+    await this.request('/users/payment-methods', {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    });
+  }
+
+  async deleteAccount(data: { reason: string }): Promise<void> {
+    await this.request('/users/delete-account', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async exportData(data: { format: string }): Promise<any> {
+    const response = await this.request<any>('/users/export-data', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data!;
+  }
+
   // Workspace endpoints
   async getWorkspaces(): Promise<Workspace[]> {
     const response = await this.request<Workspace[]>('/workspaces');

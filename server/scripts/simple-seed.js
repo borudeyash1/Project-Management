@@ -16,8 +16,27 @@ const userSchema = new mongoose.Schema({
   avatarUrl: String,
   isEmailVerified: Boolean,
   subscription: {
+    plan: String,
+    status: String,
+    startDate: Date,
+    endDate: Date,
+    autoRenew: Boolean,
+    paymentMethod: String,
+    billingCycle: String,
+    features: {
+      maxWorkspaces: Number,
+      maxProjects: Number,
+      maxTeamMembers: Number,
+      maxStorage: Number,
+      aiAssistance: Boolean,
+      advancedAnalytics: Boolean,
+      customIntegrations: Boolean,
+      prioritySupport: Boolean,
+      whiteLabeling: Boolean,
+      apiAccess: Boolean
+    },
     isPro: Boolean,
-    plan: String
+    trialEndsAt: Date
   },
   profile: mongoose.Schema.Types.Mixed
 }, { timestamps: true });
@@ -57,8 +76,24 @@ const testUsers = [
     isEmailVerified: true,
     isActive: true,
     subscription: {
-      isPro: false,
-      plan: 'free'
+      plan: 'free',
+      status: 'active',
+      startDate: new Date(),
+      autoRenew: false,
+      billingCycle: 'monthly',
+      features: {
+        maxWorkspaces: 1,
+        maxProjects: 3,
+        maxTeamMembers: 5,
+        maxStorage: 1,
+        aiAssistance: true,
+        advancedAnalytics: false,
+        customIntegrations: false,
+        prioritySupport: false,
+        whiteLabeling: false,
+        apiAccess: false
+      },
+      isPro: false
     },
     profile: {
       jobTitle: 'Product Manager',
@@ -113,8 +148,27 @@ const testUsers = [
     isEmailVerified: true,
     isActive: true,
     subscription: {
+      plan: 'pro',
+      status: 'active',
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      autoRenew: true,
+      paymentMethod: 'card',
+      billingCycle: 'yearly',
+      features: {
+        maxWorkspaces: 5,
+        maxProjects: -1, // unlimited
+        maxTeamMembers: 50,
+        maxStorage: 100,
+        aiAssistance: true,
+        advancedAnalytics: true,
+        customIntegrations: true,
+        prioritySupport: true,
+        whiteLabeling: false,
+        apiAccess: false
+      },
       isPro: true,
-      plan: 'pro'
+      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days from now
     },
     profile: {
       jobTitle: 'Senior UI/UX Designer',
@@ -169,8 +223,27 @@ const testUsers = [
     isEmailVerified: true,
     isActive: true,
     subscription: {
-      isPro: false,
-      plan: 'free'
+      plan: 'ultra',
+      status: 'active',
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      autoRenew: true,
+      paymentMethod: 'paypal',
+      billingCycle: 'yearly',
+      features: {
+        maxWorkspaces: -1, // unlimited
+        maxProjects: -1, // unlimited
+        maxTeamMembers: -1, // unlimited
+        maxStorage: 1024, // 1 TB
+        aiAssistance: true,
+        advancedAnalytics: true,
+        customIntegrations: true,
+        prioritySupport: true,
+        whiteLabeling: true,
+        apiAccess: true
+      },
+      isPro: true,
+      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days from now
     },
     profile: {
       jobTitle: 'Senior Full Stack Developer',
@@ -272,9 +345,9 @@ async function seed() {
     console.log(`👥 Users: ${users.length}`);
     
     console.log('\n🔑 Test User Credentials:');
-    console.log('Alex Johnson - alex@example.com / password123');
-    console.log('Sarah Chen - sarah@example.com / sarah123');
-    console.log('Mike Rodriguez - mike@example.com / mike123');
+    console.log('🆓 Free Plan: Alex Johnson - alex@example.com / password123');
+    console.log('⚡ Pro Plan: Sarah Chen - sarah@example.com / sarah123');
+    console.log('👑 Ultra Plan: Mike Rodriguez - mike@example.com / mike123');
     
     process.exit(0);
   } catch (error) {

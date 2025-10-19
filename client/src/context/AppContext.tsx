@@ -9,9 +9,25 @@ const initialState: AppState = {
   cwStep: 1,
   toasts: [],
   subscription: {
+    plan: 'free' as const,
+    status: 'active' as const,
+    startDate: new Date(),
+    autoRenew: false,
+    billingCycle: 'monthly' as const,
+    features: {
+      maxWorkspaces: 1,
+      maxProjects: 3,
+      maxTeamMembers: 5,
+      maxStorage: 1,
+      aiAssistance: true,
+      advancedAnalytics: false,
+      customIntegrations: false,
+      prioritySupport: false,
+      whiteLabeling: false,
+      apiAccess: false
+    },
     isPro: false,
-    trialEndsAt: undefined,
-    plan: 'free'
+    trialEndsAt: undefined
   },
   roles: {
     currentUserRole: 'Member',
@@ -55,9 +71,25 @@ const initialState: AppState = {
     isEmailVerified: true,
     isActive: true,
     subscription: {
+      plan: 'free' as const,
+      status: 'active' as const,
+      startDate: new Date(),
+      autoRenew: false,
+      billingCycle: 'monthly' as const,
+      features: {
+        maxWorkspaces: 1,
+        maxProjects: 3,
+        maxTeamMembers: 5,
+        maxStorage: 1,
+        aiAssistance: true,
+        advancedAnalytics: false,
+        customIntegrations: false,
+        prioritySupport: false,
+        whiteLabeling: false,
+        apiAccess: false
+      },
       isPro: false,
-      trialEndsAt: undefined,
-      plan: 'free'
+      trialEndsAt: undefined
     },
     settings: {
       themeColor: 'yellow',
@@ -298,7 +330,8 @@ type AppAction =
   | { type: 'SET_USER'; payload: User }
   | { type: 'SET_WORKSPACES'; payload: Workspace[] }
   | { type: 'SET_PROJECTS'; payload: Project[] }
-  | { type: 'SET_TASKS'; payload: Task[] };
+  | { type: 'SET_TASKS'; payload: Task[] }
+  | { type: 'LOGOUT' };
 
 // Reducer function
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -385,6 +418,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, projects: action.payload };
     case 'SET_TASKS':
       return { ...state, tasks: action.payload };
+    case 'LOGOUT':
+      return { ...initialState };
     default:
       return state;
   }

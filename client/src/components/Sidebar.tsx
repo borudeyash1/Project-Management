@@ -16,8 +16,10 @@ import {
   BarChart3,
   Users,
   FileText,
-  Target
+  Target,
+  LogOut
 } from 'lucide-react';
+import { apiService } from '../services/api';
 
 interface SidebarItem {
   id: string;
@@ -62,6 +64,24 @@ const Sidebar: React.FC = () => {
       label: 'Tracker',
       icon: Clock,
       path: '/tracker'
+    },
+    {
+      id: 'tasks',
+      label: 'Tasks',
+      icon: FileText,
+      path: '/tasks'
+    },
+    {
+      id: 'profile',
+      label: 'Profile',
+      icon: User,
+      path: '/profile'
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: Settings,
+      path: '/settings'
     },
     {
       id: 'reminders',
@@ -113,6 +133,19 @@ const Sidebar: React.FC = () => {
   const handleItemClick = (item: SidebarItem) => {
     navigate(item.path);
     dispatch({ type: 'SET_SECTION', payload: item.id });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await apiService.logout();
+      dispatch({ type: 'LOGOUT' });
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout fails on server, clear local state
+      dispatch({ type: 'LOGOUT' });
+      navigate('/login');
+    }
   };
 
   const isActive = (item: SidebarItem) => {
@@ -176,6 +209,17 @@ const Sidebar: React.FC = () => {
               </button>
             );
           })}
+          
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-red-600 hover:bg-red-50 hover:text-red-700"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {!state.sidebar.collapsed && (
+              <span className="truncate">Logout</span>
+            )}
+          </button>
         </div>
 
         {/* Workspace Info */}

@@ -14,6 +14,10 @@ import projectRoutes from './routes/projects';
 import taskRoutes from './routes/tasks';
 import teamRoutes from './routes/teams';
 import payrollRoutes from './routes/payroll';
+import goalRoutes from './routes/goals';
+import reminderRoutes from './routes/reminders';
+import trackerRoutes from './routes/tracker';
+import reportRoutes from './routes/reports';
 
 // Load environment variables
 dotenv.config({ path: './.env' });
@@ -52,6 +56,10 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/payroll', payrollRoutes);
+app.use('/api/goals', goalRoutes);
+app.use('/api/reminders', reminderRoutes);
+app.use('/api/tracker', trackerRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

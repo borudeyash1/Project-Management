@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, ChevronLeft, ChevronRight, Check, Star, Clock, Target, Brain, User, Briefcase, GraduationCap, Zap } from 'lucide-react';
 import { RegisterRequest } from '../types';
 import { apiService } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
+import { googleAuthService } from '../config/googleAuth';
 
 interface Skill {
   name: string;
@@ -103,7 +104,8 @@ const EnhancedRegistration: React.FC = () => {
   });
 
   const [newInterest, setNewInterest] = useState('');
-
+  const [oauthData, setOauthData] = useState<any>(null);
+  
   const steps = [
     { id: 1, title: 'Basic Info', icon: User, description: 'Your basic information' },
     { id: 2, title: 'Professional', icon: Briefcase, description: 'Work and experience' },
@@ -114,6 +116,59 @@ const EnhancedRegistration: React.FC = () => {
 
   const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
     dispatch({ type: 'ADD_TOAST', payload: { message, type } });
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      setLoading(true);
+      
+      // Initialize Google Auth if not already done
+      await googleAuthService.initializeGapi();
+      
+      // Sign in with Google
+      const googleUser = await googleAuthService.signInWithGoogle();
+      
+      // Check if user already exists
+      try {
+        const loginResponse = await apiService.googleAuth({
+          id: googleUser.id,
+          name: googleUser.name,
+          email: googleUser.email,
+          imageUrl: googleUser.imageUrl,
+          accessToken: googleUser.accessToken,
+          idToken: googleUser.idToken
+        });
+        
+        // User exists, log them in
+        localStorage.setItem('accessToken', loginResponse.accessToken);
+        localStorage.setItem('refreshToken', loginResponse.refreshToken);
+        dispatch({ type: 'SET_USER', payload: loginResponse.user });
+        showToast('Welcome back!', 'success');
+        navigate('/home');
+        return;
+      } catch (loginError: any) {
+        // User doesn't exist, pre-fill registration form
+        if (loginError.message?.includes('not found') || loginError.message?.includes('User not found')) {
+          setOauthData(googleUser);
+          setFormData(prev => ({
+            ...prev,
+            fullName: googleUser.name || '',
+            email: googleUser.email || '',
+            username: googleUser.email?.split('@')[0] + '_' + Math.random().toString(36).substr(2, 5) || '',
+            password: '', // User needs to set password
+            confirmPassword: ''
+          }));
+          showToast('Please complete your registration with the information below', 'info');
+        } else {
+          throw loginError;
+        }
+      }
+    } catch (error: any) {
+      console.error('Google authentication error:', error);
+      showToast(error.message || 'Google authentication failed', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -303,7 +358,28 @@ const EnhancedRegistration: React.FC = () => {
     try {
       console.log('Submitting registration data:', formData);
       
-      const response = await apiService.register(formData);
+      let response;
+      if (oauthData) {
+        // OAuth registration - create user with Google data
+        const oauthRegisterData = {
+          ...formData,
+          googleId: oauthData.id,
+          avatarUrl: oauthData.imageUrl,
+          isEmailVerified: true
+        };
+        response = await apiService.googleAuth({
+          id: oauthData.id,
+          name: oauthData.name,
+          email: oauthData.email,
+          imageUrl: oauthData.imageUrl,
+          accessToken: oauthData.accessToken,
+          idToken: oauthData.idToken,
+          password: formData.password // Include password for OAuth registration
+        });
+      } else {
+        // Regular registration
+        response = await apiService.register(formData);
+      }
       
       // Store tokens in localStorage
       localStorage.setItem('accessToken', response.accessToken);
@@ -428,6 +504,40 @@ const EnhancedRegistration: React.FC = () => {
                   required
                 />
               </div>
+            </div>
+            
+            {/* OAuth Section */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-3 text-sm text-gray-500">or</span>
+                </div>
+              </div>
+              
+              <button
+                type="button"
+                className="w-full mt-4 px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm flex items-center justify-center gap-3 transition-colors"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+              >
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
+                Continue with Google
+              </button>
+              
+              {oauthData && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center">
+                    <img src={oauthData.imageUrl} alt="Profile" className="w-8 h-8 rounded-full mr-3" />
+                    <div>
+                      <p className="text-sm font-medium text-green-800">Signed in as {oauthData.name}</p>
+                      <p className="text-xs text-green-600">{oauthData.email}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );

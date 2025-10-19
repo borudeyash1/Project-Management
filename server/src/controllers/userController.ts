@@ -24,12 +24,12 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
 // Update user profile
 export const updateProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { fullName, phone, designation, department, location, about } = req.body;
+    const { fullName, contactNumber, designation, department, location, about } = req.body;
     const user = req.user!;
 
     // Update fields
     if (fullName) user.fullName = fullName;
-    if (phone) user.phone = phone;
+    if (contactNumber) user.contactNumber = contactNumber;
     if (designation) user.designation = designation;
     if (department) user.department = department;
     if (location) user.location = location;

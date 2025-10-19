@@ -31,7 +31,7 @@ const userSchema = new Schema<IUser>({
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters']
   },
-  phone: {
+  contactNumber: {
     type: String,
     trim: true,
     match: [/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number']
@@ -321,21 +321,73 @@ const userSchema = new Schema<IUser>({
     }
   }],
   lastLogin: Date,
+  loginHistory: [{
+    ipAddress: String,
+    userAgent: String,
+    machineId: String,
+    macAddress: String,
+    loginTime: {
+      type: Date,
+      default: Date.now
+    },
+    location: {
+      country: String,
+      city: String,
+      region: String
+    }
+  }],
   isActive: {
     type: Boolean,
     default: true
   },
   subscription: {
+    plan: {
+      type: String,
+      enum: ['free', 'pro', 'ultra'],
+      default: 'free'
+    },
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'cancelled', 'expired'],
+      default: 'active'
+    },
+    startDate: {
+      type: Date,
+      default: Date.now
+    },
+    endDate: Date,
+    autoRenew: {
+      type: Boolean,
+      default: false
+    },
+    paymentMethod: {
+      type: String,
+      enum: ['card', 'paypal', 'bank_transfer', 'crypto'],
+      default: null
+    },
+    billingCycle: {
+      type: String,
+      enum: ['monthly', 'yearly'],
+      default: 'monthly'
+    },
+    features: {
+      maxWorkspaces: { type: Number, default: 1 },
+      maxProjects: { type: Number, default: 3 },
+      maxTeamMembers: { type: Number, default: 5 },
+      maxStorage: { type: Number, default: 1 }, // GB
+      aiAssistance: { type: Boolean, default: true },
+      advancedAnalytics: { type: Boolean, default: false },
+      customIntegrations: { type: Boolean, default: false },
+      prioritySupport: { type: Boolean, default: false },
+      whiteLabeling: { type: Boolean, default: false },
+      apiAccess: { type: Boolean, default: false }
+    },
+    // Legacy fields for backward compatibility
     isPro: {
       type: Boolean,
       default: false
     },
-    trialEndsAt: Date,
-    plan: {
-      type: String,
-      enum: ['free', 'pro', 'enterprise'],
-      default: 'free'
-    }
+    trialEndsAt: Date
   },
   settings: {
     themeColor: {
