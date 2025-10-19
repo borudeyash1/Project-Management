@@ -3,22 +3,30 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AppProvider, useApp } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Auth from './components/Auth';
+import HomePage from './components/HomePage';
+import ProjectsPage from './components/ProjectsPage';
+import ProjectViewDetailed from './components/ProjectViewDetailed';
+import PlannerPage from './components/PlannerPage';
 import Dashboard from './components/Dashboard';
-import ProjectsListSection from './components/ProjectsListSection';
-import ProjectView from './components/ProjectView';
-import PlannerSection from './components/PlannerSection';
-import TrackerSection from './components/TrackerSection';
-import RemindersCalendarSection from './components/RemindersCalendarSection';
+import TrackerPage from './components/TrackerPage';
+import RemindersPage from './components/RemindersPage';
+import ReportsPage from './components/ReportsPage';
+import TeamPage from './components/TeamPage';
+import GoalsPage from './components/GoalsPage';
 import SettingsSection from './components/SettingsSection';
 import ProfileSection from './components/ProfileSection';
 import WorkspaceDiscover from './components/WorkspaceDiscover';
 import WorkspaceOwner from './components/WorkspaceOwner';
 import WorkspaceMember from './components/WorkspaceMember';
+import Profile from './components/Profile';
+import Settings from './components/Settings';
+import ProjectManagementView from './components/ProjectManagementView';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ToastContainer from './components/ToastContainer';
 import NotificationsPanel from './components/NotificationsPanel';
 import TaskDrawer from './components/TaskDrawer';
+import TaskManagement from './components/TaskManagement';
 import LandingPage from './components/LandingPage';
 import About from './components/About';
 import UserGuide from './components/UserGuide';
@@ -95,7 +103,7 @@ const AppContent: React.FC = () => {
         <Route path="/home" element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <HomePage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -103,7 +111,7 @@ const AppContent: React.FC = () => {
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <HomePage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -111,7 +119,7 @@ const AppContent: React.FC = () => {
         <Route path="/projects" element={
           <ProtectedRoute>
             <AppLayout>
-              <ProjectsListSection />
+              <ProjectsPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -119,7 +127,23 @@ const AppContent: React.FC = () => {
         <Route path="/project/:projectId" element={
           <ProtectedRoute>
             <AppLayout>
-              <ProjectView />
+              <ProjectViewDetailed />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/project-management/:projectId" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ProjectManagementView />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/tasks" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <TaskManagement />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -127,7 +151,7 @@ const AppContent: React.FC = () => {
         <Route path="/planner" element={
           <ProtectedRoute>
             <AppLayout>
-              <PlannerSection />
+              <PlannerPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -135,23 +159,7 @@ const AppContent: React.FC = () => {
         <Route path="/tracker" element={
           <ProtectedRoute>
             <AppLayout>
-              <TrackerSection />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/reminders" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RemindersCalendarSection />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <SettingsSection />
+              <TrackerPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -159,7 +167,23 @@ const AppContent: React.FC = () => {
         <Route path="/profile" element={
           <ProtectedRoute>
             <AppLayout>
-              <ProfileSection />
+              <Profile />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Settings />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/reminders" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <RemindersPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -191,7 +215,7 @@ const AppContent: React.FC = () => {
         <Route path="/reports" element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <ReportsPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -199,7 +223,7 @@ const AppContent: React.FC = () => {
         <Route path="/team" element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <TeamPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -207,7 +231,7 @@ const AppContent: React.FC = () => {
         <Route path="/goals" element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <GoalsPage />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -217,7 +241,6 @@ const AppContent: React.FC = () => {
       </Routes>
 
       {/* Modals */}
-      <CreateWorkspaceModal />
       <CreateProjectModal />
       <WorkloadDeadlineModal />
       <TaskDetailsModal />
@@ -231,7 +254,6 @@ const AppContent: React.FC = () => {
       <TimesheetModal />
       <InviteEmployeeModal />
       <ClientModal />
-      <PricingModal />
       <RequestChangeModal />
       <NotificationsPanel />
       <TaskDrawer />

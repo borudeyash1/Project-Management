@@ -119,8 +119,37 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Update last login
+    // Update last login and track login information
     user.lastLogin = new Date();
+    
+    // Get client information
+    const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.get('User-Agent') || 'unknown';
+    const machineId = req.get('X-Machine-ID') || 'unknown';
+    const macAddress = req.get('X-MAC-Address') || 'unknown';
+    
+    // Add to login history
+    if (!user.loginHistory) {
+      user.loginHistory = [];
+    }
+    user.loginHistory.push({
+      ipAddress,
+      userAgent,
+      machineId,
+      macAddress,
+      loginTime: new Date(),
+      location: {
+        country: 'Unknown',
+        city: 'Unknown',
+        region: 'Unknown'
+      }
+    });
+    
+    // Keep only last 10 login records
+    if (user.loginHistory.length > 10) {
+      user.loginHistory = user.loginHistory.slice(-10);
+    }
+    
     await user.save();
 
     // Generate tokens
@@ -336,7 +365,7 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
 // Google OAuth authentication
 export const googleAuth = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id, name, email, imageUrl, accessToken, idToken } = req.body;
+    const { id, name, email, imageUrl, accessToken, idToken, password } = req.body;
 
     // Verify Google ID token
     let ticket;
@@ -374,6 +403,7 @@ export const googleAuth = async (req: Request, res: Response): Promise<void> => 
         fullName: name,
         username,
         email,
+        password: password || crypto.randomBytes(16).toString('hex'), // Use provided password or generate random
         avatarUrl: imageUrl,
         isEmailVerified: true,
         profile: {
@@ -445,8 +475,38 @@ export const googleAuth = async (req: Request, res: Response): Promise<void> => 
       await user.save();
     }
 
-    // Update last login
+    // Update last login and track login information
     user.lastLogin = new Date();
+    
+    // Get client information
+    const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.get('User-Agent') || 'unknown';
+    const machineId = req.get('X-Machine-ID') || 'unknown';
+    const macAddress = req.get('X-MAC-Address') || 'unknown';
+    
+    // Add to login history
+    if (!user.loginHistory) {
+      user.loginHistory = [];
+    }
+    user.loginHistory.push({
+      ipAddress,
+      userAgent,
+      machineId,
+      macAddress,
+      loginTime: new Date(),
+      location: {
+        country: 'Unknown',
+        city: 'Unknown',
+        region: 'Unknown'
+      }
+    });
+    
+    // Keep only last 10 login records
+    if (user.loginHistory.length > 10) {
+      user.loginHistory = user.loginHistory.slice(-10);
+    }
+    
+    await user.save();
 
     // Generate tokens
     const jwtAccessToken = generateToken(user._id);
