@@ -108,13 +108,7 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         } />
         
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <HomePage />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
+        
         
         <Route path="/projects" element={
           <ProtectedRoute>
