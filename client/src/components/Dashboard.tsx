@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
   Building, 
@@ -27,10 +27,12 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import ChatbotButton from './ChatbotButton';
+import { WorkspaceCreationRestriction } from './FeatureRestriction';
 
 const Dashboard: React.FC = () => {
   const { state, dispatch } = useApp();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
@@ -164,13 +166,15 @@ const Dashboard: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <button 
-                className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm"
-                onClick={() => toggleModal('createWorkspace')}
-              >
-                <Building className="w-4 h-4 mr-1 inline-block" />
-                Create workspace
-              </button>
+              <WorkspaceCreationRestriction>
+                <button 
+                  className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm"
+                  onClick={() => navigate('/workspace')}
+                >
+                  <Building className="w-4 h-4 mr-1 inline-block" />
+                  Create workspace
+                </button>
+              </WorkspaceCreationRestriction>
               <button 
                 className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
                 onClick={() => showToast('Quick add', 'info')}

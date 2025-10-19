@@ -112,9 +112,28 @@ export interface User {
 }
 
 export interface UserSubscription {
+  plan: 'free' | 'pro' | 'ultra';
+  status: 'active' | 'inactive' | 'cancelled' | 'expired';
+  startDate: Date;
+  endDate?: Date;
+  autoRenew: boolean;
+  paymentMethod?: 'card' | 'paypal' | 'bank_transfer' | 'crypto';
+  billingCycle: 'monthly' | 'yearly';
+  features: {
+    maxWorkspaces: number;
+    maxProjects: number;
+    maxTeamMembers: number;
+    maxStorage: number; // GB
+    aiAssistance: boolean;
+    advancedAnalytics: boolean;
+    customIntegrations: boolean;
+    prioritySupport: boolean;
+    whiteLabeling: boolean;
+    apiAccess: boolean;
+  };
+  // Legacy fields for backward compatibility
   isPro: boolean;
   trialEndsAt?: Date;
-  plan: 'free' | 'pro' | 'enterprise';
 }
 
 export interface UserSettings {
@@ -548,6 +567,7 @@ export interface Toast {
   message: string;
   type: 'success' | 'error' | 'warning' | 'info';
   id?: string;
+  duration?: number;
 }
 
 // Route Types

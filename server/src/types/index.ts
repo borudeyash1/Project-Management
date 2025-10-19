@@ -8,7 +8,7 @@ export interface IUser extends Document {
   email: string;
   username: string;
   password: string;
-  phone?: string;
+  contactNumber?: string;
   designation?: string;
   department?: string;
   location?: string;
@@ -23,11 +23,42 @@ export interface IUser extends Document {
     createdAt: Date;
   }>;
   lastLogin?: Date;
+  loginHistory?: Array<{
+    ipAddress: string;
+    userAgent: string;
+    machineId: string;
+    macAddress: string;
+    loginTime: Date;
+    location: {
+      country: string;
+      city: string;
+      region: string;
+    };
+  }>;
   isActive: boolean;
   subscription: {
+    plan: 'free' | 'pro' | 'ultra';
+    status: 'active' | 'inactive' | 'cancelled' | 'expired';
+    startDate: Date;
+    endDate?: Date;
+    autoRenew: boolean;
+    paymentMethod?: 'card' | 'paypal' | 'bank_transfer' | 'crypto';
+    billingCycle: 'monthly' | 'yearly';
+    features: {
+      maxWorkspaces: number;
+      maxProjects: number;
+      maxTeamMembers: number;
+      maxStorage: number; // GB
+      aiAssistance: boolean;
+      advancedAnalytics: boolean;
+      customIntegrations: boolean;
+      prioritySupport: boolean;
+      whiteLabeling: boolean;
+      apiAccess: boolean;
+    };
+    // Legacy fields for backward compatibility
     isPro: boolean;
     trialEndsAt?: Date;
-    plan: 'free' | 'pro' | 'enterprise';
   };
   settings: {
     themeColor: 'yellow' | 'blue' | 'green' | 'purple' | 'red';
