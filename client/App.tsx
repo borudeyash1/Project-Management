@@ -99,13 +99,7 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         } />
         
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Dashboard />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
+        
         
         <Route path="/projects" element={
           <ProtectedRoute>

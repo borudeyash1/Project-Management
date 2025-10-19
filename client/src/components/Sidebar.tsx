@@ -41,12 +41,7 @@ const Sidebar: React.FC = () => {
       icon: Home,
       path: '/home'
     },
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      path: '/dashboard'
-    },
+    
     {
       id: 'projects',
       label: 'Projects',
