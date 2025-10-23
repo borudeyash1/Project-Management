@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import User from '@/models/User';
-import { AuthenticatedRequest, ApiResponse } from '@/types';
+import User from '../models/User';
+import { AuthenticatedRequest, ApiResponse } from '../types';
 
 // Get user profile
 export const getProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {

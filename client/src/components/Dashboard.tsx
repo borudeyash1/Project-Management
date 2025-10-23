@@ -26,7 +26,6 @@ import {
   Home,
   LayoutDashboard
 } from 'lucide-react';
-import ChatbotButton from './ChatbotButton';
 import { WorkspaceCreationRestriction } from './FeatureRestriction';
 
 const Dashboard: React.FC = () => {
@@ -239,9 +238,6 @@ const Dashboard: React.FC = () => {
       {(currentPage === 'planner' || currentPage === 'tracker' || currentPage === 'reminders' || currentPage === 'workspace') && (
         <DefaultContent currentPage={currentPage} activeTab={activeTab} />
       )}
-
-      {/* AI Chatbot Button */}
-      <ChatbotButton />
     </div>
   );
 };
