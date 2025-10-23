@@ -6,9 +6,9 @@ import {
   updateSettings,
   deleteAccount,
   uploadAvatar
-} from '@/controllers/userController';
-import { authenticate } from '@/middleware/auth';
-import { validateRequest } from '@/middleware/validation';
+} from '../controllers/userController';
+import { authenticate } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = express.Router();
 

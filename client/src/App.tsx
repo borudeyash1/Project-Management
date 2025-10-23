@@ -30,6 +30,7 @@ import TaskManagement from './components/TaskManagement';
 import LandingPage from './components/LandingPage';
 import About from './components/About';
 import UserGuide from './components/UserGuide';
+import ChatbotButton from './components/ChatbotButton';
 
 // Import all modals
 import CreateWorkspaceModal from './components/CreateWorkspaceModal';
@@ -79,6 +80,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {children}
         </main>
       </div>
+      {/* AI Chatbot Button - Available on all protected pages */}
+      <ChatbotButton />
     </div>
   );
 };
