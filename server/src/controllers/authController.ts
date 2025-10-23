@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import User from '@/models/User';
-import { AuthenticatedRequest, ApiResponse, AuthResponse, LoginRequest, RegisterRequest, JWTPayload } from '@/types';
+import User from '../models/User';
+import { AuthenticatedRequest, ApiResponse, AuthResponse, LoginRequest, RegisterRequest, JWTPayload } from '../types';
 
 // Initialize Google OAuth2 client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

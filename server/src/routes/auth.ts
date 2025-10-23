@@ -10,9 +10,9 @@ import {
   resetPassword,
   verifyEmail,
   googleAuth
-} from '@/controllers/authController';
-import { authenticate, authenticateRefresh } from '@/middleware/auth';
-import { validateRequest } from '@/middleware/validation';
+} from '../controllers/authController';
+import { authenticate, authenticateRefresh } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = express.Router();
 

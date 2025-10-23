@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '@/models/User';
-import { AuthenticatedRequest, JWTPayload } from '@/types';
+import User from '../models/User';
+import { AuthenticatedRequest, JWTPayload } from '../types';
 
 // Verify JWT token
 export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
