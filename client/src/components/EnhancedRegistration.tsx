@@ -105,7 +105,7 @@ const EnhancedRegistration: React.FC = () => {
 
   const [newInterest, setNewInterest] = useState('');
   const [oauthData, setOauthData] = useState<any>(null);
-  
+
   const steps = [
     { id: 1, title: 'Basic Info', icon: User, description: 'Your basic information' },
     { id: 2, title: 'Professional', icon: Briefcase, description: 'Work and experience' },
@@ -121,13 +121,13 @@ const EnhancedRegistration: React.FC = () => {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
-      
+
       // Initialize Google Auth if not already done
       await googleAuthService.initializeGapi();
-      
+
       // Sign in with Google
       const googleUser = await googleAuthService.signInWithGoogle();
-      
+
       // Check if user already exists
       try {
         const loginResponse = await apiService.googleAuth({
@@ -138,7 +138,7 @@ const EnhancedRegistration: React.FC = () => {
           accessToken: googleUser.accessToken,
           idToken: googleUser.idToken
         });
-        
+
         // User exists, log them in
         localStorage.setItem('accessToken', loginResponse.accessToken);
         localStorage.setItem('refreshToken', loginResponse.refreshToken);
@@ -173,7 +173,7 @@ const EnhancedRegistration: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     if (name.startsWith('profile.')) {
       const profilePath = name.replace('profile.', '');
       setFormData(prev => ({
@@ -196,12 +196,12 @@ const EnhancedRegistration: React.FC = () => {
       const newData = { ...prev };
       const keys = path.split('.');
       let current: any = newData;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         if (!current[keys[i]]) current[keys[i]] = {};
         current = current[keys[i]];
       }
-      
+
       current[keys[keys.length - 1]] = value;
       return newData;
     });
@@ -347,17 +347,17 @@ const EnhancedRegistration: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Final validation before submission
     if (!validateCurrentStep()) {
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       console.log('Submitting registration data:', formData);
-      
+
       let response;
       if (oauthData) {
         // OAuth registration - create user with Google data
@@ -380,19 +380,19 @@ const EnhancedRegistration: React.FC = () => {
         // Regular registration
         response = await apiService.register(formData);
       }
-      
+
       // Store tokens in localStorage
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
-      
+
       // Update user profile in context
       dispatch({ type: 'SET_USER', payload: response.user });
-      
+
       showToast('Registration successful! Welcome to Proxima!', 'success');
       navigate('/home');
     } catch (error: any) {
       console.error('Registration error:', error);
-      
+
       // Handle specific error cases
       if (error.message?.includes('fetch')) {
         showToast('Unable to connect to server. Please check if the server is running.', 'error');
@@ -417,7 +417,7 @@ const EnhancedRegistration: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's get to know you</h2>
               <p className="text-gray-600">Tell us about yourself to personalize your experience</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
@@ -431,7 +431,7 @@ const EnhancedRegistration: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Username *</label>
                 <input
@@ -444,7 +444,7 @@ const EnhancedRegistration: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                 <input
@@ -457,7 +457,7 @@ const EnhancedRegistration: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Contact Number</label>
                 <input
@@ -469,7 +469,7 @@ const EnhancedRegistration: React.FC = () => {
                   placeholder="+1 555 0100"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
                 <div className="relative">
@@ -491,7 +491,7 @@ const EnhancedRegistration: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
                 <input
@@ -505,7 +505,7 @@ const EnhancedRegistration: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             {/* OAuth Section */}
             <div className="mt-6">
               <div className="relative">
@@ -516,7 +516,7 @@ const EnhancedRegistration: React.FC = () => {
                   <span className="bg-white px-3 text-sm text-gray-500">or</span>
                 </div>
               </div>
-              
+
               <button
                 type="button"
                 className="w-full mt-4 px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm flex items-center justify-center gap-3 transition-colors"
@@ -526,7 +526,7 @@ const EnhancedRegistration: React.FC = () => {
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
                 Continue with Google
               </button>
-              
+
               {oauthData && (
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center">
@@ -549,7 +549,7 @@ const EnhancedRegistration: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Professional Information</h2>
               <p className="text-gray-600">Help us understand your professional background</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
@@ -562,7 +562,7 @@ const EnhancedRegistration: React.FC = () => {
                   placeholder="Software Engineer"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
                 <input
@@ -574,7 +574,7 @@ const EnhancedRegistration: React.FC = () => {
                   placeholder="Acme Corp"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
                 <select
@@ -594,7 +594,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="Other">Other</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
                 <select
@@ -622,11 +622,11 @@ const EnhancedRegistration: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Skills & Goals</h2>
               <p className="text-gray-600">Tell us about your skills and what you want to achieve</p>
             </div>
-            
+
             {/* Skills Section */}
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Skills</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Skill Name</label>
@@ -638,7 +638,7 @@ const EnhancedRegistration: React.FC = () => {
                     placeholder="JavaScript"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Level</label>
                   <select
@@ -652,7 +652,7 @@ const EnhancedRegistration: React.FC = () => {
                     <option value="expert">Expert</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select
@@ -668,7 +668,7 @@ const EnhancedRegistration: React.FC = () => {
                   </select>
                 </div>
               </div>
-              
+
               <button
                 type="button"
                 onClick={addSkill}
@@ -676,7 +676,7 @@ const EnhancedRegistration: React.FC = () => {
               >
                 Add Skill
               </button>
-              
+
               <div className="mt-4 space-y-2">
                 {formData.profile?.skills?.map((skill, index) => (
                   <div key={index} className="flex items-center justify-between bg-white p-3 rounded-lg border">
@@ -696,11 +696,11 @@ const EnhancedRegistration: React.FC = () => {
                 ))}
               </div>
             </div>
-            
+
             {/* Goals Section */}
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Goals</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Goal Description</label>
@@ -712,7 +712,7 @@ const EnhancedRegistration: React.FC = () => {
                     placeholder="Learn React Native"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                   <select
@@ -726,7 +726,7 @@ const EnhancedRegistration: React.FC = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex space-x-2 mb-4">
                 <button
                   type="button"
@@ -743,7 +743,7 @@ const EnhancedRegistration: React.FC = () => {
                   Add Long-term Goal
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Short-term Goals</h4>
@@ -760,7 +760,7 @@ const EnhancedRegistration: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Long-term Goals</h4>
                   {formData.profile?.goals?.longTerm?.map((goal, index) => (
@@ -788,7 +788,7 @@ const EnhancedRegistration: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Work Preferences</h2>
               <p className="text-gray-600">Help us understand how you work best</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Work Style</label>
@@ -803,7 +803,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="mixed">Mixed</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Communication Style</label>
                 <select
@@ -818,7 +818,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="creative">Creative</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Time Management</label>
                 <select
@@ -833,7 +833,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="spontaneous">Spontaneous</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Working Style</label>
                 <select
@@ -848,7 +848,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="results-driven">Results-driven</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Stress Level</label>
                 <select
@@ -862,7 +862,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="high">High</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Environment</label>
                 <select
@@ -878,11 +878,11 @@ const EnhancedRegistration: React.FC = () => {
                 </select>
               </div>
             </div>
-            
+
             {/* Learning Interests */}
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Learning Interests</h3>
-              
+
               <div className="flex space-x-2 mb-4">
                 <input
                   type="text"
@@ -899,7 +899,7 @@ const EnhancedRegistration: React.FC = () => {
                   Add Interest
                 </button>
               </div>
-              
+
               <div className="flex flex-wrap gap-2">
                 {formData.profile?.learning?.interests?.map((interest, index) => (
                   <span
@@ -928,7 +928,7 @@ const EnhancedRegistration: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Assistant Setup</h2>
               <p className="text-gray-600">Personalize your AI assistant to help you work better</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Assistance Level</label>
@@ -943,7 +943,7 @@ const EnhancedRegistration: React.FC = () => {
                   <option value="comprehensive">Comprehensive - Detailed analysis and recommendations</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Communication Style</label>
                 <select
@@ -959,10 +959,10 @@ const EnhancedRegistration: React.FC = () => {
                 </select>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
-              
+
               <div className="space-y-4">
                 <label className="flex items-center">
                   <input
@@ -973,7 +973,7 @@ const EnhancedRegistration: React.FC = () => {
                   />
                   <span className="ml-3 text-sm text-gray-700">Task reminders and updates</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
@@ -983,7 +983,7 @@ const EnhancedRegistration: React.FC = () => {
                   />
                   <span className="ml-3 text-sm text-gray-700">Deadline alerts</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
@@ -993,7 +993,7 @@ const EnhancedRegistration: React.FC = () => {
                   />
                   <span className="ml-3 text-sm text-gray-700">Productivity insights</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
@@ -1005,14 +1005,14 @@ const EnhancedRegistration: React.FC = () => {
                 </label>
               </div>
             </div>
-            
+
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
               <div className="flex items-start">
                 <Zap className="w-6 h-6 text-yellow-600 mt-1 mr-3" />
                 <div>
                   <h4 className="font-semibold text-yellow-800 mb-2">Your AI Assistant</h4>
                   <p className="text-yellow-700 text-sm">
-                    Based on your preferences, your AI assistant will help you with task prioritization, 
+                    Based on your preferences, your AI assistant will help you with task prioritization,
                     time estimation, deadline optimization, and skill development recommendations.
                   </p>
                 </div>
@@ -1031,9 +1031,9 @@ const EnhancedRegistration: React.FC = () => {
       <SharedNavbar />
       <section className="min-h-screen flex pt-16">
         <div className="hidden lg:flex w-1/2 bg-white border-r border-border relative">
-          <img 
-            src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop" 
-            alt="" 
+          <img
+            src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
+            alt=""
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
@@ -1070,14 +1070,14 @@ const EnhancedRegistration: React.FC = () => {
                   const Icon = step.icon;
                   const isActive = currentStep === step.id;
                   const isCompleted = currentStep > step.id;
-                  
+
                   return (
                     <div key={step.id} className="flex items-center">
                       <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                        isActive 
-                          ? 'border-yellow-500 bg-yellow-500 text-white' 
-                          : isCompleted 
-                            ? 'border-green-500 bg-green-500 text-white' 
+                        isActive
+                          ? 'border-yellow-500 bg-yellow-500 text-white'
+                          : isCompleted
+                            ? 'border-green-500 bg-green-500 text-white'
                             : 'border-gray-300 bg-white text-gray-400'
                       }`}>
                         {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
@@ -1091,7 +1091,7 @@ const EnhancedRegistration: React.FC = () => {
                   );
                 })}
               </div>
-              
+
               <div className="text-center">
                 <h2 className="text-lg font-semibold text-gray-900">
                   {steps[currentStep - 1]?.title}
@@ -1104,7 +1104,7 @@ const EnhancedRegistration: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="bg-white border border-border rounded-xl p-8">
               {renderStepContent()}
-              
+
               <div className="flex justify-between mt-8">
                 <button
                   type="button"
@@ -1115,7 +1115,7 @@ const EnhancedRegistration: React.FC = () => {
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Previous
                 </button>
-                
+
                 {currentStep < steps.length ? (
                   <button
                     type="button"

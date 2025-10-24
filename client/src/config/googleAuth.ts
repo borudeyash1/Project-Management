@@ -1,4 +1,5 @@
 // Import Google Auth types
+// Force rebuild: 2023-10-27
 import { GoogleAuthResponse } from '../types/googleAuth';
 
 // Google OAuth Configuration
@@ -12,6 +13,9 @@ export const GOOGLE_AUTH_CONFIG = {
 export class GoogleAuthService {
   private static instance: GoogleAuthService;
   private isInitialized = false;
+  // Promises for coordinating ID token reception
+  private idTokenPromiseResolve: ((token: string) => void) | null = null;
+  private idTokenPromiseReject: ((error: Error) => void) | null = null;
 
   private constructor() {}
 
@@ -67,77 +71,132 @@ export class GoogleAuthService {
     });
   }
 
-  // Handle credential response
-  private handleCredentialResponse(response: any): GoogleAuthResponse {
-    // This will be called by Google's callback
-    return {
-      id: response.credential,
-      name: response.name || '',
-      email: response.email || '',
-      imageUrl: response.picture || '',
-      accessToken: response.credential,
-      idToken: response.credential
-    };
+  // Handle credential response (for ID token)
+  private handleCredentialResponse(response: google.accounts.id.CredentialResponse): void {
+    console.log('Credential response received:', response);
+    if (response.credential) {
+      if (this.idTokenPromiseResolve) {
+        this.idTokenPromiseResolve(response.credential);
+        this.idTokenPromiseResolve = null;
+        this.idTokenPromiseReject = null;
+      }
+    } else {
+      if (this.idTokenPromiseReject) {
+        this.idTokenPromiseReject(new Error('No ID credential received'));
+        this.idTokenPromiseReject = null;
+        this.idTokenPromiseResolve = null;
+      }
+    }
   }
 
-  // Sign in with Google using popup
+  // Sign in with Google (combining Access Token and ID Token flows)
   public async signInWithGoogle(): Promise<GoogleAuthResponse> {
     if (!this.isInitialized) {
       await this.initializeGapi();
     }
 
-    return new Promise((resolve, reject) => {
-      if (!window.google) {
-        reject(new Error('Google Identity Services not loaded'));
-        return;
+    if (!window.google) {
+      throw new Error('Google Identity Services not loaded');
+    }
+
+    let accessToken: string | null = null;
+    let idToken: string | null = null;
+
+    try {
+      // Step 1: Get Access Token
+      console.log('🚀 Starting Google OAuth flow for Access Token...');
+      accessToken = await new Promise<string>((resAT, rejAT) => {
+        window.google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_AUTH_CONFIG.clientId,
+          scope: GOOGLE_AUTH_CONFIG.scope,
+          callback: (tokenResponse: google.accounts.oauth2.TokenResponse) => {
+            if (tokenResponse.error) {
+              console.error('❌ OAuth error (Access Token):', tokenResponse.error);
+              rejAT(new Error(tokenResponse.error));
+            } else {
+              console.log('✅ Access token received:', tokenResponse.access_token);
+              resAT(tokenResponse.access_token);
+            }
+          }
+        }).requestAccessToken();
+      });
+
+      // Step 2: Get ID Token
+      console.log('🚀 Requesting Google ID Token...');
+      idToken = await new Promise<string>((resID, rejID) => {
+        this.idTokenPromiseResolve = resID;
+        this.idTokenPromiseReject = rejID;
+
+        // Trigger the ID token flow. This will call handleCredentialResponse.
+        (window.google.accounts.id as any).prompt((notification: google.accounts.id.PromptMomentNotification) => {
+          console.log('ID Token prompt notification received:', notification.getMomentType());
+
+          if (notification.isNotDisplayed()) {
+            console.warn('ID Token prompt was NOT displayed.', {
+              reason: notification.getNotDisplayedReason(),
+              notificationDetails: notification,
+            });
+            if (!idToken) { // Only reject if ID token hasn't been set by handleCredentialResponse yet
+              rejID(new Error(`ID Token prompt was not displayed: ${notification.getNotDisplayedReason()}`));
+            }
+          } else if (notification.isSkippedMoment()) {
+            console.warn('ID Token prompt was SKIPPED.', {
+              reason: notification.getSkippedReason(),
+              notificationDetails: notification,
+            });
+            if (!idToken) { // Only reject if ID token hasn't been set by handleCredentialResponse yet
+              rejID(new Error(`ID Token prompt was skipped: ${notification.getSkippedReason()}`));
+            }
+          } else if (notification.isDismissedMoment()) {
+            console.warn('ID Token prompt was DISMISSED by user.', {
+              notificationDetails: notification,
+            });
+            if (!idToken) { // Only reject if ID token hasn't been set by handleCredentialResponse yet
+              rejID(new Error('ID Token prompt was dismissed by user.'));
+            }
+          }
+          // If the prompt was displayed and not skipped/dismissed, we expect handleCredentialResponse to provide the token.
+          // No explicit rejection here unless it's a non-display/skip/dismiss event.
+        });
+      });
+
+      if (!accessToken || !idToken) {
+          throw new Error('Failed to obtain both Access Token and ID Token.');
       }
 
-      console.log('🚀 Starting Google OAuth flow...');
-      console.log('🔑 Using Client ID:', GOOGLE_AUTH_CONFIG.clientId);
-      console.log('📋 Scope:', GOOGLE_AUTH_CONFIG.scope);
+      // Fetch user info using the access token (as done previously)
+      const userinfoRes = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
+      if (!userinfoRes.ok) {
+        throw new Error(`Failed to fetch user info: ${userinfoRes.statusText}`);
+      }
+      const userInfo = await userinfoRes.json();
+      console.log('👤 User info received:', userInfo);
 
-      // Use the popup flow
-      window.google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_AUTH_CONFIG.clientId,
-        scope: GOOGLE_AUTH_CONFIG.scope,
-        callback: (response: any) => {
-          console.log('📨 OAuth response received:', response);
-          
-          if (response.error) {
-            console.error('❌ OAuth error:', response.error);
-            reject(new Error(response.error));
-            return;
-          }
+      return {
+        id: userInfo.id,
+        name: userInfo.name,
+        email: userInfo.email,
+        imageUrl: userInfo.picture,
+        accessToken: accessToken,
+        idToken: idToken
+      };
 
-          console.log('✅ Access token received, fetching user info...');
-
-          // Get user info using the access token
-          fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${response.access_token}`)
-            .then(res => res.json())
-            .then(userInfo => {
-              console.log('👤 User info received:', userInfo);
-              resolve({
-                id: userInfo.id,
-                name: userInfo.name,
-                email: userInfo.email,
-                imageUrl: userInfo.picture,
-                accessToken: response.access_token,
-                idToken: response.access_token
-              });
-            })
-            .catch(error => {
-              console.error('❌ Error fetching user info:', error);
-              reject(error);
-            });
-        }
-      }).requestAccessToken();
-    });
+    } catch (error: any) {
+      console.error('❌ Error during Google sign-in process:', error);
+      throw error; // Re-throw the error to be caught by the caller
+    } finally {
+      this.idTokenPromiseResolve = null;
+      this.idTokenPromiseReject = null;
+    }
   }
 
   // Sign out from Google
   public async signOut(): Promise<void> {
     if (window.google && window.google.accounts) {
-      window.google.accounts.oauth2.revoke();
+      // Note: oauth2.revoke requires the access token, which is not stored here
+      // For a full logout, you'd also need to clear local session state
+      // window.google.accounts.oauth2.revoke(accessToken, () => console.log('Token revoked'));
+      console.log('Google sign-out initiated. No access token to revoke directly via client.');
     }
   }
 

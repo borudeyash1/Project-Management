@@ -3,10 +3,170 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    background-color: #F7F9FC;
+    transition: background-color 0.3s ease;
+  }
+
   body {
     font-family: 'Inter', sans-serif;
     background-color: #F7F9FC;
     color: #111827;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+  }
+
+  /* Dark mode styles */
+  .dark html {
+    background-color: #111827;
+  }
+
+  .dark body {
+    background-color: #111827;
+    color: #F9FAFB;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  /* Ensure root element has dark background */
+  .dark #root {
+    background-color: #111827;
+    min-height: 100vh;
+  }
+
+  /* Dark mode for common elements */
+  .dark .bg-white {
+    background-color: #374151 !important;
+  }
+
+  .dark .bg-gray-50 {
+    background-color: #1F2937 !important;
+  }
+
+  .dark .bg-gray-100 {
+    background-color: #374151 !important;
+  }
+
+  .dark .bg-gray-200 {
+    background-color: #4B5563 !important;
+  }
+
+  /* Text colors - ensure visibility in dark mode */
+  .dark .text-gray-900,
+  .dark .text-gray-800 {
+    color: #F9FAFB !important;
+  }
+
+  .dark .text-gray-700 {
+    color: #E5E7EB !important;
+  }
+
+  .dark .text-gray-600 {
+    color: #D1D5DB !important;
+  }
+
+  .dark .text-gray-500 {
+    color: #9CA3AF !important;
+  }
+
+  .dark .text-gray-400 {
+    color: #9CA3AF !important;
+  }
+
+  .dark .text-black {
+    color: #F9FAFB !important;
+  }
+
+  /* Ensure labels and spans are visible */
+  .dark label,
+  .dark span,
+  .dark p,
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: inherit;
+  }
+
+  .dark label {
+    color: #E5E7EB;
+  }
+
+  /* Border colors */
+  .dark .border-gray-200,
+  .dark .border-gray-300 {
+    border-color: #4B5563 !important;
+  }
+
+  /* Form elements */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: #374151;
+    color: #F9FAFB;
+    border-color: #4B5563;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #9CA3AF;
+  }
+
+  /* Select dropdowns */
+  .dark select option {
+    background-color: #374151;
+    color: #F9FAFB;
+  }
+
+  /* Hover states */
+  .dark .hover\:bg-gray-50:hover {
+    background-color: #4B5563 !important;
+  }
+
+  .dark .hover\:bg-gray-100:hover {
+    background-color: #4B5563 !important;
+  }
+
+  .dark .hover\:text-gray-900:hover {
+    color: #F9FAFB !important;
+  }
+
+  /* Buttons and interactive elements */
+  .dark button {
+    color: inherit;
+  }
+
+  .dark button.bg-white {
+    color: #111827;
+  }
+
+  /* Cards and containers */
+  .dark .shadow,
+  .dark .shadow-sm,
+  .dark .shadow-md,
+  .dark .shadow-lg {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Disabled states */
+  .dark input:disabled,
+  .dark textarea:disabled,
+  .dark select:disabled {
+    background-color: #1F2937;
+    color: #6B7280;
+    opacity: 0.6;
+  }
+
+  /* Focus states */
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: #60A5FA;
+    ring-color: #60A5FA;
   }
 }
 
