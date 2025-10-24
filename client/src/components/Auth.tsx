@@ -49,23 +49,23 @@ const Auth: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const loginData: LoginRequest = {
         email: formData.email,
         password: formData.password,
         rememberMe: false
       };
-      
+
       const response = await apiService.login(loginData);
-      
+
       // Store tokens in localStorage
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
-      
+
       // Update user profile in context
       dispatch({ type: 'SET_USER', payload: response.user });
-      
+
       showToast('Welcome back!', 'success');
       navigate('/home');
     } catch (error: any) {
@@ -78,7 +78,7 @@ const Auth: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const registerData: RegisterRequest = {
         fullName: formData.fullName,
@@ -88,16 +88,16 @@ const Auth: React.FC = () => {
         password: formData.password,
         confirmPassword: formData.confirmPassword
       };
-      
+
       const response = await apiService.register(registerData);
-      
+
       // Store tokens in localStorage
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
-      
+
       // Update user profile in context
       dispatch({ type: 'SET_USER', payload: response.user });
-      
+
       showToast('Registration successful! Welcome to Proxima!', 'success');
       navigate('/home');
     } catch (error: any) {
@@ -110,13 +110,13 @@ const Auth: React.FC = () => {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
-      
+
       // Initialize Google Auth if not already done
       await googleAuthService.initializeGapi();
-      
+
       // Sign in with Google
       const googleUser = await googleAuthService.signInWithGoogle();
-      
+
       // Send Google user data to backend for authentication
       const response = await apiService.googleAuth({
         id: googleUser.id,
@@ -126,14 +126,14 @@ const Auth: React.FC = () => {
         accessToken: googleUser.accessToken,
         idToken: googleUser.idToken
       });
-      
+
       // Store tokens in localStorage
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
-      
+
       // Update user profile in context
       dispatch({ type: 'SET_USER', payload: response.user });
-      
+
       showToast('Successfully signed in with Google!', 'success');
       navigate('/home');
     } catch (error: any) {
@@ -162,9 +162,9 @@ const Auth: React.FC = () => {
       <SharedNavbar />
       <section className="min-h-screen flex pt-16">
       <div className="hidden lg:flex w-1/2 bg-white border-r border-border relative">
-        <img 
-          src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop" 
-          alt="" 
+        <img
+          src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
+          alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
@@ -197,8 +197,8 @@ const Auth: React.FC = () => {
           <div className="flex bg-white border border-border rounded-lg p-1 mb-6">
             <button
               className={`flex-1 px-3 py-2 rounded-md text-sm font-medium ${
-                authTab === 'login' 
-                  ? 'bg-yellow-100 text-text' 
+                authTab === 'login'
+                  ? 'bg-yellow-100 text-text'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
               onClick={switchToLogin}
@@ -207,8 +207,8 @@ const Auth: React.FC = () => {
             </button>
             <button
               className={`flex-1 px-3 py-2 rounded-md text-sm ${
-                authTab === 'register' 
-                  ? 'bg-yellow-100 text-text' 
+                authTab === 'register'
+                  ? 'bg-yellow-100 text-text'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
               onClick={switchToRegister}

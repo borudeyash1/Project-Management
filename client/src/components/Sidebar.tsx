@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { 
+import {
   LayoutDashboard,
   FolderOpen,
   Calendar,
@@ -41,7 +41,7 @@ const Sidebar: React.FC = () => {
       icon: Home,
       path: '/home'
     },
-    
+
     {
       id: 'projects',
       label: 'Projects',
@@ -65,18 +65,6 @@ const Sidebar: React.FC = () => {
       label: 'Tasks',
       icon: FileText,
       path: '/tasks'
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      icon: User,
-      path: '/profile'
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      path: '/settings'
     },
     {
       id: 'reminders',
@@ -144,12 +132,12 @@ const Sidebar: React.FC = () => {
   };
 
   const isActive = (item: SidebarItem) => {
-    return location.pathname === item.path || 
+    return location.pathname === item.path ||
            (item.path !== '/home' && location.pathname.startsWith(item.path));
   };
 
   return (
-    <aside className={`bg-white border-r border-border transition-all duration-300 ${
+    <aside className={`bg-white dark:bg-gray-800 border-r border-border dark:border-gray-700 transition-all duration-300 ${
       state.sidebar.collapsed ? 'w-16' : 'w-64'
     }`}>
       <div className="h-full flex flex-col">
@@ -158,15 +146,15 @@ const Sidebar: React.FC = () => {
           {sidebarItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
-            
+
             return (
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? 'bg-yellow-100 text-yellow-900 border border-yellow-200'
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700'
+                    : 'text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-gray-100'
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -182,19 +170,19 @@ const Sidebar: React.FC = () => {
         </nav>
 
         {/* Bottom Navigation */}
-        <div className="p-4 border-t border-border space-y-2">
+        <div className="p-4 border-t border-border dark:border-gray-700 space-y-2">
           {bottomItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
-            
+
             return (
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? 'bg-yellow-100 text-yellow-900 border border-yellow-200'
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700'
+                    : 'text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-gray-100'
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -204,11 +192,11 @@ const Sidebar: React.FC = () => {
               </button>
             );
           })}
-          
+
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-red-600 hover:bg-red-50 hover:text-red-700"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-300"
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
             {!state.sidebar.collapsed && (
@@ -219,15 +207,15 @@ const Sidebar: React.FC = () => {
 
         {/* Workspace Info */}
         {!state.sidebar.collapsed && (
-          <div className="p-4 border-t border-border">
-            <div className="bg-slate-50 rounded-lg p-3">
+          <div className="p-4 border-t border-border dark:border-gray-700">
+            <div className="bg-slate-50 dark:bg-gray-700 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-6 w-6 rounded-md flex items-center justify-center text-white font-semibold text-xs bg-yellow-500">
                   {state.currentWorkspace.charAt(0)}
                 </div>
-                <span className="text-sm font-medium truncate">{state.currentWorkspace}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{state.currentWorkspace}</span>
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-slate-500 dark:text-gray-400">
                 {state.workspaces.find(w => w.name === state.currentWorkspace)?.memberCount || 0} members
               </div>
             </div>
