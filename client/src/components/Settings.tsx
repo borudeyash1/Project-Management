@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Settings as SettingsIcon, User, Bell, Shield, CreditCard, Globe, Palette, Database, 
+import {
+  Settings as SettingsIcon, User, Bell, Shield, CreditCard, Globe, Palette, Database,
   Download, Upload, Trash2, Key, Lock, Unlock, Eye, EyeOff, Save,
-  AlertTriangle, CheckCircle, X, Plus, Minus, Edit, RefreshCw, 
+  AlertTriangle, CheckCircle, X, Plus, Minus, Edit, RefreshCw,
   Monitor, Smartphone, Tablet, Wifi, Cloud, Server, HardDrive,
   Zap, Moon, Sun, Volume2, VolumeX, Mic, MicOff, Camera, CameraOff,
   MapPin, Clock, Calendar, Mail, MessageSquare, Phone, Users,
@@ -451,11 +451,7 @@ const Settings: React.FC = () => {
   const tabs = [
     { id: 'account', label: 'Account', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy', icon: Shield },
     { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'workspace', label: 'Workspace', icon: Settings },
-    { id: 'integrations', label: 'Integrations', icon: Globe },
-    { id: 'security', label: 'Security', icon: Lock },
     { id: 'billing', label: 'Billing', icon: CreditCard },
     { id: 'data', label: 'Data & Export', icon: Database }
   ];
@@ -463,13 +459,13 @@ const Settings: React.FC = () => {
   const renderAccount = () => (
     <div className="space-y-6">
       {/* Account Information */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Account Information</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Account Information</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Username</p>
-              <p className="text-sm text-gray-600">{settingsData?.account.username}</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">Username</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{settingsData?.account.username}</p>
             </div>
             <button className="text-blue-600 hover:text-blue-700">
               <Edit className="w-4 h-4" />
@@ -477,8 +473,8 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Email</p>
-              <p className="text-sm text-gray-600">{settingsData?.account.email}</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">Email</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{settingsData?.account.email}</p>
             </div>
             <button className="text-blue-600 hover:text-blue-700">
               <Edit className="w-4 h-4" />
@@ -488,15 +484,15 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Security Settings */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Security</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Security</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-gray-600" />
+              <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="font-medium">Two-Factor Authentication</p>
-                <p className="text-sm text-gray-600">Add an extra layer of security</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">Two-Factor Authentication</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security</p>
               </div>
             </div>
             <button
@@ -521,10 +517,10 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-gray-600" />
+              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="font-medium">Login Notifications</p>
-                <p className="text-sm text-gray-600">Get notified of new logins</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">Login Notifications</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Get notified of new logins</p>
               </div>
             </div>
             <button
@@ -551,11 +547,11 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Session Management */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Session Management</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Session Management</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Session Timeout (minutes)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Timeout (minutes)</label>
             <input
               type="number"
               value={settingsData?.account.sessionTimeout}
@@ -567,7 +563,7 @@ const Settings: React.FC = () => {
                 } : null);
                 handleSaveSettings('account', { ...settingsData?.account, sessionTimeout: newValue });
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               min="5"
               max="480"
             />
@@ -599,11 +595,11 @@ const Settings: React.FC = () => {
   const renderNotifications = () => (
     <div className="space-y-6">
       {/* Email Notifications */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5 text-gray-600" />
-            <h3 className="font-medium text-gray-900">Email Notifications</h3>
+            <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">Email Notifications</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -635,7 +631,7 @@ const Settings: React.FC = () => {
           <div className="space-y-3">
             {Object.entries(settingsData.notifications.email).filter(([key]) => key !== 'enabled').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     value ? 'bg-blue-600' : 'bg-gray-200'
@@ -668,11 +664,11 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Push Notifications */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Bell className="w-5 h-5 text-gray-600" />
-            <h3 className="font-medium text-gray-900">Push Notifications</h3>
+            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">Push Notifications</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -704,7 +700,7 @@ const Settings: React.FC = () => {
           <div className="space-y-3">
             {Object.entries(settingsData.notifications.push).filter(([key]) => key !== 'enabled').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     value ? 'bg-blue-600' : 'bg-gray-200'
@@ -737,11 +733,11 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Desktop Notifications */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Monitor className="w-5 h-5 text-gray-600" />
-            <h3 className="font-medium text-gray-900">Desktop Notifications</h3>
+            <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">Desktop Notifications</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -773,7 +769,7 @@ const Settings: React.FC = () => {
           <div className="space-y-3">
             {Object.entries(settingsData.notifications.desktop).filter(([key]) => key !== 'enabled').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     value ? 'bg-blue-600' : 'bg-gray-200'
@@ -810,8 +806,8 @@ const Settings: React.FC = () => {
   const renderAppearance = () => (
     <div className="space-y-6">
       {/* Theme */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Theme</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Theme</h3>
         <div className="flex gap-3">
           {['light', 'dark', 'system'].map((theme) => (
             <button
@@ -819,7 +815,7 @@ const Settings: React.FC = () => {
               className={`px-4 py-2 rounded-lg border transition-colors ${
                 settingsData?.appearance.theme === theme
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
               onClick={() => {
                 setSettingsData(prev => prev ? {
@@ -839,8 +835,8 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Accent Color */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Accent Color</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Accent Color</h3>
         <div className="flex gap-3">
           {['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'].map((color) => (
             <button
@@ -862,8 +858,8 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Font Size */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Font Size</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Font Size</h3>
         <div className="flex gap-3">
           {['small', 'medium', 'large'].map((size) => (
             <button
@@ -871,7 +867,7 @@ const Settings: React.FC = () => {
               className={`px-4 py-2 rounded-lg border transition-colors ${
                 settingsData?.appearance.fontSize === size
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
               onClick={() => {
                 setSettingsData(prev => prev ? {
@@ -888,8 +884,8 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Density */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Density</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Density</h3>
         <div className="flex gap-3">
           {['compact', 'comfortable', 'spacious'].map((density) => (
             <button
@@ -897,7 +893,7 @@ const Settings: React.FC = () => {
               className={`px-4 py-2 rounded-lg border transition-colors ${
                 settingsData?.appearance.density === density
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
               onClick={() => {
                 setSettingsData(prev => prev ? {
@@ -914,13 +910,13 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Accessibility */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Accessibility</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Accessibility</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Animations</p>
-              <p className="text-sm text-gray-600">Enable smooth transitions and animations</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">Animations</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Enable smooth transitions and animations</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -944,8 +940,8 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Reduced Motion</p>
-              <p className="text-sm text-gray-600">Minimize motion for accessibility</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">Reduced Motion</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Minimize animations for accessibility</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -975,12 +971,12 @@ const Settings: React.FC = () => {
   const renderBilling = () => (
     <div className="space-y-6">
       {/* Current Plan */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Current Plan</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Current Plan</h3>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-lg font-semibold capitalize">{settingsData?.billing.plan} Plan</p>
-            <p className="text-sm text-gray-600">Next billing: {new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString()}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} Plan</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Next billing: {new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString()}</p>
           </div>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Upgrade Plan
@@ -989,11 +985,11 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Usage */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Usage</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Usage</h3>
         <div className="space-y-4">
           <div>
-            <div className="flex justify-between text-sm mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
               <span>Projects</span>
               <span>{settingsData?.billing.usage.projects} / {settingsData?.billing.usage.maxProjects}</span>
             </div>
@@ -1005,7 +1001,7 @@ const Settings: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="flex justify-between text-sm mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
               <span>Storage</span>
               <span>{settingsData?.billing.usage.storage} GB / {settingsData?.billing.usage.maxStorage} GB</span>
             </div>
@@ -1017,7 +1013,7 @@ const Settings: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="flex justify-between text-sm mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
               <span>Team Members</span>
               <span>{settingsData?.billing.usage.teamMembers} / {settingsData?.billing.usage.maxTeamMembers}</span>
             </div>
@@ -1078,14 +1074,14 @@ const Settings: React.FC = () => {
   const renderData = () => (
     <div className="space-y-6">
       {/* Data Export */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Export Data</h3>
-        <p className="text-sm text-gray-600 mb-4">Download a copy of your data in various formats</p>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Export Data</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Download a copy of your data in various formats</p>
         <div className="flex gap-3">
           <select
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="json">JSON</option>
             <option value="csv">CSV</option>
@@ -1102,13 +1098,13 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Auto Backup */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Auto Backup</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Auto Backup</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Enable Auto Backup</p>
-              <p className="text-sm text-gray-600">Automatically backup your data</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">Enable Auto Backup</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Automatically backup your data</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -1132,7 +1128,7 @@ const Settings: React.FC = () => {
           </div>
           {settingsData?.data.autoBackup && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Backup Frequency</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Backup Frequency</label>
               <select
                 value={settingsData.data.backupFrequency}
                 onChange={(e) => {
@@ -1142,7 +1138,7 @@ const Settings: React.FC = () => {
                   } : null);
                   handleSaveSettings('data', { ...settingsData?.data, backupFrequency: e.target.value as 'daily' | 'weekly' | 'monthly' });
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -1154,10 +1150,10 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Data Location */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Data Location</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Data Location</h3>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Primary Data Center</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Data Center</label>
           <select
             value={settingsData?.data.dataLocation}
             onChange={(e) => {
@@ -1167,7 +1163,7 @@ const Settings: React.FC = () => {
               } : null);
               handleSaveSettings('data', { ...settingsData?.data, dataLocation: e.target.value as 'us' | 'eu' | 'asia' });
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="us">United States</option>
             <option value="eu">Europe</option>
@@ -1197,15 +1193,15 @@ const Settings: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6">
-      <div className="bg-white border border-border rounded-xl">
+      <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-700 rounded-xl">
         {/* Header */}
-        <div className="p-6 border-b border-border">
-          <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-          <p className="text-sm text-gray-600 mt-1">Manage your account settings and preferences</p>
+        <div className="p-6 border-b border-border dark:border-gray-700">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Settings</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your account settings and preferences</p>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-border">
+        <div className="border-b border-border dark:border-gray-700">
           <nav className="flex space-x-8 px-6 overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -1215,8 +1211,8 @@ const Settings: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -1240,20 +1236,20 @@ const Settings: React.FC = () => {
       {/* Delete Account Modal */}
       {showDeleteAccount && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="w-6 h-6 text-red-600" />
               <h3 className="text-lg font-semibold text-red-900">Delete Account</h3>
             </div>
-            <p className="text-gray-700 mb-4">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
               This action cannot be undone. All your data will be permanently deleted.
             </p>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Reason for deletion</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reason for deletion</label>
               <textarea
                 value={deleteReason}
                 onChange={(e) => setDeleteReason(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 rows={3}
                 placeholder="Please tell us why you're deleting your account..."
               />
@@ -1271,7 +1267,7 @@ const Settings: React.FC = () => {
                   setShowDeleteAccount(false);
                   setDeleteReason('');
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>
@@ -1283,9 +1279,9 @@ const Settings: React.FC = () => {
       {/* Export Data Modal */}
       {showExportData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Export Data</h3>
-            <p className="text-gray-700 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Export Data</h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
               This will download a copy of all your data in {exportFormat.toUpperCase()} format.
             </p>
             <div className="flex gap-3">
