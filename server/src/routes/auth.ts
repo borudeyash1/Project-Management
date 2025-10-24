@@ -94,10 +94,7 @@ const googleAuthValidation = [
     .withMessage('Name is required'),
   body('accessToken')
     .notEmpty()
-    .withMessage('Google access token is required'),
-  body('idToken')
-    .notEmpty()
-    .withMessage('Google ID token is required')
+    .withMessage('Google access token is required')
 ];
 
 // New validation for OTP verification
