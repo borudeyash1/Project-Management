@@ -27,14 +27,22 @@ class ApiService {
     };
 
     try {
-      console.log(`Making API request to: ${url}`);
+      console.log(`🔍 [DEBUG] Making API request to: ${url}`);
       const response = await fetch(url, config);
+      console.log(`🔍 [DEBUG] Response status: ${response.status}`);
+      console.log(`🔍 [DEBUG] Response ok: ${response.ok}`);
       
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorMessage;
+          // If a specific error code like "requiresOtpVerification" is returned, include it
+          if (errorData.data?.requiresOtpVerification) {
+            const error = new Error(errorMessage);
+            (error as any).data = errorData.data; // Attach custom data
+            throw error;
+          }
         } catch (parseError) {
           console.warn('Could not parse error response:', parseError);
         }
@@ -42,6 +50,9 @@ class ApiService {
       }
 
       const data = await response.json();
+      console.log(`🔍 [DEBUG] Response data received:`, data);
+      console.log(`🔍 [DEBUG] Response data type:`, typeof data);
+      console.log(`🔍 [DEBUG] Response data keys:`, Object.keys(data));
       return data;
     } catch (error) {
       console.error('API request failed:', error);
@@ -66,17 +77,49 @@ class ApiService {
     return response.data!;
   }
 
-  async register(userData: RegisterRequest): Promise<AuthResponse> {
-    const response = await this.request<AuthResponse>('/auth/register', {
+  async register(userData: RegisterRequest): Promise<{ requiresOtpVerification: boolean; email: string; userId: string }> {
+    console.log('🔍 [DEBUG] API Service - register method called with:', userData);
+    
+    const response = await this.request<any>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
+    
+    console.log('🔍 [DEBUG] API Service - request completed, response:', response);
 
-    if (response.data) {
-      this.setToken(response.data.accessToken);
+    // For manual registration, we don't set token immediately, as OTP verification is pending
+    // if (response.data && !response.data.requiresOtpVerification) {
+    //   this.setToken(response.data.accessToken);
+    // }
+
+    // Extract the data from the response
+    console.log('🔍 [DEBUG] API Service - Full response:', response);
+    console.log('🔍 [DEBUG] API Service - response.data:', response.data);
+    console.log('🔍 [DEBUG] API Service - response.data.data:', response.data?.data);
+    console.log('🔍 [DEBUG] API Service - response.data exists:', !!response.data);
+    console.log('🔍 [DEBUG] API Service - response.data.data exists:', !!response.data?.data);
+
+    // Check if response has the expected structure
+    if (response.data && response.data.data) {
+      console.log('🔍 [DEBUG] API Service - Extracting data from response.data.data');
+      return {
+        requiresOtpVerification: response.data.data.requiresOtpVerification,
+        email: response.data.data.email,
+        userId: response.data.data.userId
+      };
+    } else if (response.data && response.data.requiresOtpVerification !== undefined) {
+      console.log('🔍 [DEBUG] API Service - Extracting data from response.data directly');
+      return {
+        requiresOtpVerification: response.data.requiresOtpVerification,
+        email: response.data.email,
+        userId: response.data.userId
+      };
     }
 
-    return response.data!;
+    console.log('❌ [DEBUG] API Service - Invalid response structure');
+    console.log('❌ [DEBUG] API Service - Available keys:', Object.keys(response));
+    console.log('❌ [DEBUG] API Service - response.data keys:', response.data ? Object.keys(response.data) : 'response.data is null/undefined');
+    throw new Error('Invalid response from server');
   }
 
   async logout(): Promise<void> {
@@ -121,6 +164,27 @@ class ApiService {
 
     return response.data!;
   }
+
+  // New OTP endpoints
+  async verifyEmailOTP(email: string, otp: string): Promise<AuthResponse> {
+    const response = await this.request<AuthResponse>('/auth/verify-email-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    });
+    if (response.data) {
+      this.setToken(response.data.accessToken);
+    }
+    return response.data!;
+  }
+
+  async resendEmailOTP(email: string): Promise<{ userId: string; email: string }> {
+    const response = await this.request<{ userId: string; email: string }>('/auth/resend-email-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+    return response.data!;
+  }
+
 
   // User endpoints
   async updateProfile(userData: Partial<User>): Promise<User> {
@@ -185,14 +249,21 @@ class ApiService {
     return response.data!;
   }
 
+  // Token management methods
+  private setToken(token: string): void {
+    this.token = token;
+    localStorage.setItem('accessToken', token);
+  }
+
+  private clearToken(): void {
+    this.token = null;
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }
+
   // Workspace endpoints
   async getWorkspaces(): Promise<Workspace[]> {
     const response = await this.request<Workspace[]>('/workspaces');
-    return response.data!;
-  }
-
-  async getWorkspace(id: string): Promise<Workspace> {
-    const response = await this.request<Workspace>(`/workspaces/${id}`);
     return response.data!;
   }
 
@@ -204,42 +275,24 @@ class ApiService {
     return response.data!;
   }
 
-  async updateWorkspace(id: string, workspaceData: Partial<Workspace>): Promise<Workspace> {
-    const response = await this.request<Workspace>(`/workspaces/${id}`, {
+  async updateWorkspace(workspaceId: string, workspaceData: Partial<Workspace>): Promise<Workspace> {
+    const response = await this.request<Workspace>(`/workspaces/${workspaceId}`, {
       method: 'PUT',
       body: JSON.stringify(workspaceData),
     });
     return response.data!;
   }
 
-  async deleteWorkspace(id: string): Promise<void> {
-    await this.request(`/workspaces/${id}`, {
-      method: 'DELETE',
-    });
-  }
-
-  async inviteMember(workspaceId: string, email: string, role: string): Promise<void> {
-    await this.request(`/workspaces/${workspaceId}/invite`, {
-      method: 'POST',
-      body: JSON.stringify({ email, role }),
-    });
-  }
-
-  async removeMember(workspaceId: string, userId: string): Promise<void> {
-    await this.request(`/workspaces/${workspaceId}/members/${userId}`, {
+  async deleteWorkspace(workspaceId: string): Promise<void> {
+    await this.request(`/workspaces/${workspaceId}`, {
       method: 'DELETE',
     });
   }
 
   // Project endpoints
   async getProjects(workspaceId?: string): Promise<Project[]> {
-    const endpoint = workspaceId ? `/projects?workspace=${workspaceId}` : '/projects';
+    const endpoint = workspaceId ? `/projects?workspaceId=${workspaceId}` : '/projects';
     const response = await this.request<Project[]>(endpoint);
-    return response.data!;
-  }
-
-  async getProject(id: string): Promise<Project> {
-    const response = await this.request<Project>(`/projects/${id}`);
     return response.data!;
   }
 
@@ -251,42 +304,24 @@ class ApiService {
     return response.data!;
   }
 
-  async updateProject(id: string, projectData: Partial<Project>): Promise<Project> {
-    const response = await this.request<Project>(`/projects/${id}`, {
+  async updateProject(projectId: string, projectData: Partial<Project>): Promise<Project> {
+    const response = await this.request<Project>(`/projects/${projectId}`, {
       method: 'PUT',
       body: JSON.stringify(projectData),
     });
     return response.data!;
   }
 
-  async deleteProject(id: string): Promise<void> {
-    await this.request(`/projects/${id}`, {
-      method: 'DELETE',
-    });
-  }
-
-  async addTeamMember(projectId: string, userId: string, role: string): Promise<void> {
-    await this.request(`/projects/${projectId}/members`, {
-      method: 'POST',
-      body: JSON.stringify({ userId, role }),
-    });
-  }
-
-  async removeTeamMember(projectId: string, userId: string): Promise<void> {
-    await this.request(`/projects/${projectId}/members/${userId}`, {
+  async deleteProject(projectId: string): Promise<void> {
+    await this.request(`/projects/${projectId}`, {
       method: 'DELETE',
     });
   }
 
   // Task endpoints
   async getTasks(projectId?: string): Promise<Task[]> {
-    const endpoint = projectId ? `/tasks?project=${projectId}` : '/tasks';
+    const endpoint = projectId ? `/tasks?projectId=${projectId}` : '/tasks';
     const response = await this.request<Task[]>(endpoint);
-    return response.data!;
-  }
-
-  async getTask(id: string): Promise<Task> {
-    const response = await this.request<Task>(`/tasks/${id}`);
     return response.data!;
   }
 
@@ -298,50 +333,22 @@ class ApiService {
     return response.data!;
   }
 
-  async updateTask(id: string, taskData: Partial<Task>): Promise<Task> {
-    const response = await this.request<Task>(`/tasks/${id}`, {
+  async updateTask(taskId: string, taskData: Partial<Task>): Promise<Task> {
+    const response = await this.request<Task>(`/tasks/${taskId}`, {
       method: 'PUT',
       body: JSON.stringify(taskData),
     });
     return response.data!;
   }
 
-  async deleteTask(id: string): Promise<void> {
-    await this.request(`/tasks/${id}`, {
+  async deleteTask(taskId: string): Promise<void> {
+    await this.request(`/tasks/${taskId}`, {
       method: 'DELETE',
     });
   }
-
-  async addComment(taskId: string, content: string): Promise<void> {
-    await this.request(`/tasks/${taskId}/comments`, {
-      method: 'POST',
-      body: JSON.stringify({ content }),
-    });
-  }
-
-  async addTimeEntry(taskId: string, timeEntryData: any): Promise<void> {
-    await this.request(`/tasks/${taskId}/time-entries`, {
-      method: 'POST',
-      body: JSON.stringify(timeEntryData),
-    });
-  }
-
-  // Utility methods
-  setToken(token: string): void {
-    this.token = token;
-    localStorage.setItem('accessToken', token);
-  }
-
-  clearToken(): void {
-    this.token = null;
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.token;
-  }
 }
 
-export const apiService = new ApiService(API_BASE_URL);
+// Create and export a singleton instance
+const apiService = new ApiService(API_BASE_URL);
 export default apiService;
+export { apiService };  
