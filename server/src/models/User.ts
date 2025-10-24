@@ -12,7 +12,6 @@ const userSchema = new Schema<IUser>({
   email: {
     type: String,
     required: [true, 'Email is required'],
-    unique: true,
     lowercase: true,
     trim: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
@@ -20,7 +19,6 @@ const userSchema = new Schema<IUser>({
   username: {
     type: String,
     required: [true, 'Username is required'],
-    unique: true,
     trim: true,
     minlength: [3, 'Username must be at least 3 characters'],
     maxlength: [30, 'Username cannot exceed 30 characters'],
@@ -309,7 +307,10 @@ const userSchema = new Schema<IUser>({
     type: Boolean,
     default: false
   },
-  emailVerificationToken: String,
+  emailVerificationOTP: String, // New field for OTP
+  emailVerificationOTPExpires: Date, // New field for OTP expiration
+  loginOtp: String, // New field for login OTP
+  loginOtpExpiry: Date, // New field for login OTP expiration
   passwordResetToken: String,
   passwordResetExpires: Date,
   refreshTokens: [{
@@ -445,17 +446,21 @@ const userSchema = new Schema<IUser>({
 });
 
 // Index for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 }, { unique: true });
 userSchema.index({ 'refreshTokens.token': 1 });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+  // Only hash the password if it's new or has been modified
+  if (!this.isModified('password') || this.password === undefined) {
+    return next();
+  }
   
   try {
     const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
+    // Ensure this.password is a string before hashing
+    this.password = await bcrypt.hash(this.password as string, salt);
     next();
   } catch (error) {
     next(error as Error);
@@ -464,6 +469,10 @@ userSchema.pre('save', async function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  // If password is not set (e.g., for some OAuth users), it cannot be compared
+  if (!this.password) {
+    return false;
+  }
   return bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -485,7 +494,10 @@ userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.refreshTokens;
-  delete userObject.emailVerificationToken;
+  delete userObject.emailVerificationOTP; // New: Delete OTP from output
+  delete userObject.emailVerificationOTPExpires; // New: Delete OTP expiration from output
+  delete userObject.loginOtp; // New: Delete login OTP from output
+  delete userObject.loginOtpExpiry; // New: Delete login OTP expiration from output
   delete userObject.passwordResetToken;
   delete userObject.passwordResetExpires;
   return userObject;

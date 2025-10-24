@@ -1,14 +1,15 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { 
-  register, 
-  login, 
-  logout, 
-  refreshToken, 
+import {
+  register,
+  login,
+  logout,
+  refreshToken,
   getCurrentUser,
   forgotPassword,
   resetPassword,
-  verifyEmail,
+  verifyEmailOTP, // Updated: Use new OTP verification function
+  resendEmailOTP, // New: Import resend OTP function
   googleAuth
 } from '../controllers/authController';
 import { authenticate, authenticateRefresh } from '../middleware/auth';
@@ -99,6 +100,28 @@ const googleAuthValidation = [
     .withMessage('Google ID token is required')
 ];
 
+// New validation for OTP verification
+const otpVerificationValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+  body('otp')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('OTP must be a 6-digit code')
+    .isNumeric()
+    .withMessage('OTP must be numeric')
+];
+
+// New validation for resending OTP
+const resendOtpValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email')
+];
+
+
 // Routes
 router.post('/register', registerValidation, validateRequest, register);
 router.post('/login', loginValidation, validateRequest, login);
@@ -108,6 +131,12 @@ router.post('/refresh', authenticateRefresh, refreshToken);
 router.get('/me', authenticate, getCurrentUser);
 router.post('/forgot-password', forgotPasswordValidation, validateRequest, forgotPassword);
 router.post('/reset-password', resetPasswordValidation, validateRequest, resetPassword);
-router.get('/verify-email/:token', verifyEmail);
+
+// OTP specific routes
+router.post('/verify-email-otp', otpVerificationValidation, validateRequest, verifyEmailOTP); // New route
+router.post('/resend-email-otp', resendOtpValidation, validateRequest, resendEmailOTP); // New route
+
+// Removed old /verify-email/:token route as it's replaced by OTP
+// router.get('/verify-email/:token', verifyEmail);
 
 export default router;

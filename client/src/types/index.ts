@@ -498,6 +498,8 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+  requiresOtpVerification?: boolean;
+  email?: string;
 }
 
 export interface GoogleAuthRequest {
