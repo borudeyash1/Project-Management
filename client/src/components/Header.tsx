@@ -1,5 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { apiService } from '../services/api';
 import WorkspaceModeSwitcher from './WorkspaceModeSwitcher';
 import {
   Search,
@@ -14,6 +16,7 @@ import {
 
 const Header: React.FC = () => {
   const { state, dispatch } = useApp();
+  const navigate = useNavigate();
 
   const toggleUserMenu = () => {
     dispatch({ type: 'TOGGLE_USER_MENU' });
@@ -27,9 +30,19 @@ const Header: React.FC = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: 'notifications' });
   };
 
-  const handleLogout = () => {
-    dispatch({ type: 'SET_SECTION', payload: 'login' });
-    dispatch({ type: 'TOGGLE_USER_MENU' });
+  const handleLogout = async () => {
+    try {
+      await apiService.logout();
+      dispatch({ type: 'LOGOUT' });
+      dispatch({ type: 'TOGGLE_USER_MENU' });
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout fails on server, clear local state
+      dispatch({ type: 'LOGOUT' });
+      dispatch({ type: 'TOGGLE_USER_MENU' });
+      navigate('/login');
+    }
   };
 
   return (
@@ -83,7 +96,7 @@ const Header: React.FC = () => {
         {/* Settings */}
         <button
           className="p-2 rounded-lg border border-border dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-300"
-          onClick={() => dispatch({ type: 'SET_SECTION', payload: 'settings' })}
+          onClick={() => navigate('/settings')}
         >
           <Settings className="w-4 h-4" />
         </button>
@@ -127,7 +140,7 @@ const Header: React.FC = () => {
                 <button
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-300 text-sm"
                   onClick={() => {
-                    dispatch({ type: 'SET_SECTION', payload: 'profile' });
+                    navigate('/profile');
                     dispatch({ type: 'TOGGLE_USER_MENU' });
                   }}
                 >
@@ -138,7 +151,7 @@ const Header: React.FC = () => {
                 <button
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-300 text-sm"
                   onClick={() => {
-                    dispatch({ type: 'SET_SECTION', payload: 'settings' });
+                    navigate('/settings');
                     dispatch({ type: 'TOGGLE_USER_MENU' });
                   }}
                 >

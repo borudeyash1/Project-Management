@@ -53,20 +53,39 @@ const SharedNavbar: React.FC = () => {
 
           {/* Auth Buttons and Theme Changer */}
           <div className="flex items-center space-x-4">
-            <Link
-              to="/login"
-              className={`${isActive('/login') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
-            >
-              <LogIn size={16} />
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' : 'from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700'} text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
-            >
-              <UserPlus size={16} />
-              Register
-            </Link>
+            {/* Show Login button only when not on register page */}
+            {!isActive('/register') && (
+              <Link
+                to="/login"
+                className={`${isActive('/login') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+              >
+                <LogIn size={16} />
+                Login
+              </Link>
+            )}
+
+            {/* Show Register button only when not on register page */}
+            {!isActive('/register') && (
+              <Link
+                to="/register"
+                className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' : 'from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700'} text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
+              >
+                <UserPlus size={16} />
+                Register
+              </Link>
+            )}
+
+            {/* Show Back to Login button when on register page */}
+            {isActive('/register') && (
+              <Link
+                to="/login"
+                className={`${isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600'} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+              >
+                <LogIn size={16} />
+                Back to Login
+              </Link>
+            )}
+
             <button
               onClick={toggleTheme}
               className={`${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} p-2 rounded-lg transition-colors duration-200`}

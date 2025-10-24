@@ -273,9 +273,9 @@ const Auth: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-sm bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Signing in...' : 'Continue'}
+                {loading ? 'Signing in...' : 'Sign In'}
               </button>
 
               <div className="relative">
@@ -391,9 +391,9 @@ const Auth: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-sm bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Creating account...' : 'Register'}
+                {loading ? 'Creating account...' : 'Create Account'}
               </button>
               <p className="text-xs text-slate-500">
                 After registration, check your email for a verification code or confirmation link.

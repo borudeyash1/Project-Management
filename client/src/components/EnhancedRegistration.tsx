@@ -1063,6 +1063,23 @@ const EnhancedRegistration: React.FC = () => {
               </div>
             </div>
 
+            {/* Login/Register Toggler */}
+            <div className="flex bg-white border border-border rounded-lg p-1 mb-6">
+              <button
+                type="button"
+                className="flex-1 px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-slate-900"
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                className="flex-1 px-3 py-2 rounded-md text-sm font-medium bg-yellow-100 text-text"
+              >
+                Register
+              </button>
+            </div>
+
             {/* Progress Steps */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
