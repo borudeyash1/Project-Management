@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle, 
+import {
+  Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle,
   Star, Flag, Tag, MessageSquare, FileText, Users,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import AIChatbot from './AIChatbot';
 
 interface Reminder {
   _id: string;
@@ -67,6 +68,7 @@ const RemindersPage: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high' | 'urgent'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState<Reminder | null>(null);
+  const [showAIChatbot, setShowAIChatbot] = useState(false);
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -238,18 +240,18 @@ const RemindersPage: React.FC = () => {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('en-US', {
       weekday: 'short',
-      month: 'short', 
-      day: 'numeric' 
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -420,7 +422,7 @@ const RemindersPage: React.FC = () => {
                         >
                           {reminder.completed && <CheckCircle className="w-3 h-3" />}
                         </button>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="flex items-center gap-2">
@@ -438,11 +440,11 @@ const RemindersPage: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          
+
                           {reminder.description && (
                             <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
                           )}
-                          
+
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span>{formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}</span>
                             {reminder.project && (
@@ -456,7 +458,7 @@ const RemindersPage: React.FC = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         <button className="text-gray-400 hover:text-gray-600">
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -504,14 +506,14 @@ const RemindersPage: React.FC = () => {
                       {day}
                     </div>
                   ))}
-                  
+
                   {/* Day Cells */}
                   {weekDays.map((day, index) => {
                     const dayReminders = getRemindersForDate(day);
                     const dayEvents = getEventsForDate(day);
                     const isToday = day.toDateString() === new Date().toDateString();
                     const isSelected = day.toDateString() === selectedDate.toDateString();
-                    
+
                     return (
                       <div
                         key={index}
@@ -530,7 +532,7 @@ const RemindersPage: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         {/* Reminders */}
                         <div className="space-y-1">
                           {dayReminders.slice(0, 2).map(reminder => (
@@ -619,7 +621,10 @@ const RemindersPage: React.FC = () => {
                 <p className="text-sm text-purple-100 mb-3">
                   Get smart suggestions for task prioritization and deadline management.
                 </p>
-                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+                <button
+                  onClick={() => setShowAIChatbot(true)}
+                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                >
                   Ask AI
                 </button>
               </div>
@@ -690,6 +695,9 @@ const RemindersPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Chatbot Modal */}
+      <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
     </div>
   );
 };

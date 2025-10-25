@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, Clock, Users, BarChart3, Settings, MessageSquare, 
-  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye, 
-  CheckCircle, AlertCircle, TrendingUp, FileText, Download, 
-  Upload, Link, Tag, Flag, User, Clock3, Target, Zap, 
-  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star, 
-  Heart, Bookmark, Share2, Copy, Move, Archive, Play, 
-  Pause, Square, Circle, Triangle, Hexagon, Layers, 
-  Activity, PieChart, LineChart, TrendingDown, Minus, 
-  Maximize, Minimize, RotateCcw, Save, RefreshCw, 
-  CheckSquare, Timer, UserCheck, UserX, MessageCircle, 
-  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot, 
-  Sparkles, Lightbulb, Globe, Shield, Key, Lock, 
-  Unlock, EyeOff, Bell, Mail, Phone, MapPin, 
+import {
+  Calendar, Clock, Users, BarChart3, Settings, MessageSquare,
+  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye,
+  CheckCircle, AlertCircle, TrendingUp, FileText, Download,
+  Upload, Link, Tag, Flag, User, Clock3, Target, Zap,
+  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star,
+  Heart, Bookmark, Share2, Copy, Move, Archive, Play,
+  Pause, Square, Circle, Triangle, Hexagon, Layers,
+  Activity, PieChart, LineChart, TrendingDown, Minus,
+  Maximize, Minimize, RotateCcw, Save, RefreshCw,
+  CheckSquare, Timer, UserCheck, UserX, MessageCircle,
+  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot,
+  Sparkles, Lightbulb, Globe, Shield, Key, Lock,
+  Unlock, EyeOff, Bell, Mail, Phone, MapPin,
   Building, Home, Crown, DollarSign, CreditCard,
   Database, Server, Cloud, Wifi, Monitor, Smartphone,
   Tablet, Headphones, Camera, Mic, Volume2, VolumeX,
@@ -197,18 +197,31 @@ const TaskManagement: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  // Calendar state variables
+  const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(null);
+  const [showDateTaskModal, setShowDateTaskModal] = useState(false);
+  const [newTaskData, setNewTaskData] = useState<Partial<Task>>({});
+
   // Initialize tasks state with mock data
   useEffect(() => {
     setTasks(mockTasks);
     setColumns(mockColumns);
+    setProjects([
+      { _id: '1', name: 'E-commerce Platform', color: '#3B82F6', status: 'active', progress: 65 },
+      { _id: '2', name: 'Mobile App', color: '#10B981', status: 'active', progress: 40 },
+      { _id: '3', name: 'Marketing Campaign', color: '#F59E0B', status: 'paused', progress: 20 },
+      { _id: '4', name: 'API Development', color: '#EF4444', status: 'active', progress: 80 }
+    ]);
   }, []);
 
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {
-    setColumns(prevColumns => 
-      prevColumns.map(column => 
-        column._id === columnId 
+    setColumns(prevColumns =>
+      prevColumns.map(column =>
+        column._id === columnId
           ? { ...column, ...updates }
           : column
       )
@@ -223,7 +236,7 @@ const TaskManagement: React.FC = () => {
       position: columnData.position || columns.length,
       taskLimit: columnData.taskLimit
     };
-    
+
     setColumns(prevColumns => [...prevColumns, newColumn]);
   };
 
@@ -248,9 +261,9 @@ const TaskManagement: React.FC = () => {
       isImportant: false
     };
 
-    setTasks((prevTasks: Task[]) => 
-      prevTasks.map((task: Task) => 
-        task._id === taskId 
+    setTasks((prevTasks: Task[]) =>
+      prevTasks.map((task: Task) =>
+        task._id === taskId
           ? { ...task, notes: [...task.notes, newNote] }
           : task
       )
@@ -258,11 +271,11 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleNoteUpdate = (noteId: string, content: string) => {
-    setTasks((prevTasks: Task[]) => 
+    setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) => ({
         ...task,
-        notes: task.notes.map((note: Note) => 
-          note._id === noteId 
+        notes: task.notes.map((note: Note) =>
+          note._id === noteId
             ? { ...note, content }
             : note
         )
@@ -271,7 +284,7 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleNoteDelete = (noteId: string) => {
-    setTasks((prevTasks: Task[]) => 
+    setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) => ({
         ...task,
         notes: task.notes.filter((note: Note) => note._id !== noteId)
@@ -280,9 +293,9 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
-    setTasks((prevTasks: Task[]) => 
-      prevTasks.map((task: Task) => 
-        task._id === taskId 
+    setTasks((prevTasks: Task[]) =>
+      prevTasks.map((task: Task) =>
+        task._id === taskId
           ? { ...task, ...updates }
           : task
       )
@@ -317,7 +330,7 @@ const TaskManagement: React.FC = () => {
       notes: [],
       isCompleted: false
     };
-    
+
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
@@ -503,11 +516,7 @@ const mockColumns: Column[] = [
   }
 ];
 
-  const projects: Project[] = [
-    { _id: '1', name: 'E-commerce Platform', color: '#3B82F6', status: 'active', progress: 65 },
-    { _id: '2', name: 'Mobile App', color: '#10B981', status: 'active', progress: 40 },
-    { _id: '3', name: 'Marketing Campaign', color: '#F59E0B', status: 'paused', progress: 20 }
-  ];
+
 
   const teamMembers: TeamMember[] = [
     { _id: 'u1', name: 'John Doe', email: 'john@example.com', avatarUrl: '', role: 'Designer', isOnline: true },
@@ -550,7 +559,7 @@ const mockColumns: Column[] = [
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', task._id);
-    
+
     // Add visual feedback to the dragged element
     const target = e.target as HTMLElement;
     target.style.opacity = '0.5';
@@ -577,20 +586,20 @@ const mockColumns: Column[] = [
     e.preventDefault();
     if (draggedTask && draggedTask.status !== status) {
       console.log(`Moving task ${draggedTask._id} to ${status}`);
-      
+
       // Update the task status in the state
-      setTasks((prevTasks: Task[]) => 
-        prevTasks.map((task: Task) => 
-          task._id === draggedTask._id 
+      setTasks((prevTasks: Task[]) =>
+        prevTasks.map((task: Task) =>
+          task._id === draggedTask._id
             ? { ...task, status: status as 'pending' | 'in-progress' | 'completed' | 'blocked', updatedAt: new Date() }
             : task
         )
       );
-      
+
       // Show success toast
       setToastMessage(`Task "${draggedTask.title}" moved to ${status.replace('-', ' ')}`);
       setShowToast(true);
-      
+
       // Hide toast after 3 seconds
       setTimeout(() => {
         setShowToast(false);
@@ -675,8 +684,8 @@ const mockColumns: Column[] = [
           <div
             key={status}
             className={`bg-gray-50 rounded-lg p-4 min-h-[500px] transition-all duration-200 ${
-              draggedOverColumn === status 
-                ? 'ring-2 ring-blue-500 bg-blue-50 border-2 border-blue-300' 
+              draggedOverColumn === status
+                ? 'ring-2 ring-blue-500 bg-blue-50 border-2 border-blue-300'
                 : 'border border-gray-200'
             }`}
             onDragOver={(e) => handleDragOver(e, status)}
@@ -691,7 +700,7 @@ const mockColumns: Column[] = [
                 {tasks.filter((t: Task) => t.status === status).length}
               </span>
             </div>
-            
+
             <div className="space-y-3">
               {draggedOverColumn === status && draggedTask && draggedTask.status !== status && (
                 <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-blue-600 text-sm font-medium">
@@ -718,9 +727,9 @@ const mockColumns: Column[] = [
                         {getPriorityIcon(task.priority)}
                       </div>
                     </div>
-                    
+
                     <p className="text-xs text-gray-600 mb-3 line-clamp-2">{task.description}</p>
-                    
+
                     <div className="flex items-center gap-2 mb-2">
                       <div
                         className="w-3 h-3 rounded-full"
@@ -728,7 +737,7 @@ const mockColumns: Column[] = [
                       />
                       <span className="text-xs text-gray-600">{task.project.name}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <img
@@ -742,7 +751,7 @@ const mockColumns: Column[] = [
                         {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
                       </span>
                     </div>
-                    
+
                     {task.milestones.length > 0 && (
                       <div className="mt-2">
                         <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
@@ -762,7 +771,7 @@ const mockColumns: Column[] = [
                         </div>
                       </div>
                     )}
-                    
+
                     {task.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {task.tags.slice(0, 2).map((tag: string) => (
@@ -922,7 +931,7 @@ const mockColumns: Column[] = [
                         />
                       </div>
                       <span className="text-sm text-gray-600">
-                        {task.milestones.length > 0 
+                        {task.milestones.length > 0
                           ? `${Math.round((task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100)}%`
                           : '0%'
                         }
@@ -960,63 +969,204 @@ const mockColumns: Column[] = [
     </div>
   );
 
-  const renderTaskCalendar = () => (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Task Calendar</h2>
-        <div className="flex items-center gap-3">
-          <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-lg font-medium text-gray-900">March 2024</span>
-          <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+  const handlePrevMonth = () => {
+    setCurrentCalendarDate(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() - 1, 1));
+  };
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="grid grid-cols-7 gap-px bg-gray-200">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
-              {day}
-            </div>
-          ))}
+  const handleNextMonth = () => {
+    setCurrentCalendarDate(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1));
+  };
+
+  const handleDateClick = (date: Date) => {
+    setSelectedCalendarDate(date);
+    setShowDateTaskModal(true);
+  };
+
+  const handleCreateTaskForDate = () => {
+    if (!selectedCalendarDate) return;
+
+    const newTask: Partial<Task> = {
+      title: '',
+      description: '',
+      status: 'pending',
+      priority: 'medium',
+      startDate: selectedCalendarDate,
+      dueDate: selectedCalendarDate,
+      assignee: {
+        _id: 'current-user',
+        name: 'Current User',
+        email: 'user@example.com'
+      },
+      project: {
+        _id: 'default-project',
+        name: 'Default Project',
+        color: '#3B82F6'
+      }
+    };
+
+    setNewTaskData({
+      ...newTaskData,
+      startDate: selectedCalendarDate,
+      dueDate: selectedCalendarDate
+    });
+    setShowDateTaskModal(false);
+    setShowCreateTask(true);
+  };
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      const prevDate = new Date(year, month, -startingDayOfWeek + i + 1);
+      days.push({ date: prevDate, isCurrentMonth: false });
+    }
+
+    // Add days of the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push({ date: new Date(year, month, day), isCurrentMonth: true });
+    }
+
+    // Add empty cells to complete the last week
+    const remainingCells = 42 - days.length;
+    for (let i = 1; i <= remainingCells; i++) {
+      const nextDate = new Date(year, month + 1, i);
+      days.push({ date: nextDate, isCurrentMonth: false });
+    }
+
+    return days;
+  };
+
+  const renderTaskCalendar = () => {
+    const monthDays = getDaysInMonth(currentCalendarDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-semibold text-gray-900">Task Calendar</h2>
+            <button
+              onClick={() => setShowCreateTask(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4" />
+              Add Task
+            </button>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePrevMonth}
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-lg font-medium text-gray-900 min-w-[140px] text-center">
+              {currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </span>
+            <button
+              onClick={handleNextMonth}
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-7 gap-px bg-gray-200">
-            {Array.from({ length: 35 }, (_, i) => {
-            const date = new Date(2024, 2, i - 6); // March 2024
-            const dayTasks = tasks.filter(task => 
-              (task.dueDate ? new Date(task.dueDate).toDateString() : '') === date.toDateString()
-            );
-            
-            return (
-              <div key={i} className="bg-white min-h-[100px] p-2">
-                <div className="text-sm text-gray-900 mb-1">{date.getDate()}</div>
-                <div className="space-y-1">
-                  {dayTasks.map(task => (
-                    <div
-                      key={task._id}
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setShowTaskModal(true);
-                      }}
-                      className="p-1 rounded text-xs cursor-pointer hover:bg-gray-100"
-                      style={{ backgroundColor: task.project.color + '20' }}
-                    >
-                      <div className="font-medium truncate">{task.title}</div>
-                      <div className="text-gray-600">{task.assignee.name}</div>
-                    </div>
-                  ))}
-                </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          <div className="grid grid-cols-7 gap-px bg-gray-200">
+            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
+              <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
+                {day.substring(0, 3)}
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-px bg-gray-200">
+            {monthDays.map(({ date, isCurrentMonth }, index) => {
+              const dayTasks = tasks.filter(task =>
+                (task.dueDate ? new Date(task.dueDate).toDateString() : '') === date.toDateString()
+              );
+
+              const isToday = date.toDateString() === today.toDateString();
+              const isPast = date < today;
+
+              return (
+                <div
+                  key={index}
+                  onClick={() => handleDateClick(date)}
+                  className={`bg-white min-h-[120px] p-2 cursor-pointer hover:bg-blue-50 transition-colors ${
+                    !isCurrentMonth ? 'opacity-40' : ''
+                  } ${isToday ? 'ring-2 ring-blue-500 ring-inset' : ''}`}
+                >
+                  <div className={`text-sm mb-2 font-medium ${
+                    isToday ? 'text-blue-600' :
+                    isPast && isCurrentMonth ? 'text-gray-500' : 'text-gray-900'
+                  }`}>
+                    {date.getDate()}
+                    {isToday && <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mx-auto mt-1"></div>}
+                  </div>
+
+                  <div className="space-y-1">
+                    {dayTasks.slice(0, 3).map(task => (
+                      <div
+                        key={task._id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTask(task);
+                          setShowTaskModal(true);
+                        }}
+                        className="p-1 rounded text-xs cursor-pointer hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 transition-all"
+                        style={{ backgroundColor: task.project.color + '20', borderLeftColor: task.project.color }}
+                      >
+                        <div className="font-medium truncate" title={task.title}>
+                          {task.title}
+                        </div>
+                        <div className="text-gray-600 truncate text-[10px]" title={task.assignee.name}>
+                          {task.assignee.name}
+                        </div>
+                      </div>
+                    ))}
+
+                    {dayTasks.length > 3 && (
+                      <div className="text-xs text-gray-500 text-center py-1">
+                        +{dayTasks.length - 3} more
+                      </div>
+                    )}
+
+                    {dayTasks.length === 0 && (
+                      <div className="text-xs text-gray-400 text-center py-2 opacity-0 group-hover:opacity-100">
+                        Click to add task
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded"></div>
+            <span>Click any date to add a task</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span>Today</span>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderTaskAnalytics = () => (
     <div className="p-6 space-y-6">
@@ -1030,7 +1180,7 @@ const mockColumns: Column[] = [
             <CheckSquare className="w-8 h-8 text-blue-600" />
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -1042,7 +1192,7 @@ const mockColumns: Column[] = [
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -1054,7 +1204,7 @@ const mockColumns: Column[] = [
             <Clock className="w-8 h-8 text-orange-600" />
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -1075,7 +1225,7 @@ const mockColumns: Column[] = [
             {['pending', 'in-progress', 'completed', 'blocked'].map(status => {
               const count = tasks.filter(t => t.status === status).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
-              
+
               return (
                 <div key={status} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1113,7 +1263,7 @@ const mockColumns: Column[] = [
             {projects.map(project => {
               const count = tasks.filter(t => t.projectId === project._id).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
-              
+
               return (
                 <div key={project._id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1127,7 +1277,7 @@ const mockColumns: Column[] = [
                     <div className="w-20 bg-gray-200 rounded-full h-2">
                       <div
                         className="h-2 rounded-full"
-                        style={{ 
+                        style={{
                           width: `${percentage}%`,
                           backgroundColor: project.color
                         }}
@@ -1278,7 +1428,7 @@ const mockColumns: Column[] = [
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{attachment.name}</p>
                           <p className="text-xs text-gray-600">
-                            {attachment.type === 'file' && attachment.size 
+                            {attachment.type === 'file' && attachment.size
                               ? `${(attachment.size / 1024 / 1024).toFixed(2)} MB`
                               : 'Link'
                             }
@@ -1314,7 +1464,7 @@ const mockColumns: Column[] = [
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="mt-4">
                     <textarea
                       placeholder="Add a comment..."
@@ -1338,14 +1488,14 @@ const mockColumns: Column[] = [
                         {selectedTask.status.replace('-', ' ')}
                       </span>
                     </div>
-                    
+
                     <div>
                       <span className="text-sm font-medium text-gray-700">Priority:</span>
                       <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getPriorityColor(selectedTask.priority)}`}>
                         {selectedTask.priority}
                       </span>
                     </div>
-                    
+
                     <div>
                       <span className="text-sm font-medium text-gray-700">Assignee:</span>
                       <div className="flex items-center gap-2 mt-1">
@@ -1357,14 +1507,14 @@ const mockColumns: Column[] = [
                         <span className="text-sm text-gray-600">{selectedTask.assignee.name}</span>
                       </div>
                     </div>
-                    
+
                     <div>
                       <span className="text-sm font-medium text-gray-700">Due Date:</span>
                       <span className="ml-2 text-sm text-gray-600">
                         {selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString() : ''}
                       </span>
                     </div>
-                    
+
                     <div>
                       <span className="text-sm font-medium text-gray-700">Time Tracking:</span>
                       <div className="mt-1 text-sm text-gray-600">
@@ -1423,7 +1573,7 @@ const mockColumns: Column[] = [
               <X className="w-5 h-5" />
             </button>
           </div>
-          
+
           <div className="space-y-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 mb-2">
@@ -1431,7 +1581,7 @@ const mockColumns: Column[] = [
               </div>
               <p className="text-sm text-gray-600">Time spent on task</p>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
               <textarea
@@ -1440,7 +1590,7 @@ const mockColumns: Column[] = [
                 rows={3}
               />
             </div>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={stopTimeTracking}
@@ -1572,10 +1722,10 @@ const mockColumns: Column[] = [
 
       {/* Task Modal */}
       {showTaskModal && renderTaskModal()}
-      
+
       {/* Time Tracking Modal */}
       {renderTimeTrackingModal()}
-      
+
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right">

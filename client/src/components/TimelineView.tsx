@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Calendar, Clock, Users, BarChart3, Settings, MessageSquare, 
-  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye, 
-  CheckCircle, AlertCircle, TrendingUp, FileText, Download, 
-  Upload, Link, Tag, Flag, User, Clock3, Target, Zap, 
-  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star, 
-  Heart, Bookmark, Share2, Copy, Move, Archive, Play, 
-  Pause, Square, Circle, Triangle, Hexagon, Layers, 
-  Activity, PieChart, LineChart, TrendingDown, Minus, 
-  Maximize, Minimize, RotateCcw, Save, RefreshCw, 
-  CheckSquare, Timer, UserCheck, UserX, MessageCircle, 
-  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot, 
-  Sparkles, Lightbulb, Globe, Shield, Key, Lock, 
-  Unlock, EyeOff, Bell, Mail, Phone, MapPin, 
+import {
+  Calendar, Clock, Users, BarChart3, Settings, MessageSquare,
+  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye,
+  CheckCircle, AlertCircle, TrendingUp, FileText, Download,
+  Upload, Link, Tag, Flag, User, Clock3, Target, Zap,
+  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star,
+  Heart, Bookmark, Share2, Copy, Move, Archive, Play,
+  Pause, Square, Circle, Triangle, Hexagon, Layers,
+  Activity, PieChart, LineChart, TrendingDown, Minus,
+  Maximize, Minimize, RotateCcw, Save, RefreshCw,
+  CheckSquare, Timer, UserCheck, UserX, MessageCircle,
+  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot,
+  Sparkles, Lightbulb, Globe, Shield, Key, Lock,
+  Unlock, EyeOff, Bell, Mail, Phone, MapPin,
   Building, Home, Crown, DollarSign, CreditCard,
   Database, Server, Cloud, Wifi, Monitor, Smartphone,
   Tablet, Headphones, Camera, Mic, Volume2, VolumeX,
@@ -128,6 +128,14 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   const [filterProject, setFilterProject] = useState('all');
   const timelineRef = useRef<HTMLDivElement>(null);
 
+  // Simplified interaction states
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeDirection, setResizeDirection] = useState<'left' | 'right' | null>(null);
+  const [resizingTask, setResizingTask] = useState<Task | null>(null);
+  const [clickCount, setClickCount] = useState(0);
+  const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
+  const [lastClickedTask, setLastClickedTask] = useState<string | null>(null);
+
   // Status categories (swimlanes)
   const statusCategories = [
     { id: 'pending', name: 'New Ideas and Requests', color: '#F3F4F6' },
@@ -141,7 +149,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   const getDateRange = () => {
     const start = new Date(currentDate);
     const end = new Date(currentDate);
-    
+
     switch (viewMode) {
       case 'week':
         start.setDate(start.getDate() - start.getDay());
@@ -157,7 +165,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         end.setMonth(quarter * 3 + 2, 31);
         break;
     }
-    
+
     return { start, end };
   };
 
@@ -166,12 +174,12 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     const { start, end } = getDateRange();
     const dates = [];
     const current = new Date(start);
-    
+
     while (current <= end) {
       dates.push(new Date(current));
       current.setDate(current.getDate() + 1);
     }
-    
+
     return dates;
   };
 
@@ -184,7 +192,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
       if (filterStatus !== 'all' && task.status !== filterStatus) return false;
       if (filterAssignee !== 'all' && task.assignee._id !== filterAssignee) return false;
       if (filterProject !== 'all' && (task as any).projectId !== filterProject && task.project?._id !== filterProject) return false;
-      
+
       // Map task status to timeline status
       switch (status) {
         case 'pending': return task.status === 'pending';
@@ -203,10 +211,10 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     const endDate = new Date(task.dueDate);
     const timelineStart = dates[0];
     const timelineEnd = dates[dates.length - 1];
-    
+
     const startOffset = Math.max(0, (startDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
     const endOffset = Math.min(dates.length - 1, (endDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     return {
       left: `${(startOffset / dates.length) * 100}%`,
       width: `${((endOffset - startOffset) / dates.length) * 100}%`,
@@ -233,6 +241,15 @@ const TimelineView: React.FC<TimelineViewProps> = ({
 
   // Handle drag and drop
   const handleDragStart = (e: React.DragEvent, task: Task) => {
+    // Check if drag started from a resize handle
+    const target = e.target as HTMLElement;
+    if (target.className.includes('cursor-w-resize') ||
+        target.className.includes('cursor-e-resize') ||
+        isResizing) {
+      e.preventDefault();
+      return;
+    }
+
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', task._id);
@@ -242,11 +259,15 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     e.preventDefault();
     setDraggedOverDate(date);
     setDraggedOverStatus(status);
+    e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDragLeave = () => {
-    setDraggedOverDate(null);
-    setDraggedOverStatus(null);
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only clear if leaving the drop zone entirely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDraggedOverDate(null);
+      setDraggedOverStatus(null);
+    }
   };
 
   const handleDrop = (e: React.DragEvent, date: Date, status: string) => {
@@ -257,7 +278,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         startDate: date,
         updatedAt: new Date()
       };
-      
+
       onTaskUpdate(draggedTask._id, updates);
     }
     setDraggedTask(null);
@@ -271,10 +292,119 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     setDraggedOverStatus(null);
   };
 
+  // Drag resize handlers with proper date adjustment
+  const handleResizeStart = (e: React.MouseEvent, task: Task, direction: 'left' | 'right') => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeDirection(direction);
+    setResizingTask(task);
+
+    const startX = e.clientX;
+    const originalStartDate = new Date(task.startDate);
+    const originalDueDate = new Date(task.dueDate);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!timelineRef.current) return;
+
+      const timelineRect = timelineRef.current.getBoundingClientRect();
+      const timelineWidth = timelineRect.width - 256; // Subtract left panel width
+      const mouseDelta = moveEvent.clientX - startX;
+      const dayWidth = timelineWidth / dates.length;
+      const daysDelta = Math.round(mouseDelta / dayWidth);
+
+      let newStartDate = new Date(originalStartDate);
+      let newDueDate = new Date(originalDueDate);
+
+      if (direction === 'left') {
+        // Adjusting start date
+        newStartDate.setDate(originalStartDate.getDate() + daysDelta);
+        // Ensure start date doesn't go beyond due date
+        if (newStartDate >= originalDueDate) {
+          newStartDate = new Date(originalDueDate);
+          newStartDate.setDate(newStartDate.getDate() - 1);
+        }
+      } else if (direction === 'right') {
+        // Adjusting due date
+        newDueDate.setDate(originalDueDate.getDate() + daysDelta);
+        // Ensure due date doesn't go before start date
+        if (newDueDate <= originalStartDate) {
+          newDueDate = new Date(originalStartDate);
+          newDueDate.setDate(newDueDate.getDate() + 1);
+        }
+      }
+
+      // Update task with new dates
+      onTaskUpdate(task._id, {
+        startDate: newStartDate,
+        dueDate: newDueDate,
+        updatedAt: new Date()
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      setResizeDirection(null);
+      setResizingTask(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  // Simplified click handlers
+  const handleTaskClick = (e: React.MouseEvent, task: Task) => {
+    if (isResizing) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (lastClickedTask === task._id) {
+      setClickCount(prev => prev + 1);
+    } else {
+      setClickCount(1);
+      setLastClickedTask(task._id);
+    }
+
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
+
+    const timer = setTimeout(() => {
+      if (clickCount === 1) {
+        // Single click - open modal
+        setSelectedTask(task);
+        setShowTaskModal(true);
+      } else if (clickCount >= 2) {
+        // Double click - toggle completion
+        const newStatus = task.status === 'completed' ? 'in-progress' : 'completed';
+        onTaskUpdate(task._id, {
+          status: newStatus,
+          updatedAt: new Date()
+        });
+      }
+      setClickCount(0);
+      setLastClickedTask(null);
+    }, 300);
+
+    setClickTimer(timer);
+  };
+
+  // Cleanup timer on unmount
+  React.useEffect(() => {
+    return () => {
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+      }
+    };
+  }, [clickTimer]);
+
   // Navigation functions
   const navigateTimeline = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
-    
+
     switch (viewMode) {
       case 'week':
         newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
@@ -286,7 +416,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 3 : -3));
         break;
     }
-    
+
     setCurrentDate(newDate);
   };
 
@@ -322,7 +452,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               </button>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">View:</span>
@@ -336,7 +466,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 <option value="quarter">Quarter</option>
               </select>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Status:</span>
               <select
@@ -351,7 +481,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 <option value="blocked">Blocked</option>
               </select>
             </div>
-            
+
             <button
               onClick={() => setShowCreateTask(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -361,7 +491,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
             </button>
           </div>
         </div>
-        
+
         {/* Date Header */}
         <div className="flex">
           <div className="w-64 flex-shrink-0"></div>
@@ -370,8 +500,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               <div
                 key={index}
                 className={`flex-1 text-center py-2 text-sm font-medium ${
-                  date.toDateString() === today.toDateString() 
-                    ? 'bg-blue-100 text-blue-900 border-l-2 border-blue-500' 
+                  date.toDateString() === today.toDateString()
+                    ? 'bg-blue-100 text-blue-900 border-l-2 border-blue-500'
                     : 'text-gray-700'
                 }`}
               >
@@ -404,21 +534,23 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                       {categoryTasks.length}
                     </span>
                   </div>
-                  
+
                   {/* Drop zone for dragging tasks */}
                   <div
-                    className="h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm"
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (draggedTask) {
-                        onTaskUpdate(draggedTask._id, { 
-                          status: category.id as 'pending' | 'in-progress' | 'completed' | 'blocked' 
-                        });
-                      }
-                    }}
+                    className={`h-16 border-2 border-dashed rounded-lg flex items-center justify-center text-sm transition-colors ${
+                      draggedOverStatus === category.id && draggedTask
+                        ? 'border-blue-400 bg-blue-50 text-blue-600'
+                        : 'border-gray-300 text-gray-400'
+                    }`}
+                    onDragOver={(e) => handleDragOver(e, new Date(), category.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, new Date(), category.id)}
                   >
-                    Drop tasks here
+                    {draggedOverStatus === category.id && draggedTask ? (
+                      <span className="font-medium">Drop "{draggedTask.title}" here</span>
+                    ) : (
+                      'Drop tasks here'
+                    )}
                   </div>
                 </div>
               );
@@ -456,37 +588,72 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   {categoryTasks.map((task) => {
                     const position = getTaskPosition(task);
                     const isOverdueTask = isOverdue(task);
-                    
+
                     return (
                       <div
                         key={task._id}
-                        draggable
+                        draggable={!isResizing}
                         onDragStart={(e) => handleDragStart(e, task)}
                         onDragEnd={handleDragEnd}
-                        onClick={() => {
-                          setSelectedTask(task);
-                          setShowTaskModal(true);
-                        }}
-                        className={`absolute top-4 h-8 rounded-lg cursor-pointer hover:shadow-md transition-all duration-200 flex items-center px-2 text-white text-sm font-medium ${
-                          isOverdueTask ? 'ring-2 ring-red-400' : ''
-                        }`}
+                        onClick={(e) => handleTaskClick(e, task)}
+                        className={`absolute top-4 h-8 rounded-lg hover:shadow-md transition-all duration-200 flex items-center text-white text-sm font-medium group relative ${
+                          isResizing ? 'cursor-default' : 'cursor-move'
+                        } ${isOverdueTask ? 'ring-2 ring-red-400' : ''
+                        } ${task.status === 'completed' ? 'opacity-75' : ''
+                        } ${draggedTask?._id === task._id ? 'opacity-50 transform scale-105 shadow-lg' : ''}`}
                         style={{
                           left: position.left,
                           width: position.width,
-                          backgroundColor: task.project.color,
-                          minWidth: '60px'
+                          backgroundColor: task.status === 'completed' ? '#374151' : task.project.color,
+                          minWidth: '80px'
                         }}
                       >
-                        <GripVertical className="w-3 h-3 mr-1 opacity-70" />
-                        <span className="truncate flex-1">{task.title}</span>
-                        <div className="flex items-center gap-1 ml-2">
+                        {/* Left resize handle */}
+                        <div
+                          className="absolute left-0 top-0 bottom-0 w-3 cursor-w-resize opacity-0 group-hover:opacity-100 bg-white bg-opacity-50 hover:bg-opacity-80 transition-opacity z-20 flex items-center justify-center rounded-l"
+                          onMouseDown={(e) => handleResizeStart(e, task, 'left')}
+                          title="Drag to adjust start date"
+                        >
+                          <div className="w-0.5 h-4 bg-white bg-opacity-80 rounded"></div>
+                        </div>
+
+                        {/* Task content - this area is draggable */}
+                        <div
+                          className="flex items-center px-2 truncate flex-1 cursor-move"
+                          onMouseDown={(e) => {
+                            // Ensure this area can start drag
+                            e.stopPropagation();
+                          }}
+                        >
+                          <GripVertical className="w-3 h-3 mr-2 opacity-70" />
+                          <span className={`truncate ${task.status === 'completed' ? 'line-through' : ''}`}>
+                            {task.title}
+                          </span>
+                        </div>
+
+                        {/* Task info */}
+                        <div className="flex items-center gap-1 mr-2">
                           <div
-                            className="w-4 h-4 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xs"
+                            className="w-4 h-4 rounded-full bg-white bg-opacity-30 flex items-center justify-center text-xs font-medium"
                             title={task.assignee.name}
                           >
                             {task.assignee.name.charAt(0)}
                           </div>
-                          {isOverdueTask && <AlertCircle className="w-3 h-3 text-red-200" />}
+                          {task.status === 'completed' && (
+                            <div title="Completed">
+                              <CheckCircle className="w-3 h-3 text-green-300" />
+                            </div>
+                          )}
+                          {isOverdueTask && <AlertCircle className="w-3 h-3 text-red-300" />}
+                        </div>
+
+                        {/* Right resize handle */}
+                        <div
+                          className="absolute right-0 top-0 bottom-0 w-3 cursor-e-resize opacity-0 group-hover:opacity-100 bg-white bg-opacity-50 hover:bg-opacity-80 transition-opacity z-20 flex items-center justify-center rounded-r"
+                          onMouseDown={(e) => handleResizeStart(e, task, 'right')}
+                          title="Drag to adjust due date"
+                        >
+                          <div className="w-0.5 h-4 bg-white bg-opacity-80 rounded"></div>
                         </div>
                       </div>
                     );
@@ -497,6 +664,21 @@ const TimelineView: React.FC<TimelineViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Instructions */}
+      <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white px-3 py-2 rounded-lg text-xs z-50">
+        Single click: Open details • Double click: Toggle completion • Drag left/right edges: Adjust dates
+      </div>
+
+      {/* Resize indicator */}
+      {isResizing && resizingTask && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm z-50 shadow-lg">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            Adjusting {resizeDirection === 'left' ? 'start' : 'due'} date for "{resizingTask.title}"
+          </div>
+        </div>
+      )}
 
       {/* Task Modal */}
       {showTaskModal && selectedTask && (
@@ -529,8 +711,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                   <select
                     value={selectedTask.status}
-                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
-                      status: e.target.value as 'pending' | 'in-progress' | 'completed' | 'blocked' 
+                    onChange={(e) => onTaskUpdate(selectedTask._id, {
+                      status: e.target.value as 'pending' | 'in-progress' | 'completed' | 'blocked'
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
@@ -545,8 +727,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                   <select
                     value={selectedTask.priority}
-                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
-                      priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' 
+                    onChange={(e) => onTaskUpdate(selectedTask._id, {
+                      priority: e.target.value as 'low' | 'medium' | 'high' | 'critical'
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
@@ -562,8 +744,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <input
                     type="date"
                     value={selectedTask.startDate.toISOString().split('T')[0]}
-                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
-                      startDate: new Date(e.target.value) 
+                    onChange={(e) => onTaskUpdate(selectedTask._id, {
+                      startDate: new Date(e.target.value)
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
@@ -574,8 +756,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <input
                     type="date"
                     value={selectedTask.dueDate.toISOString().split('T')[0]}
-                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
-                      dueDate: new Date(e.target.value) 
+                    onChange={(e) => onTaskUpdate(selectedTask._id, {
+                      dueDate: new Date(e.target.value)
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />

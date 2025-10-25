@@ -11,6 +11,7 @@ import {
 import { useApp } from "../context/AppContext";
 import { PlanStatus } from "./FeatureRestriction";
 import { useFeatureAccess } from "../hooks/useFeatureAccess";
+import AIChatbot from "./AIChatbot";
 
 interface QuickTask {
   _id: string;
@@ -51,10 +52,11 @@ interface Project {
 
 const HomePage: React.FC = () => {
   const { state, dispatch } = useApp();
-  const { userPlan, canUseAI } = useFeatureAccess();
-  const [quickTasks, setQuickTasks] = useState<QuickTask[]>([]);
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const { canUseAI } = useFeatureAccess();
+  const [tasks, setTasks] = useState<QuickTask[]>([]);
+  const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [showAIChatbot, setShowAIChatbot] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
@@ -162,8 +164,8 @@ const HomePage: React.FC = () => {
       },
     ];
 
-    setQuickTasks(mockQuickTasks);
-    setRecentActivity(mockRecentActivity);
+    setTasks(mockQuickTasks);
+    setActivities(mockRecentActivity);
     setProjects(mockProjects);
   }, []);
 
@@ -177,14 +179,14 @@ const HomePage: React.FC = () => {
       completed: false,
     };
 
-    setQuickTasks([newTask, ...quickTasks]);
+    setTasks([newTask, ...tasks]);
     setNewTaskTitle("");
     setShowQuickAdd(false);
   };
 
   const toggleTaskCompletion = (taskId: string) => {
-    setQuickTasks((tasks) =>
-      tasks.map((task) =>
+    setTasks((taskList) =>
+      taskList.map((task) =>
         task._id === taskId ? { ...task, completed: !task.completed } : task,
       ),
     );
@@ -295,7 +297,7 @@ const HomePage: React.FC = () => {
 
               {/* Quick Tasks */}
               <div className="space-y-2">
-                {quickTasks.map((task) => (
+                {tasks.map((task) => (
                   <div
                     key={task._id}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
@@ -350,7 +352,7 @@ const HomePage: React.FC = () => {
                 </button>
               </div>
               <div className="space-y-4">
-                {recentActivity.map((activity) => (
+                {activities.map((activity) => (
                   <div key={activity._id} className="flex items-start gap-3">
                     <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
                       {getActivityIcon(activity.type)}
@@ -392,7 +394,10 @@ const HomePage: React.FC = () => {
                   I can help you prioritize tasks, suggest project improvements,
                   and provide insights.
                 </p>
-                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-4 py-2 text-sm font-medium transition-colors text-white">
+                <button
+                  onClick={() => setShowAIChatbot(true)}
+                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-4 py-2 text-sm font-medium transition-colors text-white"
+                >
                   Ask AI Assistant
                 </button>
               </div>
@@ -467,7 +472,7 @@ const HomePage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-contrast-high">
-                    {quickTasks.filter((t) => !t.completed).length}
+                    {tasks.filter((t) => !t.completed).length}
                   </div>
                   <div className="text-sm text-contrast-medium">
                     Pending Tasks
@@ -506,6 +511,9 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Chatbot Modal */}
+      <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
     </div>
   );
 };
