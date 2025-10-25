@@ -20,6 +20,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@types/nodemailer": "^7.0.3",
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -33,6 +37,10 @@
     "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+<<<<<<< HEAD
+=======
+    "nodemailer": "^7.0.10",
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     "passport-google-oauth20": "^2.0.0",
     "tsconfig-paths": "^4.2.0"
   },

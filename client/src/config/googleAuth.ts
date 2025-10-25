@@ -4,7 +4,11 @@ import { GoogleAuthResponse } from '../types/googleAuth';
 
 // Google OAuth Configuration
 export const GOOGLE_AUTH_CONFIG = {
+<<<<<<< HEAD
   clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || 'your-google-client-id',
+=======
+  clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || '639767615042-n17bqv93icprl9snejn2ddj7o5db03qc.apps.googleusercontent.com',
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   redirectUri: process.env.REACT_APP_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
   scope: 'openid email profile'
 };
@@ -89,7 +93,11 @@ export class GoogleAuthService {
     }
   }
 
+<<<<<<< HEAD
   // Sign in with Google (combining Access Token and ID Token flows)
+=======
+  // Sign in with Google (using OAuth2 flow)
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   public async signInWithGoogle(): Promise<GoogleAuthResponse> {
     if (!this.isInitialized) {
       await this.initializeGapi();
@@ -99,6 +107,7 @@ export class GoogleAuthService {
       throw new Error('Google Identity Services not loaded');
     }
 
+<<<<<<< HEAD
     let accessToken: string | null = null;
     let idToken: string | null = null;
 
@@ -165,6 +174,34 @@ export class GoogleAuthService {
       }
 
       // Fetch user info using the access token (as done previously)
+=======
+    try {
+      console.log('🚀 Starting Google OAuth flow...');
+      
+      // Use OAuth2 flow to get access token
+      const accessToken = await new Promise<string>((resolve, reject) => {
+        const client = window.google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_AUTH_CONFIG.clientId,
+          scope: GOOGLE_AUTH_CONFIG.scope,
+          callback: (response: google.accounts.oauth2.TokenResponse) => {
+            if (response.error) {
+              console.error('❌ OAuth error:', response.error);
+              reject(new Error(response.error));
+            } else {
+              console.log('✅ Access token received:', response.access_token);
+              resolve(response.access_token);
+            }
+          }
+        });
+        client.requestAccessToken();
+      });
+
+      if (!accessToken) {
+        throw new Error('Failed to obtain access token');
+      }
+
+      // Fetch user info using the access token
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       const userinfoRes = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
       if (!userinfoRes.ok) {
         throw new Error(`Failed to fetch user info: ${userinfoRes.statusText}`);
@@ -178,15 +215,23 @@ export class GoogleAuthService {
         email: userInfo.email,
         imageUrl: userInfo.picture,
         accessToken: accessToken,
+<<<<<<< HEAD
         idToken: idToken
+=======
+        idToken: '' // We'll use access token for authentication
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       };
 
     } catch (error: any) {
       console.error('❌ Error during Google sign-in process:', error);
+<<<<<<< HEAD
       throw error; // Re-throw the error to be caught by the caller
     } finally {
       this.idTokenPromiseResolve = null;
       this.idTokenPromiseReject = null;
+=======
+      throw error;
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     }
   }
 

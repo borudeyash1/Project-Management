@@ -7,7 +7,11 @@ export interface IUser extends Document {
   fullName: string;
   email: string;
   username: string;
+<<<<<<< HEAD
   password: string;
+=======
+  password?: string; // Made optional as it's not always present for Google OAuth users immediately
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   contactNumber?: string;
   designation?: string;
   department?: string;
@@ -15,7 +19,14 @@ export interface IUser extends Document {
   about?: string;
   avatarUrl?: string;
   isEmailVerified: boolean;
+<<<<<<< HEAD
   emailVerificationToken?: string;
+=======
+  emailVerificationOTP?: string; // New field for OTP
+  emailVerificationOTPExpires?: Date; // New field for OTP expiration
+  loginOtp?: string; // New field for login OTP
+  loginOtpExpiry?: Date; // New field for login OTP expiration
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   refreshTokens: Array<{

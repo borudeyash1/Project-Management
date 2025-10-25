@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import {
   Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle,
+=======
+import { 
+  Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle, 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   Star, Flag, Tag, MessageSquare, FileText, Users,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
@@ -8,7 +13,10 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+<<<<<<< HEAD
 import AIChatbot from './AIChatbot';
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
 interface Reminder {
   _id: string;
@@ -68,7 +76,10 @@ const RemindersPage: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high' | 'urgent'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState<Reminder | null>(null);
+<<<<<<< HEAD
   const [showAIChatbot, setShowAIChatbot] = useState(false);
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -240,18 +251,32 @@ const RemindersPage: React.FC = () => {
   };
 
   const formatTime = (date: Date) => {
+<<<<<<< HEAD
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
+=======
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     });
   };
 
   const formatDate = (date: Date) => {
+<<<<<<< HEAD
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric'
+=======
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short',
+      month: 'short', 
+      day: 'numeric' 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     });
   };
 
@@ -422,7 +447,11 @@ const RemindersPage: React.FC = () => {
                         >
                           {reminder.completed && <CheckCircle className="w-3 h-3" />}
                         </button>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="flex items-center gap-2">
@@ -440,11 +469,19 @@ const RemindersPage: React.FC = () => {
                               </span>
                             )}
                           </div>
+<<<<<<< HEAD
 
                           {reminder.description && (
                             <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
                           )}
 
+=======
+                          
+                          {reminder.description && (
+                            <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
+                          )}
+                          
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span>{formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}</span>
                             {reminder.project && (
@@ -458,7 +495,11 @@ const RemindersPage: React.FC = () => {
                             )}
                           </div>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <button className="text-gray-400 hover:text-gray-600">
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -506,14 +547,22 @@ const RemindersPage: React.FC = () => {
                       {day}
                     </div>
                   ))}
+<<<<<<< HEAD
 
+=======
+                  
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   {/* Day Cells */}
                   {weekDays.map((day, index) => {
                     const dayReminders = getRemindersForDate(day);
                     const dayEvents = getEventsForDate(day);
                     const isToday = day.toDateString() === new Date().toDateString();
                     const isSelected = day.toDateString() === selectedDate.toDateString();
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     return (
                       <div
                         key={index}
@@ -532,7 +581,11 @@ const RemindersPage: React.FC = () => {
                             </span>
                           )}
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         {/* Reminders */}
                         <div className="space-y-1">
                           {dayReminders.slice(0, 2).map(reminder => (
@@ -621,10 +674,14 @@ const RemindersPage: React.FC = () => {
                 <p className="text-sm text-purple-100 mb-3">
                   Get smart suggestions for task prioritization and deadline management.
                 </p>
+<<<<<<< HEAD
                 <button
                   onClick={() => setShowAIChatbot(true)}
                   className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
+=======
+                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   Ask AI
                 </button>
               </div>
@@ -695,9 +752,12 @@ const RemindersPage: React.FC = () => {
           </div>
         </div>
       </div>
+<<<<<<< HEAD
 
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     </div>
   );
 };

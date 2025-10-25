@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import {
   Calendar, Clock, Users, BarChart3, Settings, MessageSquare,
   Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye,
@@ -13,6 +14,22 @@ import {
   ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot,
   Sparkles, Lightbulb, Globe, Shield, Key, Lock,
   Unlock, EyeOff, Bell, Mail, Phone, MapPin,
+=======
+import { 
+  Calendar, Clock, Users, BarChart3, Settings, MessageSquare, 
+  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye, 
+  CheckCircle, AlertCircle, TrendingUp, FileText, Download, 
+  Upload, Link, Tag, Flag, User, Clock3, Target, Zap, 
+  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star, 
+  Heart, Bookmark, Share2, Copy, Move, Archive, Play, 
+  Pause, Square, Circle, Triangle, Hexagon, Layers, 
+  Activity, PieChart, LineChart, TrendingDown, Minus, 
+  Maximize, Minimize, RotateCcw, Save, RefreshCw, 
+  CheckSquare, Timer, UserCheck, UserX, MessageCircle, 
+  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot, 
+  Sparkles, Lightbulb, Globe, Shield, Key, Lock, 
+  Unlock, EyeOff, Bell, Mail, Phone, MapPin, 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   Building, Home, Crown, DollarSign, CreditCard,
   Database, Server, Cloud, Wifi, Monitor, Smartphone,
   Tablet, Headphones, Camera, Mic, Volume2, VolumeX,
@@ -197,6 +214,7 @@ const TaskManagement: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+<<<<<<< HEAD
   const [projects, setProjects] = useState<Project[]>([]);
 
   // Calendar state variables
@@ -205,23 +223,35 @@ const TaskManagement: React.FC = () => {
   const [showDateTaskModal, setShowDateTaskModal] = useState(false);
   const [newTaskData, setNewTaskData] = useState<Partial<Task>>({});
 
+=======
+  
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   // Initialize tasks state with mock data
   useEffect(() => {
     setTasks(mockTasks);
     setColumns(mockColumns);
+<<<<<<< HEAD
     setProjects([
       { _id: '1', name: 'E-commerce Platform', color: '#3B82F6', status: 'active', progress: 65 },
       { _id: '2', name: 'Mobile App', color: '#10B981', status: 'active', progress: 40 },
       { _id: '3', name: 'Marketing Campaign', color: '#F59E0B', status: 'paused', progress: 20 },
       { _id: '4', name: 'API Development', color: '#EF4444', status: 'active', progress: 80 }
     ]);
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   }, []);
 
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {
+<<<<<<< HEAD
     setColumns(prevColumns =>
       prevColumns.map(column =>
         column._id === columnId
+=======
+    setColumns(prevColumns => 
+      prevColumns.map(column => 
+        column._id === columnId 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
           ? { ...column, ...updates }
           : column
       )
@@ -236,7 +266,11 @@ const TaskManagement: React.FC = () => {
       position: columnData.position || columns.length,
       taskLimit: columnData.taskLimit
     };
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     setColumns(prevColumns => [...prevColumns, newColumn]);
   };
 
@@ -261,9 +295,15 @@ const TaskManagement: React.FC = () => {
       isImportant: false
     };
 
+<<<<<<< HEAD
     setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) =>
         task._id === taskId
+=======
+    setTasks((prevTasks: Task[]) => 
+      prevTasks.map((task: Task) => 
+        task._id === taskId 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
           ? { ...task, notes: [...task.notes, newNote] }
           : task
       )
@@ -271,11 +311,19 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleNoteUpdate = (noteId: string, content: string) => {
+<<<<<<< HEAD
     setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) => ({
         ...task,
         notes: task.notes.map((note: Note) =>
           note._id === noteId
+=======
+    setTasks((prevTasks: Task[]) => 
+      prevTasks.map((task: Task) => ({
+        ...task,
+        notes: task.notes.map((note: Note) => 
+          note._id === noteId 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             ? { ...note, content }
             : note
         )
@@ -284,7 +332,11 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleNoteDelete = (noteId: string) => {
+<<<<<<< HEAD
     setTasks((prevTasks: Task[]) =>
+=======
+    setTasks((prevTasks: Task[]) => 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       prevTasks.map((task: Task) => ({
         ...task,
         notes: task.notes.filter((note: Note) => note._id !== noteId)
@@ -293,9 +345,15 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
+<<<<<<< HEAD
     setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) =>
         task._id === taskId
+=======
+    setTasks((prevTasks: Task[]) => 
+      prevTasks.map((task: Task) => 
+        task._id === taskId 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
           ? { ...task, ...updates }
           : task
       )
@@ -330,7 +388,11 @@ const TaskManagement: React.FC = () => {
       notes: [],
       isCompleted: false
     };
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
@@ -516,7 +578,15 @@ const mockColumns: Column[] = [
   }
 ];
 
+<<<<<<< HEAD
 
+=======
+  const projects: Project[] = [
+    { _id: '1', name: 'E-commerce Platform', color: '#3B82F6', status: 'active', progress: 65 },
+    { _id: '2', name: 'Mobile App', color: '#10B981', status: 'active', progress: 40 },
+    { _id: '3', name: 'Marketing Campaign', color: '#F59E0B', status: 'paused', progress: 20 }
+  ];
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
   const teamMembers: TeamMember[] = [
     { _id: 'u1', name: 'John Doe', email: 'john@example.com', avatarUrl: '', role: 'Designer', isOnline: true },
@@ -559,7 +629,11 @@ const mockColumns: Column[] = [
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', task._id);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     // Add visual feedback to the dragged element
     const target = e.target as HTMLElement;
     target.style.opacity = '0.5';
@@ -586,20 +660,36 @@ const mockColumns: Column[] = [
     e.preventDefault();
     if (draggedTask && draggedTask.status !== status) {
       console.log(`Moving task ${draggedTask._id} to ${status}`);
+<<<<<<< HEAD
 
       // Update the task status in the state
       setTasks((prevTasks: Task[]) =>
         prevTasks.map((task: Task) =>
           task._id === draggedTask._id
+=======
+      
+      // Update the task status in the state
+      setTasks((prevTasks: Task[]) => 
+        prevTasks.map((task: Task) => 
+          task._id === draggedTask._id 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             ? { ...task, status: status as 'pending' | 'in-progress' | 'completed' | 'blocked', updatedAt: new Date() }
             : task
         )
       );
+<<<<<<< HEAD
 
       // Show success toast
       setToastMessage(`Task "${draggedTask.title}" moved to ${status.replace('-', ' ')}`);
       setShowToast(true);
 
+=======
+      
+      // Show success toast
+      setToastMessage(`Task "${draggedTask.title}" moved to ${status.replace('-', ' ')}`);
+      setShowToast(true);
+      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       // Hide toast after 3 seconds
       setTimeout(() => {
         setShowToast(false);
@@ -684,8 +774,13 @@ const mockColumns: Column[] = [
           <div
             key={status}
             className={`bg-gray-50 rounded-lg p-4 min-h-[500px] transition-all duration-200 ${
+<<<<<<< HEAD
               draggedOverColumn === status
                 ? 'ring-2 ring-blue-500 bg-blue-50 border-2 border-blue-300'
+=======
+              draggedOverColumn === status 
+                ? 'ring-2 ring-blue-500 bg-blue-50 border-2 border-blue-300' 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                 : 'border border-gray-200'
             }`}
             onDragOver={(e) => handleDragOver(e, status)}
@@ -700,7 +795,11 @@ const mockColumns: Column[] = [
                 {tasks.filter((t: Task) => t.status === status).length}
               </span>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="space-y-3">
               {draggedOverColumn === status && draggedTask && draggedTask.status !== status && (
                 <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-blue-600 text-sm font-medium">
@@ -727,9 +826,15 @@ const mockColumns: Column[] = [
                         {getPriorityIcon(task.priority)}
                       </div>
                     </div>
+<<<<<<< HEAD
 
                     <p className="text-xs text-gray-600 mb-3 line-clamp-2">{task.description}</p>
 
+=======
+                    
+                    <p className="text-xs text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     <div className="flex items-center gap-2 mb-2">
                       <div
                         className="w-3 h-3 rounded-full"
@@ -737,7 +842,11 @@ const mockColumns: Column[] = [
                       />
                       <span className="text-xs text-gray-600">{task.project.name}</span>
                     </div>
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <img
@@ -751,7 +860,11 @@ const mockColumns: Column[] = [
                         {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
                       </span>
                     </div>
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     {task.milestones.length > 0 && (
                       <div className="mt-2">
                         <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
@@ -771,7 +884,11 @@ const mockColumns: Column[] = [
                         </div>
                       </div>
                     )}
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     {task.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {task.tags.slice(0, 2).map((tag: string) => (
@@ -931,7 +1048,11 @@ const mockColumns: Column[] = [
                         />
                       </div>
                       <span className="text-sm text-gray-600">
+<<<<<<< HEAD
                         {task.milestones.length > 0
+=======
+                        {task.milestones.length > 0 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                           ? `${Math.round((task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100)}%`
                           : '0%'
                         }
@@ -969,6 +1090,7 @@ const mockColumns: Column[] = [
     </div>
   );
 
+<<<<<<< HEAD
   const handlePrevMonth = () => {
     setCurrentCalendarDate(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() - 1, 1));
   };
@@ -1167,6 +1289,65 @@ const mockColumns: Column[] = [
       </div>
     );
   };
+=======
+  const renderTaskCalendar = () => (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">Task Calendar</h2>
+        <div className="flex items-center gap-3">
+          <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-lg font-medium text-gray-900">March 2024</span>
+          <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="grid grid-cols-7 gap-px bg-gray-200">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
+              {day}
+            </div>
+          ))}
+        </div>
+        
+        <div className="grid grid-cols-7 gap-px bg-gray-200">
+            {Array.from({ length: 35 }, (_, i) => {
+            const date = new Date(2024, 2, i - 6); // March 2024
+            const dayTasks = tasks.filter(task => 
+              (task.dueDate ? new Date(task.dueDate).toDateString() : '') === date.toDateString()
+            );
+            
+            return (
+              <div key={i} className="bg-white min-h-[100px] p-2">
+                <div className="text-sm text-gray-900 mb-1">{date.getDate()}</div>
+                <div className="space-y-1">
+                  {dayTasks.map(task => (
+                    <div
+                      key={task._id}
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setShowTaskModal(true);
+                      }}
+                      className="p-1 rounded text-xs cursor-pointer hover:bg-gray-100"
+                      style={{ backgroundColor: task.project.color + '20' }}
+                    >
+                      <div className="font-medium truncate">{task.title}</div>
+                      <div className="text-gray-600">{task.assignee.name}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
   const renderTaskAnalytics = () => (
     <div className="p-6 space-y-6">
@@ -1180,7 +1361,11 @@ const mockColumns: Column[] = [
             <CheckSquare className="w-8 h-8 text-blue-600" />
           </div>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -1192,7 +1377,11 @@ const mockColumns: Column[] = [
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -1204,7 +1393,11 @@ const mockColumns: Column[] = [
             <Clock className="w-8 h-8 text-orange-600" />
           </div>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -1225,7 +1418,11 @@ const mockColumns: Column[] = [
             {['pending', 'in-progress', 'completed', 'blocked'].map(status => {
               const count = tasks.filter(t => t.status === status).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               return (
                 <div key={status} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1263,7 +1460,11 @@ const mockColumns: Column[] = [
             {projects.map(project => {
               const count = tasks.filter(t => t.projectId === project._id).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               return (
                 <div key={project._id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1277,7 +1478,11 @@ const mockColumns: Column[] = [
                     <div className="w-20 bg-gray-200 rounded-full h-2">
                       <div
                         className="h-2 rounded-full"
+<<<<<<< HEAD
                         style={{
+=======
+                        style={{ 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                           width: `${percentage}%`,
                           backgroundColor: project.color
                         }}
@@ -1428,7 +1633,11 @@ const mockColumns: Column[] = [
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{attachment.name}</p>
                           <p className="text-xs text-gray-600">
+<<<<<<< HEAD
                             {attachment.type === 'file' && attachment.size
+=======
+                            {attachment.type === 'file' && attachment.size 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                               ? `${(attachment.size / 1024 / 1024).toFixed(2)} MB`
                               : 'Link'
                             }
@@ -1464,7 +1673,11 @@ const mockColumns: Column[] = [
                       </div>
                     ))}
                   </div>
+<<<<<<< HEAD
 
+=======
+                  
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   <div className="mt-4">
                     <textarea
                       placeholder="Add a comment..."
@@ -1488,14 +1701,22 @@ const mockColumns: Column[] = [
                         {selectedTask.status.replace('-', ' ')}
                       </span>
                     </div>
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     <div>
                       <span className="text-sm font-medium text-gray-700">Priority:</span>
                       <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getPriorityColor(selectedTask.priority)}`}>
                         {selectedTask.priority}
                       </span>
                     </div>
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     <div>
                       <span className="text-sm font-medium text-gray-700">Assignee:</span>
                       <div className="flex items-center gap-2 mt-1">
@@ -1507,14 +1728,22 @@ const mockColumns: Column[] = [
                         <span className="text-sm text-gray-600">{selectedTask.assignee.name}</span>
                       </div>
                     </div>
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     <div>
                       <span className="text-sm font-medium text-gray-700">Due Date:</span>
                       <span className="ml-2 text-sm text-gray-600">
                         {selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString() : ''}
                       </span>
                     </div>
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     <div>
                       <span className="text-sm font-medium text-gray-700">Time Tracking:</span>
                       <div className="mt-1 text-sm text-gray-600">
@@ -1573,7 +1802,11 @@ const mockColumns: Column[] = [
               <X className="w-5 h-5" />
             </button>
           </div>
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
           <div className="space-y-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 mb-2">
@@ -1581,7 +1814,11 @@ const mockColumns: Column[] = [
               </div>
               <p className="text-sm text-gray-600">Time spent on task</p>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
               <textarea
@@ -1590,7 +1827,11 @@ const mockColumns: Column[] = [
                 rows={3}
               />
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="flex gap-3">
               <button
                 onClick={stopTimeTracking}
@@ -1722,10 +1963,17 @@ const mockColumns: Column[] = [
 
       {/* Task Modal */}
       {showTaskModal && renderTaskModal()}
+<<<<<<< HEAD
 
       {/* Time Tracking Modal */}
       {renderTimeTrackingModal()}
 
+=======
+      
+      {/* Time Tracking Modal */}
+      {renderTimeTrackingModal()}
+      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right">
@@ -1743,4 +1991,8 @@ const mockColumns: Column[] = [
   );
 };
 
+<<<<<<< HEAD
 export default TaskManagement;
+=======
+export default TaskManagement;
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237

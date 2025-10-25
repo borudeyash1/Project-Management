@@ -11,7 +11,10 @@ import {
 import { useApp } from "../context/AppContext";
 import { PlanStatus } from "./FeatureRestriction";
 import { useFeatureAccess } from "../hooks/useFeatureAccess";
+<<<<<<< HEAD
 import AIChatbot from "./AIChatbot";
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
 interface QuickTask {
   _id: string;
@@ -52,11 +55,18 @@ interface Project {
 
 const HomePage: React.FC = () => {
   const { state, dispatch } = useApp();
+<<<<<<< HEAD
   const { canUseAI } = useFeatureAccess();
   const [tasks, setTasks] = useState<QuickTask[]>([]);
   const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [showAIChatbot, setShowAIChatbot] = useState(false);
+=======
+  const { userPlan, canUseAI } = useFeatureAccess();
+  const [quickTasks, setQuickTasks] = useState<QuickTask[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
@@ -164,8 +174,13 @@ const HomePage: React.FC = () => {
       },
     ];
 
+<<<<<<< HEAD
     setTasks(mockQuickTasks);
     setActivities(mockRecentActivity);
+=======
+    setQuickTasks(mockQuickTasks);
+    setRecentActivity(mockRecentActivity);
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     setProjects(mockProjects);
   }, []);
 
@@ -179,14 +194,23 @@ const HomePage: React.FC = () => {
       completed: false,
     };
 
+<<<<<<< HEAD
     setTasks([newTask, ...tasks]);
+=======
+    setQuickTasks([newTask, ...quickTasks]);
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     setNewTaskTitle("");
     setShowQuickAdd(false);
   };
 
   const toggleTaskCompletion = (taskId: string) => {
+<<<<<<< HEAD
     setTasks((taskList) =>
       taskList.map((task) =>
+=======
+    setQuickTasks((tasks) =>
+      tasks.map((task) =>
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         task._id === taskId ? { ...task, completed: !task.completed } : task,
       ),
     );
@@ -297,7 +321,11 @@ const HomePage: React.FC = () => {
 
               {/* Quick Tasks */}
               <div className="space-y-2">
+<<<<<<< HEAD
                 {tasks.map((task) => (
+=======
+                {quickTasks.map((task) => (
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   <div
                     key={task._id}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
@@ -352,7 +380,11 @@ const HomePage: React.FC = () => {
                 </button>
               </div>
               <div className="space-y-4">
+<<<<<<< HEAD
                 {activities.map((activity) => (
+=======
+                {recentActivity.map((activity) => (
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   <div key={activity._id} className="flex items-start gap-3">
                     <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
                       {getActivityIcon(activity.type)}
@@ -394,10 +426,14 @@ const HomePage: React.FC = () => {
                   I can help you prioritize tasks, suggest project improvements,
                   and provide insights.
                 </p>
+<<<<<<< HEAD
                 <button
                   onClick={() => setShowAIChatbot(true)}
                   className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-4 py-2 text-sm font-medium transition-colors text-white"
                 >
+=======
+                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-4 py-2 text-sm font-medium transition-colors text-white">
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   Ask AI Assistant
                 </button>
               </div>
@@ -472,7 +508,11 @@ const HomePage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-contrast-high">
+<<<<<<< HEAD
                     {tasks.filter((t) => !t.completed).length}
+=======
+                    {quickTasks.filter((t) => !t.completed).length}
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   </div>
                   <div className="text-sm text-contrast-medium">
                     Pending Tasks
@@ -511,9 +551,12 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+<<<<<<< HEAD
 
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     </div>
   );
 };

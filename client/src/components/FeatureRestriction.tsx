@@ -75,8 +75,48 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
 
   return (
     <>
+<<<<<<< HEAD
       <div className={`opacity-50 pointer-events-none ${className}`} onClick={() => setShowPricingModal(true)}>
         {children}
+=======
+      <div className={`relative ${className}`}>
+        {/* Blurred content */}
+        <div className="opacity-50 pointer-events-none">{children}</div>
+
+        {/* Overlay with upgrade prompt */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className={`max-w-sm mx-auto p-6 rounded-xl border-2 ${getPlanColor(requiredPlan)}`}
+          >
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-4">
+                {getPlanIcon(requiredPlan)}
+                <Lock className="w-5 h-5 text-gray-500 ml-2" />
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                {requiredPlan === "pro" ? "Pro Feature" : "Ultra Feature"}
+              </h3>
+
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+                {getUpgradeMessage(feature)}
+              </p>
+
+              <button
+                onClick={() => setShowPricingModal(true)}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white transition-colors ${
+                  requiredPlan === "pro"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-purple-600 hover:bg-purple-700"
+                }`}
+              >
+                Upgrade to {requiredPlan === "pro" ? "Pro" : "Ultra"}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       </div>
 
       {showPricingModal && (

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import {
   Target, Plus, Search, Filter, MoreVertical, Edit, Trash2,
+=======
+import { 
+  Target, Plus, Search, Filter, MoreVertical, Edit, Trash2, 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   Eye, CheckCircle, Clock, AlertCircle, Star, Flag, Calendar,
   TrendingUp, BarChart3, Users, Zap, Bot, Crown, Award,
   ArrowUp, ArrowDown, Minus, Play, Pause, Square, RotateCcw,
@@ -8,7 +13,10 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+<<<<<<< HEAD
 import AIChatbot from './AIChatbot';
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
 interface Goal {
   _id: string;
@@ -85,7 +93,10 @@ const GoalsPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'timeline'>('grid');
   const [sortBy, setSortBy] = useState<'created' | 'due_date' | 'progress' | 'priority'>('due_date');
+<<<<<<< HEAD
   const [showAIChatbot, setShowAIChatbot] = useState(false);
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -334,8 +345,13 @@ const GoalsPage: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
+<<<<<<< HEAD
     return date.toLocaleDateString('en-US', {
       month: 'short',
+=======
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       day: 'numeric',
       year: 'numeric'
     });
@@ -346,7 +362,11 @@ const GoalsPage: React.FC = () => {
 
     // Search filter
     if (searchQuery) {
+<<<<<<< HEAD
       filtered = filtered.filter(goal =>
+=======
+      filtered = filtered.filter(goal => 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         goal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         goal.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         goal.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -556,7 +576,11 @@ const GoalsPage: React.FC = () => {
               <div className="p-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900">Goals ({filteredGoals.length})</h2>
               </div>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               {viewMode === 'grid' && (
                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredGoals.map(goal => (
@@ -570,7 +594,11 @@ const GoalsPage: React.FC = () => {
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
+<<<<<<< HEAD
 
+=======
+                      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2">
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(goal.type)}`}>
@@ -584,7 +612,11 @@ const GoalsPage: React.FC = () => {
                             {goal.status.replace('_', ' ')}
                           </span>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         {isOverdue(goal.targetDate, goal.status) && (
                           <div className="flex items-center gap-1 text-red-600 text-sm">
                             <AlertCircle className="w-4 h-4" />
@@ -592,7 +624,11 @@ const GoalsPage: React.FC = () => {
                           </div>
                         )}
                       </div>
+<<<<<<< HEAD
 
+=======
+                      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Progress</span>
@@ -609,7 +645,11 @@ const GoalsPage: React.FC = () => {
                           <span>{goal.milestones.filter(m => m.completed).length}/{goal.milestones.length} milestones</span>
                         </div>
                       </div>
+<<<<<<< HEAD
 
+=======
+                      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                       <div className="flex items-center gap-2 mt-4">
                         <button
                           onClick={() => setSelectedGoal(goal)}
@@ -653,14 +693,22 @@ const GoalsPage: React.FC = () => {
                             )}
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{goal.description}</p>
+<<<<<<< HEAD
 
+=======
+                          
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span>Due: {formatDate(goal.targetDate)}</span>
                             <span>{goal.milestones.filter(m => m.completed).length}/{goal.milestones.length} milestones</span>
                             <span>Created by {goal.createdBy.name}</span>
                           </div>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="text-right">
                           <div className="text-sm font-medium text-gray-900 mb-1">{goal.progress}%</div>
                           <div className="w-24 bg-gray-200 rounded-full h-2 mb-2">
@@ -671,7 +719,11 @@ const GoalsPage: React.FC = () => {
                           </div>
                           <div className="text-xs text-gray-500">{goal.category}</div>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedGoal(goal)}
@@ -711,13 +763,21 @@ const GoalsPage: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{goal.description}</p>
+<<<<<<< HEAD
 
+=======
+                          
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                           <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                             <span>Start: {formatDate(goal.startDate)}</span>
                             <span>Due: {formatDate(goal.targetDate)}</span>
                             <span>Progress: {goal.progress}%</span>
                           </div>
+<<<<<<< HEAD
 
+=======
+                          
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className="bg-blue-500 h-2 rounded-full"
@@ -745,10 +805,14 @@ const GoalsPage: React.FC = () => {
                 <p className="text-sm text-purple-100 mb-3">
                   Get AI-powered suggestions for goal setting and achievement strategies.
                 </p>
+<<<<<<< HEAD
                 <button
                   onClick={() => setShowAIChatbot(true)}
                   className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
+=======
+                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   Ask AI
                 </button>
               </div>
@@ -851,7 +915,11 @@ const GoalsPage: React.FC = () => {
                 </button>
               </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="p-6 space-y-6">
               {/* Progress */}
               <div>
@@ -936,7 +1004,11 @@ const GoalsPage: React.FC = () => {
                 </div>
               </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="p-6 border-t border-gray-200 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedGoal(null)}
@@ -951,9 +1023,12 @@ const GoalsPage: React.FC = () => {
           </div>
         </div>
       )}
+<<<<<<< HEAD
 
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import {
   Calendar, Clock, Users, BarChart3, Settings, MessageSquare,
   Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye,
@@ -13,6 +14,22 @@ import {
   ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot,
   Sparkles, Lightbulb, Globe, Shield, Key, Lock,
   Unlock, EyeOff, Bell, Mail, Phone, MapPin,
+=======
+import { 
+  Calendar, Clock, Users, BarChart3, Settings, MessageSquare, 
+  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye, 
+  CheckCircle, AlertCircle, TrendingUp, FileText, Download, 
+  Upload, Link, Tag, Flag, User, Clock3, Target, Zap, 
+  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star, 
+  Heart, Bookmark, Share2, Copy, Move, Archive, Play, 
+  Pause, Square, Circle, Triangle, Hexagon, Layers, 
+  Activity, PieChart, LineChart, TrendingDown, Minus, 
+  Maximize, Minimize, RotateCcw, Save, RefreshCw, 
+  CheckSquare, Timer, UserCheck, UserX, MessageCircle, 
+  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot, 
+  Sparkles, Lightbulb, Globe, Shield, Key, Lock, 
+  Unlock, EyeOff, Bell, Mail, Phone, MapPin, 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   Building, Home, Crown, DollarSign, CreditCard,
   Database, Server, Cloud, Wifi, Monitor, Smartphone,
   Tablet, Headphones, Camera, Mic, Volume2, VolumeX,
@@ -128,6 +145,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   const [filterProject, setFilterProject] = useState('all');
   const timelineRef = useRef<HTMLDivElement>(null);
 
+<<<<<<< HEAD
   // Simplified interaction states
   const [isResizing, setIsResizing] = useState(false);
   const [resizeDirection, setResizeDirection] = useState<'left' | 'right' | null>(null);
@@ -136,6 +154,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
   const [lastClickedTask, setLastClickedTask] = useState<string | null>(null);
 
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   // Status categories (swimlanes)
   const statusCategories = [
     { id: 'pending', name: 'New Ideas and Requests', color: '#F3F4F6' },
@@ -149,7 +169,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   const getDateRange = () => {
     const start = new Date(currentDate);
     const end = new Date(currentDate);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     switch (viewMode) {
       case 'week':
         start.setDate(start.getDate() - start.getDay());
@@ -165,7 +189,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         end.setMonth(quarter * 3 + 2, 31);
         break;
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     return { start, end };
   };
 
@@ -174,12 +202,20 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     const { start, end } = getDateRange();
     const dates = [];
     const current = new Date(start);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     while (current <= end) {
       dates.push(new Date(current));
       current.setDate(current.getDate() + 1);
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     return dates;
   };
 
@@ -192,7 +228,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
       if (filterStatus !== 'all' && task.status !== filterStatus) return false;
       if (filterAssignee !== 'all' && task.assignee._id !== filterAssignee) return false;
       if (filterProject !== 'all' && (task as any).projectId !== filterProject && task.project?._id !== filterProject) return false;
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       // Map task status to timeline status
       switch (status) {
         case 'pending': return task.status === 'pending';
@@ -211,10 +251,17 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     const endDate = new Date(task.dueDate);
     const timelineStart = dates[0];
     const timelineEnd = dates[dates.length - 1];
+<<<<<<< HEAD
 
     const startOffset = Math.max(0, (startDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
     const endOffset = Math.min(dates.length - 1, (endDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
 
+=======
+    
+    const startOffset = Math.max(0, (startDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
+    const endOffset = Math.min(dates.length - 1, (endDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24));
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     return {
       left: `${(startOffset / dates.length) * 100}%`,
       width: `${((endOffset - startOffset) / dates.length) * 100}%`,
@@ -241,6 +288,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
 
   // Handle drag and drop
   const handleDragStart = (e: React.DragEvent, task: Task) => {
+<<<<<<< HEAD
     // Check if drag started from a resize handle
     const target = e.target as HTMLElement;
     if (target.className.includes('cursor-w-resize') ||
@@ -250,6 +298,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
       return;
     }
 
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', task._id);
@@ -259,6 +309,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     e.preventDefault();
     setDraggedOverDate(date);
     setDraggedOverStatus(status);
+<<<<<<< HEAD
     e.dataTransfer.dropEffect = 'move';
   };
 
@@ -268,6 +319,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
       setDraggedOverDate(null);
       setDraggedOverStatus(null);
     }
+=======
+  };
+
+  const handleDragLeave = () => {
+    setDraggedOverDate(null);
+    setDraggedOverStatus(null);
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   };
 
   const handleDrop = (e: React.DragEvent, date: Date, status: string) => {
@@ -278,7 +336,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         startDate: date,
         updatedAt: new Date()
       };
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       onTaskUpdate(draggedTask._id, updates);
     }
     setDraggedTask(null);
@@ -292,6 +354,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
     setDraggedOverStatus(null);
   };
 
+<<<<<<< HEAD
   // Drag resize handlers with proper date adjustment
   const handleResizeStart = (e: React.MouseEvent, task: Task, direction: 'left' | 'right') => {
     e.preventDefault();
@@ -405,6 +468,12 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   const navigateTimeline = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
 
+=======
+  // Navigation functions
+  const navigateTimeline = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     switch (viewMode) {
       case 'week':
         newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
@@ -416,7 +485,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 3 : -3));
         break;
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     setCurrentDate(newDate);
   };
 
@@ -452,7 +525,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               </button>
             </div>
           </div>
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">View:</span>
@@ -466,7 +543,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 <option value="quarter">Quarter</option>
               </select>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Status:</span>
               <select
@@ -481,7 +562,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 <option value="blocked">Blocked</option>
               </select>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <button
               onClick={() => setShowCreateTask(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -491,7 +576,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
             </button>
           </div>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         {/* Date Header */}
         <div className="flex">
           <div className="w-64 flex-shrink-0"></div>
@@ -500,8 +589,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               <div
                 key={index}
                 className={`flex-1 text-center py-2 text-sm font-medium ${
+<<<<<<< HEAD
                   date.toDateString() === today.toDateString()
                     ? 'bg-blue-100 text-blue-900 border-l-2 border-blue-500'
+=======
+                  date.toDateString() === today.toDateString() 
+                    ? 'bg-blue-100 text-blue-900 border-l-2 border-blue-500' 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     : 'text-gray-700'
                 }`}
               >
@@ -534,6 +628,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                       {categoryTasks.length}
                     </span>
                   </div>
+<<<<<<< HEAD
 
                   {/* Drop zone for dragging tasks */}
                   <div
@@ -551,6 +646,23 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                     ) : (
                       'Drop tasks here'
                     )}
+=======
+                  
+                  {/* Drop zone for dragging tasks */}
+                  <div
+                    className="h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggedTask) {
+                        onTaskUpdate(draggedTask._id, { 
+                          status: category.id as 'pending' | 'in-progress' | 'completed' | 'blocked' 
+                        });
+                      }
+                    }}
+                  >
+                    Drop tasks here
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   </div>
                 </div>
               );
@@ -588,6 +700,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   {categoryTasks.map((task) => {
                     const position = getTaskPosition(task);
                     const isOverdueTask = isOverdue(task);
+<<<<<<< HEAD
 
                     return (
                       <div
@@ -635,10 +748,39 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                         <div className="flex items-center gap-1 mr-2">
                           <div
                             className="w-4 h-4 rounded-full bg-white bg-opacity-30 flex items-center justify-center text-xs font-medium"
+=======
+                    
+                    return (
+                      <div
+                        key={task._id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, task)}
+                        onDragEnd={handleDragEnd}
+                        onClick={() => {
+                          setSelectedTask(task);
+                          setShowTaskModal(true);
+                        }}
+                        className={`absolute top-4 h-8 rounded-lg cursor-pointer hover:shadow-md transition-all duration-200 flex items-center px-2 text-white text-sm font-medium ${
+                          isOverdueTask ? 'ring-2 ring-red-400' : ''
+                        }`}
+                        style={{
+                          left: position.left,
+                          width: position.width,
+                          backgroundColor: task.project.color,
+                          minWidth: '60px'
+                        }}
+                      >
+                        <GripVertical className="w-3 h-3 mr-1 opacity-70" />
+                        <span className="truncate flex-1">{task.title}</span>
+                        <div className="flex items-center gap-1 ml-2">
+                          <div
+                            className="w-4 h-4 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xs"
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                             title={task.assignee.name}
                           >
                             {task.assignee.name.charAt(0)}
                           </div>
+<<<<<<< HEAD
                           {task.status === 'completed' && (
                             <div title="Completed">
                               <CheckCircle className="w-3 h-3 text-green-300" />
@@ -654,6 +796,9 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                           title="Drag to adjust due date"
                         >
                           <div className="w-0.5 h-4 bg-white bg-opacity-80 rounded"></div>
+=======
+                          {isOverdueTask && <AlertCircle className="w-3 h-3 text-red-200" />}
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         </div>
                       </div>
                     );
@@ -665,6 +810,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Instructions */}
       <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white px-3 py-2 rounded-lg text-xs z-50">
         Single click: Open details • Double click: Toggle completion • Drag left/right edges: Adjust dates
@@ -680,6 +826,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
         </div>
       )}
 
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       {/* Task Modal */}
       {showTaskModal && selectedTask && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -711,8 +859,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                   <select
                     value={selectedTask.status}
+<<<<<<< HEAD
                     onChange={(e) => onTaskUpdate(selectedTask._id, {
                       status: e.target.value as 'pending' | 'in-progress' | 'completed' | 'blocked'
+=======
+                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
+                      status: e.target.value as 'pending' | 'in-progress' | 'completed' | 'blocked' 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
@@ -727,8 +880,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                   <select
                     value={selectedTask.priority}
+<<<<<<< HEAD
                     onChange={(e) => onTaskUpdate(selectedTask._id, {
                       priority: e.target.value as 'low' | 'medium' | 'high' | 'critical'
+=======
+                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
+                      priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
@@ -744,8 +902,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <input
                     type="date"
                     value={selectedTask.startDate.toISOString().split('T')[0]}
+<<<<<<< HEAD
                     onChange={(e) => onTaskUpdate(selectedTask._id, {
                       startDate: new Date(e.target.value)
+=======
+                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
+                      startDate: new Date(e.target.value) 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
@@ -756,8 +919,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   <input
                     type="date"
                     value={selectedTask.dueDate.toISOString().split('T')[0]}
+<<<<<<< HEAD
                     onChange={(e) => onTaskUpdate(selectedTask._id, {
                       dueDate: new Date(e.target.value)
+=======
+                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
+                      dueDate: new Date(e.target.value) 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />

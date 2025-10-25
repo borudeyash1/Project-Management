@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import {
   Users, UserPlus, Search, Filter, MoreVertical, Edit, Trash2,
+=======
+import { 
+  Users, UserPlus, Search, Filter, MoreVertical, Edit, Trash2, 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   Eye, MessageSquare, Phone, Mail, Calendar, MapPin, Clock,
   Star, Award, TrendingUp, Target, BarChart3, Crown, Zap,
   Bot, Plus, CheckCircle, AlertCircle, XCircle, UserCheck,
@@ -8,7 +13,10 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+<<<<<<< HEAD
 import AIChatbot from './AIChatbot';
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
 interface TeamMember {
   _id: string;
@@ -80,7 +88,10 @@ const TeamPage: React.FC = () => {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+<<<<<<< HEAD
   const [showAIChatbot, setShowAIChatbot] = useState(false);
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
 
   // Mock data - replace with actual API calls
@@ -352,7 +363,11 @@ const TeamPage: React.FC = () => {
   const formatLastActive = (date: Date) => {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
@@ -367,7 +382,11 @@ const TeamPage: React.FC = () => {
                            member.department.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRole = filterRole === 'all' || member.role === filterRole;
       const matchesStatus = filterStatus === 'all' || member.status === filterStatus;
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       return matchesSearch && matchesRole && matchesStatus;
     });
   };
@@ -523,7 +542,11 @@ const TeamPage: React.FC = () => {
               <div className="p-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900">Team Members ({filteredMembers.length})</h2>
               </div>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               {viewMode === 'grid' && (
                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredMembers.map(member => (
@@ -542,7 +565,11 @@ const TeamPage: React.FC = () => {
                             </span>
                           </div>
                         )}
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-gray-900 truncate">{member.name}</h3>
                           <p className="text-sm text-gray-600 truncate">{member.email}</p>
@@ -556,12 +583,20 @@ const TeamPage: React.FC = () => {
                             </span>
                           </div>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <button className="text-gray-400 hover:text-gray-600">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
+<<<<<<< HEAD
 
+=======
+                      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                       <div className="space-y-2">
                         <div className="text-sm text-gray-600">
                           <span className="font-medium">Department:</span> {member.department}
@@ -573,7 +608,11 @@ const TeamPage: React.FC = () => {
                           <span className="font-medium">Productivity:</span> {member.performance.productivityScore}%
                         </div>
                       </div>
+<<<<<<< HEAD
 
+=======
+                      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                       <div className="flex items-center gap-2 mt-4">
                         <button
                           onClick={() => setSelectedMember(member)}
@@ -609,7 +648,11 @@ const TeamPage: React.FC = () => {
                             </span>
                           </div>
                         )}
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-1">
                             <h3 className="font-medium text-gray-900">{member.name}</h3>
@@ -623,12 +666,20 @@ const TeamPage: React.FC = () => {
                           </div>
                           <p className="text-sm text-gray-600">{member.email} • {member.department}</p>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="text-right text-sm text-gray-600">
                           <div>Last active: {formatLastActive(member.lastActive)}</div>
                           <div>Productivity: {member.performance.productivityScore}%</div>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedMember(member)}
@@ -748,10 +799,14 @@ const TeamPage: React.FC = () => {
                 <p className="text-sm text-purple-100 mb-3">
                   Get AI-powered insights on team performance and optimization suggestions.
                 </p>
+<<<<<<< HEAD
                 <button
                   onClick={() => setShowAIChatbot(true)}
                   className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
+=======
+                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                   Ask AI
                 </button>
               </div>
@@ -863,7 +918,11 @@ const TeamPage: React.FC = () => {
                 </button>
               </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="p-6 space-y-6">
               {/* Basic Info */}
               <div>
@@ -953,7 +1012,11 @@ const TeamPage: React.FC = () => {
                 </div>
               </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="p-6 border-t border-gray-200 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedMember(null)}
@@ -968,9 +1031,12 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       )}
+<<<<<<< HEAD
 
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     </div>
   );
 };

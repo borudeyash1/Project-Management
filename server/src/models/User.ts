@@ -12,7 +12,10 @@ const userSchema = new Schema<IUser>({
   email: {
     type: String,
     required: [true, 'Email is required'],
+<<<<<<< HEAD
     unique: true,
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     lowercase: true,
     trim: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
@@ -20,7 +23,10 @@ const userSchema = new Schema<IUser>({
   username: {
     type: String,
     required: [true, 'Username is required'],
+<<<<<<< HEAD
     unique: true,
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     trim: true,
     minlength: [3, 'Username must be at least 3 characters'],
     maxlength: [30, 'Username cannot exceed 30 characters'],
@@ -309,7 +315,14 @@ const userSchema = new Schema<IUser>({
     type: Boolean,
     default: false
   },
+<<<<<<< HEAD
   emailVerificationToken: String,
+=======
+  emailVerificationOTP: String, // New field for OTP
+  emailVerificationOTPExpires: Date, // New field for OTP expiration
+  loginOtp: String, // New field for login OTP
+  loginOtpExpiry: Date, // New field for login OTP expiration
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   passwordResetToken: String,
   passwordResetExpires: Date,
   refreshTokens: [{
@@ -445,17 +458,34 @@ const userSchema = new Schema<IUser>({
 });
 
 // Index for better query performance
+<<<<<<< HEAD
 userSchema.index({ email: 1 });
 userSchema.index({ username: 1 });
+=======
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 }, { unique: true });
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 userSchema.index({ 'refreshTokens.token': 1 });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
+<<<<<<< HEAD
   if (!this.isModified('password')) return next();
   
   try {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
+=======
+  // Only hash the password if it's new or has been modified
+  if (!this.isModified('password') || this.password === undefined) {
+    return next();
+  }
+  
+  try {
+    const salt = await bcrypt.genSalt(12);
+    // Ensure this.password is a string before hashing
+    this.password = await bcrypt.hash(this.password as string, salt);
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     next();
   } catch (error) {
     next(error as Error);
@@ -464,6 +494,13 @@ userSchema.pre('save', async function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+<<<<<<< HEAD
+=======
+  // If password is not set (e.g., for some OAuth users), it cannot be compared
+  if (!this.password) {
+    return false;
+  }
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   return bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -485,7 +522,14 @@ userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.refreshTokens;
+<<<<<<< HEAD
   delete userObject.emailVerificationToken;
+=======
+  delete userObject.emailVerificationOTP; // New: Delete OTP from output
+  delete userObject.emailVerificationOTPExpires; // New: Delete OTP expiration from output
+  delete userObject.loginOtp; // New: Delete login OTP from output
+  delete userObject.loginOtpExpiry; // New: Delete login OTP expiration from output
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   delete userObject.passwordResetToken;
   delete userObject.passwordResetExpires;
   return userObject;

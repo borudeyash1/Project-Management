@@ -99,10 +99,14 @@ app.use("*", (req, res) => {
 
 // Database connection
 mongoose
+<<<<<<< HEAD
   .connect(process.env.MONGODB_URI || "", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   } as any)
+=======
+  .connect(process.env.MONGODB_URI || "")
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   .then(() => {
     console.log("Connected to MongoDB");
   })

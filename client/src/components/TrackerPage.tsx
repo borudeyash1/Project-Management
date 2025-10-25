@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import {
   Play, Pause, Square, Clock, Target, Users, TrendingUp,
+=======
+import { 
+  Play, Pause, Square, Clock, Target, Users, TrendingUp, 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
   BarChart3, Calendar, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, CheckCircle, AlertCircle, Zap,
   Bot, Crown, Star, Flag, Tag, MessageSquare, FileText
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+<<<<<<< HEAD
 import AIChatbot from './AIChatbot';
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
 interface TimeEntry {
   _id: string;
@@ -56,7 +64,10 @@ const TrackerPage: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [pausedAt, setPausedAt] = useState<Date | null>(null);
   const [totalPausedTime, setTotalPausedTime] = useState(0); // in seconds
+<<<<<<< HEAD
   const [showAIChatbot, setShowAIChatbot] = useState(false);
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -134,7 +145,11 @@ const TrackerPage: React.FC = () => {
 
     setTimeEntries(mockTimeEntries);
     setProjects(mockProjects);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     // Find running entry
     const runningEntry = mockTimeEntries.find(entry => entry.isRunning);
     if (runningEntry) {
@@ -150,7 +165,11 @@ const TrackerPage: React.FC = () => {
         const now = new Date();
         const elapsed = Math.floor((now.getTime() - currentEntry.startTime.getTime()) / 1000) - totalPausedTime;
         setElapsedTime(elapsed);
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         // Update the current entry duration
         setTimeEntries(entries =>
           entries.map(entry =>
@@ -160,9 +179,15 @@ const TrackerPage: React.FC = () => {
           )
         );
       }, 1000);
+<<<<<<< HEAD
 
       setTimerInterval(interval);
 
+=======
+      
+      setTimerInterval(interval);
+      
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
       return () => {
         clearInterval(interval);
         setTimerInterval(null);
@@ -189,10 +214,17 @@ const TrackerPage: React.FC = () => {
   };
 
   const formatTime = (date: Date) => {
+<<<<<<< HEAD
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
+=======
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     });
   };
 
@@ -251,7 +283,11 @@ const TrackerPage: React.FC = () => {
 
   const pauseTracking = () => {
     if (!currentEntry) return;
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     if (isPaused) {
       // Resume tracking
       if (pausedAt) {
@@ -270,8 +306,13 @@ const TrackerPage: React.FC = () => {
   const getTotalTimeToday = () => {
     const today = new Date();
     return timeEntries
+<<<<<<< HEAD
       .filter(entry =>
         !entry.isRunning &&
+=======
+      .filter(entry => 
+        !entry.isRunning && 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         new Date(entry.startTime).toDateString() === today.toDateString()
       )
       .reduce((total, entry) => total + entry.duration, 0);
@@ -281,10 +322,17 @@ const TrackerPage: React.FC = () => {
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());
+<<<<<<< HEAD
 
     return timeEntries
       .filter(entry =>
         !entry.isRunning &&
+=======
+    
+    return timeEntries
+      .filter(entry => 
+        !entry.isRunning && 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
         new Date(entry.startTime) >= startOfWeek
       )
       .reduce((total, entry) => total + entry.duration, 0);
@@ -366,8 +414,13 @@ const TrackerPage: React.FC = () => {
                         <button
                           onClick={pauseTracking}
                           className={`p-3 text-white rounded-lg ${
+<<<<<<< HEAD
                             isPaused
                               ? 'bg-green-500 hover:bg-green-600'
+=======
+                            isPaused 
+                              ? 'bg-green-500 hover:bg-green-600' 
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                               : 'bg-yellow-500 hover:bg-yellow-600'
                           }`}
                         >
@@ -485,10 +538,14 @@ const TrackerPage: React.FC = () => {
               <p className="text-sm text-purple-100 mb-3">
                 Get insights on your productivity patterns and time optimization suggestions.
               </p>
+<<<<<<< HEAD
               <button
                 onClick={() => setShowAIChatbot(true)}
                 className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
               >
+=======
+              <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
                 Ask AI
               </button>
             </div>
@@ -541,7 +598,11 @@ const TrackerPage: React.FC = () => {
                 ×
               </button>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
@@ -556,7 +617,11 @@ const TrackerPage: React.FC = () => {
                   ))}
                 </select>
               </div>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Task</label>
                 <select
@@ -570,7 +635,11 @@ const TrackerPage: React.FC = () => {
                   ))}
                 </select>
               </div>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
                 <textarea
@@ -581,7 +650,11 @@ const TrackerPage: React.FC = () => {
                   placeholder="What are you working on?"
                 />
               </div>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowAddEntry(false)}
@@ -601,9 +674,12 @@ const TrackerPage: React.FC = () => {
           </div>
         </div>
       )}
+<<<<<<< HEAD
 
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
+=======
+>>>>>>> 473e7d7e366c2b4e682081de45b4866d6d40b237
     </div>
   );
 };
