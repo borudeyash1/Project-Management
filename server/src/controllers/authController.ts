@@ -645,27 +645,28 @@ export const googleAuth = async (
       registrationData,
     } = req.body;
 
-    // Verify Google ID token
-    let ticket;
+    // Verify Google access token by fetching user info
+    let userInfo: any;
     try {
-      ticket = await googleClient.verifyIdToken({
-        idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
+      const response = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
+      if (!response.ok) {
+        throw new Error(`Failed to verify access token: ${response.statusText}`);
+      }
+      userInfo = await response.json();
+      
+      // Verify the email matches
+      if (userInfo.email !== email) {
+        res.status(400).json({
+          success: false,
+          message: "Google token verification failed - email mismatch",
+        });
+        return;
+      }
     } catch (error) {
       console.error("Google token verification failed:", error);
       res.status(400).json({
         success: false,
         message: "Invalid Google token",
-      });
-      return;
-    }
-
-    const payload = ticket.getPayload();
-    if (!payload || payload.email !== email) {
-      res.status(400).json({
-        success: false,
-        message: "Google token verification failed",
       });
       return;
     }

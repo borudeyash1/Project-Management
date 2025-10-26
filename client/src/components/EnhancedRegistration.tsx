@@ -272,11 +272,54 @@ const EnhancedRegistration: React.FC = () => {
 
   const handleGoogleAuth = async () => {
     try {
-      // This would integrate with Google OAuth
-      showToast('Google OAuth integration coming soon!', 'info');
-    } catch (error) {
+      setLoading(true);
+
+      // Import googleAuthService
+      const { googleAuthService } = await import('../config/googleAuth');
+
+      // Initialize Google Auth if not already done
+      await googleAuthService.initializeGapi();
+
+      // Sign in with Google
+      const googleUser = await googleAuthService.signInWithGoogle();
+
+      // Pre-fill the form with Google data
+      setFormData(prev => ({
+        ...prev,
+        fullName: googleUser.name || prev.fullName,
+        email: googleUser.email || prev.email,
+        username: prev.username || googleUser.email?.split('@')[0] + '_' + Math.random().toString(36).substr(2, 5),
+      }));
+
+      // If user exists, they'll be logged in automatically via backend
+      // Try to authenticate with backend (this will work if user exists, or redirect if they don't)
+      try {
+        const response = await apiService.googleAuth({
+          id: googleUser.id,
+          name: googleUser.name,
+          email: googleUser.email,
+          imageUrl: googleUser.imageUrl,
+          accessToken: googleUser.accessToken,
+          idToken: googleUser.idToken,
+          isRegistration: false, // Try login first
+        });
+
+        // User exists - log them in
+        localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
+        dispatch({ type: "SET_USER", payload: response.user });
+        showToast("Successfully signed in with Google!", "success");
+        navigate("/home");
+      } catch (error: any) {
+        // User doesn't exist yet - they can continue registration with pre-filled data
+        console.log('User not found, continuing with registration...');
+        showToast('Please complete your registration', 'info');
+      }
+    } catch (error: any) {
       console.error('Google auth error:', error);
-      showToast('Google authentication failed', 'error');
+      showToast(error.message || 'Google authentication failed', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 

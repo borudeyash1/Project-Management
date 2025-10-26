@@ -96,8 +96,7 @@ const googleAuthValidation = [
     .notEmpty()
     .withMessage('Google access token is required'),
   body('idToken')
-    .notEmpty()
-    .withMessage('Google ID token is required')
+    .optional()
 ];
 
 // New validation for OTP verification
