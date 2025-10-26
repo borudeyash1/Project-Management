@@ -20,6 +20,8 @@ import trackerRoutes from "./routes/tracker";
 import reportRoutes from "./routes/reports";
 import aiRoutes from "./routes/ai";
 import adminRoutes from "./routes/admin";
+import userManagementRoutes from "./routes/userManagement";
+import desktopReleaseRoutes from "./routes/desktopRelease";
 
 // Load environment variables
 dotenv.config({ path: "./.env" });
@@ -66,6 +68,8 @@ app.use("/api/tracker", trackerRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/user-management", userManagementRoutes);
+app.use("/api/releases", desktopReleaseRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

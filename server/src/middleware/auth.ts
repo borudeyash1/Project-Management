@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import Admin from '../models/Admin';
 import { AuthenticatedRequest, JWTPayload } from '../types';
 
 // Verify JWT token
@@ -27,11 +28,42 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
-    // Check if user still exists
+    console.log('🔍 [AUTH] Token decoded:', { id: decoded.id, type: decoded.type, role: decoded.role });
+    
+    // Check if this is an admin token
+    if (decoded.type === 'admin') {
+      const admin = await Admin.findById(decoded.id).select('-password');
+      if (!admin) {
+        console.log('❌ [AUTH] Admin not found for ID:', decoded.id);
+        res.status(401).json({
+          success: false,
+          message: 'Token is valid but admin no longer exists.'
+        });
+        return;
+      }
+
+      if (!admin.isActive) {
+        console.log('❌ [AUTH] Admin account is inactive:', admin.email);
+        res.status(401).json({
+          success: false,
+          message: 'Admin account has been deactivated.'
+        });
+        return;
+      }
+
+      console.log('✅ [AUTH] Admin authenticated:', admin.email);
+      req.user = admin as any;
+      req.isAdmin = true;
+      next();
+      return;
+    }
+    
+    // Regular user authentication
     const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
+      console.log('❌ [AUTH] User not found for ID:', decoded.userId);
       res.status(401).json({
         success: false,
         message: 'Token is valid but user no longer exists.'
@@ -41,6 +73,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
 
     // Check if user is active
     if (!user.isActive) {
+      console.log('❌ [AUTH] User account is inactive:', user.email);
       res.status(401).json({
         success: false,
         message: 'Account has been deactivated.'
@@ -48,6 +81,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
       return;
     }
 
+    console.log('✅ [AUTH] User authenticated:', user.email);
     req.user = user;
     next();
   } catch (error: any) {

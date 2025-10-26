@@ -12,8 +12,8 @@ const seedAdminDevice = async () => {
     await mongoose.connect(mongoURI);
     console.log('✅ Connected to MongoDB');
 
-    // Your device ID
-    const yourDeviceId = '37D98603-981B-493F-9A74-C3DD4A3AEE48';
+    // Your real device ID (SHA-256 fingerprint)
+    const yourDeviceId = 'ee16529e29783f94017b264bdf4446d226dfc6506ba02cf0c4c8b8a73c6e9f5a';
 
     // Check if device already exists
     const existingDevice = await AllowedDevice.findOne({ deviceId: yourDeviceId });

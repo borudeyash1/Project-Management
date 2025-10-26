@@ -33,6 +33,11 @@ import UserGuide from './components/UserGuide';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
 import AdminDashboard from './components/admin/AdminDashboard';
+import DeviceManagement from './components/admin/DeviceManagement';
+import UserManagement from './components/admin/UserManagement';
+import Analytics from './components/admin/Analytics';
+import AdminSettings from './components/admin/Settings';
+import ReleaseManagement from './components/admin/ReleaseManagement';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -108,6 +113,11 @@ const AppContent: React.FC = () => {
         {/* Admin Routes - Hidden */}
         <Route path="/my-admin/login" element={<AdminLoginWrapper />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/devices" element={<DeviceManagement />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/admin/analytics" element={<Analytics />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/releases" element={<ReleaseManagement />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={

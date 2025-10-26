@@ -3,6 +3,7 @@ import AllowedDevice from '../models/AllowedDevice';
 import Admin from '../models/Admin';
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest } from '../types';
+import { sendEmail } from '../services/emailService';
 
 // Check if device is allowed to access admin
 export const checkDeviceAccess = async (req: Request, res: Response): Promise<void> => {
@@ -400,6 +401,263 @@ export const adminGoogleLogin = async (req: Request, res: Response): Promise<voi
     res.status(500).json({
       success: false,
       message: 'Internal server error'
+    });
+  }
+};
+
+// Generate 6-digit OTP
+const generateOTP = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Send Password Change OTP
+export const sendPasswordChangeOTP = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const adminId = req.user?._id;
+    const { currentPassword } = req.body;
+
+    console.log('🔍 [ADMIN] Send password change OTP request for admin:', adminId);
+
+    if (!adminId) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    // Find admin with password
+    const admin = await Admin.findById(adminId).select('+password');
+
+    if (!admin) {
+      res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+      return;
+    }
+
+    // Verify current password
+    const isPasswordValid = await admin.comparePassword(currentPassword);
+
+    if (!isPasswordValid) {
+      console.log('❌ [ADMIN] Invalid current password');
+      res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect'
+      });
+      return;
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    
+    // Store OTP with expiry (10 minutes)
+    admin.loginOtp = otp;
+    admin.loginOtpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await admin.save();
+
+    // Send OTP via email
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+          .otp-box { background: white; border: 2px dashed #f59e0b; padding: 20px; text-align: center; margin: 20px 0; border-radius: 10px; }
+          .otp-code { font-size: 32px; font-weight: bold; color: #f59e0b; letter-spacing: 5px; }
+          .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔐 Password Change Request</h1>
+          </div>
+          <div class="content">
+            <p>Hello <strong>${admin.name}</strong>,</p>
+            <p>You have requested to change your admin password. Please use the OTP below to verify this action:</p>
+            
+            <div class="otp-box">
+              <p style="margin: 0; color: #6b7280; font-size: 14px;">Your OTP Code</p>
+              <div class="otp-code">${otp}</div>
+              <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 12px;">Valid for 10 minutes</p>
+            </div>
+
+            <div class="warning">
+              <strong>⚠️ Security Notice:</strong><br>
+              If you did not request this password change, please ignore this email and contact support immediately.
+            </div>
+
+            <p>This OTP will expire in <strong>10 minutes</strong>.</p>
+            <p>For security reasons, never share this OTP with anyone.</p>
+          </div>
+          <div class="footer">
+            <p>© 2025 TaskFlowHQ Admin Portal. All rights reserved.</p>
+            <p>This is an automated message, please do not reply.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await sendEmail({
+      to: admin.email,
+      subject: '🔐 Password Change OTP - TaskFlowHQ Admin',
+      html: emailHtml
+    });
+
+    console.log('✅ [ADMIN] Password change OTP sent to:', admin.email);
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent to your email',
+      data: {
+        email: admin.email
+      }
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Send password change OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send OTP'
+    });
+  }
+};
+
+// Verify OTP and Change Password
+export const verifyOTPAndChangePassword = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const adminId = req.user?._id;
+    const { otp, newPassword } = req.body;
+
+    console.log('🔍 [ADMIN] Verify OTP and change password for admin:', adminId);
+
+    if (!adminId) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    if (!otp || !newPassword) {
+      res.status(400).json({
+        success: false,
+        message: 'OTP and new password are required'
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters'
+      });
+      return;
+    }
+
+    // Find admin with OTP
+    const admin = await Admin.findById(adminId).select('+password +loginOtp +loginOtpExpiry');
+
+    if (!admin) {
+      res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+      return;
+    }
+
+    // Verify OTP
+    if (!admin.loginOtp || admin.loginOtp !== otp) {
+      console.log('❌ [ADMIN] Invalid OTP');
+      res.status(401).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+      return;
+    }
+
+    // Check OTP expiry
+    if (!admin.loginOtpExpiry || admin.loginOtpExpiry < new Date()) {
+      console.log('❌ [ADMIN] OTP expired');
+      res.status(401).json({
+        success: false,
+        message: 'OTP has expired. Please request a new one.'
+      });
+      return;
+    }
+
+    // Update password
+    admin.password = newPassword;
+    admin.loginOtp = undefined;
+    admin.loginOtpExpiry = undefined;
+    await admin.save();
+
+    console.log('✅ [ADMIN] Password changed successfully for:', admin.email);
+
+    // Send confirmation email
+    const confirmationHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+          .success-box { background: #d1fae5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✅ Password Changed Successfully</h1>
+          </div>
+          <div class="content">
+            <p>Hello <strong>${admin.name}</strong>,</p>
+            
+            <div class="success-box">
+              <strong>✅ Success!</strong><br>
+              Your admin password has been changed successfully.
+            </div>
+
+            <p><strong>Details:</strong></p>
+            <ul>
+              <li>Changed at: ${new Date().toLocaleString()}</li>
+              <li>Account: ${admin.email}</li>
+            </ul>
+
+            <p>If you did not make this change, please contact support immediately.</p>
+          </div>
+          <div class="footer">
+            <p>© 2025 TaskFlowHQ Admin Portal. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await sendEmail({
+      to: admin.email,
+      subject: '✅ Password Changed Successfully - TaskFlowHQ Admin',
+      html: confirmationHtml
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Password changed successfully'
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Verify OTP and change password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to change password'
     });
   }
 };

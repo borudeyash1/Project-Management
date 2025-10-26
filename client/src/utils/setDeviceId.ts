@@ -2,7 +2,7 @@
 // This should be run once to set your device ID
 
 export const setMyDeviceId = () => {
-  const myDeviceId = '37D98603-981B-493F-9A74-C3DD4A3AEE48';
+  const myDeviceId = 'ee16529e29783f94017b264bdf4446d226dfc6506ba02cf0c4c8b8a73c6e9f5a';
   localStorage.setItem('customDeviceId', myDeviceId);
   console.log('✅ Device ID set successfully:', myDeviceId);
   console.log('You can now access the admin portal');
@@ -13,7 +13,7 @@ export const setMyDeviceId = () => {
 // setMyDeviceId();
 
 // Or run this in browser console:
-// localStorage.setItem('customDeviceId', '37D98603-981B-493F-9A74-C3DD4A3AEE48');
+// localStorage.setItem('customDeviceId', 'ee16529e29783f94017b264bdf4446d226dfc6506ba02cf0c4c8b8a73c6e9f5a');
 
 // Make it available globally for easy access
 if (typeof window !== 'undefined') {

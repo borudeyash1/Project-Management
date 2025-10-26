@@ -446,6 +446,7 @@ export interface AuthenticatedRequest extends Request {
   workspaceMember?: any;
   projectMember?: any;
   refreshToken?: string;
+  isAdmin?: boolean;
 }
 
 // JWT Payload
