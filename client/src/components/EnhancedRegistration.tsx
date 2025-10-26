@@ -476,7 +476,7 @@ const EnhancedRegistration: React.FC = () => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         dispatch({ type: 'SET_USER', payload: response.user });
-        showToast('Registration successful! Welcome to Proxima!', 'success');
+        showToast('Registration successful! Welcome to TaskFlowHQ!', 'success');
         navigate('/home');
 
       } else {
@@ -1305,10 +1305,10 @@ const EnhancedRegistration: React.FC = () => {
           <div className="w-full max-w-md">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-9 w-9 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
-                PX
+                TF
               </div>
               <div>
-                <div className="text-base font-semibold tracking-tight">Proxima</div>
+                <div className="text-base font-semibold tracking-tight">TaskFlowHQ</div>
                 <div className="text-xs text-slate-500">Project & Payroll Suite</div>
               </div>
             </div>

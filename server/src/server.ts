@@ -19,6 +19,7 @@ import reminderRoutes from "./routes/reminders";
 import trackerRoutes from "./routes/tracker";
 import reportRoutes from "./routes/reports";
 import aiRoutes from "./routes/ai";
+import adminRoutes from "./routes/admin";
 
 // Load environment variables
 dotenv.config({ path: "./.env" });
@@ -64,6 +65,7 @@ app.use("/api/reminders", reminderRoutes);
 app.use("/api/tracker", trackerRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
