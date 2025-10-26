@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
 
     if (!token || !admin) {
       console.log('❌ [ADMIN DASHBOARD] No valid session, redirecting to login');
-      addToast('Please login to access admin dashboard', 'error');
+      // Redirect without toast to avoid loops
       navigate('/my-admin/login', { replace: true });
       return;
     }
@@ -185,28 +185,49 @@ const AdminDashboard: React.FC = () => {
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}>
+            <button 
+              onClick={() => navigate('/admin/users')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+            >
               <Users className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Manage Users</p>
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>View and edit users</p>
             </button>
 
-            <button className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}>
+            <button 
+              onClick={() => navigate('/admin/devices')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+            >
               <Shield className={`w-6 h-6 ${isDarkMode ? 'text-blue-500' : 'text-blue-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Security</p>
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Manage devices & access</p>
             </button>
 
-            <button className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}>
+            <button 
+              onClick={() => navigate('/admin/analytics')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+            >
               <Activity className={`w-6 h-6 ${isDarkMode ? 'text-green-500' : 'text-green-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Analytics</p>
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>View system metrics</p>
             </button>
 
-            <button className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}>
+            <button 
+              onClick={() => navigate('/admin/settings')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+            >
               <Settings className={`w-6 h-6 ${isDarkMode ? 'text-purple-500' : 'text-purple-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Settings</p>
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Configure system</p>
+            </button>
+
+            <button 
+              onClick={() => navigate('/admin/releases')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+            >
+              <Activity className={`w-6 h-6 ${isDarkMode ? 'text-indigo-500' : 'text-indigo-600'} mb-2`} />
+              <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Desktop Releases</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Manage app versions</p>
             </button>
           </div>
         </div>

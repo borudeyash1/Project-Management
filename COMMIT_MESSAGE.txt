@@ -1,0 +1,262 @@
+🚀 Major Update: Admin Panel Enhancements & Desktop Release Management System
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 SUMMARY:
+This commit introduces comprehensive admin panel features including user management,
+analytics dashboard, settings page, desktop application release management system,
+and password change functionality with OTP verification via Gmail.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ NEW FEATURES:
+
+1. 🔐 Admin & User Password Change with OTP
+   - OTP verification via Gmail for password changes
+   - Beautiful HTML email templates
+   - 10-minute OTP expiry
+   - Confirmation emails after password change
+   - Works for both admin (/admin/settings) and user (/profile)
+
+2. 📊 Analytics Dashboard (/admin/analytics)
+   - User growth metrics with growth rate percentage
+   - Active users tracking (today, week, month)
+   - Subscription distribution visualization
+   - Revenue tracking (monthly & yearly)
+   - User engagement metrics (session duration, tasks, projects)
+   - Conversion rate analytics
+   - Time range selector (7d, 30d, 90d, 1y)
+
+3. ⚙️ Admin Settings Page (/admin/settings)
+   - Profile management (name, email, role)
+   - Password change with OTP verification
+   - Show/hide password toggles
+   - Tabbed interface (Profile, Security, Notifications, System)
+   - Responsive sidebar navigation
+
+4. 👥 User Management System (/admin/users)
+   - Complete CRUD operations for users
+   - User statistics dashboard
+   - Search functionality (name, email, username)
+   - Filters (subscription plan, active status)
+   - Pagination (10 users per page)
+   - Actions: Change subscription, verify email, toggle status, delete user
+   - Subscription plans: Free, Pro, Ultra with detailed limits
+
+5. 🖥️ Desktop Application Release Management (/admin/releases)
+   - Multi-platform support (Windows, macOS, Linux)
+   - File upload with Multer (up to 500MB)
+   - Supported formats: .exe, .dmg, .pkg, .deb, .rpm, .appimage, .zip, .tar.gz
+   - Version control with semantic versioning
+   - Latest version marking per platform
+   - Download tracking and statistics
+   - Platform-wise analytics
+   - Beautiful admin interface with stats dashboard
+
+6. 📥 Download Dropdown in Navbar
+   - Accessible from all public pages
+   - Shows latest releases for each platform
+   - Platform icons (Windows, macOS, Linux)
+   - Version information with file size
+   - One-click download functionality
+   - Auto-closes after selection
+   - Loading and empty states
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 BACKEND CHANGES:
+
+New Models:
+- DesktopRelease.ts - Desktop app release management
+
+New Controllers:
+- desktopReleaseController.ts - Release CRUD operations
+- adminController.ts - Added sendPasswordChangeOTP, verifyOTPAndChangePassword
+
+New Routes:
+- /api/releases - Desktop release management (public & admin)
+- /api/admin/send-password-otp - Send OTP for password change
+- /api/admin/verify-password-otp - Verify OTP and update password
+
+Updated Models:
+- Admin.ts - Added loginOtp, loginOtpExpiry fields
+
+Updated Middleware:
+- auth.ts - Support for admin token authentication with type checking
+
+File Upload:
+- Configured Multer for desktop app file uploads
+- Storage in /server/uploads/releases/
+- File size limit: 500MB
+- File type validation
+
+Email Service:
+- Beautiful HTML email templates for OTP
+- Gmail SMTP integration
+- Password change confirmation emails
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎨 FRONTEND CHANGES:
+
+New Components:
+- Analytics.tsx - Analytics dashboard with charts and metrics
+- Settings.tsx - Admin settings with password change
+- ReleaseManagement.tsx - Desktop release management interface
+- UserManagement.tsx - User management with CRUD operations
+
+Updated Components:
+- SharedNavbar.tsx - Added download dropdown with release selection
+- AdminDashboard.tsx - Added links to Analytics, Settings, Releases
+- App.tsx - Added routes for new admin pages
+
+New Routes:
+- /admin/analytics - Analytics dashboard
+- /admin/settings - Admin settings
+- /admin/releases - Release management
+- /admin/users - User management
+
+UI Improvements:
+- Dark mode support for all new components
+- Responsive design for all screen sizes
+- Loading states and error handling
+- Beautiful modals and dropdowns
+- Platform-specific icons and colors
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔒 SECURITY ENHANCEMENTS:
+
+- Admin token validation for all admin routes
+- OTP verification for password changes
+- File type and size validation for uploads
+- Input validation with express-validator
+- Secure file storage outside public directory
+- JWT token with admin type identification
+- Device fingerprinting still active
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 API ENDPOINTS ADDED:
+
+Public:
+- GET /api/releases - Get all releases
+- GET /api/releases/latest - Get latest releases
+- GET /api/releases/:id - Get release by ID
+- GET /api/releases/download/:filename - Download file
+
+Admin (Authenticated):
+- POST /api/releases - Create new release
+- PUT /api/releases/:id - Update release
+- DELETE /api/releases/:id - Delete release
+- GET /api/releases/admin/stats - Get statistics
+- POST /api/admin/send-password-otp - Send password change OTP
+- POST /api/admin/verify-password-otp - Verify OTP and change password
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📦 DEPENDENCIES ADDED:
+
+Backend:
+- multer - File upload handling
+- @types/multer - TypeScript types for multer
+
+Frontend:
+- (No new dependencies - using existing lucide-react icons)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🐛 BUG FIXES:
+
+- Fixed admin token authentication in middleware
+- Fixed toast loop on logout
+- Fixed TypeScript errors in UserManagement component
+- Added isAdmin property to AuthenticatedRequest interface
+- Fixed Package icon import issue in AdminDashboard
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION:
+
+New Files:
+- ADMIN_OAUTH_OTP_IMPLEMENTATION.md - OAuth + OTP implementation guide
+- DESKTOP_APP_RELEASE_SYSTEM.md - Desktop release system documentation
+- COMMIT_MESSAGE.txt - This commit message
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 TESTING CHECKLIST:
+
+Admin Panel:
+✅ Analytics dashboard loads with metrics
+✅ Settings page allows password change with OTP
+✅ User management CRUD operations work
+✅ Release management upload and download work
+✅ All admin routes require authentication
+
+User Features:
+✅ Download dropdown shows available releases
+✅ Download button triggers file download
+✅ Platform-specific icons display correctly
+✅ Dark mode works on all pages
+
+Security:
+✅ OTP emails sent successfully via Gmail
+✅ OTP verification works correctly
+✅ Admin token validation working
+✅ File upload validation working
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 DEPLOYMENT NOTES:
+
+1. Install new dependencies:
+   cd server && npm install multer @types/multer
+
+2. Set up environment variables:
+   EMAIL_USER=your-gmail@gmail.com
+   EMAIL_PASS=your-app-specific-password
+
+3. Create uploads directory:
+   mkdir -p server/uploads/releases
+
+4. Run database migrations (if needed)
+
+5. Restart both frontend and backend servers
+
+═══════════════════════════════════════════════════════════════════════════════
+
+👥 CONTRIBUTORS:
+- Admin Panel Features
+- Desktop Release Management
+- Password Change with OTP
+- Analytics Dashboard
+- User Management System
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📅 DATE: October 27, 2025
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Git Commands to Push:
+
+git add .
+git commit -m "feat: Add admin panel enhancements, desktop release management, and OTP-based password change
+
+- Add Analytics dashboard with user growth and revenue metrics
+- Add Admin Settings page with OTP-verified password change
+- Add User Management system with CRUD operations
+- Add Desktop Release Management for Windows/macOS/Linux
+- Add Download dropdown in navbar with platform selection
+- Implement OTP verification via Gmail for password changes
+- Add file upload system with Multer for desktop apps
+- Update admin authentication to support admin tokens
+- Fix TypeScript errors and improve error handling
+- Add comprehensive documentation
+
+BREAKING CHANGES: Requires multer installation and EMAIL credentials setup"
+
+git push origin main
+
+═══════════════════════════════════════════════════════════════════════════════

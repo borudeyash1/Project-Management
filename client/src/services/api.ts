@@ -373,6 +373,13 @@ class ApiService {
       method: 'DELETE',
     });
   }
+
+  async patch<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
 }
 
 // Create and export a singleton instance

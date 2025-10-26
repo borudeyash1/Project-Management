@@ -11,6 +11,8 @@ export interface IAdmin extends Document {
   avatar?: string;
   lastLogin?: Date;
   loginMethod: 'email' | 'google';
+  loginOtp?: string;
+  loginOtpExpiry?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -59,6 +61,14 @@ const adminSchema = new Schema<IAdmin>({
     type: String,
     enum: ['email', 'google'],
     required: true
+  },
+  loginOtp: {
+    type: String,
+    select: false
+  },
+  loginOtpExpiry: {
+    type: Date,
+    select: false
   }
 }, {
   timestamps: true

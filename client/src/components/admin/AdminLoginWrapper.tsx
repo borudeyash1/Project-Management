@@ -25,19 +25,17 @@ const AdminLoginWrapper: React.FC = () => {
     try {
       setIsChecking(true);
 
+      // Always get the real device fingerprint first
+      const realDeviceId = await getDeviceFingerprint();
+      
       // Check if user has manually set a custom device ID
       const customDeviceId = localStorage.getItem('customDeviceId');
       
-      // If custom device ID exists, use it; otherwise generate fingerprint
-      let currentDeviceId: string;
-      
-      if (customDeviceId) {
-        currentDeviceId = customDeviceId;
-      } else {
-        currentDeviceId = await getDeviceFingerprint();
-      }
+      // Use custom if exists, otherwise use real fingerprint
+      const currentDeviceId = customDeviceId || realDeviceId;
 
-      setDeviceId(currentDeviceId);
+      // Always show the REAL device ID on the access denied page
+      setDeviceId(realDeviceId);
 
       console.log('🔍 [DEBUG] Current Device ID:', currentDeviceId);
 
