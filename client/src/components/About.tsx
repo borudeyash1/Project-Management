@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MapPin, ExternalLink, Award, Users, Zap, Shield } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
@@ -9,131 +9,179 @@ const About: React.FC = () => {
   const { isDarkMode } = useTheme();
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'}`}>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'} relative overflow-hidden`}>
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-40 right-20 w-96 h-96 ${isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-200/20'} rounded-full blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-40 left-20 w-96 h-96 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-200/20'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+      </div>
       <SharedNavbar />
 
       {/* Content */}
-      <div className="pt-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="pt-16 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           {/* Back Button */}
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 transition-colors duration-200"
+            className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={18} />
             Back to Home
           </Link>
 
           {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              About <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Proxima</span>
+          <div className="text-center mb-20">
+            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700'} text-sm font-semibold mb-6`}>
+              ABOUT US
+            </span>
+            <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
+              About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>TaskFlowHQ</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               We're building the future of project management, one feature at a time.
             </p>
           </div>
 
           {/* Mission Section */}
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-white/20 shadow-lg mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
-            <p className="text-gray-600 text-lg leading-relaxed">
-              At Proxima, we believe that great projects start with great tools. Our mission is to simplify project management 
+          <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16 hover:shadow-3xl transition-shadow duration-300`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className={`w-12 h-12 ${isDarkMode ? 'bg-gradient-to-br from-yellow-500 to-orange-500' : 'bg-gradient-to-br from-yellow-400 to-orange-400'} rounded-xl flex items-center justify-center shadow-lg`}>
+                <Award className="w-6 h-6 text-white" />
+              </div>
+              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>
+            </div>
+            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed`}>
+              At TaskFlowHQ, we believe that great projects start with great tools. Our mission is to simplify project management 
               and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable 
               solutions that help teams collaborate effectively and achieve their goals.
             </p>
           </div>
 
           {/* Features Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-white/20 shadow-lg">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">What We Offer</h3>
-              <ul className="space-y-3 text-gray-600">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <div className={`group ${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30 hover:bg-gray-800/80' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-blue-500 to-purple-500' : 'bg-gradient-to-br from-blue-400 to-purple-400'} rounded-lg flex items-center justify-center shadow-lg`}>
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>What We Offer</h3>
+              </div>
+              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Comprehensive project tracking and management</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Comprehensive project tracking and management</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Real-time collaboration tools</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Real-time collaboration tools</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Advanced analytics and reporting</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Advanced analytics and reporting</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Seamless team communication</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Seamless team communication</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Customizable workflows</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Customizable workflows</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-white/20 shadow-lg">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Why Choose Proxima</h3>
-              <ul className="space-y-3 text-gray-600">
+            <div className={`group ${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30 hover:bg-gray-800/80' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-lg flex items-center justify-center shadow-lg`}>
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose TaskFlowHQ</h3>
+              </div>
+              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>User-friendly interface designed for productivity</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">User-friendly interface designed for productivity</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Scalable solutions for teams of any size</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Scalable solutions for teams of any size</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>24/7 customer support</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">24/7 customer support</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Regular updates and new features</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Regular updates and new features</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Secure and reliable infrastructure</span>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  </div>
+                  <span className="leading-relaxed">Secure and reliable infrastructure</span>
                 </li>
               </ul>
             </div>
           </div>
 
           {/* Team Section */}
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-white/20 shadow-lg mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Team</h2>
-            <p className="text-gray-600 text-lg leading-relaxed mb-6">
-              Proxima is built by a passionate team of developers, designers, and project management experts 
+          <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className={`w-12 h-12 ${isDarkMode ? 'bg-gradient-to-br from-green-500 to-blue-500' : 'bg-gradient-to-br from-green-400 to-blue-400'} rounded-xl flex items-center justify-center shadow-lg`}>
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Team</h2>
+            </div>
+            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
+              TaskFlowHQ is built by a passionate team of developers, designers, and project management experts 
               who understand the challenges of modern team collaboration. We're constantly working to improve 
               our platform and add new features based on user feedback.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">D</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center group">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-bold text-2xl">D</span>
                 </div>
-                <h4 className="font-semibold text-gray-900">Development Team</h4>
-                <p className="text-gray-600 text-sm">Building the future</p>
+                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Development Team</h4>
+                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Building the future</p>
               </div>
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">D</span>
+              <div className="text-center group">
+                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-bold text-2xl">D</span>
                 </div>
-                <h4 className="font-semibold text-gray-900">Design Team</h4>
-                <p className="text-gray-600 text-sm">Creating beautiful experiences</p>
+                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Design Team</h4>
+                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Creating beautiful experiences</p>
               </div>
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-green-600 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">S</span>
+              <div className="text-center group">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-bold text-2xl">S</span>
                 </div>
-                <h4 className="font-semibold text-gray-900">Support Team</h4>
-                <p className="text-gray-600 text-sm">Always here to help</p>
+                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Support Team</h4>
+                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Always here to help</p>
               </div>
             </div>
           </div>
 
           {/* Office Location Section */}
-          <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border-gray-700/20' : 'bg-white/50 backdrop-blur-sm border-white/20'} rounded-xl p-8 border shadow-lg mb-12`}>
+          <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16`}>
             <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-8 text-center`}>
               Visit Our Office
             </h2>
@@ -219,24 +267,32 @@ const About: React.FC = () => {
           </div>
 
           {/* Contact Section */}
-          <div className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-600 to-orange-600' : 'from-yellow-500 to-orange-500'} rounded-xl p-8 text-center`}>
-            <h2 className="text-2xl font-bold text-white mb-4">Get in Touch</h2>
-            <p className="text-yellow-100 mb-6">
-              Have questions or feedback? We'd love to hear from you.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/register"
-                className="bg-white text-yellow-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-all duration-200"
-              >
-                Start Free Trial
-              </Link>
-              <a
-                href="mailto:contact@thetechfactory.com"
-                className="border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-yellow-600 transition-all duration-200"
-              >
-                Contact Support
-              </a>
+          <div className={`relative bg-gradient-to-r ${isDarkMode ? 'from-yellow-600 via-orange-600 to-red-600' : 'from-yellow-500 via-orange-500 to-red-500'} rounded-2xl p-12 text-center overflow-hidden shadow-2xl`}>
+            {/* Decorative Elements */}
+            <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Get in Touch</h2>
+              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                Have questions or feedback? We'd love to hear from you.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/register"
+                  className="group bg-white text-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-xl hover:scale-105 transform inline-flex items-center justify-center gap-2"
+                >
+                  Start Free Trial
+                  <ArrowLeft size={18} className="rotate-180 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <a
+                  href="mailto:contact@thetechfactory.com"
+                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 shadow-xl hover:scale-105 transform"
+                >
+                  Contact Support
+                </a>
+              </div>
             </div>
           </div>
         </div>

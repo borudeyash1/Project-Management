@@ -31,6 +31,9 @@ import LandingPage from './components/LandingPage';
 import About from './components/About';
 import UserGuide from './components/UserGuide';
 import ChatbotButton from './components/ChatbotButton';
+import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
+import AdminDashboard from './components/admin/AdminDashboard';
+import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
 import CreateWorkspaceModal from './components/CreateWorkspaceModal';
@@ -101,6 +104,10 @@ const AppContent: React.FC = () => {
         <Route path="/user-guide" element={<UserGuide />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
+        
+        {/* Admin Routes - Hidden */}
+        <Route path="/my-admin/login" element={<AdminLoginWrapper />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={

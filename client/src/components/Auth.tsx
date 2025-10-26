@@ -230,28 +230,33 @@ const Auth: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900" : "bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50"}`}
+      className={`min-h-screen ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900" : "bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50"} relative overflow-hidden`}
     >
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-20 left-10 w-96 h-96 ${isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-200/20'} rounded-full blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-200/20'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+      </div>
       <SharedNavbar />
-      <section className="min-h-screen flex pt-16">
-        <div className="hidden lg:flex w-1/2 bg-white border-r border-border relative">
+      <section className="min-h-screen flex pt-16 relative z-10">
+        <div className="hidden lg:flex w-1/2 bg-white border-r border-border relative overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
-          <div className="relative p-10 mt-auto mb-10">
-            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-lg px-3 py-2 border border-border mb-4">
-              <div className="w-4 h-4 text-yellow-600">🚀</div>
-              <span className="text-xs text-slate-700">
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/50 to-black/20"></div>
+          <div className="relative p-12 mt-auto mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2.5 border border-white/20 mb-6 shadow-xl">
+              <div className="w-5 h-5 text-yellow-600">🚀</div>
+              <span className="text-sm font-semibold text-slate-700">
                 Projects, Payroll, Planner — unified
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl tracking-tight font-semibold text-white">
+            <h1 className="text-4xl md:text-5xl tracking-tight font-bold text-white mb-4 leading-tight">
               Plan, track, and pay — all in one place
             </h1>
-            <p className="text-white/80 mt-3 max-w-lg">
+            <p className="text-white/90 text-lg mt-4 max-w-lg leading-relaxed">
               Workspaces, roles, analytics, and automations for teams of any
               size.
             </p>
@@ -260,36 +265,36 @@ const Auth: React.FC = () => {
 
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="h-9 w-9 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
-                PX
+            <div className="flex items-center gap-3 mb-10">
+              <div className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold tracking-tight bg-gradient-to-br from-yellow-500 to-orange-500 shadow-lg">
+                TF
               </div>
               <div>
-                <div className="text-base font-semibold tracking-tight">
-                  Proxima
+                <div className={`text-xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  TaskFlowHQ
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                   Project & Payroll Suite
                 </div>
               </div>
             </div>
 
-            <div className="flex bg-white border border-border rounded-lg p-1 mb-6">
+            <div className={`flex ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-1.5 mb-8 shadow-lg`}>
               <button
-                className={`flex-1 px-3 py-2 rounded-md text-sm font-medium ${
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "login"
-                    ? "bg-yellow-100 text-text"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                    : `${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`
                 }`}
                 onClick={switchToLogin}
               >
                 Login
               </button>
               <button
-                className={`flex-1 px-3 py-2 rounded-md text-sm ${
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "register"
-                    ? "bg-yellow-100 text-text"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                    : `${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`
                 }`}
                 onClick={switchToRegister}
               >
@@ -300,11 +305,11 @@ const Auth: React.FC = () => {
             {/* Login Form */}
             {authTab === "login" && (
               <form
-                className="bg-white border border-border rounded-xl p-5 space-y-4"
+                className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
                 onSubmit={handleLogin}
               >
                 <div>
-                  <label className="text-sm font-medium block mb-1">
+                  <label className={`text-sm font-semibold block mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                     Email or Username
                   </label>
                   <input
@@ -312,17 +317,17 @@ const Auth: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+                    className={`w-full rounded-xl border ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-slate-400'} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
                     placeholder="you@company.com"
                     required
                   />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-sm font-medium">Password</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Password</label>
                     <button
                       type="button"
-                      className="text-xs text-slate-600 hover:text-slate-900"
+                      className={`text-xs font-medium ${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} transition-colors`}
                     >
                       Forgot?
                     </button>
@@ -333,49 +338,49 @@ const Auth: React.FC = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full rounded-lg border border-border bg-white px-3 py-2 pr-10 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+                      className={`w-full rounded-xl border ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-slate-400'} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
                       placeholder="••••••••"
                       required
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-2.5"
+                      className="absolute right-4 top-3.5"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="w-4 h-4 text-slate-400" />
+                        <EyeOff className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`} />
                       ) : (
-                        <Eye className="w-4 h-4 text-slate-400" />
+                        <Eye className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`} />
                       )}
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <div className="flex items-center justify-between pt-2">
+                  <label className={`inline-flex items-center gap-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'} cursor-pointer font-medium`}>
                     <input type="checkbox" className="peer sr-only" />
-                    <span className="relative inline-flex h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-yellow-500">
-                      <span className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-all peer-checked:left-4"></span>
+                    <span className={`relative inline-flex h-6 w-11 rounded-full ${isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} transition-colors peer-checked:bg-gradient-to-r peer-checked:from-yellow-500 peer-checked:to-orange-500 shadow-inner`}>
+                      <span className="absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-md transition-all peer-checked:left-6"></span>
                     </span>
                     Remember me
                   </label>
-                  <div className="text-xs text-slate-500">SSO enabled</div>
+                  <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>SSO enabled</div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? "Signing in..." : "Continue"}
                 </button>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border"></div>
+                    <div className={`w-full border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-white px-3 text-xs text-slate-500">
+                    <span className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-4 text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                       or
                     </span>
                   </div>
@@ -383,12 +388,12 @@ const Auth: React.FC = () => {
 
                 <button
                   type="button"
-                  className="w-full px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm flex items-center justify-center gap-2"
+                  className={`w-full px-4 py-3.5 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 hover:bg-gray-700/50 text-gray-200' : 'border-gray-300 hover:bg-gray-50 text-gray-700'} text-sm font-semibold flex items-center justify-center gap-3 transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
                   onClick={handleGoogleAuth}
                 >
                   <img
                     src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     alt="Google"
                   />
                   Continue with Google
@@ -398,17 +403,20 @@ const Auth: React.FC = () => {
 
             {/* OTP Verification for Login */}
             {authTab === "login" && showOtpVerification && (
-              <div className="bg-white border border-border rounded-xl p-5 space-y-4">
+              <div className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}>
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                    <span className="text-3xl">📧</span>
+                  </div>
+                  <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-3`}>
                     Verify Your Login
                   </h3>
-                  <p className="text-sm text-slate-600 mb-4">
-                    We've sent a 6-digit verification code to <strong>{loginEmail}</strong>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-6`}>
+                    We've sent a 6-digit verification code to <strong className={isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}>{loginEmail}</strong>
                   </p>
                 </div>
 
-                <div className="flex justify-center space-x-2 mb-4">
+                <div className="flex justify-center gap-3 mb-6">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
@@ -417,7 +425,7 @@ const Auth: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(e.target, index)}
                       onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                      className="w-12 h-12 text-center text-lg font-semibold border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                      className={`w-14 h-14 text-center text-xl font-bold border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200`}
                       autoComplete="off"
                     />
                   ))}
@@ -427,22 +435,22 @@ const Auth: React.FC = () => {
                   type="button"
                   onClick={handleOtpVerification}
                   disabled={loading || otp.join('').length !== 6}
-                  className="w-full px-3 py-2 rounded-lg text-white text-sm font-medium hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 shadow-sm bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? "Verifying..." : "Verify OTP"}
                 </button>
 
                 <div className="text-center">
                   {otpTimer > 0 ? (
-                    <p className="text-sm text-slate-500">
-                      Resend OTP in {otpTimer}s
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>
+                      Resend OTP in <span className={isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}>{otpTimer}s</span>
                     </p>
                   ) : (
                     <button
                       type="button"
                       onClick={handleResendOtp}
                       disabled={loading}
-                      className="text-sm text-yellow-600 hover:text-yellow-700 font-medium disabled:opacity-50"
+                      className={`text-sm ${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} font-bold disabled:opacity-50 transition-colors`}
                     >
                       Resend OTP
                     </button>

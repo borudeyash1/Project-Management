@@ -429,6 +429,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
 interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
+  addToast: (message: string, type: 'success' | 'error' | 'info' | 'warning') => void;
+  removeToast: (index: number) => void;
 }
 
 // Create context
@@ -442,8 +444,29 @@ interface AppProviderProps {
 export function AppProvider({ children }: AppProviderProps) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
+  const addToast = (message: string, type: 'success' | 'error' | 'info' | 'warning') => {
+    const toast: Toast = {
+      id: Date.now().toString(),
+      message,
+      type
+    };
+    dispatch({ type: 'ADD_TOAST', payload: toast });
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      const index = state.toasts.findIndex(t => t.id === toast.id);
+      if (index !== -1) {
+        dispatch({ type: 'REMOVE_TOAST', payload: index });
+      }
+    }, 5000);
+  };
+
+  const removeToast = (index: number) => {
+    dispatch({ type: 'REMOVE_TOAST', payload: index });
+  };
+
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, addToast, removeToast }}>
       {children}
     </AppContext.Provider>
   );
