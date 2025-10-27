@@ -136,6 +136,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       otp: otp
     });
     
+    let emailSent = false;
     try {
       await sendEmail({
         to: email,
@@ -143,18 +144,23 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         html: emailHtml,
       });
       console.log('✅ [DEBUG] OTP email sent successfully to:', email);
+      emailSent = true;
     } catch (emailError) {
       console.error('❌ [DEBUG] Failed to send OTP email:', emailError);
-      throw emailError;
+      // Don't throw error - allow registration to continue without email
+      console.warn('⚠️ [DEBUG] Continuing registration without email verification');
     }
 
     const response: ApiResponse = {
       success: true,
-      message: "Registration successful! Please check your email to verify your account with the OTP.",
+      message: emailSent 
+        ? "Registration successful! Please check your email to verify your account with the OTP."
+        : "Registration successful! Email service is not configured. Your account has been created but email verification is skipped.",
       data: {
         userId: user._id, // Return user ID for frontend to know which user to verify
         email: user.email,
-        requiresOtpVerification: true, // Add this field to trigger OTP UI
+        requiresOtpVerification: emailSent, // Only require OTP if email was sent
+        emailSent: emailSent, // Indicate if email was actually sent
       },
     };
 
@@ -391,6 +397,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(401).json({
         success: false,
         message: "Account has been deactivated",
+      });
+      return;
+    }
+
+    // Verify password
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
       });
       return;
     }

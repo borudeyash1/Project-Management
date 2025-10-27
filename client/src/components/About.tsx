@@ -35,7 +35,7 @@ const About: React.FC = () => {
               ABOUT US
             </span>
             <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>TaskFlowHQ</span>
+              About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Saarthi</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               We're building the future of project management, one feature at a time.
@@ -51,7 +51,7 @@ const About: React.FC = () => {
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed`}>
-              At TaskFlowHQ, we believe that great projects start with great tools. Our mission is to simplify project management 
+              At Saarthi, we believe that great projects start with great tools. Our mission is to simplify project management 
               and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable 
               solutions that help teams collaborate effectively and achieve their goals.
             </p>
@@ -105,7 +105,7 @@ const About: React.FC = () => {
                 <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-lg flex items-center justify-center shadow-lg`}>
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose TaskFlowHQ</h3>
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose Saarthi</h3>
               </div>
               <ul className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
@@ -151,7 +151,7 @@ const About: React.FC = () => {
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Team</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
-              TaskFlowHQ is built by a passionate team of developers, designers, and project management experts 
+              Saarthi is built by a passionate team of developers, designers, and project management experts 
               who understand the challenges of modern team collaboration. We're constantly working to improve 
               our platform and add new features based on user feedback.
             </p>
@@ -196,8 +196,9 @@ const About: React.FC = () => {
                     <MapPin size={20} className={`${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'} mt-1 flex-shrink-0`} />
                     <div>
                       <p className="font-medium">Address:</p>
-                      <p>Ahilyanagar, Maharashtra, India</p>
-                      <p className="text-sm mt-1">Located in the heart of Maharashtra's tech corridor</p>
+                      <p>Kaushalya Nagar, Ahmednagar - Aurangabad Rd</p>
+                      <p>Near Reliance Petrol Pump, Surya Nagar</p>
+                      <p>Ahilyanagar, Maharashtra 414003</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -223,7 +224,7 @@ const About: React.FC = () => {
                   </div>
                   <div className="pt-4">
                     <a
-                      href="https://maps.app.goo.gl/KbUC3YCRSp11KVV36"
+                      href="https://maps.app.goo.gl/Tp1gahGcSXTAR1sz9"
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex items-center gap-2 ${isDarkMode ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-yellow-600 hover:bg-yellow-700'} text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg`}
@@ -240,7 +241,7 @@ const About: React.FC = () => {
               <div className="relative">
                 <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.1234567890!2d73.1234567890!3d19.1234567890!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDA3JzI0LjQiTiA3M8KwMDcnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3769.8995!2d74.7234!3d19.1234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdcb0f3f3f3f3f3%3A0x3f3f3f3f3f3f3f3f!2sKaushalya%20Nagar%2C%20Ahmednagar%20-%20Aurangabad%20Rd%2C%20near%20Reliance%20Petrol%20pump%2C%20Surya%20Nagar%2C%20Ahilyanagar%2C%20Maharashtra%20414003!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -253,7 +254,7 @@ const About: React.FC = () => {
                 </div>
                 <div className="absolute top-4 right-4">
                   <a
-                    href="https://maps.app.goo.gl/KbUC3YCRSp11KVV36"
+                    href="https://maps.app.goo.gl/Tp1gahGcSXTAR1sz9"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`${isDarkMode ? 'bg-gray-800/80 hover:bg-gray-800' : 'bg-white/80 hover:bg-white'} backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}

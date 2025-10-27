@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AdminLogin from './AdminLogin';
 import DeviceAccessDenied from './DeviceAccessDenied';
 import { getDeviceFingerprint, getDeviceInfo, setCustomDeviceId } from '../../utils/deviceFingerprint';
+import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
 
 const AdminLoginWrapper: React.FC = () => {
@@ -10,12 +11,20 @@ const AdminLoginWrapper: React.FC = () => {
   const [deviceId, setDeviceId] = useState('');
 
   useEffect(() => {
-    // Check if already logged in
+    // Clear any expired tokens first
+    clearExpiredTokens();
+    
+    // Check if already logged in with valid token
     const token = localStorage.getItem('adminToken');
-    if (token) {
-      console.log('✅ [ADMIN] Already logged in, redirecting to dashboard');
+    if (token && validateAdminToken(token)) {
+      console.log('✅ [ADMIN] Already logged in with valid token, redirecting to dashboard');
       window.location.href = '/admin/dashboard';
       return;
+    } else if (token) {
+      // Token exists but is invalid/expired - clear it
+      console.log('🧹 [ADMIN] Clearing invalid/expired token');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
     }
     
     checkDeviceAccess();
