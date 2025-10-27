@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { LoginRequest, RegisterRequest } from "../types";
+import { LoginRequest, RegisterRequest, User } from "../types";
 import { apiService } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import SharedNavbar from "./SharedNavbar";
@@ -102,6 +102,63 @@ const Auth: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBypassLogin = () => {
+    const fakeUser: User = {
+      _id: 'dev-bypass',
+      fullName: 'Dev Bypass',
+      email: 'dev@example.com',
+      username: 'dev',
+      isEmailVerified: true,
+      isActive: true,
+      subscription: {
+        plan: 'free',
+        status: 'active',
+        startDate: new Date(),
+        autoRenew: false,
+        billingCycle: 'monthly',
+        features: {
+          maxWorkspaces: 1,
+          maxProjects: 3,
+          maxTeamMembers: 5,
+          maxStorage: 1,
+          aiAssistance: true,
+          advancedAnalytics: false,
+          customIntegrations: false,
+          prioritySupport: false,
+          whiteLabeling: false,
+          apiAccess: false,
+        },
+        isPro: false,
+      },
+      settings: {
+        themeColor: 'yellow',
+        darkMode: false,
+        notifications: {
+          inApp: true,
+          email: true,
+          push: false,
+        },
+        calendar: {
+          syncGoogle: false,
+          syncOutlook: false,
+          defaultView: 'month',
+        },
+        privacy: {
+          profileVisibility: 'workspace',
+          twoFactorAuth: false,
+        },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    localStorage.setItem('accessToken', 'dev-bypass');
+    localStorage.setItem('refreshToken', 'dev-bypass');
+    dispatch({ type: 'SET_USER', payload: fakeUser });
+    showToast('Bypassed login', 'success');
+    navigate('/home');
   };
 
   // OTP verification functions
@@ -373,6 +430,14 @@ const Auth: React.FC = () => {
                   className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? "Signing in..." : "Continue"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBypassLogin}
+                  className={`w-full mt-2 px-4 py-3.5 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 hover:bg-gray-700/50 text-gray-200' : 'border-gray-300 hover:bg-gray-50 text-gray-700'} text-sm font-semibold transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
+                >
+                  Bypass Login
                 </button>
 
                 <div className="relative">

@@ -98,20 +98,7 @@ const Sidebar: React.FC = () => {
     }
   ];
 
-  const bottomItems: SidebarItem[] = [
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      path: '/settings'
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      icon: User,
-      path: '/profile'
-    }
-  ];
+  // Bottom items removed - Settings and Profile are now only in header dropdown
 
   const handleItemClick = (item: SidebarItem) => {
     navigate(item.path);
@@ -171,28 +158,6 @@ const Sidebar: React.FC = () => {
 
         {/* Bottom Navigation */}
         <div className="p-4 border-t border-border dark:border-gray-700 space-y-2">
-          {bottomItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item);
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700'
-                    : 'text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-gray-100'
-                }`}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {!state.sidebar.collapsed && (
-                  <span className="truncate">{item.label}</span>
-                )}
-              </button>
-            );
-          })}
-
           {/* Logout Button */}
           <button
             onClick={handleLogout}
