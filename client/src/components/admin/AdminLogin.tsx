@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Shield, Lock, Mail } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
+import { googleAuthService } from '../../config/googleAuth';
 import api from '../../services/api';
 
 const AdminLogin: React.FC = () => {
@@ -18,6 +19,13 @@ const AdminLogin: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showOtpVerification, setShowOtpVerification] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+
+  // Initialize Google Auth
+  useEffect(() => {
+    googleAuthService.initializeGapi().catch(error => {
+      console.error('Failed to initialize Google Auth:', error);
+    });
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -40,15 +48,19 @@ const AdminLogin: React.FC = () => {
 
       console.log('🔍 [ADMIN LOGIN] Response:', response);
 
-      if (response?.success && response?.data?.token) {
-        // Store admin token
+      if (response?.success && response?.data?.requiresOtpVerification) {
+        // OTP verification required
+        console.log('✅ [ADMIN LOGIN] Password verified, OTP sent');
+        addToast('OTP sent to your email', 'success');
+        setShowOtpVerification(true);
+      } else if (response?.success && response?.data?.token) {
+        // Direct login (shouldn't happen with OTP enabled)
         localStorage.setItem('adminToken', response.data.token);
         localStorage.setItem('adminData', JSON.stringify(response.data.admin));
         
         console.log('✅ [ADMIN LOGIN] Login successful!');
         addToast('Welcome back, Admin!', 'success');
         
-        // Navigate to admin dashboard (you'll create this later)
         navigate('/admin/dashboard');
       } else {
         addToast('Invalid credentials', 'error');
@@ -88,23 +100,75 @@ const AdminLogin: React.FC = () => {
     setLoading(true);
     try {
       const otpCode = otp.join('');
-      // TODO: Implement OTP verification API call
-      if (otpCode === '123456') {
-        addToast('Admin login successful', 'success');
-        localStorage.setItem('adminToken', 'admin-token-placeholder');
-        navigate('/my-admin/dashboard');
+      
+      console.log('🔍 [ADMIN OTP] Verifying OTP:', otpCode);
+      
+      const response = await api.post('/admin/verify-login-otp', {
+        email: formData.email,
+        otp: otpCode
+      });
+
+      console.log('🔍 [ADMIN OTP] Response:', response);
+
+      if (response?.success && response?.data?.token) {
+        // Store admin token
+        localStorage.setItem('adminToken', response.data.token);
+        localStorage.setItem('adminData', JSON.stringify(response.data.admin));
+        
+        console.log('✅ [ADMIN OTP] Verification successful!');
+        addToast('Welcome back, Admin!', 'success');
+        
+        navigate('/admin/dashboard');
       } else {
         addToast('Invalid OTP', 'error');
       }
-    } catch (error) {
-      addToast('Verification failed', 'error');
+    } catch (error: any) {
+      console.error('❌ [ADMIN OTP] Error:', error);
+      const errorMessage = error?.message || 'Verification failed';
+      addToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleAuth = async () => {
-    addToast('Google OAuth for admin coming soon', 'info');
+    setLoading(true);
+    try {
+      console.log('🔍 [ADMIN GOOGLE] Starting Google OAuth...');
+      
+      // Get Google auth response
+      const googleResponse = await googleAuthService.signInWithGoogle();
+      console.log('🔍 [ADMIN GOOGLE] Google auth response:', googleResponse);
+
+      // Send to backend for admin verification
+      const response = await api.post('/admin/google-login', {
+        email: googleResponse.email,
+        googleId: googleResponse.id,
+        name: googleResponse.name,
+        avatar: googleResponse.imageUrl
+      });
+
+      console.log('🔍 [ADMIN GOOGLE] Backend response:', response);
+
+      if (response?.success && response?.data?.token) {
+        // Store admin token
+        localStorage.setItem('adminToken', response.data.token);
+        localStorage.setItem('adminData', JSON.stringify(response.data.admin));
+        
+        console.log('✅ [ADMIN GOOGLE] Login successful!');
+        addToast('Welcome back, Admin!', 'success');
+        
+        navigate('/admin/dashboard');
+      } else {
+        addToast(response?.message || 'Google authentication failed', 'error');
+      }
+    } catch (error: any) {
+      console.error('❌ [ADMIN GOOGLE] Error:', error);
+      const errorMessage = error?.message || 'Google authentication failed';
+      addToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -130,7 +194,7 @@ const AdminLogin: React.FC = () => {
           </div>
           
           <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
-            TaskFlowHQ
+            Saarthi
             <span className="block text-3xl mt-2 text-white/90">Administration Center</span>
           </h1>
           
@@ -168,7 +232,7 @@ const AdminLogin: React.FC = () => {
                 Admin Portal
               </div>
               <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                TaskFlowHQ
+                Saarthi
               </div>
             </div>
           </div>

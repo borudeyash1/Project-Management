@@ -3,13 +3,17 @@ import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables
 
-const transporter = nodemailer.createTransport({
+// Check if email credentials are configured
+const isEmailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+// Only create transporter if email is configured
+const transporter = isEmailConfigured ? nodemailer.createTransport({
   service: 'gmail', // You can use other services like 'Outlook', 'SendGrid', etc.
   auth: {
     user: process.env.EMAIL_USER, // Your email address
     pass: process.env.EMAIL_PASS, // Your email password or app-specific password
   },
-});
+}) : null;
 
 interface EmailOptions {
   to: string;
@@ -27,8 +31,16 @@ export const sendEmail = async (options: EmailOptions) => {
     
     console.log('🔍 [DEBUG] Email configuration:', {
       EMAIL_USER: process.env.EMAIL_USER ? 'set' : 'not set',
-      EMAIL_PASS: process.env.EMAIL_PASS ? 'set' : 'not set'
+      EMAIL_PASS: process.env.EMAIL_PASS ? 'set' : 'not set',
+      isConfigured: isEmailConfigured
     });
+    
+    // If email is not configured, log warning and skip sending
+    if (!isEmailConfigured || !transporter) {
+      console.warn('⚠️ [DEBUG] Email service not configured. Skipping email send.');
+      console.warn('⚠️ [DEBUG] To enable email, set EMAIL_USER and EMAIL_PASS in your .env file');
+      return; // Return without error to allow registration to continue
+    }
     
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -49,6 +61,11 @@ export const sendEmail = async (options: EmailOptions) => {
     });
     throw new Error('Failed to send email');
   }
+};
+
+// Export function to check if email is configured
+export const isEmailServiceConfigured = (): boolean => {
+  return isEmailConfigured;
 };
 
 // You'll need to add EMAIL_USER and EMAIL_PASS to your server/.env file.

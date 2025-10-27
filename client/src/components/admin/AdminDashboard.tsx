@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Shield, Users, Activity, Settings, LogOut, AlertTriangle } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
+import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 
 const AdminDashboard: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -12,6 +13,9 @@ const AdminDashboard: React.FC = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
+    // Clear any expired tokens first
+    clearExpiredTokens();
+    
     // Check if admin is logged in
     const token = localStorage.getItem('adminToken');
     const admin = localStorage.getItem('adminData');
@@ -22,7 +26,17 @@ const AdminDashboard: React.FC = () => {
 
     if (!token || !admin) {
       console.log('❌ [ADMIN DASHBOARD] No valid session, redirecting to login');
-      // Redirect without toast to avoid loops
+      addToast('Session expired. Please login again.', 'warning');
+      navigate('/my-admin/login', { replace: true });
+      return;
+    }
+
+    // Validate token expiration
+    if (!validateAdminToken(token)) {
+      console.log('❌ [ADMIN DASHBOARD] Token expired or invalid, clearing session');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
+      addToast('Your session has expired. Please login again.', 'warning');
       navigate('/my-admin/login', { replace: true });
       return;
     }
@@ -89,7 +103,7 @@ const AdminDashboard: React.FC = () => {
                   Admin Dashboard
                 </h1>
                 <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  TaskFlowHQ Management Portal
+                  Saarthi Management Portal
                 </p>
               </div>
             </div>
@@ -128,7 +142,7 @@ const AdminDashboard: React.FC = () => {
                 Welcome back, {adminData.name}!
               </h2>
               <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                You have full administrative access to TaskFlowHQ
+                You have full administrative access to Saarthi
               </p>
             </div>
           </div>
