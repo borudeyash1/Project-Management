@@ -245,8 +245,8 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    // Find admin with password field
-    const admin = await Admin.findOne({ email, isActive: true }).select('+password');
+    // Find admin with password and OTP fields
+    const admin = await Admin.findOne({ email, isActive: true }).select('+password +loginOtp +loginOtpExpiry');
 
     if (!admin) {
       console.log('❌ [ADMIN LOGIN] Admin not found or inactive');
@@ -279,30 +279,47 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    // Update last login
-    admin.lastLogin = new Date();
+    // Generate OTP for login verification
+    console.log('🔍 [ADMIN LOGIN] Password verified, sending OTP for login verification');
+    const loginOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    admin.loginOtp = loginOtp;
+    admin.loginOtpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await admin.save();
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        id: admin._id, 
-        email: admin.email, 
-        role: admin.role,
-        type: 'admin'
-      },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '7d' }
-    );
+    // Send OTP email
+    const { sendEmail } = await import('../services/emailService');
+    try {
+      await sendEmail({
+        to: admin.email,
+        subject: 'Saarthi Admin: Login Verification Code',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Admin Login Verification</h2>
+            <p>Hello ${admin.name},</p>
+            <p>You're attempting to log in to the Saarthi Admin Panel. Please use the following verification code:</p>
+            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
+              <h1 style="color: #f59e0b; font-size: 32px; margin: 0; letter-spacing: 4px;">${loginOtp}</h1>
+            </div>
+            <p>This code will expire in 10 minutes.</p>
+            <p>If you didn't request this login, please contact support immediately.</p>
+            <p>Best regards,<br>The Saarthi Team</p>
+          </div>
+        `,
+      });
+      console.log('✅ [ADMIN LOGIN] OTP email sent successfully to:', admin.email);
+    } catch (emailError) {
+      console.error('❌ [ADMIN LOGIN] Failed to send OTP email:', emailError);
+    }
 
-    console.log('✅ [ADMIN LOGIN] Login successful');
+    console.log('✅ [ADMIN LOGIN] OTP sent, awaiting verification');
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: 'Please check your email for the verification code.',
       data: {
-        token,
-        admin: {
+        email: admin.email,
+        requiresOtpVerification: true,
+        adminData: {
           id: admin._id,
           email: admin.email,
           name: admin.name,
@@ -405,6 +422,106 @@ export const adminGoogleLogin = async (req: Request, res: Response): Promise<voi
   }
 };
 
+// Verify Admin Login OTP
+export const verifyAdminLoginOTP = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, otp } = req.body;
+
+    console.log('🔍 [ADMIN OTP] Verifying OTP for:', email);
+
+    if (!email || !otp) {
+      res.status(400).json({
+        success: false,
+        message: 'Email and OTP are required'
+      });
+      return;
+    }
+
+    // Find admin with OTP fields
+    const admin = await Admin.findOne({ email, isActive: true }).select('+loginOtp +loginOtpExpiry');
+
+    if (!admin) {
+      console.log('❌ [ADMIN OTP] Admin not found');
+      res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+      return;
+    }
+
+    // Check if OTP exists
+    if (!admin.loginOtp || !admin.loginOtpExpiry) {
+      console.log('❌ [ADMIN OTP] No OTP found');
+      res.status(400).json({
+        success: false,
+        message: 'No OTP found. Please request a new one.'
+      });
+      return;
+    }
+
+    // Check if OTP is expired
+    if (admin.loginOtpExpiry < new Date()) {
+      console.log('❌ [ADMIN OTP] OTP expired');
+      res.status(400).json({
+        success: false,
+        message: 'OTP has expired. Please request a new one.'
+      });
+      return;
+    }
+
+    // Verify OTP
+    if (admin.loginOtp !== otp) {
+      console.log('❌ [ADMIN OTP] Invalid OTP');
+      res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+      return;
+    }
+
+    // OTP verified successfully - clear OTP fields
+    admin.loginOtp = undefined;
+    admin.loginOtpExpiry = undefined;
+    admin.lastLogin = new Date();
+    await admin.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        id: admin._id, 
+        email: admin.email, 
+        role: admin.role,
+        type: 'admin'
+      },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' }
+    );
+
+    console.log('✅ [ADMIN OTP] Verification successful');
+
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        token,
+        admin: {
+          id: admin._id,
+          email: admin.email,
+          name: admin.name,
+          role: admin.role,
+          avatar: admin.avatar
+        }
+      }
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN OTP] Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 // Generate 6-digit OTP
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -497,7 +614,7 @@ export const sendPasswordChangeOTP = async (req: AuthenticatedRequest, res: Resp
             <p>For security reasons, never share this OTP with anyone.</p>
           </div>
           <div class="footer">
-            <p>© 2025 TaskFlowHQ Admin Portal. All rights reserved.</p>
+            <p>© 2025 Saarthi Admin Portal. All rights reserved.</p>
             <p>This is an automated message, please do not reply.</p>
           </div>
         </div>
@@ -507,7 +624,7 @@ export const sendPasswordChangeOTP = async (req: AuthenticatedRequest, res: Resp
 
     await sendEmail({
       to: admin.email,
-      subject: '🔐 Password Change OTP - TaskFlowHQ Admin',
+      subject: '🔐 Password Change OTP - Saarthi Admin',
       html: emailHtml
     });
 
@@ -636,7 +753,7 @@ export const verifyOTPAndChangePassword = async (req: AuthenticatedRequest, res:
             <p>If you did not make this change, please contact support immediately.</p>
           </div>
           <div class="footer">
-            <p>© 2025 TaskFlowHQ Admin Portal. All rights reserved.</p>
+            <p>© 2025 Saarthi Admin Portal. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -645,7 +762,7 @@ export const verifyOTPAndChangePassword = async (req: AuthenticatedRequest, res:
 
     await sendEmail({
       to: admin.email,
-      subject: '✅ Password Changed Successfully - TaskFlowHQ Admin',
+      subject: '✅ Password Changed Successfully - Saarthi Admin',
       html: confirmationHtml
     });
 
