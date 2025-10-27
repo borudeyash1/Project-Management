@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
+import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
 
 interface Release {
@@ -50,8 +51,13 @@ const ReleaseManagement: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
+    // Clear expired tokens first
+    clearExpiredTokens();
+    
     const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) {
+    if (!adminToken || !validateAdminToken(adminToken)) {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
       window.location.href = '/my-admin/login';
       return;
     }

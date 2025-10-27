@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
+import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
 
 interface User {
@@ -48,12 +49,17 @@ const UserManagement: React.FC = () => {
   const limit = 10;
 
   useEffect(() => {
+    // Clear expired tokens first
+    clearExpiredTokens();
+    
     // Check if admin is logged in
     const adminToken = localStorage.getItem('adminToken');
     console.log('🔍 [USER MANAGEMENT] Admin token exists:', !!adminToken);
     
-    if (!adminToken) {
-      console.error('❌ [USER MANAGEMENT] No admin token found');
+    if (!adminToken || !validateAdminToken(adminToken)) {
+      console.error('❌ [USER MANAGEMENT] No valid admin token found');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
       // Redirect without showing toast to avoid loops
       window.location.href = '/my-admin/login';
       return;

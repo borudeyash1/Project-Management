@@ -20,7 +20,7 @@ const UserGuide: React.FC = () => {
       content: (
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">1. Create Your Account</h4>
-          <p className="text-gray-600">Sign up for a free account to get started with TaskFlowHQ.</p>
+          <p className="text-gray-600">Sign up for a free account to get started with Saarthi.</p>
           
           <h4 className="font-semibold text-gray-900">2. Set Up Your Workspace</h4>
           <p className="text-gray-600">Create your first workspace and invite team members.</p>
@@ -103,7 +103,7 @@ const UserGuide: React.FC = () => {
           <p className="text-gray-600">Find solutions to common problems and frequently asked questions.</p>
           
           <h4 className="font-semibold text-gray-900">Performance Tips</h4>
-          <p className="text-gray-600">Optimize your TaskFlowHQ experience with these performance tips.</p>
+          <p className="text-gray-600">Optimize your Saarthi experience with these performance tips.</p>
           
           <h4 className="font-semibold text-gray-900">Contact Support</h4>
           <p className="text-gray-600">Get help from our support team when you need it.</p>
@@ -143,7 +143,7 @@ const UserGuide: React.FC = () => {
               User <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Guide</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
-              Everything you need to know to get the most out of TaskFlowHQ.
+              Everything you need to know to get the most out of Saarthi.
             </p>
           </div>
 

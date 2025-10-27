@@ -96,7 +96,7 @@ const LandingPage: React.FC = () => {
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     </div>
                     <div className={`flex-1 text-center text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      TaskFlowHQ Dashboard
+                      Saarthi Dashboard
                     </div>
                   </div>
                   
@@ -249,7 +249,7 @@ const LandingPage: React.FC = () => {
               Ready to get started?
             </h2>
             <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
-              Join thousands of teams already using TaskFlowHQ to manage their projects efficiently.
+              Join thousands of teams already using Saarthi to manage their projects efficiently.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

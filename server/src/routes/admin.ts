@@ -5,6 +5,7 @@ import {
   logDeviceAccess,
   adminLogin,
   adminGoogleLogin,
+  verifyAdminLoginOTP,
   sendPasswordChangeOTP,
   verifyOTPAndChangePassword
 } from '../controllers/adminController';
@@ -50,6 +51,14 @@ const googleLoginValidation = [
 
 router.post('/login', loginValidation, validateRequest, adminLogin);
 router.post('/google-login', googleLoginValidation, validateRequest, adminGoogleLogin);
+
+// OTP verification route
+const otpVerificationValidation = [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+];
+
+router.post('/verify-login-otp', otpVerificationValidation, validateRequest, verifyAdminLoginOTP);
 
 // Password change routes - require authentication
 const passwordChangeValidation = [
