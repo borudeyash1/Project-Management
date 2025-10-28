@@ -2,11 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { PlannerProvider } from './context/PlannerContext';
 import Auth from './components/Auth';
 import HomePage from './components/HomePage';
 import ProjectsPage from './components/ProjectsPage';
 import ProjectViewDetailed from './components/ProjectViewDetailed';
 import PlannerPage from './components/PlannerPage';
+import PlannerLayout from './components/planner/PlannerLayout';
 import Dashboard from './components/Dashboard';
 import TrackerPage from './components/TrackerPage';
 import RemindersPage from './components/RemindersPage';
@@ -164,9 +166,11 @@ const AppContent: React.FC = () => {
 
         <Route path="/planner" element={
           <ProtectedRoute>
-            <AppLayout>
-              <PlannerPage />
-            </AppLayout>
+            <PlannerProvider>
+              <AppLayout>
+                <PlannerLayout />
+              </AppLayout>
+            </PlannerProvider>
           </ProtectedRoute>
         } />
 
