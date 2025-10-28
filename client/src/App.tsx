@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AppProvider, useApp } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PlannerProvider } from './context/PlannerContext';
+import { TrackerProvider } from './context/TrackerContext';
 import Auth from './components/Auth';
 import HomePage from './components/HomePage';
 import ProjectsPage from './components/ProjectsPage';
@@ -10,7 +11,7 @@ import ProjectViewDetailed from './components/ProjectViewDetailed';
 import PlannerPage from './components/PlannerPage';
 import PlannerLayout from './components/planner/PlannerLayout';
 import Dashboard from './components/Dashboard';
-import TrackerPage from './components/TrackerPage';
+import TrackerLayout from './components/tracker/TrackerLayout';
 import RemindersPage from './components/RemindersPage';
 import ReportsPage from './components/ReportsPage';
 import TeamPage from './components/TeamPage';
@@ -177,7 +178,7 @@ const AppContent: React.FC = () => {
         <Route path="/tracker" element={
           <ProtectedRoute>
             <AppLayout>
-              <TrackerPage />
+              <TrackerLayout />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -285,7 +286,11 @@ const App: React.FC = () => {
     <Router>
       <ThemeProvider>
         <AppProvider>
-          <AppContent />
+          <PlannerProvider>
+            <TrackerProvider>
+              <AppContent />
+            </TrackerProvider>
+          </PlannerProvider>
         </AppProvider>
       </ThemeProvider>
     </Router>
