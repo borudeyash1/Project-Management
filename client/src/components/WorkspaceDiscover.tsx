@@ -3,7 +3,7 @@ import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock } f
 import { useApp } from '../context/AppContext';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';
-import { WorkspaceCreationRestriction, PlanStatus } from './FeatureRestriction';
+import { PlanStatus } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 
 interface Workspace {
@@ -217,24 +217,20 @@ const WorkspaceDiscover: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <WorkspaceCreationRestriction>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Custom Workspace
-                </button>
-              </WorkspaceCreationRestriction>
-              <WorkspaceCreationRestriction>
-                <button
-                  onClick={() => setShowAICreateModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-colors"
-                >
-                  <Bot className="w-4 h-4" />
-                  AI-Powered Workspace
-                </button>
-              </WorkspaceCreationRestriction>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Custom Workspace
+              </button>
+              <button
+                onClick={() => setShowAICreateModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-colors"
+              >
+                <Bot className="w-4 h-4" />
+                AI-Powered Workspace
+              </button>
             </div>
           </div>
         </div>
