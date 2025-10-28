@@ -80,6 +80,7 @@ const TeamPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
+  const [activeTab, setActiveTab] = useState<'members' | 'orgchart' | 'capacity' | 'skills' | 'health'>('members');
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -453,6 +454,35 @@ const TeamPage: React.FC = () => {
               </div>
             )}
 
+            {/* Tab Navigation */}
+            <div className="bg-white rounded-lg border border-gray-200 p-1">
+              <div className="flex items-center gap-2">
+                {[
+                  { id: 'members', label: 'Team Members', icon: Users },
+                  { id: 'orgchart', label: 'Org Chart', icon: Target },
+                  { id: 'capacity', label: 'Capacity', icon: BarChart3 },
+                  { id: 'skills', label: 'Skills Matrix', icon: Award },
+                  { id: 'health', label: 'Team Health', icon: TrendingUp }
+                ].map(tab => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Filters and Search */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
@@ -516,7 +546,8 @@ const TeamPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Team Members */}
+            {/* Content based on active tab */}
+            {activeTab === 'members' && (
             <div className="bg-white rounded-lg border border-gray-200">
               <div className="p-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900">Team Members ({filteredMembers.length})</h2>
@@ -732,6 +763,209 @@ const TeamPage: React.FC = () => {
                 </div>
               )}
             </div>
+            )}
+
+            {/* Organization Chart View */}
+            {activeTab === 'orgchart' && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Organization Chart</h2>
+                <p className="text-gray-600 mb-6">Visual representation of team hierarchy and reporting structure</p>
+                <div className="text-center py-12 text-gray-500">
+                  <Target className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                  <p className="text-lg font-medium">Organization Chart Coming Soon</p>
+                  <p className="text-sm mt-2">Visual hierarchy with drag-drop, reporting lines, and role-based coloring</p>
+                </div>
+              </div>
+            )}
+
+            {/* Capacity Planning View */}
+            {activeTab === 'capacity' && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Capacity Planning</h2>
+                <p className="text-gray-600 mb-6">Workload distribution and resource allocation across team</p>
+                <div className="space-y-4">
+                  {filteredMembers.map(member => (
+                    <div key={member._id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          {member.avatar ? (
+                            <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                              <span className="text-sm font-medium text-gray-600">{member.name.charAt(0)}</span>
+                            </div>
+                          )}
+                          <div>
+                            <h3 className="font-medium text-gray-900">{member.name}</h3>
+                            <p className="text-sm text-gray-600">{member.role}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-gray-900">85%</div>
+                          <div className="text-xs text-gray-500">Utilization</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Weekly Capacity</span>
+                          <span className="font-medium">34h / 40h</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }} />
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 mt-3">
+                          {member.projects.map(project => (
+                            <div key={project._id} className="text-xs">
+                              <div className={`w-full h-1 rounded ${project.color} mb-1`} />
+                              <span className="text-gray-600">{project.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Skills Matrix View */}
+            {activeTab === 'skills' && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Skills Matrix</h2>
+                <p className="text-gray-600 mb-6">Team capabilities and expertise levels</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left p-3 font-medium text-gray-900">Team Member</th>
+                        {['React', 'Node.js', 'Python', 'Design', 'DevOps', 'Testing'].map(skill => (
+                          <th key={skill} className="text-center p-3 font-medium text-gray-900">{skill}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredMembers.map(member => (
+                        <tr key={member._id} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              {member.avatar ? (
+                                <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full" />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                  <span className="text-xs font-medium text-gray-600">{member.name.charAt(0)}</span>
+                                </div>
+                              )}
+                              <span className="font-medium text-gray-900">{member.name}</span>
+                            </div>
+                          </td>
+                          {['React', 'Node.js', 'Python', 'Design', 'DevOps', 'Testing'].map(skill => {
+                            const hasSkill = member.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
+                            const level = hasSkill ? Math.floor(Math.random() * 3) + 2 : Math.floor(Math.random() * 2);
+                            return (
+                              <td key={skill} className="p-3 text-center">
+                                <div className="flex justify-center gap-1">
+                                  {[1, 2, 3, 4].map(star => (
+                                    <Star
+                                      key={star}
+                                      className={`w-4 h-4 ${star <= level ? 'text-yellow-500 fill-current' : 'text-gray-300'}`}
+                                    />
+                                  ))}
+                                </div>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Team Health View */}
+            {activeTab === 'health' && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Team Health Dashboard</h2>
+                <p className="text-gray-600 mb-6">Monitor team well-being and identify potential issues</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium text-gray-900">Burnout Risk</h3>
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                        <span className="text-lg font-bold text-green-600">25</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-green-500 h-2 rounded-full" style={{ width: '25%' }} />
+                    </div>
+                    <p className="text-xs text-gray-600 mt-2">Low risk - Team is well-balanced</p>
+                  </div>
+
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium text-gray-900">Satisfaction</h3>
+                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span className="text-lg font-bold text-blue-600">4.2</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <Star key={star} className={`w-5 h-5 ${star <= 4 ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-600 mt-2">High satisfaction score</p>
+                  </div>
+
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium text-gray-900">Retention Risk</h3>
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                        <CheckCircle className="w-6 h-6 text-green-600" />
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">95%</div>
+                    <p className="text-xs text-gray-600 mt-2">Stable - Low flight risk</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="font-medium text-gray-900">Individual Health Scores</h3>
+                  {filteredMembers.map(member => {
+                    const healthScore = Math.floor(Math.random() * 30) + 70;
+                    const riskLevel = healthScore >= 80 ? 'low' : healthScore >= 60 ? 'medium' : 'high';
+                    const colorClass = riskLevel === 'low' ? 'bg-green-500' : riskLevel === 'medium' ? 'bg-yellow-500' : 'bg-red-500';
+                    
+                    return (
+                      <div key={member._id} className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg">
+                        <div className="flex items-center gap-3 flex-1">
+                          {member.avatar ? (
+                            <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                              <span className="text-sm font-medium text-gray-600">{member.name.charAt(0)}</span>
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900">{member.name}</h4>
+                            <p className="text-sm text-gray-600">{member.role}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-gray-900">{healthScore}</div>
+                            <div className="text-xs text-gray-500">Health Score</div>
+                          </div>
+                          <div className="w-24 bg-gray-200 rounded-full h-2">
+                            <div className={`${colorClass} h-2 rounded-full`} style={{ width: `${healthScore}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
