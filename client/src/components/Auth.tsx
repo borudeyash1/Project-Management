@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { LoginRequest, RegisterRequest, User } from "../types";
+import { LoginRequest, RegisterRequest, User, Workspace } from "../types";
 import { apiService } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import SharedNavbar from "./SharedNavbar";
@@ -157,7 +157,611 @@ const Auth: React.FC = () => {
     localStorage.setItem('accessToken', 'dev-bypass');
     localStorage.setItem('refreshToken', 'dev-bypass');
     dispatch({ type: 'SET_USER', payload: fakeUser });
+    
+    // Set Free workspaces
+    const freeWorkspaces: Workspace[] = [
+      {
+        _id: 'free-ws-1',
+        name: 'My Personal Workspace',
+        type: 'personal' as const,
+        owner: 'dev-bypass',
+        members: [],
+        settings: {
+          isPublic: false,
+          allowMemberInvites: false,
+          requireApprovalForJoining: true,
+          defaultProjectPermissions: {
+            canCreate: true,
+            canManage: true,
+            canView: true
+          }
+        },
+        subscription: {
+          plan: 'free',
+          maxMembers: 5,
+          maxProjects: 3,
+          features: {
+            advancedAnalytics: false,
+            customFields: false,
+            apiAccess: false,
+            prioritySupport: false
+          }
+        },
+        isActive: true,
+        memberCount: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    dispatch({ type: 'SET_WORKSPACES', payload: freeWorkspaces });
+    dispatch({ type: 'SET_WORKSPACE', payload: 'free-ws-1' });
+    dispatch({ type: 'SET_MODE', payload: 'Workspace' });
+    
+    // Set Free projects
+    const freeProjects = [
+      {
+        _id: 'free-proj-1',
+        name: 'Personal Website',
+        description: 'Build my portfolio website',
+        workspace: 'free-ws-1',
+        createdBy: 'dev-bypass',
+        status: 'active' as const,
+        priority: 'high' as const,
+        startDate: new Date('2024-01-01'),
+        dueDate: new Date('2024-12-31'),
+        progress: 45,
+        teamMembers: [{ user: 'dev-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['web', 'portfolio'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: false, timeTracking: { enabled: false, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 5,
+        totalTasksCount: 12,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'free-proj-2',
+        name: 'Learning React',
+        description: 'Complete React course and build projects',
+        workspace: 'free-ws-1',
+        createdBy: 'dev-bypass',
+        status: 'active' as const,
+        priority: 'medium' as const,
+        startDate: new Date('2024-02-01'),
+        dueDate: new Date('2024-06-30'),
+        progress: 60,
+        teamMembers: [{ user: 'dev-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['learning', 'react'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: false, timeTracking: { enabled: false, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 8,
+        totalTasksCount: 15,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    dispatch({ type: 'SET_PROJECTS', payload: freeProjects });
+    
     showToast('Bypassed login', 'success');
+    navigate('/home');
+  };
+
+  const handleBypassPro = () => {
+    const proUser: User = {
+      _id: 'pro-bypass',
+      fullName: 'Alex Johnson',
+      email: 'alex@techcorp.com',
+      username: 'alexjohnson',
+      isEmailVerified: true,
+      isActive: true,
+      subscription: {
+        plan: 'pro',
+        status: 'active',
+        startDate: new Date(),
+        autoRenew: true,
+        billingCycle: 'monthly',
+        features: {
+          maxWorkspaces: 10,
+          maxProjects: 50,
+          maxTeamMembers: 25,
+          maxStorage: 100,
+          aiAssistance: true,
+          advancedAnalytics: true,
+          customIntegrations: true,
+          prioritySupport: true,
+          whiteLabeling: false,
+          apiAccess: true,
+        },
+        isPro: true,
+      },
+      settings: {
+        themeColor: 'blue',
+        darkMode: false,
+        notifications: {
+          inApp: true,
+          email: true,
+          push: true,
+        },
+        calendar: {
+          syncGoogle: true,
+          syncOutlook: true,
+          defaultView: 'month',
+        },
+        privacy: {
+          profileVisibility: 'workspace',
+          twoFactorAuth: true,
+        },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    localStorage.setItem('accessToken', 'pro-bypass');
+    localStorage.setItem('refreshToken', 'pro-bypass');
+    dispatch({ type: 'SET_USER', payload: proUser });
+    
+    // Set Pro workspaces
+    const proWorkspaces: Workspace[] = [
+      {
+        _id: 'pro-ws-1',
+        name: 'TechCorp Solutions',
+        type: 'enterprise' as const,
+        owner: 'pro-bypass',
+        members: [],
+        settings: {
+          isPublic: false,
+          allowMemberInvites: true,
+          requireApprovalForJoining: false,
+          defaultProjectPermissions: {
+            canCreate: true,
+            canManage: true,
+            canView: true
+          }
+        },
+        subscription: {
+          plan: 'pro',
+          maxMembers: 25,
+          maxProjects: 50,
+          features: {
+            advancedAnalytics: true,
+            customFields: true,
+            apiAccess: true,
+            prioritySupport: true
+          }
+        },
+        isActive: true,
+        memberCount: 12,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'pro-ws-2',
+        name: 'Innovation Hub',
+        type: 'team' as const,
+        owner: 'pro-bypass',
+        members: [],
+        settings: {
+          isPublic: true,
+          allowMemberInvites: true,
+          requireApprovalForJoining: false,
+          defaultProjectPermissions: {
+            canCreate: true,
+            canManage: false,
+            canView: true
+          }
+        },
+        subscription: {
+          plan: 'pro',
+          maxMembers: 25,
+          maxProjects: 50,
+          features: {
+            advancedAnalytics: true,
+            customFields: true,
+            apiAccess: true,
+            prioritySupport: true
+          }
+        },
+        isActive: true,
+        memberCount: 8,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    dispatch({ type: 'SET_WORKSPACES', payload: proWorkspaces });
+    dispatch({ type: 'SET_WORKSPACE', payload: 'pro-ws-1' });
+    dispatch({ type: 'SET_MODE', payload: 'Workspace' });
+    
+    // Set Pro projects
+    const proProjects = [
+      {
+        _id: 'pro-proj-1',
+        name: 'E-Commerce Platform',
+        description: 'Build scalable e-commerce solution with React and Node.js',
+        workspace: 'pro-ws-1',
+        createdBy: 'pro-bypass',
+        status: 'active' as const,
+        priority: 'critical' as const,
+        startDate: new Date('2024-01-15'),
+        dueDate: new Date('2024-06-30'),
+        progress: 65,
+        teamMembers: [{ user: 'pro-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['e-commerce', 'react', 'node'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 15,
+        totalTasksCount: 25,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'pro-proj-2',
+        name: 'Mobile App Development',
+        description: 'Cross-platform mobile app using React Native',
+        workspace: 'pro-ws-1',
+        createdBy: 'pro-bypass',
+        status: 'active' as const,
+        priority: 'high' as const,
+        startDate: new Date('2024-02-01'),
+        dueDate: new Date('2024-08-31'),
+        progress: 40,
+        teamMembers: [{ user: 'pro-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['mobile', 'react-native'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 8,
+        totalTasksCount: 20,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'pro-proj-3',
+        name: 'API Gateway Service',
+        description: 'Microservices API gateway with authentication',
+        workspace: 'pro-ws-1',
+        createdBy: 'pro-bypass',
+        status: 'planning' as const,
+        priority: 'high' as const,
+        startDate: new Date('2024-03-01'),
+        dueDate: new Date('2024-07-31'),
+        progress: 20,
+        teamMembers: [{ user: 'pro-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['backend', 'microservices', 'api'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: true }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 3,
+        totalTasksCount: 15,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'pro-proj-4',
+        name: 'Innovation Lab Research',
+        description: 'AI/ML research and prototype development',
+        workspace: 'pro-ws-2',
+        createdBy: 'pro-bypass',
+        status: 'active' as const,
+        priority: 'medium' as const,
+        startDate: new Date('2024-01-01'),
+        dueDate: new Date('2024-12-31'),
+        progress: 35,
+        teamMembers: [{ user: 'pro-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['ai', 'ml', 'research'],
+        attachments: [],
+        settings: { isPublic: true, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 12,
+        totalTasksCount: 30,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    dispatch({ type: 'SET_PROJECTS', payload: proProjects });
+    
+    showToast('🚀 Pro features unlocked!', 'success');
+    navigate('/home');
+  };
+
+  const handleBypassUltra = () => {
+    const ultraUser: User = {
+      _id: 'ultra-bypass',
+      fullName: 'Sarah Chen',
+      email: 'sarah@innovatetech.com',
+      username: 'sarahchen',
+      isEmailVerified: true,
+      isActive: true,
+      subscription: {
+        plan: 'ultra',
+        status: 'active',
+        startDate: new Date(),
+        autoRenew: true,
+        billingCycle: 'yearly',
+        features: {
+          maxWorkspaces: 999,
+          maxProjects: 999,
+          maxTeamMembers: 999,
+          maxStorage: 999,
+          aiAssistance: true,
+          advancedAnalytics: true,
+          customIntegrations: true,
+          prioritySupport: true,
+          whiteLabeling: true,
+          apiAccess: true,
+        },
+        isPro: true,
+      },
+      settings: {
+        themeColor: 'purple',
+        darkMode: false,
+        notifications: {
+          inApp: true,
+          email: true,
+          push: true,
+        },
+        calendar: {
+          syncGoogle: true,
+          syncOutlook: true,
+          defaultView: 'month',
+        },
+        privacy: {
+          profileVisibility: 'public',
+          twoFactorAuth: true,
+        },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    localStorage.setItem('accessToken', 'ultra-bypass');
+    localStorage.setItem('refreshToken', 'ultra-bypass');
+    dispatch({ type: 'SET_USER', payload: ultraUser });
+    
+    // Set Ultra workspaces
+    const ultraWorkspaces: Workspace[] = [
+      {
+        _id: 'ultra-ws-1',
+        name: 'InnovateTech Global',
+        type: 'enterprise' as const,
+        owner: 'ultra-bypass',
+        members: [],
+        settings: {
+          isPublic: false,
+          allowMemberInvites: true,
+          requireApprovalForJoining: false,
+          defaultProjectPermissions: {
+            canCreate: true,
+            canManage: true,
+            canView: true
+          }
+        },
+        subscription: {
+          plan: 'enterprise',
+          maxMembers: 999,
+          maxProjects: 999,
+          features: {
+            advancedAnalytics: true,
+            customFields: true,
+            apiAccess: true,
+            prioritySupport: true
+          }
+        },
+        isActive: true,
+        memberCount: 45,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'ultra-ws-2',
+        name: 'AI Research Lab',
+        type: 'enterprise' as const,
+        owner: 'ultra-bypass',
+        members: [],
+        settings: {
+          isPublic: true,
+          allowMemberInvites: true,
+          requireApprovalForJoining: false,
+          defaultProjectPermissions: {
+            canCreate: true,
+            canManage: true,
+            canView: true
+          }
+        },
+        subscription: {
+          plan: 'enterprise',
+          maxMembers: 999,
+          maxProjects: 999,
+          features: {
+            advancedAnalytics: true,
+            customFields: true,
+            apiAccess: true,
+            prioritySupport: true
+          }
+        },
+        isActive: true,
+        memberCount: 28,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'ultra-ws-3',
+        name: 'Startup Incubator',
+        type: 'team' as const,
+        owner: 'ultra-bypass',
+        members: [],
+        settings: {
+          isPublic: true,
+          allowMemberInvites: true,
+          requireApprovalForJoining: true,
+          defaultProjectPermissions: {
+            canCreate: true,
+            canManage: false,
+            canView: true
+          }
+        },
+        subscription: {
+          plan: 'enterprise',
+          maxMembers: 999,
+          maxProjects: 999,
+          features: {
+            advancedAnalytics: true,
+            customFields: true,
+            apiAccess: true,
+            prioritySupport: true
+          }
+        },
+        isActive: true,
+        memberCount: 15,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    dispatch({ type: 'SET_WORKSPACES', payload: ultraWorkspaces });
+    dispatch({ type: 'SET_WORKSPACE', payload: 'ultra-ws-1' });
+    dispatch({ type: 'SET_MODE', payload: 'Workspace' });
+    
+    // Set Ultra projects
+    const ultraProjects = [
+      {
+        _id: 'ultra-proj-1',
+        name: 'Global Platform Launch',
+        description: 'Enterprise-scale platform for international markets',
+        workspace: 'ultra-ws-1',
+        createdBy: 'ultra-bypass',
+        status: 'active' as const,
+        priority: 'critical' as const,
+        startDate: new Date('2024-01-01'),
+        dueDate: new Date('2024-12-31'),
+        progress: 55,
+        teamMembers: [{ user: 'ultra-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['enterprise', 'global', 'platform'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: true }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 45,
+        totalTasksCount: 80,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'ultra-proj-2',
+        name: 'AI Research Initiative',
+        description: 'Advanced AI/ML research and development',
+        workspace: 'ultra-ws-2',
+        createdBy: 'ultra-bypass',
+        status: 'active' as const,
+        priority: 'high' as const,
+        startDate: new Date('2024-02-01'),
+        dueDate: new Date('2024-11-30'),
+        progress: 70,
+        teamMembers: [{ user: 'ultra-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['ai', 'research', 'innovation'],
+        attachments: [],
+        settings: { isPublic: true, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 28,
+        totalTasksCount: 40,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'ultra-proj-3',
+        name: 'Startup Accelerator Program',
+        description: 'Mentorship and funding program for startups',
+        workspace: 'ultra-ws-3',
+        createdBy: 'ultra-bypass',
+        status: 'active' as const,
+        priority: 'medium' as const,
+        startDate: new Date('2024-03-01'),
+        dueDate: new Date('2024-09-30'),
+        progress: 40,
+        teamMembers: [{ user: 'ultra-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['startup', 'accelerator', 'mentorship'],
+        attachments: [],
+        settings: { isPublic: true, allowMemberInvites: true, timeTracking: { enabled: false, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 12,
+        totalTasksCount: 30,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'ultra-proj-4',
+        name: 'Cloud Infrastructure Migration',
+        description: 'Migrate entire infrastructure to cloud-native architecture',
+        workspace: 'ultra-ws-1',
+        createdBy: 'ultra-bypass',
+        status: 'planning' as const,
+        priority: 'high' as const,
+        startDate: new Date('2024-04-01'),
+        dueDate: new Date('2024-10-31'),
+        progress: 15,
+        teamMembers: [{ user: 'ultra-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['cloud', 'infrastructure', 'devops'],
+        attachments: [],
+        settings: { isPublic: false, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: true }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 5,
+        totalTasksCount: 35,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: 'ultra-proj-5',
+        name: 'Machine Learning Pipeline',
+        description: 'Build automated ML pipeline for data processing',
+        workspace: 'ultra-ws-2',
+        createdBy: 'ultra-bypass',
+        status: 'active' as const,
+        priority: 'critical' as const,
+        startDate: new Date('2024-01-15'),
+        dueDate: new Date('2024-08-15'),
+        progress: 80,
+        teamMembers: [{ user: 'ultra-bypass', role: 'project-manager' as const, permissions: { canManageTasks: true, canManageTeam: true, canViewReports: true, canManageProject: true }, joinedAt: new Date() }],
+        milestones: [],
+        tags: ['ml', 'pipeline', 'automation'],
+        attachments: [],
+        settings: { isPublic: true, allowMemberInvites: true, timeTracking: { enabled: true, requireApproval: false }, notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true } },
+        isActive: true,
+        teamMemberCount: 1,
+        completedTasksCount: 32,
+        totalTasksCount: 40,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    dispatch({ type: 'SET_PROJECTS', payload: ultraProjects });
+    
+    showToast('⚡ Ultra features unlocked!', 'success');
     navigate('/home');
   };
 
@@ -437,7 +1041,23 @@ const Auth: React.FC = () => {
                   onClick={handleBypassLogin}
                   className={`w-full mt-2 px-4 py-3.5 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 hover:bg-gray-700/50 text-gray-200' : 'border-gray-300 hover:bg-gray-50 text-gray-700'} text-sm font-semibold transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
                 >
-                  Bypass Login
+                  Bypass Login (Free)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBypassPro}
+                  className={`w-full mt-2 px-4 py-3.5 rounded-xl border-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-blue-500 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
+                >
+                  🚀 Bypass Pro
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBypassUltra}
+                  className={`w-full mt-2 px-4 py-3.5 rounded-xl border-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-purple-500 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
+                >
+                  ⚡ Bypass Ultra
                 </button>
 
                 <div className="relative">

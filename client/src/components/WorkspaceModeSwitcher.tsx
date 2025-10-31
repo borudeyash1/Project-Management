@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Building, Home, ChevronDown, Users, Settings, Crown } from 'lucide-react';
 
@@ -8,12 +9,40 @@ interface WorkspaceModeSwitcherProps {
 
 const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className = '' }) => {
   const { state, dispatch } = useApp();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleModeChange = (mode: string, workspaceId?: string) => {
     dispatch({ type: 'SET_MODE', payload: mode });
     if (workspaceId) {
       dispatch({ type: 'SET_WORKSPACE', payload: workspaceId });
+      
+      // Navigate to workspace view
+      const workspace = state.workspaces.find(w => w._id === workspaceId);
+      if (workspace) {
+        // Navigate to workspace overview
+        navigate(`/workspace/${workspaceId}/overview`);
+        
+        // Show success message
+        dispatch({ 
+          type: 'ADD_TOAST', 
+          payload: { 
+            message: `Switched to ${workspace.name}`, 
+            type: 'success' 
+          } 
+        });
+      }
+    } else if (mode === 'Personal') {
+      // Navigate to personal mode
+      navigate('/home');
+      
+      dispatch({ 
+        type: 'ADD_TOAST', 
+        payload: { 
+          message: 'Switched to Personal Mode', 
+          type: 'success' 
+        } 
+      });
     }
     setIsOpen(false);
   };
