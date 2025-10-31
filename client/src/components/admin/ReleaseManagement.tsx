@@ -7,6 +7,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
+import AdminDockNavigation from './AdminDockNavigation';
 
 interface Release {
   _id: string;
@@ -569,6 +570,9 @@ const ReleaseManagement: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
+import AdminDockNavigation from './AdminDockNavigation';
 
 const Settings: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -292,6 +293,9 @@ const Settings: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };
