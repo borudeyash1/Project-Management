@@ -5,6 +5,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import AdminDockNavigation from './AdminDockNavigation';
+import AdminChatbotButton from './AdminChatbotButton';
+import api from '../../services/api';
 
 const AdminDashboard: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -12,6 +14,12 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [adminData, setAdminData] = useState<any>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState<any>({
+    totalUsers: 0,
+    activeSessions: 0,
+    systemStatus: 'Loading...'
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Clear any expired tokens first
@@ -46,13 +54,31 @@ const AdminDashboard: React.FC = () => {
       const parsedAdmin = JSON.parse(admin);
       console.log('✅ [ADMIN DASHBOARD] Valid session found for:', parsedAdmin.email);
       setAdminData(parsedAdmin);
+      
+      // Fetch dashboard stats
+      fetchDashboardStats();
     } catch (error) {
       console.error('❌ [ADMIN DASHBOARD] Invalid admin data, clearing session');
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminData');
-      navigate('/my-admin/login', { replace: true });
+      navigate('/my-admin/login', { replace: true});
     }
   }, [navigate, addToast]);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/admin/dashboard-stats');
+      
+      if (response?.success) {
+        setDashboardStats(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch dashboard stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     console.log('🔒 [ADMIN] Logging out...');
@@ -156,7 +182,11 @@ const AdminDashboard: React.FC = () => {
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Users</p>
                 <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-2`}>
-                  1,234
+                  {loading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    dashboardStats.totalUsers.toLocaleString()
+                  )}
                 </p>
               </div>
               <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
@@ -170,7 +200,11 @@ const AdminDashboard: React.FC = () => {
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Sessions</p>
                 <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-2`}>
-                  456
+                  {loading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    dashboardStats.activeSessions.toLocaleString()
+                  )}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
@@ -183,8 +217,16 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>System Status</p>
-                <p className={`text-3xl font-bold text-green-500 mt-2`}>
-                  Healthy
+                <p className={`text-3xl font-bold ${
+                  loading ? 'text-gray-400' :
+                  dashboardStats.systemStatus === 'Healthy' ? 'text-green-500' :
+                  dashboardStats.systemStatus === 'Warning' ? 'text-yellow-500' : 'text-red-500'
+                } mt-2`}>
+                  {loading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    dashboardStats.systemStatus
+                  )}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
@@ -318,6 +360,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Admin Dock Navigation */}
       <AdminDockNavigation />
+
+      {/* Admin AI Chatbot */}
+      <AdminChatbotButton pageContext={dashboardStats} />
     </div>
   );
 };

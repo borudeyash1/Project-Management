@@ -7,6 +7,14 @@ export interface IAllowedDevice extends Document {
   userAgent?: string;
   platform?: string;
   lastAccess?: Date;
+  ipAddress?: string;
+  location?: string;
+  loginAttempts: number;
+  failedAttempts: number;
+  lastFailedAttempt?: Date;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  isBlacklisted: boolean;
+  blacklistReason?: string;
   isActive: boolean;
   addedBy: string;
   notes?: string;
@@ -43,6 +51,38 @@ const allowedDeviceSchema = new Schema<IAllowedDevice>({
   },
   lastAccess: {
     type: Date
+  },
+  ipAddress: {
+    type: String,
+    trim: true
+  },
+  location: {
+    type: String,
+    trim: true
+  },
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  failedAttempts: {
+    type: Number,
+    default: 0
+  },
+  lastFailedAttempt: {
+    type: Date
+  },
+  riskLevel: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'critical'],
+    default: 'low'
+  },
+  isBlacklisted: {
+    type: Boolean,
+    default: false
+  },
+  blacklistReason: {
+    type: String,
+    trim: true
   },
   isActive: {
     type: Boolean,

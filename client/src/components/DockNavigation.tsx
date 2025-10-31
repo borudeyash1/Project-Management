@@ -52,13 +52,22 @@ const DockNavigation: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      console.log('🔒 [USER DOCK] Logging out...');
       await apiService.logout();
+      
+      // Clear session storage
+      sessionStorage.clear();
+      
       dispatch({ type: 'LOGOUT' });
-      navigate('/login');
+      console.log('✅ [USER DOCK] Session cleared, redirecting to login');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
+      
+      // Even if API call fails, clear local session
+      sessionStorage.clear();
       dispatch({ type: 'LOGOUT' });
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   };
 

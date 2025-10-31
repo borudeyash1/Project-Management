@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Plus, Trash2, Power, PowerOff } from 'lucide-react';
+import { 
+  Shield, Plus, Trash2, Power, PowerOff, Search, Filter, 
+  AlertTriangle, CheckCircle, XCircle, Globe, MapPin, Clock,
+  Smartphone, Monitor, Tablet, Eye
+} from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
+import { useNavigate } from 'react-router-dom';
+import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
+import AdminDockNavigation from './AdminDockNavigation';
+import AdminChatbotButton from './AdminChatbotButton';
 
 interface Device {
   _id: string;
@@ -13,23 +21,44 @@ interface Device {
   addedBy: string;
   notes?: string;
   lastAccess?: string;
+  ipAddress?: string;
+  location?: string;
+  userAgent?: string;
+  loginAttempts?: number;
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
   createdAt: string;
 }
 
 const DeviceManagement: React.FC = () => {
   const { isDarkMode } = useTheme();
   const { addToast } = useApp();
+  const navigate = useNavigate();
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRisk, setFilterRisk] = useState<string>('all');
   const [newDevice, setNewDevice] = useState({
     deviceId: '',
     deviceName: '',
     notes: ''
   });
 
+  // Validate admin session
+  useEffect(() => {
+    clearExpiredTokens();
+    const token = localStorage.getItem('adminToken');
+    if (!token || !validateAdminToken(token)) {
+      navigate('/my-admin/login', { replace: true });
+    }
+  }, [navigate]);
+
   useEffect(() => {
     fetchDevices();
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchDevices, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDevices = async () => {
@@ -100,6 +129,64 @@ const DeviceManagement: React.FC = () => {
     }
   };
 
+  // Helper functions
+  const getRiskColor = (risk?: string) => {
+    switch (risk) {
+      case 'critical': return 'text-red-500 bg-red-500/10';
+      case 'high': return 'text-orange-500 bg-orange-500/10';
+      case 'medium': return 'text-yellow-500 bg-yellow-500/10';
+      case 'low': return 'text-green-500 bg-green-500/10';
+      default: return 'text-gray-500 bg-gray-500/10';
+    }
+  };
+
+  const getRiskIcon = (risk?: string) => {
+    switch (risk) {
+      case 'critical':
+      case 'high':
+        return <AlertTriangle className="w-4 h-4" />;
+      case 'medium':
+        return <AlertTriangle className="w-4 h-4" />;
+      case 'low':
+        return <CheckCircle className="w-4 h-4" />;
+      default:
+        return <Shield className="w-4 h-4" />;
+    }
+  };
+
+  const getDeviceIcon = (userAgent?: string) => {
+    if (!userAgent) return <Monitor className="w-5 h-5" />;
+    const ua = userAgent.toLowerCase();
+    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+      return <Smartphone className="w-5 h-5" />;
+    }
+    if (ua.includes('tablet') || ua.includes('ipad')) {
+      return <Tablet className="w-5 h-5" />;
+    }
+    return <Monitor className="w-5 h-5" />;
+  };
+
+  // Filter devices
+  const filteredDevices = devices.filter(device => {
+    const matchesSearch = 
+      device.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      device.deviceId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      device.ipAddress?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      device.location?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRisk = filterRisk === 'all' || device.riskLevel === filterRisk;
+    
+    return matchesSearch && matchesRisk;
+  });
+
+  // Calculate stats
+  const stats = {
+    total: devices.length,
+    active: devices.filter(d => d.isActive).length,
+    highRisk: devices.filter(d => d.riskLevel === 'high' || d.riskLevel === 'critical').length,
+    suspicious: devices.filter(d => (d.loginAttempts || 0) > 5).length
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -109,57 +196,172 @@ const DeviceManagement: React.FC = () => {
   }
 
   return (
-    <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
-      <div className="max-w-6xl mx-auto">
+    <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen pb-32`}>
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Device Management
+              🔒 Device Security Management
             </h1>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              Manage authorized devices for admin access
+              Monitor and manage authorized devices with security insights
             </p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all shadow-lg"
           >
             <Plus className="w-5 h-5" />
             Add Device
           </button>
         </div>
 
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Devices</p>
+                <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
+                  {stats.total}
+                </p>
+              </div>
+              <Shield className="w-8 h-8 text-blue-500" />
+            </div>
+          </div>
+
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Now</p>
+                <p className={`text-2xl font-bold text-green-500 mt-1`}>
+                  {stats.active}
+                </p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-500" />
+            </div>
+          </div>
+
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>High Risk</p>
+                <p className={`text-2xl font-bold ${stats.highRisk > 0 ? 'text-red-500' : isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
+                  {stats.highRisk}
+                </p>
+              </div>
+              <AlertTriangle className={`w-8 h-8 ${stats.highRisk > 0 ? 'text-red-500' : 'text-gray-400'}`} />
+            </div>
+          </div>
+
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Suspicious</p>
+                <p className={`text-2xl font-bold ${stats.suspicious > 0 ? 'text-orange-500' : isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
+                  {stats.suspicious}
+                </p>
+              </div>
+              <XCircle className={`w-8 h-8 ${stats.suspicious > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex gap-4 mb-6">
+          <div className="flex-1 relative">
+            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+            <input
+              type="text"
+              placeholder="Search by device name, ID, IP, or location..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-full pl-10 pr-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+            />
+          </div>
+          <select
+            value={filterRisk}
+            onChange={(e) => setFilterRisk(e.target.value)}
+            className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+          >
+            <option value="all">All Risk Levels</option>
+            <option value="low">Low Risk</option>
+            <option value="medium">Medium Risk</option>
+            <option value="high">High Risk</option>
+            <option value="critical">Critical Risk</option>
+          </select>
+        </div>
+
         {/* Devices List */}
         <div className="grid gap-4">
-          {devices.map((device) => (
+          {filteredDevices.map((device) => (
             <div
               key={device._id}
               className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Shield className={`w-5 h-5 ${device.isActive ? 'text-green-500' : 'text-gray-400'}`} />
+                  <div className="flex items-center gap-3 mb-3">
+                    {getDeviceIcon(device.userAgent)}
                     <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       {device.deviceName}
                     </h3>
                     <span className={`px-2 py-1 rounded text-xs font-medium ${device.isActive ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}`}>
                       {device.isActive ? 'Active' : 'Inactive'}
                     </span>
+                    {device.riskLevel && (
+                      <span className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${getRiskColor(device.riskLevel)}`}>
+                        {getRiskIcon(device.riskLevel)}
+                        {device.riskLevel.toUpperCase()} RISK
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    {device.ipAddress && (
+                      <div className="flex items-center gap-2">
+                        <Globe className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {device.ipAddress}
+                        </span>
+                      </div>
+                    )}
+                    {device.location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {device.location}
+                        </span>
+                      </div>
+                    )}
+                    {device.lastAccess && (
+                      <div className="flex items-center gap-2">
+                        <Clock className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {new Date(device.lastAccess).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    {device.loginAttempts !== undefined && device.loginAttempts > 0 && (
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className={`w-4 h-4 ${device.loginAttempts > 5 ? 'text-red-500' : 'text-yellow-500'}`} />
+                        <span className={`text-sm ${device.loginAttempts > 5 ? 'text-red-500' : 'text-yellow-500'} font-semibold`}>
+                          {device.loginAttempts} login attempts
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} space-y-1 font-mono`}>
                     <p className="break-all">
-                      <span className="font-semibold">Device ID:</span> {device.deviceId}
+                      <span className="font-semibold">ID:</span> {device.deviceId.substring(0, 32)}...
                     </p>
                     {device.notes && (
                       <p><span className="font-semibold">Notes:</span> {device.notes}</p>
                     )}
-                    <p><span className="font-semibold">Added by:</span> {device.addedBy}</p>
-                    <p><span className="font-semibold">Added:</span> {new Date(device.createdAt).toLocaleString()}</p>
-                    {device.lastAccess && (
-                      <p><span className="font-semibold">Last Access:</span> {new Date(device.lastAccess).toLocaleString()}</p>
+                    {device.userAgent && (
+                      <p className="break-all"><span className="font-semibold">User Agent:</span> {device.userAgent.substring(0, 60)}...</p>
                     )}
                   </div>
                 </div>
@@ -189,13 +391,50 @@ const DeviceManagement: React.FC = () => {
           ))}
         </div>
 
-        {devices.length === 0 && (
+        {filteredDevices.length === 0 && (
           <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             <Shield className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p>No devices added yet</p>
+            <p className="text-lg font-semibold mb-2">
+              {searchTerm || filterRisk !== 'all' ? 'No devices match your filters' : 'No devices added yet'}
+            </p>
+            {(searchTerm || filterRisk !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilterRisk('all');
+                }}
+                className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         )}
       </div>
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
+
+      {/* Admin AI Chatbot */}
+      <AdminChatbotButton pageContext={{
+        devices: filteredDevices,
+        stats,
+        vulnerabilities: devices.filter(d => d.riskLevel === 'high' || d.riskLevel === 'critical').map(d => ({
+          type: 'High Risk Device',
+          description: `${d.deviceName} (${d.ipAddress || 'Unknown IP'})`,
+          severity: d.riskLevel
+        })),
+        suspiciousDevices: devices.filter(d => (d.loginAttempts || 0) > 5).map(d => ({
+          id: d.deviceId,
+          ip: d.ipAddress,
+          reason: `${d.loginAttempts} failed login attempts`,
+          riskLevel: d.riskLevel
+        })),
+        totalDevices: devices.length,
+        activeToday: stats.active,
+        failedLogins: devices.reduce((sum, d) => sum + (d.loginAttempts || 0), 0),
+        uniqueIPs: new Set(devices.map(d => d.ipAddress).filter(Boolean)).size
+      }} />
 
       {/* Add Device Modal */}
       {showAddModal && (
