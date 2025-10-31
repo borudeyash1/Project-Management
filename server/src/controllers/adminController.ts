@@ -291,18 +291,18 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
     try {
       await sendEmail({
         to: admin.email,
-        subject: 'Saarthi Admin: Login Verification Code',
+        subject: 'Sartthi Admin: Login Verification Code',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #333;">Admin Login Verification</h2>
             <p>Hello ${admin.name},</p>
-            <p>You're attempting to log in to the Saarthi Admin Panel. Please use the following verification code:</p>
+            <p>You're attempting to log in to the Sartthi Admin Panel. Please use the following verification code:</p>
             <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
               <h1 style="color: #f59e0b; font-size: 32px; margin: 0; letter-spacing: 4px;">${loginOtp}</h1>
             </div>
             <p>This code will expire in 10 minutes.</p>
             <p>If you didn't request this login, please contact support immediately.</p>
-            <p>Best regards,<br>The Saarthi Team</p>
+            <p>Best regards,<br>The Sartthi Team</p>
           </div>
         `,
       });
@@ -614,7 +614,7 @@ export const sendPasswordChangeOTP = async (req: AuthenticatedRequest, res: Resp
             <p>For security reasons, never share this OTP with anyone.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Saarthi Admin Portal. All rights reserved.</p>
+            <p>© 2025 Sartthi Admin Portal. All rights reserved.</p>
             <p>This is an automated message, please do not reply.</p>
           </div>
         </div>
@@ -624,7 +624,7 @@ export const sendPasswordChangeOTP = async (req: AuthenticatedRequest, res: Resp
 
     await sendEmail({
       to: admin.email,
-      subject: '🔐 Password Change OTP - Saarthi Admin',
+      subject: '🔐 Password Change OTP - Sartthi Admin',
       html: emailHtml
     });
 
@@ -753,7 +753,7 @@ export const verifyOTPAndChangePassword = async (req: AuthenticatedRequest, res:
             <p>If you did not make this change, please contact support immediately.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Saarthi Admin Portal. All rights reserved.</p>
+            <p>© 2025 Sartthi Admin Portal. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -762,7 +762,7 @@ export const verifyOTPAndChangePassword = async (req: AuthenticatedRequest, res:
 
     await sendEmail({
       to: admin.email,
-      subject: '✅ Password Changed Successfully - Saarthi Admin',
+      subject: '✅ Password Changed Successfully - Sartthi Admin',
       html: confirmationHtml
     });
 

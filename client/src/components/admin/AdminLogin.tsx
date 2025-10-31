@@ -232,7 +232,7 @@ const AdminLogin: React.FC = () => {
                 Admin Portal
               </div>
               <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Saarthi
+                Sartthi
               </div>
             </div>
           </div>

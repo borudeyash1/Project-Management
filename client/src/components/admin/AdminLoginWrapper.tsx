@@ -43,8 +43,8 @@ const AdminLoginWrapper: React.FC = () => {
       // Use custom if exists, otherwise use real fingerprint
       const currentDeviceId = customDeviceId || realDeviceId;
 
-      // Always show the REAL device ID on the access denied page
-      setDeviceId(realDeviceId);
+      // Show the device ID that is actually being checked (the one you need to add to DB)
+      setDeviceId(currentDeviceId);
 
       console.log('🔍 [DEBUG] Current Device ID:', currentDeviceId);
 

@@ -47,7 +47,7 @@ export const AI_RESOURCES = {
 
 // Instructions for setting up AI APIs
 export const SETUP_INSTRUCTIONS = `
-To enable AI features in your TaskFlowHQ app:
+To enable AI features in your Sartthi app:
 
 1. **OpenAI (Recommended):**
    - Visit: https://platform.openai.com/api-keys

@@ -103,7 +103,7 @@ const AdminDashboard: React.FC = () => {
                   Admin Dashboard
                 </h1>
                 <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Saarthi Management Portal
+                  Sartthi Management Portal
                 </p>
               </div>
             </div>
@@ -142,7 +142,7 @@ const AdminDashboard: React.FC = () => {
                 Welcome back, {adminData.name}!
               </h2>
               <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                You have full administrative access to Saarthi
+                You have full administrative access to Sartthi
               </p>
             </div>
           </div>
