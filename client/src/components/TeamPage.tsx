@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import UserDisplay from './UserDisplay';
 
 interface TeamMember {
   _id: string;
@@ -24,6 +25,9 @@ interface TeamMember {
   phone?: string;
   bio?: string;
   skills: string[];
+  subscription?: {
+    plan: 'free' | 'pro' | 'ultra';
+  };
   projects: Array<{
     _id: string;
     name: string;
@@ -100,6 +104,7 @@ const TeamPage: React.FC = () => {
         phone: '+1 (555) 123-4567',
         bio: 'Senior Full-Stack Developer with 8+ years of experience in React, Node.js, and cloud technologies.',
         skills: ['React', 'Node.js', 'TypeScript', 'AWS', 'Docker', 'MongoDB'],
+        subscription: { plan: 'ultra' },
         projects: [
           { _id: 'p1', name: 'E-commerce Platform', role: 'Lead Developer', progress: 75, color: 'bg-blue-500' },
           { _id: 'p2', name: 'Mobile App', role: 'Technical Lead', progress: 90, color: 'bg-green-500' }
@@ -140,6 +145,7 @@ const TeamPage: React.FC = () => {
         phone: '+1 (555) 987-6543',
         bio: 'Creative UI/UX Designer passionate about creating intuitive and beautiful user experiences.',
         skills: ['Figma', 'Sketch', 'Adobe Creative Suite', 'Prototyping', 'User Research', 'Design Systems'],
+        subscription: { plan: 'pro' },
         projects: [
           { _id: 'p1', name: 'E-commerce Platform', role: 'Design Lead', progress: 80, color: 'bg-blue-500' },
           { _id: 'p3', name: 'Dashboard Redesign', role: 'UI Designer', progress: 60, color: 'bg-purple-500' }
@@ -180,6 +186,7 @@ const TeamPage: React.FC = () => {
         phone: '+1 (555) 456-7890',
         bio: 'Backend Developer specializing in API development and database optimization.',
         skills: ['Python', 'Django', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes'],
+        subscription: { plan: 'free' },
         projects: [
           { _id: 'p1', name: 'E-commerce Platform', role: 'Backend Developer', progress: 70, color: 'bg-blue-500' },
           { _id: 'p2', name: 'Mobile App', role: 'API Developer', progress: 85, color: 'bg-green-500' }
@@ -220,6 +227,7 @@ const TeamPage: React.FC = () => {
         phone: '+1 (555) 321-0987',
         bio: 'Digital Marketing Specialist focused on growth strategies and content creation.',
         skills: ['SEO', 'Content Marketing', 'Social Media', 'Analytics', 'Campaign Management', 'Brand Strategy'],
+        subscription: { plan: 'pro' },
         projects: [
           { _id: 'p2', name: 'Mobile App', role: 'Marketing Lead', progress: 95, color: 'bg-green-500' }
         ],
@@ -259,6 +267,7 @@ const TeamPage: React.FC = () => {
         phone: '+1 (555) 654-3210',
         bio: 'Sales Representative with expertise in B2B sales and client relationship management.',
         skills: ['Sales', 'CRM', 'Client Relations', 'Negotiation', 'Lead Generation', 'Account Management'],
+        subscription: { plan: 'free' },
         projects: [],
         performance: {
           rating: 0,
@@ -558,22 +567,16 @@ const TeamPage: React.FC = () => {
                   {filteredMembers.map(member => (
                     <div key={member._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start gap-3 mb-3">
-                        {member.avatar ? (
-                          <img
-                            src={member.avatar}
-                            alt={member.name}
-                            className="w-12 h-12 rounded-full"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                            <span className="text-lg font-medium text-gray-600">
-                              {member.name.charAt(0)}
-                            </span>
-                          </div>
-                        )}
+                        <UserDisplay
+                          name={member.name}
+                          plan={member.subscription?.plan || 'free'}
+                          avatar={member.avatar}
+                          size="md"
+                          badgePosition="overlay"
+                          className="flex-1"
+                        />
                         
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-900 truncate">{member.name}</h3>
+                        <div className="flex-1 min-w-0 ml-2">
                           <p className="text-sm text-gray-600 truncate">{member.email}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(member.role)}`}>

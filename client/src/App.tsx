@@ -21,6 +21,16 @@ import ProfileSection from './components/ProfileSection';
 import WorkspaceDiscover from './components/WorkspaceDiscover';
 import WorkspaceOwner from './components/WorkspaceOwner';
 import WorkspaceMember from './components/WorkspaceMember';
+import WorkspaceLayout from './components/workspace/WorkspaceLayout';
+import WorkspaceOverview from './components/workspace/WorkspaceOverview';
+import WorkspaceMembers from './components/workspace/WorkspaceMembers';
+import WorkspaceProjects from './components/workspace/WorkspaceProjects';
+import WorkspaceClients from './components/workspace/WorkspaceClients';
+import WorkspaceRequests from './components/workspace/WorkspaceRequests';
+import WorkspaceSettings from './components/workspace/WorkspaceSettings';
+import WorkspaceInbox from './components/workspace/WorkspaceInbox';
+import ProjectLayout from './components/project/ProjectLayout';
+import ProjectOverview from './components/project/ProjectOverview';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
 import ProjectManagementView from './components/ProjectManagementView';
@@ -141,7 +151,30 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         } />
 
+        {/* Project Internal Routes */}
         <Route path="/project/:projectId" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ProjectLayout />
+            </AppLayout>
+          </ProtectedRoute>
+        }>
+          <Route path="overview" element={<ProjectOverview />} />
+          <Route path="info" element={<div className="p-6">Project Info - Coming Soon</div>} />
+          <Route path="team" element={<div className="p-6">Team Management - Coming Soon</div>} />
+          <Route path="tasks" element={<div className="p-6">Tasks & Board - Coming Soon</div>} />
+          <Route path="timeline" element={<div className="p-6">Timeline - Coming Soon</div>} />
+          <Route path="progress" element={<div className="p-6">Progress Tracker - Coming Soon</div>} />
+          <Route path="workload" element={<div className="p-6">Workload Management - Coming Soon</div>} />
+          <Route path="reports" element={<div className="p-6">Reports - Coming Soon</div>} />
+          <Route path="documents" element={<div className="p-6">Documents - Coming Soon</div>} />
+          <Route path="inbox" element={<div className="p-6">Project Inbox - Coming Soon</div>} />
+          <Route path="settings" element={<div className="p-6">Project Settings - Coming Soon</div>} />
+          <Route index element={<Navigate to="overview" replace />} />
+        </Route>
+
+        {/* Legacy Project View */}
+        <Route path="/project-view/:projectId" element={
           <ProtectedRoute>
             <AppLayout>
               <ProjectViewDetailed />
@@ -230,6 +263,26 @@ const AppContent: React.FC = () => {
             </AppLayout>
           </ProtectedRoute>
         } />
+
+        {/* Workspace Internal Routes */}
+        <Route path="/workspace/:workspaceId" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <WorkspaceLayout />
+            </AppLayout>
+          </ProtectedRoute>
+        }>
+          <Route path="overview" element={<WorkspaceOverview />} />
+          <Route path="members" element={<WorkspaceMembers />} />
+          <Route path="projects" element={<WorkspaceProjects />} />
+          <Route path="clients" element={<WorkspaceClients />} />
+          <Route path="requests" element={<WorkspaceRequests />} />
+          <Route path="collaborate" element={<div className="p-6">Collaborate Page - Coming Soon</div>} />
+          <Route path="advertise" element={<div className="p-6">Advertise Page - Coming Soon</div>} />
+          <Route path="inbox" element={<WorkspaceInbox />} />
+          <Route path="settings" element={<WorkspaceSettings />} />
+          <Route index element={<Navigate to="overview" replace />} />
+        </Route>
 
         <Route path="/reports" element={
           <ProtectedRoute>
