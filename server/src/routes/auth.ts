@@ -14,6 +14,12 @@ import {
 } from '../controllers/authController';
 import { authenticate, authenticateRefresh } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
+import {
+  otpRateLimiter,
+  loginRateLimiter,
+  registrationRateLimiter,
+  passwordResetRateLimiter
+} from '../middleware/rateLimiter';
 
 const router = express.Router();
 
@@ -121,19 +127,19 @@ const resendOtpValidation = [
 ];
 
 
-// Routes
-router.post('/register', registerValidation, validateRequest, register);
-router.post('/login', loginValidation, validateRequest, login);
-router.post('/google', googleAuthValidation, validateRequest, googleAuth);
+// Routes with Rate Limiting
+router.post('/register', registrationRateLimiter, registerValidation, validateRequest, register);
+router.post('/login', loginRateLimiter, loginValidation, validateRequest, login);
+router.post('/google', loginRateLimiter, googleAuthValidation, validateRequest, googleAuth);
 router.post('/logout', authenticate, logout);
 router.post('/refresh', authenticateRefresh, refreshToken);
 router.get('/me', authenticate, getCurrentUser);
-router.post('/forgot-password', forgotPasswordValidation, validateRequest, forgotPassword);
-router.post('/reset-password', resetPasswordValidation, validateRequest, resetPassword);
+router.post('/forgot-password', passwordResetRateLimiter, forgotPasswordValidation, validateRequest, forgotPassword);
+router.post('/reset-password', passwordResetRateLimiter, resetPasswordValidation, validateRequest, resetPassword);
 
-// OTP specific routes
-router.post('/verify-email-otp', otpVerificationValidation, validateRequest, verifyEmailOTP); // New route
-router.post('/resend-email-otp', resendOtpValidation, validateRequest, resendEmailOTP); // New route
+// OTP specific routes with strict rate limiting
+router.post('/verify-email-otp', otpRateLimiter, otpVerificationValidation, validateRequest, verifyEmailOTP);
+router.post('/resend-email-otp', otpRateLimiter, resendOtpValidation, validateRequest, resendEmailOTP);
 
 // Removed old /verify-email/:token route as it's replaced by OTP
 // router.get('/verify-email/:token', verifyEmail);

@@ -24,6 +24,7 @@ const AdminDockNavigation: React.FC = () => {
 
   const adminNavItems: AdminNavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
+    { id: 'devices', label: 'Devices', icon: Shield, path: '/admin/devices' },
     { id: 'users', label: 'Users', icon: Users, path: '/admin/users' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
     { id: 'releases', label: 'Releases', icon: Package, path: '/admin/releases' },
@@ -35,12 +36,19 @@ const AdminDockNavigation: React.FC = () => {
   };
 
   const handleLogout = () => {
-    // Clear admin session
+    console.log('🔒 [ADMIN DOCK] Logging out...');
+    
+    // Clear all admin session data from localStorage
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
     
+    // Clear any admin-related session storage
+    sessionStorage.clear();
+    
+    console.log('✅ [ADMIN DOCK] Session cleared, redirecting to login');
+    
     // Redirect to admin login
-    navigate('/my-admin/login');
+    navigate('/my-admin/login', { replace: true });
   };
 
   const isActive = (path: string) => {

@@ -7,10 +7,23 @@ import {
   adminGoogleLogin,
   verifyAdminLoginOTP,
   sendPasswordChangeOTP,
-  verifyOTPAndChangePassword
+  verifyOTPAndChangePassword,
+  getDashboardStats,
+  getAllDevices,
+  addDevice,
+  updateDevice,
+  deleteDevice
 } from '../controllers/adminController';
+import { getAdminAIResponse } from '../controllers/adminAIController';
+import { getAnalyticsData, getUserInsights } from '../controllers/analyticsController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
+import {
+  adminOtpRateLimiter,
+  adminLoginRateLimiter,
+  sensitiveOperationRateLimiter,
+  aiChatbotRateLimiter
+} from '../middleware/rateLimiter';
 
 const router = express.Router();
 
@@ -49,18 +62,19 @@ const googleLoginValidation = [
   body('googleId').notEmpty().withMessage('Google ID is required')
 ];
 
-router.post('/login', loginValidation, validateRequest, adminLogin);
-router.post('/google-login', googleLoginValidation, validateRequest, adminGoogleLogin);
+// Admin login routes with rate limiting
+router.post('/login', adminLoginRateLimiter, loginValidation, validateRequest, adminLogin);
+router.post('/google-login', adminLoginRateLimiter, googleLoginValidation, validateRequest, adminGoogleLogin);
 
-// OTP verification route
+// OTP verification route with rate limiting
 const otpVerificationValidation = [
   body('email').isEmail().withMessage('Valid email is required'),
   body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
 ];
 
-router.post('/verify-login-otp', otpVerificationValidation, validateRequest, verifyAdminLoginOTP);
+router.post('/verify-login-otp', adminOtpRateLimiter, otpVerificationValidation, validateRequest, verifyAdminLoginOTP);
 
-// Password change routes - require authentication
+// Password change routes with rate limiting
 const passwordChangeValidation = [
   body('currentPassword').notEmpty().withMessage('Current password is required')
 ];
@@ -70,7 +84,23 @@ const verifyOTPValidation = [
   body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ];
 
-router.post('/send-password-otp', authenticate, passwordChangeValidation, validateRequest, sendPasswordChangeOTP);
-router.post('/verify-password-otp', authenticate, verifyOTPValidation, validateRequest, verifyOTPAndChangePassword);
+router.post('/send-password-otp', authenticate, adminOtpRateLimiter, passwordChangeValidation, validateRequest, sendPasswordChangeOTP);
+router.post('/verify-password-otp', authenticate, adminOtpRateLimiter, verifyOTPValidation, validateRequest, verifyOTPAndChangePassword);
+
+// Dashboard stats route
+router.get('/dashboard-stats', getDashboardStats);
+
+// AI Assistant route with rate limiting (10 questions per day)
+router.post('/ai-assistant', aiChatbotRateLimiter, getAdminAIResponse);
+
+// Device management routes
+router.get('/devices', getAllDevices);
+router.post('/devices', addDevice);
+router.put('/devices/:id', updateDevice);
+router.delete('/devices/:id', deleteDevice);
+
+// Analytics routes
+router.get('/analytics-data', getAnalyticsData);
+router.get('/user-insights', getUserInsights);
 
 export default router;

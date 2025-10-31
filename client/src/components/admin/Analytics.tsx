@@ -1,83 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  TrendingUp, Users, CreditCard, Activity, Calendar, 
-  DollarSign, UserPlus, UserMinus, Award, Target,
-  BarChart3, PieChart, LineChart
-} from 'lucide-react';
+import { TrendingUp, Users, Activity, Target, RefreshCw } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import AdminDockNavigation from './AdminDockNavigation';
+import AdminChatbotButton from './AdminChatbotButton';
+import AnalyticsCharts from './AnalyticsCharts';
 import api from '../../services/api';
 
 interface AnalyticsData {
-  userGrowth: {
-    total: number;
-    thisMonth: number;
-    lastMonth: number;
-    growthRate: number;
-  };
-  subscriptions: {
-    free: number;
-    pro: number;
-    ultra: number;
-    revenue: {
-      monthly: number;
-      yearly: number;
-    };
-  };
-  activity: {
+  overview: {
+    totalUsers: number;
+    usersToday: number;
+    usersLast7Days: number;
+    usersLast30Days: number;
     activeToday: number;
-    activeThisWeek: number;
-    activeThisMonth: number;
+    activeLast7Days: number;
+    activeLast30Days: number;
+    inactive30Days: number;
+    inactive90Days: number;
+  };
+  growth: {
+    dailyGrowthRate: number;
+    weeklyGrowthRate: number;
+    avgDailyGrowth: string;
+    userGrowthTrend: Array<{ date: string; users: number }>;
   };
   engagement: {
-    avgSessionDuration: number;
-    avgTasksPerUser: number;
-    avgProjectsPerUser: number;
+    engagementRate: number;
+    retentionRate: number;
+    churnRate: number;
+    userDistribution: {
+      veryActive: number;
+      active: number;
+      inactive: number;
+      dormant: number;
+    };
+  };
+  devices: {
+    total: number;
+    active: number;
+    byRisk: {
+      low: number;
+      medium: number;
+      high: number;
+      critical: number;
+    };
+    suspicious: number;
+    blacklisted: number;
+    activityTrend: Array<{ date: string; active: number }>;
+  };
+  predictions: {
+    nextMonthUsers: number;
+    growthRate: number;
+    trend: string;
   };
 }
 
 const Analytics: React.FC = () => {
   const { isDarkMode } = useTheme();
   const { addToast } = useApp();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   useEffect(() => {
-    // Clear expired tokens first
     clearExpiredTokens();
-    
-    // Check admin token
-    const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken || !validateAdminToken(adminToken)) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminData');
-      window.location.href = '/my-admin/login';
+    const token = localStorage.getItem('adminToken');
+    if (!token || !validateAdminToken(token)) {
+      navigate('/my-admin/login', { replace: true });
       return;
     }
-    localStorage.setItem('accessToken', adminToken);
-    
     fetchAnalytics();
-  }, [timeRange]);
+  }, [navigate]);
 
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      console.log('🔍 [ANALYTICS] Fetching analytics data...');
-      
-      const response = await api.get(`/admin/analytics?range=${timeRange}`);
-      
-      console.log('🔍 [ANALYTICS] Response:', response);
-      
+      const response = await api.get('/admin/analytics-data');
       if (response?.success) {
-        console.log('✅ [ANALYTICS] Analytics fetched successfully');
         setAnalytics(response.data);
       }
-    } catch (error: any) {
-      console.error('❌ [ANALYTICS] Failed to fetch analytics:', error);
-      addToast(error?.message || 'Failed to load analytics', 'error');
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+      addToast('Failed to load analytics', 'error');
     } finally {
       setLoading(false);
     }
@@ -86,78 +93,64 @@ const Analytics: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
       </div>
     );
   }
 
   if (!analytics) {
     return (
-      <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
+      <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen pb-32`}>
         <div className="text-center py-12">
           <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />
           <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>No analytics data available</p>
         </div>
+        <AdminDockNavigation />
       </div>
     );
   }
 
   return (
-    <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
+    <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen pb-32`}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Analytics Dashboard
+              📊 Analytics Dashboard
             </h1>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              Comprehensive insights and metrics
+              Comprehensive insights and predictions
             </p>
           </div>
-
-          {/* Time Range Selector */}
-          <div className="flex gap-2">
-            {(['7d', '30d', '90d', '1y'] as const).map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  timeRange === range
-                    ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white'
-                    : isDarkMode
-                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                }`}
-              >
-                {range === '7d' && 'Last 7 Days'}
-                {range === '30d' && 'Last 30 Days'}
-                {range === '90d' && 'Last 90 Days'}
-                {range === '1y' && 'Last Year'}
-              </button>
-            ))}
-          </div>
+          <button
+            onClick={fetchAnalytics}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all shadow-lg"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
         </div>
 
-        {/* User Growth Stats */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-blue-500/10 rounded-lg">
                 <Users className="w-6 h-6 text-blue-500" />
               </div>
-              <span className={`text-sm font-medium ${analytics.userGrowth.growthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {analytics.userGrowth.growthRate >= 0 ? '+' : ''}{analytics.userGrowth.growthRate.toFixed(1)}%
+              <span className={`text-sm font-medium ${analytics.growth.weeklyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {analytics.growth.weeklyGrowthRate >= 0 ? '+' : ''}{analytics.growth.weeklyGrowthRate.toFixed(1)}%
               </span>
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {analytics.userGrowth.total.toLocaleString()}
+              {analytics.overview.totalUsers.toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
               Total Users
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
-              +{analytics.userGrowth.thisMonth} this month
+              +{analytics.overview.usersLast30Days} this month
             </p>
           </div>
 
@@ -169,199 +162,116 @@ const Analytics: React.FC = () => {
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {analytics.activity.activeToday.toLocaleString()}
+              {analytics.overview.activeLast30Days.toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              Active Today
+              Active Users (30d)
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
-              {analytics.activity.activeThisWeek} this week
+              {analytics.engagement.engagementRate.toFixed(1)}% engagement rate
             </p>
           </div>
 
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-purple-500/10 rounded-lg">
-                <Award className="w-6 h-6 text-purple-500" />
+                <Target className="w-6 h-6 text-purple-500" />
               </div>
               <span className="text-sm font-medium text-purple-500">
-                {analytics.subscriptions.pro + analytics.subscriptions.ultra} paid
+                {analytics.engagement.retentionRate.toFixed(1)}%
               </span>
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {((analytics.subscriptions.pro + analytics.subscriptions.ultra) / analytics.userGrowth.total * 100).toFixed(1)}%
+              {analytics.predictions.nextMonthUsers.toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              Conversion Rate
+              Predicted Next Month
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
-              Pro: {analytics.subscriptions.pro}, Ultra: {analytics.subscriptions.ultra}
+              {analytics.predictions.trend === 'growing' ? '📈 Growing' : '📉 Declining'}
             </p>
           </div>
 
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-yellow-500/10 rounded-lg">
-                <DollarSign className="w-6 h-6 text-yellow-500" />
+              <div className="p-3 bg-red-500/10 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-red-500" />
               </div>
-              <TrendingUp className="w-5 h-5 text-yellow-500" />
+              <span className={`text-sm font-medium ${analytics.engagement.churnRate < 10 ? 'text-green-500' : 'text-red-500'}`}>
+                {analytics.engagement.churnRate.toFixed(1)}%
+              </span>
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              ${analytics.subscriptions.revenue.monthly.toLocaleString()}
+              {analytics.overview.inactive90Days.toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              Monthly Revenue
+              Dormant Users
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
-              ${analytics.subscriptions.revenue.yearly.toLocaleString()} yearly
+              Churn rate: {analytics.engagement.churnRate.toFixed(1)}%
             </p>
           </div>
         </div>
 
-        {/* Subscription Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Charts */}
+        <AnalyticsCharts
+          isDarkMode={isDarkMode}
+          userGrowthTrend={analytics.growth.userGrowthTrend.map(t => ({ date: t.date, value: t.users }))}
+          deviceActivityTrend={analytics.devices.activityTrend.map(t => ({ date: t.date, value: t.active }))}
+          userDistribution={analytics.engagement.userDistribution}
+          devicesByRisk={analytics.devices.byRisk}
+        />
+
+        {/* Additional Insights */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
-            <div className="flex items-center gap-3 mb-6">
-              <PieChart className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'}`} />
-              <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                Subscription Distribution
-              </h3>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Free Plan
-                  </span>
-                  <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {analytics.subscriptions.free} ({((analytics.subscriptions.free / analytics.userGrowth.total) * 100).toFixed(1)}%)
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-gray-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(analytics.subscriptions.free / analytics.userGrowth.total) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Pro Plan
-                  </span>
-                  <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {analytics.subscriptions.pro} ({((analytics.subscriptions.pro / analytics.userGrowth.total) * 100).toFixed(1)}%)
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(analytics.subscriptions.pro / analytics.userGrowth.total) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Ultra Plan
-                  </span>
-                  <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {analytics.subscriptions.ultra} ({((analytics.subscriptions.ultra / analytics.userGrowth.total) * 100).toFixed(1)}%)
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-purple-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(analytics.subscriptions.ultra / analytics.userGrowth.total) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Engagement Metrics */}
-          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
-            <div className="flex items-center gap-3 mb-6">
-              <BarChart3 className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'}`} />
-              <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                User Engagement
-              </h3>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Avg. Session Duration
-                  </span>
-                  <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {Math.floor(analytics.engagement.avgSessionDuration / 60)}m {analytics.engagement.avgSessionDuration % 60}s
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Avg. Tasks Per User
-                  </span>
-                  <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {analytics.engagement.avgTasksPerUser.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Avg. Projects Per User
-                  </span>
-                  <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {analytics.engagement.avgProjectsPerUser.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Activity Timeline */}
-        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
-          <div className="flex items-center gap-3 mb-6">
-            <LineChart className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'}`} />
-            <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Activity Overview
+            <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              Growth Metrics
             </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Daily Growth Rate</span>
+                <span className={`font-semibold ${analytics.growth.dailyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {analytics.growth.dailyGrowthRate >= 0 ? '+' : ''}{analytics.growth.dailyGrowthRate.toFixed(2)}%
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Weekly Growth Rate</span>
+                <span className={`font-semibold ${analytics.growth.weeklyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {analytics.growth.weeklyGrowthRate >= 0 ? '+' : ''}{analytics.growth.weeklyGrowthRate.toFixed(2)}%
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Avg Daily Growth</span>
+                <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {analytics.growth.avgDailyGrowth} users/day
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
-                {analytics.activity.activeToday}
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
+            <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              Device Security
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Total Devices</span>
+                <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {analytics.devices.total}
+                </span>
               </div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Active Today
+              <div className="flex justify-between">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Active Devices</span>
+                <span className="font-semibold text-green-500">
+                  {analytics.devices.active}
+                </span>
               </div>
-            </div>
-
-            <div className="text-center">
-              <div className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
-                {analytics.activity.activeThisWeek}
-              </div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Active This Week
-              </div>
-            </div>
-
-            <div className="text-center">
-              <div className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
-                {analytics.activity.activeThisMonth}
-              </div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Active This Month
+              <div className="flex justify-between">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Suspicious Devices</span>
+                <span className={`font-semibold ${analytics.devices.suspicious > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                  {analytics.devices.suspicious}
+                </span>
               </div>
             </div>
           </div>
@@ -370,6 +280,9 @@ const Analytics: React.FC = () => {
 
       {/* Admin Dock Navigation */}
       <AdminDockNavigation />
+
+      {/* Admin AI Chatbot */}
+      <AdminChatbotButton pageContext={analytics} />
     </div>
   );
 };

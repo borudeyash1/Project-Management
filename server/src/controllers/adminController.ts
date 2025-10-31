@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import AllowedDevice from '../models/AllowedDevice';
 import Admin from '../models/Admin';
+import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest } from '../types';
 import { sendEmail } from '../services/emailService';
@@ -775,6 +776,193 @@ export const verifyOTPAndChangePassword = async (req: AuthenticatedRequest, res:
     res.status(500).json({
       success: false,
       message: 'Failed to change password'
+    });
+  }
+};
+
+// Get Dashboard Statistics
+export const getDashboardStats = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    console.log('📊 [ADMIN] Fetching dashboard statistics...');
+
+    // Get total users count
+    const totalUsers = await User.countDocuments();
+
+    // Get active sessions (users logged in within last 24 hours)
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const activeSessions = await User.countDocuments({
+      lastLogin: { $gte: twentyFourHoursAgo }
+    });
+
+    // Determine system status based on metrics
+    let systemStatus = 'Healthy';
+    const activeSessionsRatio = totalUsers > 0 ? (activeSessions / totalUsers) * 100 : 0;
+    
+    if (activeSessionsRatio < 10) {
+      systemStatus = 'Warning';
+    } else if (activeSessionsRatio < 5) {
+      systemStatus = 'Critical';
+    }
+
+    const stats = {
+      totalUsers,
+      activeSessions,
+      systemStatus,
+      activeSessionsRatio: activeSessionsRatio.toFixed(2),
+      timestamp: new Date()
+    };
+
+    console.log('✅ [ADMIN] Dashboard stats:', stats);
+
+    res.status(200).json({
+      success: true,
+      data: stats
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Get dashboard stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch dashboard statistics'
+    });
+  }
+};
+
+// Get All Devices with Security Data
+export const getAllDevices = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    console.log('🔒 [ADMIN] Fetching all devices...');
+
+    const devices = await AllowedDevice.find().sort({ createdAt: -1 });
+
+    console.log(`✅ [ADMIN] Found ${devices.length} devices`);
+
+    res.status(200).json({
+      success: true,
+      data: devices
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Get devices error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch devices'
+    });
+  }
+};
+
+// Add New Device
+export const addDevice = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { deviceId, deviceName, deviceType, notes } = req.body;
+
+    console.log('➕ [ADMIN] Adding new device:', deviceName);
+
+    // Check if device already exists
+    const existingDevice = await AllowedDevice.findOne({ deviceId });
+    if (existingDevice) {
+      res.status(400).json({
+        success: false,
+        message: 'Device already exists'
+      });
+      return;
+    }
+
+    const device = new AllowedDevice({
+      deviceId,
+      deviceName,
+      deviceType: deviceType || 'admin',
+      addedBy: 'admin',
+      notes,
+      isActive: true,
+      loginAttempts: 0,
+      failedAttempts: 0,
+      riskLevel: 'low',
+      isBlacklisted: false
+    });
+
+    await device.save();
+
+    console.log('✅ [ADMIN] Device added successfully');
+
+    res.status(201).json({
+      success: true,
+      data: device,
+      message: 'Device added successfully'
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Add device error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add device'
+    });
+  }
+};
+
+// Update Device
+export const updateDevice = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    console.log('🔄 [ADMIN] Updating device:', id);
+
+    const device = await AllowedDevice.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true, runValidators: true }
+    );
+
+    if (!device) {
+      res.status(404).json({
+        success: false,
+        message: 'Device not found'
+      });
+      return;
+    }
+
+    console.log('✅ [ADMIN] Device updated successfully');
+
+    res.status(200).json({
+      success: true,
+      data: device,
+      message: 'Device updated successfully'
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Update device error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update device'
+    });
+  }
+};
+
+// Delete Device
+export const deleteDevice = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    console.log('🗑️ [ADMIN] Deleting device:', id);
+
+    const device = await AllowedDevice.findByIdAndDelete(id);
+
+    if (!device) {
+      res.status(404).json({
+        success: false,
+        message: 'Device not found'
+      });
+      return;
+    }
+
+    console.log('✅ [ADMIN] Device deleted successfully');
+
+    res.status(200).json({
+      success: true,
+      message: 'Device deleted successfully'
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Delete device error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete device'
     });
   }
 };
