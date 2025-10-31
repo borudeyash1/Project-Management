@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.12.2",
+    "framer-motion": "^11.0.0",
     "google-auth-library": "^10.4.1",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",

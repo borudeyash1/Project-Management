@@ -35,7 +35,7 @@ import Profile from './components/Profile';
 import Settings from './components/Settings';
 import ProjectManagementView from './components/ProjectManagementView';
 import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import DockNavigation from './components/DockNavigation';
 import ToastContainer from './components/ToastContainer';
 import NotificationsPanel from './components/NotificationsPanel';
 import TaskDrawer from './components/TaskDrawer';
@@ -95,13 +95,13 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen bg-bg dark:bg-gray-900">
       <Header />
-      <div className="flex min-h-[calc(100vh-56px)]">
-        <Sidebar />
-        <main className="flex-1 bg-bg dark:bg-gray-900">
-          {children}
-        </main>
-      </div>
-      {/* AI Chatbot Button - Available on all protected pages */}
+      <main className="min-h-[calc(100vh-56px)] bg-bg dark:bg-gray-900 pb-24">
+        {children}
+      </main>
+      <DockNavigation />
+      <ToastContainer />
+      <NotificationsPanel />
+      <TaskDrawer />
       <ChatbotButton />
     </div>
   );
@@ -109,7 +109,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // App Content Component
 const AppContent: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
 
   return (
     <div className="antialiased bg-bg dark:bg-gray-900 text-text dark:text-gray-100 font-inter selection-bg-primary">
@@ -313,6 +313,10 @@ const AppContent: React.FC = () => {
       </Routes>
 
       {/* Modals */}
+      <CreateWorkspaceModal 
+        isOpen={state.modals.createWorkspace} 
+        onClose={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' })} 
+      />
       <CreateProjectModal />
       <WorkloadDeadlineModal />
       <TaskDetailsModal />
