@@ -120,14 +120,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Send OTP email
     console.log('🔍 [DEBUG] Preparing to send OTP email...');
-    const emailSubject = 'Proxima: Verify Your Email Address';
+    const emailSubject = 'Sartthi: Verify Your Email Address';
     const emailHtml = `
       <p>Hello ${fullName},</p>
-      <p>Thank you for registering with Proxima. Please use the following One-Time Password (OTP) to verify your email address:</p>
+      <p>Thank you for registering with Sartthi. Please use the following One-Time Password (OTP) to verify your email address:</p>
       <h3>${otp}</h3>
       <p>This OTP is valid for 10 minutes. If you did not request this, please ignore this email.</p>
       <p>Best regards,</p>
-      <p>The Proxima Team</p>
+      <p>The Sartthi Team</p>
     `;
     
     console.log('🔍 [DEBUG] Email details:', {
@@ -219,7 +219,7 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
 
     const response: ApiResponse<AuthResponse> = {
       success: true,
-      message: "Email verified successfully! Welcome to Proxima!",
+      message: "Email verified successfully! Welcome to Sartthi!",
       data: {
         user: user.toJSON() as any,
         accessToken,
@@ -341,14 +341,14 @@ export const resendEmailOTP = async (req: Request, res: Response): Promise<void>
     await user.save();
 
     // Send new OTP email
-    const emailSubject = 'Proxima: Your New Email Verification OTP';
+    const emailSubject = 'Sartthi: Your New Email Verification OTP';
     const emailHtml = `
       <p>Hello ${user.fullName},</p>
-      <p>You recently requested a new One-Time Password (OTP) to verify your email address for Proxima:</p>
+      <p>You recently requested a new One-Time Password (OTP) to verify your email address for Sartthi:</p>
       <h3>${newOtp}</h3>
       <p>This OTP is valid for 10 minutes. If you did not request this, please ignore this email.</p>
       <p>Best regards,</p>
-      <p>The Proxima Team</p>
+      <p>The Sartthi Team</p>
     `;
     await sendEmail({
       to: email,
@@ -437,18 +437,18 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     try {
       await sendEmail({
         to: user.email,
-        subject: 'Proxima: Login Verification Code',
+        subject: 'Sartthi: Login Verification Code',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #333;">Login Verification</h2>
             <p>Hello ${user.fullName},</p>
-            <p>You're attempting to log in to your Proxima account. Please use the following verification code:</p>
+            <p>You're attempting to log in to your Sartthi account. Please use the following verification code:</p>
             <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
               <h1 style="color: #f59e0b; font-size: 32px; margin: 0; letter-spacing: 4px;">${loginOtp}</h1>
             </div>
             <p>This code will expire in 10 minutes.</p>
             <p>If you didn't request this login, please ignore this email.</p>
-            <p>Best regards,<br>The Proxima Team</p>
+            <p>Best regards,<br>The Sartthi Team</p>
           </div>
         `,
       });
@@ -839,7 +839,7 @@ export const googleAuth = async (
     const response: ApiResponse<AuthResponse> = {
       success: true,
       message: isRegistration
-        ? "Registration successful! Welcome to Proxima!"
+        ? "Registration successful! Welcome to Sartthi!"
         : "Google authentication successful",
       data: {
         user: user.toJSON() as any,

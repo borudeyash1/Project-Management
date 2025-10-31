@@ -54,7 +54,7 @@ const generateFingerprint = async (): Promise<string> => {
     ctx.fillStyle = '#f60';
     ctx.fillRect(125, 1, 62, 20);
     ctx.fillStyle = '#069';
-    ctx.fillText('TaskFlowHQ', 2, 15);
+    ctx.fillText('Sartthi', 2, 15);
     components.push(canvas.toDataURL());
   }
 

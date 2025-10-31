@@ -75,7 +75,7 @@ const DeviceAccessDenied: React.FC<DeviceAccessDeniedProps> = ({ deviceId }) => 
         {/* Footer */}
         <div className={`text-center mt-6 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
           <Shield className="w-4 h-4 inline mr-1" />
-          Protected by TaskFlowHQ Security
+          Protected by Sartthi Security
         </div>
       </div>
     </div>

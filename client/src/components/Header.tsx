@@ -60,7 +60,7 @@ const Header: React.FC = () => {
             TF
           </div>
           <div className="hidden sm:block">
-            <div className="text-sm font-semibold tracking-tight dark:text-gray-100">Saarthi</div>
+            <div className="text-sm font-semibold tracking-tight dark:text-gray-100">Sartthi</div>
             <div className="text-xs text-slate-500 dark:text-gray-400">Project & Payroll Suite</div>
           </div>
         </div>

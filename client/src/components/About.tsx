@@ -35,7 +35,7 @@ const About: React.FC = () => {
               ABOUT US
             </span>
             <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Saarthi</span>
+              About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Sartthi</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               We're building the future of project management, one feature at a time.
@@ -51,7 +51,7 @@ const About: React.FC = () => {
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed`}>
-              At Saarthi, we believe that great projects start with great tools. Our mission is to simplify project management 
+              At Sartthi, we believe that great projects start with great tools. Our mission is to simplify project management 
               and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable 
               solutions that help teams collaborate effectively and achieve their goals.
             </p>
@@ -105,7 +105,7 @@ const About: React.FC = () => {
                 <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-lg flex items-center justify-center shadow-lg`}>
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose Saarthi</h3>
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose Sartthi</h3>
               </div>
               <ul className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
@@ -151,7 +151,7 @@ const About: React.FC = () => {
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Team</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
-              Saarthi is built by a passionate team of developers, designers, and project management experts 
+              Sartthi is built by a passionate team of developers, designers, and project management experts 
               who understand the challenges of modern team collaboration. We're constantly working to improve 
               our platform and add new features based on user feedback.
             </p>

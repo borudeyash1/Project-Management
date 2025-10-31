@@ -932,7 +932,7 @@ const Auth: React.FC = () => {
               </div>
               <div>
                 <div className={`text-xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  TaskFlowHQ
+                  Sartthi
                 </div>
                 <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                   Project & Payroll Suite

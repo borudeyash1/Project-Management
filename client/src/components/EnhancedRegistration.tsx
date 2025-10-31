@@ -476,7 +476,7 @@ const EnhancedRegistration: React.FC = () => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         dispatch({ type: 'SET_USER', payload: response.user });
-        showToast('Registration successful! Welcome to TaskFlowHQ!', 'success');
+        showToast('Registration successful! Welcome to Sartthi!', 'success');
         navigate('/home');
 
       } else {
@@ -1308,7 +1308,7 @@ const EnhancedRegistration: React.FC = () => {
                 TF
               </div>
               <div>
-                <div className="text-base font-semibold tracking-tight">TaskFlowHQ</div>
+                <div className="text-base font-semibold tracking-tight">Sartthi</div>
                 <div className="text-xs text-slate-500">Project & Payroll Suite</div>
               </div>
             </div>
