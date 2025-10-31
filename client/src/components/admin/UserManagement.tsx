@@ -8,6 +8,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import api from '../../services/api';
+import AdminDockNavigation from './AdminDockNavigation';
 
 interface User {
   _id: string;
@@ -588,6 +589,9 @@ const UserManagement: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };

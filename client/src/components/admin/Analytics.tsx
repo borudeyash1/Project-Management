@@ -7,6 +7,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
+import AdminDockNavigation from './AdminDockNavigation';
 import api from '../../services/api';
 
 interface AnalyticsData {
@@ -366,6 +367,9 @@ const Analytics: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };

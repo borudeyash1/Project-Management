@@ -14,6 +14,7 @@ interface Release {
   fileSize: number;
   downloadUrl: string;
   isLatest: boolean;
+  createdAt: string;
 }
 
 const SharedNavbar: React.FC = () => {
@@ -50,9 +51,16 @@ const SharedNavbar: React.FC = () => {
   const fetchReleases = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/releases?latest=true');
+      // Fetch ALL releases, not just latest
+      const response = await api.get('/releases');
       if (response?.success) {
-        setReleases(response.data);
+        // Sort releases: latest first, then by date
+        const sortedReleases = response.data.sort((a: Release, b: Release) => {
+          if (a.isLatest && !b.isLatest) return -1;
+          if (!a.isLatest && b.isLatest) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setReleases(sortedReleases);
       }
     } catch (error) {
       console.error('Failed to fetch releases:', error);
@@ -156,36 +164,74 @@ const SharedNavbar: React.FC = () => {
                         </div>
                       ) : (
                         <div className="py-2">
-                          {releases.map((release) => (
-                            <button
-                              key={release._id}
-                              onClick={() => handleDownload(release)}
-                              className={`w-full px-4 py-3 flex items-center gap-3 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
-                            >
-                              <div className="flex-shrink-0">
-                                {getPlatformIcon(release.platform)}
+                          {/* Latest Releases Section */}
+                          {releases.some(r => r.isLatest) && (
+                            <>
+                              <div className={`px-4 py-2 text-xs font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} uppercase tracking-wider`}>
+                                Latest Releases
                               </div>
-                              <div className="flex-1 text-left">
-                                <div className="flex items-center gap-2">
-                                  <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} capitalize`}>
-                                    {release.platform}
-                                  </p>
-                                  {release.isLatest && (
-                                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-500/10 text-green-500">
-                                      Latest
-                                    </span>
-                                  )}
-                                </div>
-                                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  {release.versionName} • v{release.version}
-                                </p>
-                                <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-0.5`}>
-                                  {release.architecture} • {formatFileSize(release.fileSize)}
-                                </p>
+                              {releases.filter(r => r.isLatest).map((release) => (
+                                <button
+                                  key={release._id}
+                                  onClick={() => handleDownload(release)}
+                                  className={`w-full px-4 py-3 flex items-center gap-3 ${isDarkMode ? 'hover:bg-gray-700 bg-green-500/5' : 'hover:bg-gray-50 bg-green-50'} transition-colors border-l-2 border-green-500`}
+                                >
+                                  <div className="flex-shrink-0">
+                                    {getPlatformIcon(release.platform)}
+                                  </div>
+                                  <div className="flex-1 text-left">
+                                    <div className="flex items-center gap-2">
+                                      <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} capitalize`}>
+                                        {release.platform}
+                                      </p>
+                                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-500 text-white">
+                                        Latest
+                                      </span>
+                                    </div>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                      {release.versionName} • v{release.version}
+                                    </p>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-0.5`}>
+                                      {release.architecture} • {formatFileSize(release.fileSize)}
+                                    </p>
+                                  </div>
+                                  <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                </button>
+                              ))}
+                            </>
+                          )}
+
+                          {/* Previous Releases Section */}
+                          {releases.some(r => !r.isLatest) && (
+                            <>
+                              <div className={`px-4 py-2 mt-2 text-xs font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} uppercase tracking-wider`}>
+                                Previous Releases
                               </div>
-                              <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                            </button>
-                          ))}
+                              {releases.filter(r => !r.isLatest).map((release) => (
+                                <button
+                                  key={release._id}
+                                  onClick={() => handleDownload(release)}
+                                  className={`w-full px-4 py-3 flex items-center gap-3 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
+                                >
+                                  <div className="flex-shrink-0">
+                                    {getPlatformIcon(release.platform)}
+                                  </div>
+                                  <div className="flex-1 text-left">
+                                    <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} capitalize`}>
+                                      {release.platform}
+                                    </p>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                      {release.versionName} • v{release.version}
+                                    </p>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-0.5`}>
+                                      {release.architecture} • {formatFileSize(release.fileSize)}
+                                    </p>
+                                  </div>
+                                  <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                </button>
+                              ))}
+                            </>
+                          )}
                         </div>
                       )}
                     </div>

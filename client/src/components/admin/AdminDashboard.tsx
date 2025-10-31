@@ -4,6 +4,7 @@ import { Shield, Users, Activity, Settings, LogOut, AlertTriangle } from 'lucide
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
+import AdminDockNavigation from './AdminDockNavigation';
 
 const AdminDashboard: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -314,6 +315,9 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };
