@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, MotionValue } from 'framer-motion';
+import { ProgressiveBlur } from './progressive-blur';
 
 interface DockProps {
   children: React.ReactNode;
@@ -20,8 +21,13 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
 
   return (
     <>
-      {/* Backdrop Blur Area */}
-      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/10 via-black/5 to-transparent dark:from-black/30 dark:via-black/15 backdrop-blur-sm pointer-events-none z-40" />
+      {/* Progressive Blur Background */}
+      <div className="fixed bottom-0 left-0 right-0 h-40 pointer-events-none z-40">
+        <ProgressiveBlur 
+          position="bottom" 
+          height="100%"
+        />
+      </div>
       
       {/* Dock Container */}
       <div 
