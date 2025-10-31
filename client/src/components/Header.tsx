@@ -4,6 +4,8 @@ import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
 import WorkspaceModeSwitcher from './WorkspaceModeSwitcher';
 import UserDisplay from './UserDisplay';
+import { AnimatedThemeToggler } from './ui/animated-theme-toggler';
+import { SparklesText } from './ui/sparkles-text';
 import {
   Search,
   Bell,
@@ -48,6 +50,9 @@ const Header: React.FC = () => {
   return (
     <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-700 flex items-center justify-between px-4 sm:px-6">
       <div className="flex items-center gap-3">
+        {/* Theme Toggle */}
+        <AnimatedThemeToggler />
+        
         <button
           className="p-2 rounded-lg border border-border dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 md:hidden"
           onClick={toggleSidebar}
@@ -57,10 +62,12 @@ const Header: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
-            TF
+            S
           </div>
           <div className="hidden sm:block">
-            <div className="text-sm font-semibold tracking-tight dark:text-gray-100">Saarthi</div>
+            <div className="text-sm font-semibold tracking-tight dark:text-gray-100">
+              <SparklesText>Saarthi</SparklesText>
+            </div>
             <div className="text-xs text-slate-500 dark:text-gray-400">Project & Payroll Suite</div>
           </div>
         </div>
