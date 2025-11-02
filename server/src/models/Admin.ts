@@ -10,7 +10,7 @@ export interface IAdmin extends Document {
   googleId?: string;
   avatar?: string;
   lastLogin?: Date;
-  loginMethod: 'email' | 'google';
+  loginMethod: 'email' | 'google' | 'both';
   loginOtp?: string;
   loginOtpExpiry?: Date;
   createdAt: Date;
@@ -59,7 +59,7 @@ const adminSchema = new Schema<IAdmin>({
   },
   loginMethod: {
     type: String,
-    enum: ['email', 'google'],
+    enum: ['email', 'google', 'both'],
     required: true
   },
   loginOtp: {
