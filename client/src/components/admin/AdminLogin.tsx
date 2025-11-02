@@ -59,7 +59,7 @@ const AdminLogin: React.FC = () => {
         localStorage.setItem('adminData', JSON.stringify(response.data.admin));
         
         console.log('✅ [ADMIN LOGIN] Login successful!');
-        addToast('Welcome back, Admin!', 'success');
+        addToast(`Welcome back, ${response.data.admin.name}! 🎉`, 'success');
         
         navigate('/admin/dashboard');
       } else {
@@ -116,7 +116,7 @@ const AdminLogin: React.FC = () => {
         localStorage.setItem('adminData', JSON.stringify(response.data.admin));
         
         console.log('✅ [ADMIN OTP] Verification successful!');
-        addToast('Welcome back, Admin!', 'success');
+        addToast(`Welcome back, ${response.data.admin.name}! 🎉`, 'success');
         
         navigate('/admin/dashboard');
       } else {
@@ -156,7 +156,7 @@ const AdminLogin: React.FC = () => {
         localStorage.setItem('adminData', JSON.stringify(response.data.admin));
         
         console.log('✅ [ADMIN GOOGLE] Login successful!');
-        addToast('Welcome back, Admin!', 'success');
+        addToast(`Welcome back, ${response.data.admin.name}! 🎉`, 'success');
         
         navigate('/admin/dashboard');
       } else {
@@ -174,15 +174,19 @@ const AdminLogin: React.FC = () => {
   return (
     <div className={`min-h-screen flex ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'}`}>
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className={`absolute inset-0 ${isDarkMode ? 'bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900' : 'bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500'}`}>
-          <div className="absolute inset-0 bg-black/20"></div>
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500">
+        {/* Decorative Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
         </div>
         
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse animation-delay-500"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl animate-pulse animation-delay-500"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
         </div>
 
         <div className="relative z-10 p-12 flex flex-col justify-center">
@@ -224,7 +228,7 @@ const AdminLogin: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Logo for mobile */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <div className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold bg-gradient-to-br from-yellow-500 to-orange-500 shadow-lg">
+            <div className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold bg-gradient-to-br from-purple-600 to-cyan-500 shadow-lg">
               <Shield className="w-6 h-6" />
             </div>
             <div>
@@ -244,7 +248,7 @@ const AdminLogin: React.FC = () => {
               onSubmit={handleAdminLogin}
             >
               <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 mb-4 shadow-xl">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 mb-4 shadow-xl">
                   <Lock className="w-8 h-8 text-white" />
                 </div>
                 <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
@@ -265,7 +269,7 @@ const AdminLogin: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full rounded-xl border ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-slate-400'} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
+                  className={`w-full rounded-xl border ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-slate-400'} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transition-all duration-200`}
                   placeholder="admin@taskflowhq.com"
                   required
                 />
@@ -282,7 +286,7 @@ const AdminLogin: React.FC = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className={`w-full rounded-xl border ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-slate-400'} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
+                    className={`w-full rounded-xl border ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-slate-400'} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transition-all duration-200`}
                     placeholder="••••••••"
                     required
                   />
@@ -303,7 +307,7 @@ const AdminLogin: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
@@ -361,7 +365,7 @@ const AdminLogin: React.FC = () => {
                     value={digit}
                     onChange={(e) => handleOtpChange(e.target, index)}
                     onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                    className={`w-14 h-14 text-center text-xl font-bold border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200`}
+                    className={`w-14 h-14 text-center text-xl font-bold border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700/50 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200`}
                     autoComplete="off"
                   />
                 ))}
@@ -371,7 +375,7 @@ const AdminLogin: React.FC = () => {
                 type="button"
                 onClick={handleOtpVerification}
                 disabled={loading || otp.join('').length !== 6}
-                className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
               >
                 {loading ? "Verifying..." : "Verify & Continue"}
               </button>

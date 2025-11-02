@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Info, BookOpen, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
+import sartthi_logo from '../images/sartthi_logo.jpg';
 
 interface Release {
   _id: string;
@@ -34,6 +35,7 @@ const SharedNavbar: React.FC = () => {
     if (showDownloadMenu && releases.length === 0) {
       fetchReleases();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDownloadMenu]);
 
   // Close dropdown when clicking outside
@@ -96,8 +98,16 @@ const SharedNavbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Link to="/" className={`text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>
-                Sartthi
+              <Link to="/" className="flex items-center gap-3">
+                <img src={sartthi_logo} alt="Sartthi Logo" className="h-10 w-auto rounded-lg shadow-md" />
+                <div className="flex flex-col">
+                  <span className={`text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>
+                    Sartthi
+                  </span>
+                  <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} -mt-1`}>
+                    Project & Payroll Suite
+                  </span>
+                </div>
               </Link>
             </div>
           </div>

@@ -83,19 +83,23 @@ const AdminDashboard: React.FC = () => {
   const handleLogout = () => {
     console.log('🔒 [ADMIN] Logging out...');
     
+    // Get admin name before clearing
+    const adminName = adminData?.name || 'Admin';
+    
     // Clear all admin session data
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
+    localStorage.removeItem('accessToken');
     
-    // Clear any admin-related session storage
-    sessionStorage.clear();
+    console.log('✅ [ADMIN] Session cleared, redirecting to login...');
     
     // Show success message
-    addToast('Logged out successfully', 'success');
+    addToast(`Goodbye ${adminName}! You've been logged out successfully.`, 'success');
     
-    console.log('✅ [ADMIN] Session ended, redirecting to login');
+    // Close the modal
+    setShowLogoutConfirm(false);
     
-    // Redirect to login page
+    // Redirect to admin login
     navigate('/my-admin/login', { replace: true });
   };
 

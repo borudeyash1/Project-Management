@@ -36,16 +36,35 @@ const AdminDockNavigation: React.FC = () => {
   };
 
   const handleLogout = () => {
-    console.log('🔒 [ADMIN DOCK] Logging out...');
+    console.log(' [ADMIN DOCK] Logging out...');
+    
+    // Get admin name before clearing
+    const adminData = localStorage.getItem('adminData');
+    let adminName = 'Admin';
+    if (adminData) {
+      try {
+        const parsed = JSON.parse(adminData);
+        adminName = parsed.name || 'Admin';
+      } catch (e) {
+        console.error('Failed to parse admin data:', e);
+      }
+    }
     
     // Clear all admin session data from localStorage
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
+    localStorage.removeItem('accessToken');
     
-    // Clear any admin-related session storage
-    sessionStorage.clear();
+    console.log(' [ADMIN DOCK] Session cleared, redirecting to login...');
     
-    console.log('✅ [ADMIN DOCK] Session cleared, redirecting to login');
+    // Show success message
+    const toastEvent = new CustomEvent('showToast', {
+      detail: {
+        message: `Goodbye ${adminName}! You've been logged out successfully.`,
+        type: 'success'
+      }
+    });
+    window.dispatchEvent(toastEvent);
     
     // Redirect to admin login
     navigate('/my-admin/login', { replace: true });

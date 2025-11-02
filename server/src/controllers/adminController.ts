@@ -258,8 +258,8 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    // Check if admin uses email login method
-    if (admin.loginMethod !== 'email') {
+    // Check if admin uses email login method or both
+    if (admin.loginMethod !== 'email' && admin.loginMethod !== 'both') {
       console.log('❌ [ADMIN LOGIN] Admin uses different login method:', admin.loginMethod);
       res.status(401).json({
         success: false,
@@ -365,8 +365,8 @@ export const adminGoogleLogin = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Check if admin uses Google login
-    if (admin.loginMethod !== 'google') {
+    // Check if admin uses Google login or both
+    if (admin.loginMethod !== 'google' && admin.loginMethod !== 'both') {
       console.log('❌ [ADMIN GOOGLE LOGIN] Admin uses different login method:', admin.loginMethod);
       res.status(401).json({
         success: false,
