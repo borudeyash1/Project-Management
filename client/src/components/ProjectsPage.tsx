@@ -9,6 +9,9 @@ import {
 import { useApp } from '../context/AppContext';
 import { WorkspaceCreationRestriction } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
+import CreateProjectModal from './CreateProjectModal';
 
 interface Project {
   _id: string;
@@ -42,6 +45,8 @@ interface Project {
 const ProjectsPage: React.FC = () => {
   const { state, dispatch } = useApp();
   const { canCreateProject } = useFeatureAccess();
+  const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,6 +56,7 @@ const ProjectsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'name' | 'progress' | 'dueDate' | 'created'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showFilters, setShowFilters] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -252,29 +258,62 @@ const ProjectsPage: React.FC = () => {
     return diffDays;
   };
 
+  const handleCreateProject = (projectData: any) => {
+    // Add new project to the list
+    const newProject: Project = {
+      _id: Date.now().toString(),
+      ...projectData,
+      progress: 0,
+      team: [],
+      owner: {
+        _id: state.userProfile?._id || 'current-user',
+        name: state.userProfile?.fullName || 'Current User'
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    setProjects([newProject, ...projects]);
+    dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project created successfully!' } });
+  };
+
+  const handleViewProject = (projectId: string) => {
+    navigate(`/project-view/${projectId}`);
+  };
+
+  const handleEditProject = (projectId: string) => {
+    navigate(`/project-view/${projectId}`);
+  };
+
   return (
-    <div className="h-full bg-gray-50">
+    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
-            <p className="text-gray-600 mt-1">Manage and track your projects</p>
+            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Projects</h1>
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Manage and track your projects</p>
           </div>
           <div className="flex items-center gap-3">
-            <WorkspaceCreationRestriction>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            {canCreateProject() ? (
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 <Plus className="w-4 h-4" />
                 New Project
               </button>
-            </WorkspaceCreationRestriction>
+            ) : (
+              <WorkspaceCreationRestriction>
+                <div />
+              </WorkspaceCreationRestriction>
+            )}
           </div>
         </div>
       </div>
 
       <div className="p-6">
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4 mb-6`}>
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
@@ -284,7 +323,11 @@ const ProjectsPage: React.FC = () => {
                 placeholder="Search projects..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
               />
             </div>
 
@@ -293,7 +336,11 @@ const ProjectsPage: React.FC = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
               >
                 <option value="all">All Status</option>
                 <option value="planning">Planning</option>
@@ -306,7 +353,11 @@ const ProjectsPage: React.FC = () => {
               <select
                 value={selectedPriority}
                 onChange={(e) => setSelectedPriority(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
               >
                 <option value="all">All Priority</option>
                 <option value="urgent">Urgent</option>
@@ -322,7 +373,11 @@ const ProjectsPage: React.FC = () => {
                   setSortBy(field as any);
                   setSortOrder(order as any);
                 }}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
               >
                 <option value="name-asc">Name A-Z</option>
                 <option value="name-desc">Name Z-A</option>
@@ -445,11 +500,25 @@ const ProjectsPage: React.FC = () => {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                  <button 
+                    onClick={() => handleViewProject(project._id)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
+                      isDarkMode
+                        ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
+                        : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
                     <Eye className="w-4 h-4" />
                     View
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                  <button 
+                    onClick={() => handleEditProject(project._id)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
+                      isDarkMode
+                        ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
+                        : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
                     <Edit className="w-4 h-4" />
                     Edit
                   </button>
@@ -560,17 +629,22 @@ const ProjectsPage: React.FC = () => {
         {/* Empty State */}
         {filteredProjects.length === 0 && (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Target className="w-8 h-8 text-gray-400" />
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+            }`}>
+              <Target className={`w-8 h-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`} />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>No projects found</h3>
+            <p className={`mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {searchTerm || selectedStatus !== 'all' || selectedPriority !== 'all'
                 ? 'Try adjusting your filters to see more projects.'
                 : 'Get started by creating your first project.'}
             </p>
             {canCreateProject() && (
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
                 <Plus className="w-4 h-4" />
                 Create Project
               </button>
@@ -578,6 +652,13 @@ const ProjectsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={handleCreateProject}
+      />
     </div>
   );
 };

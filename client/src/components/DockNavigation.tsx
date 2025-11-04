@@ -96,6 +96,33 @@ const DockNavigation: React.FC = () => {
           );
         })}
 
+        {/* Project Icons - Show personal and workspace projects */}
+        {state.projects.slice(0, 3).map((project) => (
+          <DockIcon
+            key={project._id}
+            onClick={() => {
+              navigate(`/project-view/${project._id}`);
+            }}
+            active={location.pathname === `/project-view/${project._id}`}
+            tooltip={project.name}
+          >
+            <FolderOpen className="w-5 h-5" />
+          </DockIcon>
+        ))}
+
+        {/* More Projects if > 3 */}
+        {state.projects.length > 3 && (
+          <DockIcon
+            onClick={() => navigate('/projects')}
+            tooltip={`${state.projects.length - 3} more projects`}
+          >
+            <FolderOpen className="w-5 h-5" />
+            <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              +{state.projects.length - 3}
+            </span>
+          </DockIcon>
+        )}
+
         {/* Workspace Icons - Show all joined/created workspaces */}
         {state.workspaces.slice(0, 3).map((workspace) => (
           <DockIcon
