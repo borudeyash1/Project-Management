@@ -28,7 +28,6 @@ import {
   Bot
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import CreateProjectModal from './CreateProjectModal';
 import CreateAIProjectModal from './CreateAIProjectModal';
 import ClientModal from './ClientModal';
 import InviteEmployeeModal from './InviteEmployeeModal';
@@ -741,7 +740,6 @@ const WorkspaceOwner: React.FC = () => {
       </div>
 
       {/* Modals */}
-      <CreateProjectModal />
       <CreateAIProjectModal 
         isOpen={showAICreateProject}
         onClose={() => setShowAICreateProject(false)}

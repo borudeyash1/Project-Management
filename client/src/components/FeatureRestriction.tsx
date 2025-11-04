@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import PricingModal from './PricingModal';
+import { useTheme } from '../context/ThemeContext';
 
 interface FeatureRestrictionProps {
   feature: string;
@@ -58,53 +59,23 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
   }
   
   if (!showUpgradePrompt) {
-    return (
-      <div className={`opacity-50 pointer-events-none ${className}`}>
-        {children}
-      </div>
-    );
+    return null; // Don't show anything if feature is restricted
   }
   
+  // For button-level restrictions, just disable the button
   return (
     <>
-      <div className={`relative ${className}`}>
-        {/* Blurred content */}
-        <div className="opacity-50 pointer-events-none">
-          {children}
-        </div>
-        
-        {/* Overlay with upgrade prompt */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className={`max-w-sm mx-auto p-6 rounded-xl border-2 ${getPlanColor(requiredPlan)}`}>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-4">
-                {getPlanIcon(requiredPlan)}
-                <Lock className="w-5 h-5 text-gray-500 ml-2" />
-              </div>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {requiredPlan === 'pro' ? 'Pro Feature' : 'Ultra Feature'}
-              </h3>
-              
-              <p className="text-sm text-gray-600 mb-4">
-                {getUpgradeMessage(feature)}
-              </p>
-              
-              <button
-                onClick={() => setShowPricingModal(true)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white transition-colors ${
-                  requiredPlan === 'pro' 
-                    ? 'bg-blue-600 hover:bg-blue-700' 
-                    : 'bg-purple-600 hover:bg-purple-700'
-                }`}
-              >
-                Upgrade to {requiredPlan === 'pro' ? 'Pro' : 'Ultra'}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <button
+        onClick={() => setShowPricingModal(true)}
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+          requiredPlan === 'pro' 
+            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+            : 'bg-purple-600 hover:bg-purple-700 text-white'
+        } ${className}`}
+      >
+        {getPlanIcon(requiredPlan)}
+        <span>Upgrade to {requiredPlan === 'pro' ? 'Pro' : 'Ultra'}</span>
+      </button>
       
       {showPricingModal && (
         <PricingModal 
@@ -150,20 +121,29 @@ export const WhiteLabelingRestriction: React.FC<{ children: React.ReactNode }> =
 // Component to show plan status and limits
 export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { userPlan, getPlanComparison } = useFeatureAccess();
+  const { isDarkMode } = useTheme();
   const [showPricingModal, setShowPricingModal] = React.useState(false);
   
   const planInfo = getPlanComparison();
   
   const getPlanIcon = (plan: string) => {
     switch (plan) {
-      case 'free': return <Star className="w-4 h-4 text-gray-500" />;
+      case 'free': return <Star className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />;
       case 'pro': return <Zap className="w-4 h-4 text-blue-500" />;
       case 'ultra': return <Crown className="w-4 h-4 text-purple-500" />;
-      default: return <Star className="w-4 h-4 text-gray-500" />;
+      default: return <Star className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />;
     }
   };
   
   const getPlanColor = (plan: string) => {
+    if (isDarkMode) {
+      switch (plan) {
+        case 'free': return 'text-gray-400 bg-gray-700';
+        case 'pro': return 'text-blue-400 bg-blue-900/50';
+        case 'ultra': return 'text-purple-400 bg-purple-900/50';
+        default: return 'text-gray-400 bg-gray-700';
+      }
+    }
     switch (plan) {
       case 'free': return 'text-gray-600 bg-gray-100';
       case 'pro': return 'text-blue-600 bg-blue-100';
@@ -174,23 +154,31 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
   
   return (
     <>
-      <div className={`flex items-center gap-3 p-3 rounded-lg border ${className}`}>
+      <div className={`flex items-center gap-3 p-4 rounded-lg border ${
+        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+      } ${className}`}>
         <div className={`p-2 rounded-lg ${getPlanColor(userPlan)}`}>
           {getPlanIcon(userPlan)}
         </div>
         
         <div className="flex-1">
           <div className="flex items-center justify-between">
-            <h4 className="font-medium text-gray-900 capitalize">{userPlan} Plan</h4>
-            <button
-              onClick={() => setShowPricingModal(true)}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Upgrade
-            </button>
+            <h4 className={`font-medium capitalize ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>{userPlan} Plan</h4>
+            {userPlan !== 'ultra' && (
+              <button
+                onClick={() => setShowPricingModal(true)}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Upgrade
+              </button>
+            )}
           </div>
           
-          <div className="text-xs text-gray-600 mt-1">
+          <div className={`text-xs mt-1 ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+          }`}>
             {planInfo.limits.workspaces === -1 ? 'Unlimited' : planInfo.limits.workspaces} workspaces • 
             {planInfo.limits.projects === -1 ? 'Unlimited' : planInfo.limits.projects} projects • 
             {planInfo.limits.teamMembers === -1 ? 'Unlimited' : planInfo.limits.teamMembers} members

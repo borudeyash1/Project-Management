@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { 
   ChevronDown, ChevronRight, Users, Calendar, Clock, Target, 
   BarChart3, MessageSquare, Settings, Plus, Filter, Search,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useTheme } from '../context/ThemeContext';
 
 interface Project {
   _id: string;
@@ -171,8 +173,10 @@ interface TeamMemberPermissions {
 }
 
 const ProjectViewDetailed: React.FC = () => {
+  const { projectId } = useParams<{ projectId: string }>();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
+  const { isDarkMode } = useTheme();
   
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -183,6 +187,16 @@ const ProjectViewDetailed: React.FC = () => {
   const [showTeamManagement, setShowTeamManagement] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview', 'team']));
+
+  // Load project data based on URL parameter
+  useEffect(() => {
+    if (projectId && projects.length > 0) {
+      const project = projects.find(p => p._id === projectId);
+      if (project) {
+        setActiveProject(project);
+      }
+    }
+  }, [projectId, projects]);
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -436,11 +450,49 @@ const ProjectViewDetailed: React.FC = () => {
     </div>
   );
 
+  const renderTabNavigation = () => {
+    const tabs = [
+      { id: 'overview', label: 'Overview', icon: LayoutGrid },
+      { id: 'tasks', label: 'Tasks', icon: CheckCircle },
+      { id: 'timeline', label: 'Timeline', icon: Calendar },
+      { id: 'team', label: 'Team', icon: Users },
+      { id: 'documents', label: 'Documents', icon: FileText },
+      { id: 'analytics', label: 'Analytics', icon: BarChart3 }
+    ];
+
+    return (
+      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
+        <nav className="flex space-x-8 px-6">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveView(tab.id as any)}
+                className={`flex items-center gap-2 py-4 border-b-2 font-medium transition-colors ${
+                  activeView === tab.id
+                    ? 'border-blue-600 text-blue-600'
+                    : isDarkMode
+                    ? 'border-transparent text-gray-400 hover:text-gray-300'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    );
+  };
+
   const renderProjectOverview = () => (
-    <div className="space-y-6">
-      {/* Project Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+  <div className="space-y-6">
+    {/* Project Stats */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="bg-white p-6 rounded-lg border border-gray-200">
+        {/* ... */}
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Progress</p>
@@ -817,8 +869,9 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {renderProjectHeader()}
+      {renderTabNavigation()}
       
       <div className="flex flex-1 overflow-hidden">
         {/* Main Content */}

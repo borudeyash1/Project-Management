@@ -55,7 +55,6 @@ import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
 import CreateWorkspaceModal from './components/CreateWorkspaceModal';
-import CreateProjectModal from './components/CreateProjectModal';
 import WorkloadDeadlineModal from './components/WorkloadDeadlineModal';
 import TaskDetailsModal from './components/TaskDetailsModal';
 import TaskRatingModal from './components/TaskRatingModal';
@@ -317,7 +316,6 @@ const AppContent: React.FC = () => {
         isOpen={state.modals.createWorkspace} 
         onClose={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' })} 
       />
-      <CreateProjectModal />
       <WorkloadDeadlineModal />
       <TaskDetailsModal />
       <TaskRatingModal />

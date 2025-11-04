@@ -35,14 +35,14 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
   const getBackgroundColor = () => {
     switch (toast.type) {
       case 'success':
-        return isDarkMode ? 'bg-green-900/90 border-green-700' : 'bg-green-50 border-green-200';
+        return isDarkMode ? 'bg-green-800 border-green-600' : 'bg-green-50 border-green-200';
       case 'error':
-        return isDarkMode ? 'bg-red-900/90 border-red-700' : 'bg-red-50 border-red-200';
+        return isDarkMode ? 'bg-red-800 border-red-600' : 'bg-red-50 border-red-200';
       case 'warning':
-        return isDarkMode ? 'bg-yellow-900/90 border-yellow-700' : 'bg-yellow-50 border-yellow-200';
+        return isDarkMode ? 'bg-yellow-800 border-yellow-600' : 'bg-yellow-50 border-yellow-200';
       case 'info':
       default:
-        return isDarkMode ? 'bg-blue-900/90 border-blue-700' : 'bg-blue-50 border-blue-200';
+        return isDarkMode ? 'bg-blue-800 border-blue-600' : 'bg-blue-50 border-blue-200';
     }
   };
 
