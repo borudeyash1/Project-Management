@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useNavigate } from 'react-router-dom';
+import AddClientModal from '../AddClientModal';
 import {
   Search,
   Plus,
@@ -12,7 +14,8 @@ import {
   Briefcase,
   Building,
   User,
-  FolderKanban
+  FolderKanban,
+  X
 } from 'lucide-react';
 
 interface Client {
@@ -30,9 +33,12 @@ interface Client {
 }
 
 const WorkspaceClients: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showClientProjects, setShowClientProjects] = useState(false);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
@@ -193,10 +199,16 @@ const WorkspaceClients: React.FC = () => {
 
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <button
+                  onClick={() => {
+                    setSelectedClient(client);
+                    setShowClientProjects(true);
+                  }}
+                  className="flex items-center gap-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
                   <FolderKanban className="w-4 h-4" />
                   <span>{client.projectCount} Projects</span>
-                </div>
+                </button>
                 <div className="font-semibold text-green-600">
                   ${(client.totalRevenue / 1000).toFixed(0)}k
                 </div>
@@ -242,100 +254,90 @@ const WorkspaceClients: React.FC = () => {
         </div>
       )}
 
-      {/* Create Client Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Add New Client
-            </h2>
-            
-            <div className="space-y-4">
+      {/* Add Client Modal */}
+      <AddClientModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={(clientData) => {
+          // Handle client creation
+          dispatch({
+            type: 'ADD_TOAST',
+            payload: {
+              type: 'success',
+              message: `Client "${clientData.name}" added successfully!`
+            }
+          });
+        }}
+      />
+
+      {/* Client Projects Modal */}
+      {showClientProjects && selectedClient && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Client Name *
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter client name"
-                />
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                  {selectedClient.name} - Projects
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {selectedClient.company}
+                </p>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Company
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Company name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Contact Person
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Contact person name"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                    placeholder="client@example.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                    placeholder="+1 (555) 000-0000"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Address
-                </label>
-                <textarea
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Client address"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 mt-6">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Cancel
-              </button>
               <button
                 onClick={() => {
-                  // Handle create client
-                  setShowCreateModal(false);
+                  setShowClientProjects(false);
+                  setSelectedClient(null);
                 }}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
-                Add Client
+                <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
+            </div>
+
+            {/* Projects List */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-3">
+                {/* Mock projects for this client */}
+                {state.projects.filter(p => (p.client as any)?._id === selectedClient._id || p.client === selectedClient._id).length === 0 ? (
+                  <div className="text-center py-12">
+                    <FolderKanban className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                      No projects yet
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      This client doesn't have any projects assigned
+                    </p>
+                  </div>
+                ) : (
+                  state.projects
+                    .filter(p => (p.client as any)?._id === selectedClient._id || p.client === selectedClient._id)
+                    .map(project => (
+                      <div
+                        key={project._id}
+                        onClick={() => {
+                          navigate(`/project-view/${project._id}`);
+                          setShowClientProjects(false);
+                        }}
+                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md cursor-pointer transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                              {project.name}
+                            </h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              {project.description}
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            {project.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
             </div>
           </div>
         </div>

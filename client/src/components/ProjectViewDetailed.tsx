@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { 
   ChevronDown, ChevronRight, Users, Calendar, Clock, Target, 
   BarChart3, MessageSquare, Settings, Plus, Filter, Search,
-  Edit, Trash2, Eye, CheckCircle, AlertCircle, Star, Flag,
+  Edit, Trash2, Eye, CheckCircle, AlertCircle, Star, Flag, UserPlus,
   TrendingUp, Activity, FileText, Image, Link, Download,
   Upload, Share2, MoreVertical, Play, Pause, Square,
   Zap, Bot, Crown, Award, Trophy, Medal, Heart, Bookmark,
@@ -24,6 +24,8 @@ import {
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
+import AddTeamMemberModal from './AddTeamMemberModal';
+import InviteMemberModal from './InviteMemberModal';
 
 interface Project {
   _id: string;
@@ -185,6 +187,8 @@ const ProjectViewDetailed: React.FC = () => {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showManageProject, setShowManageProject] = useState(false);
   const [showTeamManagement, setShowTeamManagement] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [showInviteMemberModal, setShowInviteMemberModal] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview', 'team']));
 
@@ -697,14 +701,23 @@ const ProjectViewDetailed: React.FC = () => {
   const renderTeamSection = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Team Members</h3>
-        <button
-          onClick={() => setShowTeamManagement(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" />
-          Add Member
-        </button>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team Members</h3>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowInviteMemberModal(true)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+          >
+            <UserPlus className="w-4 h-4" />
+            Invite Member
+          </button>
+          <button
+            onClick={() => setShowAddMemberModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4" />
+            Add Member
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -868,6 +881,46 @@ const ProjectViewDetailed: React.FC = () => {
     }
   };
 
+  const handleAddTeamMember = (memberId: string, role: string) => {
+    // Mock implementation - replace with actual API call
+    const newMember: TeamMember = {
+      _id: memberId,
+      name: 'New Member', // This would come from the workspace member data
+      email: 'newmember@company.com',
+      role: role as any,
+      status: 'active',
+      joinedAt: new Date(),
+      permissions: {
+        canEditTasks: role === 'owner' || role === 'manager',
+        canCreateTasks: true,
+        canDeleteTasks: role === 'owner' || role === 'manager',
+        canManageTeam: role === 'owner',
+        canViewAnalytics: role === 'owner' || role === 'manager'
+      },
+      workload: 0,
+      tasksAssigned: 0,
+      tasksCompleted: 0,
+      rating: 0,
+      lastActive: new Date()
+    };
+
+    if (activeProject) {
+      setActiveProject({
+        ...activeProject,
+        team: [...activeProject.team, newMember]
+      });
+    }
+
+    setShowAddMemberModal(false);
+    dispatch({ 
+      type: 'ADD_TOAST', 
+      payload: { 
+        type: 'success', 
+        message: `Member added to project with role: ${role}` 
+      } 
+    });
+  };
+
   return (
     <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {renderProjectHeader()}
@@ -884,6 +937,32 @@ const ProjectViewDetailed: React.FC = () => {
         {/* Sidebar */}
         {renderSidebar()}
       </div>
+
+      {/* Add Team Member Modal */}
+      <AddTeamMemberModal
+        isOpen={showAddMemberModal}
+        onClose={() => setShowAddMemberModal(false)}
+        onAddMember={handleAddTeamMember}
+        currentTeamIds={activeProject?.team.map(m => m._id) || []}
+        workspaceId={state.currentWorkspace}
+      />
+
+      {/* Invite Member Modal */}
+      <InviteMemberModal
+        isOpen={showInviteMemberModal}
+        onClose={() => setShowInviteMemberModal(false)}
+        onInvite={(email, role, message) => {
+          // Handle invite logic here
+          dispatch({ 
+            type: 'ADD_TOAST', 
+            payload: { 
+              type: 'success', 
+              message: `Invitation sent to ${email} with role: ${role}` 
+            } 
+          });
+          setShowInviteMemberModal(false);
+        }}
+      />
     </div>
   );
 };
