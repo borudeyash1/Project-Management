@@ -30,9 +30,9 @@ const ProjectInternalNav: React.FC = () => {
   const { projectId } = useParams();
 
   const project = state.projects.find(p => p._id === projectId);
-  const isProjectManager = project?.teamMembers.some(
-    m => m.user === state.userProfile._id && m.role === 'project-manager'
-  );
+  const isProjectManager = project?.teamMembers?.some(
+    (m: any) => m.user === state.userProfile._id && (m.role === 'project-manager' || m.permissions?.canManageProject)
+  ) || false;
   const isOwner = state.workspaces.find(w => w._id === project?.workspace)?.owner === state.userProfile._id;
   const canManage = isProjectManager || isOwner;
 

@@ -27,6 +27,7 @@ import WorkspaceMembers from './components/workspace/WorkspaceMembers';
 import WorkspaceProjects from './components/workspace/WorkspaceProjects';
 import WorkspaceClients from './components/workspace/WorkspaceClients';
 import WorkspaceRequests from './components/workspace/WorkspaceRequests';
+import WorkspaceCollaborate from './components/workspace/WorkspaceCollaborate';
 import WorkspaceSettings from './components/workspace/WorkspaceSettings';
 import WorkspaceInbox from './components/workspace/WorkspaceInbox';
 import ProjectLayout from './components/project/ProjectLayout';
@@ -276,7 +277,7 @@ const AppContent: React.FC = () => {
           <Route path="projects" element={<WorkspaceProjects />} />
           <Route path="clients" element={<WorkspaceClients />} />
           <Route path="requests" element={<WorkspaceRequests />} />
-          <Route path="collaborate" element={<div className="p-6">Collaborate Page - Coming Soon</div>} />
+          <Route path="collaborate" element={<WorkspaceCollaborate />} />
           <Route path="advertise" element={<div className="p-6">Advertise Page - Coming Soon</div>} />
           <Route path="inbox" element={<WorkspaceInbox />} />
           <Route path="settings" element={<WorkspaceSettings />} />
@@ -329,8 +330,6 @@ const AppContent: React.FC = () => {
       <InviteEmployeeModal />
       <ClientModal />
       <RequestChangeModal />
-      <NotificationsPanel />
-      <TaskDrawer />
     </div>
   );
 };

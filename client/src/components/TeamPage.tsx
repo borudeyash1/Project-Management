@@ -9,6 +9,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import UserDisplay from './UserDisplay';
+import InviteMemberModal from './InviteMemberModal';
 
 interface TeamMember {
   _id: string;
@@ -1200,6 +1201,23 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Invite Member Modal */}
+      <InviteMemberModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onInvite={(email, role, message) => {
+          // Handle invite logic here
+          dispatch({ 
+            type: 'ADD_TOAST', 
+            payload: { 
+              type: 'success', 
+              message: `Invitation sent to ${email} with role: ${role}` 
+            } 
+          });
+          setShowInviteModal(false);
+        }}
+      />
     </div>
   );
 };
