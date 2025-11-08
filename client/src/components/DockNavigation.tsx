@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
@@ -14,7 +14,8 @@ import {
   Target,
   LogOut,
   Settings,
-  User
+  User,
+  Shield
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { apiService } from '../services/api';
@@ -32,18 +33,38 @@ const DockNavigation: React.FC = () => {
   const navigate = useNavigate();
   const [showWorkspaces, setShowWorkspaces] = useState(false);
 
-  const mainNavItems: NavItem[] = [
-    { id: 'home', label: 'Home', icon: Home, path: '/home' },
-    { id: 'projects', label: 'Projects', icon: FolderOpen, path: '/projects' },
-    { id: 'planner', label: 'Planner', icon: Calendar, path: '/planner' },
-    { id: 'tracker', label: 'Tracker', icon: Clock, path: '/tracker' },
-    { id: 'tasks', label: 'Tasks', icon: FileText, path: '/tasks' },
-    { id: 'reminders', label: 'Reminders', icon: Bell, path: '/reminders' },
-    { id: 'workspace', label: 'Workspace', icon: Building, path: '/workspace' },
-    { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports' },
-    { id: 'team', label: 'Team', icon: Users, path: '/team' },
-    { id: 'goals', label: 'Goals', icon: Target, path: '/goals' }
-  ];
+  // Check if user owns any workspace
+  const isWorkspaceOwner = useMemo(() => {
+    return state.workspaces.some(w => w.owner === state.userProfile._id);
+  }, [state.workspaces, state.userProfile._id]);
+
+  // Build main nav items dynamically
+  const mainNavItems: NavItem[] = useMemo(() => {
+    const items: NavItem[] = [
+      { id: 'home', label: 'Home', icon: Home, path: '/home' },
+      { id: 'projects', label: 'Projects', icon: FolderOpen, path: '/projects' },
+      { id: 'planner', label: 'Planner', icon: Calendar, path: '/planner' },
+      { id: 'tracker', label: 'Tracker', icon: Clock, path: '/tracker' },
+      { id: 'tasks', label: 'Tasks', icon: FileText, path: '/tasks' },
+      { id: 'reminders', label: 'Reminders', icon: Bell, path: '/reminders' },
+      { id: 'workspace', label: 'Workspace', icon: Building, path: '/workspace' },
+      { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports' },
+      { id: 'team', label: 'Team', icon: Users, path: '/team' },
+      { id: 'goals', label: 'Goals', icon: Target, path: '/goals' }
+    ];
+
+    // Add Manage Workspace tab if user owns any workspace
+    if (isWorkspaceOwner) {
+      items.push({
+        id: 'manage-workspace',
+        label: 'Manage Workspace',
+        icon: Shield,
+        path: '/manage-workspace'
+      });
+    }
+
+    return items;
+  }, [isWorkspaceOwner]);
 
   const handleItemClick = (item: NavItem) => {
     navigate(item.path);
@@ -95,33 +116,6 @@ const DockNavigation: React.FC = () => {
             </DockIcon>
           );
         })}
-
-        {/* Project Icons - Show personal and workspace projects */}
-        {state.projects.slice(0, 3).map((project) => (
-          <DockIcon
-            key={project._id}
-            onClick={() => {
-              navigate(`/project-view/${project._id}`);
-            }}
-            active={location.pathname === `/project-view/${project._id}`}
-            tooltip={project.name}
-          >
-            <FolderOpen className="w-5 h-5" />
-          </DockIcon>
-        ))}
-
-        {/* More Projects if > 3 */}
-        {state.projects.length > 3 && (
-          <DockIcon
-            onClick={() => navigate('/projects')}
-            tooltip={`${state.projects.length - 3} more projects`}
-          >
-            <FolderOpen className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              +{state.projects.length - 3}
-            </span>
-          </DockIcon>
-        )}
 
         {/* Workspace Icons - Show all joined/created workspaces */}
         {state.workspaces.slice(0, 3).map((workspace) => (

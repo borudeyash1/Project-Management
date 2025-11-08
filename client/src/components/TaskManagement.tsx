@@ -198,6 +198,7 @@ const TaskManagement: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [calendarDate, setCalendarDate] = useState(new Date());
   
   // Initialize tasks state with mock data
   useEffect(() => {
@@ -968,63 +969,187 @@ const mockColumns: Column[] = [
             </div>
           );
 
-  const renderTaskCalendar = () => (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Task Calendar</h2>
-        <div className="flex items-center gap-3">
-          <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-lg font-medium text-gray-900">March 2024</span>
-          <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="grid grid-cols-7 gap-px bg-gray-200">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
-              {day}
-            </div>
-          ))}
-        </div>
+  const renderTaskCalendar = () => {
+    const today = new Date();
+    
+    // Get first day of month and total days
+    const firstDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+    const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+    const startingDayOfWeek = firstDayOfMonth.getDay();
+    const daysInMonth = lastDayOfMonth.getDate();
+    
+    // Generate calendar days (including previous/next month days)
+    const calendarDays = [];
+    
+    // Previous month days
+    const prevMonthLastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 0).getDate();
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      calendarDays.push({
+        date: new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, prevMonthLastDay - i),
+        isCurrentMonth: false
+      });
+    }
+    
+    // Current month days
+    for (let i = 1; i <= daysInMonth; i++) {
+      calendarDays.push({
+        date: new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i),
+        isCurrentMonth: true
+      });
+    }
+    
+    // Next month days to fill the grid
+    const remainingDays = 35 - calendarDays.length;
+    for (let i = 1; i <= remainingDays; i++) {
+      calendarDays.push({
+        date: new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, i),
+        isCurrentMonth: false
+      });
+    }
+    
+    const navigateMonth = (direction: 'prev' | 'next') => {
+      const newDate = new Date(calendarDate);
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+      setCalendarDate(newDate);
+    };
+    
+    const goToToday = () => {
+      setCalendarDate(new Date());
+    };
+    
+    const isToday = (date: Date) => {
+      return date.toDateString() === today.toDateString();
+    };
+    
+    const getTasksForDate = (date: Date) => {
+      return tasks.filter(task => {
+        const taskDueDate = task.dueDate ? new Date(task.dueDate) : null;
+        const taskStartDate = task.startDate ? new Date(task.startDate) : null;
+        const dateStr = date.toDateString();
         
-        <div className="grid grid-cols-7 gap-px bg-gray-200">
-            {Array.from({ length: 35 }, (_, i) => {
-            const date = new Date(2024, 2, i - 6); // March 2024
-            const dayTasks = tasks.filter(task => 
-              (task.dueDate ? new Date(task.dueDate).toDateString() : '') === date.toDateString()
-            );
-            
-            return (
-              <div key={i} className="bg-white min-h-[100px] p-2">
-                <div className="text-sm text-gray-900 mb-1">{date.getDate()}</div>
-                <div className="space-y-1">
-                  {dayTasks.map(task => (
-                    <div
-                      key={task._id}
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setShowTaskModal(true);
-                      }}
-                      className="p-1 rounded text-xs cursor-pointer hover:bg-gray-100"
-                      style={{ backgroundColor: task.project.color + '20' }}
-                    >
-                      <div className="font-medium truncate">{task.title}</div>
-                      <div className="text-gray-600">{task.assignee.name}</div>
-                    </div>
-                  ))}
-                </div>
+        return (
+          (taskDueDate && taskDueDate.toDateString() === dateStr) ||
+          (taskStartDate && taskStartDate.toDateString() === dateStr)
+        );
+      });
+    };
+    
+    const handleDateClick = (date: Date) => {
+      // Open create task modal with pre-filled date
+      setShowCreateTask(true);
+      // You can add logic here to pre-fill the date in the modal
+    };
+    
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">Task Calendar</h2>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigateMonth('prev')}
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              title="Previous Month"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-medium text-gray-900 min-w-[150px] text-center">
+                {calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </span>
+              <button
+                onClick={goToToday}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Today
+              </button>
+            </div>
+            <button 
+              onClick={() => navigateMonth('next')}
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              title="Next Month"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowCreateTask(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Task
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="grid grid-cols-7 gap-px bg-gray-200">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
+                {day}
               </div>
-            );
-          })}
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-7 gap-px bg-gray-200">
+            {calendarDays.map((day, i) => {
+              const dayTasks = getTasksForDate(day.date);
+              const isTodayDate = isToday(day.date);
+              
+              return (
+                <div 
+                  key={i} 
+                  onClick={() => handleDateClick(day.date)}
+                  className={`bg-white min-h-[100px] p-2 cursor-pointer hover:bg-gray-50 transition-colors ${
+                    !day.isCurrentMonth ? 'opacity-40' : ''
+                  } ${
+                    isTodayDate ? 'ring-2 ring-blue-500 ring-inset' : ''
+                  }`}
+                >
+                  <div className={`text-sm mb-1 ${
+                    isTodayDate 
+                      ? 'bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center font-semibold' 
+                      : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                  }`}>
+                    {day.date.getDate()}
+                  </div>
+                  <div className="space-y-1">
+                    {dayTasks.slice(0, 3).map(task => {
+                      const isDueDate = task.dueDate && new Date(task.dueDate).toDateString() === day.date.toDateString();
+                      return (
+                        <div
+                          key={task._id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTask(task);
+                            setShowTaskModal(true);
+                          }}
+                          className="p-1 rounded text-xs cursor-pointer hover:shadow-md transition-shadow"
+                          style={{ 
+                            backgroundColor: task.project.color + '30',
+                            borderLeft: `3px solid ${task.project.color}`
+                          }}
+                        >
+                          <div className="font-medium truncate flex items-center gap-1">
+                            {isDueDate && <Flag className="w-3 h-3" />}
+                            {task.title}
+                          </div>
+                          <div className="text-gray-600 truncate text-[10px]">{task.assignee.name}</div>
+                        </div>
+                      );
+                    })}
+                    {dayTasks.length > 3 && (
+                      <div className="text-xs text-gray-500 text-center py-1">
+                        +{dayTasks.length - 3} more
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderTaskAnalytics = () => (
     <div className="p-6 space-y-6">
