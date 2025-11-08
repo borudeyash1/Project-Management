@@ -47,17 +47,33 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
       joinedAt: new Date(),
       status: 'pending'
     };
+
+    const updatedMembers = [...members, newMember];
+    setMembers(updatedMembers);
     
-    setMembers([...members, newMember]);
-    setInviteEmail('');
+    // Store members in sessionStorage for AddTeamMemberModal to access
+    try {
+      const membersForStorage = updatedMembers.map(m => ({
+        _id: m._id,
+        name: m.name,
+        email: m.email,
+        workspaceRole: m.role || 'Member',
+        department: 'General'
+      }));
+      sessionStorage.setItem(`workspace_${workspaceId}_members`, JSON.stringify(membersForStorage));
+    } catch (e) {
+      console.error('Error storing members:', e);
+    }
+    
     setShowInviteModal(false);
-    
+    setInviteEmail('');
+
     dispatch({
       type: 'ADD_TOAST',
       payload: {
         id: Date.now().toString(),
         type: 'success',
-        message: 'Member invitation sent!',
+        message: 'Member invitation sent successfully!',
         duration: 3000
       }
     });

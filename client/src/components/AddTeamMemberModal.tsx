@@ -44,54 +44,119 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
     { value: 'custom', label: 'Custom Role', description: 'Define a custom role' }
   ];
 
-  // Load workspace members (mock data - replace with API call)
+  // Load workspace members
   useEffect(() => {
     if (isOpen) {
-      // Mock workspace members
-      const mockMembers: WorkspaceMember[] = [
-        {
-          _id: 'wm1',
-          name: 'Alice Johnson',
-          email: 'alice@company.com',
-          workspaceRole: 'Developer',
-          department: 'Engineering'
-        },
-        {
-          _id: 'wm2',
-          name: 'Bob Smith',
-          email: 'bob@company.com',
-          workspaceRole: 'Designer',
-          department: 'Design'
-        },
-        {
-          _id: 'wm3',
-          name: 'Carol Williams',
-          email: 'carol@company.com',
-          workspaceRole: 'QA Engineer',
-          department: 'Quality Assurance'
-        },
-        {
-          _id: 'wm4',
-          name: 'David Brown',
-          email: 'david@company.com',
-          workspaceRole: 'Product Manager',
-          department: 'Product'
-        },
-        {
-          _id: 'wm5',
-          name: 'Emma Davis',
-          email: 'emma@company.com',
-          workspaceRole: 'Backend Developer',
-          department: 'Engineering'
+      if (workspaceId) {
+        // Fetch workspace members from the workspace
+        // TODO: Replace with actual API call to get workspace members
+        // For now, get from sessionStorage or use mock data
+        const storedMembers = sessionStorage.getItem(`workspace_${workspaceId}_members`);
+        
+        let members: WorkspaceMember[] = [];
+        
+        if (storedMembers) {
+          try {
+            members = JSON.parse(storedMembers);
+          } catch (e) {
+            console.error('Error parsing stored members:', e);
+          }
         }
-      ];
+        
+        // If no stored members, use mock data
+        if (members.length === 0) {
+          members = [
+            {
+              _id: 'wm1',
+              name: 'Alice Johnson',
+              email: 'alice@company.com',
+              workspaceRole: 'Developer',
+              department: 'Engineering'
+            },
+            {
+              _id: 'wm2',
+              name: 'Bob Smith',
+              email: 'bob@company.com',
+              workspaceRole: 'Designer',
+              department: 'Design'
+            },
+            {
+              _id: 'wm3',
+              name: 'Carol Williams',
+              email: 'carol@company.com',
+              workspaceRole: 'QA Engineer',
+              department: 'Quality Assurance'
+            },
+            {
+              _id: 'wm4',
+              name: 'David Brown',
+              email: 'david@company.com',
+              workspaceRole: 'Product Manager',
+              department: 'Product'
+            },
+            {
+              _id: 'wm5',
+              name: 'Emma Davis',
+              email: 'emma@company.com',
+              workspaceRole: 'Backend Developer',
+              department: 'Engineering'
+            }
+          ];
+        }
 
-      // Filter out members already in the project
-      const availableMembers = mockMembers.filter(
-        member => !currentTeamIds.includes(member._id)
-      );
-      
-      setWorkspaceMembers(availableMembers);
+        // Filter out members already in the project
+        const availableMembers = members.filter(
+          member => !currentTeamIds.includes(member._id)
+        );
+        
+        setWorkspaceMembers(availableMembers);
+      } else {
+        // No workspace ID provided, use mock data for backward compatibility
+        const mockMembers: WorkspaceMember[] = [
+          {
+            _id: 'wm1',
+            name: 'Alice Johnson',
+            email: 'alice@company.com',
+            workspaceRole: 'Developer',
+            department: 'Engineering'
+          },
+          {
+            _id: 'wm2',
+            name: 'Bob Smith',
+            email: 'bob@company.com',
+            workspaceRole: 'Designer',
+            department: 'Design'
+          },
+          {
+            _id: 'wm3',
+            name: 'Carol Williams',
+            email: 'carol@company.com',
+            workspaceRole: 'QA Engineer',
+            department: 'Quality Assurance'
+          },
+          {
+            _id: 'wm4',
+            name: 'David Brown',
+            email: 'david@company.com',
+            workspaceRole: 'Product Manager',
+            department: 'Product'
+          },
+          {
+            _id: 'wm5',
+            name: 'Emma Davis',
+            email: 'emma@company.com',
+            workspaceRole: 'Backend Developer',
+            department: 'Engineering'
+          }
+        ];
+
+        // Filter out members already in the project
+        const availableMembers = mockMembers.filter(
+          member => !currentTeamIds.includes(member._id)
+        );
+        
+        setWorkspaceMembers(availableMembers);
+      }
     }
   }, [isOpen, currentTeamIds, workspaceId]);
 

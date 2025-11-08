@@ -944,7 +944,7 @@ const ProjectViewDetailed: React.FC = () => {
         onClose={() => setShowAddMemberModal(false)}
         onAddMember={handleAddTeamMember}
         currentTeamIds={activeProject?.team.map(m => m._id) || []}
-        workspaceId={state.currentWorkspace}
+        workspaceId={state.currentWorkspace || sessionStorage.getItem('currentWorkspaceId') || undefined}
       />
 
       {/* Invite Member Modal */}

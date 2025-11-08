@@ -323,6 +323,7 @@ type AppAction =
   | { type: 'ADD_PROJECT'; payload: Project }
   | { type: 'ADD_TASK'; payload: Task }
   | { type: 'ADD_WORKSPACE'; payload: Workspace }
+  | { type: 'UPDATE_WORKSPACE'; payload: Partial<Workspace> & { _id: string } }
   | { type: 'ADD_PENDING_REQUEST'; payload: any }
   | { type: 'UPDATE_PROFILE'; payload: Partial<User> }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<AppState['settings']> }
@@ -392,6 +393,13 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, tasks: [...state.tasks, action.payload] };
     case 'ADD_WORKSPACE':
       return { ...state, workspaces: [...state.workspaces, action.payload] };
+    case 'UPDATE_WORKSPACE':
+      return {
+        ...state,
+        workspaces: state.workspaces.map(ws =>
+          ws._id === action.payload._id ? { ...ws, ...action.payload } : ws
+        )
+      };
     case 'ADD_PENDING_REQUEST':
       return { ...state, pendingWorkspaceRequests: [...state.pendingWorkspaceRequests, action.payload] };
     case 'UPDATE_PROFILE':
