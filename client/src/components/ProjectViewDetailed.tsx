@@ -138,7 +138,7 @@ interface Milestone {
 interface Document {
   _id: string;
   name: string;
-  type: 'file' | 'folder';
+  type: 'file' | 'folder' | 'image';
   url?: string;
   size?: number;
   uploadedBy: TeamMember;
@@ -870,12 +870,544 @@ const ProjectViewDetailed: React.FC = () => {
     </div>
   );
 
+  const renderTasksView = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Tasks</h3>
+        <button
+          onClick={() => setShowCreateTask(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <Plus className="w-4 h-4" />
+          Create Task
+        </button>
+      </div>
+
+      {/* Task Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">Total Tasks</p>
+          <p className="text-2xl font-bold text-gray-900">{activeProject?.tasks.length || 0}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">In Progress</p>
+          <p className="text-2xl font-bold text-blue-600">
+            {activeProject?.tasks.filter(t => t.status === 'in-progress').length || 0}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">Completed</p>
+          <p className="text-2xl font-bold text-green-600">
+            {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">Blocked</p>
+          <p className="text-2xl font-bold text-red-600">
+            {activeProject?.tasks.filter(t => t.status === 'blocked').length || 0}
+          </p>
+        </div>
+      </div>
+
+      {/* Task List */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-4">
+            <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">
+              All Tasks
+            </button>
+            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+              My Tasks
+            </button>
+            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+              Overdue
+            </button>
+          </div>
+        </div>
+        
+        <div className="divide-y divide-gray-200">
+          {activeProject?.tasks.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p className="font-medium">No tasks yet</p>
+              <p className="text-sm mt-1">Create your first task to get started</p>
+            </div>
+          ) : (
+            activeProject?.tasks.map((task) => (
+              <div key={task._id} className="p-4 hover:bg-gray-50">
+                <div className="flex items-start gap-4">
+                  <input type="checkbox" className="mt-1 rounded" checked={task.status === 'completed'} />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-gray-900">{task.title}</h4>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        task.priority === 'critical' ? 'bg-red-100 text-red-800' :
+                        task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {task.priority}
+                      </span>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        task.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        task.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                        task.status === 'blocked' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {task.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <User className="w-4 h-4" />
+                        {task.assignee?.name || 'Unassigned'}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {formatDate(task.dueDate)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {task.estimatedHours}h estimated
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTimelineView = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Timeline</h3>
+        <div className="flex items-center gap-2">
+          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+            Day
+          </button>
+          <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">
+            Week
+          </button>
+          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+            Month
+          </button>
+        </div>
+      </div>
+
+      {/* Timeline */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="space-y-6">
+          {activeProject?.timeline.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <Activity className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p className="font-medium">No activity yet</p>
+              <p className="text-sm mt-1">Activity will appear here as work progresses</p>
+            </div>
+          ) : (
+            activeProject?.timeline.map((event, index) => (
+              <div key={event._id} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    event.type === 'task' ? 'bg-blue-100' :
+                    event.type === 'milestone' ? 'bg-green-100' :
+                    event.type === 'comment' ? 'bg-purple-100' :
+                    'bg-gray-100'
+                  }`}>
+                    {event.type === 'task' && <CheckCircle className="w-5 h-5 text-blue-600" />}
+                    {event.type === 'milestone' && <Flag className="w-5 h-5 text-green-600" />}
+                    {event.type === 'comment' && <MessageSquare className="w-5 h-5 text-purple-600" />}
+                    {event.type === 'status-change' && <Activity className="w-5 h-5 text-gray-600" />}
+                  </div>
+                  {index < (activeProject?.timeline.length || 0) - 1 && (
+                    <div className="w-0.5 h-full bg-gray-200 mt-2" />
+                  )}
+                </div>
+                <div className="flex-1 pb-6">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="font-medium text-gray-900">{event.title}</h4>
+                    <span className="text-sm text-gray-500">{formatDate(event.date)}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{event.description}</p>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <User className="w-4 h-4" />
+                    <span>{event.user?.name || 'System'}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Milestones */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h4 className="font-semibold text-gray-900 mb-4">Milestones</h4>
+        <div className="space-y-4">
+          {activeProject?.milestones.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No milestones defined</p>
+          ) : (
+            activeProject?.milestones.map((milestone) => (
+              <div key={milestone._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1">
+                  <h5 className="font-medium text-gray-900">{milestone.title}</h5>
+                  <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                    <span>Due: {formatDate(milestone.dueDate)}</span>
+                    <span>{milestone.progress}% complete</span>
+                  </div>
+                </div>
+                <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                  milestone.status === 'completed' ? 'bg-green-100 text-green-800' :
+                  milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {milestone.status}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDocumentsView = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Documents</h3>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+            <Upload className="w-4 h-4" />
+            Upload
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <Plus className="w-4 h-4" />
+            New Folder
+          </button>
+        </div>
+      </div>
+
+      {/* Document Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">Total Files</p>
+          <p className="text-2xl font-bold text-gray-900">{activeProject?.documents.length || 0}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">Storage Used</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {((activeProject?.documents.reduce((acc, doc) => acc + (doc.size || 0), 0) || 0) / 1024 / 1024).toFixed(2)} MB
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600">Recent Uploads</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {activeProject?.documents.filter(d => {
+              const dayAgo = new Date();
+              dayAgo.setDate(dayAgo.getDate() - 1);
+              return new Date(d.uploadedAt) > dayAgo;
+            }).length || 0}
+          </p>
+        </div>
+      </div>
+
+      {/* Documents Grid */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-4">
+            <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">
+              All Files
+            </button>
+            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+              Images
+            </button>
+            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+              Documents
+            </button>
+            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+              Recent
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          {activeProject?.documents.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p className="font-medium">No documents yet</p>
+              <p className="text-sm mt-1">Upload files to share with your team</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeProject?.documents.map((doc) => (
+                <div key={doc._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        {doc.type === 'folder' && <FileText className="w-5 h-5 text-blue-600" />}
+                        {doc.type === 'file' && <File className="w-5 h-5 text-blue-600" />}
+                        {doc.type === 'image' && <Image className="w-5 h-5 text-blue-600" />}
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="font-medium text-gray-900 text-sm">{doc.name}</h5>
+                        <p className="text-xs text-gray-500">
+                          {doc.size ? `${(doc.size / 1024).toFixed(2)} KB` : 'Folder'}
+                        </p>
+                      </div>
+                    </div>
+                    <button className="p-1 text-gray-400 hover:text-gray-600">
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    <p>Uploaded by {doc.uploadedBy?.name || 'Unknown'}</p>
+                    <p>{formatDate(doc.uploadedAt)}</p>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button className="flex-1 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                      <Download className="w-3 h-3 inline mr-1" />
+                      Download
+                    </button>
+                    <button className="flex-1 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                      <Share2 className="w-3 h-3 inline mr-1" />
+                      Share
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAnalyticsView = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Analytics</h3>
+        <div className="flex items-center gap-2">
+          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+            Last 7 Days
+          </button>
+          <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">
+            Last 30 Days
+          </button>
+          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+            All Time
+          </button>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-medium text-gray-600">Completion Rate</p>
+            <TrendingUp className="w-5 h-5 text-green-600" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">{activeProject?.progress}%</p>
+          <p className="text-sm text-green-600 mt-1">+5% from last month</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-medium text-gray-600">Team Velocity</p>
+            <Activity className="w-5 h-5 text-blue-600" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
+          </p>
+          <p className="text-sm text-blue-600 mt-1">Tasks completed</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-medium text-gray-600">Budget Usage</p>
+            <DollarSign className="w-5 h-5 text-purple-600" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {activeProject?.budget && activeProject?.spent 
+              ? Math.round((activeProject.spent / activeProject.budget) * 100)
+              : 0}%
+          </p>
+          <p className="text-sm text-gray-600 mt-1">
+            {formatCurrency(activeProject?.spent || 0)} of {formatCurrency(activeProject?.budget || 0)}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-medium text-gray-600">Team Workload</p>
+            <Users className="w-5 h-5 text-orange-600" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {activeProject?.team.length 
+              ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
+              : 0}%
+          </p>
+          <p className="text-sm text-gray-600 mt-1">Average workload</p>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Task Status Distribution */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h4 className="font-semibold text-gray-900 mb-4">Task Status Distribution</h4>
+          <div className="space-y-3">
+            {['pending', 'in-progress', 'review', 'completed', 'blocked'].map((status) => {
+              const count = activeProject?.tasks.filter(t => t.status === status).length || 0;
+              const total = activeProject?.tasks.length || 1;
+              const percentage = Math.round((count / total) * 100);
+              return (
+                <div key={status}>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="capitalize text-gray-700">{status.replace('-', ' ')}</span>
+                    <span className="font-medium text-gray-900">{count} ({percentage}%)</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${
+                        status === 'completed' ? 'bg-green-600' :
+                        status === 'in-progress' ? 'bg-blue-600' :
+                        status === 'blocked' ? 'bg-red-600' :
+                        status === 'review' ? 'bg-purple-600' :
+                        'bg-gray-400'
+                      }`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Team Performance */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h4 className="font-semibold text-gray-900 mb-4">Team Performance</h4>
+          <div className="space-y-4">
+            {activeProject?.team.map((member) => (
+              <div key={member._id}>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span className="text-gray-700">{member.name}</span>
+                  <span className="font-medium text-gray-900">
+                    {member.tasksCompleted}/{member.tasksAssigned} tasks
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full"
+                    style={{ 
+                      width: `${member.tasksAssigned > 0 
+                        ? Math.round((member.tasksCompleted / member.tasksAssigned) * 100)
+                        : 0}%` 
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Budget Breakdown */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h4 className="font-semibold text-gray-900 mb-4">Budget Breakdown</h4>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Total Budget</span>
+              <span className="font-semibold text-gray-900">{formatCurrency(activeProject?.budget || 0)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Spent</span>
+              <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Remaining</span>
+              <span className="font-semibold text-green-600">
+                {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
+              </span>
+            </div>
+            <div className="pt-4 border-t border-gray-200">
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
+                  style={{ 
+                    width: `${activeProject?.budget && activeProject?.spent 
+                      ? Math.min(Math.round((activeProject.spent / activeProject.budget) * 100), 100)
+                      : 0}%` 
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h4 className="font-semibold text-gray-900 mb-4">Activity Summary</h4>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-blue-600" />
+                <span className="text-sm font-medium text-gray-900">Tasks Created</span>
+              </div>
+              <span className="text-lg font-bold text-blue-600">{activeProject?.tasks.length || 0}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-green-600" />
+                <span className="text-sm font-medium text-gray-900">Tasks Completed</span>
+              </div>
+              <span className="text-lg font-bold text-green-600">
+                {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Users className="w-5 h-5 text-purple-600" />
+                <span className="text-sm font-medium text-gray-900">Team Members</span>
+              </div>
+              <span className="text-lg font-bold text-purple-600">{activeProject?.team.length || 0}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5 text-orange-600" />
+                <span className="text-sm font-medium text-gray-900">Documents</span>
+              </div>
+              <span className="text-lg font-bold text-orange-600">{activeProject?.documents.length || 0}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderMainContent = () => {
     switch (activeView) {
       case 'overview':
         return renderProjectOverview();
+      case 'tasks':
+        return renderTasksView();
+      case 'timeline':
+        return renderTimelineView();
       case 'team':
         return renderTeamSection();
+      case 'documents':
+        return renderDocumentsView();
+      case 'analytics':
+        return renderAnalyticsView();
       default:
         return renderProjectOverview();
     }
