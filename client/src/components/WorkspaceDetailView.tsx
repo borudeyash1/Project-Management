@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -19,6 +19,23 @@ const WorkspaceDetailView: React.FC = () => {
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects'>('edit');
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+
+  // Listen for client click events from ClientsTab
+  useEffect(() => {
+    const handleSwitchToProjects = (event: any) => {
+      const clientId = event.detail?.clientId;
+      if (clientId) {
+        setSelectedClientId(clientId);
+        setActiveTab('projects');
+      }
+    };
+
+    window.addEventListener('switchToProjectsTab', handleSwitchToProjects as EventListener);
+    return () => {
+      window.removeEventListener('switchToProjectsTab', handleSwitchToProjects as EventListener);
+    };
+  }, []);
   
   // Get workspace details
   const workspace = useMemo(() => {
@@ -103,7 +120,13 @@ const WorkspaceDetailView: React.FC = () => {
           {activeTab === 'collaborate' && <WorkspaceCollaborateTab workspaceId={workspace._id} />}
           {activeTab === 'members' && <WorkspaceMembersTab workspaceId={workspace._id} />}
           {activeTab === 'clients' && <WorkspaceClientsTab workspaceId={workspace._id} />}
-          {activeTab === 'projects' && <WorkspaceProjectsTab workspaceId={workspace._id} />}
+          {activeTab === 'projects' && (
+            <WorkspaceProjectsTab 
+              workspaceId={workspace._id} 
+              selectedClientId={selectedClientId}
+              onClearClientFilter={() => setSelectedClientId(null)}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -24,7 +24,46 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
   });
 
   const handleSave = () => {
-    // TODO: Implement API call to update workspace
+    // Validate required fields
+    if (!formData.name.trim()) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Workspace name is required',
+          duration: 3000
+        }
+      });
+      return;
+    }
+
+    // Update workspace in global state
+    dispatch({
+      type: 'UPDATE_WORKSPACE',
+      payload: {
+        _id: workspace._id,
+        name: formData.name,
+        description: formData.description,
+        type: formData.type,
+        region: formData.region,
+        contactInfo: {
+          email: formData.contactEmail,
+          phone: formData.contactPhone,
+          address: formData.address,
+          website: formData.website
+        },
+        isPublic: formData.isPublic,
+        settings: {
+          allowMemberInvites: formData.allowMemberInvites,
+          requireApprovalForJoining: formData.requireApproval
+        },
+        updatedAt: new Date()
+      } as any
+    });
+
+    // TODO: Implement API call to persist changes to backend
+    
     dispatch({
       type: 'ADD_TOAST',
       payload: {

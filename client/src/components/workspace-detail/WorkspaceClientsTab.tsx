@@ -162,10 +162,19 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({ workspaceId }
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clients.map((client) => (
-              <div key={client._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={client._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow group">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <div 
+                    className="flex-1 cursor-pointer"
+                    onClick={() => {
+                      // Store client filter and switch to projects tab
+                      sessionStorage.setItem('selectedClientId', client._id);
+                      sessionStorage.setItem('selectedClientName', client.name);
+                      // Trigger navigation to projects tab
+                      window.dispatchEvent(new CustomEvent('switchToProjectsTab', { detail: { clientId: client._id } }));
+                    }}
+                  >
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
                       <Briefcase className="w-4 h-4 text-blue-600" />
                       {client.name}
                     </h4>
@@ -175,17 +184,28 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({ workspaceId }
                         {client.company}
                       </p>
                     )}
+                    <p className="text-xs text-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Click to view projects →
+                    </p>
                   </div>
                   <div className="flex gap-1">
                     <button
-                      onClick={() => handleEditClient(client)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClient(client);
+                      }}
                       className="text-blue-600 hover:text-blue-700 p-1"
+                      title="Edit Client"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteClient(client._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClient(client._id);
+                      }}
                       className="text-red-600 hover:text-red-700 p-1"
+                      title="Delete Client"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

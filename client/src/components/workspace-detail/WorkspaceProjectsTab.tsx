@@ -24,9 +24,15 @@ interface WorkspaceProject {
 
 interface WorkspaceProjectsTabProps {
   workspaceId: string;
+  selectedClientId?: string | null;
+  onClearClientFilter?: () => void;
 }
 
-const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({ workspaceId }) => {
+const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({ 
+  workspaceId, 
+  selectedClientId,
+  onClearClientFilter 
+}) => {
   const { dispatch } = useApp();
   const navigate = useNavigate();
   const [projects, setProjects] = useState<WorkspaceProject[]>([]);
@@ -223,14 +229,24 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({ workspaceId
     }
   };
 
+  // Filter projects by selected client
+  const filteredProjects = selectedClientId 
+    ? projects.filter(p => p.clientId === selectedClientId)
+    : projects;
+
   // Group projects by client
-  const projectsByClient = projects.reduce((acc, project) => {
+  const projectsByClient = filteredProjects.reduce((acc, project) => {
     if (!acc[project.clientName]) {
       acc[project.clientName] = [];
     }
     acc[project.clientName].push(project);
     return acc;
   }, {} as Record<string, WorkspaceProject[]>);
+
+  // Get selected client name
+  const selectedClientName = selectedClientId 
+    ? sessionStorage.getItem('selectedClientName') || mockClients.find(c => c._id === selectedClientId)?.name
+    : null;
 
   return (
     <div className="space-y-6">
@@ -251,6 +267,23 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({ workspaceId
           </button>
         </div>
 
+        {/* Client Filter Badge */}
+        {selectedClientId && selectedClientName && (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+              <Briefcase className="w-3 h-3" />
+              Showing projects for: {selectedClientName}
+              <button
+                onClick={onClearClientFilter}
+                className="hover:text-blue-900"
+                title="Clear filter"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          </div>
+        )}
+
         {/* Projects List */}
         {projects.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
@@ -270,34 +303,54 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({ workspaceId
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {clientProjects.map((project) => (
-                    <div key={project._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={project._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow group cursor-pointer">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <h5 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <div 
+                          className="flex-1"
+                          onClick={() => {
+                            // Store workspace ID for project context
+                            sessionStorage.setItem('currentWorkspaceId', workspaceId);
+                            navigate(`/project-view/${project._id}`);
+                          }}
+                        >
+                          <h5 className="font-semibold text-gray-900 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
                             <FolderOpen className="w-4 h-4 text-blue-600" />
                             {project.name}
                           </h5>
                           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                             {project.description || 'No description'}
                           </p>
+                          <p className="text-xs text-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Click to open project →
+                          </p>
                         </div>
                         <div className="flex gap-1">
                           <button
-                            onClick={() => navigate(`/project-view/${project._id}`)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              sessionStorage.setItem('currentWorkspaceId', workspaceId);
+                              navigate(`/project-view/${project._id}`);
+                            }}
                             className="text-gray-600 hover:text-gray-700 p-1"
                             title="View Project"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleEditProject(project)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditProject(project);
+                            }}
                             className="text-blue-600 hover:text-blue-700 p-1"
                             title="Edit Project"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteProject(project._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteProject(project._id);
+                            }}
                             className="text-red-600 hover:text-red-700 p-1"
                             title="Delete Project"
                           >
