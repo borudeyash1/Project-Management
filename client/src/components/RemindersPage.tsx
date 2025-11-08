@@ -4,10 +4,12 @@ import {
   Star, Flag, Tag, MessageSquare, FileText, Users,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
-  Target, TrendingUp, BarChart3, List
+  Target, TrendingUp, BarChart3, List, Download, Volume2, Repeat
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import ReminderModal from './ReminderModal';
+import { useReminderNotifications, useReminderSnooze, downloadICalendar } from '../hooks/useReminderNotifications';
 
 interface Reminder {
   _id: string;
@@ -36,9 +38,10 @@ interface Reminder {
   };
   notifications: Array<{
     type: 'email' | 'push' | 'sms';
-    time: Date;
-    sent: boolean;
+    minutesBefore: number;
+    sent?: boolean;
   }>;
+  snoozedUntil?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -67,6 +70,26 @@ const RemindersPage: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high' | 'urgent'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState<Reminder | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSnoozeMenu, setShowSnoozeMenu] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
+  // Notification system
+  const { permission, requestPermission } = useReminderNotifications(reminders, {
+    sound: true,
+    volume: 0.7,
+    vibrate: true
+  });
+
+  // Snooze functionality
+  const { snoozeOptions, snoozeReminder } = useReminderSnooze();
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if (permission === 'default') {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -91,8 +114,8 @@ const RemindersPage: React.FC = () => {
         },
         tags: ['design', 'meeting'],
         notifications: [
-          { type: 'email', time: new Date('2024-03-25T09:30:00'), sent: false },
-          { type: 'push', time: new Date('2024-03-25T09:45:00'), sent: false }
+          { type: 'email', minutesBefore: 30, sent: false },
+          { type: 'push', minutesBefore: 15, sent: false }
         ],
         createdAt: new Date('2024-03-20'),
         updatedAt: new Date('2024-03-20')
@@ -117,8 +140,8 @@ const RemindersPage: React.FC = () => {
         },
         tags: ['deadline', 'proposal'],
         notifications: [
-          { type: 'email', time: new Date('2024-03-22T16:00:00'), sent: false },
-          { type: 'push', time: new Date('2024-03-22T16:30:00'), sent: false }
+          { type: 'email', minutesBefore: 60, sent: false },
+          { type: 'push', minutesBefore: 30, sent: false }
         ],
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
@@ -144,7 +167,7 @@ const RemindersPage: React.FC = () => {
         },
         tags: ['code', 'review'],
         notifications: [
-          { type: 'email', time: new Date('2024-03-26T13:30:00'), sent: true }
+          { type: 'email', minutesBefore: 30, sent: true }
         ],
         createdAt: new Date('2024-03-18'),
         updatedAt: new Date('2024-03-25')
@@ -169,7 +192,7 @@ const RemindersPage: React.FC = () => {
         },
         tags: ['standup', 'daily'],
         notifications: [
-          { type: 'push', time: new Date('2024-03-27T08:45:00'), sent: false }
+          { type: 'push', minutesBefore: 15, sent: false }
         ],
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-03-20')
@@ -260,6 +283,17 @@ const RemindersPage: React.FC = () => {
   const getFilteredReminders = () => {
     let filtered = reminders;
 
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(r => 
+        r.title.toLowerCase().includes(query) ||
+        r.description?.toLowerCase().includes(query) ||
+        r.tags.some(tag => tag.toLowerCase().includes(query)) ||
+        r.project?.name.toLowerCase().includes(query)
+      );
+    }
+
     // Status filter
     if (filterStatus === 'pending') {
       filtered = filtered.filter(r => !r.completed);
@@ -288,6 +322,64 @@ const RemindersPage: React.FC = () => {
       }
       return reminder;
     }));
+  };
+
+  const handleSaveReminder = (reminderData: Partial<Reminder>) => {
+    if (selectedReminder) {
+      // Update existing
+      setReminders(reminders.map(r => 
+        r._id === selectedReminder._id 
+          ? { ...r, ...reminderData, updatedAt: new Date() }
+          : r
+      ));
+    } else {
+      // Create new
+      const newReminder: Reminder = {
+        ...reminderData as Reminder,
+        _id: `reminder_${Date.now()}`,
+        completed: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      setReminders([...reminders, newReminder]);
+    }
+  };
+
+  const handleEditReminder = (reminder: Reminder) => {
+    setSelectedReminder(reminder);
+    setShowAddModal(true);
+  };
+
+  const handleDeleteReminder = (reminderId: string) => {
+    if (window.confirm('Are you sure you want to delete this reminder?')) {
+      setReminders(reminders.filter(r => r._id !== reminderId));
+    }
+  };
+
+  const handleSnooze = (reminderId: string, minutes: number) => {
+    snoozeReminder(reminderId, minutes, (id, snoozedUntil) => {
+      setReminders(reminders.map(r => 
+        r._id === id ? { ...r, snoozedUntil } : r
+      ));
+    });
+    setShowSnoozeMenu(null);
+  };
+
+  const handleExport = (type: 'all' | 'pending' | 'completed') => {
+    let remindersToExport = reminders;
+    
+    if (type === 'pending') {
+      remindersToExport = reminders.filter(r => !r.completed);
+    } else if (type === 'completed') {
+      remindersToExport = reminders.filter(r => r.completed);
+    }
+    
+    downloadICalendar(remindersToExport, `reminders-${type}.ics`);
+    setShowExportMenu(false);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
   const getWeekDays = (date: Date) => {
@@ -329,8 +421,61 @@ const RemindersPage: React.FC = () => {
             <p className="text-gray-600 mt-1">Stay on top of your tasks and deadlines</p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Notification Permission */}
+            {permission === 'default' && (
+              <button
+                onClick={requestPermission}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50"
+              >
+                <Bell className="w-4 h-4" />
+                Enable Notifications
+              </button>
+            )}
+            {permission === 'granted' && (
+              <span className="inline-flex items-center gap-2 px-3 py-2 text-sm text-green-600 bg-green-50 rounded-lg">
+                <Bell className="w-4 h-4" />
+                Notifications On
+              </span>
+            )}
+            
+            {/* Export Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+              {showExportMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                  <button
+                    onClick={() => handleExport('all')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Export All
+                  </button>
+                  <button
+                    onClick={() => handleExport('pending')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Export Pending
+                  </button>
+                  <button
+                    onClick={() => handleExport('completed')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Export Completed
+                  </button>
+                </div>
+              )}
+            </div>
+            
             <button
-              onClick={() => setShowAddModal(true)}
+              onClick={() => {
+                setSelectedReminder(null);
+                setShowAddModal(true);
+              }}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4" />
@@ -344,9 +489,23 @@ const RemindersPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Filters and View Toggle */}
+            {/* Search and Filters */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
+                {/* Search */}
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search reminders..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                
                 {/* Filters */}
                 <div className="flex items-center gap-3">
                   <select
@@ -690,6 +849,28 @@ const RemindersPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Reminder Modal */}
+      {showAddModal && (
+        <ReminderModal
+          reminder={selectedReminder}
+          onSave={handleSaveReminder}
+          onClose={() => {
+            setShowAddModal(false);
+            setSelectedReminder(null);
+          }}
+          projects={state.projects?.map(p => ({
+            _id: p._id,
+            name: p.name,
+            color: (p as any).color || '#3B82F6'
+          })) || []}
+          teamMembers={[
+            { _id: 'u1', name: 'John Doe', avatar: '' },
+            { _id: 'u2', name: 'Jane Smith', avatar: '' },
+            { _id: 'u3', name: 'Bob Wilson', avatar: '' }
+          ]}
+        />
+      )}
     </div>
   );
 };

@@ -133,6 +133,39 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Create the workspace
+      const newWorkspace = {
+        _id: `workspace_${Date.now()}`,
+        name: formData.name,
+        description: formData.description,
+        type: formData.type,
+        region: formData.region,
+        owner: 'current_user_id', // Will be set by backend
+        memberCount: 1,
+        members: [],
+        isPublic: false,
+        subscription: {
+          plan: 'pro' as const,
+          status: 'active' as const,
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year
+        },
+        isActive: true,
+        settings: {
+          isPublic: false,
+          allowMemberInvites: true,
+          requireApprovalForJoining: false
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      // Add workspace to state
+      dispatch({
+        type: 'ADD_WORKSPACE',
+        payload: newWorkspace as any
+      });
+      
       setShowPayment(true);
       setStep(4);
       

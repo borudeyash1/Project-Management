@@ -21,6 +21,8 @@ import ProfileSection from './components/ProfileSection';
 import WorkspaceDiscover from './components/WorkspaceDiscover';
 import WorkspaceOwner from './components/WorkspaceOwner';
 import WorkspaceMember from './components/WorkspaceMember';
+import ManageWorkspace from './components/ManageWorkspace';
+import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
 import WorkspaceMembers from './components/workspace/WorkspaceMembers';
@@ -244,6 +246,22 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <WorkspaceDiscover />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/manage-workspace" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ManageWorkspace />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/manage-workspace/:workspaceId" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <WorkspaceDetailView />
             </AppLayout>
           </ProtectedRoute>
         } />

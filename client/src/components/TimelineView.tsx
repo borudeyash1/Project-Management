@@ -304,21 +304,29 @@ const TimelineView: React.FC<TimelineViewProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigateTimeline('prev')}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Previous"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
+              <div className="px-4 py-2 bg-gray-100 rounded-lg min-w-[200px] text-center">
+                <span className="text-sm font-semibold text-gray-900">
+                  {dates[0]?.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  {viewMode === 'quarter' && ` - ${dates[dates.length - 1]?.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+                </span>
+              </div>
               <button
                 onClick={goToToday}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Today
               </button>
               <button
                 onClick={() => navigateTimeline('next')}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Next"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -459,7 +467,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                     
                     return (
                       <div
-                        key={task._id}
+                        key={`${task._id}-${task.startDate}-${task.dueDate}`}
                         draggable
                         onDragStart={(e) => handleDragStart(e, task)}
                         onDragEnd={handleDragEnd}
