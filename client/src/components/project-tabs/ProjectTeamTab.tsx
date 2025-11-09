@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Users, UserPlus, Trash2, Crown, Shield, X } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
 interface TeamMember {
   _id: string;
@@ -32,24 +33,20 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   onRemoveMember,
   onChangeProjectManager
 }) => {
+  const { state } = useApp();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [selectedRole, setSelectedRole] = useState<'project-manager' | 'member'>('member');
 
-  // Get workspace members from sessionStorage
-  const getWorkspaceMembers = () => {
-    const stored = sessionStorage.getItem(`workspace_${workspaceId}_members`);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  };
-
-  const workspaceMembers = getWorkspaceMembers();
+  // Get workspace members from AppContext
+  // For now, use mock data. In production, this would come from workspace.members
+  const workspace = state.workspaces.find(w => w._id === workspaceId);
+  const workspaceMembers = workspace?.members || [
+    { _id: 'user_emp_789', name: 'Bob Wilson', email: 'bob.wilson@company.com', role: 'developer' },
+    { _id: 'user_emp_101', name: 'Alice Johnson', email: 'alice.johnson@company.com', role: 'designer' },
+    { _id: 'user_emp_102', name: 'Charlie Brown', email: 'charlie.brown@company.com', role: 'developer' },
+    { _id: 'user_emp_103', name: 'Diana Prince', email: 'diana.prince@company.com', role: 'tester' }
+  ];
   
   // Filter out members already in project
   const availableMembers = workspaceMembers.filter(

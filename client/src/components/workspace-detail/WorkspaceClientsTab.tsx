@@ -16,9 +16,13 @@ interface Client {
 
 interface WorkspaceClientsTabProps {
   workspaceId: string;
+  isWorkspaceOwner?: boolean;
 }
 
-const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({ workspaceId }) => {
+const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({ 
+  workspaceId, 
+  isWorkspaceOwner = false 
+}) => {
   const { dispatch } = useApp();
   const [clients, setClients] = useState<Client[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -143,13 +147,15 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({ workspaceId }
               Manage client profiles and associate them with projects
             </p>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add Client
-          </button>
+          {isWorkspaceOwner && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Client
+            </button>
+          )}
         </div>
 
         {/* Clients Grid */}
@@ -188,28 +194,30 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({ workspaceId }
                       Click to view projects →
                     </p>
                   </div>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditClient(client);
-                      }}
-                      className="text-blue-600 hover:text-blue-700 p-1"
-                      title="Edit Client"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClient(client._id);
-                      }}
-                      className="text-red-600 hover:text-red-700 p-1"
-                      title="Delete Client"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {isWorkspaceOwner && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClient(client);
+                        }}
+                        className="text-blue-600 hover:text-blue-700 p-1"
+                        title="Edit Client"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClient(client._id);
+                        }}
+                        className="text-red-600 hover:text-red-700 p-1"
+                        title="Delete Client"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2 text-sm">
