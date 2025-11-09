@@ -34,6 +34,7 @@ import ProjectTeamTab from './project-tabs/ProjectTeamTab';
 import ProjectProgressTab from './project-tabs/ProjectProgressTab';
 import ProjectRequestsTab from './project-tabs/ProjectRequestsTab';
 import ProjectTaskAssignmentTab from './project-tabs/ProjectTaskAssignmentTab';
+import EmployeeTasksTab from './project-tabs/EmployeeTasksTab';
 import RoleSwitcher from './RoleSwitcher';
 
 interface Project {
@@ -210,7 +211,7 @@ const ProjectViewDetailed: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [showTaskReview, setShowTaskReview] = useState(false);
-  const [currentUserRole, setCurrentUserRole] = useState<string>('project-manager'); // Testing: can be 'owner', 'project-manager', 'employee'
+  const [currentUserRole, setCurrentUserRole] = useState<string>('manager'); // Testing: can be 'owner', 'manager', 'employee'
   const [currentTestUserId, setCurrentTestUserId] = useState('user_pm_456'); // Testing user ID
   const [currentTestUserName, setCurrentTestUserName] = useState('Jane Smith (PM)'); // Testing user name
   const [taskFilter, setTaskFilter] = useState<'all' | 'my' | 'overdue' | 'review'>('all');
@@ -534,13 +535,17 @@ const ProjectViewDetailed: React.FC = () => {
 
   // Role Switcher Handler (Testing only)
   const handleRoleChange = (role: 'owner' | 'project-manager' | 'employee') => {
-    setCurrentUserRole(role);
+    // Map 'project-manager' to 'manager' for internal use
+    const mappedRole = role === 'project-manager' ? 'manager' : role;
+    setCurrentUserRole(mappedRole);
   };
 
   const handleUserChange = (userId: string, userName: string, role: string) => {
+    // Map 'project-manager' to 'manager' for internal use
+    const mappedRole = role === 'project-manager' ? 'manager' : role;
     setCurrentTestUserId(userId);
     setCurrentTestUserName(userName);
-    setCurrentUserRole(role);
+    setCurrentUserRole(mappedRole);
   };
 
   const getStatusColor = (status: string) => {
@@ -596,13 +601,13 @@ const ProjectViewDetailed: React.FC = () => {
             <Settings className="w-4 h-4" />
             Settings
           </button>
-          {currentUserRole !== 'viewer' && (
+          {(currentUserRole === 'owner' || currentUserRole === 'manager') && (
             <button
               onClick={() => setShowCreateTask(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4" />
-              {currentUserRole === 'employee' ? 'Create Task' : 'Add Task'}
+              Add Task
             </button>
           )}
         </div>
@@ -610,41 +615,57 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Project Selector Dropdown */}
       {showProjectSelector && (
-        <div className="absolute top-16 left-6 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Search className="w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div className="space-y-1">
-              {projects.map((project) => (
+        <>
+          {/* Backdrop to close on click outside */}
+          <div 
+            className="fixed inset-0 z-10" 
+            onClick={() => setShowProjectSelector(false)}
+          />
+          <div className="absolute top-16 left-6 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900">Switch Project</h3>
                 <button
-                  key={project._id}
-                  onClick={() => {
-                    setActiveProject(project);
-                    setShowProjectSelector(false);
-                  }}
-                  className={`w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-gray-50 ${
-                    activeProject?._id === project._id ? 'bg-blue-50 border border-blue-200' : ''
-                  }`}
+                  onClick={() => setShowProjectSelector(false)}
+                  className="p-1 hover:bg-gray-100 rounded-lg"
                 >
-                  <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: project.color }} />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{project.name}</h4>
-                    <p className="text-sm text-gray-600">{project.description}</p>
-                  </div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
-                    {project.status}
-                  </span>
+                  <X className="w-4 h-4 text-gray-500" />
                 </button>
-              ))}
+              </div>
+              <div className="flex items-center gap-2 mb-3">
+                <Search className="w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search projects..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="space-y-1 max-h-96 overflow-y-auto">
+                {projects.map((project) => (
+                  <button
+                    key={project._id}
+                    onClick={() => {
+                      setActiveProject(project);
+                      setShowProjectSelector(false);
+                    }}
+                    className={`w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-gray-50 ${
+                      activeProject?._id === project._id ? 'bg-blue-50 border border-blue-200' : ''
+                    }`}
+                  >
+                    <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: project.color }} />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{project.name}</h4>
+                      <p className="text-sm text-gray-600">{project.description}</p>
+                    </div>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
+                      {project.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
@@ -1035,7 +1056,7 @@ const ProjectViewDetailed: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Team Members</h3>
             <div className="space-y-3">
-              {activeProject?.team.slice(0, 5).map((member) => (
+              {activeProject?.team?.slice(0, 5).map((member) => (
                 <div key={member._id} className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-gray-400" />
@@ -1049,7 +1070,7 @@ const ProjectViewDetailed: React.FC = () => {
                   </button>
                 </div>
               ))}
-              {activeProject && activeProject.team.length > 5 && (
+              {activeProject && activeProject.team && activeProject.team.length > 5 && (
                 <p className="text-sm text-gray-600 text-center">
                   +{activeProject.team.length - 5} more members
                 </p>
@@ -1063,24 +1084,24 @@ const ProjectViewDetailed: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">Total Tasks</span>
-                <span className="font-medium text-gray-900">{activeProject?.tasks.length}</span>
+                <span className="font-medium text-gray-900">{activeProject?.tasks?.length || 0}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">Completed</span>
                 <span className="font-medium text-gray-900">
-                  {activeProject?.tasks.filter(t => t.status === 'completed').length}
+                  {activeProject?.tasks?.filter(t => t.status === 'completed').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">In Progress</span>
                 <span className="font-medium text-gray-900">
-                  {activeProject?.tasks.filter(t => t.status === 'in-progress').length}
+                  {activeProject?.tasks?.filter(t => t.status === 'in-progress').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">Overdue</span>
                 <span className="font-medium text-red-600">
-                  {activeProject?.tasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed').length}
+                  {activeProject?.tasks?.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed').length || 0}
                 </span>
               </div>
             </div>
@@ -1793,8 +1814,8 @@ const ProjectViewDetailed: React.FC = () => {
         );
       
       case 'tasks':
-        // PM sees task assignment interface, others see their tasks
-        if (currentUserRole === 'project-manager' || isProjectManager) {
+        // PM/Owner sees task assignment interface, employees see their tasks
+        if (currentUserRole === 'owner' || currentUserRole === 'manager' || isProjectManager) {
           return (
             <ProjectTaskAssignmentTab
               projectId={activeProject?._id || ''}
@@ -1808,7 +1829,14 @@ const ProjectViewDetailed: React.FC = () => {
             />
           );
         }
-        return renderTasksView();
+        // Employee view - only their assigned tasks
+        return (
+          <EmployeeTasksTab
+            tasks={projectTasks}
+            currentUserId={currentTestUserId}
+            onUpdateTask={handleUpdateTask}
+          />
+        );
       
       case 'timeline':
         return renderTimelineView();
@@ -2020,7 +2048,7 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Role Switcher (Testing Only) */}
       <RoleSwitcher
-        currentRole={currentUserRole as any}
+        currentRole={(currentUserRole === 'manager' ? 'project-manager' : currentUserRole) as any}
         onRoleChange={handleRoleChange}
         currentUserId={currentTestUserId}
         onUserChange={handleUserChange}

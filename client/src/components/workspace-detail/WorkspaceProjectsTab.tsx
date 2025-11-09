@@ -37,7 +37,19 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   });
   
   // Get projects and clients from AppContext
-  const workspaceProjects = state.projects.filter(p => p.workspace === workspaceId);
+  const workspace = state.workspaces.find(w => w._id === workspaceId);
+  const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
+  
+  // Filter projects based on user role
+  // Owner sees all projects, employees see only projects they're assigned to
+  const allWorkspaceProjects = state.projects.filter(p => p.workspace === workspaceId);
+  const workspaceProjects = isWorkspaceOwner 
+    ? allWorkspaceProjects
+    : allWorkspaceProjects.filter(p => 
+        (p as any).team?.some((member: any) => member._id === state.userProfile._id) ||
+        p.createdBy === state.userProfile._id
+      );
+  
   const workspaceClients = state.clients || [];
 
   const handleCreateProject = () => {
@@ -223,13 +235,15 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               Manage projects associated with clients in this workspace ({filteredProjects.length} projects)
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Create Project
-          </button>
+          {isWorkspaceOwner && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Create Project
+            </button>
+          )}
         </div>
 
         {/* Client Filter Badge */}
