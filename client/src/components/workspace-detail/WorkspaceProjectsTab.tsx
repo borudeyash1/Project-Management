@@ -3,24 +3,9 @@ import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { 
   Plus, FolderOpen, Edit, Trash2, X, Calendar, DollarSign, 
-  Users, Tag, AlertCircle, Eye, Briefcase, Clock
+  Users, Tag, AlertCircle, Eye, Briefcase, Clock, CheckCircle,
+  Pause, XCircle, Play, Archive
 } from 'lucide-react';
-
-interface WorkspaceProject {
-  _id: string;
-  name: string;
-  description: string;
-  clientId: string;
-  clientName: string;
-  startDate: Date;
-  dueDate: Date;
-  budget?: number;
-  status: 'planning' | 'active' | 'on-hold' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  tags: string[];
-  assignedMembers: string[];
-  createdAt: Date;
-}
 
 interface WorkspaceProjectsTabProps {
   workspaceId: string;
@@ -33,148 +18,135 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   selectedClientId,
   onClearClientFilter 
 }) => {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const navigate = useNavigate();
-  const [projects, setProjects] = useState<WorkspaceProject[]>([]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingProject, setEditingProject] = useState<WorkspaceProject | null>(null);
-  
-  // Mock clients - in real app, fetch from WorkspaceClientsTab
-  const mockClients = [
-    { _id: 'client1', name: 'Acme Corp' },
-    { _id: 'client2', name: 'Tech Solutions Inc' },
-    { _id: 'client3', name: 'Global Enterprises' }
-  ];
-
-  const [projectForm, setProjectForm] = useState<{
-    name: string;
-    description: string;
-    clientId: string;
-    startDate: string;
-    dueDate: string;
-    budget: string;
-    status: 'planning' | 'active' | 'on-hold' | 'completed';
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    tags: string[];
-    assignedMembers: string[];
-  }>({
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedProjectForStatus, setSelectedProjectForStatus] = useState<any | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [projectForm, setProjectForm] = useState({
     name: '',
     description: '',
-    clientId: '',
+    client: '',
+    status: 'planning' as 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled' | 'abandoned',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
     startDate: new Date().toISOString().split('T')[0],
     dueDate: '',
-    budget: '',
-    status: 'planning',
-    priority: 'medium',
-    tags: [],
-    assignedMembers: []
+    budgetEstimated: '',
+    budgetActual: '0',
+    tags: ''
   });
+  
+  // Get projects and clients from AppContext
+  const workspaceProjects = state.projects.filter(p => p.workspace === workspaceId);
+  const workspaceClients = state.clients || [];
 
-  const [tagInput, setTagInput] = useState('');
-
-  const resetForm = () => {
-    setProjectForm({
-      name: '',
-      description: '',
-      clientId: '',
-      startDate: new Date().toISOString().split('T')[0],
-      dueDate: '',
-      budget: '',
-      status: 'planning',
-      priority: 'medium',
-      tags: [],
-      assignedMembers: []
-    });
-    setTagInput('');
-    setEditingProject(null);
-  };
-
-  const handleAddProject = () => {
-    if (!projectForm.name.trim() || !projectForm.clientId) {
+  const handleCreateProject = () => {
+    if (!projectForm.name.trim()) {
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Please fill in required fields (Name and Client)',
+          message: 'Please enter a project name',
           duration: 3000
         }
       });
       return;
     }
 
-    const clientName = mockClients.find(c => c._id === projectForm.clientId)?.name || '';
+    const newProject = {
+      _id: `project_${Date.now()}`,
+      name: projectForm.name,
+      description: projectForm.description,
+      client: projectForm.client,
+      workspace: workspaceId,
+      createdBy: state.userProfile._id,
+      status: projectForm.status,
+      priority: projectForm.priority,
+      startDate: projectForm.startDate ? new Date(projectForm.startDate) : undefined,
+      dueDate: projectForm.dueDate ? new Date(projectForm.dueDate) : undefined,
+      budget: {
+        estimated: parseFloat(projectForm.budgetEstimated) || 0,
+        actual: parseFloat(projectForm.budgetActual) || 0,
+        currency: 'USD'
+      },
+      progress: 0,
+      team: [],
+      teamMembers: [],
+      milestones: [],
+      tags: projectForm.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: true,
+        timeTracking: { enabled: true, requireApproval: false },
+        notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true }
+      },
+      isActive: true,
+      teamMemberCount: 0,
+      completedTasksCount: 0,
+      totalTasksCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
 
-    if (editingProject) {
-      // Update existing project
-      setProjects(projects.map(p => 
-        p._id === editingProject._id 
-          ? {
-              ...p,
-              ...projectForm,
-              clientName,
-              startDate: new Date(projectForm.startDate),
-              dueDate: new Date(projectForm.dueDate),
-              budget: projectForm.budget ? parseFloat(projectForm.budget) : undefined
-            }
-          : p
-      ));
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Project updated successfully!',
-          duration: 3000
-        }
-      });
-    } else {
-      // Add new project
-      const newProject: WorkspaceProject = {
-        _id: `project_${Date.now()}`,
-        ...projectForm,
-        clientName,
-        startDate: new Date(projectForm.startDate),
-        dueDate: new Date(projectForm.dueDate),
-        budget: projectForm.budget ? parseFloat(projectForm.budget) : undefined,
-        createdAt: new Date()
-      };
-      setProjects([...projects, newProject]);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Project created successfully!',
-          duration: 3000
-        }
-      });
-    }
-    
-    resetForm();
-    setShowAddModal(false);
+    dispatch({
+      type: 'ADD_PROJECT',
+      payload: newProject as any
+    });
+
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Project created successfully!',
+        duration: 3000
+      }
+    });
+
+    setShowCreateModal(false);
+    setProjectForm({
+      name: '',
+      description: '',
+      client: '',
+      status: 'planning',
+      priority: 'medium',
+      startDate: new Date().toISOString().split('T')[0],
+      dueDate: '',
+      budgetEstimated: '',
+      budgetActual: '0',
+      tags: ''
+    });
   };
 
-  const handleEditProject = (project: WorkspaceProject) => {
-    setEditingProject(project);
-    setProjectForm({
-      name: project.name,
-      description: project.description,
-      clientId: project.clientId,
-      startDate: new Date(project.startDate).toISOString().split('T')[0],
-      dueDate: new Date(project.dueDate).toISOString().split('T')[0],
-      budget: project.budget?.toString() || '',
-      status: project.status,
-      priority: project.priority,
-      tags: project.tags,
-      assignedMembers: project.assignedMembers
+  const handleUpdateProjectStatus = (projectId: string, newStatus: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled' | 'abandoned') => {
+    dispatch({
+      type: 'UPDATE_PROJECT',
+      payload: {
+        projectId,
+        updates: { status: newStatus }
+      }
     });
-    setShowAddModal(true);
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: `Project status updated to ${newStatus}`,
+        duration: 3000
+      }
+    });
+    setShowStatusModal(false);
+    setSelectedProjectForStatus(null);
   };
 
   const handleDeleteProject = (projectId: string) => {
-    if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-      setProjects(projects.filter(p => p._id !== projectId));
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      dispatch({
+        type: 'DELETE_PROJECT',
+        payload: projectId
+      });
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -187,35 +159,27 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
     }
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && !projectForm.tags.includes(tagInput.trim())) {
-      setProjectForm({
-        ...projectForm,
-        tags: [...projectForm.tags, tagInput.trim()]
-      });
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setProjectForm({
-      ...projectForm,
-      tags: projectForm.tags.filter(t => t !== tag)
-    });
-  };
-
-  const handleCloseModal = () => {
-    setShowAddModal(false);
-    resetForm();
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'planning': return 'bg-gray-100 text-gray-700';
       case 'active': return 'bg-green-100 text-green-700';
       case 'on-hold': return 'bg-yellow-100 text-yellow-700';
       case 'completed': return 'bg-blue-100 text-blue-700';
+      case 'cancelled': return 'bg-red-100 text-red-700';
+      case 'abandoned': return 'bg-orange-100 text-orange-700';
       default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'planning': return <Clock className="w-4 h-4" />;
+      case 'active': return <Play className="w-4 h-4" />;
+      case 'on-hold': return <Pause className="w-4 h-4" />;
+      case 'completed': return <CheckCircle className="w-4 h-4" />;
+      case 'cancelled': return <XCircle className="w-4 h-4" />;
+      case 'abandoned': return <Archive className="w-4 h-4" />;
+      default: return <FolderOpen className="w-4 h-4" />;
     }
   };
 
@@ -224,28 +188,29 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
       case 'low': return 'bg-gray-100 text-gray-700';
       case 'medium': return 'bg-blue-100 text-blue-700';
       case 'high': return 'bg-orange-100 text-orange-700';
-      case 'urgent': return 'bg-red-100 text-red-700';
+      case 'critical': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
 
   // Filter projects by selected client
   const filteredProjects = selectedClientId 
-    ? projects.filter(p => p.clientId === selectedClientId)
-    : projects;
+    ? workspaceProjects.filter(p => p.client === workspaceClients.find(c => c._id === selectedClientId)?.name)
+    : workspaceProjects;
 
   // Group projects by client
-  const projectsByClient = filteredProjects.reduce((acc, project) => {
-    if (!acc[project.clientName]) {
-      acc[project.clientName] = [];
+  const projectsByClient = filteredProjects.reduce((acc: Record<string, any[]>, project) => {
+    const clientName = project.client || 'No Client';
+    if (!acc[clientName]) {
+      acc[clientName] = [];
     }
-    acc[project.clientName].push(project);
+    acc[clientName].push(project);
     return acc;
-  }, {} as Record<string, WorkspaceProject[]>);
+  }, {});
 
   // Get selected client name
   const selectedClientName = selectedClientId 
-    ? sessionStorage.getItem('selectedClientName') || mockClients.find(c => c._id === selectedClientId)?.name
+    ? workspaceClients.find(c => c._id === selectedClientId)?.name
     : null;
 
   return (
@@ -255,11 +220,11 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Workspace Projects</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Manage projects associated with clients in this workspace
+              Manage projects associated with clients in this workspace ({filteredProjects.length} projects)
             </p>
           </div>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => setShowCreateModal(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -285,11 +250,11 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         )}
 
         {/* Projects List */}
-        {projects.length === 0 ? (
+        {filteredProjects.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <FolderOpen className="w-12 h-12 mx-auto mb-3 text-gray-400" />
             <p className="font-medium">No projects yet</p>
-            <p className="text-sm mt-1">Create a project to get started</p>
+            <p className="text-sm mt-1">Projects will appear here</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -298,95 +263,99 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                 <div className="flex items-center gap-2 mb-3">
                   <Briefcase className="w-4 h-4 text-gray-600" />
                   <h4 className="font-semibold text-gray-900">{clientName}</h4>
-                  <span className="text-sm text-gray-500">({clientProjects.length} project{clientProjects.length !== 1 ? 's' : ''})</span>
+                  <span className="text-sm text-gray-500">({clientProjects.length})</span>
                 </div>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {clientProjects.map((project) => (
-                    <div key={project._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow group cursor-pointer">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {clientProjects.map((project: any) => (
+                    <div 
+                      key={project._id}
+                      className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      {/* Project Header */}
                       <div className="flex items-start justify-between mb-3">
-                        <div 
-                          className="flex-1"
-                          onClick={() => {
-                            // Store workspace ID for project context
-                            sessionStorage.setItem('currentWorkspaceId', workspaceId);
-                            navigate(`/project-view/${project._id}`);
-                          }}
-                        >
-                          <h5 className="font-semibold text-gray-900 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
-                            <FolderOpen className="w-4 h-4 text-blue-600" />
-                            {project.name}
-                          </h5>
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                            {project.description || 'No description'}
-                          </p>
-                          <p className="text-xs text-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            Click to open project →
-                          </p>
-                        </div>
-                        <div className="flex gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              sessionStorage.setItem('currentWorkspaceId', workspaceId);
-                              navigate(`/project-view/${project._id}`);
-                            }}
-                            className="text-gray-600 hover:text-gray-700 p-1"
-                            title="View Project"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditProject(project);
-                            }}
-                            className="text-blue-600 hover:text-blue-700 p-1"
-                            title="Edit Project"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteProject(project._id);
-                            }}
-                            className="text-red-600 hover:text-red-700 p-1"
-                            title="Delete Project"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                        <div className="flex-1">
+                          <h5 className="font-semibold text-gray-900 mb-1">{project.name}</h5>
+                          <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
                         </div>
                       </div>
 
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(project.startDate).toLocaleDateString()} - {new Date(project.dueDate).toLocaleDateString()}
-                        </div>
-                        {project.budget && (
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <DollarSign className="w-3 h-3" />
-                            ${project.budget.toLocaleString()}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2 mt-3 flex-wrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
+                      {/* Status and Priority */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
+                          {getStatusIcon(project.status)}
                           {project.status}
                         </span>
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(project.priority)}`}>
                           {project.priority}
                         </span>
-                        {project.tags.slice(0, 2).map(tag => (
-                          <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700">
-                            {tag}
-                          </span>
-                        ))}
-                        {project.tags.length > 2 && (
-                          <span className="text-xs text-gray-500">+{project.tags.length - 2} more</span>
+                      </div>
+
+                      {/* Project Details */}
+                      <div className="space-y-2 mb-3 text-sm text-gray-600">
+                        {project.startDate && (
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>
+                              {new Date(project.startDate).toLocaleDateString()} - {new Date(project.dueDate).toLocaleDateString()}
+                            </span>
+                          </div>
                         )}
+                        {project.budget && (
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4" />
+                            <span>
+                              ${project.budget.actual?.toLocaleString()} / ${project.budget.estimated?.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full transition-all"
+                              style={{ width: `${project.progress || 0}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-medium">{project.progress || 0}%</span>
+                        </div>
+                      </div>
+
+                      {/* Tags */}
+                      {project.tags && project.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {project.tags.map((tag: string, idx: number) => (
+                            <span key={idx} className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                        <button
+                          onClick={() => navigate(`/project-view/${project._id}`)}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          <Eye className="w-3 h-3" />
+                          View
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedProjectForStatus(project);
+                            setShowStatusModal(true);
+                          }}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                        >
+                          <Edit className="w-3 h-3" />
+                          Status
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProject(project._id)}
+                          className="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -397,51 +366,128 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         )}
       </div>
 
-      {/* Add/Edit Project Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
-          <div className="bg-white rounded-lg p-6 max-w-3xl w-full mx-4 my-8">
+      {/* Status Update Modal */}
+      {showStatusModal && selectedProjectForStatus && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {editingProject ? 'Edit Project' : 'Create Project'}
-              </h3>
-              <button onClick={handleCloseModal}>
-                <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Update Project Status</h3>
+              <button
+                onClick={() => {
+                  setShowStatusModal(false);
+                  setSelectedProjectForStatus(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
-            
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-              <div className="grid grid-cols-2 gap-4">
+
+            <p className="text-sm text-gray-600 mb-4">
+              Project: <span className="font-medium">{selectedProjectForStatus.name}</span>
+            </p>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'planning')}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+              >
+                <Clock className="w-5 h-5 text-gray-600" />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={projectForm.name}
-                    onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Website Redesign"
-                  />
+                  <div className="font-medium text-gray-900">Planning</div>
+                  <div className="text-xs text-gray-500">Project is in planning phase</div>
                 </div>
-                
+              </button>
+
+              <button
+                onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'active')}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+              >
+                <Play className="w-5 h-5 text-green-600" />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Client *
-                  </label>
-                  <select
-                    value={projectForm.clientId}
-                    onChange={(e) => setProjectForm({ ...projectForm, clientId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select a client</option>
-                    {mockClients.map(client => (
-                      <option key={client._id} value={client._id}>{client.name}</option>
-                    ))}
-                  </select>
+                  <div className="font-medium text-gray-900">Active</div>
+                  <div className="text-xs text-gray-500">Project is actively being worked on</div>
                 </div>
+              </button>
+
+              <button
+                onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'on-hold')}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+              >
+                <Pause className="w-5 h-5 text-yellow-600" />
+                <div>
+                  <div className="font-medium text-gray-900">On Hold</div>
+                  <div className="text-xs text-gray-500">Project is temporarily paused</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'completed')}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+              >
+                <CheckCircle className="w-5 h-5 text-blue-600" />
+                <div>
+                  <div className="font-medium text-gray-900">Completed</div>
+                  <div className="text-xs text-gray-500">Project is successfully completed</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'cancelled')}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+              >
+                <XCircle className="w-5 h-5 text-red-600" />
+                <div>
+                  <div className="font-medium text-gray-900">Cancelled</div>
+                  <div className="text-xs text-gray-500">Project was cancelled</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'abandoned')}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+              >
+                <Archive className="w-5 h-5 text-orange-600" />
+                <div>
+                  <div className="font-medium text-gray-900">Abandoned</div>
+                  <div className="text-xs text-gray-500">Project was abandoned</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Create New Project</h3>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Project Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Name *
+                </label>
+                <input
+                  type="text"
+                  value={projectForm.name}
+                  onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter project name"
+                />
               </div>
 
+              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
@@ -450,50 +496,31 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   value={projectForm.description}
                   onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Project description..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter project description"
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={projectForm.startDate}
-                    onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Due Date
-                  </label>
-                  <input
-                    type="date"
-                    value={projectForm.dueDate}
-                    onChange={(e) => setProjectForm({ ...projectForm, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Budget ($)
-                  </label>
-                  <input
-                    type="number"
-                    value={projectForm.budget}
-                    onChange={(e) => setProjectForm({ ...projectForm, budget: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="10000"
-                  />
-                </div>
+              {/* Client */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Client
+                </label>
+                <select
+                  value={projectForm.client}
+                  onChange={(e) => setProjectForm({ ...projectForm, client: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select a client...</option>
+                  {workspaceClients.map((client) => (
+                    <option key={client._id} value={client.name}>
+                      {client.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
+              {/* Status and Priority */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -502,7 +529,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   <select
                     value={projectForm.status}
                     onChange={(e) => setProjectForm({ ...projectForm, status: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="planning">Planning</option>
                     <option value="active">Active</option>
@@ -518,60 +545,99 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   <select
                     value={projectForm.priority}
                     onChange={(e) => setProjectForm({ ...projectForm, priority: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
                     <option value="high">High</option>
-                    <option value="urgent">Urgent</option>
+                    <option value="critical">Critical</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tags
-                </label>
-                <div className="flex gap-2 mb-2">
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date
+                  </label>
                   <input
-                    type="text"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Add a tag..."
+                    type="date"
+                    value={projectForm.startDate}
+                    onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
-                  <button
-                    onClick={handleAddTag}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                  >
-                    Add
-                  </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {projectForm.tags.map(tag => (
-                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                      {tag}
-                      <button onClick={() => handleRemoveTag(tag)} className="hover:text-purple-900">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={projectForm.dueDate}
+                    onChange={(e) => setProjectForm({ ...projectForm, dueDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
-              
-              <div className="flex gap-3 pt-4 border-t border-gray-200">
+
+              {/* Budget */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Estimated Budget ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={projectForm.budgetEstimated}
+                    onChange={(e) => setProjectForm({ ...projectForm, budgetEstimated: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Actual Spent ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={projectForm.budgetActual}
+                    onChange={(e) => setProjectForm({ ...projectForm, budgetActual: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={projectForm.tags}
+                  onChange={(e) => setProjectForm({ ...projectForm, tags: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., Web, Mobile, Design"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4">
                 <button
-                  onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={handleCreateProject}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  Cancel
+                  Create Project
                 </button>
                 <button
-                  onClick={handleAddProject}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
-                  {editingProject ? 'Update Project' : 'Create Project'}
+                  Cancel
                 </button>
               </div>
             </div>

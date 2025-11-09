@@ -217,7 +217,8 @@ export interface Project {
   client?: string;
   workspace: string;
   createdBy: string;
-  status: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled';
+  projectManager?: string; // User ID of the project manager
+  status: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled' | 'abandoned';
   priority: 'low' | 'medium' | 'high' | 'critical';
   category?: string;
   startDate?: Date;
@@ -229,6 +230,13 @@ export interface Project {
     currency: string;
   };
   progress: number;
+  team?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    role: 'project-manager' | 'member';
+    addedAt: Date;
+  }>;
   teamMembers: ProjectTeamMember[];
   milestones: Milestone[];
   tags: string[];
@@ -240,6 +248,7 @@ export interface Project {
   totalTasksCount: number;
   createdAt: Date;
   updatedAt: Date;
+  tasks?: any[]; // For storing project tasks
 }
 
 export interface ProjectTeamMember {
@@ -561,8 +570,27 @@ export interface AppState {
   workspaces: Workspace[];
   pendingWorkspaceRequests: any[];
   mode: string;
+  clients: Client[];
   projects: Project[];
   tasks: Task[];
+}
+
+export interface Client {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  industry?: string;
+  website?: string;
+  address?: string;
+  contactPerson?: string;
+  status: 'active' | 'inactive';
+  projectsCount?: number;
+  totalRevenue?: number;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Toast {
