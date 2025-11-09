@@ -207,17 +207,111 @@ const initialState: AppState = {
   ],
   pendingWorkspaceRequests: [],
   mode: 'Personal',
+  clients: [
+    {
+      _id: 'client_1',
+      name: 'TechCorp Solutions',
+      email: 'contact@techcorp.com',
+      phone: '+1 555-0123',
+      company: 'TechCorp Solutions Inc.',
+      industry: 'Technology',
+      website: 'https://techcorp.com',
+      address: '123 Tech Street, San Francisco, CA 94105',
+      contactPerson: 'John Smith',
+      status: 'active',
+      projectsCount: 3,
+      totalRevenue: 150000,
+      notes: 'Premium client, high priority',
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date()
+    },
+    {
+      _id: 'client_2',
+      name: 'DesignHub Agency',
+      email: 'hello@designhub.io',
+      phone: '+1 555-0456',
+      company: 'DesignHub Creative Agency',
+      industry: 'Design & Marketing',
+      website: 'https://designhub.io',
+      address: '456 Creative Ave, New York, NY 10001',
+      contactPerson: 'Sarah Johnson',
+      status: 'active',
+      projectsCount: 2,
+      totalRevenue: 85000,
+      notes: 'Long-term partnership',
+      createdAt: new Date('2024-02-20'),
+      updatedAt: new Date()
+    },
+    {
+      _id: 'client_3',
+      name: 'StartupX',
+      email: 'team@startupx.com',
+      phone: '+1 555-0789',
+      company: 'StartupX Inc.',
+      industry: 'E-commerce',
+      website: 'https://startupx.com',
+      address: '789 Innovation Blvd, Austin, TX 78701',
+      contactPerson: 'Mike Chen',
+      status: 'active',
+      projectsCount: 1,
+      totalRevenue: 45000,
+      notes: 'Fast-growing startup, flexible deadlines',
+      createdAt: new Date('2024-03-10'),
+      updatedAt: new Date()
+    },
+    {
+      _id: 'client_4',
+      name: 'Global Finance Corp',
+      email: 'projects@globalfinance.com',
+      phone: '+1 555-0321',
+      company: 'Global Finance Corporation',
+      industry: 'Finance & Banking',
+      website: 'https://globalfinance.com',
+      address: '321 Wall Street, New York, NY 10005',
+      contactPerson: 'Emily Davis',
+      status: 'active',
+      projectsCount: 2,
+      totalRevenue: 200000,
+      notes: 'Enterprise client, strict compliance requirements',
+      createdAt: new Date('2024-01-05'),
+      updatedAt: new Date()
+    },
+    {
+      _id: 'client_5',
+      name: 'HealthTech Innovations',
+      email: 'info@healthtech.io',
+      phone: '+1 555-0654',
+      company: 'HealthTech Innovations LLC',
+      industry: 'Healthcare',
+      website: 'https://healthtech.io',
+      address: '654 Medical Plaza, Boston, MA 02108',
+      contactPerson: 'Dr. Robert Wilson',
+      status: 'inactive',
+      projectsCount: 1,
+      totalRevenue: 30000,
+      notes: 'Project on hold, potential future work',
+      createdAt: new Date('2024-04-15'),
+      updatedAt: new Date()
+    }
+  ],
   projects: [
     {
       _id: '1',
-      name: 'NovaTech Website',
-      client: 'NovaTech',
+      name: 'E-Commerce Platform Redesign',
+      client: 'TechCorp Solutions',
+      description: 'Complete redesign of the e-commerce platform with modern UI/UX',
       status: 'active',
-      dueDate: new Date('2024-10-25'),
+      dueDate: new Date('2024-12-31'),
+      startDate: new Date('2024-09-01'),
       priority: 'high',
+      budget: {
+        estimated: 75000,
+        actual: 45000,
+        currency: 'USD'
+      },
       workspace: '1',
       createdBy: '1',
-      progress: 75,
+      progress: 65,
       teamMembers: [
         { 
           user: '2', 
@@ -243,7 +337,130 @@ const initialState: AppState = {
         }
       ],
       milestones: [],
-      tags: [],
+      tags: ['E-commerce', 'UI/UX', 'React'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: true,
+        timeTracking: {
+          enabled: true,
+          requireApproval: false
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: true,
+      teamMemberCount: 5,
+      completedTasksCount: 12,
+      totalTasksCount: 18,
+      createdAt: new Date('2024-09-01'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '2',
+      name: 'Mobile App Development',
+      client: 'TechCorp Solutions',
+      description: 'Native iOS and Android app for customer engagement',
+      status: 'active',
+      dueDate: new Date('2025-02-28'),
+      startDate: new Date('2024-10-01'),
+      priority: 'critical',
+      budget: {
+        estimated: 120000,
+        actual: 35000,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 30,
+      teamMembers: [],
+      milestones: [],
+      tags: ['Mobile', 'iOS', 'Android', 'React Native'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: true,
+        timeTracking: {
+          enabled: true,
+          requireApproval: true
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: true,
+      teamMemberCount: 4,
+      completedTasksCount: 5,
+      totalTasksCount: 22,
+      createdAt: new Date('2024-10-01'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '3',
+      name: 'Brand Identity Refresh',
+      client: 'DesignHub Agency',
+      description: 'Complete brand identity redesign including logo, colors, and guidelines',
+      status: 'active',
+      dueDate: new Date('2024-11-30'),
+      startDate: new Date('2024-09-15'),
+      priority: 'medium',
+      budget: {
+        estimated: 35000,
+        actual: 28000,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 80,
+      teamMembers: [],
+      milestones: [],
+      tags: ['Branding', 'Design', 'Identity'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: true,
+        timeTracking: {
+          enabled: true,
+          requireApproval: false
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: true,
+      teamMemberCount: 3,
+      completedTasksCount: 15,
+      totalTasksCount: 18,
+      createdAt: new Date('2024-09-15'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '4',
+      name: 'Marketing Website',
+      client: 'DesignHub Agency',
+      description: 'Modern marketing website with CMS integration',
+      status: 'planning',
+      dueDate: new Date('2025-01-15'),
+      startDate: new Date('2024-11-01'),
+      priority: 'low',
+      budget: {
+        estimated: 25000,
+        actual: 0,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 10,
+      teamMembers: [],
+      milestones: [],
+      tags: ['Website', 'Marketing', 'CMS'],
       attachments: [],
       settings: {
         isPublic: false,
@@ -260,9 +477,173 @@ const initialState: AppState = {
       },
       isActive: true,
       teamMemberCount: 2,
-      completedTasksCount: 0,
-      totalTasksCount: 0,
-      createdAt: new Date(),
+      completedTasksCount: 1,
+      totalTasksCount: 8,
+      createdAt: new Date('2024-10-20'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '5',
+      name: 'E-commerce MVP',
+      client: 'StartupX',
+      description: 'Minimum viable product for online marketplace',
+      status: 'active',
+      dueDate: new Date('2024-12-15'),
+      startDate: new Date('2024-10-01'),
+      priority: 'high',
+      budget: {
+        estimated: 45000,
+        actual: 22000,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 50,
+      teamMembers: [],
+      milestones: [],
+      tags: ['MVP', 'E-commerce', 'Startup'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: true,
+        timeTracking: {
+          enabled: true,
+          requireApproval: false
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: true,
+      teamMemberCount: 4,
+      completedTasksCount: 8,
+      totalTasksCount: 16,
+      createdAt: new Date('2024-10-01'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '6',
+      name: 'Banking Portal Upgrade',
+      client: 'Global Finance Corp',
+      description: 'Security upgrade and feature enhancement for online banking',
+      status: 'active',
+      dueDate: new Date('2025-03-31'),
+      startDate: new Date('2024-09-01'),
+      priority: 'critical',
+      budget: {
+        estimated: 150000,
+        actual: 60000,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 40,
+      teamMembers: [],
+      milestones: [],
+      tags: ['Banking', 'Security', 'Enterprise'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: false,
+        timeTracking: {
+          enabled: true,
+          requireApproval: true
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: true,
+      teamMemberCount: 8,
+      completedTasksCount: 18,
+      totalTasksCount: 45,
+      createdAt: new Date('2024-09-01'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '7',
+      name: 'Financial Dashboard',
+      client: 'Global Finance Corp',
+      description: 'Real-time analytics dashboard for financial data',
+      status: 'on-hold',
+      dueDate: new Date('2025-04-30'),
+      startDate: new Date('2024-10-15'),
+      priority: 'medium',
+      budget: {
+        estimated: 50000,
+        actual: 8000,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 15,
+      teamMembers: [],
+      milestones: [],
+      tags: ['Dashboard', 'Analytics', 'Finance'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: false,
+        timeTracking: {
+          enabled: true,
+          requireApproval: true
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: true,
+      teamMemberCount: 3,
+      completedTasksCount: 2,
+      totalTasksCount: 12,
+      createdAt: new Date('2024-10-15'),
+      updatedAt: new Date()
+    },
+    {
+      _id: '8',
+      name: 'Patient Portal',
+      client: 'HealthTech Innovations',
+      description: 'HIPAA-compliant patient management system',
+      status: 'completed',
+      dueDate: new Date('2024-09-30'),
+      startDate: new Date('2024-06-01'),
+      priority: 'high',
+      budget: {
+        estimated: 30000,
+        actual: 30000,
+        currency: 'USD'
+      },
+      workspace: '1',
+      createdBy: '1',
+      progress: 100,
+      teamMembers: [],
+      milestones: [],
+      tags: ['Healthcare', 'HIPAA', 'Portal'],
+      attachments: [],
+      settings: {
+        isPublic: false,
+        allowMemberInvites: false,
+        timeTracking: {
+          enabled: true,
+          requireApproval: true
+        },
+        notifications: {
+          taskUpdates: true,
+          milestoneReminders: true,
+          deadlineAlerts: true
+        }
+      },
+      isActive: false,
+      teamMemberCount: 4,
+      completedTasksCount: 20,
+      totalTasksCount: 20,
+      createdAt: new Date('2024-06-01'),
       updatedAt: new Date()
     }
   ],
@@ -321,7 +702,11 @@ type AppAction =
   | { type: 'TOGGLE_USER_MENU' }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'ADD_PROJECT'; payload: Project }
+  | { type: 'UPDATE_PROJECT'; payload: { projectId: string; updates: Partial<Project> } }
+  | { type: 'DELETE_PROJECT'; payload: string }
   | { type: 'ADD_TASK'; payload: Task }
+  | { type: 'UPDATE_TASK'; payload: { taskId: string; updates: Partial<Task> } }
+  | { type: 'DELETE_TASK'; payload: string }
   | { type: 'ADD_WORKSPACE'; payload: Workspace }
   | { type: 'UPDATE_WORKSPACE'; payload: Partial<Workspace> & { _id: string } }
   | { type: 'ADD_PENDING_REQUEST'; payload: any }
@@ -389,8 +774,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     case 'ADD_PROJECT':
       return { ...state, projects: [...state.projects, action.payload] };
+    case 'UPDATE_PROJECT':
+      return {
+        ...state,
+        projects: state.projects.map(project =>
+          project._id === action.payload.projectId ? { ...project, ...action.payload.updates } : project
+        )
+      };
+    case 'DELETE_PROJECT':
+      return {
+        ...state,
+        projects: state.projects.filter(project => project._id !== action.payload)
+      };
     case 'ADD_TASK':
       return { ...state, tasks: [...state.tasks, action.payload] };
+    case 'UPDATE_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.map(task =>
+          task._id === action.payload.taskId ? { ...task, ...action.payload.updates } : task
+        )
+      };
+    case 'DELETE_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.filter(task => task._id !== action.payload)
+      };
     case 'ADD_WORKSPACE':
       return { ...state, workspaces: [...state.workspaces, action.payload] };
     case 'UPDATE_WORKSPACE':

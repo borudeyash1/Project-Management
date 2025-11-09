@@ -162,16 +162,16 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         }>
           <Route path="overview" element={<ProjectOverview />} />
-          <Route path="info" element={<div className="p-6">Project Info - Coming Soon</div>} />
-          <Route path="team" element={<div className="p-6">Team Management - Coming Soon</div>} />
-          <Route path="tasks" element={<div className="p-6">Tasks & Board - Coming Soon</div>} />
-          <Route path="timeline" element={<div className="p-6">Timeline - Coming Soon</div>} />
-          <Route path="progress" element={<div className="p-6">Progress Tracker - Coming Soon</div>} />
-          <Route path="workload" element={<div className="p-6">Workload Management - Coming Soon</div>} />
-          <Route path="reports" element={<div className="p-6">Reports - Coming Soon</div>} />
-          <Route path="documents" element={<div className="p-6">Documents - Coming Soon</div>} />
-          <Route path="inbox" element={<div className="p-6">Project Inbox - Coming Soon</div>} />
-          <Route path="settings" element={<div className="p-6">Project Settings - Coming Soon</div>} />
+          <Route path="info" element={<ProjectViewDetailed />} />
+          <Route path="team" element={<ProjectViewDetailed />} />
+          <Route path="tasks" element={<ProjectViewDetailed />} />
+          <Route path="timeline" element={<ProjectViewDetailed />} />
+          <Route path="progress" element={<ProjectViewDetailed />} />
+          <Route path="workload" element={<ProjectViewDetailed />} />
+          <Route path="reports" element={<ProjectViewDetailed />} />
+          <Route path="documents" element={<ProjectViewDetailed />} />
+          <Route path="inbox" element={<ProjectViewDetailed />} />
+          <Route path="settings" element={<ProjectViewDetailed />} />
           <Route index element={<Navigate to="overview" replace />} />
         </Route>
 

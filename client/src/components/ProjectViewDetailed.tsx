@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronDown, ChevronRight, Users, Calendar, Clock, Target, 
   BarChart3, MessageSquare, Settings, Plus, Filter, Search,
@@ -19,13 +19,22 @@ import {
   Bold, Italic, Underline, AlignLeft, AlignCenter,
   AlignRight, List as ListIcon, Quote,
   Code, Link as LinkIcon, Image as ImageIcon, Video,
-  Music, File
+  Music, File, Folder
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
 import AddTeamMemberModal from './AddTeamMemberModal';
 import InviteMemberModal from './InviteMemberModal';
+import TaskCreationModal from './TaskCreationModal';
+import TaskDetailModal from './TaskDetailModal';
+import TaskReviewModal from './TaskReviewModal';
+import ProjectInfoTab from './project-tabs/ProjectInfoTab';
+import ProjectTeamTab from './project-tabs/ProjectTeamTab';
+import ProjectProgressTab from './project-tabs/ProjectProgressTab';
+import ProjectRequestsTab from './project-tabs/ProjectRequestsTab';
+import ProjectTaskAssignmentTab from './project-tabs/ProjectTaskAssignmentTab';
+import RoleSwitcher from './RoleSwitcher';
 
 interface Project {
   _id: string;
@@ -78,6 +87,8 @@ interface Task {
   _id: string;
   title: string;
   description: string;
+  taskType?: 'task' | 'bug' | 'feature' | 'improvement' | 'research' | 'documentation';
+  category?: 'development' | 'design' | 'testing' | 'deployment' | 'meeting' | 'review' | 'other';
   status: 'pending' | 'in-progress' | 'review' | 'completed' | 'blocked';
   priority: 'low' | 'medium' | 'high' | 'critical';
   assignee: TeamMember;
@@ -89,12 +100,16 @@ interface Task {
   subtasks: Subtask[];
   comments: Comment[];
   attachments: Attachment[];
+  links: string[];
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
   dependencies: string[];
   isMilestone: boolean;
   milestoneId?: string;
+  rating?: number;
+  reviewComments?: string;
+  completedAt?: Date;
 }
 
 interface Subtask {
@@ -176,13 +191,14 @@ interface TeamMemberPermissions {
 
 const ProjectViewDetailed: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
+  const location = useLocation();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
   const { isDarkMode } = useTheme();
   
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [activeView, setActiveView] = useState<'overview' | 'tasks' | 'timeline' | 'team' | 'documents' | 'analytics'>('overview');
+  const [activeView, setActiveView] = useState<'overview' | 'info' | 'team' | 'tasks' | 'timeline' | 'progress' | 'workload' | 'reports' | 'documents' | 'inbox' | 'settings' | 'analytics'>('overview');
   const [showProjectSelector, setShowProjectSelector] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showManageProject, setShowManageProject] = useState(false);
@@ -191,20 +207,98 @@ const ProjectViewDetailed: React.FC = () => {
   const [showInviteMemberModal, setShowInviteMemberModal] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview', 'team']));
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTaskDetail, setShowTaskDetail] = useState(false);
+  const [showTaskReview, setShowTaskReview] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState<string>('project-manager'); // Testing: can be 'owner', 'project-manager', 'employee'
+  const [currentTestUserId, setCurrentTestUserId] = useState('user_pm_456'); // Testing user ID
+  const [currentTestUserName, setCurrentTestUserName] = useState('Jane Smith (PM)'); // Testing user name
+  const [taskFilter, setTaskFilter] = useState<'all' | 'my' | 'overdue' | 'review'>('all');
+  const [requests, setRequests] = useState<any[]>([]); // Workload/deadline requests
+  const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment
 
-  // Load project data based on URL parameter
+  // Detect active view from URL path
   useEffect(() => {
-    if (projectId && projects.length > 0) {
-      const project = projects.find(p => p._id === projectId);
+    const path = location.pathname;
+    if (path.includes('/info')) setActiveView('info');
+    else if (path.includes('/team')) setActiveView('team');
+    else if (path.includes('/tasks')) setActiveView('tasks');
+    else if (path.includes('/timeline')) setActiveView('timeline');
+    else if (path.includes('/progress')) setActiveView('progress');
+    else if (path.includes('/workload')) setActiveView('workload');
+    else if (path.includes('/reports')) setActiveView('reports');
+    else if (path.includes('/documents')) setActiveView('documents');
+    else if (path.includes('/inbox')) setActiveView('inbox');
+    else if (path.includes('/settings')) setActiveView('settings');
+    else setActiveView('overview');
+  }, [location.pathname]);
+
+  // Load project data from AppContext
+  useEffect(() => {
+    if (projectId && state.projects.length > 0) {
+      const project = state.projects.find(p => p._id === projectId);
       if (project) {
-        setActiveProject(project);
+        // Mock team members for testing
+        const mockTeam = [
+          {
+            _id: 'user_pm_456',
+            name: 'Jane Smith',
+            email: 'jane.smith@company.com',
+            role: 'project-manager',
+            status: 'active',
+            joinedAt: new Date('2024-01-01')
+          },
+          {
+            _id: 'user_emp_789',
+            name: 'Bob Wilson',
+            email: 'bob.wilson@company.com',
+            role: 'developer',
+            status: 'active',
+            joinedAt: new Date('2024-01-15')
+          },
+          {
+            _id: 'user_emp_101',
+            name: 'Alice Johnson',
+            email: 'alice.johnson@company.com',
+            role: 'designer',
+            status: 'active',
+            joinedAt: new Date('2024-02-01')
+          },
+          {
+            _id: 'user_emp_102',
+            name: 'Charlie Brown',
+            email: 'charlie.brown@company.com',
+            role: 'developer',
+            status: 'active',
+            joinedAt: new Date('2024-02-15')
+          }
+        ];
+
+        // Ensure project has all necessary fields
+        const enrichedProject = {
+          ...project,
+          tasks: (project as any).tasks || state.tasks.filter(t => t.project === projectId) || [],
+          team: (project as any).team && (project as any).team.length > 0 ? (project as any).team : mockTeam,
+          documents: (project as any).documents || [],
+          timeline: (project as any).timeline || [],
+          milestones: (project as any).milestones || []
+        };
+        setActiveProject(enrichedProject as any);
       }
     }
-  }, [projectId, projects]);
+  }, [projectId, state.projects, state.tasks]);
 
-  // Mock data - replace with actual API calls
+  // Set projects from state
   useEffect(() => {
-    const mockProjects: Project[] = [
+    if (state.projects.length > 0) {
+      setProjects(state.projects as any);
+    }
+  }, [state.projects]);
+
+  // Mock data - BACKUP if no projects in state
+  useEffect(() => {
+    if (state.projects.length === 0) {
+      const mockProjects: Project[] = [
       {
         _id: '1',
         name: 'E-commerce Platform',
@@ -322,9 +416,10 @@ const ProjectViewDetailed: React.FC = () => {
       }
     ];
 
-    setProjects(mockProjects);
-    setActiveProject(mockProjects[0]);
-  }, []);
+      setProjects(mockProjects);
+      setActiveProject(mockProjects[0]);
+    }
+  }, [state.projects.length]);
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
@@ -344,11 +439,108 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  // Task Assignment Handlers (PM only)
+  const handleCreateTask = (task: any) => {
+    setProjectTasks([...projectTasks, { ...task, project: activeProject?._id }]);
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Task assigned successfully!',
+        duration: 3000
+      }
+    });
+  };
+
+  const handleUpdateTask = (taskId: string, updates: any) => {
+    setProjectTasks(projectTasks.map(t => t._id === taskId ? { ...t, ...updates } : t));
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Task updated successfully!',
+        duration: 3000
+      }
+    });
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setProjectTasks(projectTasks.filter(t => t._id !== taskId));
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Task deleted successfully!',
+        duration: 3000
+      }
+    });
+  };
+
+  const handleReassignTask = (taskId: string, newAssignee: string) => {
+    const task = projectTasks.find(t => t._id === taskId);
+    const member = (activeProject as any)?.team?.find((m: any) => m._id === newAssignee);
+    handleUpdateTask(taskId, { assignedTo: newAssignee, assignedToName: member?.name || 'Unknown' });
+  };
+
+  // Request Handlers
+  const handleCreateRequest = (request: any) => {
+    setRequests([...requests, request]);
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'info',
+        message: 'Request submitted to Project Manager!',
+        duration: 3000
+      }
+    });
+  };
+
+  const handleApproveRequest = (requestId: string) => {
+    setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'approved' } : r));
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Request approved!',
+        duration: 3000
+      }
+    });
+  };
+
+  const handleRejectRequest = (requestId: string, reason: string) => {
+    setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'rejected', rejectionReason: reason } : r));
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'info',
+        message: 'Request rejected!',
+        duration: 3000
+      }
+    });
+  };
+
+  // Role Switcher Handler (Testing only)
+  const handleRoleChange = (role: 'owner' | 'project-manager' | 'employee') => {
+    setCurrentUserRole(role);
+  };
+
+  const handleUserChange = (userId: string, userName: string, role: string) => {
+    setCurrentTestUserId(userId);
+    setCurrentTestUserName(userName);
+    setCurrentUserRole(role);
   };
 
   const getStatusColor = (status: string) => {
@@ -374,6 +566,7 @@ const ProjectViewDetailed: React.FC = () => {
 
   const renderProjectHeader = () => (
     <div className="bg-white border-b border-gray-200 px-6 py-4">
+      {/* Role Selector for Testing */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -403,13 +596,15 @@ const ProjectViewDetailed: React.FC = () => {
             <Settings className="w-4 h-4" />
             Settings
           </button>
-          <button
-            onClick={() => setShowCreateTask(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4" />
-            Add Task
-          </button>
+          {currentUserRole !== 'viewer' && (
+            <button
+              onClick={() => setShowCreateTask(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4" />
+              {currentUserRole === 'employee' ? 'Create Task' : 'Add Task'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -455,25 +650,38 @@ const ProjectViewDetailed: React.FC = () => {
   );
 
   const renderTabNavigation = () => {
-    const tabs = [
-      { id: 'overview', label: 'Overview', icon: LayoutGrid },
-      { id: 'tasks', label: 'Tasks', icon: CheckCircle },
-      { id: 'timeline', label: 'Timeline', icon: Calendar },
-      { id: 'team', label: 'Team', icon: Users },
-      { id: 'documents', label: 'Documents', icon: FileText },
-      { id: 'analytics', label: 'Analytics', icon: BarChart3 }
+    // Check if current user is workspace owner or project manager
+    const isWorkspaceOwner = activeProject?.createdBy === state.userProfile?._id;
+    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id || 
+                            (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
+    const canManageTeam = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
+
+    const allTabs = [
+      { id: 'overview', label: 'Overview', icon: LayoutGrid, visible: true },
+      { id: 'info', label: 'Project Info', icon: FileText, visible: true },
+      { id: 'team', label: 'Team', icon: Users, visible: canManageTeam }, // Only owner/PM can see
+      { id: 'tasks', label: 'Tasks & Board', icon: CheckCircle, visible: true },
+      { id: 'timeline', label: 'Timeline', icon: Calendar, visible: true },
+      { id: 'progress', label: 'Progress Tracker', icon: TrendingUp, visible: true },
+      { id: 'workload', label: 'Workload', icon: Activity, visible: true },
+      { id: 'reports', label: 'Reports', icon: BarChart3, visible: true },
+      { id: 'documents', label: 'Documents', icon: Folder, visible: true },
+      { id: 'inbox', label: 'Inbox', icon: Mail, visible: true },
+      { id: 'settings', label: 'Settings', icon: Settings, visible: canManageTeam }
     ];
+
+    const tabs = allTabs.filter(tab => tab.visible);
 
     return (
       <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
-        <nav className="flex space-x-8 px-6">
+        <nav className="flex space-x-4 px-6 overflow-x-auto">
           {tabs.map(tab => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id as any)}
-                className={`flex items-center gap-2 py-4 border-b-2 font-medium transition-colors ${
+                className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium transition-colors whitespace-nowrap ${
                   activeView === tab.id
                     ? 'border-blue-600 text-blue-600'
                     : isDarkMode
@@ -535,14 +743,14 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Team Members</p>
-              <p className="text-2xl font-bold text-gray-900">{activeProject?.team.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{activeProject?.team?.length || 0}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
               <Users className="w-6 h-6 text-purple-600" />
             </div>
           </div>
           <p className="text-sm text-gray-600 mt-1">
-            {activeProject?.team.filter(m => m.status === 'active').length} active
+            {activeProject?.team?.filter(m => m.status === 'active').length || 0} active
           </p>
         </div>
 
@@ -550,14 +758,14 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Tasks</p>
-              <p className="text-2xl font-bold text-gray-900">{activeProject?.tasks.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{activeProject?.tasks?.length || 0}</p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-orange-600" />
             </div>
           </div>
           <p className="text-sm text-gray-600 mt-1">
-            {activeProject?.tasks.filter(t => t.status === 'completed').length} completed
+            {activeProject?.tasks?.filter(t => t.status === 'completed').length || 0} completed
           </p>
         </div>
       </div>
@@ -638,8 +846,16 @@ const ProjectViewDetailed: React.FC = () => {
                 <Building className="w-5 h-5 text-gray-400" />
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">{activeProject?.client.name}</h4>
-                <p className="text-sm text-gray-600">{activeProject?.client.email}</p>
+                <h4 className="font-medium text-gray-900">
+                  {typeof activeProject?.client === 'string' 
+                    ? activeProject?.client 
+                    : activeProject?.client?.name || 'No Client'}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {typeof activeProject?.client === 'object' && activeProject?.client?.email 
+                    ? activeProject?.client?.email 
+                    : ''}
+                </p>
               </div>
             </div>
           </div>
@@ -648,14 +864,18 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
-              {activeProject?.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+              {activeProject?.tags && activeProject.tags.length > 0 ? (
+                activeProject.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No tags</p>
+              )}
             </div>
           </div>
 
@@ -912,34 +1132,101 @@ const ProjectViewDetailed: React.FC = () => {
       {/* Task List */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-4">
-            <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">
-              All Tasks
+          <div className="flex items-center gap-4 flex-wrap">
+            <button 
+              onClick={() => setTaskFilter('all')}
+              className={`px-3 py-1 text-sm font-medium rounded-lg ${
+                taskFilter === 'all' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              All Tasks ({activeProject?.tasks.length || 0})
             </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
-              My Tasks
+            <button 
+              onClick={() => setTaskFilter('my')}
+              className={`px-3 py-1 text-sm font-medium rounded-lg ${
+                taskFilter === 'my' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              My Tasks ({activeProject?.tasks.filter(t => t.assignee?._id === state.userProfile?._id).length || 0})
             </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
-              Overdue
+            <button 
+              onClick={() => setTaskFilter('overdue')}
+              className={`px-3 py-1 text-sm font-medium rounded-lg ${
+                taskFilter === 'overdue' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              Overdue ({activeProject?.tasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed').length || 0})
             </button>
+            {(currentUserRole === 'manager' || currentUserRole === 'owner') && (
+              <button 
+                onClick={() => setTaskFilter('review')}
+                className={`px-3 py-1 text-sm font-medium rounded-lg ${
+                  taskFilter === 'review' ? 'text-purple-600 bg-purple-50' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Needs Review ({activeProject?.tasks.filter(t => t.status === 'review').length || 0})
+              </button>
+            )}
           </div>
         </div>
         
         <div className="divide-y divide-gray-200">
-          {activeProject?.tasks.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-              <p className="font-medium">No tasks yet</p>
-              <p className="text-sm mt-1">Create your first task to get started</p>
-            </div>
-          ) : (
-            activeProject?.tasks.map((task) => (
-              <div key={task._id} className="p-4 hover:bg-gray-50">
+          {(() => {
+            let filteredTasks = activeProject?.tasks || [];
+            
+            if (taskFilter === 'my') {
+              filteredTasks = filteredTasks.filter(t => t.assignee?._id === state.userProfile?._id || t.createdBy === state.userProfile?._id);
+            } else if (taskFilter === 'overdue') {
+              filteredTasks = filteredTasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed');
+            } else if (taskFilter === 'review') {
+              filteredTasks = filteredTasks.filter(t => t.status === 'review');
+            }
+            
+            return filteredTasks.length === 0 ? (
+              <div className="p-12 text-center text-gray-500">
+                <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <p className="font-medium">No tasks found</p>
+                <p className="text-sm mt-1">{taskFilter === 'all' ? 'Create your first task to get started' : 'No tasks match this filter'}</p>
+              </div>
+            ) : (
+              filteredTasks.map((task) => (
+              <div 
+                key={task._id} 
+                className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                  task.status === 'completed' ? 'opacity-60' : ''
+                }`}
+                onClick={() => {
+                  setSelectedTask(task);
+                  if (task.status === 'review' && currentUserRole === 'manager') {
+                    setShowTaskReview(true);
+                  } else {
+                    setShowTaskDetail(true);
+                  }
+                }}
+              >
                 <div className="flex items-start gap-4">
-                  <input type="checkbox" className="mt-1 rounded" checked={task.status === 'completed'} />
+                  <input 
+                    type="checkbox" 
+                    className="mt-1 rounded" 
+                    checked={task.status === 'completed'}
+                    onClick={(e) => e.stopPropagation()}
+                    readOnly
+                  />
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900">{task.title}</h4>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h4 className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                        {task.title}
+                      </h4>
+                      {task.taskType && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                          {task.taskType === 'bug' ? '🐛' : task.taskType === 'feature' ? '✨' : task.taskType === 'improvement' ? '🔧' : task.taskType === 'research' ? '🔍' : task.taskType === 'documentation' ? '📝' : '📋'} {task.taskType}
+                        </span>
+                      )}
+                      {task.category && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-cyan-100 text-cyan-800">
+                          {task.category === 'design' ? '🎨' : task.category === 'testing' ? '🧪' : task.category === 'deployment' ? '🚀' : task.category === 'meeting' ? '👥' : task.category === 'review' ? '👀' : '💻'} {task.category}
+                        </span>
+                      )}
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                         task.priority === 'critical' ? 'bg-red-100 text-red-800' :
                         task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
@@ -951,11 +1238,17 @@ const ProjectViewDetailed: React.FC = () => {
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                         task.status === 'completed' ? 'bg-green-100 text-green-800' :
                         task.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                        task.status === 'review' ? 'bg-purple-100 text-purple-800' :
                         task.status === 'blocked' ? 'bg-red-100 text-red-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {task.status}
                       </span>
+                      {task.status === 'review' && (currentUserRole === 'manager' || currentUserRole === 'owner') && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 animate-pulse">
+                          Needs Review
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{task.description}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -971,20 +1264,40 @@ const ProjectViewDetailed: React.FC = () => {
                         <Clock className="w-4 h-4" />
                         {task.estimatedHours}h estimated
                       </span>
+                      {task.progress > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Target className="w-4 h-4" />
+                          {task.progress}% done
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                      <Edit className="w-4 h-4" />
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button 
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setShowTaskDetail(true);
+                      }}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                      title="View Details"
+                    >
+                      <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {currentUserRole === 'manager' && (
+                      <button 
+                        onClick={() => handleDeleteTask(task._id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        title="Delete Task"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
-            ))
-          )}
+              ))
+            );
+          })()}
         </div>
       </div>
     </div>
@@ -1010,7 +1323,7 @@ const ProjectViewDetailed: React.FC = () => {
       {/* Timeline */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="space-y-6">
-          {activeProject?.timeline.length === 0 ? (
+          {!activeProject?.timeline || activeProject?.timeline.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
               <Activity className="w-12 h-12 mx-auto mb-3 text-gray-400" />
               <p className="font-medium">No activity yet</p>
@@ -1056,7 +1369,7 @@ const ProjectViewDetailed: React.FC = () => {
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h4 className="font-semibold text-gray-900 mb-4">Milestones</h4>
         <div className="space-y-4">
-          {activeProject?.milestones.length === 0 ? (
+          {!activeProject?.milestones || activeProject?.milestones.length === 0 ? (
             <p className="text-center text-gray-500 py-8">No milestones defined</p>
           ) : (
             activeProject?.milestones.map((milestone) => (
@@ -1395,22 +1708,197 @@ const ProjectViewDetailed: React.FC = () => {
   );
 
   const renderMainContent = () => {
+    // Debug: Check if activeProject exists
+    if (!activeProject) {
+      return (
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Project Found</h3>
+          <p className="text-gray-600">Unable to load project data. Please try again.</p>
+        </div>
+      );
+    }
+
+    const isWorkspaceOwner = activeProject?.createdBy === state.userProfile?._id;
+    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id;
+    const canEdit = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
+
     switch (activeView) {
       case 'overview':
         return renderProjectOverview();
+      
+      case 'info':
+        return (
+          <ProjectInfoTab
+            project={activeProject}
+            canEdit={canEdit}
+            onUpdate={(updates) => {
+              if (activeProject) {
+                dispatch({
+                  type: 'UPDATE_PROJECT',
+                  payload: {
+                    projectId: activeProject._id,
+                    updates
+                  }
+                });
+                setActiveProject({ ...activeProject, ...updates });
+              }
+            }}
+          />
+        );
+      
+      case 'team':
+        return (
+          <ProjectTeamTab
+            projectId={activeProject?._id || ''}
+            workspaceId={(activeProject as any)?.workspace || state.currentWorkspace || ''}
+            projectTeam={(activeProject as any)?.team || []}
+            projectManager={(activeProject as any)?.projectManager}
+            isOwner={isWorkspaceOwner}
+            isProjectManager={isProjectManager}
+            onAddMember={(memberId, role) => {
+              // Add member to project team
+              const member = { _id: memberId, name: 'Member Name', email: 'email@example.com', role, addedAt: new Date() };
+              const updatedTeam = [...((activeProject as any)?.team || []), member];
+              dispatch({
+                type: 'UPDATE_PROJECT',
+                payload: {
+                  projectId: activeProject?._id || '',
+                  updates: { team: updatedTeam }
+                }
+              });
+            }}
+            onRemoveMember={(memberId) => {
+              // Remove member from project team
+              const updatedTeam = ((activeProject as any)?.team || []).filter((m: any) => m._id !== memberId);
+              dispatch({
+                type: 'UPDATE_PROJECT',
+                payload: {
+                  projectId: activeProject?._id || '',
+                  updates: { team: updatedTeam }
+                }
+              });
+            }}
+            onChangeProjectManager={(memberId) => {
+              // Change project manager
+              dispatch({
+                type: 'UPDATE_PROJECT',
+                payload: {
+                  projectId: activeProject?._id || '',
+                  updates: { projectManager: memberId }
+                }
+              });
+            }}
+          />
+        );
+      
       case 'tasks':
+        // PM sees task assignment interface, others see their tasks
+        if (currentUserRole === 'project-manager' || isProjectManager) {
+          return (
+            <ProjectTaskAssignmentTab
+              projectId={activeProject?._id || ''}
+              projectTeam={(activeProject as any)?.team || []}
+              tasks={projectTasks}
+              isProjectManager={true}
+              onCreateTask={handleCreateTask}
+              onUpdateTask={handleUpdateTask}
+              onDeleteTask={handleDeleteTask}
+              onReassignTask={handleReassignTask}
+            />
+          );
+        }
         return renderTasksView();
+      
       case 'timeline':
         return renderTimelineView();
-      case 'team':
-        return renderTeamSection();
+      
+      case 'progress':
+        return <ProjectProgressTab project={activeProject} />;
+      
+      case 'workload':
+        // Show Requests tab for employees and PM
+        return (
+          <ProjectRequestsTab
+            projectId={activeProject?._id || ''}
+            currentUserId={currentTestUserId}
+            isProjectManager={currentUserRole === 'project-manager' || isProjectManager}
+            requests={requests}
+            tasks={projectTasks}
+            onCreateRequest={handleCreateRequest}
+            onApproveRequest={handleApproveRequest}
+            onRejectRequest={handleRejectRequest}
+          />
+        );
+      
+      case 'reports':
+        return renderAnalyticsView(); // Reuse analytics for reports
+      
       case 'documents':
         return renderDocumentsView();
-      case 'analytics':
-        return renderAnalyticsView();
+      
+      case 'inbox':
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Inbox</h3>
+            <p className="text-gray-600">Messages, notifications, and activity feed coming soon!</p>
+          </div>
+        );
+      
+      case 'settings':
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Settings</h3>
+            <p className="text-gray-600">Project configuration and management settings coming soon!</p>
+          </div>
+        );
+      
       default:
         return renderProjectOverview();
     }
+  };
+
+  // Keep existing handlers for task review
+  const handleApproveTask = (taskId: string, rating: number, comments: string) => {
+    const updates = {
+      status: 'completed',
+      rating: rating,
+      reviewComments: comments,
+      completedAt: new Date()
+    };
+    
+    handleUpdateTask(taskId, updates);
+    
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'success',
+        message: `Task approved with ${rating} stars!`,
+        duration: 3000
+      }
+    });
+  };
+
+  const handleRejectTask = (taskId: string, reason: string) => {
+    const updates = {
+      status: 'in-progress',
+      reviewComments: `Rejected: ${reason}`
+    };
+    
+    handleUpdateTask(taskId, updates);
+    
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'info',
+        message: 'Task sent back for revision',
+        duration: 3000
+      }
+    });
   };
 
   const handleAddTeamMember = (memberId: string, role: string) => {
@@ -1456,7 +1944,6 @@ const ProjectViewDetailed: React.FC = () => {
   return (
     <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {renderProjectHeader()}
-      {renderTabNavigation()}
       
       <div className="flex flex-1 overflow-hidden">
         {/* Main Content */}
@@ -1494,6 +1981,49 @@ const ProjectViewDetailed: React.FC = () => {
           });
           setShowInviteMemberModal(false);
         }}
+      />
+
+      {/* Task Creation Modal */}
+      <TaskCreationModal
+        isOpen={showCreateTask}
+        onClose={() => setShowCreateTask(false)}
+        onCreateTask={handleCreateTask}
+        projectTeam={activeProject?.team || []}
+        projectId={activeProject?._id || ''}
+      />
+
+      {/* Task Detail Modal */}
+      <TaskDetailModal
+        isOpen={showTaskDetail}
+        onClose={() => {
+          setShowTaskDetail(false);
+          setSelectedTask(null);
+        }}
+        task={selectedTask}
+        onUpdateTask={handleUpdateTask}
+        onDeleteTask={handleDeleteTask}
+        currentUserRole={currentUserRole}
+        currentUserId={state.userProfile?._id || 'current_user'}
+      />
+
+      {/* Task Review Modal */}
+      <TaskReviewModal
+        isOpen={showTaskReview}
+        onClose={() => {
+          setShowTaskReview(false);
+          setSelectedTask(null);
+        }}
+        task={selectedTask}
+        onApprove={handleApproveTask}
+        onReject={handleRejectTask}
+      />
+
+      {/* Role Switcher (Testing Only) */}
+      <RoleSwitcher
+        currentRole={currentUserRole as any}
+        onRoleChange={handleRoleChange}
+        currentUserId={currentTestUserId}
+        onUserChange={handleUserChange}
       />
     </div>
   );
