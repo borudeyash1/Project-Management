@@ -1,5 +1,45 @@
 import { Request, Response } from 'express';
 import { TimeEntry } from '../models/TimeEntry';
+import { scheduleReminderTrigger, clearReminderTriggers } from '../services/reminderScheduler';
+
+const TRACKER_REMINDER_MINUTES = 60;
+
+const toIdString = (value: any): string => {
+  if (!value) return '';
+  return typeof value === 'string' ? value : value.toString?.() || '';
+};
+
+const scheduleTimeEntryReminder = async (entry: any) => {
+  const entryId = toIdString(entry?._id);
+  if (!entryId || !entry.isRunning) return;
+
+  await clearReminderTriggers('tracker_time_entry', entryId);
+
+  const triggerTime = new Date(entry.startTime.getTime() + TRACKER_REMINDER_MINUTES * 60 * 1000);
+  if (Number.isNaN(triggerTime.getTime()) || triggerTime <= new Date()) {
+    return;
+  }
+
+  await scheduleReminderTrigger({
+    entityType: 'tracker_time_entry',
+    entityId: entryId,
+    userIds: [entry.userId],
+    triggerType: 'deadline_reached',
+    triggerTime,
+    payload: {
+      message: entry.description ? `Timer running: ${entry.description}` : 'Timer running reminder',
+      description: 'Your tracker timer has been running for an hour. Remember to take action.',
+      project: entry.projectId,
+      tags: ['tracker'],
+    },
+  });
+};
+
+const clearTimeEntryReminder = async (entryId: any) => {
+  const id = toIdString(entryId);
+  if (!id) return;
+  await clearReminderTriggers('tracker_time_entry', id);
+};
 
 // Start timer
 export const startTimer = async (req: Request, res: Response): Promise<void> => {
@@ -32,6 +72,8 @@ export const startTimer = async (req: Request, res: Response): Promise<void> => 
     });
 
     await timeEntry.save();
+
+    await scheduleTimeEntryReminder(timeEntry);
 
     res.status(201).json({
       success: true,
@@ -76,6 +118,8 @@ export const stopTimer = async (req: Request, res: Response): Promise<void> => {
     timeEntry.isRunning = false;
 
     await timeEntry.save();
+
+    await clearTimeEntryReminder(timeEntry._id);
 
     res.status(200).json({
       success: true,
@@ -176,6 +220,8 @@ export const resumeTimer = async (req: Request, res: Response): Promise<void> =>
 
     await timeEntry.save();
 
+    await scheduleTimeEntryReminder(timeEntry);
+
     res.status(200).json({
       success: true,
       data: timeEntry,
@@ -248,6 +294,10 @@ export const createTimeEntry = async (req: Request, res: Response): Promise<void
     const timeEntry = new TimeEntry(timeEntryData);
     await timeEntry.save();
 
+    if (timeEntry.isRunning) {
+      await scheduleTimeEntryReminder(timeEntry);
+    }
+
     res.status(201).json({
       success: true,
       data: timeEntry,
@@ -289,6 +339,11 @@ export const updateTimeEntry = async (req: Request, res: Response): Promise<void
       data: timeEntry,
       message: 'Time entry updated successfully'
     });
+    if (timeEntry.isRunning) {
+      await scheduleTimeEntryReminder(timeEntry);
+    } else {
+      await clearTimeEntryReminder(timeEntry._id);
+    }
   } catch (error) {
     console.error('Error updating time entry:', error);
     res.status(500).json({

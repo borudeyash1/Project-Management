@@ -527,6 +527,7 @@ export interface AppState {
   currentProject: string;
   cwStep: number;
   toasts: Toast[];
+  isAuthLoading: boolean;
   subscription: UserSubscription;
   roles: {
     currentUserRole: string;

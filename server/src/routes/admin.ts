@@ -16,6 +16,16 @@ import {
 } from '../controllers/adminController';
 import { getAdminAIResponse } from '../controllers/adminAIController';
 import { getAnalyticsData, getUserInsights } from '../controllers/analyticsController';
+import {
+  getAdminSubscriptionPlans,
+  updateSubscriptionPlan,
+  addSubscriptionCoupon,
+  updateSubscriptionCoupon,
+  deleteSubscriptionCoupon,
+  addSubscriptionAffiliate,
+  updateSubscriptionAffiliate,
+  deleteSubscriptionAffiliate
+} from '../controllers/subscriptionController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import {
@@ -102,5 +112,14 @@ router.delete('/devices/:id', deleteDevice);
 // Analytics routes
 router.get('/analytics-data', getAnalyticsData);
 router.get('/user-insights', getUserInsights);
+// Subscription management
+router.get('/subscriptions', authenticate, getAdminSubscriptionPlans);
+router.put('/subscriptions/:planKey', authenticate, updateSubscriptionPlan);
+router.post('/subscriptions/:planKey/coupons', authenticate, addSubscriptionCoupon);
+router.put('/subscriptions/:planKey/coupons/:code', authenticate, updateSubscriptionCoupon);
+router.delete('/subscriptions/:planKey/coupons/:code', authenticate, deleteSubscriptionCoupon);
+router.post('/subscriptions/:planKey/affiliates', authenticate, addSubscriptionAffiliate);
+router.put('/subscriptions/:planKey/affiliates/:code', authenticate, updateSubscriptionAffiliate);
+router.delete('/subscriptions/:planKey/affiliates/:code', authenticate, deleteSubscriptionAffiliate);
 
 export default router;

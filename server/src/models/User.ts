@@ -311,6 +311,9 @@ const userSchema = new Schema<IUser>({
   emailVerificationOTPExpires: Date, // New field for OTP expiration
   loginOtp: String, // New field for login OTP
   loginOtpExpiry: Date, // New field for login OTP expiration
+  workspaceCreationOtp: String,
+  workspaceCreationOtpExpires: Date,
+  workspaceCreationOtpVerifiedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
   refreshTokens: [{

@@ -19,6 +19,9 @@ export interface IUser extends Document {
   emailVerificationOTPExpires?: Date; // New field for OTP expiration
   loginOtp?: string; // New field for login OTP
   loginOtpExpiry?: Date; // New field for login OTP expiration
+  workspaceCreationOtp?: string;
+  workspaceCreationOtpExpires?: Date;
+  workspaceCreationOtpVerifiedAt?: Date;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   refreshTokens: Array<{
@@ -179,6 +182,63 @@ export interface IUser extends Document {
   toJSON(): any;
 }
 
+export interface ISubscriptionCoupon {
+  code: string;
+  type: 'percentage' | 'flat';
+  amount: number;
+  maxRedemptions?: number;
+  redeemedCount: number;
+  expiresAt?: Date;
+  isActive: boolean;
+  notes?: string;
+}
+
+export interface ISubscriptionAffiliate {
+  code: string;
+  referralUrl?: string;
+  commissionRate: number;
+  discountPercentage: number;
+  totalReferrals: number;
+  isActive: boolean;
+  notes?: string;
+}
+
+export interface ISubscriptionPlan extends Document {
+  _id: string;
+  planKey: 'free' | 'pro' | 'ultra';
+  displayName: string;
+  summary: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  limits: {
+    maxWorkspaces: number;
+    maxProjects: number;
+    maxTeamMembers: number;
+    storageInGB: number;
+  };
+  features: {
+    aiAccess: boolean;
+    adsEnabled: boolean;
+    collaboratorAccess: boolean;
+    customStorageIntegration: boolean;
+    desktopAppAccess: boolean;
+    automaticScheduling: boolean;
+    realtimeAISuggestions: boolean;
+  };
+  workspaceFees: {
+    personal: number;
+    team: number;
+    enterprise: number;
+  };
+  perHeadPrice: number;
+  collaboratorsLimit: number;
+  order: number;
+  couponCodes?: ISubscriptionCoupon[];
+  affiliateLinks?: ISubscriptionAffiliate[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 // Workspace Types
 export interface IWorkspace extends Document {
   _id: string;
@@ -237,7 +297,8 @@ export interface IProject extends Document {
   name: string;
   description?: string;
   client?: string;
-  workspace: string;
+  tier: 'free' | 'pro' | 'ultra' | 'enterprise';
+  workspace?: string;
   createdBy: string;
   status: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled';
   priority: 'low' | 'medium' | 'high' | 'critical';
@@ -302,6 +363,7 @@ export interface IProject extends Document {
   removeTeamMember(userId: string): Promise<IProject>;
   isTeamMember(userId: string): boolean;
   hasPermission(userId: string, permission: string): boolean;
+  upgradeTier(newTier: 'pro' | 'ultra' | 'enterprise', workspaceId?: string): Promise<IProject>;
   addMilestone(milestoneData: any, userId: string): Promise<IProject>;
   updateMilestone(milestoneId: string, updateData: any): Promise<IProject>;
   deleteMilestone(milestoneId: string): Promise<IProject>;
@@ -313,13 +375,6 @@ export interface ITask extends Document {
   _id: string;
   title: string;
   description?: string;
-  project: string;
-  workspace: string;
-  createdBy: string;
-  assignee?: string;
-  status: 'todo' | 'in-progress' | 'completed' | 'cancelled' | 'on-hold';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  category?: string;
   type: 'task' | 'bug' | 'feature' | 'epic' | 'story' | 'subtask';
   startDate?: Date;
   dueDate?: Date;

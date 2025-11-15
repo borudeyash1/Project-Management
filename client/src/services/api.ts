@@ -1,5 +1,37 @@
 import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, Workspace, Project, Task } from '../types';
 
+export interface SubscriptionPlanData {
+  planKey: 'free' | 'pro' | 'ultra';
+  displayName: string;
+  summary: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  order: number;
+  perHeadPrice: number;
+  workspaceFees: { personal: number; team: number; enterprise: number };
+  limits: { maxWorkspaces: number; maxProjects: number; maxTeamMembers: number; storageInGB: number };
+
+  features: {
+    aiAccess: boolean;
+    adsEnabled: boolean;
+    collaboratorAccess: boolean;
+    customStorageIntegration: boolean;
+    desktopAppAccess: boolean;
+    automaticScheduling: boolean;
+    realtimeAISuggestions: boolean;
+  };
+}
+
+export interface CustomBillingResponse {
+  requiresCustomBilling: boolean;
+  billing: {
+    baseFee: number;
+    perHeadPrice: number;
+    estimatedMembers: number;
+    total: number;
+  };
+}
+
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 class ApiService {
@@ -142,6 +174,9 @@ class ApiService {
 
     if (response.data) {
       this.setToken(response.data.accessToken);
+      if (response.data.refreshToken) {
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+      }
     }
 
     return response.data!;
@@ -185,6 +220,69 @@ class ApiService {
     return response.data!;
   }
 
+  async getSubscriptionPlans(): Promise<SubscriptionPlanData[]> {
+    const response = await fetch(`${this.baseURL}/subscriptions`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to load subscription plans');
+    }
+    const data = await response.json();
+    return data.data || [];
+  }
+
+  async sendWorkspaceOtp(): Promise<void> {
+    const url = `${this.baseURL}/workspaces/otp`; // endpoint to add
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to send workspace OTP');
+    }
+  }
+
+  async verifyWorkspaceOtp(code: string): Promise<void> {
+    const url = `${this.baseURL}/workspaces/otp/verify`; // endpoint to add
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+      },
+      body: JSON.stringify({ otp: code })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || 'Invalid OTP');
+    }
+  }
+
+  async createWorkspaceWithBilling(workspaceData: Partial<Workspace>): Promise<{ data?: Workspace; requiresCustomBilling?: boolean; billing?: CustomBillingResponse['billing'] }> {
+    const url = `${this.baseURL}/workspaces`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+      },
+      body: JSON.stringify(workspaceData)
+    });
+    const body = await response.json().catch(() => ({}));
+    if (response.ok) {
+      return { data: body.data }; 
+    }
+    if (response.status === 402 && body.requiresCustomBilling) {
+      return { requiresCustomBilling: true, billing: body.billing };
+    }
+    throw new Error(body.message || 'Failed to create workspace');
+  }
 
   // User endpoints
   async updateProfile(userData: Partial<User>): Promise<User> {

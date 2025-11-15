@@ -76,7 +76,6 @@ const adminSchema = new Schema<IAdmin>({
 
 // Index for faster queries
 adminSchema.index({ email: 1, isActive: 1 });
-adminSchema.index({ googleId: 1 });
 
 // Hash password before saving
 adminSchema.pre('save', async function(next) {

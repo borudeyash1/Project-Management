@@ -22,6 +22,10 @@ import aiRoutes from "./routes/ai";
 import adminRoutes from "./routes/admin";
 import userManagementRoutes from "./routes/userManagement";
 import desktopReleaseRoutes from "./routes/desktopRelease";
+import homeRoutes from "./routes/home";
+import plannerRoutes from "./routes/planner";
+import subscriptionsRoutes from "./routes/subscriptions";
+import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 
 // Load environment variables
 dotenv.config({ path: "./.env" });
@@ -31,21 +35,24 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
-});
-app.use("/api/", limiter);
-
 // CORS configuration
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   }),
 );
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+  skip: (req) => req.path.startsWith("/admin/subscriptions"),
+});
+app.use("/api/", limiter);
 
 // Logging
 app.use(morgan("combined"));
@@ -70,6 +77,9 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user-management", userManagementRoutes);
 app.use("/api/releases", desktopReleaseRoutes);
+app.use("/api/home", homeRoutes);
+app.use("/api/planner", plannerRoutes);
+app.use("/api/subscriptions", subscriptionsRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -106,7 +116,8 @@ app.use("*", (req, res) => {
 // Database connection
 mongoose
   .connect(process.env.MONGODB_URI || "")
-  .then(() => {
+  .then(async () => {
+    await ensureDefaultSubscriptionPlans();
     console.log("Connected to MongoDB");
   })
   .catch((error) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Plus, Search, Filter, Calendar, Clock, Target, Users, 
   TrendingUp, BarChart3, MoreVertical, Edit, Trash2,
@@ -12,6 +12,14 @@ import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import CreateProjectModal from './CreateProjectModal';
+import {
+  getProjects,
+  createProject as createProjectApi,
+  updateProject as updateProjectApi,
+  deleteProject as deleteProjectApi,
+  Project as ApiProject,
+  ProjectFilters,
+} from '../services/projectService';
 
 interface Project {
   _id: string;
@@ -57,107 +65,79 @@ const ProjectsPage: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [creatingProject, setCreatingProject] = useState(false);
+  const [processingProjectId, setProcessingProjectId] = useState<string | null>(null);
 
-  // Mock data - replace with actual API calls
-  useEffect(() => {
-    const mockProjects: Project[] = [
-      {
-        _id: '1',
-        name: 'E-commerce Platform',
-        description: 'Building a modern e-commerce platform with React and Node.js',
-        status: 'active',
-        priority: 'high',
-        progress: 75,
-        startDate: new Date('2024-01-15'),
-        endDate: new Date('2024-06-30'),
-        budget: { estimated: 50000, actual: 25000, currency: 'USD' },
-        team: [
-          { _id: 'u1', name: 'John Doe', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face' },
-          { _id: 'u2', name: 'Jane Smith', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face' },
-          { _id: 'u3', name: 'Bob Wilson', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face' }
-        ],
-        tags: ['web', 'ecommerce', 'react'],
-        owner: {
-          _id: 'u1',
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-        },
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date('2024-03-20')
-      },
-      {
-        _id: '2',
-        name: 'Mobile App',
-        description: 'iOS and Android mobile application for customer management',
-        status: 'active',
-        priority: 'medium',
-        progress: 45,
-        startDate: new Date('2024-02-01'),
-        endDate: new Date('2024-08-15'),
-        budget: { estimated: 30000, actual: 12000, currency: 'USD' },
-        team: [
-          { _id: 'u2', name: 'Jane Smith', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face' },
-          { _id: 'u4', name: 'Alice Johnson', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face' }
-        ],
-        tags: ['mobile', 'ios', 'android'],
-        owner: {
-          _id: 'u2',
-          name: 'Jane Smith',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
-        },
-        createdAt: new Date('2024-02-01'),
-        updatedAt: new Date('2024-03-18')
-      },
-      {
-        _id: '3',
-        name: 'Marketing Campaign',
-        description: 'Q2 marketing campaign launch and social media strategy',
-        status: 'completed',
-        priority: 'high',
-        progress: 100,
-        startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-03-31'),
-        budget: { estimated: 15000, actual: 14200, currency: 'USD' },
-        team: [
-          { _id: 'u3', name: 'Bob Wilson', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face' },
-          { _id: 'u5', name: 'Carol Davis', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=32&h=32&fit=crop&crop=face' }
-        ],
-        tags: ['marketing', 'social', 'campaign'],
-        owner: {
-          _id: 'u3',
-          name: 'Bob Wilson',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
-        },
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-03-31')
-      },
-      {
-        _id: '4',
-        name: 'Data Analytics Dashboard',
-        description: 'Real-time analytics dashboard for business intelligence',
-        status: 'on-hold',
-        priority: 'low',
-        progress: 20,
-        startDate: new Date('2024-03-01'),
-        endDate: new Date('2024-07-30'),
-        budget: { estimated: 25000, actual: 5000, currency: 'USD' },
-        team: [
-          { _id: 'u1', name: 'John Doe', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face' },
-          { _id: 'u6', name: 'David Brown', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face' }
-        ],
-        tags: ['analytics', 'dashboard', 'data'],
-        owner: {
-          _id: 'u1',
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-        },
-        createdAt: new Date('2024-03-01'),
-        updatedAt: new Date('2024-03-15')
+  const activeWorkspaceId = useMemo(() => {
+    if ((state as any)?.currentWorkspaceId) {
+      return (state as any).currentWorkspaceId;
+    }
+    const matchByName = state.workspaces?.find((ws) => ws.name === state.currentWorkspace);
+    return matchByName?._id || state.workspaces?.[0]?._id;
+  }, [state.currentWorkspace, state.workspaces]);
+
+  const loadProjects = useCallback(async () => {
+    try {
+      if (!activeWorkspaceId) {
+        setError('No active workspace selected. Please create or select a workspace.');
+        setProjects([]);
+        setFilteredProjects([]);
+        setLoading(false);
+        return;
       }
-    ];
-    setProjects(mockProjects);
-    setFilteredProjects(mockProjects);
-  }, []);
+      setLoading(true);
+      setError(null);
+      const filters: ProjectFilters = {};
+      if (selectedStatus !== 'all') filters.status = selectedStatus;
+      const response = await getProjects(activeWorkspaceId, filters);
+        const normalized = response.map((project: ApiProject) => {
+        const rawOwner = (project as any).createdBy || (project as any).owner || {};
+        const rawTeam = (project as any).teamMembers || (project as any).team || [];
+        const start = project.startDate || (project as any).startDate || new Date().toISOString();
+        const due = project.dueDate || (project as any).endDate || new Date().toISOString();
+
+        return {
+          _id: project._id,
+          name: project.name,
+          description: project.description || 'No description provided',
+          status: (project.status as Project['status']) || 'active',
+          priority: (project.priority as Project['priority']) || 'medium',
+          progress: project.progress ?? 0,
+          startDate: new Date(start),
+          endDate: new Date(due),
+          budget: (project as any).budget || { estimated: 0, actual: 0, currency: 'USD' },
+          team: Array.isArray(rawTeam)
+            ? rawTeam.map((member: any) => ({
+                _id: member.user?._id || member._id,
+                name: member.user?.fullName || member.name || 'Member',
+                avatar: member.user?.avatarUrl || member.avatar,
+              }))
+            : [],
+          tags: project.tags || [],
+          owner: {
+            _id: rawOwner._id || 'owner',
+            name: rawOwner.fullName || rawOwner.name || 'Owner',
+            avatar: rawOwner.avatarUrl || rawOwner.avatar,
+          },
+          createdAt: project.createdAt ? new Date(project.createdAt) : new Date(),
+          updatedAt: project.updatedAt ? new Date(project.updatedAt) : new Date(),
+        };
+      });
+      setProjects(normalized);
+      setFilteredProjects(normalized);
+    } catch (err: any) {
+      console.error('Failed to load projects', err);
+      setError(err.message || 'Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedStatus, activeWorkspaceId]);
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
 
   // Filter and search projects
   useEffect(() => {
@@ -258,22 +238,65 @@ const ProjectsPage: React.FC = () => {
     return diffDays;
   };
 
-  const handleCreateProject = (projectData: any) => {
-    // Add new project to the list
-    const newProject: Project = {
-      _id: Date.now().toString(),
-      ...projectData,
-      progress: 0,
-      team: [],
-      owner: {
-        _id: state.userProfile?._id || 'current-user',
-        name: state.userProfile?.fullName || 'Current User'
-      },
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    setProjects([newProject, ...projects]);
-    dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project created successfully!' } });
+  const handleCreateProject = async (projectData: any) => {
+    if (!activeWorkspaceId) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: { type: 'error', message: 'No active workspace selected.' },
+      });
+      return;
+    }
+
+    try {
+      setCreatingProject(true);
+      await createProjectApi({
+        name: projectData.name,
+        description: projectData.description,
+        status: projectData.status,
+        priority: projectData.priority,
+        startDate: projectData.startDate,
+        dueDate: projectData.endDate,
+        budget: projectData.budget,
+        tags: projectData.tags,
+        workspaceId: activeWorkspaceId,
+      } as any);
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project created successfully!' } });
+      setShowCreateModal(false);
+      await loadProjects();
+    } catch (err: any) {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to create project' } });
+    } finally {
+      setCreatingProject(false);
+    }
+  };
+
+  const handleUpdateProjectStatus = async (projectId: string, status: Project['status']) => {
+    try {
+      setProcessingProjectId(projectId);
+      await updateProjectApi(projectId, { status });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: `Project marked as ${status}` } });
+      await loadProjects();
+    } catch (err: any) {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to update project' } });
+    } finally {
+      setProcessingProjectId(null);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this project?');
+    if (!confirmDelete) return;
+
+    try {
+      setProcessingProjectId(projectId);
+      await deleteProjectApi(projectId);
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project deleted successfully' } });
+      await loadProjects();
+    } catch (err: any) {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to delete project' } });
+    } finally {
+      setProcessingProjectId(null);
+    }
   };
 
   const handleViewProject = (projectId: string) => {
@@ -407,8 +430,22 @@ const ProjectsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Projects Grid/List */}
-        {viewMode === 'grid' ? (
+        {/* Loading & Error States */}
+        {loading ? (
+          <ProjectSkeletonGrid />
+        ) : error ? (
+          <div className={`max-w-lg mx-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6 text-center`}>
+            <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-2" />
+            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Unable to load projects</h3>
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>{error}</p>
+            <button
+              onClick={loadProjects}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map(project => (
               <div key={project._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -499,7 +536,7 @@ const ProjectsPage: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200 flex-wrap">
                   <button 
                     onClick={() => handleViewProject(project._id)}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
@@ -521,6 +558,32 @@ const ProjectsPage: React.FC = () => {
                   >
                     <Edit className="w-4 h-4" />
                     Edit
+                  </button>
+                  {project.status !== 'completed' && (
+                    <button
+                      onClick={() => handleUpdateProjectStatus(project._id, 'completed')}
+                      disabled={processingProjectId === project._id}
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
+                        isDarkMode
+                          ? 'text-green-300 border-green-600 hover:bg-green-900/40'
+                          : 'text-green-600 border-green-300 hover:bg-green-50'
+                      } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Complete
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteProject(project._id)}
+                    disabled={processingProjectId === project._id}
+                    className={`flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
+                      isDarkMode
+                        ? 'text-red-300 border-red-600 hover:bg-red-900/40'
+                        : 'text-red-600 border-red-300 hover:bg-red-50'
+                    } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
                   </button>
                 </div>
               </div>
@@ -607,14 +670,27 @@ const ProjectsPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button className="text-gray-400 hover:text-gray-600">
+                          <button className="text-gray-400 hover:text-gray-600" onClick={() => handleViewProject(project._id)}>
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-400 hover:text-gray-600">
+                          <button className="text-gray-400 hover:text-gray-600" onClick={() => handleEditProject(project._id)}>
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-400 hover:text-gray-600">
-                            <MoreVertical className="w-4 h-4" />
+                          {project.status !== 'completed' && (
+                            <button
+                              className={`text-green-500 hover:text-green-700 ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                              onClick={() => handleUpdateProjectStatus(project._id, 'completed')}
+                              disabled={processingProjectId === project._id}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            className={`text-red-500 hover:text-red-700 ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                            onClick={() => handleDeleteProject(project._id)}
+                            disabled={processingProjectId === project._id}
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -658,9 +734,32 @@ const ProjectsPage: React.FC = () => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateProject}
+        isSubmitting={creatingProject}
       />
     </div>
   );
 };
 
 export default ProjectsPage;
+
+const ProjectSkeletonGrid: React.FC = () => {
+  const skeletonCards = Array.from({ length: 6 });
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {skeletonCards.map((_, index) => (
+        <div key={index} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-3/4" />
+          <div className="h-4 bg-gray-200 rounded w-full" />
+          <div className="h-4 bg-gray-200 rounded w-5/6" />
+          <div className="h-3 bg-gray-200 rounded w-full" />
+          <div className="flex gap-2">
+            <div className="h-8 w-8 bg-gray-200 rounded-full" />
+            <div className="h-8 w-8 bg-gray-200 rounded-full" />
+            <div className="h-8 w-8 bg-gray-200 rounded-full" />
+          </div>
+          <div className="h-2 bg-gray-200 rounded w-full" />
+        </div>
+      ))}
+    </div>
+  );
+};

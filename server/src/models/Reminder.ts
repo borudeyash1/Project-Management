@@ -26,6 +26,7 @@ export interface IReminder extends Document {
   tags: string[];
   recurring?: IRecurring;
   notifications: INotification[];
+  expiresAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -113,7 +114,11 @@ const reminderSchema = new Schema<IReminder>({
     trim: true
   }],
   recurring: recurringSchema,
-  notifications: [notificationSchema]
+  notifications: [notificationSchema],
+  expiresAt: {
+    type: Date,
+    default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  }
 }, {
   timestamps: true
 });
@@ -124,5 +129,6 @@ reminderSchema.index({ createdBy: 1, type: 1 });
 reminderSchema.index({ createdBy: 1, priority: 1 });
 reminderSchema.index({ createdBy: 1, dueDate: 1 });
 reminderSchema.index({ title: 'text', description: 'text', tags: 'text' });
+reminderSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const Reminder = mongoose.model<IReminder>('Reminder', reminderSchema);

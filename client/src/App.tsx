@@ -46,6 +46,7 @@ import TaskManagement from './components/TaskManagement';
 import LandingPage from './components/LandingPage';
 import About from './components/About';
 import UserGuide from './components/UserGuide';
+import PricingPage from './components/PricingPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -54,6 +55,7 @@ import UserManagement from './components/admin/UserManagement';
 import Analytics from './components/admin/Analytics';
 import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
+import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -122,6 +124,7 @@ const AppContent: React.FC = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/user-guide" element={<UserGuide />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         
@@ -133,6 +136,7 @@ const AppContent: React.FC = () => {
         <Route path="/admin/analytics" element={<Analytics />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/releases" element={<ReleaseManagement />} />
+        <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={

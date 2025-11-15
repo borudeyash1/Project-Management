@@ -6,9 +6,10 @@ interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (projectData: any) => void;
+  isSubmitting?: boolean;
 }
 
-const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting = false }) => {
   const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState({
     name: '',
@@ -310,9 +311,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={isSubmitting}
+              className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              Create Project
+              {isSubmitting ? 'Creating...' : 'Create Project'}
             </button>
           </div>
         </form>

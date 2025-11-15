@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, UserPlus, Search, Filter, MoreVertical, Edit, Trash2, 
   Eye, MessageSquare, Phone, Mail, Calendar, MapPin, Clock,
@@ -10,6 +10,7 @@ import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import UserDisplay from './UserDisplay';
 import InviteMemberModal from './InviteMemberModal';
+import teamService, { TeamResponse, TeamMemberResponse } from '../services/teamService';
 
 interface TeamMember {
   _id: string;
@@ -73,6 +74,48 @@ interface TeamStats {
   }>;
 }
 
+const normalizeMember = (member: TeamMemberResponse): TeamMember => {
+  const name = member.user.fullName || member.user.username || member.user.email || 'Unknown';
+  return {
+    _id: member.user._id,
+    name,
+    email: member.user.email || '',
+    avatar: member.user.avatarUrl,
+    role: member.role,
+    department: member.user.department || 'General',
+    status: (member.status === 'inactive' ? 'inactive' : member.status === 'pending' ? 'pending' : member.status === 'on-leave' ? 'away' : 'active') as TeamMember['status'],
+    joinDate: member.joinedAt ? new Date(member.joinedAt) : new Date(),
+    lastActive: member.user.profile?.lastActive ? new Date(member.user.profile.lastActive) : new Date(),
+    timezone: member.user.profile?.timezone || 'UTC',
+    location: member.user.profile?.location || 'Remote',
+    phone: member.user.profile?.contactNumber,
+    bio: member.user.profile?.bio,
+    skills: member.user.profile?.skills || [],
+    subscription: { plan: 'free' },
+    projects: [],
+    performance: {
+      rating: 0,
+      tasksCompleted: 0,
+      totalTasks: 0,
+      completionRate: 0,
+      productivityScore: 0,
+      averageRating: 0,
+    },
+    permissions: {
+      canCreateProjects: false,
+      canManageTeam: member.role === 'leader' || member.role === 'senior',
+      canViewReports: true,
+      canManageSettings: member.role === 'leader',
+      canInviteMembers: member.role === 'leader' || member.role === 'senior',
+    },
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+    },
+  };
+};
+
 const TeamPage: React.FC = () => {
   const { state, dispatch } = useApp();
   const { canAddTeamMember, canManageTeam, canUseAI } = useFeatureAccess();
@@ -86,248 +129,90 @@ const TeamPage: React.FC = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
   const [activeTab, setActiveTab] = useState<'members' | 'orgchart' | 'capacity' | 'skills' | 'health'>('members');
+  const [loadingTeams, setLoadingTeams] = useState(true);
+  const [teamError, setTeamError] = useState<string | null>(null);
+  const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
 
-  // Mock data - replace with actual API calls
-  useEffect(() => {
-    const mockTeamMembers: TeamMember[] = [
-      {
-        _id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
-        role: 'admin',
-        department: 'Engineering',
-        status: 'active',
-        joinDate: new Date('2023-01-15'),
-        lastActive: new Date('2024-03-20T14:30:00'),
-        timezone: 'UTC-5',
-        location: 'New York, NY',
-        phone: '+1 (555) 123-4567',
-        bio: 'Senior Full-Stack Developer with 8+ years of experience in React, Node.js, and cloud technologies.',
-        skills: ['React', 'Node.js', 'TypeScript', 'AWS', 'Docker', 'MongoDB'],
-        subscription: { plan: 'ultra' },
-        projects: [
-          { _id: 'p1', name: 'E-commerce Platform', role: 'Lead Developer', progress: 75, color: 'bg-blue-500' },
-          { _id: 'p2', name: 'Mobile App', role: 'Technical Lead', progress: 90, color: 'bg-green-500' }
-        ],
-        performance: {
-          rating: 4.8,
-          tasksCompleted: 45,
-          totalTasks: 48,
-          completionRate: 94,
-          productivityScore: 92,
-          averageRating: 4.7
-        },
-        permissions: {
-          canCreateProjects: true,
-          canManageTeam: true,
-          canViewReports: true,
-          canManageSettings: true,
-          canInviteMembers: true
-        },
-        notifications: {
-          email: true,
-          push: true,
-          sms: false
-        }
-      },
-      {
-        _id: '2',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face',
-        role: 'manager',
-        department: 'Design',
-        status: 'active',
-        joinDate: new Date('2023-03-10'),
-        lastActive: new Date('2024-03-20T16:45:00'),
-        timezone: 'UTC-8',
-        location: 'San Francisco, CA',
-        phone: '+1 (555) 987-6543',
-        bio: 'Creative UI/UX Designer passionate about creating intuitive and beautiful user experiences.',
-        skills: ['Figma', 'Sketch', 'Adobe Creative Suite', 'Prototyping', 'User Research', 'Design Systems'],
-        subscription: { plan: 'pro' },
-        projects: [
-          { _id: 'p1', name: 'E-commerce Platform', role: 'Design Lead', progress: 80, color: 'bg-blue-500' },
-          { _id: 'p3', name: 'Dashboard Redesign', role: 'UI Designer', progress: 60, color: 'bg-purple-500' }
-        ],
-        performance: {
-          rating: 4.6,
-          tasksCompleted: 38,
-          totalTasks: 42,
-          completionRate: 90,
-          productivityScore: 88,
-          averageRating: 4.5
-        },
-        permissions: {
-          canCreateProjects: true,
-          canManageTeam: false,
-          canViewReports: true,
-          canManageSettings: false,
-          canInviteMembers: false
-        },
-        notifications: {
-          email: true,
-          push: true,
-          sms: true
-        }
-      },
-      {
-        _id: '3',
-        name: 'Bob Wilson',
-        email: 'bob@example.com',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face',
-        role: 'member',
-        department: 'Engineering',
-        status: 'active',
-        joinDate: new Date('2023-06-20'),
-        lastActive: new Date('2024-03-19T11:20:00'),
-        timezone: 'UTC-5',
-        location: 'Boston, MA',
-        phone: '+1 (555) 456-7890',
-        bio: 'Backend Developer specializing in API development and database optimization.',
-        skills: ['Python', 'Django', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes'],
-        subscription: { plan: 'free' },
-        projects: [
-          { _id: 'p1', name: 'E-commerce Platform', role: 'Backend Developer', progress: 70, color: 'bg-blue-500' },
-          { _id: 'p2', name: 'Mobile App', role: 'API Developer', progress: 85, color: 'bg-green-500' }
-        ],
-        performance: {
-          rating: 4.4,
-          tasksCompleted: 32,
-          totalTasks: 36,
-          completionRate: 89,
-          productivityScore: 85,
-          averageRating: 4.3
-        },
-        permissions: {
-          canCreateProjects: false,
-          canManageTeam: false,
-          canViewReports: false,
-          canManageSettings: false,
-          canInviteMembers: false
-        },
-        notifications: {
-          email: true,
-          push: false,
-          sms: false
-        }
-      },
-      {
-        _id: '4',
-        name: 'Alice Johnson',
-        email: 'alice@example.com',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face',
-        role: 'member',
-        department: 'Marketing',
-        status: 'away',
-        joinDate: new Date('2023-09-05'),
-        lastActive: new Date('2024-03-18T09:15:00'),
-        timezone: 'UTC-7',
-        location: 'Seattle, WA',
-        phone: '+1 (555) 321-0987',
-        bio: 'Digital Marketing Specialist focused on growth strategies and content creation.',
-        skills: ['SEO', 'Content Marketing', 'Social Media', 'Analytics', 'Campaign Management', 'Brand Strategy'],
-        subscription: { plan: 'pro' },
-        projects: [
-          { _id: 'p2', name: 'Mobile App', role: 'Marketing Lead', progress: 95, color: 'bg-green-500' }
-        ],
-        performance: {
-          rating: 4.2,
-          tasksCompleted: 28,
-          totalTasks: 32,
-          completionRate: 88,
-          productivityScore: 82,
-          averageRating: 4.1
-        },
-        permissions: {
-          canCreateProjects: false,
-          canManageTeam: false,
-          canViewReports: false,
-          canManageSettings: false,
-          canInviteMembers: false
-        },
-        notifications: {
-          email: true,
-          push: true,
-          sms: false
-        }
-      },
-      {
-        _id: '5',
-        name: 'Mike Chen',
-        email: 'mike@example.com',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=face',
-        role: 'viewer',
-        department: 'Sales',
-        status: 'pending',
-        joinDate: new Date('2024-03-15'),
-        lastActive: new Date('2024-03-15T10:00:00'),
-        timezone: 'UTC-8',
-        location: 'Los Angeles, CA',
-        phone: '+1 (555) 654-3210',
-        bio: 'Sales Representative with expertise in B2B sales and client relationship management.',
-        skills: ['Sales', 'CRM', 'Client Relations', 'Negotiation', 'Lead Generation', 'Account Management'],
-        subscription: { plan: 'free' },
-        projects: [],
-        performance: {
-          rating: 0,
-          tasksCompleted: 0,
-          totalTasks: 0,
-          completionRate: 0,
-          productivityScore: 0,
-          averageRating: 0
-        },
-        permissions: {
-          canCreateProjects: false,
-          canManageTeam: false,
-          canViewReports: false,
-          canManageSettings: false,
-          canInviteMembers: false
-        },
-        notifications: {
-          email: true,
-          push: false,
-          sms: false
-        }
+  const loadTeams = useCallback(async () => {
+    if (!state.currentWorkspace) {
+      setLoadingTeams(false);
+      return;
+    }
+
+    setLoadingTeams(true);
+    setTeamError(null);
+
+    try {
+      const teams = await teamService.getTeams(state.currentWorkspace);
+      if (!teams.length) {
+        setTeamMembers([]);
+        setTeamStats(null);
+        setLoadingTeams(false);
+        return;
       }
-    ];
 
-    const mockTeamStats: TeamStats = {
-      totalMembers: 5,
-      activeMembers: 4,
-      pendingInvites: 1,
-      averageProductivity: 87,
-      topPerformers: teamMembers.slice(0, 3),
-      recentActivity: [
-        {
-          _id: 'a1',
+      const team = teams[0];
+      setActiveTeamId(team._id);
+      const normalizedMembers = team.members.map(normalizeMember);
+      setTeamMembers(normalizedMembers);
+
+      const statsResponse = await teamService.getTeamStats(team._id);
+      const avgProductivity = normalizedMembers.length
+        ? Math.round(
+            normalizedMembers.reduce((sum, member) => sum + member.performance.productivityScore, 0) /
+              normalizedMembers.length,
+          )
+        : 0;
+
+      setTeamStats({
+        totalMembers: statsResponse.totalMembers,
+        activeMembers: statsResponse.activeMembers,
+        pendingInvites: normalizedMembers.filter((member) => member.status === 'pending').length,
+        averageProductivity: avgProductivity,
+        topPerformers: [...normalizedMembers]
+          .sort((a, b) => b.performance.productivityScore - a.performance.productivityScore)
+          .slice(0, 3),
+        recentActivity: normalizedMembers.slice(0, 3).map((member, index) => ({
+          _id: `${member._id}-${index}`,
           type: 'joined',
-          member: 'Mike Chen',
-          description: 'Mike Chen joined the team as Sales Representative',
-          timestamp: new Date('2024-03-15T10:00:00')
-        },
-        {
-          _id: 'a2',
-          type: 'role_changed',
-          member: 'Jane Smith',
-          description: 'Jane Smith was promoted to Design Manager',
-          timestamp: new Date('2024-03-10T14:30:00')
-        },
-        {
-          _id: 'a3',
-          type: 'project_assigned',
-          member: 'Bob Wilson',
-          description: 'Bob Wilson was assigned to Mobile App project',
-          timestamp: new Date('2024-03-08T09:15:00')
-        }
-      ]
-    };
+          member: member.name,
+          description: `${member.name} (${member.role}) is active in ${member.department}`,
+          timestamp: member.lastActive,
+        })),
+      });
+    } catch (error) {
+      console.error('[TeamPage] Failed to load teams', error);
+      setTeamError((error as Error).message);
+    } finally {
+      setLoadingTeams(false);
+    }
+  }, [state.currentWorkspace]);
 
-    setTeamMembers(mockTeamMembers);
-    setTeamStats(mockTeamStats);
-  }, []);
+  useEffect(() => {
+    loadTeams();
+  }, [loadTeams]);
 
+  if (loadingTeams) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center space-y-1">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500 border-b-2 border-gray-300"></div>
+          <p className="text-sm text-gray-500">Loading your teams...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (teamError) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-red-600">
+          <p className="font-medium">Unable to load teams</p>
+          <p className="text-sm">{teamError}</p>
+        </div>
+      </div>
+    );
+  }
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'text-green-600 bg-green-100';

@@ -15,7 +15,16 @@ const projectSchema = new Schema<IProject>({
   },
   workspace: {
     type: String,
-    required: true
+    required: function (this: IProject): boolean {
+      // Workspace is required for all paid plans
+      return this.tier !== 'free';
+    },
+    default: null
+  },
+  tier: {
+    type: String,
+    enum: ['free', 'pro', 'ultra', 'enterprise'],
+    default: 'free'
   },
   createdBy: {
     type: String,
@@ -135,7 +144,7 @@ const projectSchema = new Schema<IProject>({
 });
 
 // Indexes
-projectSchema.index({ workspace: 1 });
+projectSchema.index({ workspace: 1 }, { sparse: true });
 projectSchema.index({ createdBy: 1 });
 projectSchema.index({ 'teamMembers.user': 1 });
 projectSchema.index({ status: 1 });
@@ -194,6 +203,23 @@ projectSchema.methods.isTeamMember = function(userId: string) {
   return this.teamMembers.some((member: any) => 
     member.user.toString() === userId.toString()
   );
+};
+
+// Method to upgrade project tier and optionally link to workspace
+projectSchema.methods.upgradeTier = async function(newTier: string, workspaceId?: string) {
+  this.tier = newTier;
+  
+  // If workspace ID is provided, link the project to the workspace
+  if (workspaceId) {
+    this.workspace = workspaceId;
+  }
+  
+  // Apply any tier-specific updates here
+  if (newTier !== 'free' && !this.workspace) {
+    throw new Error('Workspace is required for paid plans');
+  }
+  
+  return this.save();
 };
 
 // Method to check if user has permission
