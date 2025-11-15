@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Plus, Search, Filter, Calendar, Clock, Target, Users, 
   TrendingUp, BarChart3, Bell, Settings, User, 
@@ -14,6 +14,7 @@ import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
+import { getDashboardData } from '../services/homeService';
 
 interface QuickTask {
   _id: string;
@@ -102,231 +103,109 @@ const HomePage: React.FC = () => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskType, setNewTaskType] = useState<'task' | 'note' | 'checklist'>('task');
   const [productivityData, setProductivityData] = useState<number[]>([65, 72, 68, 85, 78, 90, 88]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with actual API calls
-  useEffect(() => {
-    const mockQuickTasks: QuickTask[] = [
-      {
-        _id: '1',
-        title: 'Review design mockups',
-        type: 'task',
-        priority: 'high',
-        dueDate: new Date('2024-03-25'),
-        project: 'E-commerce Platform',
-        assignee: 'John Doe',
-        completed: false
-      },
-      {
-        _id: '2',
-        title: 'Update project documentation',
-        type: 'note',
-        priority: 'medium',
-        dueDate: new Date('2024-03-30'),
-        project: 'Mobile App',
-        assignee: 'Jane Smith',
-        completed: false
-      },
-      {
-        _id: '3',
-        title: 'Prepare client presentation',
-        type: 'checklist',
-        priority: 'urgent',
-        dueDate: new Date('2024-03-22'),
-        project: 'Marketing Campaign',
-        assignee: 'Bob Wilson',
-        completed: true
-      }
-    ];
+  const loadDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getDashboardData();
 
-    const mockNotifications: Notification[] = [
-      {
-        _id: '1',
-        title: 'New task assigned',
-        message: 'You have been assigned to "Review design mockups"',
-        type: 'info',
-        timestamp: new Date('2024-03-20T10:30:00'),
-        read: false
-      },
-      {
-        _id: '2',
-        title: 'Deadline approaching',
-        message: 'Task "Prepare client presentation" is due tomorrow',
-        type: 'warning',
-        timestamp: new Date('2024-03-21T09:00:00'),
-        read: false
-      },
-      {
-        _id: '3',
-        title: 'Task completed',
-        message: 'John Doe completed "Review design mockups"',
-        type: 'success',
-        timestamp: new Date('2024-03-20T15:45:00'),
-        read: true
-      }
-    ];
-
-    const mockRecentActivity: RecentActivity[] = [
-      {
-        _id: '1',
-        type: 'task_completed',
-        title: 'Task completed',
-        description: 'Review design mockups was completed',
-        timestamp: new Date('2024-03-20T10:30:00'),
-        user: {
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-        }
-      },
-      {
-        _id: '2',
-        type: 'project_created',
-        title: 'Project created',
-        description: 'New project "Mobile App" was created',
-        timestamp: new Date('2024-03-19T14:20:00'),
-        user: {
-          name: 'Jane Smith',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
-        }
-      },
-      {
-        _id: '3',
-        type: 'milestone_reached',
-        title: 'Milestone reached',
-        description: 'UI/UX Design milestone completed',
-        timestamp: new Date('2024-03-18T16:45:00'),
-        user: {
-          name: 'Bob Wilson',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
-        }
-      }
-    ];
-
-    const mockProjects: Project[] = [
-      {
-        _id: '1',
-        name: 'E-commerce Platform',
-        description: 'Building a modern e-commerce platform',
-        progress: 75,
-        status: 'active',
-        team: 5,
-        dueDate: new Date('2024-06-30'),
-        color: 'bg-blue-500'
-      },
-      {
-        _id: '2',
-        name: 'Mobile App',
-        description: 'iOS and Android mobile application',
-        progress: 45,
-        status: 'active',
-        team: 3,
-        dueDate: new Date('2024-08-15'),
-        color: 'bg-green-500'
-      },
-      {
-        _id: '3',
-        name: 'Marketing Campaign',
-        description: 'Q2 marketing campaign launch',
-        progress: 90,
-        status: 'active',
-        team: 4,
-        dueDate: new Date('2024-04-30'),
-        color: 'bg-purple-500'
-      }
-    ];
-
-    const mockDeadlines: Deadline[] = [
-      {
-        _id: '1',
-        title: 'Submit final design',
-        project: 'E-commerce Platform',
-        dueDate: new Date('2024-03-25'),
-        priority: 'urgent',
-        daysLeft: 2
-      },
-      {
-        _id: '2',
-        title: 'Code review completion',
-        project: 'Mobile App',
-        dueDate: new Date('2024-03-28'),
-        priority: 'high',
-        daysLeft: 5
-      },
-      {
-        _id: '3',
-        title: 'Client presentation',
-        project: 'Marketing Campaign',
-        dueDate: new Date('2024-04-01'),
-        priority: 'medium',
-        daysLeft: 9
-      }
-    ];
-
-    const mockTeamActivity: TeamActivity[] = [
-      {
-        _id: '1',
-        user: 'Sarah Johnson',
-        action: 'completed',
-        target: 'Homepage redesign task',
-        timestamp: new Date('2024-03-20T14:30:00')
-      },
-      {
-        _id: '2',
-        user: 'Mike Chen',
-        action: 'commented on',
-        target: 'API integration issue',
-        timestamp: new Date('2024-03-20T13:15:00')
-      },
-      {
-        _id: '3',
-        user: 'Emily Davis',
-        action: 'uploaded',
-        target: 'Design mockups v2.0',
-        timestamp: new Date('2024-03-20T11:45:00')
-      },
-      {
-        _id: '4',
-        user: 'Alex Kumar',
-        action: 'created',
-        target: 'Sprint planning meeting',
-        timestamp: new Date('2024-03-20T10:20:00')
-      }
-    ];
-
-    const mockRecentFiles: RecentFile[] = [
-      {
-        _id: '1',
-        name: 'Project_Requirements.pdf',
-        type: 'PDF',
-        size: '2.4 MB',
-        uploadedBy: 'John Doe',
-        uploadedAt: new Date('2024-03-20T15:30:00')
-      },
-      {
-        _id: '2',
-        name: 'Design_Mockups_v2.fig',
-        type: 'Figma',
-        size: '15.8 MB',
-        uploadedBy: 'Emily Davis',
-        uploadedAt: new Date('2024-03-20T11:45:00')
-      },
-      {
-        _id: '3',
-        name: 'Sprint_Report_Q1.xlsx',
-        type: 'Excel',
-        size: '856 KB',
-        uploadedBy: 'Mike Chen',
-        uploadedAt: new Date('2024-03-19T16:20:00')
-      }
-    ];
-
-    setQuickTasks(mockQuickTasks);
-    setRecentActivity(mockRecentActivity);
-    setProjects(mockProjects);
-    setNotifications(mockNotifications);
-    setDeadlines(mockDeadlines);
-    setTeamActivity(mockTeamActivity);
-    setRecentFiles(mockRecentFiles);
+      setQuickTasks(
+        (response.quickTasks || []).map((task) => ({
+          ...task,
+          dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+          type: 'task',
+          priority: (task as any).priority || 'medium',
+          project: (task as any).project?.name,
+        })),
+      );
+      setRecentActivity(
+        (response.recentActivity || []).map((activity) => {
+          const rawActivity = activity as any;
+          const rawUser = rawActivity.user || {};
+          return {
+            _id: activity._id,
+            type: rawActivity.type || 'task_updated',
+            title: rawActivity.title || rawActivity.message || 'Activity',
+            description: rawActivity.description || rawActivity.message || 'Recent update',
+            timestamp: activity.timestamp ? new Date(activity.timestamp) : new Date(),
+            user: rawUser.name
+              ? {
+                  name: rawUser.name,
+                  avatar: rawUser.avatar,
+                }
+              : undefined,
+          } as RecentActivity;
+        }),
+      );
+      setProjects(
+        (response.projects || []).map((project) => ({
+          ...project,
+          dueDate: project.endDate ? new Date(project.endDate) : new Date(),
+          team: project.team?.length || 0,
+          color: 'bg-blue-500',
+          status: (project.status || 'active') as Project['status'],
+        })),
+      );
+      setNotifications(
+        (response.notifications || []).map((notification) => ({
+          _id: notification._id,
+          title: 'Notification',
+          message: notification.message,
+          type: (notification as any).type || 'info',
+          timestamp: notification.createdAt ? new Date(notification.createdAt) : new Date(),
+          read: notification.read,
+        })),
+      );
+      setDeadlines(
+        (response.deadlines || []).map((deadline) => {
+          const dueDate = deadline.dueDate ? new Date(deadline.dueDate) : new Date();
+          return {
+            _id: deadline._id,
+            title: deadline.title,
+            project: deadline.project?.name || 'General',
+            dueDate,
+            priority: ((deadline as any).priority || 'medium') as Deadline['priority'],
+            daysLeft: Math.max(
+              0,
+              Math.ceil((dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+            ),
+          };
+        }),
+      );
+      setTeamActivity(
+        (response.teamActivity || []).map((activity) => {
+          const raw = activity as any;
+          return {
+            _id: activity._id,
+            user: raw.user?.name || 'User',
+            action: raw.action || 'updated',
+            target: raw.target || 'Task',
+            timestamp: activity.timestamp ? new Date(activity.timestamp) : new Date(),
+          } as TeamActivity;
+        }),
+      );
+      setRecentFiles(
+        (response.recentFiles || []).map((file) => ({
+          ...file,
+          size: `${((file.size || 0) / (1024 * 1024)).toFixed(1)} MB`,
+          uploadedBy: file.name,
+          uploadedAt: file.updatedAt ? new Date(file.updatedAt) : new Date(),
+        })),
+      );
+    } catch (err: any) {
+      console.error('Failed to load dashboard data', err);
+      setError(err.message || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   const handleAddQuickTask = () => {
     if (!newTaskTitle.trim()) return;
@@ -434,6 +313,37 @@ const HomePage: React.FC = () => {
       default: return 'text-gray-600';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full py-20">
+        <div className="flex flex-col items-center space-y-3">
+          <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+          <p className="text-sm text-gray-500">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-xl shadow border border-red-200 dark:border-red-900 mt-10 p-6">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+          <div>
+            <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">Unable to load dashboard</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{error}</p>
+            <button
+              onClick={loadDashboardData}
+              className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>

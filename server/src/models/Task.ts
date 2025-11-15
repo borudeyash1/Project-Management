@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ITask } from "../types";
+import { scheduleReminderTrigger, clearReminderTriggers } from '../services/reminderScheduler';
 
 const taskSchema: Schema<any> = new Schema<any>(
   {
@@ -341,3 +342,97 @@ taskSchema.methods.toJSON = function () {
 };
 
 export default mongoose.model("Task", taskSchema);
+
+const toIdString = (value: any): string => {
+  if (!value) return '';
+  return typeof value === 'string' ? value : value.toString?.() || '';
+};
+
+const rescheduleTaskReminders = async (task: any) => {
+  const taskId = toIdString(task._id);
+  if (!taskId) return;
+
+  await clearReminderTriggers('task', taskId);
+
+  const recipientIds = new Set<string>();
+  if (task.assignee) recipientIds.add(toIdString(task.assignee));
+  if (task.reporter) recipientIds.add(toIdString(task.reporter));
+
+  if (recipientIds.size === 0) {
+    return;
+  }
+
+  const userIds = Array.from(recipientIds).filter(Boolean);
+  const payloadBase = {
+    title: task.title,
+    project: toIdString(task.project),
+    workspace: toIdString(task.workspace),
+    dueDate: task.dueDate,
+    priority: task.priority,
+  };
+
+  await scheduleReminderTrigger({
+    entityType: 'task',
+    entityId: taskId,
+    userIds,
+    triggerType: 'immediate',
+    triggerTime: new Date(),
+    payload: {
+      ...payloadBase,
+      message: `Task assigned: ${task.title}`,
+    },
+  });
+
+  if (task.dueDate) {
+    const dueDate = new Date(task.dueDate);
+
+    const preDeadline = new Date(dueDate.getTime() - 24 * 60 * 60 * 1000);
+    if (preDeadline > new Date()) {
+      await scheduleReminderTrigger({
+        entityType: 'task',
+        entityId: taskId,
+        userIds,
+        triggerType: 'pre_deadline',
+        triggerTime: preDeadline,
+        payload: {
+          ...payloadBase,
+          message: `Task due soon: ${task.title}`,
+        },
+      });
+    }
+
+    await scheduleReminderTrigger({
+      entityType: 'task',
+      entityId: taskId,
+      userIds,
+      triggerType: 'deadline_reached',
+      triggerTime: dueDate,
+      payload: {
+        ...payloadBase,
+        message: `Task deadline reached: ${task.title}`,
+      },
+    });
+  }
+};
+
+taskSchema.post('save', function(doc) {
+  rescheduleTaskReminders(doc).catch((err) => {
+    console.error('[Task] Failed to schedule reminders after save:', err);
+  });
+});
+
+taskSchema.post('findOneAndUpdate', function(doc: any) {
+  if (doc) {
+    rescheduleTaskReminders(doc).catch((err) => {
+      console.error('[Task] Failed to schedule reminders after update:', err);
+    });
+  }
+});
+
+taskSchema.post('deleteOne', { document: true, query: false }, function(doc: any) {
+  if (doc) {
+    clearReminderTriggers('task', toIdString(doc._id)).catch((err) => {
+      console.error('[Task] Failed to clear reminders after delete:', err);
+    });
+  }
+});

@@ -2,11 +2,12 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Users,
+  Users2,
   BarChart3,
   Settings,
-  Package,
-  Shield,
+  Rocket,
+  ShieldCheck,
+  CreditCard,
   LogOut
 } from 'lucide-react';
 import { AdminDock, AdminDockIcon, AdminDockDivider } from '../ui/AdminDock';
@@ -24,10 +25,11 @@ const AdminDockNavigation: React.FC = () => {
 
   const adminNavItems: AdminNavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
-    { id: 'devices', label: 'Devices', icon: Shield, path: '/admin/devices' },
-    { id: 'users', label: 'Users', icon: Users, path: '/admin/users' },
+    { id: 'devices', label: 'Devices', icon: ShieldCheck, path: '/admin/devices' },
+    { id: 'users', label: 'Users', icon: Users2, path: '/admin/users' },
+    { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, path: '/admin/subscriptions' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
-    { id: 'releases', label: 'Releases', icon: Package, path: '/admin/releases' },
+    { id: 'releases', label: 'Releases', icon: Rocket, path: '/admin/releases' },
     { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/settings' }
   ];
 

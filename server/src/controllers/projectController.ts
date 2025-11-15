@@ -1,39 +1,83 @@
 import { Request, Response } from 'express';
 import Project from '../models/Project';
 import Workspace from '../models/Workspace';
+import mongoose from 'mongoose';
 import { AuthenticatedRequest, ApiResponse, IProject } from '../types';
+import { PlanName, SUBSCRIPTION_LIMITS, requiresWorkspaceForProjects } from '../config/subscriptionLimits';
+import { sendEmail } from '../services/emailService';
 
 // Create project
 export const createProject = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { name, description, workspaceId, startDate, dueDate, priority, category } = req.body;
-    const userId = req.user!._id;
+    const { name, description, workspaceId, startDate, dueDate, priority, category, tier } = req.body;
+    const user = req.user!;
+    const plan = (user.subscription?.plan || 'free') as keyof typeof SUBSCRIPTION_LIMITS;
+    const planLimits = SUBSCRIPTION_LIMITS[plan];
 
-    // Verify workspace access
-    const workspace = await Workspace.findOne({
-      _id: workspaceId,
-      $or: [
-        { owner: userId },
-        { 'members.user': userId, 'members.status': 'active' }
-      ]
-    });
+    // Determine tier + workspace relationship
+    const isPaidTier = tier && tier !== 'free';
+    const needsWorkspace = isPaidTier || requiresWorkspaceForProjects(plan);
 
-    if (!workspace) {
-      res.status(404).json({
-        success: false,
-        message: 'Workspace not found or access denied'
+    let resolvedWorkspaceId: string | undefined = workspaceId;
+
+    if (needsWorkspace) {
+      if (!workspaceId) {
+        res.status(400).json({
+          success: false,
+          message: 'Workspace is required for your current plan/tier'
+        });
+        return;
+      }
+
+      const workspace = await Workspace.findOne({
+        _id: workspaceId,
+        $or: [
+          { owner: user._id },
+          { 'members.user': user._id, 'members.status': 'active' }
+        ]
       });
-      return;
+
+      if (!workspace) {
+        res.status(404).json({
+          success: false,
+          message: 'Workspace not found or access denied'
+        });
+        return;
+      }
+
+      // Enforce workspace project limits when applicable
+      const currentWorkspaceProjectCount = await Project.countDocuments({ workspace: workspaceId, isActive: true });
+      const workspaceLimit = workspace.subscription?.maxProjects ?? planLimits.maxProjects;
+      if (workspaceLimit !== -1 && currentWorkspaceProjectCount >= workspaceLimit) {
+        res.status(403).json({
+          success: false,
+          message: 'Workspace project limit reached'
+        });
+        return;
+      }
+
+      resolvedWorkspaceId = workspaceId;
+    } else {
+      // Free users can only have 1 active project
+      const existingProjectCount = await Project.countDocuments({ createdBy: user._id, tier: 'free', isActive: true });
+      if (planLimits.maxProjects !== -1 && existingProjectCount >= planLimits.maxProjects) {
+        res.status(403).json({
+          success: false,
+          message: 'Free plan allows only one active project. Upgrade to add more.'
+        });
+        return;
+      }
     }
 
     // Create project
     const project = new Project({
       name,
       description,
-      workspace: workspaceId,
-      owner: userId,
-      members: [{
-        user: userId,
+      workspace: resolvedWorkspaceId || null,
+      tier: tier || plan,
+      createdBy: user._id,
+      teamMembers: [{
+        user: user._id,
         role: 'owner',
         permissions: {
           canEdit: true,
@@ -51,14 +95,30 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
     await project.save();
 
     // Populate the project with owner details
-    await project.populate('owner', 'fullName email avatarUrl');
-    await project.populate('members.user', 'fullName email avatarUrl');
+    await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IProject> = {
       success: true,
       message: 'Project created successfully',
       data: project
     };
+
+    try {
+      if (req.user?.email && resolvedWorkspaceId) {
+        await sendEmail({
+          to: req.user.email,
+          subject: `New project created: ${project.name}`,
+          html: `
+            <h2>Project Created Successfully</h2>
+            <p>Your project <strong>${project.name}</strong> has been created${resolvedWorkspaceId ? ' in your workspace' : ''}.</p>
+            <p>Status: ${project.status || 'active'} | Priority: ${project.priority || 'medium'}</p>
+            <p>Start: ${project.startDate ? new Date(project.startDate).toLocaleDateString() : 'N/A'} | Due: ${project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'N/A'}</p>
+          `,
+        });
+      }
+    } catch (emailErr) {
+      console.error('Project creation email failed:', emailErr);
+    }
 
     res.status(201).json(response);
   } catch (error: any) {
@@ -73,12 +133,58 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
 // Get workspace projects
 export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { workspaceId } = req.params;
+    const { workspaceId: workspaceIdParam } = req.params as { workspaceId?: string };
     const userId = req.user!._id;
+
+    if (!workspaceIdParam) {
+      res.status(400).json({
+        success: false,
+        message: 'Workspace identifier is required',
+      });
+      return;
+    }
+
+    // Handle personal projects (workspace-less)
+    if (workspaceIdParam === 'personal') {
+      const personalProjects = await Project.find({
+        createdBy: userId,
+        workspace: null,
+        isActive: true
+      })
+      .populate('teamMembers.user', 'fullName email avatarUrl')
+      .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        message: 'Personal projects retrieved successfully',
+        data: personalProjects
+      });
+      return;
+    }
+
+    let resolvedWorkspaceId = workspaceIdParam;
+    if (!mongoose.Types.ObjectId.isValid(workspaceIdParam)) {
+      const fallbackWorkspace = await Workspace.findOne({
+        $or: [
+          { owner: userId },
+          { 'members.user': userId, 'members.status': 'active' },
+        ],
+      }).select('_id');
+
+      if (!fallbackWorkspace) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid workspace identifier provided',
+        });
+        return;
+      }
+
+      resolvedWorkspaceId = fallbackWorkspace._id.toString();
+    }
 
     // Verify workspace access
     const workspace = await Workspace.findOne({
-      _id: workspaceId,
+      _id: resolvedWorkspaceId,
       $or: [
         { owner: userId },
         { 'members.user': userId, 'members.status': 'active' }
@@ -94,11 +200,10 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
     }
 
     const projects = await Project.find({
-      workspace: workspaceId,
+      workspace: resolvedWorkspaceId,
       isActive: true
     })
-    .populate('owner', 'fullName email avatarUrl')
-    .populate('members.user', 'fullName email avatarUrl')
+    .populate('teamMembers.user', 'fullName email avatarUrl')
     .sort({ createdAt: -1 });
 
     const response: ApiResponse<IProject[]> = {
@@ -128,11 +233,10 @@ export const getProject = async (req: AuthenticatedRequest, res: Response): Prom
       isActive: true,
       $or: [
         { owner: userId },
-        { 'members.user': userId }
+        { 'teamMembers.user': userId }
       ]
     })
-    .populate('owner', 'fullName email avatarUrl')
-    .populate('members.user', 'fullName email avatarUrl');
+    .populate('teamMembers.user', 'fullName email avatarUrl');
 
     if (!project) {
       res.status(404).json({
@@ -170,7 +274,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
       isActive: true,
       $or: [
         { owner: userId },
-        { 'members.user': userId, 'members.role': { $in: ['owner', 'manager'] } }
+        { 'teamMembers.user': userId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
       ]
     });
 
@@ -199,13 +303,39 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     await project.save();
 
     await project.populate('owner', 'fullName email avatarUrl');
-    await project.populate('members.user', 'fullName email avatarUrl');
+    await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IProject> = {
       success: true,
       message: 'Project updated successfully',
       data: project
     };
+
+    try {
+      const recipients = new Set<string>();
+      if (req.user?.email) recipients.add(req.user.email);
+
+      const projectMembers = Array.isArray((project as any).teamMembers) ? (project as any).teamMembers : [];
+      projectMembers.forEach((member: any) => {
+        const email = member.user?.email || member.user?.emailAddress;
+        if (email) recipients.add(email);
+      });
+
+      if (recipients.size > 0) {
+        await sendEmail({
+          to: Array.from(recipients),
+          subject: `Project updated: ${project.name}`,
+          html: `
+            <h2>Project Updated</h2>
+            <p>The project <strong>${project.name}</strong> has new updates.</p>
+            <p>Status: ${project.status || 'active'} | Priority: ${project.priority || 'medium'}</p>
+            <p>Updated by: ${req.user?.fullName || req.user?.email}</p>
+          `,
+        });
+      }
+    } catch (emailErr) {
+      console.error('Project update email failed:', emailErr);
+    }
 
     res.status(200).json(response);
   } catch (error: any) {
@@ -265,7 +395,7 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
       isActive: true,
       $or: [
         { owner: currentUserId },
-        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'manager'] } }
+        { 'teamMembers.user': currentUserId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
       ]
     });
 
@@ -278,7 +408,8 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
     }
 
     // Add member
-    (project as any).members.push({
+    (project as any).teamMembers = (project as any).teamMembers || [];
+    (project as any).teamMembers.push({
       user: userId,
       role: role || 'member',
       permissions: {
@@ -290,7 +421,7 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
     });
     await project.save();
 
-    await project.populate('members.user', 'fullName email avatarUrl');
+    await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IProject> = {
       success: true,
@@ -319,7 +450,7 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
       isActive: true,
       $or: [
         { owner: currentUserId },
-        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'manager'] } }
+        { 'teamMembers.user': currentUserId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
       ]
     });
 
@@ -332,12 +463,12 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     }
 
     // Remove member
-    (project as any).members = (project as any).members.filter((member: any) => 
+    (project as any).teamMembers = ((project as any).teamMembers || []).filter((member: any) => 
       member.user.toString() !== memberId
     );
     await project.save();
 
-    await project.populate('members.user', 'fullName email avatarUrl');
+    await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IProject> = {
       success: true,
@@ -367,7 +498,7 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
       isActive: true,
       $or: [
         { owner: currentUserId },
-        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'manager'] } }
+        { 'teamMembers.user': currentUserId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
       ]
     });
 
@@ -380,7 +511,7 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
     }
 
     // Update member role
-    const member = (project as any).members.find((member: any) => 
+    const member = ((project as any).teamMembers || []).find((member: any) => 
       member.user.toString() === memberId
     );
     if (member) {
@@ -388,7 +519,7 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
     }
     await project.save();
 
-    await project.populate('members.user', 'fullName email avatarUrl');
+    await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IProject> = {
       success: true,
@@ -402,6 +533,89 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
     res.status(500).json({
       success: false,
       message: 'Internal server error'
+    });
+  }
+};
+
+// Link existing personal project to a workspace after upgrade
+export const linkProjectToWorkspace = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { workspaceId } = req.body as { workspaceId?: string };
+    const user = req.user!;
+    const plan = (user.subscription?.plan || 'free') as PlanName;
+
+    if (plan === 'free') {
+      res.status(403).json({
+        success: false,
+        message: 'Upgrade to a paid plan before linking projects to a workspace'
+      });
+      return;
+    }
+
+    if (!workspaceId || !mongoose.Types.ObjectId.isValid(workspaceId)) {
+      res.status(400).json({
+        success: false,
+        message: 'A valid workspaceId is required'
+      });
+      return;
+    }
+
+    const project = await Project.findOne({
+      _id: id,
+      createdBy: user._id,
+      isActive: true,
+      workspace: null
+    });
+
+    if (!project) {
+      res.status(404).json({
+        success: false,
+        message: 'Personal project not found or already linked'
+      });
+      return;
+    }
+
+    const workspace = await Workspace.findOne({
+      _id: workspaceId,
+      $or: [
+        { owner: user._id },
+        { 'members.user': user._id, 'members.status': 'active' }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    const planLimits = SUBSCRIPTION_LIMITS[plan];
+    const currentWorkspaceProjectCount = await Project.countDocuments({ workspace: workspaceId, isActive: true });
+    const workspaceLimit = workspace.subscription?.maxProjects ?? planLimits.maxProjects;
+    if (workspaceLimit !== -1 && currentWorkspaceProjectCount >= workspaceLimit) {
+      res.status(403).json({
+        success: false,
+        message: 'Workspace project limit reached'
+      });
+      return;
+    }
+
+    await project.upgradeTier(plan === 'ultra' ? 'ultra' : 'pro', workspaceId);
+    await project.populate('teamMembers.user', 'fullName email avatarUrl');
+
+    res.status(200).json({
+      success: true,
+      message: 'Project linked to workspace successfully',
+      data: project
+    });
+  } catch (error: any) {
+    console.error('Link project error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error while linking project'
     });
   }
 };

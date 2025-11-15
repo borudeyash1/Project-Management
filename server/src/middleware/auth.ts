@@ -1,13 +1,14 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import User from '../models/User';
 import Admin from '../models/Admin';
 import { AuthenticatedRequest, JWTPayload } from '../types';
 
 // Verify JWT token
-export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization; 
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({
@@ -54,8 +55,9 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
       }
 
       console.log('✅ [AUTH] Admin authenticated:', admin.email);
-      req.user = admin as any;
-      req.isAdmin = true;
+      const authReq = req as AuthenticatedRequest;
+      authReq.user = admin as any;
+      authReq.isAdmin = true;
       next();
       return;
     }
@@ -82,7 +84,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     }
 
     console.log('✅ [AUTH] User authenticated:', user.email);
-    req.user = user;
+    (req as AuthenticatedRequest).user = user;
     next();
   } catch (error: any) {
     if (error.name === 'JsonWebTokenError') {
@@ -110,7 +112,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
 };
 
 // Verify refresh token
-export const authenticateRefresh = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const authenticateRefresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { refreshToken } = req.body;
     
@@ -145,8 +147,9 @@ export const authenticateRefresh = async (req: AuthenticatedRequest, res: Respon
       return;
     }
 
-    req.user = user;
-    req.refreshToken = refreshToken;
+    const authReq = req as AuthenticatedRequest;
+    authReq.user = user;
+    authReq.refreshToken = refreshToken;
     next();
   } catch (error: any) {
     if (error.name === 'JsonWebTokenError') {

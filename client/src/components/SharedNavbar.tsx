@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Info, BookOpen, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown } from 'lucide-react';
+import { Home, Info, BookOpen, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown, BadgeDollarSign } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 import sartthi_logo from '../images/sartthi_logo.jpg';
@@ -135,6 +135,13 @@ const SharedNavbar: React.FC = () => {
               >
                 <BookOpen size={16} />
                 User Guide
+              </Link>
+              <Link
+                to="/pricing"
+                className={`${isActive('/pricing') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+              >
+                <BadgeDollarSign size={16} />
+                Pricing
               </Link>
 
               {/* Download Dropdown */}

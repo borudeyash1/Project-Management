@@ -5,7 +5,10 @@ import Workspace from '../src/models/Workspace';
 import Project from '../src/models/Project';
 import Task from '../src/models/Task';
 import Team from '../src/models/Team';
+import { Goal } from '../src/models/Goal';
+import { Report } from '../src/models/Report';
 import Payroll from '../src/models/Payroll';
+import SubscriptionPlan from '../src/models/SubscriptionPlan';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -191,7 +194,7 @@ const testUsers = [
     department: 'Engineering',
     location: 'Austin',
     about: 'Passionate about building scalable web applications.',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd722b786?q=80&w=200&auto=format&fit=crop',
     isEmailVerified: true,
     subscription: {
       isPro: false,
@@ -268,15 +271,12 @@ const testUsers = [
   }
 ];
 
-// Sample workspaces
-const testWorkspaces = [
+const testVacantWorkspaces = [
   {
     name: 'Acme Corp',
     description: 'Main workspace for Acme Corporation',
     type: 'enterprise',
     region: 'US',
-    owner: null, // Will be set after user creation
-    members: [],
     settings: {
       isPublic: false,
       allowMemberInvites: true,
@@ -284,30 +284,20 @@ const testWorkspaces = [
       defaultProjectPermissions: {
         canCreate: true,
         canManage: true,
-        canView: true
-      }
+        canView: true,
+      },
     },
     subscription: {
       plan: 'enterprise',
       maxMembers: 100,
       maxProjects: 50,
-      features: {
-        advancedAnalytics: true,
-        customFields: true,
-        apiAccess: true,
-        prioritySupport: true
-      }
     },
-    isActive: true,
-    memberCount: 0
   },
   {
     name: 'Design Team',
     description: 'Workspace for the design team',
     type: 'team',
     region: 'US',
-    owner: null, // Will be set after user creation
-    members: [],
     settings: {
       isPublic: false,
       allowMemberInvites: true,
@@ -315,189 +305,216 @@ const testWorkspaces = [
       defaultProjectPermissions: {
         canCreate: true,
         canManage: false,
-        canView: true
-      }
+        canView: true,
+      },
     },
     subscription: {
       plan: 'pro',
       maxMembers: 25,
       maxProjects: 20,
-      features: {
-        advancedAnalytics: true,
-        customFields: true,
-        apiAccess: false,
-        prioritySupport: false
-      }
     },
-    isActive: true,
-    memberCount: 0
   }
 ];
 
-// Sample projects
+const defaultSubscriptionPlans = [
+  {
+    planKey: 'free',
+    displayName: 'Free User',
+    summary:
+      'Access essential task management features. Create a single workspace/project and experience SaaS task flow with ads.',
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    limits: {
+      maxWorkspaces: 1,
+      maxProjects: 1,
+      maxTeamMembers: 5,
+      storageInGB: 1
+    },
+    features: {
+      aiAccess: false,
+      adsEnabled: true,
+      collaboratorAccess: false,
+      customStorageIntegration: false,
+      desktopAppAccess: false,
+      automaticScheduling: false,
+      realtimeAISuggestions: false
+    },
+    workspaceFees: {
+      personal: 29.99,
+      team: 39.99,
+      enterprise: 59.99
+    },
+    perHeadPrice: 8,
+    collaboratorsLimit: 0,
+    order: 0
+  },
+  {
+    planKey: 'pro',
+    displayName: 'Pro User',
+    summary:
+      'Unlock workspace freedom—manage up to five workspaces with 5 projects each, 20 employees per project, no ads, and limited AI signals.',
+    monthlyPrice: 12,
+    yearlyPrice: 120,
+    limits: {
+      maxWorkspaces: 5,
+      maxProjects: 5,
+      maxTeamMembers: 100,
+      storageInGB: 100
+    },
+    features: {
+      aiAccess: true,
+      adsEnabled: false,
+      collaboratorAccess: true,
+      customStorageIntegration: false,
+      desktopAppAccess: true,
+      automaticScheduling: false,
+      realtimeAISuggestions: false
+    },
+    workspaceFees: {
+      personal: 39.99,
+      team: 79.99,
+      enterprise: 99.99
+    },
+    perHeadPrice: 5,
+    collaboratorsLimit: 5,
+    order: 1
+  },
+  {
+    planKey: 'ultra',
+    displayName: 'Ultra User',
+    summary:
+      'Enterprise-grade automation: 10 workspaces, 20 projects each, 30 members, automatic scheduling, AI-driven guidance, and private cloud storage.',
+    monthlyPrice: 25,
+    yearlyPrice: 250,
+    limits: {
+      maxWorkspaces: 10,
+      maxProjects: 20,
+      maxTeamMembers: 30,
+      storageInGB: 500
+    },
+    features: {
+      aiAccess: true,
+      adsEnabled: false,
+      collaboratorAccess: true,
+      customStorageIntegration: true,
+      desktopAppAccess: true,
+      automaticScheduling: true,
+      realtimeAISuggestions: true
+    },
+    workspaceFees: {
+      personal: 59.99,
+      team: 129.99,
+      enterprise: 199.99
+    },
+    perHeadPrice: 3,
+    collaboratorsLimit: 10,
+    order: 2
+  }
+];
+
 const testProjects = [
   {
     name: 'Website Redesign',
     description: 'Complete redesign of the company website',
     client: 'Acme Corp',
-    workspace: null, // Will be set after workspace creation
-    createdBy: null, // Will be set after user creation
     status: 'active',
     priority: 'high',
     category: 'Web Development',
     startDate: new Date('2024-01-01'),
     dueDate: new Date('2024-03-31'),
-    budget: {
-      estimated: 50000,
-      actual: 25000,
-      currency: 'USD'
-    },
-    progress: 50,
-    teamMembers: [],
-    milestones: [
-      {
-        name: 'Design Phase Complete',
-        description: 'All designs approved and ready for development',
-        dueDate: new Date('2024-02-15'),
-        status: 'completed',
-        createdBy: null
-      },
-      {
-        name: 'Development Phase',
-        description: 'Frontend and backend development',
-        dueDate: new Date('2024-03-15'),
-        status: 'in-progress',
-        createdBy: null
-      }
-    ],
     tags: ['website', 'redesign', 'frontend'],
-    attachments: [],
-    settings: {
-      isPublic: false,
-      allowMemberInvites: true,
-      timeTracking: {
-        enabled: true,
-        requireApproval: false
-      },
-      notifications: {
-        taskUpdates: true,
-        milestoneReminders: true,
-        deadlineAlerts: true
-      }
-    },
-    isActive: true,
-    teamMemberCount: 0,
-    completedTasksCount: 5,
-    totalTasksCount: 15
   },
   {
     name: 'Mobile App Development',
     description: 'Native mobile app for iOS and Android',
     client: 'TechStart Inc',
-    workspace: null, // Will be set after workspace creation
-    createdBy: null, // Will be set after user creation
     status: 'planning',
     priority: 'medium',
     category: 'Mobile Development',
     startDate: new Date('2024-02-01'),
     dueDate: new Date('2024-06-30'),
-    budget: {
-      estimated: 100000,
-      actual: 0,
-      currency: 'USD'
-    },
-    progress: 10,
-    teamMembers: [],
-    milestones: [
-      {
-        name: 'Project Planning',
-        description: 'Complete project requirements and planning',
-        dueDate: new Date('2024-02-28'),
-        status: 'in-progress',
-        createdBy: null
-      }
-    ],
     tags: ['mobile', 'app', 'ios', 'android'],
-    attachments: [],
-    settings: {
-      isPublic: false,
-      allowMemberInvites: true,
-      timeTracking: {
-        enabled: true,
-        requireApproval: true
-      },
-      notifications: {
-        taskUpdates: true,
-        milestoneReminders: true,
-        deadlineAlerts: true
-      }
-    },
-    isActive: true,
-    teamMemberCount: 0,
-    completedTasksCount: 1,
-    totalTasksCount: 8
   }
 ];
 
-// Sample tasks
-const testTasks = [
+const testReports = [
   {
-    title: 'Design Homepage Layout',
-    description: 'Create wireframes and mockups for the new homepage',
-    project: null, // Will be set after project creation
-    workspace: null, // Will be set after workspace creation
-    createdBy: null, // Will be set after user creation
-    assignee: null, // Will be set after user creation
-    status: 'in-progress',
-    priority: 'high',
-    category: 'Design',
-    type: 'task',
-    startDate: new Date('2024-01-15'),
-    dueDate: new Date('2024-02-01'),
-    estimatedHours: 16,
-    actualHours: 8,
-    progress: 50,
-    subtasks: [
-      {
-        title: 'Create wireframes',
-        status: 'completed',
-        assignee: null,
-        dueDate: new Date('2024-01-20'),
-        createdBy: null
-      },
-      {
-        title: 'Design mockups',
-        status: 'in-progress',
-        assignee: null,
-        dueDate: new Date('2024-02-01'),
-        createdBy: null
-      }
-    ],
-    dependencies: [],
-    comments: [
-      {
-        content: 'Great start on the wireframes!',
-        author: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isEdited: false
-      }
-    ],
-    attachments: [],
-    tags: ['design', 'homepage', 'wireframes'],
-    watchers: [],
-    timeEntries: [],
-    customFields: [],
-    settings: {
-      isPublic: true,
-      allowComments: true,
-      allowTimeTracking: true,
-      requireApproval: false
+    name: 'Team Productivity Snapshot',
+    description: 'Summary of delivery health and team bandwidth.',
+    type: 'team',
+    data: {
+      totalTasks: 48,
+      completed: 36,
+      blocked: 3,
+      velocityTrend: [12, 14, 11, 15],
+      highlights: ['On-time delivery improved 8%', '3 automation rules shipped'],
     },
-    isActive: true,
-    subtaskCompletionPercentage: 50,
-    totalTimeLogged: 8,
-    commentCount: 1
+    isPublic: true,
+    tags: ['team', 'performance'],
+  },
+  {
+    name: 'Project Health Overview',
+    description: 'High-level metrics for active delivery initiatives.',
+    type: 'project',
+    data: {
+      burnDown: [100, 78, 60, 45, 27, 10],
+      risks: ['API dependency delay', 'QA capacity'],
+      budget: { spent: 42000, allocated: 60000 },
+    },
+    isPublic: false,
+    tags: ['project', 'budget'],
+  }
+];
+
+const testTeams = [
+  {
+    name: 'Product Strategy Squad',
+    description: 'Cross-functional team responsible for roadmap prioritization and AI feature strategy.',
+    skills: ['Strategy', 'AI', 'Collaboration']
+  },
+  {
+    name: 'Delivery Ops Crew',
+    description: 'Handles delivery tracking, quality metrics, and operational reporting.',
+    skills: ['Delivery', 'Reporting', 'Automation']
+  }
+];
+
+const testGoals = [
+  {
+    title: 'Launch AI Insights',
+    description: 'Ship AI-based analytics dashboards for customer success and delivery teams.',
+    type: 'team',
+    category: 'productivity',
+    priority: 'high',
+    status: 'in_progress',
+    progress: 45,
+    startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+    targetDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+    tags: ['ai', 'analytics', 'team'],
+    isPublic: true,
+    milestones: [
+      { _id: 'g-m1', title: 'Define AI metrics', dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), completed: true },
+      { _id: 'g-m2', title: 'Build data pipeline', dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), completed: true },
+      { _id: 'g-m3', title: 'Ship dashboard beta', dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), completed: false },
+      { _id: 'g-m4', title: 'Collect feedback', dueDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), completed: false }
+    ]
+  },
+  {
+    title: 'Improve delivery predictability',
+    description: 'Cut cycle time by standardizing delivery rituals and reporting.',
+    type: 'company',
+    category: 'productivity',
+    priority: 'medium',
+    status: 'not_started',
+    progress: 0,
+    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    targetDate: new Date(Date.now() + 40 * 24 * 60 * 60 * 1000),
+    tags: ['delivery', 'ops', 'reporting'],
+    isPublic: false,
+    milestones: [
+      { _id: 'g-m5', title: 'Define delivery rituals', dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), completed: false },
+      { _id: 'g-m6', title: 'Roll out reporting templates', dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), completed: false }
+    ]
   },
   {
     title: 'Implement User Authentication',
@@ -556,7 +573,10 @@ async function clearData() {
     await Project.deleteMany({});
     await Task.deleteMany({});
     await Team.deleteMany({});
+    await Goal.deleteMany({});
+    await Report.deleteMany({});
     await Payroll.deleteMany({});
+    await SubscriptionPlan.deleteMany({});
     console.log('🗑️  Cleared existing data');
   } catch (error) {
     console.error('❌ Error clearing data:', error);
@@ -587,28 +607,27 @@ async function createUsers() {
 // Create workspaces
 async function createWorkspaces(users: any[]) {
   try {
-    const workspaces = testWorkspaces.map((workspace, index) => ({
+    const workspacesPayload = testVacantWorkspaces.map((workspace) => ({
       ...workspace,
-      owner: users[0]._id, // Alex is the owner
+      owner: users[0]._id,
       members: [
         {
           user: users[0]._id,
           role: 'owner',
+          status: 'active',
+          joinedAt: new Date(),
           permissions: {
             canCreateProject: true,
             canManageEmployees: true,
             canViewPayroll: true,
             canExportReports: true,
-            canManageWorkspace: true
+            canManageWorkspace: true,
           },
-          joinedAt: new Date(),
-          status: 'active'
-        }
+        },
       ],
-      memberCount: 1
     }));
 
-    const createdWorkspaces = await Workspace.insertMany(workspaces);
+    const createdWorkspaces = await Workspace.insertMany(workspacesPayload);
     console.log(`🏢 Created ${createdWorkspaces.length} workspaces`);
     return createdWorkspaces;
   } catch (error) {
@@ -617,10 +636,36 @@ async function createWorkspaces(users: any[]) {
   }
 }
 
+// Create teams
+async function createTeams(users: any[], workspaces: any[]) {
+  try {
+    const teamsPayload = testTeams.map((team: any) => ({
+      ...team,
+      workspace: workspaces[0]._id,
+      leader: users[0]._id,
+      members: [
+        {
+          user: users[0]._id,
+          role: 'leader',
+          status: 'active',
+          joinedAt: new Date(),
+        },
+      ],
+    }));
+
+    const createdTeams = await Team.insertMany(teamsPayload);
+    console.log(`👥 Created ${createdTeams.length} teams`);
+    return createdTeams;
+  } catch (error) {
+    console.error('❌ Error creating teams:', error);
+    throw error;
+  }
+}
+
 // Create projects
 async function createProjects(users: any[], workspaces: any[]) {
   try {
-    const projects = testProjects.map((project, index) => ({
+    const projectsPayload = testProjects.map((project: any) => ({
       ...project,
       workspace: workspaces[0]._id,
       createdBy: users[0]._id,
@@ -632,15 +677,14 @@ async function createProjects(users: any[], workspaces: any[]) {
             canManageTasks: true,
             canManageTeam: true,
             canViewReports: true,
-            canManageProject: true
+            canManageProject: true,
           },
-          joinedAt: new Date()
-        }
+          joinedAt: new Date(),
+        },
       ],
-      teamMemberCount: 1
     }));
 
-    const createdProjects = await Project.insertMany(projects);
+    const createdProjects = await Project.insertMany(projectsPayload);
     console.log(`📁 Created ${createdProjects.length} projects`);
     return createdProjects;
   } catch (error) {
@@ -649,22 +693,41 @@ async function createProjects(users: any[], workspaces: any[]) {
   }
 }
 
-// Create tasks
-async function createTasks(users: any[], workspaces: any[], projects: any[]) {
+// Create goals
+async function createGoals(users: any[], projects: any[], workspaces: any[]) {
   try {
-    const tasks = testTasks.map((task, index) => ({
-      ...task,
+    const goalsPayload = testGoals.map((goal: any) => ({
+      ...goal,
+      createdBy: users[0]._id,
+      assignedTo: users[0]._id,
       project: projects[0]._id,
       workspace: workspaces[0]._id,
-      createdBy: users[0]._id,
-      assignee: users[index % users.length]._id
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
 
-    const createdTasks = await Task.insertMany(tasks);
-    console.log(`📋 Created ${createdTasks.length} tasks`);
-    return createdTasks;
+    const createdGoals = await Goal.insertMany(goalsPayload);
+    console.log(`🎯 Created ${createdGoals.length} goals`);
+    return createdGoals;
   } catch (error) {
-    console.error('❌ Error creating tasks:', error);
+    console.error('❌ Error creating goals:', error);
+    throw error;
+  }
+}
+
+// Create reports
+async function createReports(users: any[]) {
+  try {
+    const reportsPayload = testReports.map((report: any) => ({
+      ...report,
+      createdBy: users[0]._id,
+    }));
+
+    const createdReports = await Report.insertMany(reportsPayload);
+    console.log(`📈 Created ${createdReports.length} reports`);
+    return createdReports;
+  } catch (error) {
+    console.error('❌ Error creating reports:', error);
     throw error;
   }
 }
@@ -680,14 +743,18 @@ async function seed() {
     const users = await createUsers();
     const workspaces = await createWorkspaces(users);
     const projects = await createProjects(users, workspaces);
-    const tasks = await createTasks(users, workspaces, projects);
+    const teams = await createTeams(users, workspaces);
+    await createGoals(users, projects, workspaces);
+    const reports = await createReports(users);
     
     console.log('✅ Database seeding completed successfully!');
     console.log('\n📊 Summary:');
     console.log(`👥 Users: ${users.length}`);
     console.log(`🏢 Workspaces: ${workspaces.length}`);
     console.log(`📁 Projects: ${projects.length}`);
-    console.log(`📋 Tasks: ${tasks.length}`);
+    console.log(`👥 Teams: ${teams.length}`);
+    console.log(`🎯 Goals seeded`);
+    console.log(`📈 Reports: ${reports.length}`);
     
     console.log('\n🔑 Test User Credentials:');
     console.log('Alex Johnson - alex@example.com / password123');

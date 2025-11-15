@@ -8,7 +8,8 @@ import {
   deleteProject,
   addMember,
   removeMember,
-  updateMemberRole
+  updateMemberRole,
+  linkProjectToWorkspace
 } from '../controllers/projectController';
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.get('/workspace/:workspaceId', getWorkspaceProjects);
 router.get('/:id', getProject);
 router.put('/:id', updateProject);
 router.delete('/:id', deleteProject);
+router.post('/:id/link-workspace', linkProjectToWorkspace);
 
 // Member management routes
 router.post('/:id/members', addMember);

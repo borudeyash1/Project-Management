@@ -5,6 +5,8 @@ import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';
 import { PlanStatus } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import api from '../services/api';
+import { SubscriptionPlanData } from '../services/api';
 
 interface Workspace {
   _id: string;
@@ -38,95 +40,109 @@ const WorkspaceDiscover: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAICreateModal, setShowAICreateModal] = useState(false);
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlanData[]>([]);
 
-  // Mock data for demonstration - replace with actual API call
   useEffect(() => {
-    const mockWorkspaces: Workspace[] = [
-      {
-        _id: '1',
-        name: 'TechCorp Solutions',
-        description: 'Leading technology solutions provider',
-        type: 'enterprise',
-        region: 'North America',
-        memberCount: 150,
-        isPublic: true,
-        owner: {
-          _id: 'owner1',
-          fullName: 'John Smith',
-          avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-        },
-        settings: {
-          isPublic: true,
-          allowMemberInvites: true,
-          requireApprovalForJoining: true
-        },
-        createdAt: new Date('2024-01-15')
-      },
-      {
-        _id: '2',
-        name: 'Design Studio Pro',
-        description: 'Creative design and branding agency',
-        type: 'team',
-        region: 'Europe',
-        memberCount: 25,
-        isPublic: true,
-        owner: {
-          _id: 'owner2',
-          fullName: 'Sarah Johnson',
-          avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
-        },
-        settings: {
-          isPublic: true,
-          allowMemberInvites: true,
-          requireApprovalForJoining: false
-        },
-        createdAt: new Date('2024-02-20')
-      },
-      {
-        _id: '3',
-        name: 'StartupHub',
-        description: 'Innovation and startup community',
-        type: 'team',
-        region: 'Asia',
-        memberCount: 45,
-        isPublic: true,
-        owner: {
-          _id: 'owner3',
-          fullName: 'Mike Chen',
-          avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
-        },
-        settings: {
-          isPublic: true,
-          allowMemberInvites: true,
-          requireApprovalForJoining: true
-        },
-        createdAt: new Date('2024-03-10')
-      },
-      {
-        _id: '4',
-        name: 'Marketing Masters',
-        description: 'Digital marketing and growth hacking',
-        type: 'team',
-        region: 'North America',
-        memberCount: 18,
-        isPublic: false,
-        owner: {
-          _id: 'owner4',
-          fullName: 'Emily Davis',
-          avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face'
-        },
-        settings: {
-          isPublic: false,
-          allowMemberInvites: false,
-          requireApprovalForJoining: true
-        },
-        createdAt: new Date('2024-04-05')
+    const fetchPlans = async () => {
+      try {
+        const planData = await api.getSubscriptionPlans();
+        setSubscriptionPlans(planData);
+      } catch (error) {
+        console.error('Failed to load subscription plans', error);
       }
-    ];
+    };
 
-    setWorkspaces(mockWorkspaces);
-    setFilteredWorkspaces(mockWorkspaces);
-    setLoading(false);
+    const loadWorkspaces = async () => {
+      const mockWorkspaces: Workspace[] = [
+        {
+          _id: '1',
+          name: 'TechCorp Solutions',
+          description: 'Leading technology solutions provider',
+          type: 'enterprise',
+          region: 'North America',
+          memberCount: 150,
+          isPublic: true,
+          owner: {
+            _id: 'owner1',
+            fullName: 'John Smith',
+            avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
+          },
+          settings: {
+            isPublic: true,
+            allowMemberInvites: true,
+            requireApprovalForJoining: true
+          },
+          createdAt: new Date('2024-01-15')
+        },
+        {
+          _id: '2',
+          name: 'Design Studio Pro',
+          description: 'Creative design and branding agency',
+          type: 'team',
+          region: 'Europe',
+          memberCount: 25,
+          isPublic: true,
+          owner: {
+            _id: 'owner2',
+            fullName: 'Sarah Johnson',
+            avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
+          },
+          settings: {
+            isPublic: true,
+            allowMemberInvites: true,
+            requireApprovalForJoining: false
+          },
+          createdAt: new Date('2024-02-20')
+        },
+        {
+          _id: '3',
+          name: 'StartupHub',
+          description: 'Innovation and startup community',
+          type: 'team',
+          region: 'Asia',
+          memberCount: 45,
+          isPublic: true,
+          owner: {
+            _id: 'owner3',
+            fullName: 'Mike Chen',
+            avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
+          },
+          settings: {
+            isPublic: true,
+            allowMemberInvites: true,
+            requireApprovalForJoining: true
+          },
+          createdAt: new Date('2024-03-10')
+        },
+        {
+          _id: '4',
+          name: 'Marketing Masters',
+          description: 'Digital marketing and growth hacking',
+          type: 'team',
+          region: 'North America',
+          memberCount: 18,
+          isPublic: false,
+          owner: {
+            _id: 'owner4',
+            fullName: 'Emily Davis',
+            avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face'
+          },
+          settings: {
+            isPublic: false,
+            allowMemberInvites: false,
+            requireApprovalForJoining: true
+          },
+          createdAt: new Date('2024-04-05')
+        }
+      ];
+
+      setWorkspaces(mockWorkspaces);
+      setFilteredWorkspaces(mockWorkspaces);
+      setLoading(false);
+    };
+
+    fetchPlans();
+    loadWorkspaces();
   }, []);
 
   // Filter workspaces based on search and filters

@@ -1,37 +1,76 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { EmailUsage } from '../models/EmailUsage';
 
 dotenv.config(); // Load environment variables
 
+const smtpHost = process.env.SMTP_HOST;
+const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
+const smtpSecure = process.env.SMTP_SECURE === 'true';
+const smtpUser = process.env.SMTP_USER;
+const smtpPassword = process.env.SMTP_PASSWORD;
+const emailFrom = process.env.EMAIL_FROM || smtpUser;
+const emailFromName = process.env.EMAIL_FROM_NAME || 'TaskFlowHQ';
+const emailDailyLimit = Number(process.env.EMAIL_DAILY_LIMIT || 300);
+
 // Check if email credentials are configured
-const isEmailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+const isEmailConfigured = Boolean(smtpHost && smtpPort && smtpUser && smtpPassword);
 
 // Only create transporter if email is configured
-const transporter = isEmailConfigured ? nodemailer.createTransport({
-  service: 'gmail', // You can use other services like 'Outlook', 'SendGrid', etc.
-  auth: {
-    user: process.env.EMAIL_USER, // Your email address
-    pass: process.env.EMAIL_PASS, // Your email password or app-specific password
-  },
-}) : null;
+const transporter = isEmailConfigured
+  ? nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
+      },
+    })
+  : null;
 
 interface EmailOptions {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
 }
+
+const getDateKey = () => new Date().toISOString().split('T')[0];
+
+const reserveEmailQuota = async (units: number) => {
+  if (!emailDailyLimit || Number.isNaN(emailDailyLimit)) {
+    return;
+  }
+
+  const dateKey = getDateKey();
+  const usage = await EmailUsage.findOneAndUpdate(
+    { dateKey },
+    {
+      $setOnInsert: { limit: emailDailyLimit },
+      $inc: { count: units },
+    },
+    { new: true, upsert: true }
+  );
+
+  if (usage.count > usage.limit) {
+    await EmailUsage.updateOne({ _id: usage._id }, { $inc: { count: -units } });
+    throw new Error('Daily email quota exceeded');
+  }
+};
 
 export const sendEmail = async (options: EmailOptions) => {
   try {
     console.log('🔍 [DEBUG] Email service called with options:', {
       to: options.to,
       subject: options.subject,
-      from: process.env.EMAIL_USER
+      from: emailFrom
     });
     
     console.log('🔍 [DEBUG] Email configuration:', {
-      EMAIL_USER: process.env.EMAIL_USER ? 'set' : 'not set',
-      EMAIL_PASS: process.env.EMAIL_PASS ? 'set' : 'not set',
+      SMTP_HOST: smtpHost || 'not set',
+      SMTP_PORT: smtpPort || 'not set',
+      SMTP_USER: smtpUser ? 'set' : 'not set',
+      SMTP_SECURE: smtpSecure,
       isConfigured: isEmailConfigured
     });
     
@@ -41,9 +80,12 @@ export const sendEmail = async (options: EmailOptions) => {
       console.warn('⚠️ [DEBUG] To enable email, set EMAIL_USER and EMAIL_PASS in your .env file');
       return; // Return without error to allow registration to continue
     }
+
+    const toList = Array.isArray(options.to) ? options.to : [options.to];
+    await reserveEmailQuota(toList.length);
     
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: emailFromName ? `${emailFromName} <${emailFrom}>` : emailFrom,
       to: options.to,
       subject: options.subject,
       html: options.html,

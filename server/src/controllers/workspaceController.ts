@@ -1,19 +1,74 @@
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import Workspace from '../models/Workspace';
 import User from '../models/User';
+import SubscriptionPlan from '../models/SubscriptionPlan';
+import { sendEmail } from '../services/emailService';
+import { generateOTP, OTP_VALIDITY_MS } from '../utils/otp';
 import { AuthenticatedRequest, ApiResponse, IWorkspace } from '../types';
 
-// Create workspace
-export const createWorkspace = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  try {
-    const { name, description, type, region } = req.body;
-    const userId = req.user!._id;
+const buildBillingResponse = (plan: any, type: string, estimatedMembers: number) => {
+  const workspaceType = type === 'enterprise' ? 'enterprise' : type === 'personal' ? 'personal' : 'team';
+  const baseFee = plan.workspaceFees?.[workspaceType] ?? plan.workspaceFees?.team ?? 0;
+  const perHead = plan.perHeadPrice ?? 0;
+  const total = baseFee + perHead * Math.max(0, estimatedMembers);
+  return {
+    baseFee,
+    perHeadPrice: perHead,
+    estimatedMembers,
+    total
+  };
+};
 
-    // Create workspace
+// Create workspace with plan limits & OTP guard
+export const createWorkspace: RequestHandler = async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      type = 'team',
+      region,
+      estimatedMembers = 0
+    } = req.body;
+    const user = (req as AuthenticatedRequest).user!;
+    const userId = user._id;
+
+    if (!user.workspaceCreationOtpVerifiedAt) {
+      res.status(403).json({
+        success: false,
+        message: 'Please verify the workspace creation OTP before continuing.'
+      });
+      return;
+    }
+
+    if (Date.now() - user.workspaceCreationOtpVerifiedAt.getTime() > OTP_VALIDITY_MS) {
+      user.workspaceCreationOtpVerifiedAt = undefined;
+      await user.save();
+      res.status(403).json({
+        success: false,
+        message: 'OTP verification expired. Please request a new code.'
+      });
+      return;
+    }
+
+    const planKey = (user.subscription?.plan as 'free' | 'pro' | 'ultra') || 'free';
+    const plan = await SubscriptionPlan.findOne({ planKey });
+    const ownerWorkspaceCount = await Workspace.countDocuments({ owner: userId });
+
+    if (plan && plan.limits?.maxWorkspaces !== -1 && ownerWorkspaceCount >= plan.limits.maxWorkspaces) {
+      const billing = buildBillingResponse(plan, type, Number(estimatedMembers));
+      res.status(402).json({
+        success: false,
+        message: 'Workspace limit reached for your current subscription.',
+        requiresCustomBilling: true,
+        billing
+      });
+      return;
+    }
+
     const workspace = new Workspace({
       name,
       description,
-      type: type || 'team',
+      type,
       region,
       owner: userId,
       members: [{
@@ -31,9 +86,12 @@ export const createWorkspace = async (req: AuthenticatedRequest, res: Response):
     });
 
     await workspace.save();
-
-    // Populate the workspace with owner details
     await workspace.populate('owner', 'fullName email avatarUrl');
+
+    user.workspaceCreationOtp = undefined;
+    user.workspaceCreationOtpExpires = undefined;
+    user.workspaceCreationOtpVerifiedAt = undefined;
+    await user.save();
 
     const response: ApiResponse<IWorkspace> = {
       success: true,
@@ -47,6 +105,88 @@ export const createWorkspace = async (req: AuthenticatedRequest, res: Response):
     res.status(500).json({
       success: false,
       message: 'Internal server error during workspace creation'
+    });
+  }
+};
+
+// Send OTP for workspace creation
+export const sendWorkspaceCreationOtp: RequestHandler = async (req, res) => {
+  try {
+    const user = (req as AuthenticatedRequest).user!;
+    const otp = generateOTP();
+    user.workspaceCreationOtp = otp;
+    user.workspaceCreationOtpExpires = new Date(Date.now() + OTP_VALIDITY_MS);
+    user.workspaceCreationOtpVerifiedAt = undefined;
+    await user.save();
+
+    const emailSubject = 'Saarthi Workspace Creation OTP';
+    const emailHtml = `
+      <p>Hello ${user.fullName},</p>
+      <p>You're initiating a new workspace. Please use the code below to verify your email:</p>
+      <h2>${otp}</h2>
+      <p>This code expires in 10 minutes. If you did not request this, please ignore this email.</p>
+    `;
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: emailSubject,
+        html: emailHtml
+      });
+    } catch (error) {
+      console.warn('Failed to send workspace OTP email:', error);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent to your email address'
+    });
+  } catch (error: any) {
+    console.error('Send workspace OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate workspace OTP'
+    });
+  }
+};
+
+// Verify workspace creation OTP
+export const verifyWorkspaceCreationOtp: RequestHandler = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    if (!otp) {
+      res.status(400).json({ success: false, message: 'OTP is required' });
+      return;
+    }
+
+    const user = (req as AuthenticatedRequest).user!;
+    if (!user.workspaceCreationOtp || !user.workspaceCreationOtpExpires) {
+      res.status(400).json({ success: false, message: 'No OTP request found' });
+      return;
+    }
+
+    if (user.workspaceCreationOtp !== otp) {
+      res.status(400).json({ success: false, message: 'Invalid OTP' });
+      return;
+    }
+
+    if (user.workspaceCreationOtpExpires < new Date()) {
+      res.status(400).json({ success: false, message: 'OTP has expired' });
+      return;
+    }
+
+    user.workspaceCreationOtpVerifiedAt = new Date();
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Workspace creation OTP verified'
+    });
+  } catch (error: any) {
+    console.error('Verify workspace OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify OTP'
     });
   }
 };

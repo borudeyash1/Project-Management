@@ -8,7 +8,9 @@ import {
   deleteWorkspace,
   addMember,
   removeMember,
-  updateMemberRole
+  updateMemberRole,
+  sendWorkspaceCreationOtp,
+  verifyWorkspaceCreationOtp
 } from '../controllers/workspaceController';
 
 const router = express.Router();
@@ -19,6 +21,8 @@ router.use(authenticate);
 // Workspace routes
 router.get('/', getUserWorkspaces);
 router.post('/', createWorkspace);
+router.post('/otp', sendWorkspaceCreationOtp);
+router.post('/otp/verify', verifyWorkspaceCreationOtp);
 router.get('/:id', getWorkspace);
 router.put('/:id', updateWorkspace);
 router.delete('/:id', deleteWorkspace);

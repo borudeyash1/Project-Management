@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Building2, Mail, Shield, CreditCard, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import api from '../services/api';
+import { SubscriptionPlanData, CustomBillingResponse } from '../services/api';
 
 interface CreateWorkspaceModalProps {
   isOpen: boolean;
@@ -11,22 +13,34 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
   const { dispatch } = useApp();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  
+  const [customBilling, setCustomBilling] = useState<CustomBillingResponse['billing'] | null>(null);
+  const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     type: 'team' as 'personal' | 'team' | 'enterprise',
     logo: '',
-    contactEmail: '',
     organizationName: '',
+    contactEmail: '',
     otp: '',
     region: 'North America'
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const loadPlans = async () => {
+      try {
+        const data = await api.getSubscriptionPlans();
+        setPlans(data);
+      } catch (error) {
+        console.error('Failed to load subscription plans', error);
+      }
+    };
+    loadPlans();
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -53,38 +67,17 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
 
   const handleSendOTP = async () => {
     if (!validateStep1()) return;
-    
     setLoading(true);
     try {
-      // TODO: Implement actual OTP sending API call
-      console.log('Sending OTP to:', formData.contactEmail);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setOtpSent(true);
+      await api.sendWorkspaceOtp();
       setStep(2);
-      
       dispatch({
         type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'OTP sent to your email address',
-          duration: 3000
-        }
+        payload: { id: Date.now().toString(), type: 'success', message: 'OTP sent to your workspace email', duration: 3000 }
       });
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'error',
-          message: 'Failed to send OTP. Please try again.',
-          duration: 3000
-        }
-      });
+    } catch (error: any) {
+      console.error('Error sending workspace OTP:', error);
+      dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: error.message || 'Failed to send OTP', duration: 4000 } });
     } finally {
       setLoading(false);
     }
@@ -95,100 +88,55 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
       setErrors({ otp: 'Please enter the OTP' });
       return;
     }
-
     setLoading(true);
     try {
-      // TODO: Implement actual OTP verification API call
-      console.log('Verifying OTP:', formData.otp);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await api.verifyWorkspaceOtp(formData.otp.trim());
       setOtpVerified(true);
       setStep(3);
-      
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Email verified successfully!',
-          duration: 3000
-        }
-      });
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      setErrors({ otp: 'Invalid OTP. Please try again.' });
+      dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: 'OTP verified, ready to create the workspace', duration: 3000 } });
+    } catch (error: any) {
+      console.error('Error verifying workspace OTP:', error);
+      setErrors({ otp: error.message || 'Invalid OTP. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePayment = async () => {
+  const handleResendOTP = async () => {
     setLoading(true);
     try {
-      // TODO: Implement actual payment processing
-      console.log('Processing payment for workspace creation');
-      
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Create the workspace
-      const newWorkspace = {
-        _id: `workspace_${Date.now()}`,
+      await api.sendWorkspaceOtp();
+      dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'info', message: 'OTP resent to your inbox', duration: 3000 } });
+    } catch (error: any) {
+      console.error('Error resending OTP:', error);
+      dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: error.message || 'Unable to resend OTP', duration: 3000 } });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateWorkspace = async () => {
+    setLoading(true);
+    try {
+      const response = await api.createWorkspaceWithBilling({
         name: formData.name,
         description: formData.description,
         type: formData.type,
-        region: formData.region,
-        owner: 'current_user_id', // Will be set by backend
-        memberCount: 1,
-        members: [],
-        isPublic: false,
-        subscription: {
-          plan: 'pro' as const,
-          status: 'active' as const,
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year
-        },
-        isActive: true,
-        settings: {
-          isPublic: false,
-          allowMemberInvites: true,
-          requireApprovalForJoining: false
-        },
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      // Add workspace to state
-      dispatch({
-        type: 'ADD_WORKSPACE',
-        payload: newWorkspace as any
+        region: formData.region
       });
-      
-      setShowPayment(true);
-      setStep(4);
-      
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Workspace created successfully!',
-          duration: 3000
-        }
-      });
-    } catch (error) {
-      console.error('Error processing payment:', error);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'error',
-          message: 'Payment failed. Please try again.',
-          duration: 3000
-        }
-      });
+      if (response.requiresCustomBilling && response.billing) {
+        setCustomBilling(response.billing);
+        dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'warning', message: 'Custom billing required for this workspace', duration: 4000 } });
+        return;
+      }
+      if (response.data) {
+        dispatch({ type: 'ADD_WORKSPACE', payload: response.data });
+        dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: 'Workspace created', duration: 3000 } });
+        handleClose();
+      }
+    } catch (error: any) {
+      console.error('Error creating workspace:', error);
+      dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: error.message || 'Workspace creation failed', duration: 4000 } });
     } finally {
       setLoading(false);
     }
@@ -196,9 +144,8 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
 
   const handleClose = () => {
     setStep(1);
-    setOtpSent(false);
     setOtpVerified(false);
-    setShowPayment(false);
+    setCustomBilling(null);
     setFormData({
       name: '',
       description: '',
@@ -213,8 +160,42 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     onClose();
   };
 
+  const renderPlans = () => (
+    <div className="mb-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        {plans.map((plan) => (
+          <div key={plan.planKey} className="border rounded-xl p-4 shadow-sm bg-white">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold capitalize">{plan.displayName}</h3>
+              <span className="text-xs uppercase tracking-wide text-gray-500">{plan.planKey}</span>
+            </div>
+            <p className="text-sm text-gray-600 mt-2 line-clamp-3">{plan.summary}</p>
+            <div className="mt-3 text-sm">
+              <div className="flex justify-between">
+                <span>Workspaces</span>
+                <span>{plan.limits.maxWorkspaces === -1 ? 'Unlimited' : plan.limits.maxWorkspaces}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Team Members</span>
+                <span>{plan.limits.maxTeamMembers}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Projects</span>
+                <span>{plan.limits.maxProjects}</span>
+              </div>
+            </div>
+            <div className="mt-3 text-sm text-gray-500">
+              ${plan.monthlyPrice.toFixed(2)}/mo or ${plan.yearlyPrice.toFixed(2)}/yr
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderStep1 = () => (
     <div className="space-y-6">
+      {plans.length > 0 && renderPlans()}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Workspace Details</h3>
         
@@ -348,7 +329,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
 
       <div className="text-center">
         <button
-          onClick={() => setOtpSent(false)}
+          onClick={handleResendOTP}
           className="text-blue-600 hover:text-blue-700 text-sm"
         >
           Didn't receive the code? Resend
@@ -369,22 +350,48 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         </p>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3">
         <div className="flex items-start gap-3">
           <Shield className="w-5 h-5 text-yellow-600 mt-0.5" />
           <div>
-            <h4 className="font-medium text-yellow-800">Payment Required</h4>
+            <h4 className="font-medium text-yellow-800">Billing overview</h4>
             <p className="text-sm text-yellow-700 mt-1">
-              To create your workspace, a one-time payment of $29.99 is required. This includes:
+              Our billing system is pending a gateway, so once a plan limit triggers a custom fee we show the shortcut below.
             </p>
-            <ul className="text-sm text-yellow-700 mt-2 space-y-1">
-              <li>• Up to 50 team members</li>
-              <li>• Unlimited projects</li>
-              <li>• Advanced analytics</li>
-              <li>• Priority support</li>
-            </ul>
           </div>
         </div>
+        {customBilling ? (
+          <div className="rounded-lg border border-yellow-200 bg-white p-3 text-sm text-gray-800 space-y-1">
+            <div className="flex items-center justify-between">
+              <span>Base fee</span>
+              <strong>${customBilling.baseFee.toFixed(2)}</strong>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Per head</span>
+              <strong>${customBilling.perHeadPrice.toFixed(2)}</strong>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Employees</span>
+              <strong>{customBilling.estimatedMembers}</strong>
+            </div>
+            <div className="flex items-center justify-between text-lg font-semibold">
+              <span>Total</span>
+              <strong>${customBilling.total.toFixed(2)}</strong>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-yellow-900">
+            <span>Default template pricing applies: modify the plan in admin if you need custom limits.</span>
+          </div>
+        )}
+        {customBilling && (
+          <button
+            onClick={handleCreateWorkspace}
+            className="w-full px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold"
+          >
+            Bypass gateway & accept charge
+          </button>
+        )}
       </div>
     </div>
   );
@@ -415,53 +422,82 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     </div>
   );
 
+  const renderCurrentStep = () => {
+    switch (step) {
+      case 1:
+        return renderStep1();
+      case 2:
+        return renderStep2();
+      case 3:
+        return renderStep3();
+      case 4:
+        return renderStep4();
+      default:
+        return renderStep1();
+    }
+  };
+
+  const stepMeta = {
+    title:
+      step === 1
+        ? 'Workspace details'
+        : step === 2
+        ? 'Verify ownership'
+        : step === 3
+        ? 'Billing confirmation'
+        : 'Workspace created',
+    subtitle:
+      step === 1
+        ? 'Provide workspace information so we can prepare the upgrade options.'
+        : step === 2
+        ? 'Enter the verification code sent to your contact email.'
+        : step === 3
+        ? 'Review billing details and create your workspace.'
+        : 'You can now start inviting your team.',
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {step === 1 && 'Create Workspace'}
-            {step === 2 && 'Verify Email'}
-            {step === 3 && 'Payment Required'}
-            {step === 4 && 'Success!'}
-          </h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+        <div className="flex items-start justify-between p-6 border-b border-gray-200">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-gray-400">
+              {step < 4 ? `Step ${step} of 3` : 'Completed'}
+            </p>
+            <h2 className="text-xl font-semibold text-gray-900 mt-1">{stepMeta.title}</h2>
+            <p className="text-sm text-gray-500 mt-1">{stepMeta.subtitle}</p>
+          </div>
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {step === 1 && renderStep1()}
-          {step === 2 && renderStep2()}
-          {step === 3 && renderStep3()}
-          {step === 4 && renderStep4()}
+        {/* Body */}
+        <div className="p-6 space-y-6">
+          {renderCurrentStep()}
         </div>
 
         {/* Footer */}
         <div className="flex gap-3 p-6 border-t border-gray-200">
           {step === 1 && (
             <>
-          <button 
+              <button
                 onClick={handleClose}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button 
+              >
+                Cancel
+              </button>
+              <button
                 onClick={handleSendOTP}
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {loading ? 'Sending...' : 'Send Verification'}
+                {loading ? 'Sending...' : 'Verify user'}
               </button>
             </>
           )}
-          
+
           {step === 2 && (
             <>
               <button
@@ -489,11 +525,11 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                 Back
               </button>
               <button
-                onClick={handlePayment}
+                onClick={handleCreateWorkspace}
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
               >
-                {loading ? 'Processing...' : 'Pay $29.99'}
+                {loading ? 'Processing...' : 'Create Workspace'}
               </button>
             </>
           )}

@@ -1,330 +1,181 @@
-import React, { useState } from 'react';
-import { 
-  X, Check, Star, Zap, Crown, Users, FolderOpen, 
-  BarChart3, Bot, Shield, Headphones, Palette, 
-  Code, Database, Globe, Clock, Calendar, FileText,
-  TrendingUp, Target, MessageSquare, Settings,
-  CreditCard, DollarSign, Gift, ArrowRight
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  X,
+  Check,
+  Star,
+  Zap,
+  Crown,
+  Users,
+  Bot,
+  Shield,
+  Headphones,
+  Gift,
+  ArrowRight,
+  ShieldCheck,
+  KeyRound
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import api, { SubscriptionPlanData } from '../services/api';
 
-interface PricingPlan {
-  id: string;
-  name: string;
-  description: string;
-  price: {
-    monthly: number;
-    yearly: number;
-  };
-  originalPrice?: {
-    monthly: number;
-    yearly: number;
-  };
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  gradient: string;
-  features: Array<{
-    name: string;
-    description: string;
-    icon: React.ComponentType<{ className?: string }>;
-    included: boolean;
-    highlight?: boolean;
-  }>;
-  limits: {
-    workspaces: number | 'unlimited';
-    projects: number | 'unlimited';
-    teamMembers: number | 'unlimited';
-    storage: number | 'unlimited';
-  };
-  popular?: boolean;
-  comingSoon?: boolean;
+interface PricingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelectPlan?: (planKey: 'free' | 'pro' | 'ultra') => void;
+  presetPlanKey?: 'free' | 'pro' | 'ultra';
 }
 
-const PricingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+const planIcons: Record<'free' | 'pro' | 'ultra', React.ComponentType<{ className?: string }>> = {
+  free: Users,
+  pro: Zap,
+  ultra: Crown
+};
+
+const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPlan, presetPlanKey }) => {
   const { state, dispatch } = useApp();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [selectedPlan, setSelectedPlan] = useState<string>('pro');
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro' | 'ultra'>('pro');
+  const [detailPlan, setDetailPlan] = useState<SubscriptionPlanData | null>(null);
+  const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [otpStep, setOtpStep] = useState<'idle' | 'code-sent' | 'verified'>('idle');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [otpLoading, setOtpLoading] = useState(false);
 
-  const plans: PricingPlan[] = [
-    {
-      id: 'free',
-      name: 'Free',
-      description: 'Perfect for individuals and small teams getting started',
-      price: { monthly: 0, yearly: 0 },
-      icon: Users,
-      color: 'text-gray-600',
-      gradient: 'from-gray-400 to-gray-600',
-      features: [
-        {
-          name: 'Basic Task Management',
-          description: 'Create, assign, and track tasks with basic views',
-          icon: Check,
-          included: true
-        },
-        {
-          name: 'Up to 3 Projects',
-          description: 'Manage up to 3 active projects',
-          icon: FolderOpen,
-          included: true
-        },
-        {
-          name: 'Up to 5 Team Members',
-          description: 'Collaborate with up to 5 team members',
-          icon: Users,
-          included: true
-        },
-        {
-          name: '1GB Storage',
-          description: 'Store files and documents',
-          icon: Database,
-          included: true
-        },
-        {
-          name: 'Basic AI Assistant',
-          description: 'Limited AI suggestions and help',
-          icon: Bot,
-          included: true
-        },
-        {
-          name: 'Basic Analytics',
-          description: 'Simple project progress tracking',
-          icon: BarChart3,
-          included: true
-        },
-        {
-          name: 'Email Support',
-          description: 'Community support via email',
-          icon: MessageSquare,
-          included: true
-        },
-        {
-          name: 'Mobile App Access',
-          description: 'Access via mobile applications',
-          icon: Globe,
-          included: true
-        }
-      ],
-      limits: {
-        workspaces: 1,
-        projects: 3,
-        teamMembers: 5,
-        storage: 1
-      }
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      description: 'Advanced features for growing teams and businesses',
-      price: { monthly: 12, yearly: 120 },
-      originalPrice: { monthly: 15, yearly: 150 },
-      icon: Zap,
-      color: 'text-blue-600',
-      gradient: 'from-blue-500 to-purple-600',
-      popular: true,
-      features: [
-        {
-          name: 'Everything in Free',
-          description: 'All free features included',
-          icon: Check,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Unlimited Projects',
-          description: 'Create and manage unlimited projects',
-          icon: FolderOpen,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Up to 50 Team Members',
-          description: 'Scale your team up to 50 members',
-          icon: Users,
-          included: true,
-          highlight: true
-        },
-        {
-          name: '100GB Storage',
-          description: 'Ample storage for all your files',
-          icon: Database,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Advanced AI Assistant',
-          description: 'Smart project creation, task suggestions, and insights',
-          icon: Bot,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Advanced Analytics',
-          description: 'Detailed reports, charts, and performance metrics',
-          icon: BarChart3,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Custom Integrations',
-          description: 'Connect with 100+ third-party tools',
-          icon: Code,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Time Tracking',
-          description: 'Built-in time tracking and timesheets',
-          icon: Clock,
-          included: true
-        },
-        {
-          name: 'Advanced Views',
-          description: 'Gantt charts, calendar, and timeline views',
-          icon: Calendar,
-          included: true
-        },
-        {
-          name: 'Priority Support',
-          description: 'Faster response times and priority support',
-          icon: Headphones,
-          included: true
-        },
-        {
-          name: 'Custom Fields',
-          description: 'Create custom fields for tasks and projects',
-          icon: Settings,
-          included: true
-        },
-        {
-          name: 'Advanced Permissions',
-          description: 'Granular role-based access control',
-          icon: Shield,
-          included: true
-        }
-      ],
-      limits: {
-        workspaces: 5,
-        projects: 'unlimited',
-        teamMembers: 50,
-        storage: 100
-      }
-    },
-    {
-      id: 'ultra',
-      name: 'Ultra',
-      description: 'Enterprise-grade features for large organizations',
-      price: { monthly: 25, yearly: 250 },
-      originalPrice: { monthly: 30, yearly: 300 },
-      icon: Crown,
-      color: 'text-purple-600',
-      gradient: 'from-purple-500 to-pink-600',
-      features: [
-        {
-          name: 'Everything in Pro',
-          description: 'All Pro features included',
-          icon: Check,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Unlimited Everything',
-          description: 'No limits on workspaces, projects, or team members',
-          icon: Star,
-          included: true,
-          highlight: true
-        },
-        {
-          name: '1TB Storage',
-          description: 'Massive storage capacity for enterprise needs',
-          icon: Database,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'AI-Powered Insights',
-          description: 'Predictive analytics and intelligent recommendations',
-          icon: Bot,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'White Labeling',
-          description: 'Custom branding and domain options',
-          icon: Palette,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'API Access',
-          description: 'Full API access for custom integrations',
-          icon: Code,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Advanced Security',
-          description: 'SSO, SAML, and enterprise security features',
-          icon: Shield,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Dedicated Support',
-          description: 'Dedicated account manager and 24/7 support',
-          icon: Headphones,
-          included: true,
-          highlight: true
-        },
-        {
-          name: 'Custom Workflows',
-          description: 'Create custom automation and workflows',
-          icon: Settings,
-          included: true
-        },
-        {
-          name: 'Advanced Reporting',
-          description: 'Custom reports and data export options',
-          icon: FileText,
-          included: true
-        },
-        {
-          name: 'Multi-Region Deployment',
-          description: 'Deploy across multiple regions for compliance',
-          icon: Globe,
-          included: true
-        },
-        {
-          name: 'SLA Guarantee',
-          description: '99.9% uptime SLA with financial guarantees',
-          icon: Target,
-          included: true
-        }
-      ],
-      limits: {
-        workspaces: 'unlimited',
-        projects: 'unlimited',
-        teamMembers: 'unlimited',
-        storage: 1000
-      }
+  useEffect(() => {
+    if (!isOpen) {
+      setOtpStep('idle');
+      setOtpCode('');
+      setOtpError(null);
+      return;
     }
-  ];
+    const loadPlans = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getSubscriptionPlans();
+        setPlans(response);
+      } catch (error) {
+        console.error('Failed to load subscription plans', error);
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: 'Unable to load subscription plans. Please try again.',
+            duration: 4000
+          }
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSelectPlan = (planId: string) => {
-    setSelectedPlan(planId);
-    // Here you would typically integrate with payment processing
-    console.log(`Selected plan: ${planId}, Billing: ${billingCycle}`);
+    loadPlans();
+  }, [dispatch, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !presetPlanKey) return;
+    setSelectedPlan(presetPlanKey);
+  }, [isOpen, presetPlanKey]);
+
+  useEffect(() => {
+    if (!isOpen || !presetPlanKey || !plans.length) return;
+    if (detailPlan && detailPlan.planKey === presetPlanKey) return;
+    openPlanDetail(presetPlanKey);
+  }, [isOpen, presetPlanKey, plans]);
+
+  const openPlanDetail = (planKey: 'free' | 'pro' | 'ultra') => {
+    if (planKey === state.userProfile.subscription?.plan) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'info',
+          message: 'You are already on this plan.',
+          duration: 3000
+        }
+      });
+      return;
+    }
+
+    const planMeta = plans.find((plan) => plan.planKey === planKey) || null;
+    setSelectedPlan(planKey);
+    setDetailPlan(planMeta);
+    setOtpStep('idle');
+    setOtpCode('');
+    setOtpError(null);
+  };
+
+  const handleSendVerification = async () => {
+    if (!detailPlan) return;
+    setOtpLoading(true);
+    setOtpError(null);
+    try {
+      await api.sendWorkspaceOtp();
+      setOtpStep('code-sent');
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Verification code sent to your account email.',
+          duration: 3000
+        }
+      });
+    } catch (error: any) {
+      console.error('Failed to send OTP for plan upgrade', error);
+      setOtpError(error?.message || 'Failed to send verification code.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!detailPlan) return;
+    if (!otpCode.trim()) {
+      setOtpError('Please enter the 6-digit code.');
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await api.verifyWorkspaceOtp(otpCode.trim());
+      setOtpStep('verified');
+      setOtpError(null);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'OTP verified. You can now confirm the upgrade.',
+          duration: 3000
+        }
+      });
+    } catch (error: any) {
+      setOtpError(error?.message || 'Invalid verification code.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleConfirmUpgrade = () => {
+    if (otpStep !== 'verified') {
+      setOtpError('Please verify the code before upgrading.');
+      return;
+    }
+    onSelectPlan?.(selectedPlan);
+    setDetailPlan(null);
+    setOtpStep('idle');
+    setOtpCode('');
+    setOtpError(null);
   };
 
   const formatPrice = (price: number) => {
     return price === 0 ? 'Free' : `$${price}`;
   };
 
-  const calculateSavings = (plan: PricingPlan) => {
-    if (!plan.originalPrice) return 0;
-    const monthlySavings = plan.originalPrice.monthly - plan.price.monthly;
-    const yearlySavings = plan.originalPrice.yearly - plan.price.yearly;
-    return billingCycle === 'monthly' ? monthlySavings : yearlySavings;
-  };
+  const sortedPlans = useMemo(() => {
+    return plans.sort((a, b) => a.order - b.order);
+  }, [plans]);
 
   if (!isOpen) return null;
 
@@ -379,23 +230,31 @@ const PricingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOp
         {/* Plans Grid */}
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => {
-              const Icon = plan.icon;
-              const isSelected = selectedPlan === plan.id;
-              const savings = calculateSavings(plan);
-              
+            {loading && (
+              <div className="col-span-full text-center text-gray-500 py-8">Loading subscription plans...</div>
+            )}
+            {!loading && sortedPlans.map((plan) => {
+              const planKey = plan.planKey;
+              const Icon = planIcons[planKey];
+              const isSelected = selectedPlan === planKey;
+              const buttonLabel =
+                planKey === 'free'
+                  ? 'Get Started Free'
+                  : planKey === 'pro'
+                  ? 'Choose Pro User'
+                  : 'Choose Ultra User';
+
               return (
                 <div
-                  key={plan.id}
-                  className={`relative rounded-xl border-2 transition-all duration-200 ${
-                    plan.popular
-                      ? 'border-blue-500 shadow-lg scale-105'
-                      : isSelected
-                      ? 'border-purple-500 shadow-md'
+                  key={plan.planKey}
+                  onClick={() => setSelectedPlan(planKey)}
+                  className={`relative rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'border-blue-500 shadow-lg scale-[1.01]'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  {plan.popular && (
+                  {planKey === 'pro' && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                       <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
                         Most Popular
@@ -406,36 +265,26 @@ const PricingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOp
                   <div className="p-6">
                     {/* Plan Header */}
                     <div className="text-center mb-6">
-                      <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center`}>
+                      <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 flex items-center justify-center`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
-                      <p className="text-gray-600 mt-2">{plan.description}</p>
+                      <h3 className="text-2xl font-bold text-gray-900">{plan.displayName}</h3>
+                      <p className="text-gray-600 mt-2">{plan.summary}</p>
                     </div>
 
                     {/* Pricing */}
                     <div className="text-center mb-6">
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-4xl font-bold text-gray-900">
-                          {formatPrice(plan.price[billingCycle])}
+                          {formatPrice(billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice)}
                         </span>
-                        {billingCycle === 'yearly' && plan.price.yearly > 0 && (
+                        {billingCycle === 'yearly' && plan.yearlyPrice > 0 && (
                           <span className="text-gray-600">/year</span>
                         )}
-                        {billingCycle === 'monthly' && plan.price.monthly > 0 && (
+                        {billingCycle === 'monthly' && plan.monthlyPrice > 0 && (
                           <span className="text-gray-600">/month</span>
                         )}
                       </div>
-                      {plan.originalPrice && savings > 0 && (
-                        <div className="flex items-center justify-center gap-2 mt-2">
-                          <span className="text-lg text-gray-500 line-through">
-                            {formatPrice(plan.originalPrice[billingCycle])}
-                          </span>
-                          <span className="text-green-600 font-medium">
-                            Save {formatPrice(savings)}
-                          </span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Limits */}
@@ -444,19 +293,19 @@ const PricingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOp
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Workspaces:</span>
-                          <span className="font-medium">{plan.limits.workspaces}</span>
+                          <span className="font-medium">{plan.limits.maxWorkspaces === -1 ? 'Unlimited' : plan.limits.maxWorkspaces}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Projects:</span>
-                          <span className="font-medium">{plan.limits.projects}</span>
+                          <span className="font-medium">{plan.limits.maxProjects === -1 ? 'Unlimited' : plan.limits.maxProjects}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Team Members:</span>
-                          <span className="font-medium">{plan.limits.teamMembers}</span>
+                          <span className="font-medium">{plan.limits.maxTeamMembers === -1 ? 'Unlimited' : plan.limits.maxTeamMembers}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Storage:</span>
-                          <span className="font-medium">{plan.limits.storage}GB</span>
+                          <span className="font-medium">{plan.limits.storageInGB}GB</span>
                         </div>
                       </div>
                     </div>
@@ -465,52 +314,40 @@ const PricingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOp
                     <div className="mb-6">
                       <h4 className="font-semibold text-gray-900 mb-3">Features</h4>
                       <div className="space-y-3">
-                        {plan.features.map((feature, index) => {
-                          const FeatureIcon = feature.icon;
-  return (
-                            <div
-                              key={index}
-                              className={`flex items-start gap-3 p-2 rounded-lg ${
-                                feature.highlight ? 'bg-blue-50 border border-blue-200' : ''
-                              }`}
-                            >
-                              <FeatureIcon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                                feature.included ? 'text-green-500' : 'text-gray-300'
-                              }`} />
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-sm font-medium ${
-                                    feature.included ? 'text-gray-900' : 'text-gray-500'
-                                  }`}>
-                                    {feature.name}
-                                  </span>
-                                  {feature.highlight && (
-                                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                      Pro
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-gray-600 mt-1">{feature.description}</p>
+                        {Object.entries(plan.features).map(([featureKey, enabled]) => (
+                          <div key={featureKey} className="flex items-start gap-3 p-2 rounded-lg">
+                            <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${enabled ? 'text-green-500' : 'text-gray-300'}`} />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-sm font-medium ${enabled ? 'text-gray-900' : 'text-gray-500'}`}>
+                                  {featureKey.replace(/([A-Z])/g, ' $1')}
+                                </span>
                               </div>
+                              <p className="text-xs text-gray-600 mt-1">
+                                {enabled ? 'Included' : 'Not included'}
+                              </p>
                             </div>
-                          );
-                        })}
+                          </div>
+                        ))}
                       </div>
                     </div>
 
                     {/* CTA Button */}
                     <button
-                      onClick={() => handleSelectPlan(plan.id)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openPlanDetail(planKey);
+                      }}
                       className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                        plan.popular
+                        planKey === 'pro'
                           ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : plan.id === 'free'
+                          : planKey === 'free'
                           ? 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                           : 'bg-purple-600 text-white hover:bg-purple-700'
                       }`}
                     >
-                      {plan.id === 'free' ? 'Get Started Free' : `Choose ${plan.name}`}
-                      {plan.id !== 'free' && (
+                      {buttonLabel}
+                      {planKey !== 'free' && (
                         <ArrowRight className="w-4 h-4 inline ml-2" />
                       )}
                     </button>
@@ -523,27 +360,126 @@ const PricingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOp
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-4">
-              All plans include a 14-day free trial. Cancel anytime.
-            </p>
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                <span>Secure payments</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Headphones className="w-4 h-4" />
-                <span>24/7 support</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Gift className="w-4 h-4" />
-                <span>14-day free trial</span>
-              </div>
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              <span>Secure payments</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Headphones className="w-4 h-4" />
+              <span>24/7 support</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Gift className="w-4 h-4" />
+              <span>Admin-configurable perks</span>
             </div>
           </div>
         </div>
       </div>
+
+      {detailPlan && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[110] px-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 space-y-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-wide text-gray-400">Selected plan</p>
+                <h3 className="text-2xl font-semibold text-gray-900">{detailPlan.displayName}</h3>
+                <p className="text-sm text-gray-600 mt-1">{detailPlan.summary}</p>
+              </div>
+              <button onClick={() => setDetailPlan(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 p-4 bg-gray-50">
+              <h4 className="font-semibold text-gray-900 mb-3">What you’ll get</h4>
+              <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
+                <div>
+                  <p className="text-gray-500">Workspaces</p>
+                  <p className="font-semibold">{detailPlan.limits.maxWorkspaces === -1 ? 'Unlimited' : detailPlan.limits.maxWorkspaces}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Projects</p>
+                  <p className="font-semibold">{detailPlan.limits.maxProjects === -1 ? 'Unlimited' : detailPlan.limits.maxProjects}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Team members</p>
+                  <p className="font-semibold">{detailPlan.limits.maxTeamMembers === -1 ? 'Unlimited' : detailPlan.limits.maxTeamMembers}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Storage</p>
+                  <p className="font-semibold">{detailPlan.limits.storageInGB} GB</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600">Verification is required before we upgrade your workspace billing.</p>
+              {otpStep === 'idle' && (
+                <button
+                  onClick={handleSendVerification}
+                  disabled={otpLoading}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-60"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  {otpLoading ? 'Sending...' : 'Send verification code'}
+                </button>
+              )}
+
+              {otpStep === 'code-sent' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Enter verification code</label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="mt-1 w-full px-3 py-2 border rounded-lg text-center tracking-widest text-lg"
+                      placeholder="123456"
+                    />
+                    {otpError && <p className="text-xs text-red-500 mt-1">{otpError}</p>}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleVerifyOtp}
+                      disabled={otpLoading}
+                      className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                    >
+                      {otpLoading ? 'Verifying...' : 'Verify code'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setOtpStep('idle');
+                        setOtpCode('');
+                        setOtpError(null);
+                      }}
+                      className="flex-1 px-4 py-2 rounded-lg border border-gray-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {otpStep === 'verified' && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-green-700 text-sm">
+                    <Check className="w-4 h-4" />
+                    <span>Verification complete. You can now bypass billing and upgrade.</span>
+                  </div>
+                  <button
+                    onClick={handleConfirmUpgrade}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600"
+                  >
+                    <KeyRound className="w-4 h-4" /> Bypass & upgrade to {detailPlan.displayName}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

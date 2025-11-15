@@ -84,8 +84,11 @@ const WorkspaceMembers: React.FC = () => {
   };
 
   const filteredMembers = members.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const name = member.name?.toLowerCase?.() || '';
+    const email = member.email?.toLowerCase?.() || '';
+    const query = searchQuery.toLowerCase();
+
+    const matchesSearch = name.includes(query) || email.includes(query);
     const matchesRole = filterRole === 'all' || member.role === filterRole;
     return matchesSearch && matchesRole;
   });
