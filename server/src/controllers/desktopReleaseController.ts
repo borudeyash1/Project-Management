@@ -3,6 +3,8 @@ import DesktopRelease from '../models/DesktopRelease';
 import { AuthenticatedRequest } from '../types';
 import path from 'path';
 import fs from 'fs';
+import zlib from 'zlib';
+import { Readable } from 'stream';
 
 // Get all releases (public)
 export const getAllReleases = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -133,6 +135,21 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
     // Create download URL
     const downloadUrl = `/api/releases/download/${file.filename}`;
 
+    // Read uploaded file into memory so it can be stored in Mongo
+    const fileBuffer = await fs.promises.readFile(file.path);
+    let storedBuffer = fileBuffer;
+    let isCompressed = false;
+
+    try {
+      const compressed = zlib.gzipSync(fileBuffer);
+      if (compressed.length < fileBuffer.length) {
+        storedBuffer = compressed;
+        isCompressed = true;
+      }
+    } catch (compressionError) {
+      console.warn('⚠️ [RELEASES] Failed to compress file, storing raw buffer.', compressionError);
+    }
+
     const release = await DesktopRelease.create({
       version,
       versionName,
@@ -144,6 +161,9 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
       fileSize: file.size,
       filePath: file.path,
       downloadUrl,
+      fileData: storedBuffer,
+      fileContentType: file.mimetype,
+      isCompressed,
       isLatest: isLatest === 'true',
       uploadedBy: adminId
     });
@@ -265,7 +285,54 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
       return;
     }
 
-    if (!fs.existsSync(release.filePath)) {
+    const streamFromDisk = () => {
+      if (!release.filePath || !fs.existsSync(release.filePath)) {
+        return false;
+      }
+
+      res.setHeader('Content-Type', release.fileContentType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${release.fileName}"`);
+      res.setHeader('Content-Length', release.fileSize);
+
+      const fileStream = fs.createReadStream(release.filePath);
+      fileStream.on('error', (streamError) => {
+        console.error('❌ [RELEASES] Error streaming file from disk:', streamError);
+        if (!res.headersSent) {
+          res.status(500).json({ success: false, message: 'Failed to download release' });
+        } else {
+          res.destroy(streamError);
+        }
+      });
+      fileStream.pipe(res);
+      return true;
+    };
+
+    const streamFromDatabase = () => {
+      if (!release.fileData || !release.fileData.length) {
+        return false;
+      }
+
+      res.setHeader('Content-Type', release.fileContentType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${release.fileName}"`);
+      res.setHeader('Content-Length', release.fileSize);
+
+      const bufferStream = Readable.from(release.fileData);
+      const payloadStream = release.isCompressed ? bufferStream.pipe(zlib.createGunzip()) : bufferStream;
+
+      payloadStream.on('error', (streamError) => {
+        console.error('❌ [RELEASES] Error streaming file from database:', streamError);
+        if (!res.headersSent) {
+          res.status(500).json({ success: false, message: 'Failed to download release' });
+        } else {
+          res.destroy(streamError);
+        }
+      });
+
+      payloadStream.pipe(res);
+      return true;
+    };
+
+    if (!streamFromDisk() && !streamFromDatabase()) {
       res.status(404).json({
         success: false,
         message: 'File not found'
@@ -273,20 +340,11 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
       return;
     }
 
-    // Increment download count
+    // Increment download count after successfully initiating the stream
     release.downloadCount += 1;
     await release.save();
 
     console.log('✅ [RELEASES] Starting download, count:', release.downloadCount);
-
-    // Set headers for download
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${release.fileName}"`);
-    res.setHeader('Content-Length', release.fileSize);
-
-    // Stream the file
-    const fileStream = fs.createReadStream(release.filePath);
-    fileStream.pipe(res);
   } catch (error: any) {
     console.error('❌ [RELEASES] Error downloading release:', error);
     res.status(500).json({

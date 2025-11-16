@@ -41,6 +41,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
   const [otpCode, setOtpCode] = useState('');
   const [otpError, setOtpError] = useState<string | null>(null);
   const [otpLoading, setOtpLoading] = useState(false);
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -157,16 +158,39 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
     }
   };
 
-  const handleConfirmUpgrade = () => {
+  const handleConfirmUpgrade = async () => {
+    if (!detailPlan) return;
     if (otpStep !== 'verified') {
       setOtpError('Please verify the code before upgrading.');
       return;
     }
-    onSelectPlan?.(selectedPlan);
-    setDetailPlan(null);
-    setOtpStep('idle');
-    setOtpCode('');
-    setOtpError(null);
+
+    setUpgradeLoading(true);
+    try {
+      const updatedUser = await api.upgradeSubscription(detailPlan.planKey, billingCycle);
+      dispatch({ type: 'SET_USER', payload: updatedUser });
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: `Upgraded to ${detailPlan.displayName} plan`,
+          duration: 3500
+        }
+      });
+
+      onSelectPlan?.(detailPlan.planKey);
+      setDetailPlan(null);
+      setOtpStep('idle');
+      setOtpCode('');
+      setOtpError(null);
+      onClose();
+    } catch (error: any) {
+      console.error('Failed to upgrade subscription', error);
+      setOtpError(error?.message || 'Failed to upgrade subscription.');
+    } finally {
+      setUpgradeLoading(false);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -343,8 +367,8 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                           ? 'bg-blue-600 text-white hover:bg-blue-700'
                           : planKey === 'free'
                           ? 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                          : 'bg-purple-600 text-white hover:bg-purple-700'
-                      }`}
+                          : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500'
+                      } shadow-md`}
                     >
                       {buttonLabel}
                       {planKey !== 'free' && (
@@ -470,9 +494,11 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                   </div>
                   <button
                     onClick={handleConfirmUpgrade}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600"
+                    disabled={upgradeLoading}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600 disabled:opacity-60"
                   >
-                    <KeyRound className="w-4 h-4" /> Bypass & upgrade to {detailPlan.displayName}
+                    <KeyRound className="w-4 h-4" />
+                    {upgradeLoading ? 'Upgrading...' : `Bypass & upgrade to ${detailPlan.displayName}`}
                   </button>
                 </div>
               )}
