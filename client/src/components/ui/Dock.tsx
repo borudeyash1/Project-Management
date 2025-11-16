@@ -1,5 +1,14 @@
-import React, { useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform, MotionValue } from 'framer-motion';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  MotionValue,
+  useDragControls,
+  PanInfo
+} from 'framer-motion';
+import { GripVertical, Lock, Unlock } from 'lucide-react';
 import { ProgressiveBlur } from './progressive-blur';
 
 interface DockProps {
@@ -8,46 +17,251 @@ interface DockProps {
   className?: string;
 }
 
+type DockPosition = 'top' | 'bottom' | 'left' | 'right';
+
+const DOCK_POSITION_KEY = 'userDockPosition';
+const DOCK_LOCK_KEY = 'userDockLocked';
+const DOCK_EDGE_GAP = 12;
+const DOCK_TOP_OFFSET = 48;
+const DOCK_BOTTOM_OFFSET = 50;
+const MotionDockWrapper = motion.div as React.ComponentType<any>;
+
 interface DockIconProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
   active?: boolean;
   tooltip?: string;
+  orientation?: 'horizontal' | 'vertical';
 }
 
 const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', className = '' }) => {
   const mouseX = useMotionValue(Infinity);
+  const dragControls = useDragControls();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const [dockSize, setDockSize] = useState({ width: 0, height: 0 });
+  const bodyPaddingRef = useRef<{ top: string; bottom: string; left: string; right: string } | null>(null);
+  const [dockPosition, setDockPosition] = useState<DockPosition>(() => {
+    if (typeof window === 'undefined') return 'bottom';
+    const stored = window.localStorage.getItem(DOCK_POSITION_KEY) as DockPosition | null;
+    return stored ?? 'bottom';
+  });
+  const [isLocked, setIsLocked] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(DOCK_LOCK_KEY) === 'true';
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(DOCK_POSITION_KEY, dockPosition);
+  }, [dockPosition]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(DOCK_LOCK_KEY, isLocked ? 'true' : 'false');
+  }, [isLocked]);
+
+  const getPositionClasses = useCallback(() => {
+    switch (dockPosition) {
+      case 'top':
+        return 'top-6 left-1/2 -translate-x-1/2';
+      case 'left':
+        return 'left-6 top-1/2 -translate-y-1/2';
+      case 'right':
+        return 'right-6 top-1/2 -translate-y-1/2';
+      case 'bottom':
+      default:
+        return 'bottom-6 left-1/2 -translate-x-1/2';
+    }
+  }, [dockPosition]);
+
+  const determineClosestEdge = (point: { x: number; y: number }): DockPosition => {
+    const { innerWidth, innerHeight } = window;
+    const distances: Record<DockPosition, number> = {
+      top: point.y,
+      bottom: innerHeight - point.y,
+      left: point.x,
+      right: innerWidth - point.x
+    };
+
+    return (Object.keys(distances) as DockPosition[]).reduce((closest, edge) => {
+      return distances[edge] < distances[closest] ? edge : closest;
+    }, 'bottom');
+  };
+
+  const handleDragEnd = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      if (isLocked || typeof window === 'undefined') return;
+      const next = determineClosestEdge(info.point);
+      setDockPosition(next);
+      x.set(0);
+      y.set(0);
+    },
+    [isLocked, x, y]
+  );
+
+  const startDrag = useCallback(
+    (event: React.PointerEvent) => {
+      if (isLocked) return;
+      dragControls.start(event);
+    },
+    [dragControls, isLocked]
+  );
+
+  const isVertical = dockPosition === 'left' || dockPosition === 'right';
+  const blurPosition = dockPosition === 'top' ? 'top' : dockPosition === 'bottom' ? 'bottom' : null;
+  const controlsAlignment = isVertical ? 'top-4 right-4 flex-col' : 'top-4 right-4 flex-row';
+
+  const anchorStyle = useMemo(() => {
+    const base: React.CSSProperties = {
+      cursor: isLocked ? 'default' : 'grab',
+      pointerEvents: 'none',
+      x,
+      y
+    } as React.CSSProperties;
+    if (dockPosition === 'top') {
+      return {
+        ...base,
+        top: DOCK_TOP_OFFSET,
+        left: '50%',
+        marginLeft: dockSize.width ? `${-dockSize.width / 2}px` : undefined
+      };
+    }
+    if (dockPosition === 'bottom') {
+      return {
+        ...base,
+        bottom: DOCK_BOTTOM_OFFSET,
+        left: '50%',
+        marginLeft: dockSize.width ? `${-dockSize.width / 2}px` : undefined
+      };
+    }
+    if (dockPosition === 'left') {
+      return { ...base, left: DOCK_EDGE_GAP, top: DOCK_EDGE_GAP, bottom: DOCK_EDGE_GAP };
+    }
+    return { ...base, right: DOCK_EDGE_GAP, top: DOCK_EDGE_GAP, bottom: DOCK_EDGE_GAP };
+  }, [dockPosition, dockSize.width, isLocked, x, y]);
+
+  useEffect(() => {
+    if (!dockRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      setDockSize({ width, height });
+    });
+    observer.observe(dockRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const safeOffset = useMemo(() => {
+    const measured = dockSize.width ? dockSize.width + DOCK_EDGE_GAP * 2 : 96;
+    return `${Math.max(measured, 96)}px`;
+  }, [dockSize.width]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const body = document.body;
+    if (!bodyPaddingRef.current) {
+      bodyPaddingRef.current = {
+        top: body.style.paddingTop,
+        bottom: body.style.paddingBottom,
+        left: body.style.paddingLeft,
+        right: body.style.paddingRight
+      };
+    }
+
+    const base = bodyPaddingRef.current;
+    const isSideDock = dockPosition === 'left' || dockPosition === 'right';
+    body.style.paddingTop = base?.top || '';
+    body.style.paddingBottom = base?.bottom || '';
+    body.style.paddingLeft = dockPosition === 'left' ? safeOffset : base?.left || '';
+    body.style.paddingRight = dockPosition === 'right' ? safeOffset : base?.right || '';
+    if (!isSideDock) {
+      body.style.paddingLeft = base?.left || '';
+      body.style.paddingRight = base?.right || '';
+    }
+  }, [dockPosition, safeOffset]);
+
+  useEffect(() => {
+    return () => {
+      if (typeof document === 'undefined' || !bodyPaddingRef.current) return;
+      const body = document.body;
+      const base = bodyPaddingRef.current;
+      body.style.paddingTop = base.top;
+      body.style.paddingBottom = base.bottom;
+      body.style.paddingLeft = base.left;
+      body.style.paddingRight = base.right;
+    };
+  }, []);
 
   return (
     <>
       {/* Progressive Blur Background */}
-      <div className="fixed bottom-0 left-0 right-0 h-40 pointer-events-none z-40">
-        <ProgressiveBlur 
-          position="bottom" 
-          height="100%"
-        />
-      </div>
-      
+      {blurPosition && dockPosition !== 'top' && (
+        <div
+          className={`fixed ${blurPosition === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 h-40 pointer-events-none z-40`}
+        >
+          <ProgressiveBlur position={blurPosition} height="100%" />
+        </div>
+      )}
+
       {/* Dock Container */}
-      <div 
-        className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 ${className}`}
+      <MotionDockWrapper
+        className={`fixed z-50 ${className}`}
+        drag={!isLocked}
+        dragControls={dragControls}
+        dragListener={false}
+        dragMomentum={false}
+        onDragEnd={handleDragEnd}
+        style={anchorStyle as any}
         onMouseMove={(e: React.MouseEvent) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
       >
-        <motion.div
+        <div
+          ref={dockRef}
           style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
             position: 'relative',
             display: 'flex',
-            alignItems: 'flex-end',
-            gap: '0.25rem',
-            padding: '1rem 1.5rem',
-            borderRadius: '1rem',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: isVertical ? 'column' : 'row',
+            gap: isVertical ? '0.5rem' : '0.35rem',
+            padding: isVertical ? '1rem 0.95rem' : '0.85rem 1.5rem',
+            borderRadius: isVertical ? '1.5rem' : '1rem',
             boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-            overflow: 'visible'
+            overflow: 'visible',
+            minWidth: isVertical ? '80px' : undefined,
+            maxHeight: isVertical ? '85vh' : undefined,
+            pointerEvents: 'auto'
           }}
         >
+          <div
+            className={`absolute ${controlsAlignment} gap-2 z-20 pointer-events-auto`}
+            style={{
+              transform: isVertical ? 'translateY(-0.5rem)' : 'translateX(0)',
+              display: 'flex'
+            }}
+          >
+            <button
+              type="button"
+              onPointerDown={startDrag}
+              className="p-1.5 rounded-full bg-white/70 text-gray-700 shadow hover:bg-white"
+              title={isLocked ? 'Unlock to drag' : 'Drag dock'}
+            >
+              <GripVertical className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsLocked((prev) => !prev)}
+              className="p-1.5 rounded-full bg-white/70 text-gray-700 shadow hover:bg-white"
+              title={isLocked ? 'Unlock dock' : 'Lock dock'}
+            >
+              {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+            </button>
+          </div>
           {/* Glass Effect Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-700/40 dark:via-gray-800/20 dark:to-transparent backdrop-blur-2xl" />
           
@@ -64,19 +278,36 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
           />
           
           {/* Content */}
-          <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'flex-end', gap: '0.25rem' }}>
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 10,
+              display: 'flex',
+              alignItems: isVertical ? 'center' : 'flex-end',
+              justifyContent: 'center',
+              flexDirection: isVertical ? 'column' : 'row',
+              gap: '0.25rem',
+              overflowX: isVertical ? 'visible' : 'auto',
+              scrollbarWidth: 'none'
+            }}
+          >
             {React.Children.map(children, (child) => {
               if (React.isValidElement(child)) {
-                return React.cloneElement(child, { mouseX } as any);
+                return React.cloneElement(child, { mouseX, orientation: isVertical ? 'vertical' : 'horizontal' } as any);
               }
               return child;
             })}
           </div>
           
           {/* Bottom Glow */}
-          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-blue-500/20 to-transparent blur-xl" />
-        </motion.div>
-      </div>
+          {dockPosition === 'bottom' && (
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-blue-500/20 to-transparent blur-xl" />
+          )}
+          {dockPosition === 'top' && (
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-b from-blue-500/20 to-transparent blur-xl" />
+          )}
+        </div>
+      </MotionDockWrapper>
     </>
   );
 };
@@ -90,7 +321,8 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   onClick, 
   active = false,
   tooltip,
-  mouseX: parentMouseX
+  mouseX: parentMouseX,
+  orientation = 'horizontal'
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const defaultMouseX = useMotionValue(Infinity);
@@ -101,12 +333,14 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   });
 
   // Keep width constant, only change margins to push icons apart
-  const width = 56; // Fixed size, no enlargement
-  
+  const width = 56; // Fixed size, base size
+
+  const scale = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
+
   // Add margin to push adjacent icons away (left and right separately for better control)
   const marginSync = useTransform(distance, [-150, 0, 150], [0, 16, 0]);
-  const marginLeft = useSpring(marginSync, { mass: 0.1, stiffness: 150, damping: 12 });
-  const marginRight = useSpring(marginSync, { mass: 0.1, stiffness: 150, damping: 12 });
+  const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
+  const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
 
   return (
     <div className="group relative">
@@ -115,7 +349,8 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
         style={{ 
           width,
           marginLeft,
-          marginRight
+          marginRight,
+          scale
         }}
       >
         {/* Tooltip - Shows on hover */}
