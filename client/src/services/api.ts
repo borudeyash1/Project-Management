@@ -234,6 +234,14 @@ class ApiService {
     return data.data || [];
   }
 
+  async upgradeSubscription(planKey: 'free' | 'pro' | 'ultra', billingCycle: 'monthly' | 'yearly' = 'monthly'): Promise<User> {
+    const response = await this.request<User>('/subscriptions/upgrade', {
+      method: 'POST',
+      body: JSON.stringify({ planKey, billingCycle })
+    });
+    return response.data!;
+  }
+
   async sendWorkspaceOtp(): Promise<void> {
     const url = `${this.baseURL}/workspaces/otp`; // endpoint to add
     const response = await fetch(url, {

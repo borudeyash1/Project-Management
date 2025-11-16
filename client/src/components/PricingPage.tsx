@@ -183,7 +183,11 @@ const PricingPage: React.FC = () => {
                           : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                       } ${isDarkMode && plan.planKey === 'free' ? 'bg-gray-700 text-white hover:bg-gray-600' : ''}`}
                     >
-                      {plan.planKey === 'free' ? 'Start for free' : `Choose ${plan.displayName}`}
+                      {plan.planKey === 'free'
+                        ? 'Get Started Free'
+                        : plan.planKey === 'pro'
+                        ? 'Choose Pro User'
+                        : 'Choose Ultra'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>

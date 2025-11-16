@@ -11,6 +11,9 @@ export interface IDesktopRelease extends Document {
   fileSize: number;
   filePath: string;
   downloadUrl: string;
+  fileData?: Buffer;
+  fileContentType?: string;
+  isCompressed?: boolean;
   downloadCount: number;
   isLatest: boolean;
   isActive: boolean;
@@ -67,6 +70,17 @@ const desktopReleaseSchema = new Schema<IDesktopRelease>({
   downloadUrl: {
     type: String,
     required: [true, 'Download URL is required']
+  },
+  fileData: {
+    type: Buffer
+  },
+  fileContentType: {
+    type: String,
+    default: 'application/octet-stream'
+  },
+  isCompressed: {
+    type: Boolean,
+    default: false
   },
   downloadCount: {
     type: Number,
