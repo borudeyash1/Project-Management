@@ -33,7 +33,7 @@ export interface CustomBillingResponse {
   };
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.sartthi.com/api';
 
 class ApiService {
   private baseURL: string;
@@ -537,17 +537,33 @@ class ApiService {
     return this.request<any>('/admin/sessions/recent');
   }
 
-  // Generic HTTP methods
-  async post<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, {
+  async uploadRelease(formData: FormData) {
+    const response = await fetch(`${this.baseURL}/releases`, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      headers: {
+        ...(this.token && { Authorization: `Bearer ${this.token}` })
+      },
+      body: formData
     });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.success) {
+      throw new Error(data?.message || 'Failed to create release');
+    }
+
+    return data;
   }
 
   async get<T = any>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'GET',
+    });
+  }
+
+  async post<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 
