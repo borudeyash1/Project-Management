@@ -2,76 +2,113 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { Bell, X, CheckCircle, AlertCircle, Info, Trash2 } from 'lucide-react';
-
-interface Notification {
-  _id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  timestamp: Date;
-  read: boolean;
-}
+import apiService from '../services/api';
+import { Notification as AppNotification } from '../types';
 
 const NotificationsPanel: React.FC = () => {
   const { state, dispatch } = useApp();
   const { isDarkMode } = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   useEffect(() => {
-    // Mock notifications data
-    const mockNotifications: Notification[] = [
-      {
-        _id: '1',
-        title: 'New task assigned',
-        message: 'You have been assigned to "Homepage Redesign" task',
-        type: 'info',
-        timestamp: new Date('2024-03-23T10:30:00'),
-        read: false
-      },
-      {
-        _id: '2',
-        title: 'Project deadline approaching',
-        message: 'E-commerce Platform project is due in 2 days',
-        type: 'warning',
-        timestamp: new Date('2024-03-23T09:15:00'),
-        read: false
-      },
-      {
-        _id: '3',
-        title: 'Task completed',
-        message: 'Sarah Johnson completed "API Integration" task',
-        type: 'success',
-        timestamp: new Date('2024-03-22T16:45:00'),
-        read: true
-      },
-      {
-        _id: '4',
-        title: 'Meeting reminder',
-        message: 'Team standup meeting starts in 15 minutes',
-        type: 'info',
-        timestamp: new Date('2024-03-23T08:45:00'),
-        read: false
-      },
-      {
-        _id: '5',
-        title: 'Comment on your task',
-        message: 'Mike Chen commented on "Database optimization"',
-        type: 'info',
-        timestamp: new Date('2024-03-22T14:20:00'),
-        read: true
+    const loadNotifications = async () => {
+      try {
+        const data = await apiService.getNotifications();
+        setNotifications(data);
+      } catch (error) {
+        console.error('Failed to load notifications', error);
       }
-    ];
-    setNotifications(mockNotifications);
+    };
+
+    loadNotifications();
   }, []);
 
-  const markAsRead = (notificationId: string) => {
-    setNotifications(notifications.map(notif =>
-      notif._id === notificationId ? { ...notif, read: true } : notif
-    ));
+  const resolveUiType = (notif: AppNotification): 'info' | 'success' | 'warning' | 'error' => {
+    // Map domain notification type to UI type
+    switch (notif.type) {
+      case 'system':
+        return 'info';
+      case 'workspace':
+        return 'info';
+      case 'task':
+      case 'project':
+      default:
+        return 'info';
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+  const handleNotificationClick = async (notif: AppNotification) => {
+    // For workspace invites, use explicit Accept/Decline buttons instead of clicking the card
+    if (notif.type === 'workspace' && notif.relatedId) {
+      return;
+    }
+
+    await markAsRead(notif._id);
+  };
+
+  const handleAcceptWorkspaceInvite = async (notif: AppNotification) => {
+    if (!notif.relatedId) return;
+    try {
+      await apiService.acceptWorkspaceInvite(notif.relatedId, notif._id);
+      await markAsRead(notif._id);
+      try {
+        const workspaces = await apiService.getWorkspaces();
+        dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
+      } catch (e) {
+        console.error('Failed to refresh workspaces after joining', e);
+      }
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'You have joined the workspace',
+          duration: 3000,
+        },
+      });
+    } catch (error: any) {
+      console.error('Failed to accept workspace invite', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to join workspace',
+          duration: 4000,
+        },
+      });
+    }
+  };
+
+  const handleDeclineWorkspaceInvite = async (notif: AppNotification) => {
+    await markAsRead(notif._id);
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'info',
+        message: 'Invitation dismissed',
+        duration: 2500,
+      },
+    });
+  };
+
+  const markAsRead = async (notificationId: string) => {
+    setNotifications((prev) =>
+      prev.map((notif) => (notif._id === notificationId ? { ...notif, read: true } : notif)),
+    );
+    try {
+      await apiService.markNotificationRead(notificationId);
+    } catch (error) {
+      console.error('Failed to mark notification as read', error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    const ids = notifications.filter((n) => !n.read).map((n) => n._id);
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    // Best-effort: mark each as read in the background
+    await Promise.all(ids.map((id) => apiService.markNotificationRead(id).catch(() => undefined)));
   };
 
   const deleteNotification = (notificationId: string) => {
@@ -183,10 +220,10 @@ const NotificationsPanel: React.FC = () => {
               {notifications.map((notif) => (
                 <div
                   key={notif._id}
-                  className={`p-4 ${getNotificationBg(notif.type, notif.read)} ${
+                  className={`p-4 ${getNotificationBg(resolveUiType(notif), notif.read)} ${
                     isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                   } transition-colors cursor-pointer group`}
-                  onClick={() => markAsRead(notif._id)}
+                  onClick={() => handleNotificationClick(notif)}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5">
@@ -206,19 +243,43 @@ const NotificationsPanel: React.FC = () => {
                       </p>
                       <div className="flex items-center justify-between mt-2">
                         <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                          {new Date(notif.timestamp).toLocaleString()}
+                          {new Date(notif.createdAt).toLocaleString()}
                         </p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteNotification(notif._id);
-                          }}
-                          className={`opacity-0 group-hover:opacity-100 p-1 rounded ${
-                            isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
-                          } transition-opacity`}
-                        >
-                          <Trash2 className={`w-3 h-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {notif.type === 'workspace' && notif.relatedId && !notif.read && (
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAcceptWorkspaceInvite(notif);
+                                }}
+                                className="px-3 py-1.5 text-xs font-medium rounded-full bg-green-600 text-white hover:bg-green-700"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeclineWorkspaceInvite(notif);
+                                }}
+                                className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+                              >
+                                Decline
+                              </button>
+                            </div>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNotification(notif._id);
+                            }}
+                            className={`opacity-0 group-hover:opacity-100 p-1 rounded ${
+                              isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
+                            } transition-opacity`}
+                          >
+                            <Trash2 className={`w-3 h-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

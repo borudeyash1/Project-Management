@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   BarChart3, 
   User, 
@@ -22,6 +22,8 @@ import {
   LogOut
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import apiService from '../services/api';
+import { useLocation } from 'react-router-dom';
 
 interface Project {
   _id: string;
@@ -63,9 +65,16 @@ interface Notification {
 
 const WorkspaceMember: React.FC = () => {
   const { state, dispatch } = useApp();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [facePreview, setFacePreview] = useState<string | null>(null);
+  const [faceStatus, setFaceStatus] = useState<string | null>(null);
+  const [faceSaving, setFaceSaving] = useState(false);
+  const [autoScanTriggered, setAutoScanTriggered] = useState(false);
 
   // Mock data - replace with actual API calls
   const projects: Project[] = [
@@ -305,6 +314,91 @@ const WorkspaceMember: React.FC = () => {
     </div>
   );
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const shouldAutoScan = params.get('autoFaceScan') === '1';
+
+    if (!shouldAutoScan || autoScanTriggered) {
+      return;
+    }
+
+    // First switch to profile tab so the video element is mounted
+    if (activeTab !== 'profile') {
+      setActiveTab('profile');
+      return;
+    }
+
+    // Once profile tab is active and video element is available, trigger capture once
+    if (videoRef.current) {
+      handleCaptureFaceScan();
+      setAutoScanTriggered(true);
+    }
+  }, [location.search, autoScanTriggered, activeTab]);
+
+  const handleCaptureFaceScan = async () => {
+    setFaceStatus(null);
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setFaceStatus('Camera access is not supported in this browser.');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        const videoEl = videoRef.current;
+        videoEl.srcObject = stream as any;
+        await new Promise((resolve) => {
+          const handler = () => {
+            videoEl.removeEventListener('loadedmetadata', handler);
+            resolve(null);
+          };
+          videoEl.addEventListener('loadedmetadata', handler);
+        });
+      }
+
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) {
+        stream.getTracks().forEach((t) => t.stop());
+        setFaceStatus('Unable to access camera elements.');
+        return;
+      }
+
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        stream.getTracks().forEach((t) => t.stop());
+        setFaceStatus('Unable to capture from camera.');
+        return;
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      setFacePreview(dataUrl);
+
+      stream.getTracks().forEach((t) => t.stop());
+      if (videoRef.current) {
+        (videoRef.current.srcObject as any) = null;
+      }
+
+      setFaceSaving(true);
+      try {
+        await apiService.post('/users/face-scan', { imageData: dataUrl });
+        setFaceStatus('Face scan saved successfully. This will be used for attendance verification.');
+      } catch (err: any) {
+        console.error('Failed to save face scan', err);
+        setFaceStatus(err?.message || 'Failed to save face scan.');
+      } finally {
+        setFaceSaving(false);
+      }
+    } catch (err: any) {
+      console.error('Camera error', err);
+      setFaceStatus('Could not access camera. Please allow camera permissions.');
+    }
+  };
+
   const renderProfile = () => (
     <div className="space-y-6">
       <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -379,6 +473,48 @@ const WorkspaceMember: React.FC = () => {
           <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Save Changes
           </button>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Face Scan for Attendance</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Capture your face once so the system can verify you during automatic attendance.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="space-y-3">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              className="w-full rounded-lg border border-gray-200 bg-gray-100"
+            />
+            <canvas ref={canvasRef} className="hidden" />
+            {facePreview && (
+              <img
+                src={facePreview}
+                alt="Face scan preview"
+                className="w-full rounded-lg border border-gray-200"
+              />
+            )}
+          </div>
+          <div className="md:col-span-2 space-y-3 text-sm">
+            <p className="text-gray-600">
+              Make sure your face is clearly visible, with good lighting. This basic capture is stored securely in
+              your profile and used only for project attendance verification.
+            </p>
+            <button
+              type="button"
+              onClick={handleCaptureFaceScan}
+              disabled={faceSaving}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+            >
+              {faceSaving ? 'Saving...' : 'Capture & Save Face Scan'}
+            </button>
+            {faceStatus && (
+              <p className="text-xs text-gray-600 mt-2 max-w-md">{faceStatus}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

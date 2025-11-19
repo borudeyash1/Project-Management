@@ -15,7 +15,6 @@ interface Workspace {
   type: 'personal' | 'team' | 'enterprise';
   region?: string;
   memberCount: number;
-  isPublic: boolean;
   owner: {
     _id: string;
     fullName: string;
@@ -53,92 +52,31 @@ const WorkspaceDiscover: React.FC = () => {
     };
 
     const loadWorkspaces = async () => {
-      const mockWorkspaces: Workspace[] = [
-        {
-          _id: '1',
-          name: 'TechCorp Solutions',
-          description: 'Leading technology solutions provider',
-          type: 'enterprise',
-          region: 'North America',
-          memberCount: 150,
-          isPublic: true,
-          owner: {
-            _id: 'owner1',
-            fullName: 'John Smith',
-            avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-          },
-          settings: {
-            isPublic: true,
-            allowMemberInvites: true,
-            requireApprovalForJoining: true
-          },
-          createdAt: new Date('2024-01-15')
-        },
-        {
-          _id: '2',
-          name: 'Design Studio Pro',
-          description: 'Creative design and branding agency',
-          type: 'team',
-          region: 'Europe',
-          memberCount: 25,
-          isPublic: true,
-          owner: {
-            _id: 'owner2',
-            fullName: 'Sarah Johnson',
-            avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
-          },
-          settings: {
-            isPublic: true,
-            allowMemberInvites: true,
-            requireApprovalForJoining: false
-          },
-          createdAt: new Date('2024-02-20')
-        },
-        {
-          _id: '3',
-          name: 'StartupHub',
-          description: 'Innovation and startup community',
-          type: 'team',
-          region: 'Asia',
-          memberCount: 45,
-          isPublic: true,
-          owner: {
-            _id: 'owner3',
-            fullName: 'Mike Chen',
-            avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
-          },
-          settings: {
-            isPublic: true,
-            allowMemberInvites: true,
-            requireApprovalForJoining: true
-          },
-          createdAt: new Date('2024-03-10')
-        },
-        {
-          _id: '4',
-          name: 'Marketing Masters',
-          description: 'Digital marketing and growth hacking',
-          type: 'team',
-          region: 'North America',
-          memberCount: 18,
-          isPublic: false,
-          owner: {
-            _id: 'owner4',
-            fullName: 'Emily Davis',
-            avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face'
-          },
-          settings: {
+      try {
+        const apiWorkspaces = await api.getDiscoverWorkspaces();
+        const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
+          _id: ws._id,
+          name: ws.name,
+          description: ws.description,
+          type: ws.type,
+          region: ws.region,
+          memberCount: ws.memberCount ?? 0,
+          owner: ws.owner,
+          settings: ws.settings || {
             isPublic: false,
-            allowMemberInvites: false,
+            allowMemberInvites: true,
             requireApprovalForJoining: true
           },
-          createdAt: new Date('2024-04-05')
-        }
-      ];
+          createdAt: ws.createdAt ? new Date(ws.createdAt) : new Date()
+        }));
 
-      setWorkspaces(mockWorkspaces);
-      setFilteredWorkspaces(mockWorkspaces);
-      setLoading(false);
+        setWorkspaces(normalized);
+        setFilteredWorkspaces(normalized);
+      } catch (error) {
+        console.error('Failed to load workspaces for discovery', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchPlans();
@@ -342,7 +280,7 @@ const WorkspaceDiscover: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">{workspace.name}</h3>
-                        {workspace.isPublic ? (
+                        {workspace.settings.isPublic ? (
                           <Eye className="w-4 h-4 text-green-600" />
                         ) : (
                           <EyeOff className="w-4 h-4 text-gray-400" />

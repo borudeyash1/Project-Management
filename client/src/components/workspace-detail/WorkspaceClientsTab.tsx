@@ -1,18 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Plus, Briefcase, Edit, Trash2, X, Mail, Phone, Globe, MapPin, Building } from 'lucide-react';
-
-interface Client {
-  _id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  address?: string;
-  website?: string;
-  notes?: string;
-  createdAt: Date;
-}
+import { Client } from '../../types';
+import apiService from '../../services/api';
 
 interface WorkspaceClientsTabProps {
   workspaceId: string;
@@ -23,8 +13,9 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
   workspaceId, 
   isWorkspaceOwner = false 
 }) => {
-  const { dispatch } = useApp();
-  const [clients, setClients] = useState<Client[]>([]);
+  const { state, dispatch } = useApp();
+  const allClients = (state.clients || []) as Client[];
+  const clients = allClients.filter((client) => client.workspaceId === workspaceId);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [clientForm, setClientForm] = useState({
@@ -50,7 +41,30 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
     setEditingClient(null);
   };
 
-  const handleAddClient = () => {
+  // Load clients for this workspace from backend
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const clients = await apiService.getClients(workspaceId);
+        dispatch({ type: 'SET_CLIENTS', payload: clients });
+      } catch (error: any) {
+        console.error('Failed to load workspace clients', error);
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: error?.message || 'Failed to load clients',
+            duration: 3000,
+          },
+        });
+      }
+    };
+
+    loadClients();
+  }, [workspaceId, dispatch]);
+
+  const handleAddClient = async () => {
     if (!clientForm.name.trim() || !clientForm.email.trim()) {
       dispatch({
         type: 'ADD_TOAST',
@@ -64,39 +78,56 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
       return;
     }
 
-    if (editingClient) {
-      // Update existing client
-      setClients(clients.map(c => 
-        c._id === editingClient._id 
-          ? { ...c, ...clientForm }
-          : c
-      ));
+    try {
+      if (editingClient) {
+        const updated = await apiService.updateClient(editingClient._id, { ...clientForm });
+        dispatch({
+          type: 'UPDATE_CLIENT',
+          payload: {
+            clientId: editingClient._id,
+            updates: updated,
+          },
+        });
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'success',
+            message: 'Client updated successfully!',
+            duration: 3000,
+          },
+        });
+      } else {
+        const created = await apiService.createClient({
+          ...clientForm,
+          workspaceId,
+        });
+        dispatch({
+          type: 'ADD_CLIENT',
+          payload: created,
+        });
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'success',
+            message: 'Client created successfully!',
+            duration: 3000,
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error('Failed to save client', error);
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
-          type: 'success',
-          message: 'Client updated successfully!',
-          duration: 3000
-        }
+          type: 'error',
+          message: error?.message || 'Failed to save client',
+          duration: 3000,
+        },
       });
-    } else {
-      // Add new client
-      const newClient: Client = {
-        _id: `client_${Date.now()}`,
-        ...clientForm,
-        createdAt: new Date()
-      };
-      setClients([...clients, newClient]);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Client created successfully!',
-          duration: 3000
-        }
-      });
+      return;
     }
     
     resetForm();
@@ -117,17 +148,36 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
     setShowAddModal(true);
   };
 
-  const handleDeleteClient = (clientId: string) => {
-    if (window.confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
-      setClients(clients.filter(c => c._id !== clientId));
+  const handleDeleteClient = async (clientId: string) => {
+    if (!window.confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await apiService.deleteClient(clientId);
+      dispatch({
+        type: 'DELETE_CLIENT',
+        payload: clientId,
+      });
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'success',
           message: 'Client deleted successfully',
-          duration: 3000
-        }
+          duration: 3000,
+        },
+      });
+    } catch (error: any) {
+      console.error('Failed to delete client', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to delete client',
+          duration: 3000,
+        },
       });
     }
   };

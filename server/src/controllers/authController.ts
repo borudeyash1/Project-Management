@@ -426,48 +426,34 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // For verified users, send OTP for login verification
     console.log('🔍 [DEBUG] Login - User is verified, sending OTP for login verification');
-    
-    // Generate OTP for login verification
     const loginOtp = generateOTP();
     user.loginOtp = loginOtp;
     user.loginOtpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await user.save();
-
-    // Send OTP email
     try {
+      const emailSubject = 'Sartthi: Login Verification Code';
+      const emailHtml = `
+        <p>Hello ${user.fullName || user.email},</p>
+        <p>We received a request to sign in to your Sartthi account. Use the following One-Time Password (OTP) to complete your login:</p>
+        <h2>${loginOtp}</h2>
+        <p>This code is valid for 10 minutes. If you did not attempt to log in, please secure your account.</p>
+        <p>Best regards,<br/>The Sartthi Team</p>
+      `;
       await sendEmail({
         to: user.email,
-        subject: 'Sartthi: Login Verification Code',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Login Verification</h2>
-            <p>Hello ${user.fullName},</p>
-            <p>You're attempting to log in to your Sartthi account. Please use the following verification code:</p>
-            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
-              <h1 style="color: #f59e0b; font-size: 32px; margin: 0; letter-spacing: 4px;">${loginOtp}</h1>
-            </div>
-            <p>This code will expire in 10 minutes.</p>
-            <p>If you didn't request this login, please ignore this email.</p>
-            <p>Best regards,<br>The Sartthi Team</p>
-          </div>
-        `,
+        subject: emailSubject,
+        html: emailHtml,
       });
-      console.log('✅ [DEBUG] Login OTP email sent successfully to:', user.email);
     } catch (emailError) {
       console.error('❌ [DEBUG] Failed to send login OTP email:', emailError);
     }
 
-    // Return response indicating OTP verification is required
-    const response: ApiResponse = {
+    res.status(200).json({
       success: true,
       message: "Please check your email for the login verification code.",
-      data: {
-        email: user.email,
-        requiresOtpVerification: true,
-      },
-    };
-
-    res.status(200).json(response);
+      data: { email: user.email, requiresOtpVerification: true },
+    });
+    return;
   } catch (error: any) {
     console.error("Login error:", error);
     res.status(500).json({

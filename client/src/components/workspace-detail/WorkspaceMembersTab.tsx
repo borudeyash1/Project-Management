@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar } from 'lucide-react';
+import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar, UserCheck, UserX, AlertCircle } from 'lucide-react';
+import api from '../../services/api';
 
 interface Member {
   _id: string;
@@ -13,19 +14,156 @@ interface Member {
   status: 'active' | 'pending';
 }
 
+interface JoinRequest {
+  id: string;
+  name: string;
+  email: string;
+  message?: string;
+  requestedAt: Date;
+  status: 'pending' | 'accepted' | 'declined';
+}
+
 interface WorkspaceMembersTabProps {
   workspaceId: string;
 }
 
 const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }) => {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
+  const [userSearch, setUserSearch] = useState('');
+  const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
+  const [directoryUsers, setDirectoryUsers] = useState<{
+    _id: string;
+    fullName: string;
+    email: string;
+    username: string;
+    avatarUrl?: string;
+  }[]>([]);
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
 
-  const handleInviteMember = () => {
-    if (!inviteEmail.trim()) {
+  const workspace: any = useMemo(
+    () => state.workspaces.find((w) => w._id === workspaceId),
+    [state.workspaces, workspaceId]
+  );
+
+  const currentUserId = state.userProfile._id;
+  const isOwner = workspace?.owner === currentUserId;
+  const isAdmin = (workspace?.members || []).some((member: any) => {
+    const user = member.user;
+    const id = typeof user === 'string' ? user : user._id;
+    return (
+      id === currentUserId &&
+      (member.role === 'owner' || member.role === 'admin')
+    );
+  });
+  const canManageMembers = isOwner || isAdmin;
+
+  // Initialize local members list from workspace data so the members tab
+  // always shows all current workspace members for this workspace.
+  useEffect(() => {
+    if (!workspace) {
+      setMembers([]);
+      return;
+    }
+
+    const workspaceMembers: Member[] = (workspace.members || []).map((m: any) => {
+      const user = m.user;
+      const userId = typeof user === 'string' ? user : user?._id;
+      const name =
+        typeof user === 'string'
+          ? user
+          : user?.fullName || user?.username || user?.email || 'Member';
+      const email = typeof user === 'string' ? '' : user?.email || '';
+
+      return {
+        _id: userId,
+        userId,
+        name,
+        email,
+        avatar: typeof user === 'string' ? undefined : user?.avatarUrl,
+        role: m.role || 'member',
+        joinedAt: m.joinedAt ? new Date(m.joinedAt) : new Date(),
+        status: m.status === 'pending' || m.status === 'active' ? m.status : 'active',
+      } as Member;
+    });
+
+    setMembers(workspaceMembers);
+    persistMembersForModals(workspaceMembers);
+  }, [workspace]);
+
+  const filteredDirectoryUsers = useMemo(() => {
+    if (!userSearch.trim()) return [];
+    const lowered = userSearch.toLowerCase();
+    return directoryUsers
+      .filter((user) => {
+        const name = user.fullName || user.username || user.email;
+        const match =
+          name.toLowerCase().includes(lowered) ||
+          user.email.toLowerCase().includes(lowered) ||
+          user.username.toLowerCase().includes(lowered);
+        const alreadyMember = members.some((member) => member.email === user.email);
+        return match && !alreadyMember;
+      })
+      .slice(0, 5)
+      .map((user) => ({
+        id: user._id,
+        name: user.fullName || user.username || user.email,
+        email: user.email
+      }));
+  }, [directoryUsers, userSearch, members]);
+
+  useEffect(() => {
+    if (!userSearch.trim()) {
+      setDirectoryUsers([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const runSearch = async () => {
+      try {
+        setIsSearchingUsers(true);
+        const results = await api.searchUsers(userSearch.trim());
+        if (!cancelled) {
+          setDirectoryUsers(results);
+        }
+      } catch (error) {
+        console.error('User search failed', error);
+      } finally {
+        if (!cancelled) {
+          setIsSearchingUsers(false);
+        }
+      }
+    };
+
+    runSearch();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userSearch]);
+
+  const persistMembersForModals = (payload: Member[]) => {
+    try {
+      const membersForStorage = payload.map((m) => ({
+        _id: m._id,
+        name: m.name,
+        email: m.email,
+        workspaceRole: m.role || 'Member',
+        department: 'General'
+      }));
+      sessionStorage.setItem(`workspace_${workspaceId}_members`, JSON.stringify(membersForStorage));
+    } catch (e) {
+      console.error('Error storing members:', e);
+    }
+  };
+
+  const handleInviteMember = async (overrideEmail?: string, overrideName?: string, targetUserId?: string) => {
+    const inviteTarget = overrideEmail || inviteEmail;
+    if (!inviteTarget.trim() && !targetUserId) {
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -38,50 +176,73 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
       return;
     }
 
-    const newMember: Member = {
-      _id: `member_${Date.now()}`,
-      userId: 'user_id',
-      name: inviteEmail.split('@')[0] || inviteEmail,
-      email: inviteEmail.includes('@') ? inviteEmail : `${inviteEmail}@example.com`,
-      role: 'Member',
-      joinedAt: new Date(),
-      status: 'pending'
-    };
-
-    const updatedMembers = [...members, newMember];
-    setMembers(updatedMembers);
-    
-    // Store members in sessionStorage for AddTeamMemberModal to access
     try {
-      const membersForStorage = updatedMembers.map(m => ({
-        _id: m._id,
-        name: m.name,
-        email: m.email,
-        workspaceRole: m.role || 'Member',
-        department: 'General'
-      }));
-      sessionStorage.setItem(`workspace_${workspaceId}_members`, JSON.stringify(membersForStorage));
-    } catch (e) {
-      console.error('Error storing members:', e);
-    }
-    
-    setShowInviteModal(false);
-    setInviteEmail('');
+      await api.sendWorkspaceInvite(workspaceId, {
+        targetUserId,
+        identifier: targetUserId ? undefined : inviteTarget,
+      });
 
+      setShowInviteModal(false);
+      setInviteEmail('');
+      setUserSearch('');
+
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Member invitation sent successfully!',
+          duration: 3000
+        }
+      });
+    } catch (error: any) {
+      console.error('Failed to send workspace invite', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to send invitation',
+          duration: 4000
+        }
+      });
+    }
+  };
+
+  const handleAcceptRequest = (request: JoinRequest) => {
+    setJoinRequests((prev) =>
+      prev.map((req) => (req.id === request.id ? { ...req, status: 'accepted' } : req))
+    );
+    handleInviteMember(request.email, request.name);
     dispatch({
       type: 'ADD_TOAST',
       payload: {
         id: Date.now().toString(),
         type: 'success',
-        message: 'Member invitation sent successfully!',
+        message: `${request.name} has been added to the workspace`,
         duration: 3000
+      }
+    });
+  };
+
+  const handleDeclineRequest = (requestId: string) => {
+    setJoinRequests((prev) =>
+      prev.map((req) => (req.id === requestId ? { ...req, status: 'declined' } : req))
+    );
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        id: Date.now().toString(),
+        type: 'info',
+        message: 'Request declined',
+        duration: 2500
       }
     });
   };
 
   const handleRemoveMember = (memberId: string) => {
     if (window.confirm('Are you sure you want to remove this member from the workspace?')) {
-      setMembers(members.filter(m => m._id !== memberId));
+      setMembers(members.filter((m) => m._id !== memberId));
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -109,13 +270,15 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
               Invite members to join projects in this workspace. Members will appear in project teammate lists.
             </p>
           </div>
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <UserPlus className="w-4 h-4" />
-            Invite Member
-          </button>
+          {canManageMembers && (
+            <button
+              onClick={() => setShowInviteModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <UserPlus className="w-4 h-4" />
+              Invite Member
+            </button>
+          )}
         </div>
 
         {/* Search Bar */}
@@ -170,12 +333,14 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   }`}>
                     {member.status}
                   </span>
-                  <button
-                    onClick={() => handleRemoveMember(member._id)}
-                    className="text-red-600 hover:text-red-700 p-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {canManageMembers && (
+                    <button
+                      onClick={() => handleRemoveMember(member._id)}
+                      className="text-red-600 hover:text-red-700 p-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))
@@ -192,6 +357,152 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
           </div>
         )}
       </div>
+
+      {/* Contact Admin / Owner info for regular members */}
+      {!canManageMembers && workspace && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Contact workspace admin</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            For changes to workspace members or settings, please reach out to an owner or admin.
+          </p>
+          <div className="space-y-3">
+            {/* Owner */}
+            {workspace.owner && (
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {typeof workspace.owner === 'string'
+                      ? 'Workspace owner'
+                      : workspace.owner.fullName || workspace.owner.email || workspace.owner.username || 'Workspace owner'}
+                  </p>
+                  {typeof workspace.owner !== 'string' && workspace.owner.email && (
+                    <p className="text-xs text-gray-600 flex items-center gap-1">
+                      <Mail className="w-3 h-3" />
+                      {workspace.owner.email}
+                    </p>
+                  )}
+                </div>
+                <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                  Owner
+                </span>
+              </div>
+            )}
+
+            {/* Admin / collaborator members */}
+            {(workspace.members || [])
+              .filter((m: any) => m.role === 'admin' || m.role === 'manager')
+              .map((m: any) => {
+                const user = m.user;
+                const displayName =
+                  typeof user === 'string'
+                    ? user
+                    : user.fullName || user.username || user.email || 'Collaborator';
+                const email = typeof user === 'string' ? undefined : user.email;
+                return (
+                  <div
+                    key={typeof user === 'string' ? user : user._id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{displayName}</p>
+                      {email && (
+                        <p className="text-xs text-gray-600 flex items-center gap-1">
+                          <Mail className="w-3 h-3" />
+                          {email}
+                        </p>
+                      )}
+                    </div>
+                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700">
+                      {m.role === 'admin' ? 'Admin' : 'Manager'}
+                    </span>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Join Requests (owners/admins only) */}
+      {canManageMembers && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Join Requests</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Approve or decline join requests submitted from the Discover Workspace page.
+            </p>
+          </div>
+          <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700">
+            {joinRequests.filter((req) => req.status === 'pending').length} pending
+          </span>
+        </div>
+
+        {joinRequests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <AlertCircle className="w-10 h-10 mb-2 text-gray-300" />
+            <p className="font-medium">No requests yet</p>
+            <p className="text-sm">Requests from Discover Workspace will appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {joinRequests.map((request) => (
+              <div
+                key={request.id}
+                className="p-4 border border-gray-200 rounded-lg flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold">
+                    {request.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{request.name}</p>
+                    <p className="text-sm text-gray-600 flex items-center gap-1">
+                      <Mail className="w-3 h-3" />
+                      {request.email}
+                    </p>
+                    {request.message && <p className="text-sm text-gray-500 mt-1">{request.message}</p>}
+                    <p className="text-xs text-gray-400 mt-1">
+                      Requested {request.requestedAt.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      request.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : request.status === 'accepted'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {request.status}
+                  </span>
+                  {request.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => handleAcceptRequest(request)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                      >
+                        <UserCheck className="w-4 h-4" />
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleDeclineRequest(request.id)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <UserX className="w-4 h-4" />
+                        Decline
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      )}
 
       {/* Invite Member Modal */}
       {showInviteModal && (
@@ -220,6 +531,39 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   The user will receive an invitation to join this workspace
                 </p>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Search platform directory
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    placeholder="Search by name or email"
+                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  {filteredDirectoryUsers.length > 0 && (
+                    <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {filteredDirectoryUsers.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => handleInviteMember(user.email, user.name)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-50 flex flex-col"
+                        >
+                          <span className="font-medium text-gray-900">{user.name}</span>
+                          <span className="text-sm text-gray-500">{user.email}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Pull users who are already on the platform without re-typing their email.
+                </p>
+              </div>
               
               <div className="flex gap-3 pt-2">
                 <button
@@ -229,7 +573,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   Cancel
                 </button>
                 <button
-                  onClick={handleInviteMember}
+                  onClick={() => handleInviteMember()}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Send Invite

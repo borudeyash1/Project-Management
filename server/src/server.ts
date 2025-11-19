@@ -12,19 +12,23 @@ import userRoutes from "./routes/users";
 import workspaceRoutes from "./routes/workspaces";
 import projectRoutes from "./routes/projects";
 import taskRoutes from "./routes/tasks";
+import clientRoutes from "./routes/clients";
 import teamRoutes from "./routes/teams";
 import payrollRoutes from "./routes/payroll";
 import goalRoutes from "./routes/goals";
 import reminderRoutes from "./routes/reminders";
+import notificationRoutes from "./routes/notifications";
 import trackerRoutes from "./routes/tracker";
 import reportRoutes from "./routes/reports";
 import aiRoutes from "./routes/ai";
+import inboxRoutes from "./routes/inbox";
 import adminRoutes from "./routes/admin";
 import userManagementRoutes from "./routes/userManagement";
 import desktopReleaseRoutes from "./routes/desktopRelease";
 import homeRoutes from "./routes/home";
 import plannerRoutes from "./routes/planner";
 import subscriptionsRoutes from "./routes/subscriptions";
+import attendanceRoutes from "./routes/attendance";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 
 // Load environment variables
@@ -67,10 +71,14 @@ app.use("/api/users", userRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/inbox", inboxRoutes);
+app.use("/api/attendance", attendanceRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/payroll", payrollRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/reminders", reminderRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/tracker", trackerRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/ai", aiRoutes);
@@ -80,6 +88,7 @@ app.use("/api/releases", desktopReleaseRoutes);
 app.use("/api/home", homeRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
+app.use("/api/inbox", inboxRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

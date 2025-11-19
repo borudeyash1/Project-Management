@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AddClientModal from '../AddClientModal';
+import { Client as ClientType } from '../../types';
+import apiService from '../../services/api';
 import {
   Search,
   Plus,
@@ -18,7 +20,7 @@ import {
   X
 } from 'lucide-react';
 
-interface Client {
+interface ClientView {
   _id: string;
   name: string;
   email: string;
@@ -35,56 +37,65 @@ interface Client {
 const WorkspaceClients: React.FC = () => {
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
+  const { workspaceId: routeWorkspaceId } = useParams<{ workspaceId: string }>();
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedClient, setSelectedClient] = useState<ClientView | null>(null);
   const [showClientProjects, setShowClientProjects] = useState(false);
 
-  const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
+  const workspaceId = routeWorkspaceId || state.currentWorkspace;
+  const currentWorkspace = state.workspaces.find((w) => w._id === workspaceId);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
 
-  // Mock clients data
-  const clients: Client[] = [
-    {
-      _id: '1',
-      name: 'Acme Corporation',
-      email: 'contact@acme.com',
-      phone: '+1 (555) 123-4567',
-      company: 'Acme Corp',
-      address: 'New York, NY',
-      contactPerson: 'John Smith',
-      projectCount: 3,
-      totalRevenue: 125000,
-      status: 'active',
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      _id: '2',
-      name: 'TechStart Inc',
-      email: 'hello@techstart.io',
-      phone: '+1 (555) 987-6543',
-      company: 'TechStart',
-      address: 'San Francisco, CA',
-      contactPerson: 'Jane Doe',
-      projectCount: 2,
-      totalRevenue: 85000,
-      status: 'active',
-      createdAt: new Date('2024-02-20')
-    },
-    {
-      _id: '3',
-      name: 'Global Solutions',
-      email: 'info@globalsolutions.com',
-      phone: '+1 (555) 456-7890',
-      company: 'Global Solutions Ltd',
-      address: 'London, UK',
-      contactPerson: 'Robert Brown',
-      projectCount: 1,
-      totalRevenue: 45000,
-      status: 'inactive',
-      createdAt: new Date('2024-03-10')
-    }
-  ];
+  // Load clients for this workspace from the backend so they persist in MongoDB
+  useEffect(() => {
+    const loadClients = async () => {
+      if (!workspaceId) return;
+      try {
+        const clients = await apiService.getClients(workspaceId);
+        dispatch({ type: 'SET_CLIENTS', payload: clients });
+      } catch (error: any) {
+        console.error('Failed to load workspace clients', error);
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            type: 'error',
+            message: error?.message || 'Failed to load clients',
+          },
+        });
+      }
+    };
+
+    loadClients();
+  }, [workspaceId, dispatch]);
+
+  // Derive clients for this workspace from global state
+  const workspaceClients = (state.clients as ClientType[]).filter((client) => {
+    if (!workspaceId) return true;
+    return client.workspaceId === workspaceId;
+  });
+
+  const clients: ClientView[] = workspaceClients.map((client) => {
+    const projectCount = state.projects.filter((p) => {
+      const matchesWorkspace = !workspaceId || p.workspace === workspaceId;
+      const clientId = (p.client as any)?._id ?? (p.client as any) ?? undefined;
+      return matchesWorkspace && clientId === client._id;
+    }).length;
+
+    return {
+      _id: client._id,
+      name: client.name,
+      email: client.email,
+      phone: client.phone,
+      company: client.company,
+      address: client.address,
+      contactPerson: client.contactPerson,
+      projectCount,
+      totalRevenue: client.totalRevenue ?? 0,
+      status: client.status,
+      createdAt: client.createdAt,
+    };
+  });
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -258,15 +269,47 @@ const WorkspaceClients: React.FC = () => {
       <AddClientModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onSubmit={(clientData) => {
-          // Handle client creation
-          dispatch({
-            type: 'ADD_TOAST',
-            payload: {
-              type: 'success',
-              message: `Client "${clientData.name}" added successfully!`
-            }
-          });
+        onSubmit={async (clientData) => {
+          if (!workspaceId) {
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: { type: 'error', message: 'No active workspace selected.' },
+            });
+            return;
+          }
+
+          try {
+            const created = await apiService.createClient({
+              name: clientData.name,
+              email: clientData.email,
+              phone: clientData.phone,
+              company: clientData.company,
+              website: clientData.website,
+              address: clientData.address,
+              contactPerson: clientData.contactPerson,
+              notes: clientData.notes,
+              workspaceId,
+            });
+
+            dispatch({ type: 'ADD_CLIENT', payload: created });
+
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'success',
+                message: `Client "${clientData.name}" added successfully!`,
+              },
+            });
+          } catch (error: any) {
+            console.error('Failed to create client', error);
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'error',
+                message: error?.message || 'Failed to create client',
+              },
+            });
+          }
         }}
       />
 

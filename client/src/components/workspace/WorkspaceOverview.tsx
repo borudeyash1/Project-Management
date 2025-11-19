@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { getProjects as getWorkspaceProjects } from '../../services/projectService';
 import { 
   FolderKanban, 
   Users, 
@@ -10,16 +12,39 @@ import {
   AlertCircle,
   Plus
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const WorkspaceOverview: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
-  const workspaceProjects = state.projects.filter(p => p.workspace === state.currentWorkspace);
-  
-  const isOwner = currentWorkspace?.owner === state.userProfile._id;
+  const workspaceProjects = state.projects.filter(
+    (project) => project.workspace === state.currentWorkspace
+  );
+
+  // Ensure projects for the active workspace are loaded from the backend
+  // so they persist in MongoDB and are available after page refresh.
+  useEffect(() => {
+    const loadWorkspaceProjects = async () => {
+      if (!state.currentWorkspace) return;
+      try {
+        const projects = await getWorkspaceProjects(state.currentWorkspace);
+        // We intentionally replace the current project list so overview
+        // stays in sync with the backend.
+        (state as any).dispatch?.({ type: 'SET_PROJECTS', payload: projects });
+      } catch (error) {
+        console.error('Failed to load workspace projects for overview', error);
+      }
+    };
+
+    // Only run if we have a workspace and a dispatch function exposed
+    // (when using the hook outside of the AppProvider this will be undefined).
+    if ((state as any)?.currentWorkspace && (state as any)?.dispatch) {
+      loadWorkspaceProjects();
+    }
+  }, [state]);
+
+  const isOwner = currentWorkspace?.owner === state.userProfile._id || state.roles.currentUserRole === 'owner';
 
   // Calculate stats
   const activeProjects = workspaceProjects.filter(p => p.status === 'active').length;

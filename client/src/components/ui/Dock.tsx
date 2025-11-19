@@ -112,7 +112,12 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
 
   const isVertical = dockPosition === 'left' || dockPosition === 'right';
   const blurPosition = dockPosition === 'top' ? 'top' : dockPosition === 'bottom' ? 'bottom' : null;
-  const controlsAlignment = isVertical ? 'top-4 right-4 flex-col' : 'top-4 right-4 flex-row';
+  const controlPositionStyles = useMemo(() => {
+    if (isVertical) {
+      return { top: '0.75rem', right: '-2.5rem', flexDirection: 'column' as const };
+    }
+    return { top: '-2.25rem', right: '1rem', flexDirection: 'row' as const };
+  }, [isVertical]);
 
   const anchorStyle = useMemo(() => {
     const base: React.CSSProperties = {
@@ -229,7 +234,8 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
             justifyContent: 'center',
             flexDirection: isVertical ? 'column' : 'row',
             gap: isVertical ? '0.5rem' : '0.35rem',
-            padding: isVertical ? '1rem 0.95rem' : '0.85rem 1.5rem',
+            padding: isVertical ? '1rem 1.15rem' : '0.85rem 1.5rem',
+            paddingRight: isVertical ? '1.75rem' : '3.5rem',
             borderRadius: isVertical ? '1.5rem' : '1rem',
             boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
             overflow: 'visible',
@@ -239,10 +245,11 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
           }}
         >
           <div
-            className={`absolute ${controlsAlignment} gap-2 z-20 pointer-events-auto`}
+            className="absolute gap-2 z-20 pointer-events-auto"
             style={{
-              transform: isVertical ? 'translateY(-0.5rem)' : 'translateX(0)',
-              display: 'flex'
+              display: 'flex',
+              alignItems: 'center',
+              ...controlPositionStyles
             }}
           >
             <button

@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import User from '../models/User';
 import { AuthenticatedRequest, ApiResponse } from '../types';
 
@@ -14,6 +14,85 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Save face scan image data for basic face recognition setup
+export const saveFaceScan = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { imageData } = req.body as { imageData?: string };
+    const user = req.user!;
+
+    if (!imageData || typeof imageData !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Face scan image data is required'
+      });
+      return;
+    }
+
+    user.faceScanImage = imageData;
+    await user.save();
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Face scan saved successfully',
+      data: user.toJSON()
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Save face scan error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Search users by name, email, or username (for invites/autocomplete)
+export const searchUsers = async (req: any, res: Response): Promise<void> => {
+  try {
+    const { q } = req.query as { q?: string };
+
+    const search = (q || '').trim();
+    if (!search) {
+      const emptyResponse: ApiResponse = {
+        success: true,
+        message: 'No query provided',
+        data: []
+      };
+      res.status(200).json(emptyResponse);
+      return;
+    }
+
+    const regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+
+    const users = await User.find({
+      isActive: true,
+      $or: [
+        { fullName: { $regex: regex } },
+        { email: { $regex: regex } },
+        { username: { $regex: regex } }
+      ]
+    })
+      .select('_id fullName email username avatarUrl')
+      .limit(10)
+      .lean();
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Users retrieved successfully',
+      data: users
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Search users error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'

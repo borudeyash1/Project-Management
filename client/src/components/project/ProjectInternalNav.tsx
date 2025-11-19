@@ -34,7 +34,11 @@ const ProjectInternalNav: React.FC = () => {
     (m: any) => m.user === state.userProfile._id && (m.role === 'project-manager' || m.permissions?.canManageProject)
   ) || false;
   const isOwner = state.workspaces.find(w => w._id === project?.workspace)?.owner === state.userProfile._id;
-  const canManage = isProjectManager || isOwner;
+  const canManage =
+    isProjectManager ||
+    isOwner ||
+    state.roles.currentUserRole === 'owner' ||
+    state.roles.currentUserRole === 'project-manager';
 
   const projectTabs: ProjectTab[] = [
     {
@@ -79,6 +83,12 @@ const ProjectInternalNav: React.FC = () => {
       icon: Clock,
       path: `/project/${projectId}/workload`,
       managerOnly: true
+    },
+    {
+      id: 'attendance',
+      label: 'Attendance',
+      icon: Clock,
+      path: `/project/${projectId}/attendance`,
     },
     {
       id: 'reports',
