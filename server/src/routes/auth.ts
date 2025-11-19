@@ -10,7 +10,9 @@ import {
   resetPassword,
   verifyEmailOTP, // Updated: Use new OTP verification function
   resendEmailOTP, // New: Import resend OTP function
-  googleAuth
+  googleAuth,
+  createDesktopSessionToken,
+  exchangeDesktopSessionToken
 } from '../controllers/authController';
 import { authenticate, authenticateRefresh } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -140,6 +142,8 @@ router.post('/reset-password', passwordResetRateLimiter, resetPasswordValidation
 // OTP specific routes with strict rate limiting
 router.post('/verify-email-otp', otpRateLimiter, otpVerificationValidation, validateRequest, verifyEmailOTP);
 router.post('/resend-email-otp', otpRateLimiter, resendOtpValidation, validateRequest, resendEmailOTP);
+router.post('/desktop-session', authenticate, createDesktopSessionToken);
+router.post('/desktop-session/exchange', exchangeDesktopSessionToken);
 
 // Removed old /verify-email/:token route as it's replaced by OTP
 // router.get('/verify-email/:token', verifyEmail);

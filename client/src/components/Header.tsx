@@ -16,6 +16,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 
 const Header: React.FC = () => {
   const { state, dispatch } = useApp();
@@ -44,6 +45,12 @@ const Header: React.FC = () => {
     localStorage.removeItem('refreshToken');
     dispatch({ type: 'LOGOUT' });
     dispatch({ type: 'TOGGLE_USER_MENU' });
+
+    if (shouldHandleInDesktop()) {
+      redirectToDesktopSplash();
+      return;
+    }
+
     navigate('/login');
   };
 

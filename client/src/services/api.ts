@@ -1,4 +1,5 @@
 import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, Workspace, Project, Task, Notification as AppNotification, Client } from '../types';
+import { buildDesktopDeviceInfo } from '../constants/desktop';
 
 export interface SubscriptionPlanData {
   planKey: 'free' | 'pro' | 'ultra';
@@ -198,6 +199,22 @@ class ApiService {
     }
 
     return response.data!;
+  }
+
+  async createDesktopSessionToken(): Promise<{ token: string; expiresAt: string }> {
+    const deviceInfo = buildDesktopDeviceInfo();
+    const response = await this.request<{ token: string; expiresAt: string }>('/auth/desktop-session', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...(deviceInfo ? { deviceInfo } : {})
+      })
+    });
+
+    if (!response.data) {
+      throw new Error('Failed to create desktop session token');
+    }
+
+    return response.data;
   }
 
   // New OTP endpoints
@@ -509,6 +526,15 @@ class ApiService {
     await this.request(`/tasks/${taskId}`, {
       method: 'DELETE',
     });
+  }
+
+  // Admin helpers
+  async getAdminDevices() {
+    return this.request<any>('/admin/devices');
+  }
+
+  async getAdminRecentSessions() {
+    return this.request<any>('/admin/sessions/recent');
   }
 
   // Generic HTTP methods

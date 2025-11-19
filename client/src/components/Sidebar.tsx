@@ -7,19 +7,17 @@ import {
   Calendar,
   Clock,
   Bell,
-  Settings,
-  User,
+  FileText,
   Building,
-  ChevronRight,
-  ChevronDown,
-  Home,
   BarChart3,
   Users,
-  FileText,
   Target,
+  ChevronRight,
+  Home,
   LogOut
 } from 'lucide-react';
 import { apiService } from '../services/api';
+import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 
 interface SidebarItem {
   id: string;
@@ -108,14 +106,18 @@ const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await apiService.logout();
-      dispatch({ type: 'LOGOUT' });
-      navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
-      // Even if logout fails on server, clear local state
-      dispatch({ type: 'LOGOUT' });
-      navigate('/login');
     }
+
+    dispatch({ type: 'LOGOUT' });
+
+    if (shouldHandleInDesktop()) {
+      redirectToDesktopSplash();
+      return;
+    }
+
+    navigate('/login');
   };
 
   const isActive = (item: SidebarItem) => {

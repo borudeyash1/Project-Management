@@ -5,6 +5,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { PlannerProvider } from './context/PlannerContext';
 import { TrackerProvider } from './context/TrackerContext';
 import Auth from './components/Auth';
+import DesktopHandshake from './components/DesktopHandshake';
+import DesktopShell from './components/DesktopShell';
 import HomePage from './components/HomePage';
 import ProjectsPage from './components/ProjectsPage';
 import ProjectViewDetailed from './components/ProjectViewDetailed';
@@ -51,11 +53,6 @@ import UserGuide from './components/UserGuide';
 import PricingPage from './components/PricingPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
-import AdminDashboard from './components/admin/AdminDashboard';
-import DeviceManagement from './components/admin/DeviceManagement';
-import UserManagement from './components/admin/UserManagement';
-import Analytics from './components/admin/Analytics';
-import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
@@ -129,6 +126,8 @@ const AppContent: React.FC = () => {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
+        <Route path="/desktop-handshake" element={<DesktopHandshake />} />
+        <Route path="/desktop-shell" element={<DesktopShell />} />
         
         {/* Admin Routes - Hidden */}
         <Route path="/my-admin/login" element={<AdminLoginWrapper />} />

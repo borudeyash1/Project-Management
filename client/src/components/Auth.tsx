@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useApp } from "../context/AppContext";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
-import { LoginRequest, RegisterRequest, User, Workspace } from "../types";
-import { apiService } from "../services/api";
-import { useTheme } from "../context/ThemeContext";
-import SharedNavbar from "./SharedNavbar";
-import EnhancedRegistration from "./EnhancedRegistration";
-import { googleAuthService } from "../config/googleAuth";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useApp } from '../context/AppContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import { LoginRequest, RegisterRequest, User, Workspace } from '../types';
+import { apiService } from '../services/api';
+import { useTheme } from '../context/ThemeContext';
+import SharedNavbar from './SharedNavbar';
+import EnhancedRegistration from './EnhancedRegistration';
+import { googleAuthService } from '../config/googleAuth';
+import { DESKTOP_FLOW_STORAGE_KEY } from '../constants/desktop';
 
 const Auth: React.FC = () => {
   const { dispatch } = useApp();
@@ -29,6 +30,29 @@ const Auth: React.FC = () => {
     contactNumber: "",
     confirmPassword: "",
   });
+
+  const queryDesktopFlow = useMemo(() => {
+    return new URLSearchParams(location.search).get("source") === "desktop";
+  }, [location.search]);
+
+  const isDesktopFlow = useMemo(() => {
+    if (queryDesktopFlow) return true;
+    return sessionStorage.getItem(DESKTOP_FLOW_STORAGE_KEY) === "true";
+  }, [queryDesktopFlow]);
+
+  useEffect(() => {
+    if (queryDesktopFlow) {
+      sessionStorage.setItem(DESKTOP_FLOW_STORAGE_KEY, "true");
+    } else if (!isDesktopFlow) {
+      sessionStorage.removeItem(DESKTOP_FLOW_STORAGE_KEY);
+    }
+
+    if (!isDesktopFlow) return;
+
+    if (localStorage.getItem("accessToken")) {
+      navigate("/desktop-handshake", { replace: true });
+    }
+  }, [queryDesktopFlow, isDesktopFlow, navigate]);
 
   const ensureWorkspaceAccess = useCallback(
     async (user: User) => {
@@ -107,14 +131,15 @@ const Auth: React.FC = () => {
     } else {
       setAuthTab("login");
     }
+    setShowOtpVerification(false);
   }, [location.pathname]);
 
-  const showToast = (
+  const showToast = useCallback((
     message: string,
     type: "success" | "error" | "warning" | "info" = "info",
   ) => {
     dispatch({ type: "ADD_TOAST", payload: { message, type } });
-  };
+  }, [dispatch]);
 
   // OTP Timer
   const startOtpTimer = (seconds: number) => {
@@ -166,7 +191,12 @@ const Auth: React.FC = () => {
         await ensureWorkspaceAccess(response.user);
 
         showToast("Welcome back!", "success");
-        navigate("/home");
+
+        if (isDesktopFlow) {
+          navigate("/desktop-handshake", { replace: true });
+        } else {
+          navigate("/home");
+        }
       }
     } catch (error: any) {
       showToast(error.message || "Login failed", "error");
@@ -218,7 +248,12 @@ const Auth: React.FC = () => {
       dispatch({ type: "SET_USER", payload: response.user });
 
       showToast("Login successful! Welcome back!", "success");
-      navigate("/home");
+
+      if (isDesktopFlow) {
+        navigate("/desktop-handshake", { replace: true });
+      } else {
+        navigate("/home");
+      }
     } catch (error: any) {
       showToast(error.message || "OTP verification failed", "error");
     } finally {
@@ -270,7 +305,12 @@ const Auth: React.FC = () => {
         await ensureWorkspaceAccess(response.user);
 
         showToast("Successfully signed in with Google!", "success");
-        navigate("/home");
+
+        if (isDesktopFlow) {
+          navigate("/desktop-handshake", { replace: true });
+        } else {
+          navigate("/home");
+        }
       } catch (authError: any) {
         // Check if user needs to register
         if (authError.message === "USER_NOT_REGISTERED") {
@@ -291,11 +331,17 @@ const Auth: React.FC = () => {
   };
 
   const switchToRegister = () => {
-    navigate("/register");
+    const suffix = (isDesktopFlow || queryDesktopFlow || sessionStorage.getItem(DESKTOP_FLOW_STORAGE_KEY) === "true")
+      ? "?source=desktop"
+      : "";
+    navigate("/register" + suffix);
   };
 
   const switchToLogin = () => {
-    navigate("/login");
+    const suffix = (isDesktopFlow || queryDesktopFlow || sessionStorage.getItem(DESKTOP_FLOW_STORAGE_KEY) === "true")
+      ? "?source=desktop"
+      : "";
+    navigate("/login" + suffix);
   };
 
   // If on register route, show enhanced registration
@@ -386,6 +432,19 @@ const Auth: React.FC = () => {
                 Register
               </button>
             </div>
+
+            {isDesktopFlow && (
+              <div
+                className={`mb-8 rounded-2xl border ${isDarkMode ? "border-yellow-500/40 bg-yellow-500/10" : "border-yellow-200 bg-yellow-50"} p-4 text-sm leading-relaxed`}
+              >
+                <p className={`font-semibold ${isDarkMode ? "text-yellow-200" : "text-yellow-800"}`}>
+                  Sartthi Desktop sign-in
+                </p>
+                <p className={isDarkMode ? "text-gray-200" : "text-slate-600"}>
+                  You started login from the desktop app. After signing in here, we’ll reopen the desktop app automatically.
+                </p>
+              </div>
+            )}
 
             {/* Login Form */}
             {authTab === "login" && (
@@ -587,6 +646,9 @@ const Auth: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Desktop CTA now handled via dedicated route */}
+
           </div>
         </div>
       </section>

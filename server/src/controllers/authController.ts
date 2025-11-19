@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import User from "../models/User";
+import DesktopSessionToken from '../models/DesktopSessionToken';
 import {
   AuthenticatedRequest,
   ApiResponse,
@@ -10,6 +11,7 @@ import {
   LoginRequest,
   RegisterRequest,
   JWTPayload,
+  DesktopDeviceInfo,
 } from "../types";
 import { sendEmail } from '../services/emailService'; // Import the email service
 
@@ -23,6 +25,183 @@ const generateToken = (userId: string): string => {
   });
 };
 
+const extractClientMeta = (req: Request) => {
+  const ipAddress =
+    (req.headers['x-forwarded-for'] as string) ||
+    req.ip ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    "unknown";
+
+  return {
+    ipAddress,
+    userAgent: req.get("User-Agent") || "unknown",
+    machineId: req.get("X-Machine-ID") || "unknown",
+    macAddress: req.get("X-MAC-Address") || "unknown",
+    language: req.get("Accept-Language") || undefined,
+  };
+};
+
+const normalizeDeviceInfo = (info: any): DesktopDeviceInfo | undefined => {
+  if (!info || typeof info !== 'object') return undefined;
+  const normalized: DesktopDeviceInfo = {};
+  if (typeof info.runtime === 'string') normalized.runtime = info.runtime;
+  if (typeof info.platform === 'string') normalized.platform = info.platform;
+  if (typeof info.userAgent === 'string') normalized.userAgent = info.userAgent;
+  if (typeof info.language === 'string') normalized.language = info.language;
+  if (info.timestamp) {
+    const ts = new Date(info.timestamp);
+    if (!isNaN(ts.getTime())) normalized.timestamp = ts;
+  }
+  return Object.keys(normalized).length ? normalized : undefined;
+};
+
+const buildLoginDeviceInfo = (req: Request, fallback: 'browser' | 'desktop' | 'mobile', base?: DesktopDeviceInfo): DesktopDeviceInfo => {
+  return {
+    runtime: base?.runtime || fallback,
+    platform: base?.platform,
+    userAgent: base?.userAgent || req.get("User-Agent") || "unknown",
+    language: base?.language || req.get("Accept-Language") || undefined,
+    timestamp: new Date(),
+  };
+};
+
+const appendLoginHistoryEntry = (
+  user: any,
+  req: Request,
+  runtime: 'browser' | 'desktop' | 'mobile',
+  source?: 'web' | 'desktop' | 'mobile',
+  base?: DesktopDeviceInfo
+) => {
+  const { ipAddress, userAgent, machineId, macAddress } = extractClientMeta(req);
+  const loginDeviceInfo = buildLoginDeviceInfo(req, runtime, base);
+
+  if (!user.loginHistory) {
+    user.loginHistory = [] as any;
+  }
+
+  const history = user.loginHistory as any[];
+  history.push({
+    ipAddress,
+    userAgent,
+    machineId,
+    macAddress,
+    runtime: loginDeviceInfo.runtime || runtime,
+    source: source || (runtime === 'desktop' ? 'desktop' : 'web'),
+    deviceInfo: loginDeviceInfo,
+    loginTime: new Date(),
+    location: {
+      country: "Unknown",
+      city: "Unknown",
+      region: "Unknown",
+    },
+  });
+
+  if (history.length > 10) {
+    user.loginHistory = history.slice(-10) as any;
+  }
+};
+
+export const createDesktopSessionToken: RequestHandler = async (req, res) => {
+  const authReq = req as AuthenticatedRequest;
+  try {
+    if (!authReq.user) {
+      res.status(401).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(Date.now() + DESKTOP_SESSION_TTL_MS);
+    const deviceInfo = normalizeDeviceInfo((req.body || {}).deviceInfo);
+    const { ipAddress, userAgent } = extractClientMeta(req);
+
+    await DesktopSessionToken.create({
+      tokenHash,
+      user: authReq.user._id,
+      expiresAt,
+      consumed: false,
+      source: 'desktop',
+      deviceInfo,
+      ipAddress,
+      userAgent
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Desktop session token created',
+      data: {
+        token: rawToken,
+        expiresAt
+      }
+    });
+  } catch (error) {
+    console.error('Desktop token creation failed:', error);
+    res.status(500).json({ success: false, message: 'Failed to create desktop session token' });
+  }
+};
+
+export const exchangeDesktopSessionToken: RequestHandler = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      res.status(400).json({ success: false, message: 'Token is required' });
+      return;
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const record = await DesktopSessionToken.findOne({ tokenHash });
+
+    if (!record) {
+      res.status(400).json({ success: false, message: 'Invalid desktop session token' });
+      return;
+    }
+
+    if (record.consumed) {
+      res.status(400).json({ success: false, message: 'Desktop session token already used' });
+      return;
+    }
+
+    if (record.expiresAt < new Date()) {
+      res.status(400).json({ success: false, message: 'Desktop session token expired' });
+      return;
+    }
+
+    const user = await User.findById(record.user);
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    record.consumed = true;
+    record.consumedAt = new Date();
+    record.source = record.source || 'desktop';
+    await record.save();
+
+    const accessToken = generateToken(user._id.toString());
+    const refreshToken = generateRefreshToken(user._id.toString());
+    user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
+
+    appendLoginHistoryEntry(user, req, 'desktop', record.source || 'desktop', record.deviceInfo);
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Desktop session established',
+      data: {
+        user: user.toJSON() as any,
+        accessToken,
+        refreshToken
+      }
+    });
+  } catch (error) {
+    console.error('Desktop token exchange failed:', error);
+    res.status(500).json({ success: false, message: 'Failed to exchange desktop session token' });
+  }
+};
+
 // Generate refresh token
 const generateRefreshToken = (userId: string): string => {
   return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET as string, {
@@ -34,6 +213,8 @@ const generateRefreshToken = (userId: string): string => {
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
 };
+
+const DESKTOP_SESSION_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // Register user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -209,12 +390,12 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
     user.isEmailVerified = true;
     user.emailVerificationOTP = undefined;
     user.emailVerificationOTPExpires = undefined;
-    await user.save();
 
     // Generate tokens for the newly verified user
     const accessToken = generateToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
     user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
+    appendLoginHistoryEntry(user, req, 'browser');
     await user.save();
 
     const response: ApiResponse<AuthResponse> = {
@@ -249,39 +430,7 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
       
       // Update last login and track login information
       user.lastLogin = new Date();
-
-      // Get client information
-      const ipAddress =
-        req.ip ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        "unknown";
-      const userAgent = req.get("User-Agent") || "unknown";
-      const machineId = req.get("X-Machine-ID") || "unknown";
-      const macAddress = req.get("X-MAC-Address") || "unknown";
-
-      // Add to login history
-      if (!user.loginHistory) {
-        user.loginHistory = [];
-      }
-      user.loginHistory.push({
-        ipAddress,
-        userAgent,
-        machineId,
-        macAddress,
-        loginTime: new Date(),
-        location: {
-          country: "Unknown",
-          city: "Unknown",
-          region: "Unknown",
-        },
-      });
-
-      // Keep only last 10 login records
-      if (user.loginHistory.length > 10) {
-        user.loginHistory = user.loginHistory.slice(-10);
-      }
-
+      appendLoginHistoryEntry(user, req, 'browser');
       await user.save();
 
       // Generate tokens
@@ -779,39 +928,7 @@ export const googleAuth = async (
 
     // Update last login and track login information
     user.lastLogin = new Date();
-
-    // Get client information
-    const ipAddress =
-      req.ip ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress ||
-      "unknown";
-    const userAgent = req.get("User-Agent") || "unknown";
-    const machineId = req.get("X-Machine-ID") || "unknown";
-    const macAddress = req.get("X-MAC-Address") || "unknown";
-
-    // Add to login history
-    if (!user.loginHistory) {
-      user.loginHistory = [];
-    }
-    user.loginHistory.push({
-      ipAddress,
-      userAgent,
-      machineId,
-      macAddress,
-      loginTime: new Date(),
-      location: {
-        country: "Unknown",
-        city: "Unknown",
-        region: "Unknown",
-      },
-    });
-
-    // Keep only last 10 login records
-    if (user.loginHistory.length > 10) {
-      user.loginHistory = user.loginHistory.slice(-10);
-    }
-
+    appendLoginHistoryEntry(user, req, 'browser');
     await user.save();
 
     // Generate tokens

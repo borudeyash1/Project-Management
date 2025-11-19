@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { apiService } from '../services/api';
+import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 
 interface NavItem {
   id: string;
@@ -76,23 +77,22 @@ const DockNavigation: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      console.log('🔒 [USER DOCK] Logging out...');
+      console.log(' [USER DOCK] Logging out...');
       await apiService.logout();
-      
-      // Clear session storage
-      sessionStorage.clear();
-      
-      dispatch({ type: 'LOGOUT' });
-      console.log('✅ [USER DOCK] Session cleared, redirecting to login');
-      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      
-      // Even if API call fails, clear local session
-      sessionStorage.clear();
-      dispatch({ type: 'LOGOUT' });
-      navigate('/login', { replace: true });
     }
+    
+    sessionStorage.clear();
+    dispatch({ type: 'LOGOUT' });
+    console.log(' [USER DOCK] Session cleared, redirecting to login');
+
+    if (shouldHandleInDesktop()) {
+      redirectToDesktopSplash();
+      return;
+    }
+
+    navigate('/login', { replace: true });
   };
 
   const isActive = (path: string) => {

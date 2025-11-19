@@ -24,9 +24,33 @@ interface Device {
   ipAddress?: string;
   location?: string;
   userAgent?: string;
+  runtime?: 'browser' | 'desktop' | 'mobile';
+  source?: 'web' | 'desktop' | 'mobile';
+  deviceInfo?: {
+    platform?: string;
+    language?: string;
+    timestamp?: string;
+  };
   loginAttempts?: number;
   riskLevel?: 'low' | 'medium' | 'high' | 'critical';
   createdAt: string;
+}
+
+interface SessionEntry {
+  userId: string;
+  fullName: string;
+  email: string;
+  runtime?: 'browser' | 'desktop' | 'mobile';
+  source?: 'web' | 'desktop' | 'mobile';
+  ipAddress?: string;
+  userAgent?: string;
+  loginTime: string;
+  machineId?: string;
+  macAddress?: string;
+  deviceInfo?: {
+    platform?: string;
+    language?: string;
+  };
 }
 
 const DeviceManagement: React.FC = () => {
@@ -34,6 +58,7 @@ const DeviceManagement: React.FC = () => {
   const { addToast } = useApp();
   const navigate = useNavigate();
   const [devices, setDevices] = useState<Device[]>([]);
+  const [sessions, setSessions] = useState<SessionEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
@@ -56,14 +81,18 @@ const DeviceManagement: React.FC = () => {
 
   useEffect(() => {
     fetchDevices();
+    fetchSessions();
     // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchDevices, 30000);
+    const interval = setInterval(() => {
+      fetchDevices();
+      fetchSessions();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
   const fetchDevices = async () => {
     try {
-      const response = await api.get('/admin/devices');
+      const response = await api.getAdminDevices();
       if (response?.success) {
         setDevices(response.data);
       }
@@ -72,6 +101,17 @@ const DeviceManagement: React.FC = () => {
       addToast('Failed to load devices', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSessions = async () => {
+    try {
+      const response = await api.getAdminRecentSessions();
+      if (response?.success) {
+        setSessions(response.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch sessions:', error);
     }
   };
 
@@ -184,7 +224,9 @@ const DeviceManagement: React.FC = () => {
     total: devices.length,
     active: devices.filter(d => d.isActive).length,
     highRisk: devices.filter(d => d.riskLevel === 'high' || d.riskLevel === 'critical').length,
-    suspicious: devices.filter(d => (d.loginAttempts || 0) > 5).length
+    suspicious: devices.filter(d => (d.loginAttempts || 0) > 5).length,
+    desktopSessions: sessions.filter(s => s.runtime === 'desktop').length,
+    browserSessions: sessions.filter(s => !s.runtime || s.runtime === 'browser').length
   };
 
   if (loading) {
@@ -410,6 +452,67 @@ const DeviceManagement: React.FC = () => {
             )}
           </div>
         )}
+      </div>
+
+      {/* Recent Sessions */}
+      <div className={`mt-8 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-2xl p-6`}>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent User Sessions</h2>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Last 200 logins across browser & desktop</p>
+          </div>
+          <div className="flex gap-2 text-xs">
+            <span className="px-2 py-1 rounded bg-purple-500/10 text-purple-400 font-semibold">Desktop: {stats.desktopSessions}</span>
+            <span className="px-2 py-1 rounded bg-teal-500/10 text-teal-400 font-semibold">Browser: {stats.browserSessions}</span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} uppercase text-xs tracking-wider`}>
+                <th className="py-2 text-left">User</th>
+                <th className="py-2 text-left">Runtime</th>
+                <th className="py-2 text-left">IP / Device</th>
+                <th className="py-2 text-left">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.slice(0, 20).map((session) => (
+                <tr key={`${session.userId}-${session.loginTime}`} className={`${isDarkMode ? 'border-gray-700' : 'border-gray-200'} border-t`}>
+                  <td className="py-2">
+                    <div className="font-semibold">{session.fullName || 'Unknown User'}</div>
+                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-xs`}>{session.email}</div>
+                  </td>
+                  <td className="py-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${session.runtime === 'desktop' ? 'bg-purple-500/10 text-purple-300' : 'bg-teal-500/10 text-teal-400'}`}>
+                        {session.runtime ? session.runtime.toUpperCase() : 'BROWSER'}
+                      </span>
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${session.source === 'desktop' ? 'bg-blue-500/10 text-blue-300' : 'bg-green-500/10 text-green-400'}`}>
+                        {session.source ? session.source.toUpperCase() : 'WEB'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-2">
+                    <div className="font-mono text-xs break-all">{session.ipAddress || 'Unknown IP'}</div>
+                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-xs`}>{session.deviceInfo?.platform || session.userAgent?.split(' ')[0] || 'Unknown Device'}</div>
+                  </td>
+                  <td className="py-2 text-xs">
+                    {new Date(session.loginTime).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+              {sessions.length === 0 && (
+                <tr>
+                  <td colSpan={4} className={`py-6 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    No recent session data found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Admin Dock Navigation */}
