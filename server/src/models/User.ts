@@ -2,6 +2,14 @@ import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { IUser } from '../types';
 
+const LoginDeviceInfoSchema = new Schema({
+  runtime: { type: String, enum: ['browser', 'desktop', 'mobile'], default: 'browser' },
+  platform: { type: String },
+  userAgent: { type: String },
+  language: { type: String },
+  timestamp: { type: Date }
+}, { _id: false });
+
 const userSchema = new Schema<IUser>({
   fullName: {
     type: String,
@@ -334,6 +342,20 @@ const userSchema = new Schema<IUser>({
     userAgent: String,
     machineId: String,
     macAddress: String,
+    runtime: {
+      type: String,
+      enum: ['browser', 'desktop', 'mobile'],
+      default: 'browser'
+    },
+    source: {
+      type: String,
+      enum: ['web', 'desktop', 'mobile'],
+      default: 'web'
+    },
+    deviceInfo: {
+      type: LoginDeviceInfoSchema,
+      default: undefined
+    },
     loginTime: {
       type: Date,
       default: Date.now

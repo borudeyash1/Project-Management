@@ -12,7 +12,8 @@ import {
   getAllDevices,
   addDevice,
   updateDevice,
-  deleteDevice
+  deleteDevice,
+  getRecentSessions
 } from '../controllers/adminController';
 import { getAdminAIResponse } from '../controllers/adminAIController';
 import { getAnalyticsData, getUserInsights } from '../controllers/analyticsController';
@@ -108,6 +109,9 @@ router.get('/devices', getAllDevices);
 router.post('/devices', addDevice);
 router.put('/devices/:id', updateDevice);
 router.delete('/devices/:id', deleteDevice);
+
+// Session activity
+router.get('/sessions/recent', getRecentSessions);
 
 // Analytics routes
 router.get('/analytics-data', getAnalyticsData);

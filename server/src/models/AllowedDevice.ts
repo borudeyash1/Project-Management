@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { DesktopDeviceInfo } from '../types';
 
 export interface IAllowedDevice extends Document {
   deviceId: string;
@@ -9,6 +10,9 @@ export interface IAllowedDevice extends Document {
   lastAccess?: Date;
   ipAddress?: string;
   location?: string;
+  runtime?: 'browser' | 'desktop' | 'mobile';
+  source?: 'web' | 'desktop' | 'mobile';
+  deviceInfo?: DesktopDeviceInfo;
   loginAttempts: number;
   failedAttempts: number;
   lastFailedAttempt?: Date;
@@ -21,6 +25,14 @@ export interface IAllowedDevice extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+const DeviceInfoSchema = new Schema({
+  runtime: { type: String, enum: ['browser', 'desktop', 'mobile'], default: 'browser' },
+  platform: { type: String },
+  userAgent: { type: String },
+  language: { type: String },
+  timestamp: { type: Date }
+}, { _id: false });
 
 const allowedDeviceSchema = new Schema<IAllowedDevice>({
   deviceId: {
@@ -59,6 +71,20 @@ const allowedDeviceSchema = new Schema<IAllowedDevice>({
   location: {
     type: String,
     trim: true
+  },
+  runtime: {
+    type: String,
+    enum: ['browser', 'desktop', 'mobile'],
+    default: 'browser'
+  },
+  source: {
+    type: String,
+    enum: ['web', 'desktop', 'mobile'],
+    default: 'web'
+  },
+  deviceInfo: {
+    type: DeviceInfoSchema,
+    default: undefined
   },
   loginAttempts: {
     type: Number,

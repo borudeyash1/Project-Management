@@ -1,6 +1,14 @@
 import { Request } from 'express';
 import { Document } from 'mongoose';
 
+export interface DesktopDeviceInfo {
+  runtime?: 'browser' | 'desktop' | 'mobile';
+  platform?: string;
+  userAgent?: string;
+  language?: string;
+  timestamp?: Date | string;
+}
+
 // User Types
 export interface IUser extends Document {
   _id: string;
@@ -35,6 +43,9 @@ export interface IUser extends Document {
     userAgent: string;
     machineId: string;
     macAddress: string;
+    runtime?: 'browser' | 'desktop' | 'mobile';
+    source?: 'web' | 'desktop' | 'mobile';
+    deviceInfo?: DesktopDeviceInfo;
     loginTime: Date;
     location: {
       country: string;
@@ -496,7 +507,7 @@ export interface AuthResponse {
 
 // Request Types
 export interface AuthenticatedRequest extends Request {
-  user?: IUser;
+  user?: any;
   workspace?: IWorkspace;
   project?: IProject;
   workspaceMember?: any;

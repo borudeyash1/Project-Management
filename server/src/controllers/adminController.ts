@@ -73,6 +73,45 @@ export const checkDeviceAccess = async (req: Request, res: Response): Promise<vo
   }
 };
 
+// Recent user sessions with device metadata
+export const getRecentSessions = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const sessions = await User.aggregate([
+      { $match: { loginHistory: { $exists: true, $ne: [] } } },
+      { $unwind: '$loginHistory' },
+      { $sort: { 'loginHistory.loginTime': -1 } },
+      { $limit: 200 },
+      {
+        $project: {
+          _id: 0,
+          userId: '$_id',
+          fullName: '$fullName',
+          email: '$email',
+          runtime: '$loginHistory.runtime',
+          source: '$loginHistory.source',
+          ipAddress: '$loginHistory.ipAddress',
+          userAgent: '$loginHistory.userAgent',
+          machineId: '$loginHistory.machineId',
+          macAddress: '$loginHistory.macAddress',
+          loginTime: '$loginHistory.loginTime',
+          deviceInfo: '$loginHistory.deviceInfo'
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: sessions
+    });
+  } catch (error: any) {
+    console.error('Get recent sessions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch session activity'
+    });
+  }
+};
+
 // Get all allowed devices (admin only)
 export const getAllowedDevices = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -210,13 +249,32 @@ export const logDeviceAccess = async (req: Request, res: Response): Promise<void
   try {
     const { deviceId, deviceInfo } = req.body;
 
+    const normalizedInfo = deviceInfo && typeof deviceInfo === 'object' ? deviceInfo : undefined;
+
     // Log the access attempt (you can create a separate AccessLog model if needed)
     console.log('Device access attempt:', {
       deviceId,
-      deviceInfo,
+      deviceInfo: normalizedInfo,
       timestamp: new Date(),
       ip: req.ip
     });
+
+    if (deviceId && normalizedInfo) {
+      await AllowedDevice.updateOne(
+        { deviceId },
+        {
+          $set: {
+            userAgent: normalizedInfo.userAgent,
+            platform: normalizedInfo.platform,
+            runtime: normalizedInfo.runtime || 'browser',
+            source: normalizedInfo.runtime === 'desktop' ? 'desktop' : 'web',
+            deviceInfo: normalizedInfo,
+            lastAccess: new Date(),
+            ipAddress: req.ip
+          }
+        }
+      );
+    }
 
     res.status(200).json({
       success: true,
