@@ -53,6 +53,11 @@ import UserGuide from './components/UserGuide';
 import PricingPage from './components/PricingPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
+import AdminDashboard from './components/admin/AdminDashboard';
+import DeviceManagement from './components/admin/DeviceManagement';
+import UserManagement from './components/admin/UserManagement';
+import Analytics from './components/admin/Analytics';
+import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
