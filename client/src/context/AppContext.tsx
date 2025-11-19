@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { AppState, User, Workspace, Project, Task, Toast } from '../types';
+import { AppState, User, Workspace, Project, Task, Toast, Client } from '../types';
 import apiService from '../services/api';
 
 // Initial state
@@ -64,7 +64,7 @@ const initialState: AppState = {
   isAuthLoading: true,
   subscription: emptySubscription,
   roles: {
-    currentUserRole: 'Member',
+    currentUserRole: 'employee',
     permissions: {
       canCreateProject: false,
       canManageEmployees: false,
@@ -75,6 +75,7 @@ const initialState: AppState = {
   modals: {
     createWorkspace: false,
     createProject: false,
+    workspaceCreateProject: false,
     workloadDeadline: false,
     taskDetails: false,
     taskRating: false,
@@ -116,6 +117,7 @@ type AppAction =
   | { type: 'SET_WORKSPACE'; payload: string }
   | { type: 'SET_PROJECT'; payload: string }
   | { type: 'SET_MODE'; payload: string }
+  | { type: 'SET_CURRENT_USER_ROLE'; payload: 'owner' | 'project-manager' | 'employee' }
   | { type: 'SET_CW_STEP'; payload: number }
   | { type: 'ADD_TOAST'; payload: Toast }
   | { type: 'REMOVE_TOAST'; payload: number }
@@ -141,6 +143,10 @@ type AppAction =
   | { type: 'SET_WORKSPACES'; payload: Workspace[] }
   | { type: 'SET_PROJECTS'; payload: Project[] }
   | { type: 'SET_TASKS'; payload: Task[] }
+  | { type: 'SET_CLIENTS'; payload: Client[] }
+  | { type: 'ADD_CLIENT'; payload: any }
+  | { type: 'UPDATE_CLIENT'; payload: { clientId: string; updates: any } }
+  | { type: 'DELETE_CLIENT'; payload: string }
   | { type: 'LOGOUT' }
   | { type: 'SET_AUTH_LOADING'; payload: boolean };
 
@@ -155,6 +161,39 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, currentProject: action.payload };
     case 'SET_MODE':
       return { ...state, mode: action.payload };
+    case 'SET_CURRENT_USER_ROLE': {
+      let permissions = state.roles.permissions;
+      if (action.payload === 'owner') {
+        permissions = {
+          canCreateProject: true,
+          canManageEmployees: true,
+          canViewPayroll: true,
+          canExportReports: true
+        };
+      } else if (action.payload === 'project-manager') {
+        permissions = {
+          canCreateProject: true,
+          canManageEmployees: true,
+          canViewPayroll: false,
+          canExportReports: true
+        };
+      } else {
+        // employee
+        permissions = {
+          canCreateProject: false,
+          canManageEmployees: false,
+          canViewPayroll: false,
+          canExportReports: false
+        };
+      }
+      return {
+        ...state,
+        roles: {
+          currentUserRole: action.payload,
+          permissions
+        }
+      };
+    }
     case 'SET_CW_STEP':
       return { ...state, cwStep: action.payload };
     case 'ADD_TOAST':
@@ -197,8 +236,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
           collapsed: !state.sidebar.collapsed 
         } 
       };
-    case 'ADD_PROJECT':
+    case 'ADD_PROJECT': {
+      // Simply add project to global state; clients are managed per workspace via Client.workspaceId
       return { ...state, projects: [...state.projects, action.payload] };
+    }
     case 'UPDATE_PROJECT':
       return {
         ...state,
@@ -260,6 +301,22 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, projects: action.payload };
     case 'SET_TASKS':
       return { ...state, tasks: action.payload };
+    case 'SET_CLIENTS':
+      return { ...state, clients: action.payload };
+    case 'ADD_CLIENT':
+      return { ...state, clients: [...state.clients, action.payload] };
+    case 'UPDATE_CLIENT':
+      return {
+        ...state,
+        clients: state.clients.map((client: any) =>
+          client._id === action.payload.clientId ? { ...client, ...action.payload.updates } : client
+        )
+      };
+    case 'DELETE_CLIENT':
+      return {
+        ...state,
+        clients: state.clients.filter((client: any) => client._id !== action.payload)
+      };
     case 'LOGOUT':
       return { ...initialState };
     case 'SET_AUTH_LOADING':

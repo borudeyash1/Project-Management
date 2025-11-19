@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
+import { getProjects as getWorkspaceProjects, createProject as createWorkspaceProject } from '../../services/projectService';
 import {
   Search,
   Filter,
@@ -31,9 +32,25 @@ const WorkspaceProjects: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
+  const currentWorkspace = state.workspaces.find((w) => w._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
-  const workspaceProjects = state.projects.filter(p => p.workspace === state.currentWorkspace);
+  const workspaceProjects = state.projects.filter((p) => p.workspace === state.currentWorkspace);
+
+  // Load projects for the current workspace from the backend so they
+  // persist in MongoDB and are restored after refresh.
+  useEffect(() => {
+    const loadWorkspaceProjects = async () => {
+      if (!state.currentWorkspace) return;
+      try {
+        const projects = await getWorkspaceProjects(state.currentWorkspace);
+        dispatch({ type: 'SET_PROJECTS', payload: projects as any });
+      } catch (error) {
+        console.error('Failed to load workspace projects', error);
+      }
+    };
+
+    loadWorkspaceProjects();
+  }, [state.currentWorkspace, dispatch]);
 
   const filteredProjects = workspaceProjects.filter(project => {
     const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -367,26 +384,53 @@ const WorkspaceProjects: React.FC = () => {
       <WorkspaceCreateProjectModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onSubmit={(projectData) => {
-          // Handle project creation
-          dispatch({
-            type: 'ADD_PROJECT',
-            payload: {
-              _id: Date.now().toString(),
-              ...projectData,
-              workspace: state.currentWorkspace,
-              team: [],
-              tasks: [],
-              progress: 0
-            }
-          });
-          dispatch({
-            type: 'ADD_TOAST',
-            payload: {
-              type: 'success',
-              message: `Project "${projectData.name}" created successfully!`
-            }
-          });
+        onSubmit={async (projectData) => {
+          if (!state.currentWorkspace) {
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'error',
+                message: 'No active workspace selected. Please select a workspace first.',
+              },
+            });
+            return;
+          }
+
+          try {
+            const created = await createWorkspaceProject({
+              name: projectData.name,
+              description: projectData.description,
+              status: projectData.status,
+              priority: projectData.priority,
+              startDate: projectData.startDate,
+              dueDate: projectData.endDate,
+              tags: projectData.tags,
+              workspaceId: state.currentWorkspace,
+            } as any);
+
+            // Add the created project from MongoDB into global state
+            dispatch({
+              type: 'ADD_PROJECT',
+              payload: created as any,
+            });
+
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'success',
+                message: `Project "${projectData.name}" created successfully!`,
+              },
+            });
+          } catch (error: any) {
+            console.error('Failed to create workspace project', error);
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'error',
+                message: error?.message || 'Failed to create project',
+              },
+            });
+          }
         }}
         workspaceId={state.currentWorkspace || ''}
       />

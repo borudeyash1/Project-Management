@@ -13,7 +13,8 @@ interface WorkspaceCreateProjectModalProps {
 const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = ({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  workspaceId
 }) => {
   const { isDarkMode } = useTheme();
   const { state } = useApp();
@@ -22,23 +23,29 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
     name: '',
     description: '',
     clientId: '',
+    projectManagerId: '',
     status: 'planning',
     priority: 'medium',
     startDate: '',
     endDate: '',
     budget: '',
-    tags: '',
-    teamLead: ''
+    tags: ''
   });
 
-  // Mock clients data - replace with actual workspace clients
-  const workspaceClients = [
-    { _id: '1', name: 'Acme Corporation', company: 'Acme Corp' },
-    { _id: '2', name: 'TechStart Inc', company: 'TechStart' },
-    { _id: '3', name: 'Global Solutions', company: 'Global Solutions Ltd' },
-    { _id: '4', name: 'Innovation Labs', company: 'Innovation Labs' },
-    { _id: '5', name: 'Digital Dynamics', company: 'Digital Dynamics Co' }
-  ];
+  // Real clients for this workspace from global state
+  const workspaceClients = state.clients.filter((client) => client.workspaceId === workspaceId);
+
+  // Workspace members (for selecting project manager)
+  const currentWorkspace = state.workspaces.find((w) => w._id === workspaceId);
+  const workspaceMembers = (currentWorkspace?.members || []).map((member: any) => {
+    const user = member.user;
+    const id = typeof user === 'string' ? user : user._id;
+    const name =
+      typeof user === 'string'
+        ? user
+        : user.fullName || user.username || user.email || String(user._id);
+    return { id, name };
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -62,6 +69,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
       ...formData,
       budget: formData.budget ? parseFloat(formData.budget) : 0,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      projectManager: formData.projectManagerId || undefined,
       createdAt: new Date()
     };
 
@@ -74,13 +82,13 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
       name: '',
       description: '',
       clientId: '',
+      projectManagerId: '',
       status: 'planning',
       priority: 'medium',
       startDate: '',
       endDate: '',
       budget: '',
-      tags: '',
-      teamLead: ''
+      tags: ''
     });
     onClose();
   };
@@ -176,6 +184,34 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
               </select>
               <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 Select the client this project belongs to
+              </p>
+            </div>
+
+            {/* Project Manager Selection */}
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <Users className="w-4 h-4 inline mr-2" />
+                Project Manager
+              </label>
+              <select
+                name="projectManagerId"
+                value={formData.projectManagerId}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+              >
+                <option value="">Select a project manager (optional)</option>
+                {workspaceMembers.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Choose who will manage this project. They must be part of this workspace.
               </p>
             </div>
 

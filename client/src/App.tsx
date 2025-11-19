@@ -26,12 +26,14 @@ import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
 import WorkspaceMembers from './components/workspace/WorkspaceMembers';
+import WorkspaceMembersInternal from './components/workspace/WorkspaceMembersInternal';
 import WorkspaceProjects from './components/workspace/WorkspaceProjects';
 import WorkspaceClients from './components/workspace/WorkspaceClients';
 import WorkspaceRequests from './components/workspace/WorkspaceRequests';
 import WorkspaceCollaborate from './components/workspace/WorkspaceCollaborate';
 import WorkspaceSettings from './components/workspace/WorkspaceSettings';
 import WorkspaceInbox from './components/workspace/WorkspaceInbox';
+import WorkspaceProfile from './components/workspace/WorkspaceProfile';
 import ProjectLayout from './components/project/ProjectLayout';
 import ProjectOverview from './components/project/ProjectOverview';
 import Profile from './components/Profile';
@@ -172,6 +174,7 @@ const AppContent: React.FC = () => {
           <Route path="timeline" element={<ProjectViewDetailed />} />
           <Route path="progress" element={<ProjectViewDetailed />} />
           <Route path="workload" element={<ProjectViewDetailed />} />
+          <Route path="attendance" element={<ProjectViewDetailed />} />
           <Route path="reports" element={<ProjectViewDetailed />} />
           <Route path="documents" element={<ProjectViewDetailed />} />
           <Route path="inbox" element={<ProjectViewDetailed />} />
@@ -295,8 +298,9 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         }>
           <Route path="overview" element={<WorkspaceOverview />} />
-          <Route path="members" element={<WorkspaceMembers />} />
+          <Route path="members" element={<WorkspaceMembersInternal />} />
           <Route path="projects" element={<WorkspaceProjects />} />
+          <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />
           <Route path="requests" element={<WorkspaceRequests />} />
           <Route path="collaborate" element={<WorkspaceCollaborate />} />

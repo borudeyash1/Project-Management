@@ -1,4 +1,4 @@
-import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, Workspace, Project, Task } from '../types';
+import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, Workspace, Project, Task, Notification as AppNotification, Client } from '../types';
 
 export interface SubscriptionPlanData {
   planKey: 'free' | 'pro' | 'ultra';
@@ -102,7 +102,7 @@ class ApiService {
       body: JSON.stringify(credentials),
     });
 
-    if (response.data) {
+    if (response.data && response.data.accessToken) {
       this.setToken(response.data.accessToken);
     }
 
@@ -314,6 +314,12 @@ class ApiService {
     return response.data!;
   }
 
+  async searchUsers(query: string): Promise<Array<{ _id: string; fullName: string; email: string; username: string; avatarUrl?: string }>> {
+    const encoded = encodeURIComponent(query.trim());
+    const response = await this.get<any>(`/users/search?q=${encoded}`);
+    return (response.data as any[]) || [];
+  }
+
   async getSettings(): Promise<any> {
     const response = await this.request<any>('/users/settings');
     return response.data!;
@@ -355,6 +361,37 @@ class ApiService {
     return response.data!;
   }
 
+  // Notification endpoints
+  async getNotifications(): Promise<AppNotification[]> {
+    const response = await this.get<AppNotification[]>('/notifications');
+    return response.data || [];
+  }
+
+  async markNotificationRead(id: string): Promise<AppNotification | undefined> {
+    const response = await this.patch<AppNotification>(`/notifications/${id}/read`);
+    return response.data;
+  }
+
+  // Client endpoints (workspace-scoped)
+  async getClients(workspaceId: string): Promise<Client[]> {
+    const response = await this.get<Client[]>(`/clients/workspace/${workspaceId}`);
+    return response.data || [];
+  }
+
+  async createClient(clientData: Partial<Client> & { workspaceId: string }): Promise<Client> {
+    const response = await this.post<Client>('/clients', clientData);
+    return response.data!;
+  }
+
+  async updateClient(clientId: string, clientData: Partial<Client>): Promise<Client> {
+    const response = await this.put<Client>(`/clients/${clientId}`, clientData);
+    return response.data!;
+  }
+
+  async deleteClient(clientId: string): Promise<void> {
+    await this.delete(`/clients/${clientId}`);
+  }
+
   // Token management methods
   private setToken(token: string): void {
     this.token = token;
@@ -393,6 +430,27 @@ class ApiService {
     await this.request(`/workspaces/${workspaceId}`, {
       method: 'DELETE',
     });
+  }
+
+  // Workspace discovery
+  async getDiscoverWorkspaces(): Promise<any[]> {
+    const response = await this.get<any>('/workspaces/discover');
+    return (response.data as any[]) || [];
+  }
+
+  // Workspace invitations
+  async sendWorkspaceInvite(
+    workspaceId: string,
+    payload: { targetUserId?: string; identifier?: string; message?: string },
+  ): Promise<void> {
+    await this.post(`/workspaces/${workspaceId}/invite`, payload);
+  }
+
+  async acceptWorkspaceInvite(workspaceId: string, notificationId?: string): Promise<Workspace> {
+    const response = await this.post<Workspace>(`/workspaces/${workspaceId}/accept-invite`, {
+      notificationId,
+    });
+    return response.data!;
   }
 
   // Project endpoints

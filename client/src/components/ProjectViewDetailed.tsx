@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronDown, ChevronRight, Users, Calendar, Clock, Target, 
@@ -24,6 +25,8 @@ import {
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
+import apiService from '../services/api';
+
 import AddTeamMemberModal from './AddTeamMemberModal';
 import InviteMemberModal from './InviteMemberModal';
 import TaskCreationModal from './TaskCreationModal';
@@ -36,6 +39,9 @@ import ProjectRequestsTab from './project-tabs/ProjectRequestsTab';
 import ProjectTaskAssignmentTab from './project-tabs/ProjectTaskAssignmentTab';
 import EmployeeTasksTab from './project-tabs/EmployeeTasksTab';
 import RoleSwitcher from './RoleSwitcher';
+import WorkspaceInbox from './workspace/WorkspaceInbox';
+import ProjectAttendanceManagerTab from './project-tabs/ProjectAttendanceManagerTab';
+import ProjectAttendanceEmployeeTab from './project-tabs/ProjectAttendanceEmployeeTab';
 
 interface Project {
   _id: string;
@@ -199,7 +205,21 @@ const ProjectViewDetailed: React.FC = () => {
   
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [activeView, setActiveView] = useState<'overview' | 'info' | 'team' | 'tasks' | 'timeline' | 'progress' | 'workload' | 'reports' | 'documents' | 'inbox' | 'settings' | 'analytics'>('overview');
+  const [activeView, setActiveView] = useState<
+    | 'overview'
+    | 'info'
+    | 'team'
+    | 'tasks'
+    | 'timeline'
+    | 'progress'
+    | 'workload'
+    | 'attendance'
+    | 'reports'
+    | 'documents'
+    | 'inbox'
+    | 'settings'
+    | 'analytics'
+  >('overview');
   const [showProjectSelector, setShowProjectSelector] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showManageProject, setShowManageProject] = useState(false);
@@ -211,12 +231,18 @@ const ProjectViewDetailed: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [showTaskReview, setShowTaskReview] = useState(false);
-  const [currentUserRole, setCurrentUserRole] = useState<string>('manager'); // Testing: can be 'owner', 'manager', 'employee'
-  const [currentTestUserId, setCurrentTestUserId] = useState('user_pm_456'); // Testing user ID
-  const [currentTestUserName, setCurrentTestUserName] = useState('Jane Smith (PM)'); // Testing user name
   const [taskFilter, setTaskFilter] = useState<'all' | 'my' | 'overdue' | 'review'>('all');
   const [requests, setRequests] = useState<any[]>([]); // Workload/deadline requests
-  const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment
+  const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment (loaded from backend)
+
+  // Map global test role from AppContext into the local role flags used in this component
+  const currentUserRole = state.roles.currentUserRole === 'project-manager' ? 'manager' : state.roles.currentUserRole; // 'owner' | 'manager' | 'employee'
+  const currentTestUserId =
+    state.roles.currentUserRole === 'owner'
+      ? 'user_owner_123'
+      : state.roles.currentUserRole === 'project-manager'
+      ? 'user_pm_456'
+      : 'user_emp_789';
 
   // Detect active view from URL path
   useEffect(() => {
@@ -227,6 +253,7 @@ const ProjectViewDetailed: React.FC = () => {
     else if (path.includes('/timeline')) setActiveView('timeline');
     else if (path.includes('/progress')) setActiveView('progress');
     else if (path.includes('/workload')) setActiveView('workload');
+    else if (path.includes('/attendance')) setActiveView('attendance');
     else if (path.includes('/reports')) setActiveView('reports');
     else if (path.includes('/documents')) setActiveView('documents');
     else if (path.includes('/inbox')) setActiveView('inbox');
@@ -234,52 +261,17 @@ const ProjectViewDetailed: React.FC = () => {
     else setActiveView('overview');
   }, [location.pathname]);
 
-  // Load project data from AppContext
+  // Load project data from AppContext (no dummy members)
   useEffect(() => {
     if (projectId && state.projects.length > 0) {
       const project = state.projects.find(p => p._id === projectId);
       if (project) {
-        // Mock team members for testing
-        const mockTeam = [
-          {
-            _id: 'user_pm_456',
-            name: 'Jane Smith',
-            email: 'jane.smith@company.com',
-            role: 'project-manager',
-            status: 'active',
-            joinedAt: new Date('2024-01-01')
-          },
-          {
-            _id: 'user_emp_789',
-            name: 'Bob Wilson',
-            email: 'bob.wilson@company.com',
-            role: 'developer',
-            status: 'active',
-            joinedAt: new Date('2024-01-15')
-          },
-          {
-            _id: 'user_emp_101',
-            name: 'Alice Johnson',
-            email: 'alice.johnson@company.com',
-            role: 'designer',
-            status: 'active',
-            joinedAt: new Date('2024-02-01')
-          },
-          {
-            _id: 'user_emp_102',
-            name: 'Charlie Brown',
-            email: 'charlie.brown@company.com',
-            role: 'developer',
-            status: 'active',
-            joinedAt: new Date('2024-02-15')
-          }
-        ];
-
         // Ensure project has all necessary fields
         const enrichedProject = {
           ...project,
           tasks: (project as any).tasks || state.tasks.filter(t => t.project === projectId) || [],
-          team: (project as any).team && (project as any).team.length > 0 ? (project as any).team : mockTeam,
+          // Use only real team members from backend (no dummy data)
+          team: (project as any).team && (project as any).team.length > 0 ? (project as any).team : [],
           documents: (project as any).documents || [],
           timeline: (project as any).timeline || [],
           milestones: (project as any).milestones || []
@@ -288,6 +280,93 @@ const ProjectViewDetailed: React.FC = () => {
       }
     }
   }, [projectId, state.projects, state.tasks]);
+
+  // Helper to map backend Task to UI task shape used in tabs
+  const mapBackendTaskToUi = (task: any, team: any[]): any => {
+    const assigneeId = task.assignee || '';
+    const assigneeMember = team?.find((m: any) => m.user === assigneeId || m._id === assigneeId);
+
+    // Map backend status/priority to UI values
+    let uiStatus: 'pending' | 'in-progress' | 'review' | 'completed' | 'blocked' = 'pending';
+    switch (task.status) {
+      case 'todo':
+        uiStatus = 'pending';
+        break;
+      case 'in-progress':
+        uiStatus = 'in-progress';
+        break;
+      case 'in-review':
+        uiStatus = 'review';
+        break;
+      case 'done':
+        uiStatus = 'completed';
+        break;
+      case 'cancelled':
+        uiStatus = 'blocked';
+        break;
+      default:
+        uiStatus = 'pending';
+    }
+
+    let uiPriority: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+    switch (task.priority) {
+      case 'low':
+        uiPriority = 'low';
+        break;
+      case 'medium':
+        uiPriority = 'medium';
+        break;
+      case 'high':
+        uiPriority = 'high';
+        break;
+      case 'urgent':
+        uiPriority = 'critical';
+        break;
+      default:
+        uiPriority = 'medium';
+    }
+
+    return {
+      _id: task._id,
+      title: task.title,
+      description: task.description || '',
+      taskType: 'general',
+      assignedTo: assigneeId,
+      assignedToName: assigneeMember?.name || assigneeMember?.fullName || 'Unassigned',
+      status: uiStatus,
+      priority: uiPriority,
+      startDate: task.startDate ? new Date(task.startDate) : new Date(),
+      dueDate: task.dueDate ? new Date(task.dueDate) : new Date(),
+      progress: typeof task.progress === 'number' ? task.progress : 0,
+      files: [],
+      links: [],
+      subtasks: [],
+      rating: undefined,
+      verifiedBy: undefined,
+      verifiedAt: undefined,
+      isFinished: uiStatus === 'completed',
+      requiresFile: false,
+      requiresLink: false,
+    };
+  };
+
+  // Load tasks for active project from backend
+  useEffect(() => {
+    const loadTasks = async () => {
+      if (!activeProject?._id) return;
+      try {
+        const backendTasks = await apiService.getTasks(activeProject._id);
+        const uiTasks = (backendTasks || []).map((t: any) =>
+          mapBackendTaskToUi(t, (activeProject as any)?.team || []),
+        );
+        setProjectTasks(uiTasks);
+      } catch (error) {
+        console.error('[ProjectViewDetailed] Failed to load project tasks:', error);
+      }
+    };
+
+    loadTasks();
+  }, [activeProject?._id, (activeProject as any)?.team]);
 
   // Set projects from state
   useEffect(() => {
@@ -300,122 +379,122 @@ const ProjectViewDetailed: React.FC = () => {
   useEffect(() => {
     if (state.projects.length === 0) {
       const mockProjects: Project[] = [
-      {
-        _id: '1',
-        name: 'E-commerce Platform',
-        description: 'Building a comprehensive e-commerce platform with modern features',
-        status: 'active',
-        priority: 'high',
-        startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-06-30'),
-        progress: 65,
-        budget: 50000,
-        spent: 32500,
-        client: {
-          _id: 'c1',
-          name: 'TechCorp Inc.',
-          email: 'contact@techcorp.com',
-          avatar: ''
-        },
-        team: [
-          {
-            _id: 'u1',
-            name: 'John Doe',
-            email: 'john@example.com',
-            role: 'manager',
-            status: 'active',
-            joinedAt: new Date('2024-01-01'),
-            permissions: {
-              canEditTasks: true,
-              canCreateTasks: true,
-              canDeleteTasks: true,
-              canManageTeam: true,
-              canViewAnalytics: true
-            },
-            workload: 80,
-            tasksAssigned: 12,
-            tasksCompleted: 8,
-            rating: 4.5,
-            lastActive: new Date()
+        {
+          _id: '1',
+          name: 'E-commerce Platform',
+          description: 'Building a comprehensive e-commerce platform with modern features',
+          status: 'active',
+          priority: 'high',
+          startDate: new Date('2024-01-01'),
+          endDate: new Date('2024-06-30'),
+          progress: 65,
+          budget: 50000,
+          spent: 32500,
+          client: {
+            _id: 'c1',
+            name: 'TechCorp Inc.',
+            email: 'contact@techcorp.com',
+            avatar: ''
           },
-          {
-            _id: 'u2',
-            name: 'Jane Smith',
-            email: 'jane@example.com',
-            role: 'member',
-            status: 'active',
-            joinedAt: new Date('2024-01-15'),
-            permissions: {
-              canEditTasks: true,
-              canCreateTasks: true,
-              canDeleteTasks: false,
-              canManageTeam: false,
-              canViewAnalytics: false
+          team: [
+            {
+              _id: 'u1',
+              name: 'John Doe',
+              email: 'john@example.com',
+              role: 'manager',
+              status: 'active',
+              joinedAt: new Date('2024-01-01'),
+              permissions: {
+                canEditTasks: true,
+                canCreateTasks: true,
+                canDeleteTasks: true,
+                canManageTeam: true,
+                canViewAnalytics: true
+              },
+              workload: 80,
+              tasksAssigned: 12,
+              tasksCompleted: 8,
+              rating: 4.5,
+              lastActive: new Date()
             },
-            workload: 60,
-            tasksAssigned: 8,
-            tasksCompleted: 6,
-            rating: 4.2,
-            lastActive: new Date()
+            {
+              _id: 'u2',
+              name: 'Jane Smith',
+              email: 'jane@example.com',
+              role: 'member',
+              status: 'active',
+              joinedAt: new Date('2024-01-15'),
+              permissions: {
+                canEditTasks: true,
+                canCreateTasks: true,
+                canDeleteTasks: false,
+                canManageTeam: false,
+                canViewAnalytics: false
+              },
+              workload: 60,
+              tasksAssigned: 8,
+              tasksCompleted: 6,
+              rating: 4.2,
+              lastActive: new Date()
+            }
+          ],
+          tasks: [],
+          milestones: [],
+          documents: [],
+          timeline: [],
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date(),
+          createdBy: 'u1',
+          tags: ['e-commerce', 'web', 'react'],
+          color: '#3B82F6',
+          isPublic: false,
+          permissions: {
+            canEdit: true,
+            canDelete: true,
+            canManageTeam: true,
+            canManageTasks: true,
+            canViewAnalytics: true,
+            canManageDocuments: true
           }
-        ],
-        tasks: [],
-        milestones: [],
-        documents: [],
-        timeline: [],
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date(),
-        createdBy: 'u1',
-        tags: ['e-commerce', 'web', 'react'],
-        color: '#3B82F6',
-        isPublic: false,
-        permissions: {
-          canEdit: true,
-          canDelete: true,
-          canManageTeam: true,
-          canManageTasks: true,
-          canViewAnalytics: true,
-          canManageDocuments: true
-        }
-      },
-      {
-        _id: '2',
-        name: 'Mobile App Development',
-        description: 'Native mobile app for iOS and Android platforms',
-        status: 'active',
-        priority: 'medium',
-        startDate: new Date('2024-02-01'),
-        endDate: new Date('2024-08-31'),
-        progress: 40,
-        budget: 75000,
-        spent: 30000,
-        client: {
-          _id: 'c2',
-          name: 'MobileFirst Ltd.',
-          email: 'hello@mobilefirst.com',
-          avatar: ''
         },
-        team: [],
-        tasks: [],
-        milestones: [],
-        documents: [],
-        timeline: [],
-        createdAt: new Date('2024-02-01'),
-        updatedAt: new Date(),
-        createdBy: 'u1',
-        tags: ['mobile', 'ios', 'android'],
-        color: '#10B981',
-        isPublic: false,
-        permissions: {
-          canEdit: true,
-          canDelete: true,
-          canManageTeam: true,
-          canManageTasks: true,
-          canViewAnalytics: true,
-          canManageDocuments: true
+        {
+          _id: '2',
+          name: 'Mobile App Development',
+          description: 'Native mobile app for iOS and Android platforms',
+          status: 'active',
+          priority: 'medium',
+          startDate: new Date('2024-02-01'),
+          endDate: new Date('2024-08-31'),
+          progress: 40,
+          budget: 75000,
+          spent: 30000,
+          client: {
+            _id: 'c2',
+            name: 'MobileFirst Ltd.',
+            email: 'hello@mobilefirst.com',
+            avatar: ''
+          },
+          team: [],
+          tasks: [],
+          milestones: [],
+          documents: [],
+          timeline: [],
+          createdAt: new Date('2024-02-01'),
+          updatedAt: new Date(),
+          createdBy: 'u1',
+          tags: ['mobile', 'ios', 'android'],
+          color: '#10B981',
+          isPublic: false,
+          permissions: {
+            canEdit: true,
+            canDelete: true,
+            canManageTeam: true,
+            canManageTasks: true,
+            canViewAnalytics: true,
+            canManageDocuments: true
+          }
         }
-      }
-    ];
+      ];
 
       setProjects(mockProjects);
       setActiveProject(mockProjects[0]);
@@ -447,44 +526,126 @@ const ProjectViewDetailed: React.FC = () => {
     });
   };
 
-  // Task Assignment Handlers (PM only)
-  const handleCreateTask = (task: any) => {
-    setProjectTasks([...projectTasks, { ...task, project: activeProject?._id }]);
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: 'Task assigned successfully!',
-        duration: 3000
-      }
-    });
+  // Task Assignment Handlers (PM only) - backed by backend Task model
+  const handleCreateTask = async (task: any) => {
+    if (!activeProject?._id) return;
+    try {
+      const payload = {
+        title: task.title,
+        description: task.description,
+        project: activeProject._id,
+        workspace: (activeProject as any)?.workspace || state.currentWorkspace,
+        assignee: task.assignedTo || undefined,
+        status: task.status,
+        // Keep priority in frontend Task union; backend will map 'critical' -> 'urgent'
+        priority: task.priority,
+        // omit type here; backend Task model defaults type to 'task'
+        startDate: task.startDate,
+        dueDate: task.dueDate,
+        estimatedHours: task.estimatedHours,
+        progress: task.progress,
+      };
+
+      const createdBackendTask = await apiService.createTask(payload);
+      const uiTask = mapBackendTaskToUi(createdBackendTask, (activeProject as any)?.team || []);
+      setProjectTasks([...projectTasks, uiTask]);
+
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Task assigned successfully!',
+          duration: 3000,
+        },
+      });
+    } catch (error) {
+      console.error('[ProjectViewDetailed] Failed to create task:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to create task. Please try again.',
+          duration: 4000,
+        },
+      });
+    }
   };
 
-  const handleUpdateTask = (taskId: string, updates: any) => {
-    setProjectTasks(projectTasks.map(t => t._id === taskId ? { ...t, ...updates } : t));
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: 'Task updated successfully!',
-        duration: 3000
-      }
-    });
+  const handleUpdateTask = async (taskId: string, updates: any) => {
+    if (!activeProject?._id) return;
+    try {
+      const existing = projectTasks.find(t => t._id === taskId);
+      const merged = { ...existing, ...updates };
+
+      const payload: any = {
+        title: merged.title,
+        description: merged.description,
+        assignee: merged.assignedTo || undefined,
+        status: merged.status,
+        // Keep priority in frontend Task union; backend will map 'critical' -> 'urgent'
+        priority: merged.priority,
+        startDate: merged.startDate,
+        dueDate: merged.dueDate,
+        estimatedHours: merged.estimatedHours,
+        progress: merged.progress,
+      };
+
+      const updatedBackendTask = await apiService.updateTask(taskId, payload);
+      const uiTask = mapBackendTaskToUi(updatedBackendTask, (activeProject as any)?.team || []);
+
+      setProjectTasks(projectTasks.map(t => (t._id === taskId ? { ...t, ...uiTask } : t)));
+
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Task updated successfully!',
+          duration: 3000,
+        },
+      });
+    } catch (error) {
+      console.error('[ProjectViewDetailed] Failed to update task:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to update task. Please try again.',
+          duration: 4000,
+        },
+      });
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    setProjectTasks(projectTasks.filter(t => t._id !== taskId));
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: 'Task deleted successfully!',
-        duration: 3000
-      }
-    });
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await apiService.deleteTask(taskId);
+      setProjectTasks(projectTasks.filter(t => t._id !== taskId));
+
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Task deleted successfully!',
+          duration: 3000,
+        },
+      });
+    } catch (error) {
+      console.error('[ProjectViewDetailed] Failed to delete task:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to delete task. Please try again.',
+          duration: 4000,
+        },
+      });
+    }
   };
 
   const handleReassignTask = (taskId: string, newAssignee: string) => {
@@ -535,17 +696,12 @@ const ProjectViewDetailed: React.FC = () => {
 
   // Role Switcher Handler (Testing only)
   const handleRoleChange = (role: 'owner' | 'project-manager' | 'employee') => {
-    // Map 'project-manager' to 'manager' for internal use
-    const mappedRole = role === 'project-manager' ? 'manager' : role;
-    setCurrentUserRole(mappedRole);
+    // Drive the global test role in AppContext
+    dispatch({ type: 'SET_CURRENT_USER_ROLE', payload: role });
   };
 
   const handleUserChange = (userId: string, userName: string, role: string) => {
-    // Map 'project-manager' to 'manager' for internal use
-    const mappedRole = role === 'project-manager' ? 'manager' : role;
-    setCurrentTestUserId(userId);
-    setCurrentTestUserName(userName);
-    setCurrentUserRole(mappedRole);
+    // No-op for now; kept for compatibility with RoleSwitcher props
   };
 
   const getStatusColor = (status: string) => {
@@ -685,6 +841,7 @@ const ProjectViewDetailed: React.FC = () => {
       { id: 'timeline', label: 'Timeline', icon: Calendar, visible: true },
       { id: 'progress', label: 'Progress Tracker', icon: TrendingUp, visible: true },
       { id: 'workload', label: 'Workload', icon: Activity, visible: true },
+      { id: 'attendance', label: 'Attendance', icon: ClockIcon, visible: true },
       { id: 'reports', label: 'Reports', icon: BarChart3, visible: true },
       { id: 'documents', label: 'Documents', icon: Folder, visible: true },
       { id: 'inbox', label: 'Inbox', icon: Mail, visible: true },
@@ -1741,7 +1898,8 @@ const ProjectViewDetailed: React.FC = () => {
     }
 
     const isWorkspaceOwner = activeProject?.createdBy === state.userProfile?._id;
-    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id;
+    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id || 
+                            (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
     const canEdit = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
 
     switch (activeView) {
@@ -1838,6 +1996,23 @@ const ProjectViewDetailed: React.FC = () => {
           />
         );
       
+      case 'attendance': {
+        const isManagerView = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
+        if (isManagerView) {
+          return (
+            <ProjectAttendanceManagerTab
+              projectId={activeProject?._id || ''}
+              team={(activeProject as any)?.team || []}
+            />
+          );
+        }
+        return (
+          <ProjectAttendanceEmployeeTab
+            projectId={activeProject?._id || ''}
+          />
+        );
+      }
+      
       case 'timeline':
         return renderTimelineView();
       
@@ -1850,7 +2025,7 @@ const ProjectViewDetailed: React.FC = () => {
           <ProjectRequestsTab
             projectId={activeProject?._id || ''}
             currentUserId={currentTestUserId}
-            isProjectManager={currentUserRole === 'project-manager' || isProjectManager}
+            isProjectManager={state.roles.currentUserRole === 'project-manager' || isProjectManager}
             requests={requests}
             tasks={projectTasks}
             onCreateRequest={handleCreateRequest}
@@ -1866,20 +2041,72 @@ const ProjectViewDetailed: React.FC = () => {
         return renderDocumentsView();
       
       case 'inbox':
-        return (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Inbox</h3>
-            <p className="text-gray-600">Messages, notifications, and activity feed coming soon!</p>
-          </div>
-        );
+        return <WorkspaceInbox />;
       
       case 'settings':
         return (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Settings</h3>
-            <p className="text-gray-600">Project configuration and management settings coming soon!</p>
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+              <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Settings</h3>
+              <p className="text-gray-600">Project configuration and management settings coming soon!</p>
+            </div>
+
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Attendance Office Location</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Set your primary office location. This will be used as a reference for automatic attendance
+                verification for this project.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    placeholder="e.g. 28.6139"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    placeholder="e.g. 77.2090"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!navigator.geolocation) {
+                        alert('Geolocation is not supported by this browser.');
+                        return;
+                      }
+                      navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                          const latInput = document.querySelector<HTMLInputElement>('input[placeholder="e.g. 28.6139"]');
+                          const lngInput = document.querySelector<HTMLInputElement>('input[placeholder="e.g. 77.2090"]');
+                          if (latInput && lngInput) {
+                            latInput.value = String(pos.coords.latitude.toFixed(6));
+                            lngInput.value = String(pos.coords.longitude.toFixed(6));
+                          }
+                        },
+                        () => {
+                          alert('Unable to detect current location. Please allow location permission.');
+                        }
+                      );
+                    }}
+                    className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                  >
+                    Use My Current Location
+                  </button>
+                  <p className="text-xs text-gray-500">
+                    (UI only for now) We can later connect this to backend attendance configuration.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         );
       
@@ -2031,7 +2258,7 @@ const ProjectViewDetailed: React.FC = () => {
         onUpdateTask={handleUpdateTask}
         onDeleteTask={handleDeleteTask}
         currentUserRole={currentUserRole}
-        currentUserId={state.userProfile?._id || 'current_user'}
+        currentUserId={currentTestUserId}
       />
 
       {/* Task Review Modal */}

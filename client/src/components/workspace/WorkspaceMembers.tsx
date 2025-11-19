@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Search,
-  Filter,
   UserPlus,
   Mail,
   MoreVertical,
@@ -10,7 +9,10 @@ import {
   Shield,
   User as UserIcon,
   Trash2,
-  Edit
+  Edit,
+  UserCheck,
+  UserX,
+  AlertCircle
 } from 'lucide-react';
 import UserDisplay from '../UserDisplay';
 
@@ -28,16 +30,45 @@ interface Member {
   status: 'active' | 'inactive';
 }
 
+interface JoinRequest {
+  id: string;
+  name: string;
+  email: string;
+  message?: string;
+  requestedAt: Date;
+  status: 'pending' | 'accepted' | 'declined';
+}
+
 const WorkspaceMembers: React.FC = () => {
   const { state } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [directoryQuery, setDirectoryQuery] = useState('');
+  const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([
+    {
+      id: 'jr_1',
+      name: 'Priya Khanna',
+      email: 'priya.khanna@example.com',
+      message: 'Working on Q1 OKRs, please add me to collaborate.',
+      requestedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      status: 'pending'
+    },
+    {
+      id: 'jr_2',
+      name: 'Rahul Shah',
+      email: 'rahul.shah@example.com',
+      message: 'Need access to update customer dashboards.',
+      requestedAt: new Date(Date.now() - 7 * 60 * 60 * 1000),
+      status: 'pending'
+    }
+  ]);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
 
-  // Mock members data - replace with actual API call
-  const members: Member[] = [
+  const [members, setMembers] = useState<Member[]>([
     {
       _id: state.userProfile._id,
       name: state.userProfile.fullName,
@@ -68,7 +99,7 @@ const WorkspaceMembers: React.FC = () => {
       joinedAt: new Date('2024-03-10'),
       status: 'active'
     }
-  ];
+  ]);
 
   const getRoleBadge = (role: string) => {
     switch (role) {
@@ -93,6 +124,78 @@ const WorkspaceMembers: React.FC = () => {
     return matchesSearch && matchesRole;
   });
 
+  const availableDirectory = useMemo(
+    () => [
+      { id: 'dir_1', name: 'Priya Khanna', email: 'priya.khanna@example.com' },
+      { id: 'dir_2', name: 'Rahul Shah', email: 'rahul.shah@example.com' },
+      { id: 'dir_3', name: 'Divya Shetty', email: 'divya.shetty@example.com' },
+      { id: 'dir_4', name: 'Sameer Agarwal', email: 'sameer.agarwal@example.com' },
+      { id: 'dir_5', name: 'Leo Messi', email: 'oblong_pencil984@simplelogin.com' }
+    ],
+    []
+  );
+
+  const filteredDirectory = useMemo(() => {
+    if (!directoryQuery.trim()) return [];
+    return availableDirectory
+      .filter((user) => {
+        const q = directoryQuery.toLowerCase();
+        const alreadyMember = members.some((m) => m.email === user.email);
+        return (
+          !alreadyMember &&
+          (user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q))
+        );
+      })
+      .slice(0, 5);
+  }, [availableDirectory, directoryQuery, members]);
+
+  useEffect(() => {
+    const shouldOpen = sessionStorage.getItem('workspaceMembersOpenInvite');
+    if (shouldOpen === 'true') {
+      setShowInviteModal(true);
+      sessionStorage.removeItem('workspaceMembersOpenInvite');
+    }
+    const handler = () => setShowInviteModal(true);
+    window.addEventListener('workspace:open-invite', handler);
+    return () => window.removeEventListener('workspace:open-invite', handler);
+  }, []);
+
+  const handleInvite = (email?: string, name?: string) => {
+    const target = email || inviteEmail;
+    if (!target.trim()) {
+      setShowInviteModal(false);
+      return;
+    }
+
+    const newMember: Member = {
+      _id: `pending_${Date.now()}`,
+      name: name || target.split('@')[0],
+      email: target,
+      role: 'member',
+      position: 'Pending invite',
+      joinedAt: new Date(),
+      status: 'active'
+    };
+
+    setMembers((prev) => [...prev, newMember]);
+    setInviteEmail('');
+    setDirectoryQuery('');
+    setShowInviteModal(false);
+  };
+
+  const handleAcceptRequest = (request: JoinRequest) => {
+    setJoinRequests((prev) =>
+      prev.map((req) => (req.id === request.id ? { ...req, status: 'accepted' } : req))
+    );
+    handleInvite(request.email, request.name);
+  };
+
+  const handleDeclineRequest = (requestId: string) => {
+    setJoinRequests((prev) =>
+      prev.map((req) => (req.id === requestId ? { ...req, status: 'declined' } : req))
+    );
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -104,7 +207,10 @@ const WorkspaceMembers: React.FC = () => {
           </p>
         </div>
         {isOwner && (
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <UserPlus className="w-4 h-4" />
             Invite Members
           </button>
@@ -203,6 +309,157 @@ const WorkspaceMembers: React.FC = () => {
       </div>
 
       {/* Stats */}
+      {/* Join Requests */}
+      {isOwner && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Join Requests</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Requests submitted from Discover Workspace are listed here.
+              </p>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+              {joinRequests.filter((req) => req.status === 'pending').length} pending
+            </span>
+          </div>
+          {joinRequests.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+              <AlertCircle className="w-10 h-10 mb-2 text-gray-300" />
+              <p className="font-medium">No requests right now</p>
+              <p className="text-sm">Learners who apply from Discover will appear here.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {joinRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{request.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                      <Mail className="w-4 h-4" />
+                      {request.email}
+                    </p>
+                    {request.message && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{request.message}</p>
+                    )}
+                    <p className="text-xs text-gray-400 mt-1">
+                      Requested {request.requestedAt.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        request.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : request.status === 'accepted'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {request.status}
+                    </span>
+                    {request.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleAcceptRequest(request)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                        >
+                          <UserCheck className="w-4 h-4" />
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleDeclineRequest(request.id)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+                        >
+                          <UserX className="w-4 h-4" />
+                          Decline
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Invite Modal */}
+      {isOwner && showInviteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Invite member</h3>
+              <button onClick={() => setShowInviteModal(false)} className="text-gray-500 hover:text-gray-700">
+                ✕
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email or username
+                </label>
+                <input
+                  type="text"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="someone@example.com"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Search platform directory
+                </label>
+                <div className="relative">
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={directoryQuery}
+                    onChange={(e) => setDirectoryQuery(e.target.value)}
+                    placeholder="Type a name or email"
+                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  {filteredDirectory.length > 0 && (
+                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {filteredDirectory.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => handleInvite(user.email, user.name)}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        >
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Quickly invite existing platform members without retyping their details.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleInvite()}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Send Invite
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Members</div>
@@ -221,8 +478,10 @@ const WorkspaceMembers: React.FC = () => {
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Pending</div>
-          <div className="text-2xl font-bold text-orange-600">0</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Pending requests</div>
+          <div className="text-2xl font-bold text-orange-600">
+            {joinRequests.filter((req) => req.status === 'pending').length}
+          </div>
         </div>
       </div>
     </div>

@@ -54,6 +54,10 @@ const userSchema = new Schema<IUser>({
     trim: true,
     maxlength: [500, 'About cannot exceed 500 characters']
   },
+  faceScanImage: {
+    type: String,
+    trim: true
+  },
   // Enhanced profile information for AI-powered insights
   profile: {
     // Professional Information

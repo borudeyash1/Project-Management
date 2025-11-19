@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from 'express';
 import Workspace from '../models/Workspace';
 import User from '../models/User';
+import Notification from '../models/Notification';
 import SubscriptionPlan from '../models/SubscriptionPlan';
 import { sendEmail } from '../services/emailService';
 import { generateOTP, OTP_VALIDITY_MS } from '../utils/otp';
@@ -105,6 +106,32 @@ export const createWorkspace: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Internal server error during workspace creation'
+    });
+  }
+};
+
+// Discover public workspaces
+export const discoverWorkspaces: RequestHandler = async (req, res) => {
+  try {
+    const workspaces = await Workspace.find({
+      isActive: { $ne: false },
+      'settings.isPublic': true
+    })
+      .populate('owner', 'fullName email avatarUrl')
+      .sort({ createdAt: -1 });
+
+    const response: ApiResponse<IWorkspace[]> = {
+      success: true,
+      message: 'Workspaces retrieved successfully',
+      data: workspaces as any
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Discover workspaces error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
     });
   }
 };
@@ -480,5 +507,125 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
       success: false,
       message: 'Internal server error'
     });
+  }
+};
+
+// Send workspace invite from owner/admin to a specific user
+export const sendWorkspaceInvite: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { targetUserId, identifier, message } = req.body as {
+      targetUserId?: string;
+      identifier?: string;
+      message?: string;
+    };
+
+    const authReq = req as AuthenticatedRequest;
+    const currentUser = authReq.user!;
+    const currentUserId = currentUser._id;
+
+    const workspace = await Workspace.findOne({
+      _id: id,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    let targetUser: any = null;
+    if (targetUserId) {
+      targetUser = await User.findById(targetUserId);
+    } else if (identifier) {
+      const query: any = identifier.includes('@')
+        ? { email: identifier.toLowerCase() }
+        : { username: identifier };
+      targetUser = await User.findOne(query);
+    }
+
+    if (!targetUser) {
+      res.status(404).json({ success: false, message: 'Target user not found' });
+      return;
+    }
+
+    if (targetUser._id.toString() === currentUserId.toString()) {
+      res.status(400).json({ success: false, message: 'You cannot invite yourself' });
+      return;
+    }
+
+    await Notification.create({
+      type: 'workspace',
+      title: `Workspace invitation: ${workspace.name}`,
+      message:
+        message ||
+        `${currentUser.fullName || 'Workspace owner'} invited you to join workspace "${workspace.name}"`,
+      userId: targetUser._id.toString(),
+      relatedId: workspace._id.toString()
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Invitation sent successfully'
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Send workspace invite error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Accept workspace invite by notification
+export const acceptWorkspaceInvite: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notificationId } = req.body as { notificationId?: string };
+    const authReq = req as AuthenticatedRequest;
+    const currentUser = authReq.user!;
+    const currentUserId = currentUser._id.toString();
+
+    const workspace = await Workspace.findById(id);
+    if (!workspace || workspace.isActive === false) {
+      res.status(404).json({ success: false, message: 'Workspace not found' });
+      return;
+    }
+
+    // Avoid adding duplicates
+    if (workspace.isMember(currentUserId)) {
+      res.status(400).json({ success: false, message: 'You are already a member of this workspace' });
+      return;
+    }
+
+    await workspace.addMember(currentUserId, 'member');
+    await workspace.populate('members.user', 'fullName email avatarUrl');
+
+    if (notificationId) {
+      const notif = await Notification.findOne({ _id: notificationId, userId: currentUserId });
+      if (notif) {
+        notif.read = true;
+        await notif.save();
+      }
+    }
+
+    const response: ApiResponse<IWorkspace> = {
+      success: true,
+      message: 'Joined workspace successfully',
+      data: workspace as any
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Accept workspace invite error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

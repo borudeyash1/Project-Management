@@ -170,6 +170,13 @@ export interface Workspace {
   memberCount: number;
   createdAt: Date;
   updatedAt: Date;
+  clients?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    projects: number;
+    totalValue: number;
+  }>;
 }
 
 export interface WorkspaceMember {
@@ -530,7 +537,7 @@ export interface AppState {
   isAuthLoading: boolean;
   subscription: UserSubscription;
   roles: {
-    currentUserRole: string;
+    currentUserRole: 'owner' | 'project-manager' | 'employee';
     permissions: {
       canCreateProject: boolean;
       canManageEmployees: boolean;
@@ -541,6 +548,7 @@ export interface AppState {
   modals: {
     createWorkspace: boolean;
     createProject: boolean;
+    workspaceCreateProject: boolean;
     workloadDeadline: boolean;
     taskDetails: boolean;
     taskRating: boolean;
@@ -590,6 +598,7 @@ export interface Client {
   projectsCount?: number;
   totalRevenue?: number;
   notes?: string;
+  workspaceId: string;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -5,7 +5,9 @@ import {
   updateProfile, 
   updateSettings,
   deleteAccount,
-  uploadAvatar
+  uploadAvatar,
+  searchUsers,
+  saveFaceScan
 } from '../controllers/userController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -14,6 +16,9 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+// Search users (for invites/autocomplete)
+router.get('/search', searchUsers);
 
 // Validation rules
 const updateProfileValidation = [
@@ -51,6 +56,7 @@ const updateProfileValidation = [
 // Routes
 router.get('/profile', getProfile);
 router.put('/profile', updateProfileValidation, validateRequest, updateProfile);
+router.post('/face-scan', saveFaceScan);
 router.put('/settings', validateRequest, updateSettings);
 router.delete('/account', deleteAccount);
 router.post('/avatar', uploadAvatar);
