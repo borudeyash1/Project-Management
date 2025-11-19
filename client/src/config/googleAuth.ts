@@ -5,7 +5,7 @@ import { GoogleAuthResponse } from '../types/googleAuth';
 // Google OAuth Configuration
 export const GOOGLE_AUTH_CONFIG = {
   clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || '639767615042-n17bqv93icprl9snejn2ddj7o5db03qc.apps.googleusercontent.com',
-  redirectUri: process.env.REACT_APP_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+  redirectUri: process.env.REACT_APP_GOOGLE_REDIRECT_URI || 'https://sartthi.com/auth/google/callback',
   scope: 'openid email profile'
 };
 

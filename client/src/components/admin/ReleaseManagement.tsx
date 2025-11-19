@@ -129,17 +129,9 @@ const ReleaseManagement: React.FC = () => {
       formDataToSend.append('architecture', formData.architecture);
       formDataToSend.append('isLatest', formData.isLatest.toString());
 
-      const response = await fetch('http://localhost:5000/api/releases', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: formDataToSend
-      });
+      const data = await api.uploadRelease(formDataToSend);
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (data?.success) {
         console.log('✅ [RELEASES] Release created successfully');
         addToast('Release created successfully!', 'success');
         setShowCreateModal(false);
