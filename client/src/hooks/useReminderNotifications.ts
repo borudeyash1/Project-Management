@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface Reminder {
   _id: string;
@@ -55,14 +55,14 @@ export const useReminderNotifications = (
   };
 
   // Play notification sound
-  const playSound = (priority: string = 'medium') => {
+  const playSound = useCallback((priority: string = 'medium') => {
     if (!options.sound) return;
 
     try {
       if (!audioRef.current) {
         audioRef.current = new Audio();
       }
-      
+
       audioRef.current.src = sounds[priority as keyof typeof sounds] || sounds.medium;
       audioRef.current.volume = options.volume || 0.5;
       audioRef.current.play().catch(err => {
@@ -71,24 +71,24 @@ export const useReminderNotifications = (
     } catch (error) {
       console.error('Error playing sound:', error);
     }
-  };
+  }, [options.sound, options.volume, sounds]);
 
   // Vibrate device (mobile)
-  const vibrate = () => {
+  const vibrate = useCallback(() => {
     if (options.vibrate && 'vibrate' in navigator) {
       navigator.vibrate([200, 100, 200]);
     }
-  };
+  }, [options.vibrate]);
 
   // Show browser notification
-  const showNotification = (reminder: Reminder, minutesBefore: number) => {
+  const showNotification = useCallback((reminder: Reminder, minutesBefore: number) => {
     if (permission !== 'granted') return;
 
     const title = minutesBefore > 0
       ? `Reminder in ${minutesBefore} minutes`
       : `Reminder: ${reminder.title}`;
 
-    const body = reminder.description || 
+    const body = reminder.description ||
       `${reminder.type.charAt(0).toUpperCase() + reminder.type.slice(1)} due now`;
 
     const notification = new Notification(title, {
@@ -118,10 +118,10 @@ export const useReminderNotifications = (
 
     // Mark as notified
     setNotifiedReminders(prev => new Set(prev).add(`${reminder._id}-${minutesBefore}`));
-  };
+  }, [permission, playSound, vibrate]);
 
   // Check if reminder should trigger notification
-  const shouldNotify = (reminder: Reminder, minutesBefore: number): boolean => {
+  const shouldNotify = useCallback((reminder: Reminder, minutesBefore: number): boolean => {
     // Don't notify if completed
     if (reminder.completed) return false;
 
@@ -142,10 +142,10 @@ export const useReminderNotifications = (
     // Notify if current time is within 1 minute of notify time
     const timeDiff = Math.abs(now.getTime() - notifyTime.getTime());
     return timeDiff < 60 * 1000; // Within 1 minute
-  };
+  }, [notifiedReminders]);
 
   // Check all reminders for notifications
-  const checkReminders = () => {
+  const checkReminders = useCallback(() => {
     reminders.forEach(reminder => {
       // Check each notification setting
       reminder.notifications?.forEach(notif => {
@@ -159,7 +159,7 @@ export const useReminderNotifications = (
         showNotification(reminder, 0);
       }
     });
-  };
+  }, [reminders, shouldNotify, showNotification]);
 
   // Initialize
   useEffect(() => {
@@ -182,7 +182,7 @@ export const useReminderNotifications = (
         clearInterval(checkIntervalRef.current);
       }
     };
-  }, [reminders, permission, notifiedReminders]);
+  }, [checkReminders, permission]);
 
   // Handle service worker notifications (for actions)
   useEffect(() => {
@@ -190,7 +190,7 @@ export const useReminderNotifications = (
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data.type === 'notification-action') {
           const { action, reminderId } = event.data;
-          
+
           if (action === 'snooze') {
             // Trigger snooze callback
             console.log('Snooze reminder:', reminderId);
@@ -267,24 +267,24 @@ export const exportToICalendar = (reminders: Reminder[]): string => {
   ical += 'PRODID:-//Project Management System//Reminders//EN\n';
   ical += 'CALSCALE:GREGORIAN\n';
   ical += 'METHOD:PUBLISH\n';
-  
+
   reminders.forEach(reminder => {
     ical += 'BEGIN:VEVENT\n';
     ical += `UID:${reminder._id}@pms.com\n`;
     ical += `DTSTAMP:${formatICalDate(new Date())}\n`;
     ical += `DTSTART:${formatICalDate(reminder.dueDate)}\n`;
     ical += `SUMMARY:${escapeICalText(reminder.title)}\n`;
-    
+
     if (reminder.description) {
       ical += `DESCRIPTION:${escapeICalText(reminder.description)}\n`;
     }
-    
+
     // Priority (1=high, 5=medium, 9=low)
     const priorityMap = { urgent: 1, high: 3, medium: 5, low: 9 };
     ical += `PRIORITY:${priorityMap[reminder.priority]}\n`;
-    
+
     ical += `STATUS:${reminder.completed ? 'COMPLETED' : 'CONFIRMED'}\n`;
-    
+
     // Alarms
     reminder.notifications?.forEach(notif => {
       if (notif.type === 'push' || notif.type === 'email') {
@@ -295,12 +295,12 @@ export const exportToICalendar = (reminders: Reminder[]): string => {
         ical += 'END:VALARM\n';
       }
     });
-    
+
     ical += 'END:VEVENT\n';
   });
-  
+
   ical += 'END:VCALENDAR';
-  
+
   return ical;
 };
 

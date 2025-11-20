@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Plus, Search, Filter, Calendar, Clock, Target, Users, 
-  TrendingUp, BarChart3, Bell, Settings, User, 
+import {
+  Plus, Search, Filter, Calendar, Clock, Target, Users,
+  TrendingUp, BarChart3, Bell, Settings, User,
   ChevronRight, ChevronDown, Star, Flag, Tag,
   MessageSquare, FileText, Zap, Bot, Crown,
   CheckCircle, AlertCircle, Play, Pause, Square, X,
@@ -15,6 +15,10 @@ import { useTheme } from '../context/ThemeContext';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/homeService';
+import QuickLinks from './dashboard/QuickLinks';
+import CalendarWidget from './dashboard/CalendarWidget';
+import ReportsWidget from './dashboard/ReportsWidget';
+import ExpandedStatCard from './dashboard/ExpandedStatCard'; // Import ExpandedStatCard component
 
 interface QuickTask {
   _id: string;
@@ -105,6 +109,7 @@ const HomePage: React.FC = () => {
   const [productivityData, setProductivityData] = useState<number[]>([65, 72, 68, 85, 78, 90, 88]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedCard, setExpandedCard] = useState<'tasks' | 'projects' | 'team' | 'progress' | null>(null);
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -133,9 +138,9 @@ const HomePage: React.FC = () => {
             timestamp: activity.timestamp ? new Date(activity.timestamp) : new Date(),
             user: rawUser.name
               ? {
-                  name: rawUser.name,
-                  avatar: rawUser.avatar,
-                }
+                name: rawUser.name,
+                avatar: rawUser.avatar,
+              }
               : undefined,
           } as RecentActivity;
         }),
@@ -225,7 +230,7 @@ const HomePage: React.FC = () => {
   };
 
   const markNotificationAsRead = (notificationId: string) => {
-    setNotifications(notifications.map(notif => 
+    setNotifications(notifications.map(notif =>
       notif._id === notificationId ? { ...notif, read: true } : notif
     ));
   };
@@ -363,8 +368,12 @@ const HomePage: React.FC = () => {
 
       <div className="p-6 max-w-[1600px] mx-auto">
         {/* Top Row - Stats Overview */}
+        {/* Top Row - Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border`}>
+          <div
+            onClick={() => setExpandedCard('tasks')}
+            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pending Tasks</p>
@@ -377,7 +386,10 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border`}>
+          <div
+            onClick={() => setExpandedCard('projects')}
+            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Projects</p>
@@ -390,7 +402,10 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border`}>
+          <div
+            onClick={() => setExpandedCard('team')}
+            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Members</p>
@@ -403,12 +418,15 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border`}>
+          <div
+            onClick={() => setExpandedCard('progress')}
+            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Avg Progress</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
-                  {Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / projects.length)}%
+                  {Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))}%
                 </p>
               </div>
               <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-orange-900/50' : 'bg-orange-50'}`}>
@@ -417,6 +435,9 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Quick Links */}
+        <QuickLinks />
 
         {/* Main Content Grid - 2 Equal Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -444,39 +465,36 @@ const HomePage: React.FC = () => {
                   <div className="flex gap-2 mb-3">
                     <button
                       onClick={() => setNewTaskType('task')}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                        newTaskType === 'task'
-                          ? 'bg-blue-600 text-white'
-                          : isDarkMode
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'task'
+                        ? 'bg-blue-600 text-white'
+                        : isDarkMode
                           ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                        }`}
                     >
                       <CheckSquare className="w-4 h-4" />
                       Task
                     </button>
                     <button
                       onClick={() => setNewTaskType('note')}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                        newTaskType === 'note'
-                          ? 'bg-blue-600 text-white'
-                          : isDarkMode
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'note'
+                        ? 'bg-blue-600 text-white'
+                        : isDarkMode
                           ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                        }`}
                     >
                       <Type className="w-4 h-4" />
                       Note
                     </button>
                     <button
                       onClick={() => setNewTaskType('checklist')}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                        newTaskType === 'checklist'
-                          ? 'bg-blue-600 text-white'
-                          : isDarkMode
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'checklist'
+                        ? 'bg-blue-600 text-white'
+                        : isDarkMode
                           ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                        }`}
                     >
                       <List className="w-4 h-4" />
                       Checklist
@@ -488,11 +506,10 @@ const HomePage: React.FC = () => {
                       value={newTaskTitle}
                       onChange={(e) => setNewTaskTitle(e.target.value)}
                       placeholder={`What ${newTaskType === 'note' ? 'note' : newTaskType === 'checklist' ? 'checklist' : 'task'} needs to be added?`}
-                      className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        isDarkMode
-                          ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                      }`}
+                      className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDarkMode
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        }`}
                       onKeyPress={(e) => e.key === 'Enter' && handleAddQuickTask()}
                     />
                     <button
@@ -510,35 +527,32 @@ const HomePage: React.FC = () => {
                 {quickTasks.map(task => (
                   <div
                     key={task._id}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                    }`}
+                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                      }`}
                   >
                     <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {getTaskTypeIcon(task.type)}
                     </div>
                     <button
                       onClick={() => toggleTaskCompletion(task._id)}
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                        task.completed
-                          ? 'bg-green-500 border-green-500 text-white'
-                          : isDarkMode
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${task.completed
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : isDarkMode
                           ? 'border-gray-500'
                           : 'border-gray-300'
-                      }`}
+                        }`}
                     >
                       {task.completed && <CheckCircle className="w-3 h-3" />}
                     </button>
                     <div className="flex-1">
-                      <p className={`text-sm ${
-                        task.completed
-                          ? isDarkMode
-                            ? 'line-through text-gray-500'
-                            : 'line-through text-gray-500'
-                          : isDarkMode
+                      <p className={`text-sm ${task.completed
+                        ? isDarkMode
+                          ? 'line-through text-gray-500'
+                          : 'line-through text-gray-500'
+                        : isDarkMode
                           ? 'text-gray-200'
                           : 'text-gray-900'
-                      }`}>
+                        }`}>
                         {task.title}
                       </p>
                       {task.project && (
@@ -564,7 +578,7 @@ const HomePage: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Activity</h2>
-                <button 
+                <button
                   onClick={() => navigate('/activity')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
@@ -600,9 +614,8 @@ const HomePage: React.FC = () => {
                   <div key={index} className="flex-1 flex flex-col items-center gap-2">
                     <div className="relative w-full flex items-end justify-center" style={{ height: '100px' }}>
                       <div
-                        className={`w-full rounded-t-lg transition-all ${
-                          value >= 80 ? 'bg-green-500' : value >= 60 ? 'bg-blue-500' : 'bg-yellow-500'
-                        }`}
+                        className={`w-full rounded-t-lg transition-all ${value >= 80 ? 'bg-green-500' : value >= 60 ? 'bg-blue-500' : 'bg-yellow-500'
+                          }`}
                         style={{ height: `${value}%` }}
                       />
                     </div>
@@ -630,9 +643,8 @@ const HomePage: React.FC = () => {
               <div className="space-y-4">
                 {teamActivity.map(activity => (
                   <div key={activity._id} className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                      }`}>
                       <User className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                     </div>
                     <div className="flex-1">
@@ -655,15 +667,13 @@ const HomePage: React.FC = () => {
           <div className="space-y-6">
             {/* AI Assistant */}
             {canUseAI() && (
-              <div className={`rounded-lg p-6 shadow-lg ${
-                isDarkMode
-                  ? 'bg-gradient-to-br from-purple-600 to-pink-600'
-                  : 'bg-gradient-to-br from-purple-100 via-pink-50 to-purple-50'
-              }`}>
+              <div className={`rounded-lg p-6 shadow-lg ${isDarkMode
+                ? 'bg-gradient-to-br from-purple-600 to-pink-600'
+                : 'bg-gradient-to-br from-purple-100 via-pink-50 to-purple-50'
+                }`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-purple-200'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-purple-200'
+                    }`}>
                     <Bot className={`w-5 h-5 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
                   </div>
                   <div>
@@ -674,7 +684,7 @@ const HomePage: React.FC = () => {
                 <p className={`text-sm mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
                   I can help you prioritize tasks, suggest project improvements, and provide insights.
                 </p>
-                <button 
+                <button
                   onClick={() => navigate('/ai-assistant')}
                   className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium text-white drop-shadow-sm transition-colors border border-white border-opacity-20"
                 >
@@ -683,11 +693,17 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
+            {/* Calendar Widget */}
+            <CalendarWidget />
+
+            {/* Reports Widget */}
+            <ReportsWidget />
+
             {/* Projects Overview */}
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Projects</h2>
-                <button 
+                <button
                   onClick={() => navigate('/workspace')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
@@ -696,9 +712,8 @@ const HomePage: React.FC = () => {
               </div>
               <div className="space-y-4">
                 {projects.map(project => (
-                  <div key={project._id} className={`p-4 border rounded-lg hover:shadow-sm transition-shadow ${
-                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                  }`}>
+                  <div key={project._id} className={`p-4 border rounded-lg hover:shadow-sm transition-shadow ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                    }`}>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${project.color}`} />
@@ -736,7 +751,7 @@ const HomePage: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Upcoming Deadlines</h2>
-                <button 
+                <button
                   onClick={() => navigate('/tasks')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
@@ -745,9 +760,8 @@ const HomePage: React.FC = () => {
               </div>
               <div className="space-y-3">
                 {deadlines.map(deadline => (
-                  <div key={deadline._id} className={`p-3 rounded-lg border ${
-                    isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'
-                  } transition-colors`}>
+                  <div key={deadline._id} className={`p-3 rounded-lg border ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'
+                    } transition-colors`}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -761,9 +775,8 @@ const HomePage: React.FC = () => {
                         <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(deadline.priority)}`}>
                           {deadline.priority}
                         </span>
-                        <span className={`text-xs ${
-                          deadline.daysLeft <= 2 ? 'text-red-500 font-medium' : isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
+                        <span className={`text-xs ${deadline.daysLeft <= 2 ? 'text-red-500 font-medium' : isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
                           {deadline.daysLeft} days left
                         </span>
                       </div>
@@ -777,7 +790,7 @@ const HomePage: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Files</h2>
-                <button 
+                <button
                   onClick={() => navigate('/files')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
@@ -786,9 +799,8 @@ const HomePage: React.FC = () => {
               </div>
               <div className="space-y-3">
                 {recentFiles.map(file => (
-                  <div key={file._id} className={`flex items-center gap-3 p-3 rounded-lg ${
-                    isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                  } transition-colors cursor-pointer`}>
+                  <div key={file._id} className={`flex items-center gap-3 p-3 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    } transition-colors cursor-pointer`}>
                     <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                       {getFileIcon(file.type)}
                     </div>
@@ -800,7 +812,7 @@ const HomePage: React.FC = () => {
                         {file.size} • {file.uploadedBy}
                       </p>
                     </div>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         // Simulate file download
@@ -809,9 +821,8 @@ const HomePage: React.FC = () => {
                         link.download = file.name;
                         dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: `Downloading ${file.name}...` } });
                       }}
-                      className={`p-2 rounded-lg ${
-                        isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
-                      } transition-colors`}
+                      className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
+                        } transition-colors`}
                     >
                       <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                     </button>
@@ -824,46 +835,42 @@ const HomePage: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Quick Links</h2>
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   onClick={() => navigate('/calendar')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                    isDarkMode 
-                      ? 'border-gray-700 hover:bg-gray-700' 
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
+                    ? 'border-gray-700 hover:bg-gray-700'
+                    : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                 >
                   <Calendar className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                   <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Calendar</span>
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/workspace')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                    isDarkMode 
-                      ? 'border-gray-700 hover:bg-gray-700' 
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
+                    ? 'border-gray-700 hover:bg-gray-700'
+                    : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                 >
                   <Users className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
                   <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team</span>
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/analytics')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                    isDarkMode 
-                      ? 'border-gray-700 hover:bg-gray-700' 
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
+                    ? 'border-gray-700 hover:bg-gray-700'
+                    : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                 >
                   <BarChart3 className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                   <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Reports</span>
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/settings')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                    isDarkMode 
-                      ? 'border-gray-700 hover:bg-gray-700' 
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
+                    ? 'border-gray-700 hover:bg-gray-700'
+                    : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                 >
                   <Settings className={`w-5 h-5 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
                   <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Settings</span>
@@ -873,6 +880,18 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+      {expandedCard && (
+        <ExpandedStatCard
+          type={expandedCard}
+          onClose={() => setExpandedCard(null)}
+          data={{
+            tasks: quickTasks.filter(t => !t.completed),
+            projects: projects,
+            teamMembers: projects.flatMap(p => Array(p.team).fill({ role: 'Member' })), // Mock team data for now
+            avgProgress: Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))
+          }}
+        />
+      )}
     </div>
   );
 };

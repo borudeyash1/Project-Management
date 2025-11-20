@@ -105,6 +105,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
   const startDrag = useCallback(
     (event: React.PointerEvent) => {
       if (isLocked) return;
+      event.preventDefault();
       dragControls.start(event);
     },
     [dragControls, isLocked]
@@ -143,9 +144,9 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       };
     }
     if (dockPosition === 'left') {
-      return { ...base, left: DOCK_EDGE_GAP, top: DOCK_EDGE_GAP, bottom: DOCK_EDGE_GAP };
+      return { ...base, left: DOCK_EDGE_GAP, top: '15%', bottom: '15%' };
     }
-    return { ...base, right: DOCK_EDGE_GAP, top: DOCK_EDGE_GAP, bottom: DOCK_EDGE_GAP };
+    return { ...base, right: DOCK_EDGE_GAP, top: '15%', bottom: '15%' };
   }, [dockPosition, dockSize.width, isLocked, x, y]);
 
   useEffect(() => {
@@ -217,7 +218,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
         className={`fixed z-50 ${className}`}
         drag={!isLocked}
         dragControls={dragControls}
-        dragListener={false}
+        dragListener={!isLocked}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
         style={anchorStyle as any}
@@ -230,18 +231,18 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
             position: 'relative',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            alignItems: isVertical ? 'flex-start' : 'center',
+            justifyContent: 'flex-start',
             flexDirection: isVertical ? 'column' : 'row',
-            gap: isVertical ? '0.5rem' : '0.35rem',
-            padding: isVertical ? '1rem 1.15rem' : '0.85rem 1.5rem',
-            paddingRight: isVertical ? '1.75rem' : '3.5rem',
+            gap: isVertical ? '0.75rem' : '0.75rem',
+            padding: isVertical ? '5rem 1.15rem 1.5rem 1.15rem' : '0.85rem 1.5rem 0.85rem 3.5rem',
             borderRadius: isVertical ? '1.5rem' : '1rem',
             boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-            overflow: 'visible',
+            overflow: 'hidden',
             minWidth: isVertical ? '80px' : undefined,
-            maxHeight: isVertical ? '85vh' : undefined,
-            pointerEvents: 'auto'
+            maxHeight: isVertical ? '70vh' : undefined,
+            pointerEvents: 'auto',
+            cursor: isLocked ? 'default' : 'grab'
           }}
         >
           <div
@@ -254,49 +255,45 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
           >
             <button
               type="button"
-              onPointerDown={startDrag}
-              className="p-1.5 rounded-full bg-white/70 text-gray-700 shadow hover:bg-white"
-              title={isLocked ? 'Unlock to drag' : 'Drag dock'}
-            >
-              <GripVertical className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
               onClick={() => setIsLocked((prev) => !prev)}
               className="p-1.5 rounded-full bg-white/70 text-gray-700 shadow hover:bg-white"
-              title={isLocked ? 'Unlock dock' : 'Lock dock'}
+              title={isLocked ? 'Lock dock' : 'Unlock dock'}
             >
               {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
             </button>
           </div>
           {/* Glass Effect Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-700/40 dark:via-gray-800/20 dark:to-transparent backdrop-blur-2xl" />
-          
+
           {/* Border Gradient */}
-          <div 
-            className="absolute inset-0 rounded-2xl border border-white/30 dark:border-gray-600/30" 
+          <div
+            className="absolute inset-0 rounded-2xl border border-white/30 dark:border-gray-600/30"
             style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
               maskComposite: 'exclude',
               padding: '1px'
-            }} 
+            }}
           />
-          
+
           {/* Content */}
           <div
             style={{
               position: 'relative',
               zIndex: 10,
               display: 'flex',
-              alignItems: isVertical ? 'center' : 'flex-end',
-              justifyContent: 'center',
+              alignItems: isVertical ? 'flex-start' : 'flex-end',
+              justifyContent: isVertical ? 'flex-start' : 'center',
               flexDirection: isVertical ? 'column' : 'row',
-              gap: '0.25rem',
-              overflowX: isVertical ? 'visible' : 'auto',
-              scrollbarWidth: 'none'
+              gap: '0.75rem',
+              overflowX: isVertical ? 'hidden' : 'auto',
+              overflowY: isVertical ? 'auto' : 'hidden',
+              scrollbarWidth: 'none',
+              width: '100%',
+              maxHeight: '100%'
             }}
+            className="scrollbar-hide"
           >
             {React.Children.map(children, (child) => {
               if (React.isValidElement(child)) {
@@ -305,7 +302,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
               return child;
             })}
           </div>
-          
+
           {/* Bottom Glow */}
           {dockPosition === 'bottom' && (
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-blue-500/20 to-transparent blur-xl" />
@@ -322,10 +319,10 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
 // Memoize to prevent re-animation on navigation
 export const Dock = React.memo(DockComponent);
 
-export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }> = ({ 
-  children, 
-  className = '', 
-  onClick, 
+export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }> = ({
+  children,
+  className = '',
+  onClick,
   active = false,
   tooltip,
   mouseX: parentMouseX,
@@ -339,12 +336,13 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
     return val - bounds.x - bounds.width / 2;
   });
 
-  // Keep width constant, only change margins to push icons apart
-  const width = 56; // Fixed size, base size
+  // Keep width constant, base size
+  const width = 56;
 
-  const scale = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
+  const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
+  const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
 
-  // Add margin to push adjacent icons away (left and right separately for better control)
+  // Add margin to push adjacent icons away
   const marginSync = useTransform(distance, [-150, 0, 150], [0, 16, 0]);
   const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
   const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
@@ -353,7 +351,7 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
     <div className="group relative">
       <motion.div
         ref={ref}
-        style={{ 
+        style={{
           width,
           marginLeft,
           marginRight,
@@ -362,37 +360,36 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
       >
         {/* Tooltip - Shows on hover */}
         {tooltip && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-2xl z-[9999]">
+          <div className={`absolute ${orientation === 'vertical' ? 'left-full ml-3 top-1/2 -translate-y-1/2' : 'bottom-full mb-3 left-1/2 -translate-x-1/2'} px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-2xl z-[9999]`}>
             {tooltip}
             {/* Tooltip arrow */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-[1px]">
-              <div className="border-[7px] border-transparent border-t-black" />
+            <div className={`absolute ${orientation === 'vertical' ? 'right-full top-1/2 -translate-y-1/2 mr-[1px]' : 'top-full left-1/2 -translate-x-1/2 -mt-[1px]'}`}>
+              <div className={`${orientation === 'vertical' ? 'border-[7px] border-transparent border-r-black' : 'border-[7px] border-transparent border-t-black'}`} />
             </div>
           </div>
         )}
-        
+
         <button
-        onClick={onClick}
-        className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
-          active 
-            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50' 
+          onClick={onClick}
+          className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${active
+            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50'
             : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-700 hover:bg-white/80 dark:hover:bg-gray-700/80 backdrop-blur-md'
-        } ${className}`}
-        aria-label={tooltip}
-      >
-        {/* Glass shine effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        {/* Icon content */}
-        <div className="relative z-10 pointer-events-none">
-          {children}
-        </div>
-        
-        {/* Active indicator glow */}
-        {active && (
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-400/30 to-transparent blur-sm" />
-        )}
-      </button>
+            } ${className}`}
+          aria-label={tooltip}
+        >
+          {/* Glass shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+          {/* Icon content */}
+          <div className="relative z-10 pointer-events-none">
+            {children}
+          </div>
+
+          {/* Active indicator glow */}
+          {active && (
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-400/30 to-transparent blur-sm" />
+          )}
+        </button>
       </motion.div>
     </div>
   );

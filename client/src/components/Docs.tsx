@@ -82,6 +82,32 @@ const Docs: React.FC = () => {
     setSidebarOpen(false);
   };
 
+  // Helper function to convert YouTube/Vimeo URLs to embed URLs
+  const getVideoEmbedUrl = (url: string): string | null => {
+    if (!url) return null;
+
+    // YouTube patterns
+    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+    const youtubeMatch = url.match(youtubeRegex);
+    if (youtubeMatch && youtubeMatch[1]) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+    }
+
+    // Vimeo patterns
+    const vimeoRegex = /(?:vimeo\.com\/)([0-9]+)/;
+    const vimeoMatch = url.match(vimeoRegex);
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    }
+
+    // If already an embed URL, return as is
+    if (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/video/')) {
+      return url;
+    }
+
+    return null;
+  };
+
   const Sidebar = () => (
     <div className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border-r h-full overflow-y-auto`}>
       {/* Search */}
@@ -211,14 +237,22 @@ const Docs: React.FC = () => {
                   </div>
 
                   {/* Video */}
-                  {currentArticle.videoUrl && (
-                    <div className="mb-8 rounded-lg overflow-hidden">
-                      <div className="aspect-video bg-gray-900 flex items-center justify-center">
-                        <PlayCircle className="w-16 h-16 text-white/50" />
-                        {/* Video player will be added here */}
+                  {currentArticle.videoUrl && (() => {
+                    const embedUrl = getVideoEmbedUrl(currentArticle.videoUrl);
+                    return embedUrl ? (
+                      <div className="mb-8 rounded-lg overflow-hidden">
+                        <div className="aspect-video">
+                          <iframe
+                            src={embedUrl}
+                            title={currentArticle.title}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ) : null;
+                  })()}
 
                   {/* Markdown Content */}
                   <div className={`prose ${isDarkMode ? 'prose-invert' : ''} max-w-none`}>
