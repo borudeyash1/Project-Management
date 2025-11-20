@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, Search, Filter, Edit, Trash2, Power, PowerOff, 
+import {
+  Users, Search, Filter, Edit, Trash2, Power, PowerOff,
   Mail, Shield, CreditCard, Calendar, Eye, ChevronLeft, ChevronRight,
   CheckCircle, XCircle, Award, TrendingUp
 } from 'lucide-react';
@@ -33,14 +33,14 @@ interface User {
 const UserManagement: React.FC = () => {
   const { isDarkMode } = useTheme();
   const { addToast } = useApp();
-  
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [stats, setStats] = useState<any>(null);
-  
+
   // Filters and pagination
   const [search, setSearch] = useState('');
   const [subscriptionFilter, setSubscriptionFilter] = useState('');
@@ -52,11 +52,11 @@ const UserManagement: React.FC = () => {
   useEffect(() => {
     // Clear expired tokens first
     clearExpiredTokens();
-    
+
     // Check if admin is logged in
     const adminToken = localStorage.getItem('adminToken');
     console.log('🔍 [USER MANAGEMENT] Admin token exists:', !!adminToken);
-    
+
     if (!adminToken || !validateAdminToken(adminToken)) {
       console.error('❌ [USER MANAGEMENT] No valid admin token found');
       localStorage.removeItem('adminToken');
@@ -65,13 +65,16 @@ const UserManagement: React.FC = () => {
       window.location.href = '/my-admin/login';
       return;
     }
-    
+
     // Set admin token for API requests
     localStorage.setItem('accessToken', adminToken);
-    
-    fetchUsers();
-    fetchStats();
-    
+
+    // Small delay to ensure token is set in API service
+    setTimeout(() => {
+      fetchUsers();
+      fetchStats();
+    }, 100);
+
     // Cleanup function to prevent memory leaks
     return () => {
       // Optional: cleanup if needed
@@ -82,7 +85,7 @@ const UserManagement: React.FC = () => {
     try {
       setLoading(true);
       console.log('🔍 [USER MANAGEMENT] Fetching users...');
-      
+
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -92,11 +95,11 @@ const UserManagement: React.FC = () => {
       });
 
       console.log('🔍 [USER MANAGEMENT] Request params:', Object.fromEntries(params));
-      
+
       const response = await api.get(`/user-management?${params}`);
-      
+
       console.log('🔍 [USER MANAGEMENT] Response:', response);
-      
+
       if (response?.success) {
         console.log('✅ [USER MANAGEMENT] Fetched', response.data.users.length, 'users');
         setUsers(response.data.users);
@@ -114,11 +117,11 @@ const UserManagement: React.FC = () => {
   const fetchStats = async () => {
     try {
       console.log('🔍 [USER MANAGEMENT] Fetching stats...');
-      
+
       const response = await api.get('/user-management/stats');
-      
+
       console.log('🔍 [USER MANAGEMENT] Stats response:', response);
-      
+
       if (response?.success) {
         console.log('✅ [USER MANAGEMENT] Stats fetched:', response.data);
         setStats(response.data);
@@ -135,7 +138,7 @@ const UserManagement: React.FC = () => {
       console.log('🔍 [USER MANAGEMENT] Toggling status for user:', userId);
       const response = await api.patch(`/user-management/${userId}/toggle-status`);
       console.log('🔍 [USER MANAGEMENT] Toggle status response:', response);
-      
+
       if (response?.success) {
         console.log('✅ [USER MANAGEMENT] Status toggled successfully');
         addToast('User status updated', 'success');
@@ -153,7 +156,7 @@ const UserManagement: React.FC = () => {
       console.log('🔍 [USER MANAGEMENT] Verifying email for user:', userId);
       const response = await api.patch(`/user-management/${userId}/verify-email`);
       console.log('🔍 [USER MANAGEMENT] Verify email response:', response);
-      
+
       if (response?.success) {
         console.log('✅ [USER MANAGEMENT] Email verified successfully');
         addToast('Email verified successfully', 'success');
@@ -172,7 +175,7 @@ const UserManagement: React.FC = () => {
       console.log('🔍 [USER MANAGEMENT] Deleting user:', userId);
       const response = await api.delete(`/user-management/${userId}`);
       console.log('🔍 [USER MANAGEMENT] Delete user response:', response);
-      
+
       if (response?.success) {
         console.log('✅ [USER MANAGEMENT] User deleted successfully');
         addToast('User deleted successfully', 'success');
@@ -188,7 +191,7 @@ const UserManagement: React.FC = () => {
   const handleUpdateSubscription = async (userId: string, plan: string) => {
     try {
       console.log('🔍 [USER MANAGEMENT] Updating subscription for user:', userId, 'to plan:', plan);
-      
+
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 1); // 1 month from now
 
@@ -199,11 +202,11 @@ const UserManagement: React.FC = () => {
         autoRenew: false,
         billingCycle: 'monthly'
       };
-      
+
       console.log('🔍 [USER MANAGEMENT] Subscription payload:', payload);
 
       const response = await api.put(`/user-management/${userId}/subscription`, payload);
-      
+
       console.log('🔍 [USER MANAGEMENT] Update subscription response:', response);
 
       if (response?.success) {

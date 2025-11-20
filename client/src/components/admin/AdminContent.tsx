@@ -72,7 +72,11 @@ const AdminContent: React.FC = () => {
       placement: 'top',
       routes: [],
       isActive: true,
-      priority: 0
+      priority: 0,
+      borderRadius: 0,
+      fontSize: 16,
+      fontWeight: 700,
+      padding: 16
     });
     setIsEditing(true);
   };
@@ -261,8 +265,9 @@ const AdminContent: React.FC = () => {
 
                 {/* Image URL (if type includes image) */}
                 {(currentBanner?.type === 'image' || currentBanner?.type === 'both') && (
-                  <div>
+                  <div className="space-y-3">
                     <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      <ImageIcon className="w-4 h-4 inline mr-1" />
                       Image URL
                     </label>
                     <input
@@ -273,8 +278,68 @@ const AdminContent: React.FC = () => {
                         ? 'bg-gray-700 border-gray-600 text-white'
                         : 'bg-white border-gray-300 text-gray-900'
                         } focus:outline-none focus:ring-2 focus:ring-accent`}
-                      placeholder="https://example.com/banner.png"
+                      placeholder="https://example.com/banner.png or https://drive.google.com/..."
                     />
+
+                    {/* Image Preview */}
+                    {currentBanner?.imageUrl && (
+                      <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
+                        <p className={`text-xs font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Preview:
+                        </p>
+                        <div className="flex items-center justify-center p-2 bg-white/10 rounded">
+                          <img
+                            src={currentBanner.imageUrl}
+                            alt="Banner preview"
+                            className="max-h-20 w-auto object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              const parent = (e.target as HTMLElement).parentElement;
+                              if (parent && !parent.querySelector('.error-text')) {
+                                const errorText = document.createElement('p');
+                                errorText.className = 'error-text text-xs text-red-500';
+                                errorText.textContent = 'Failed to load image. Please check the URL.';
+                                parent.appendChild(errorText);
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Image Dimensions */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Image Width (px)
+                        </label>
+                        <input
+                          type="number"
+                          value={currentBanner?.imageWidth || ''}
+                          onChange={(e) => setCurrentBanner(prev => ({ ...prev, imageWidth: e.target.value ? parseInt(e.target.value) : undefined }))}
+                          className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                            ? 'bg-gray-700 border-gray-600 text-white'
+                            : 'bg-white border-gray-300 text-gray-900'
+                            } focus:outline-none focus:ring-2 focus:ring-accent`}
+                          placeholder="Auto"
+                        />
+                      </div>
+                      <div>
+                        <label className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Image Height (px)
+                        </label>
+                        <input
+                          type="number"
+                          value={currentBanner?.imageHeight || ''}
+                          onChange={(e) => setCurrentBanner(prev => ({ ...prev, imageHeight: e.target.value ? parseInt(e.target.value) : undefined }))}
+                          className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                            ? 'bg-gray-700 border-gray-600 text-white'
+                            : 'bg-white border-gray-300 text-gray-900'
+                            } focus:outline-none focus:ring-2 focus:ring-accent`}
+                          placeholder="Auto"
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -306,17 +371,87 @@ const AdminContent: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Height */}
+                {/* Typography */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Font Size: {currentBanner?.fontSize || 16}px
+                    </label>
+                    <input
+                      type="range"
+                      min="10"
+                      max="48"
+                      value={currentBanner?.fontSize || 16}
+                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, fontSize: parseInt(e.target.value) }))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Font Weight: {currentBanner?.fontWeight || 700}
+                    </label>
+                    <select
+                      value={currentBanner?.fontWeight || 700}
+                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, fontWeight: parseInt(e.target.value) }))}
+                      className={`w-full px-4 py-2 rounded-lg border ${isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                        } focus:outline-none focus:ring-2 focus:ring-accent`}
+                    >
+                      <option value="100">Thin (100)</option>
+                      <option value="200">Extra Light (200)</option>
+                      <option value="300">Light (300)</option>
+                      <option value="400">Normal (400)</option>
+                      <option value="500">Medium (500)</option>
+                      <option value="600">Semi Bold (600)</option>
+                      <option value="700">Bold (700)</option>
+                      <option value="800">Extra Bold (800)</option>
+                      <option value="900">Black (900)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Spacing */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Height: {currentBanner?.height || 60}px
+                    </label>
+                    <input
+                      type="range"
+                      min="40"
+                      max="200"
+                      value={currentBanner?.height || 60}
+                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, height: parseInt(e.target.value) }))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Padding: {currentBanner?.padding || 16}px
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={currentBanner?.padding || 16}
+                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, padding: parseInt(e.target.value) }))}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                {/* Border Radius */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                    Height: {currentBanner?.height || 60}px
+                    Border Radius: {currentBanner?.borderRadius || 0}px
                   </label>
                   <input
                     type="range"
-                    min="40"
-                    max="200"
-                    value={currentBanner?.height || 60}
-                    onChange={(e) => setCurrentBanner(prev => ({ ...prev, height: parseInt(e.target.value) }))}
+                    min="0"
+                    max="50"
+                    value={currentBanner?.borderRadius || 0}
+                    onChange={(e) => setCurrentBanner(prev => ({ ...prev, borderRadius: parseInt(e.target.value) }))}
                     className="w-full"
                   />
                 </div>
@@ -467,41 +602,95 @@ const AdminContent: React.FC = () => {
 
               <div className="space-y-4">
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  This is how your banner will appear:
+                  This is how your banner will appear. Drag elements to reposition:
                 </p>
 
-                {/* Preview */}
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                {/* Enhanced Preview with Drag & Drop */}
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden backdrop-blur-sm">
                   <div
                     style={{
                       backgroundColor: currentBanner?.backgroundColor || '#FF006B',
                       color: currentBanner?.textColor || '#FFFFFF',
-                      height: `${currentBanner?.height || 60}px`
+                      height: `${currentBanner?.height || 60}px`,
+                      borderRadius: currentBanner?.borderRadius ? `${currentBanner.borderRadius}px` : '0px',
+                      padding: currentBanner?.padding ? `${currentBanner.padding}px` : '16px',
                     }}
-                    className="flex items-center justify-center px-4 relative"
+                    className="flex items-center justify-center relative backdrop-blur-md bg-opacity-90"
                   >
+                    {/* Image */}
                     {(currentBanner?.type === 'image' || currentBanner?.type === 'both') && currentBanner?.imageUrl && (
-                      <img
-                        src={currentBanner.imageUrl}
-                        alt="Preview"
-                        className="h-full max-h-[80%] w-auto object-contain mr-4"
-                      />
+                      <div
+                        draggable
+                        className="cursor-move hover:opacity-80 transition-opacity"
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = 'move';
+                          (e.target as HTMLElement).style.opacity = '0.5';
+                        }}
+                        onDragEnd={(e) => {
+                          (e.target as HTMLElement).style.opacity = '1';
+                        }}
+                      >
+                        <img
+                          src={currentBanner.imageUrl}
+                          alt="Preview"
+                          className="object-contain"
+                          style={{
+                            maxHeight: `${(currentBanner.height || 60) * 0.8}px`,
+                            height: currentBanner.imageHeight ? `${currentBanner.imageHeight}px` : 'auto',
+                            width: currentBanner.imageWidth ? `${currentBanner.imageWidth}px` : 'auto',
+                          }}
+                        />
+                      </div>
                     )}
+
+                    {/* Text */}
                     {(currentBanner?.type === 'text' || currentBanner?.type === 'both') && (
-                      <p className="font-bold text-center">
-                        {currentBanner?.content || 'Your content here...'}
-                      </p>
+                      <div
+                        draggable
+                        className={`cursor-move hover:opacity-80 transition-opacity ${currentBanner?.type === 'both' ? 'ml-4' : ''
+                          }`}
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = 'move';
+                          (e.target as HTMLElement).style.opacity = '0.5';
+                        }}
+                        onDragEnd={(e) => {
+                          (e.target as HTMLElement).style.opacity = '1';
+                        }}
+                      >
+                        <p
+                          className="text-center drop-shadow-sm select-none"
+                          style={{
+                            fontSize: currentBanner?.fontSize ? `${currentBanner.fontSize}px` : '16px',
+                            fontWeight: currentBanner?.fontWeight || 700,
+                          }}
+                        >
+                          {currentBanner?.content || 'Your content here...'}
+                        </p>
+                      </div>
                     )}
-                    <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded-full">
+
+                    {/* Close Button */}
+                    <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded-full backdrop-blur-sm">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  <p><strong>Placement:</strong> {currentBanner?.placement || 'top'}</p>
-                  <p><strong>Routes:</strong> {currentBanner?.routes?.length || 0} selected</p>
-                  <p><strong>Status:</strong> {currentBanner?.isActive !== false ? 'Active' : 'Inactive'}</p>
+                {/* Formatting Info */}
+                <div className={`text-xs space-y-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <p><strong>Placement:</strong> {currentBanner?.placement || 'top'}</p>
+                    <p><strong>Height:</strong> {currentBanner?.height || 60}px</p>
+                    <p><strong>Font Size:</strong> {currentBanner?.fontSize || 16}px</p>
+                    <p><strong>Font Weight:</strong> {currentBanner?.fontWeight || 700}</p>
+                    <p><strong>Padding:</strong> {currentBanner?.padding || 16}px</p>
+                    <p><strong>Border Radius:</strong> {currentBanner?.borderRadius || 0}px</p>
+                    <p><strong>Routes:</strong> {currentBanner?.routes?.length || 0} selected</p>
+                    <p><strong>Status:</strong> {currentBanner?.isActive !== false ? 'Active' : 'Inactive'}</p>
+                  </div>
+                  <p className="text-xs italic mt-2 text-blue-500">
+                    💡 Tip: Drag the image or text to reposition them in the preview
+                  </p>
                 </div>
               </div>
             </div>

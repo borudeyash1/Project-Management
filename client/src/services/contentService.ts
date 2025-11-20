@@ -15,6 +15,13 @@ export interface ContentBanner {
     startDate?: string;
     endDate?: string;
     priority: number;
+    // New formatting options
+    borderRadius?: number;
+    fontSize?: number;
+    fontWeight?: number;
+    padding?: number;
+    imageHeight?: number;
+    imageWidth?: number;
     createdBy: string;
     createdAt: string;
     updatedAt: string;
@@ -33,8 +40,14 @@ export const getAllBanners = async (): Promise<ContentBanner[]> => {
 export const getActiveBanners = async (route: string): Promise<ContentBanner[]> => {
     console.log('[contentService] Fetching active banners for route:', route);
     const response = await api.get(`/content/banners/active?route=${encodeURIComponent(route)}`);
-    console.log('[contentService] Active banners response:', response.data);
-    return response.data.data || [];
+    console.log('[contentService] Active banners response:', response);
+    console.log('[contentService] response.data:', response.data);
+    console.log('[contentService] response.data.data:', response.data?.data);
+    // The API returns { success: true, data: [...] } and api.get returns { data: { success: true, data: [...] } }
+    // So we need to access response.data.data
+    const banners = response.data?.data || response.data || [];
+    console.log('[contentService] Extracted banners:', banners);
+    return Array.isArray(banners) ? banners : [];
 };
 
 // Create new banner (admin)

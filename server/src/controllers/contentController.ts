@@ -38,6 +38,12 @@ export const getActiveBanners = async (req: AuthenticatedRequest, res: Response)
 
         const now = new Date();
         console.log('🕐 [CONTENT] Current time:', now);
+        console.log('🕐 [CONTENT] Current time ISO:', now.toISOString());
+
+        // First, let's see ALL banners
+        const allBanners = await ContentBanner.find({});
+        console.log('📊 [CONTENT] Total banners in database:', allBanners.length);
+        console.log('📊 [CONTENT] All banners:', JSON.stringify(allBanners, null, 2));
 
         const banners = await ContentBanner.find({
             isActive: true,
@@ -60,7 +66,7 @@ export const getActiveBanners = async (req: AuthenticatedRequest, res: Response)
             data: banners
         });
     } catch (error: any) {
-        console.error('Get active banners error:', error);
+        console.error('❌ [CONTENT] Get active banners error:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to fetch active banners'

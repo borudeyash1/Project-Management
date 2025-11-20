@@ -14,6 +14,13 @@ export interface IContentBanner extends Document {
     startDate?: Date;
     endDate?: Date;
     priority: number;
+    // New formatting options
+    borderRadius?: number;
+    fontSize?: number;
+    fontWeight?: number;
+    padding?: number;
+    imageHeight?: number;
+    imageWidth?: number;
     createdBy: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
@@ -78,6 +85,37 @@ const ContentBannerSchema: Schema = new Schema(
         priority: {
             type: Number,
             default: 0
+        },
+        borderRadius: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 50
+        },
+        fontSize: {
+            type: Number,
+            default: 16,
+            min: 10,
+            max: 48
+        },
+        fontWeight: {
+            type: Number,
+            default: 700,
+            enum: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+        },
+        padding: {
+            type: Number,
+            default: 16,
+            min: 0,
+            max: 100
+        },
+        imageHeight: {
+            type: Number,
+            default: null
+        },
+        imageWidth: {
+            type: Number,
+            default: null
         },
         createdBy: {
             type: Schema.Types.ObjectId,

@@ -27,7 +27,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   });
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    // Save theme preference immediately
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+    // Refresh page to apply theme properly and avoid flash issues
+    window.location.reload();
   };
 
   useEffect(() => {
