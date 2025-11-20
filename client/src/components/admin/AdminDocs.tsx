@@ -15,20 +15,9 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { docsStorage, DocArticle } from '../../services/docsStorage';
 
-interface DocArticle {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  category: string;
-  subcategory?: string;
-  videoUrl?: string;
-  order: number;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+
 
 const AdminDocs: React.FC = () => {
   const navigate = useNavigate();
@@ -48,24 +37,22 @@ const AdminDocs: React.FC = () => {
     { value: 'tutorials', label: 'Tutorials' }
   ];
 
-  // Load articles (will be replaced with API call)
+  // Load articles from storage
   useEffect(() => {
-    // TODO: Fetch from API
-    const sampleArticles: DocArticle[] = [
-      {
-        id: '1',
-        title: 'Introduction to Sartthi',
-        slug: 'introduction',
-        content: '# Welcome to Sartthi\n\nThis is the introduction...',
-        category: 'getting-started',
-        order: 1,
-        isPublished: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    ];
-    setArticles(sampleArticles);
+    loadArticles();
+
+    // Listen for storage changes
+    const unsubscribe = docsStorage.onStorageChange(() => {
+      loadArticles();
+    });
+
+    return unsubscribe;
   }, []);
+
+  const loadArticles = () => {
+    const allArticles = docsStorage.getAllArticles();
+    setArticles(allArticles);
+  };
 
   const handleCreateNew = () => {
     setCurrentArticle({
@@ -88,22 +75,11 @@ const AdminDocs: React.FC = () => {
   const handleSave = () => {
     if (!currentArticle) return;
 
-    // TODO: Save to API
-    if (currentArticle.id) {
-      // Update existing
-      setArticles(prev =>
-        prev.map(art => (art.id === currentArticle.id ? { ...art, ...currentArticle } as DocArticle : art))
-      );
-    } else {
-      // Create new
-      const newArticle: DocArticle = {
-        ...currentArticle,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as DocArticle;
-      setArticles(prev => [...prev, newArticle]);
-    }
+    // Save to localStorage via docsStorage
+    docsStorage.saveArticle(currentArticle);
+
+    // Reload articles
+    loadArticles();
 
     setIsEditing(false);
     setCurrentArticle(null);
@@ -111,8 +87,11 @@ const AdminDocs: React.FC = () => {
 
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this article?')) {
-      // TODO: Delete from API
-      setArticles(prev => prev.filter(art => art.id !== id));
+      // Delete from localStorage via docsStorage
+      docsStorage.deleteArticle(id);
+
+      // Reload articles
+      loadArticles();
     }
   };
 
@@ -123,7 +102,7 @@ const AdminDocs: React.FC = () => {
 
   const filteredArticles = articles.filter(article => {
     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         article.content.toLowerCase().includes(searchQuery.toLowerCase());
+      article.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -177,11 +156,10 @@ const AdminDocs: React.FC = () => {
                   type="text"
                   value={currentArticle?.title || ''}
                   onChange={(e) => setCurrentArticle(prev => ({ ...prev, title: e.target.value }))}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    isDarkMode
+                  className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-accent`}
+                    } focus:outline-none focus:ring-2 focus:ring-accent`}
                   placeholder="Enter article title"
                 />
               </div>
@@ -195,11 +173,10 @@ const AdminDocs: React.FC = () => {
                   type="text"
                   value={currentArticle?.slug || ''}
                   onChange={(e) => setCurrentArticle(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    isDarkMode
+                  className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-accent`}
+                    } focus:outline-none focus:ring-2 focus:ring-accent`}
                   placeholder="article-url-slug"
                 />
               </div>
@@ -212,11 +189,10 @@ const AdminDocs: React.FC = () => {
                 <select
                   value={currentArticle?.category || ''}
                   onChange={(e) => setCurrentArticle(prev => ({ ...prev, category: e.target.value }))}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    isDarkMode
+                  className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-accent`}
+                    } focus:outline-none focus:ring-2 focus:ring-accent`}
                 >
                   {categories.filter(cat => cat.value !== 'all').map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -235,11 +211,10 @@ const AdminDocs: React.FC = () => {
                     type="url"
                     value={currentArticle?.videoUrl || ''}
                     onChange={(e) => setCurrentArticle(prev => ({ ...prev, videoUrl: e.target.value }))}
-                    className={`flex-1 px-4 py-3 rounded-lg border ${
-                      isDarkMode
+                    className={`flex-1 px-4 py-3 rounded-lg border ${isDarkMode
                         ? 'bg-gray-700 border-gray-600 text-white'
                         : 'bg-white border-gray-300 text-gray-900'
-                    } focus:outline-none focus:ring-2 focus:ring-accent`}
+                      } focus:outline-none focus:ring-2 focus:ring-accent`}
                     placeholder="https://youtube.com/watch?v=..."
                   />
                 </div>
@@ -259,20 +234,18 @@ const AdminDocs: React.FC = () => {
                     <textarea
                       value={currentArticle?.content || ''}
                       onChange={(e) => setCurrentArticle(prev => ({ ...prev, content: e.target.value }))}
-                      className={`w-full h-96 px-4 py-3 rounded-lg border ${
-                        isDarkMode
+                      className={`w-full h-96 px-4 py-3 rounded-lg border ${isDarkMode
                           ? 'bg-gray-700 border-gray-600 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm`}
+                        } focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm`}
                       placeholder="# Heading&#10;&#10;Your content here in **Markdown** format..."
                     />
                   </div>
                   {/* Preview */}
-                  <div className={`h-96 overflow-y-auto px-4 py-3 rounded-lg border ${
-                    isDarkMode
+                  <div className={`h-96 overflow-y-auto px-4 py-3 rounded-lg border ${isDarkMode
                       ? 'bg-gray-900 border-gray-600'
                       : 'bg-gray-50 border-gray-300'
-                  }`}>
+                    }`}>
                     <div className={`prose ${isDarkMode ? 'prose-invert' : ''} max-w-none`}>
                       <p className="text-sm text-gray-400 mb-4">Preview:</p>
                       {currentArticle?.content || <p className="text-gray-500 italic">No content yet...</p>}
@@ -306,11 +279,10 @@ const AdminDocs: React.FC = () => {
                 </button>
                 <button
                   onClick={handleCancel}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                    isDarkMode
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${isDarkMode
                       ? 'bg-gray-700 hover:bg-gray-600 text-white'
                       : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                  }`}
+                    }`}
                 >
                   <X className="w-5 h-5" />
                   Cancel
@@ -331,22 +303,20 @@ const AdminDocs: React.FC = () => {
                     placeholder="Search articles..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
-                      isDarkMode
+                    className={`w-full pl-10 pr-4 py-3 rounded-lg border ${isDarkMode
                         ? 'bg-gray-800 border-gray-700 text-white'
                         : 'bg-white border-gray-300 text-gray-900'
-                    } focus:outline-none focus:ring-2 focus:ring-accent`}
+                      } focus:outline-none focus:ring-2 focus:ring-accent`}
                   />
                 </div>
               </div>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className={`px-4 py-3 rounded-lg border ${
-                  isDarkMode
+                className={`px-4 py-3 rounded-lg border ${isDarkMode
                     ? 'bg-gray-800 border-gray-700 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-accent`}
+                  } focus:outline-none focus:ring-2 focus:ring-accent`}
               >
                 {categories.map(cat => (
                   <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -380,11 +350,10 @@ const AdminDocs: React.FC = () => {
                           <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             {article.title}
                           </h3>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            article.isPublished
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${article.isPublished
                               ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                               : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
-                          }`}>
+                            }`}>
                             {article.isPublished ? 'Published' : 'Draft'}
                           </span>
                         </div>

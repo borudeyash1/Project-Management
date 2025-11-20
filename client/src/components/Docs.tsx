@@ -18,183 +18,46 @@ import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import SEO from './SEO';
+import { docsStorage, DocArticle, DocCategory } from '../services/docsStorage';
 
-interface DocArticle {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  category: string;
-  subcategory?: string;
-  videoUrl?: string;
-  order: number;
-}
 
-interface DocCategory {
-  name: string;
-  slug: string;
-  icon: string;
-  articles: DocArticle[];
-  expanded?: boolean;
-}
-
-// Sample documentation data - will be replaced with API calls
-const sampleDocs: DocCategory[] = [
-  {
-    name: 'Getting Started',
-    slug: 'getting-started',
-    icon: '🚀',
-    articles: [
-      {
-        id: '1',
-        title: 'Introduction',
-        slug: 'introduction',
-        category: 'getting-started',
-        content: `# Welcome to Sartthi Documentation
-
-Sartthi is a comprehensive project management and payroll suite designed to streamline your workflow and boost productivity.
-
-## What is Sartthi?
-
-Sartthi combines powerful project management tools with integrated payroll features, making it the perfect solution for teams of all sizes.
-
-### Key Features
-
-- **Project Management**: Organize tasks, track progress, and collaborate with your team
-- **Payroll Integration**: Manage employee compensation seamlessly
-- **Real-time Collaboration**: Work together with your team in real-time
-- **Analytics & Reporting**: Get insights into your projects and team performance
-
-## Getting Started
-
-Follow our quick start guide to begin using Sartthi in minutes!`,
-        order: 1
-      },
-      {
-        id: '2',
-        title: 'Installation',
-        slug: 'installation',
-        category: 'getting-started',
-        content: `# Installation Guide
-
-Get Sartthi up and running in just a few steps.
-
-## System Requirements
-
-- Node.js 16.x or higher
-- MongoDB 5.x or higher
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-
-## Installation Steps
-
-### 1. Clone the Repository
-
-\`\`\`bash
-git clone https://github.com/your-org/sartthi.git
-cd sartthi
-\`\`\`
-
-### 2. Install Dependencies
-
-\`\`\`bash
-# Install server dependencies
-cd server
-npm install
-
-# Install client dependencies
-cd ../client
-npm install
-\`\`\`
-
-### 3. Configure Environment
-
-Create a \`.env\` file in the server directory:
-
-\`\`\`env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/sartthi
-JWT_SECRET=your_secret_key_here
-\`\`\`
-
-### 4. Start the Application
-
-\`\`\`bash
-# Start server
-cd server
-npm run dev
-
-# Start client (in another terminal)
-cd client
-npm start
-\`\`\`
-
-Your application should now be running at \`http://localhost:3000\`!`,
-        order: 2
-      }
-    ]
-  },
-  {
-    name: 'User Guide',
-    slug: 'user-guide',
-    icon: '📖',
-    articles: [
-      {
-        id: '3',
-        title: 'Creating Projects',
-        slug: 'creating-projects',
-        category: 'user-guide',
-        content: `# Creating Projects
-
-Learn how to create and manage projects in Sartthi.
-
-## Creating a New Project
-
-1. Navigate to your workspace dashboard
-2. Click the **"+ New Project"** button
-3. Fill in the project details:
-   - Project Name
-   - Description
-   - Start and End Dates
-   - Team Members
-   - Priority Level
-
-## Project Settings
-
-Configure your project settings to match your workflow:
-
-- **Visibility**: Public or Private
-- **Permissions**: Set team member roles
-- **Notifications**: Configure alert preferences
-- **Integrations**: Connect external tools
-
-## Best Practices
-
-- Use descriptive project names
-- Set realistic deadlines
-- Assign clear roles to team members
-- Regular status updates`,
-        order: 1
-      }
-    ]
-  }
-];
 
 const Docs: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
-  const [categories, setCategories] = useState<DocCategory[]>(sampleDocs);
+  const [categories, setCategories] = useState<DocCategory[]>([]);
   const [currentArticle, setCurrentArticle] = useState<DocArticle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Load categories and articles from storage
+  const loadDocs = () => {
+    const loadedCategories = docsStorage.getArticlesGroupedByCategory();
+    setCategories(loadedCategories);
+  };
+
+  useEffect(() => {
+    // Initial load
+    loadDocs();
+
+    // Listen for storage changes (real-time sync across tabs)
+    const unsubscribe = docsStorage.onStorageChange(() => {
+      loadDocs();
+    });
+
+    return unsubscribe;
+  }, []);
+
   useEffect(() => {
     // Load article based on slug
     if (slug) {
-      const article = categories
-        .flatMap(cat => cat.articles)
-        .find(art => art.slug === slug);
-      setCurrentArticle(article || null);
+      const article = docsStorage.getArticleBySlug(slug);
+      if (article && article.isPublished) {
+        setCurrentArticle(article);
+      } else {
+        setCurrentArticle(null);
+      }
     } else {
       // Load first article by default
       const firstArticle = categories[0]?.articles[0];
@@ -230,11 +93,10 @@ const Docs: React.FC = () => {
             placeholder="Search documentation..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-              isDarkMode
-                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:outline-none focus:ring-2 focus:ring-accent`}
+            className={`w-full pl-10 pr-4 py-2 rounded-lg border ${isDarkMode
+              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:outline-none focus:ring-2 focus:ring-accent`}
           />
         </div>
       </div>
@@ -245,9 +107,8 @@ const Docs: React.FC = () => {
           <div key={category.slug} className="mb-4">
             <button
               onClick={() => toggleCategory(category.slug)}
-              className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              } transition-colors`}
+              className={`w-full flex items-center justify-between p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                } transition-colors`}
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">{category.icon}</span>
@@ -268,15 +129,14 @@ const Docs: React.FC = () => {
                   <button
                     key={article.id}
                     onClick={() => selectArticle(article)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      currentArticle?.id === article.id
-                        ? isDarkMode
-                          ? 'bg-accent/20 text-accent'
-                          : 'bg-accent/10 text-accent-dark'
-                        : isDarkMode
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${currentArticle?.id === article.id
+                      ? isDarkMode
+                        ? 'bg-accent/20 text-accent'
+                        : 'bg-accent/10 text-accent-dark'
+                      : isDarkMode
                         ? 'text-gray-300 hover:bg-gray-700'
                         : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     {article.title}
                   </button>
@@ -297,7 +157,7 @@ const Docs: React.FC = () => {
         keywords="documentation, user guide, help, tutorial, sartthi docs"
         url="/docs"
       />
-      
+
       <SharedNavbar />
 
       <div className="pt-16 min-h-screen">
