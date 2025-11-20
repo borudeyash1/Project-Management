@@ -8,7 +8,28 @@ interface ContentBannerProps {
 
 const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
   const [banners, setBanners] = useState<IBanner[]>([]);
-  const [closedBanners, setClosedBanners] = useState<Set<string>>(new Set());
+  const [closedBanners, setClosedBanners] = useState<Set<string>>(() => {
+    // Initialize from localStorage
+    const saved = localStorage.getItem('closed_banners');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const now = Date.now();
+        const valid = new Set<string>();
+
+        // Filter out expired dismissals (older than 24 hours)
+        Object.entries(parsed).forEach(([id, timestamp]: [string, any]) => {
+          if (now - timestamp < 24 * 60 * 60 * 1000) {
+            valid.add(id);
+          }
+        });
+        return valid;
+      } catch (e) {
+        return new Set();
+      }
+    }
+    return new Set();
+  });
 
   useEffect(() => {
     loadBanners();
@@ -26,7 +47,20 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
   };
 
   const handleClose = (bannerId: string) => {
-    setClosedBanners(prev => new Set(prev).add(bannerId));
+    const newClosed = new Set(closedBanners).add(bannerId);
+    setClosedBanners(newClosed);
+
+    // Save to localStorage with timestamp
+    const saved = localStorage.getItem('closed_banners');
+    let parsed = {};
+    if (saved) {
+      try {
+        parsed = JSON.parse(saved);
+      } catch (e) { }
+    }
+
+    parsed = { ...parsed, [bannerId]: Date.now() };
+    localStorage.setItem('closed_banners', JSON.stringify(parsed));
   };
 
   const visibleBanners = banners.filter(banner => !closedBanners.has(banner._id));
