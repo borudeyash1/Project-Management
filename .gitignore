@@ -139,3 +139,9 @@ Thumbs.db
 
 # Optional: Ignore yarn.lock if using npm
 # yarn.lock
+
+# Server uploads (binary files, should be in R2)
+server/uploads/
+server/migration-log.txt
+server/test-output.txt
+server/test-r2.log
