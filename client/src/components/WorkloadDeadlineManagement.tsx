@@ -226,7 +226,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -449,7 +449,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -458,7 +458,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
           </select>
           <button
             onClick={() => setShowRequestModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Request
@@ -470,7 +470,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
         {workloadRequests
           .filter(request => selectedStatus === 'all' || request.status === selectedStatus)
           .map(request => (
-            <div key={request._id} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+            <div key={request._id} className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <img
@@ -540,7 +540,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
                   View Details
                 </button>
                 {request.status === 'pending' && (
-                  <button className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <button className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
                     <CheckCircle className="w-4 h-4" />
                     Review
                   </button>
@@ -560,7 +560,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -569,7 +569,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
           </select>
           <button
             onClick={() => setShowRequestModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Request
@@ -581,7 +581,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
         {deadlineExtensionRequests
           .filter(request => selectedStatus === 'all' || request.status === selectedStatus)
           .map(request => (
-            <div key={request._id} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+            <div key={request._id} className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <img
@@ -655,7 +655,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
                   View Details
                 </button>
                 {request.status === 'pending' && (
-                  <button className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <button className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
                     <CheckCircle className="w-4 h-4" />
                     Review
                   </button>
@@ -673,7 +673,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Employee Workload Overview</h3>
         <button
           onClick={() => setShowAnalyticsModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <BarChart3 className="w-4 h-4" />
           View Analytics
@@ -703,7 +703,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
                     {employee.utilizationPercentage}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-300 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full transition-all duration-300 ${
                       employee.utilizationPercentage >= 90 ? 'bg-red-500' :
@@ -736,7 +736,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Performance Rating</span>
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-400" />
+                  <Star className="w-4 h-4 text-yellow-600" />
                   <span className="text-sm font-medium text-gray-900">{employee.performance.rating}</span>
                 </div>
               </div>
@@ -763,7 +763,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
               <p className="text-sm font-medium text-gray-600">Total Requests</p>
               <p className="text-2xl font-semibold text-gray-900">{workloadAnalytics.totalRequests}</p>
             </div>
-            <FileText className="w-8 h-8 text-blue-600" />
+            <FileText className="w-8 h-8 text-accent-dark" />
           </div>
         </div>
         
@@ -806,7 +806,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
               <div key={requester.employeeId} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-blue-600">{index + 1}</span>
+                    <span className="text-sm font-medium text-accent-dark">{index + 1}</span>
                   </div>
                   <span className="text-sm font-medium text-gray-900">{requester.employeeName}</span>
                 </div>
@@ -823,9 +823,9 @@ const WorkloadDeadlineManagement: React.FC = () => {
               <div key={index} className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">{item.range}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-20 bg-gray-200 rounded-full h-2">
+                  <div className="w-20 bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-accent h-2 rounded-full"
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
@@ -890,8 +890,8 @@ const WorkloadDeadlineManagement: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   title={tab.description}
                 >
@@ -923,7 +923,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
             <span className="font-medium">{message.text}</span>
             <button
               onClick={() => setMessage(null)}
-              className="ml-2 text-gray-400 hover:text-gray-600"
+              className="ml-2 text-gray-600 hover:text-gray-600"
             >
               <X className="w-4 h-4" />
             </button>

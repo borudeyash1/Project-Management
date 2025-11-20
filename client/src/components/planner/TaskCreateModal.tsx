@@ -117,11 +117,11 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Create New Task</h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="p-2 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <X className="w-5 h-5" />
           </button>
@@ -131,7 +131,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
           <div className="p-6 space-y-6">
             {/* Task Type Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-3">
                 Task Type
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -144,17 +144,17 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                       onClick={() => setTaskType(type.id as TaskType)}
                       className={`p-4 border-2 rounded-lg text-left transition-all ${
                         taskType === type.id
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'border-accent bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-300 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       <Icon className={`w-6 h-6 mb-2 ${
-                        taskType === type.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
+                        taskType === type.id ? 'text-accent-dark dark:text-accent-light' : 'text-gray-600'
                       }`} />
                       <div className="font-medium text-gray-900 dark:text-white text-sm">
                         {type.label}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                         {type.description}
                       </div>
                     </button>
@@ -166,7 +166,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Info Box based on Task Type */}
             {taskType === 'reminder' && (
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <p className="text-sm text-blue-800 dark:text-blue-200">
+                <p className="text-sm text-blue-800 dark:text-blue-700">
                   <strong>Reminder:</strong> Quick notification for important events. Set the date/time and notification timing.
                 </p>
               </div>
@@ -188,14 +188,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
 
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Title *
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder={
                   taskType === 'reminder' ? 'e.g., Team standup meeting' :
                   taskType === 'milestone' ? 'e.g., Launch v2.0' :
@@ -209,14 +209,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Description - Show for Task and Milestone */}
             {(taskType === 'task' || taskType === 'milestone') && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                   placeholder="Add description..."
                 />
               </div>
@@ -225,7 +225,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Date and Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
                   Due Date
                 </label>
@@ -233,11 +233,11 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   type="date"
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Clock className="w-4 h-4 inline mr-1" />
                   Time
                 </label>
@@ -245,7 +245,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   type="time"
                   value={formData.dueTime}
                   onChange={(e) => setFormData({ ...formData, dueTime: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
             </div>
@@ -253,14 +253,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Priority and Status */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Flag className="w-4 h-4 inline mr-1" />
                   Priority
                 </label>
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -269,13 +269,13 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Status
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="todo">To Do</option>
                   <option value="in-progress">In Progress</option>
@@ -288,7 +288,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Estimated Time - Show for Task and Subtask only */}
             {(taskType === 'task' || taskType === 'subtask') && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Clock className="w-4 h-4 inline mr-1" />
                   Estimated Time (hours)
                 </label>
@@ -298,7 +298,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   step="0.5"
                   value={formData.estimatedTime}
                   onChange={(e) => setFormData({ ...formData, estimatedTime: parseFloat(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
             )}
@@ -306,7 +306,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Assignees - Show for Task, Subtask, and Milestone */}
             {(taskType === 'task' || taskType === 'subtask' || taskType === 'milestone') && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
                 Assignees
               </label>
@@ -316,13 +316,13 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   value={assigneeInput}
                   onChange={(e) => setAssigneeInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAssignee())}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                   placeholder="Enter assignee name"
                 />
                 <button
                   type="button"
                   onClick={handleAddAssignee}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Add
                 </button>
@@ -331,7 +331,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                 {formData.assignees.map(assignee => (
                   <span
                     key={assignee}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded-full text-sm"
                   >
                     {assignee}
                     <button
@@ -349,7 +349,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
 
             {/* Tags - Show for all types */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 <Tag className="w-4 h-4 inline mr-1" />
                 Tags
               </label>
@@ -359,13 +359,13 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                   placeholder="Enter tag"
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Add
                 </button>
@@ -374,7 +374,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                 {formData.tags.map(tag => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-700 rounded-full text-sm"
                   >
                     {tag}
                     <button
@@ -392,14 +392,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Recurrence (for reminders) */}
             {taskType === 'reminder' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Repeat className="w-4 h-4 inline mr-1" />
                   Recurrence
                 </label>
                 <select
                   value={formData.recurrence}
                   onChange={(e) => setFormData({ ...formData, recurrence: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="none">None</option>
                   <option value="daily">Daily</option>
@@ -412,14 +412,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Reminder - Show for all except Subtask */}
             {taskType !== 'subtask' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Bell className="w-4 h-4 inline mr-1" />
                   {taskType === 'reminder' ? 'Notification Timing *' : 'Reminder'}
                 </label>
                 <select
                   value={formData.reminder}
                   onChange={(e) => setFormData({ ...formData, reminder: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                   required={taskType === 'reminder'}
                 >
                   <option value="none">No reminder</option>
@@ -429,7 +429,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   <option value="1day">1 day before</option>
                 </select>
                 {taskType === 'reminder' && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                     You'll receive a notification at this time
                   </p>
                 )}
@@ -444,9 +444,9 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   id="clientVisible"
                   checked={formData.clientVisible}
                   onChange={(e) => setFormData({ ...formData, clientVisible: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                  className="w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent"
                 />
-                <label htmlFor="clientVisible" className="text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="clientVisible" className="text-sm text-gray-700 dark:text-gray-700">
                   Make visible to client
                 </label>
               </div>
@@ -454,18 +454,18 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-300 dark:border-gray-600">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!formData.title.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Create {taskType.charAt(0).toUpperCase() + taskType.slice(1)}
             </button>

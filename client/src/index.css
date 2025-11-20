@@ -68,11 +68,106 @@
   }
 
   .dark .text-gray-500 {
-    color: #9CA3AF !important;
+    color: #D1D5DB !important;
   }
 
   .dark .text-gray-400 {
-    color: #9CA3AF !important;
+    color: #D1D5DB !important;
+  }
+  
+  /* Improved color contrast in dark mode */
+  .dark .text-blue-700,
+  .dark .text-blue-600 {
+    color: #93C5FD !important;
+  }
+  
+  .dark .text-blue-800 {
+    color: #BFDBFE !important;
+  }
+  
+  .dark .text-green-700,
+  .dark .text-green-600 {
+    color: #86EFAC !important;
+  }
+  
+  .dark .text-green-800 {
+    color: #BBF7D0 !important;
+  }
+  
+  .dark .text-orange-700,
+  .dark .text-orange-600 {
+    color: #FDBA74 !important;
+  }
+  
+  .dark .text-orange-800 {
+    color: #FED7AA !important;
+  }
+  
+  .dark .text-yellow-700,
+  .dark .text-yellow-600 {
+    color: #FDE047 !important;
+  }
+  
+  .dark .text-yellow-800 {
+    color: #FEF08A !important;
+  }
+  
+  .dark .text-red-700,
+  .dark .text-red-600 {
+    color: #FCA5A5 !important;
+  }
+  
+  .dark .text-red-800 {
+    color: #FECACA !important;
+  }
+  
+  .dark .text-purple-700,
+  .dark .text-purple-600 {
+    color: #C4B5FD !important;
+  }
+  
+  .dark .text-purple-800 {
+    color: #DDD6FE !important;
+  }
+  
+  /* Additional dark mode improvements for better contrast */
+  .dark .text-gray-200 {
+    color: #E5E7EB !important;
+  }
+  
+  .dark .text-gray-300 {
+    color: #D1D5DB !important;
+  }
+  
+  /* Cyan/Teal colors for dark mode */
+  .dark .text-cyan-200,
+  .dark .text-cyan-300 {
+    color: #A5F3FC !important;
+  }
+  
+  /* Ensure all badge text is visible in dark mode */
+  .dark .text-blue-200 {
+    color: #BFDBFE !important;
+  }
+  
+  .dark .text-green-200 {
+    color: #BBF7D0 !important;
+  }
+  
+  .dark .text-orange-200 {
+    color: #FED7AA !important;
+  }
+  
+  .dark .text-yellow-200 {
+    color: #FEF08A !important;
+  }
+  
+  .dark .text-red-200 {
+    color: #FECACA !important;
+  }
+  
+  .dark .text-purple-200 {
+    color: #DDD6FE !important;
   }
 
   .dark .text-black {

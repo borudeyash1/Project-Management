@@ -484,7 +484,7 @@ const MilestoneTaskSystem: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -580,13 +580,13 @@ const MilestoneTaskSystem: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
             </div>
           </div>
@@ -594,7 +594,7 @@ const MilestoneTaskSystem: React.FC = () => {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -605,7 +605,7 @@ const MilestoneTaskSystem: React.FC = () => {
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="all">All Priority</option>
               <option value="low">Low</option>
@@ -616,7 +616,7 @@ const MilestoneTaskSystem: React.FC = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="dueDate">Due Date</option>
               <option value="priority">Priority</option>
@@ -634,7 +634,7 @@ const MilestoneTaskSystem: React.FC = () => {
           const isExpanded = expandedTasks.has(task._id);
           
           return (
-            <div key={task._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div key={task._id} className="bg-white rounded-lg border border-gray-300 overflow-hidden">
               {/* Task Header */}
               <div className="p-4">
                 <div className="flex items-center justify-between">
@@ -644,9 +644,9 @@ const MilestoneTaskSystem: React.FC = () => {
                       className="p-1 hover:bg-gray-100 rounded"
                     >
                       {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                        <ChevronDown className="w-4 h-4 text-gray-600" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-gray-500" />
+                        <ChevronRight className="w-4 h-4 text-gray-600" />
                       )}
                     </button>
                     <div className="flex-1">
@@ -666,7 +666,7 @@ const MilestoneTaskSystem: React.FC = () => {
                         setSelectedTask(task);
                         setShowTaskModal(true);
                       }}
-                      className="p-2 text-gray-400 hover:text-gray-600"
+                      className="p-2 text-gray-600 hover:text-gray-600"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -679,9 +679,9 @@ const MilestoneTaskSystem: React.FC = () => {
                     <span>Progress: {task.completedMilestones}/{task.totalMilestones} milestones</span>
                     <span>{task.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-accent h-2 rounded-full transition-all duration-300"
                       style={{ width: `${task.progress}%` }}
                     />
                   </div>
@@ -710,7 +710,7 @@ const MilestoneTaskSystem: React.FC = () => {
 
               {/* Milestones (Expanded View) */}
               {isExpanded && (
-                <div className="border-t border-gray-200 bg-gray-50">
+                <div className="border-t border-gray-300 bg-gray-50">
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-semibold text-gray-900">Milestones</h4>
@@ -719,7 +719,7 @@ const MilestoneTaskSystem: React.FC = () => {
                           setSelectedTask(task);
                           setShowCreateMilestone(true);
                         }}
-                        className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="flex items-center gap-2 px-3 py-1 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                       >
                         <Plus className="w-4 h-4" />
                         Add Milestone
@@ -738,7 +738,7 @@ const MilestoneTaskSystem: React.FC = () => {
                                 className={`p-1 rounded-full ${
                                   milestone.status === 'completed' 
                                     ? 'text-green-600 hover:text-green-700' 
-                                    : 'text-gray-400 hover:text-gray-600'
+                                    : 'text-gray-600 hover:text-gray-600'
                                 }`}
                               >
                                 {milestone.status === 'completed' ? (
@@ -764,7 +764,7 @@ const MilestoneTaskSystem: React.FC = () => {
                                   setSelectedMilestone(milestone);
                                   setShowMilestoneModal(true);
                                 }}
-                                className="p-1 text-gray-400 hover:text-gray-600"
+                                className="p-1 text-gray-600 hover:text-gray-600"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -777,7 +777,7 @@ const MilestoneTaskSystem: React.FC = () => {
                               <span>Progress: {milestone.progress}%</span>
                               <span>{milestone.actualHours}/{milestone.estimatedHours}h</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div className="w-full bg-gray-300 rounded-full h-1.5">
                               <div 
                                 className="bg-green-600 h-1.5 rounded-full transition-all duration-300"
                                 style={{ width: `${milestone.progress}%` }}
@@ -794,8 +794,8 @@ const MilestoneTaskSystem: React.FC = () => {
                                     key={star}
                                     className={`w-4 h-4 ${
                                       star <= milestone.rating! 
-                                        ? 'text-yellow-400 fill-current' 
-                                        : 'text-gray-300'
+                                        ? 'text-yellow-600 fill-current' 
+                                        : 'text-gray-700'
                                     }`}
                                   />
                                 ))}
@@ -834,7 +834,7 @@ const MilestoneTaskSystem: React.FC = () => {
                   className={`p-1 rounded-full ${
                     milestone.status === 'completed' 
                       ? 'text-green-600 hover:text-green-700' 
-                      : 'text-gray-400 hover:text-gray-600'
+                      : 'text-gray-600 hover:text-gray-600'
                   }`}
                 >
                   {milestone.status === 'completed' ? (
@@ -865,7 +865,7 @@ const MilestoneTaskSystem: React.FC = () => {
                     setSelectedMilestone(milestone);
                     setShowMilestoneModal(true);
                   }}
-                  className="p-2 text-gray-400 hover:text-gray-600"
+                  className="p-2 text-gray-600 hover:text-gray-600"
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -878,9 +878,9 @@ const MilestoneTaskSystem: React.FC = () => {
                 <span>Progress: {milestone.progress}%</span>
                 <span>{milestone.actualHours}/{milestone.estimatedHours} hours</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-300 rounded-full h-2">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-accent h-2 rounded-full transition-all duration-300"
                   style={{ width: `${milestone.progress}%` }}
                 />
               </div>
@@ -895,8 +895,8 @@ const MilestoneTaskSystem: React.FC = () => {
                       key={star}
                       className={`w-4 h-4 ${
                         star <= milestone.rating! 
-                          ? 'text-yellow-400 fill-current' 
-                          : 'text-gray-300'
+                          ? 'text-yellow-600 fill-current' 
+                          : 'text-gray-700'
                       }`}
                     />
                   ))}
@@ -919,7 +919,7 @@ const MilestoneTaskSystem: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Milestone Templates</h3>
         <button
           onClick={() => setShowCreateTemplate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
         >
           <Plus className="w-4 h-4" />
           Create Template
@@ -954,7 +954,7 @@ const MilestoneTaskSystem: React.FC = () => {
                 <Eye className="w-4 h-4" />
                 View
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
                 <Copy className="w-4 h-4" />
                 Use
               </button>
@@ -975,7 +975,7 @@ const MilestoneTaskSystem: React.FC = () => {
               <p className="text-2xl font-bold text-gray-900">{tasks.length}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <Target className="w-6 h-6 text-blue-600" />
+              <Target className="w-6 h-6 text-accent-dark" />
             </div>
           </div>
         </div>
@@ -1036,11 +1036,11 @@ const MilestoneTaskSystem: React.FC = () => {
                 <div key={status} className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 capitalize">{status}</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
+                    <div className="w-20 bg-gray-300 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
                           status === 'completed' ? 'bg-green-600' :
-                          status === 'in-progress' ? 'bg-blue-600' :
+                          status === 'in-progress' ? 'bg-accent' :
                           status === 'blocked' ? 'bg-red-600' :
                           'bg-gray-600'
                         }`}
@@ -1062,9 +1062,9 @@ const MilestoneTaskSystem: React.FC = () => {
               <div key={task._id} className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 truncate">{task.title}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-20 bg-gray-200 rounded-full h-2">
+                  <div className="w-20 bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-accent h-2 rounded-full"
                       style={{ width: `${task.progress}%` }}
                     />
                   </div>
@@ -1096,7 +1096,7 @@ const MilestoneTaskSystem: React.FC = () => {
   return (
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Milestone Task System</h1>
@@ -1105,7 +1105,7 @@ const MilestoneTaskSystem: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowCreateTask(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               Create Task
@@ -1167,7 +1167,7 @@ const MilestoneTaskSystem: React.FC = () => {
             <span className="font-medium">{message.text}</span>
             <button
               onClick={() => setMessage(null)}
-              className="ml-2 text-gray-400 hover:text-gray-600"
+              className="ml-2 text-gray-600 hover:text-gray-600"
             >
               <X className="w-4 h-4" />
             </button>

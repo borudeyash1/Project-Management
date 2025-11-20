@@ -112,7 +112,7 @@ const Settings: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Admin Settings</h1>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Manage your admin account preferences</p>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage your admin account preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -130,7 +130,7 @@ const Settings: React.FC = () => {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white'
-                      : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'
+                      : isDarkMode ? 'text-gray-700 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <tab.icon className="w-5 h-5" />
@@ -147,17 +147,17 @@ const Settings: React.FC = () => {
                   <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Profile Settings</h2>
                   
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Name</label>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>Name</label>
                     <input type="text" value={adminData.name} disabled className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-400' : 'bg-gray-50 border-gray-300 text-gray-500'} cursor-not-allowed`} />
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Email</label>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>Email</label>
                     <input type="email" value={adminData.email} disabled className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-400' : 'bg-gray-50 border-gray-300 text-gray-500'} cursor-not-allowed`} />
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Role</label>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>Role</label>
                     <input type="text" value={adminData.role} disabled className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-400' : 'bg-gray-50 border-gray-300 text-gray-500'} cursor-not-allowed`} />
                   </div>
 
@@ -170,7 +170,7 @@ const Settings: React.FC = () => {
                       <div className="mt-4 space-y-4">
                         {['current', 'new', 'confirm'].map(type => (
                           <div key={type}>
-                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                               {type === 'current' ? 'Current Password' : type === 'new' ? 'New Password' : 'Confirm New Password'}
                             </label>
                             <div className="relative">
@@ -181,7 +181,7 @@ const Settings: React.FC = () => {
                                 className={`w-full px-4 py-2 pr-10 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
                               />
                               <button type="button" onClick={() => setShowPasswords({ ...showPasswords, [type]: !showPasswords[type as keyof typeof showPasswords] })} className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                {showPasswords[type as keyof typeof showPasswords] ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
+                                {showPasswords[type as keyof typeof showPasswords] ? <EyeOff className="w-5 h-5 text-gray-600" /> : <Eye className="w-5 h-5 text-gray-600" />}
                               </button>
                             </div>
                           </div>
@@ -206,21 +206,21 @@ const Settings: React.FC = () => {
               {activeTab === 'security' && (
                 <div className="space-y-6">
                   <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Security Settings</h2>
-                  <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Security features coming soon...</p>
+                  <p className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Security features coming soon...</p>
                 </div>
               )}
 
               {activeTab === 'notifications' && (
                 <div className="space-y-6">
                   <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Notification Preferences</h2>
-                  <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Notification settings coming soon...</p>
+                  <p className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Notification settings coming soon...</p>
                 </div>
               )}
 
               {activeTab === 'system' && (
                 <div className="space-y-6">
                   <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>System Settings</h2>
-                  <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>System configuration coming soon...</p>
+                  <p className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>System configuration coming soon...</p>
                 </div>
               )}
             </div>
@@ -234,7 +234,7 @@ const Settings: React.FC = () => {
               <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
                 Verify OTP
               </h3>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-6`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-6`}>
                 Enter the 6-digit code sent to your email
               </p>
               
@@ -271,7 +271,7 @@ const Settings: React.FC = () => {
                   className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
                     otp.length === 6
                       ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gray-400 text-gray-600 cursor-not-allowed'
                   }`}
                 >
                   Verify & Change Password
@@ -283,7 +283,7 @@ const Settings: React.FC = () => {
                 disabled={otpSending}
                 className={`w-full mt-4 text-sm font-medium ${
                   otpSending 
-                    ? 'text-gray-400 cursor-not-allowed' 
+                    ? 'text-gray-600 cursor-not-allowed' 
                     : 'text-yellow-500 hover:text-yellow-600'
                 }`}
               >

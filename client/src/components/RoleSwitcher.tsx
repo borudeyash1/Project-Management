@@ -17,7 +17,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
   const roles = [
     { id: 'owner', label: 'Workspace Owner', icon: Crown, color: 'text-yellow-600 bg-yellow-100', userId: 'user_owner_123', userName: 'John Doe (Owner)' },
     { id: 'project-manager', label: 'Project Manager', icon: Shield, color: 'text-purple-600 bg-purple-100', userId: 'user_pm_456', userName: 'Jane Smith (PM)' },
-    { id: 'employee', label: 'Employee', icon: User, color: 'text-blue-600 bg-blue-100', userId: 'user_emp_789', userName: 'Bob Wilson (Employee)' }
+    { id: 'employee', label: 'Employee', icon: User, color: 'text-accent-dark bg-blue-100', userId: 'user_emp_789', userName: 'Bob Wilson (Employee)' }
   ];
 
   const handleRoleSwitch = (role: any) => {
@@ -30,8 +30,8 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
-        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase">
+      <div className="bg-white rounded-lg shadow-lg border border-gray-300 p-4">
+        <div className="text-xs font-semibold text-gray-600 mb-2 uppercase">
           Testing Mode - Switch Role
         </div>
         <div className="space-y-2">
@@ -63,7 +63,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
           <p className="text-xs text-gray-600">
             Current User: {roles.find(r => r.id === currentRole)?.userName}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-600 mt-1">
             ID: {currentUserId}
           </p>
         </div>

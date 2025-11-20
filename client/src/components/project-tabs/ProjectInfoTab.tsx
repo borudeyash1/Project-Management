@@ -69,7 +69,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       case 'on-hold': return 'bg-yellow-100 text-yellow-700';
       case 'completed': return 'bg-blue-100 text-blue-700';
       case 'cancelled': return 'bg-red-100 text-red-700';
-      case 'abandoned': return 'bg-orange-100 text-orange-700';
+      case 'abandoned': return 'bg-orange-200 text-orange-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -78,7 +78,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
     switch (priority) {
       case 'low': return 'bg-gray-100 text-gray-700';
       case 'medium': return 'bg-blue-100 text-blue-700';
-      case 'high': return 'bg-orange-100 text-orange-700';
+      case 'high': return 'bg-orange-200 text-orange-700';
       case 'critical': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
@@ -86,8 +86,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
 
   if (!project) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+      <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
+        <AlertCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
         <p className="text-gray-600">Project information not available</p>
       </div>
     );
@@ -95,7 +95,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Project Information</h3>
@@ -112,7 +112,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div className="flex items-center gap-2">
               <button
                 onClick={handleSave}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Save className="w-4 h-4" />
                 Save
@@ -142,7 +142,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 />
               ) : (
                 <p className="text-gray-900 font-medium">{project.name}</p>
@@ -159,7 +159,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="text"
                   value={formData.client}
                   onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 />
               ) : (
                 <p className="text-gray-900">{project.client || 'No client'}</p>
@@ -177,7 +177,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
               />
             ) : (
               <p className="text-gray-700">{project.description || 'No description'}</p>
@@ -194,7 +194,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
                   <option value="planning">Planning</option>
                   <option value="active">Active</option>
@@ -218,7 +218,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -245,7 +245,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="date"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 />
               ) : (
                 <p className="text-gray-900">
@@ -264,7 +264,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="date"
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 />
               ) : (
                 <p className="text-gray-900">
@@ -286,7 +286,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="number"
                   value={formData.budgetEstimated}
                   onChange={(e) => setFormData({ ...formData, budgetEstimated: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   placeholder="0"
                 />
               ) : (
@@ -306,7 +306,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="number"
                   value={formData.budgetActual}
                   onChange={(e) => setFormData({ ...formData, budgetActual: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   placeholder="0"
                 />
               ) : (
@@ -324,9 +324,9 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
               Progress
             </label>
             <div className="flex items-center gap-4">
-              <div className="flex-1 bg-gray-200 rounded-full h-3">
+              <div className="flex-1 bg-gray-300 rounded-full h-3">
                 <div
-                  className="bg-blue-600 h-3 rounded-full transition-all"
+                  className="bg-accent h-3 rounded-full transition-all"
                   style={{ width: `${project.progress || 0}%` }}
                 />
               </div>
@@ -345,7 +345,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 type="text"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 placeholder="Enter tags separated by commas"
               />
             ) : (
@@ -360,7 +360,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                     </span>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm">No tags</p>
+                  <p className="text-gray-600 text-sm">No tags</p>
                 )}
               </div>
             )}

@@ -401,7 +401,7 @@ const Auth: React.FC = () => {
                   Sartthi
                 </div>
                 <div
-                  className={`text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+                  className={`text-sm ${isDarkMode ? "text-gray-600" : "text-slate-500"}`}
                 >
                   Project & Payroll Suite
                 </div>
@@ -415,7 +415,7 @@ const Auth: React.FC = () => {
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "login"
                     ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
-                    : `${isDarkMode ? "text-gray-400 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
+                    : `${isDarkMode ? "text-gray-600 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
                 }`}
                 onClick={switchToLogin}
               >
@@ -425,7 +425,7 @@ const Auth: React.FC = () => {
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "register"
                     ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
-                    : `${isDarkMode ? "text-gray-400 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
+                    : `${isDarkMode ? "text-gray-600 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
                 }`}
                 onClick={switchToRegister}
               >
@@ -463,7 +463,7 @@ const Auth: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
+                    className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-600" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
                     placeholder="you@company.com"
                     required
                   />
@@ -477,7 +477,7 @@ const Auth: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      className={`text-xs font-medium ${isDarkMode ? "text-yellow-400 hover:text-yellow-300" : "text-yellow-600 hover:text-yellow-700"} transition-colors`}
+                      className={`text-xs font-medium ${isDarkMode ? "text-yellow-600 hover:text-yellow-700" : "text-yellow-600 hover:text-yellow-700"} transition-colors`}
                     >
                       Forgot?
                     </button>
@@ -488,7 +488,7 @@ const Auth: React.FC = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
+                      className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-600" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
                       placeholder="••••••••"
                       required
                     />
@@ -499,11 +499,11 @@ const Auth: React.FC = () => {
                     >
                       {showPassword ? (
                         <EyeOff
-                          className={`w-5 h-5 ${isDarkMode ? "text-gray-400" : "text-slate-400"}`}
+                          className={`w-5 h-5 ${isDarkMode ? "text-gray-600" : "text-slate-400"}`}
                         />
                       ) : (
                         <Eye
-                          className={`w-5 h-5 ${isDarkMode ? "text-gray-400" : "text-slate-400"}`}
+                          className={`w-5 h-5 ${isDarkMode ? "text-gray-600" : "text-slate-400"}`}
                         />
                       )}
                     </button>
@@ -512,7 +512,7 @@ const Auth: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-2">
                   <label
-                    className={`inline-flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-300" : "text-slate-700"} cursor-pointer font-medium`}
+                    className={`inline-flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-700" : "text-slate-700"} cursor-pointer font-medium`}
                   >
                     <input type="checkbox" className="peer sr-only" />
                     <span
@@ -523,7 +523,7 @@ const Auth: React.FC = () => {
                     Remember me
                   </label>
                   <div
-                    className={`text-xs ${isDarkMode ? "text-gray-400" : "text-slate-500"} font-medium`}
+                    className={`text-xs ${isDarkMode ? "text-gray-600" : "text-slate-500"} font-medium`}
                   >
                     SSO enabled
                   </div>
@@ -545,7 +545,7 @@ const Auth: React.FC = () => {
                   </div>
                   <div className="relative flex justify-center">
                     <span
-                      className={`${isDarkMode ? "bg-gray-800" : "bg-white"} px-4 text-sm font-medium ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+                      className={`${isDarkMode ? "bg-gray-800" : "bg-white"} px-4 text-sm font-medium ${isDarkMode ? "text-gray-600" : "text-slate-500"}`}
                     >
                       or
                     </span>
@@ -582,12 +582,12 @@ const Auth: React.FC = () => {
                     Verify Your Login
                   </h3>
                   <p
-                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-slate-600"} mb-6`}
+                    className={`text-sm ${isDarkMode ? "text-gray-700" : "text-slate-600"} mb-6`}
                   >
                     We've sent a 6-digit verification code to{" "}
                     <strong
                       className={
-                        isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                        isDarkMode ? "text-yellow-600" : "text-yellow-600"
                       }
                     >
                       {loginEmail}
@@ -622,12 +622,12 @@ const Auth: React.FC = () => {
                 <div className="text-center">
                   {otpTimer > 0 ? (
                     <p
-                      className={`text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"} font-medium`}
+                      className={`text-sm ${isDarkMode ? "text-gray-600" : "text-slate-500"} font-medium`}
                     >
                       Resend OTP in{" "}
                       <span
                         className={
-                          isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                          isDarkMode ? "text-yellow-600" : "text-yellow-600"
                         }
                       >
                         {otpTimer}s
@@ -638,7 +638,7 @@ const Auth: React.FC = () => {
                       type="button"
                       onClick={handleResendOtp}
                       disabled={loading}
-                      className={`text-sm ${isDarkMode ? "text-yellow-400 hover:text-yellow-300" : "text-yellow-600 hover:text-yellow-700"} font-bold disabled:opacity-50 transition-colors`}
+                      className={`text-sm ${isDarkMode ? "text-yellow-600 hover:text-yellow-700" : "text-yellow-600 hover:text-yellow-700"} font-bold disabled:opacity-50 transition-colors`}
                     >
                       Resend OTP
                     </button>

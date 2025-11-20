@@ -74,7 +74,7 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+        <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Review Task</h2>
@@ -84,7 +84,7 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-600" />
             </button>
           </div>
         </div>
@@ -145,7 +145,7 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
                 ))}
               </div>
               <div className="mt-3">
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-300 rounded-full h-2">
                   <div
                     className="bg-green-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${task.progress}%` }}
@@ -166,13 +166,13 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
                 {task.attachments.map((file: any, index: number) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <FileText className="w-4 h-4 text-gray-600 flex-shrink-0" />
                       <span className="text-sm text-gray-700 truncate">{file.name}</span>
                     </div>
                     <a
                       href={file.url}
                       download
-                      className="p-1 text-blue-600 hover:bg-blue-50 rounded ml-2"
+                      className="p-1 text-accent-dark hover:bg-blue-50 rounded ml-2"
                       title="Download"
                     >
                       <Download className="w-4 h-4" />
@@ -196,10 +196,10 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                    className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors"
                   >
-                    <ExternalLink className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    <span className="text-sm text-blue-600 hover:underline truncate flex-1">{link}</span>
+                    <ExternalLink className="w-4 h-4 text-accent-dark flex-shrink-0" />
+                    <span className="text-sm text-accent-dark hover:underline truncate flex-1">{link}</span>
                   </a>
                 ))}
               </div>
@@ -225,8 +225,8 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
                       <Star
                         className={`w-10 h-10 ${
                           star <= (hoverRating || rating)
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-gray-300'
+                            ? 'fill-yellow-400 text-yellow-600'
+                            : 'text-gray-700'
                         }`}
                       />
                     </button>
@@ -254,7 +254,7 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Add feedback about the task completion..."
                 />
               </div>
@@ -280,7 +280,7 @@ const TaskReviewModal: React.FC<TaskReviewModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4">
+        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-300 px-6 py-4">
           {!showRejectForm ? (
             <div className="flex items-center justify-between">
               <button

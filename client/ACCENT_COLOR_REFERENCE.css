@@ -1,0 +1,203 @@
+/* 
+ * Quick Reference: Yellow Accent Color Theme
+ * Use these classes throughout the application for consistent styling
+ */
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+
+/* Primary Action Button */
+.example-primary-button {
+  @apply bg-accent text-gray-900 px-4 py-2 rounded-lg hover:bg-accent-hover transition-colors;
+}
+
+/* Or use the utility class */
+.btn-accent {
+  /* Already defined in index.css */
+}
+
+/* ============================================
+   LOADING INDICATORS
+   ============================================ */
+
+/* Spinner with accent color */
+.example-spinner {
+  @apply w-10 h-10 border-4 border-accent/20 border-t-accent rounded-full animate-spin;
+}
+
+/* ============================================
+   PROGRESS BARS
+   ============================================ */
+
+/* Progress bar fill */
+.example-progress {
+  @apply bg-accent h-2 rounded-full transition-all;
+}
+
+/* ============================================
+   BADGES & TAGS
+   ============================================ */
+
+/* Accent badge */
+.example-badge {
+  @apply bg-accent/10 text-accent-dark px-2 py-1 rounded-full text-xs font-medium;
+}
+
+/* ============================================
+   BORDERS & OUTLINES
+   ============================================ */
+
+/* Accent border */
+.example-border {
+  @apply border-2 border-accent;
+}
+
+/* Focus ring */
+.example-focus {
+  @apply focus:ring-2 focus:ring-accent focus:ring-offset-2;
+}
+
+/* ============================================
+   BACKGROUNDS
+   ============================================ */
+
+/* Solid accent background */
+.example-bg-solid {
+  @apply bg-accent;
+}
+
+/* Gradient background */
+.example-bg-gradient {
+  @apply bg-accent-gradient;
+}
+
+/* Light accent background */
+.example-bg-light {
+  @apply bg-accent/10;
+}
+
+/* ============================================
+   TEXT COLORS
+   ============================================ */
+
+/* Accent text */
+.example-text {
+  @apply text-accent-dark;
+}
+
+/* Hover text */
+.example-text-hover {
+  @apply hover:text-accent;
+}
+
+/* ============================================
+   ICON COLORS
+   ============================================ */
+
+/* Icon with accent color */
+.example-icon {
+  @apply text-accent;
+}
+
+/* ============================================
+   DARK MODE COMPATIBILITY
+   ============================================ */
+
+/* The accent colors work well in both light and dark modes */
+/* Example: */
+.example-dark-mode-button {
+  @apply bg-accent text-gray-900 dark:text-gray-900 hover:bg-accent-hover;
+}
+
+/* ============================================
+   COMPLETE BUTTON EXAMPLES
+   ============================================ */
+
+/* Primary Button */
+<button className="bg-accent text-gray-900 px-4 py-2 rounded-lg hover:bg-accent-hover transition-all duration-200 font-medium">
+  Primary Action
+</button>
+
+/* Secondary Button with Accent Border */
+<button className="border-2 border-accent text-accent-dark px-4 py-2 rounded-lg hover:bg-accent hover:text-gray-900 transition-all duration-200">
+  Secondary Action
+</button>
+
+/* Icon Button */
+<button className="p-2 rounded-lg bg-accent/10 text-accent-dark hover:bg-accent hover:text-gray-900 transition-colors">
+  <Icon className="w-5 h-5" />
+</button>
+
+/* Loading Button */
+<button className="bg-accent text-gray-900 px-4 py-2 rounded-lg flex items-center gap-2" disabled>
+  <div className="w-4 h-4 border-2 border-gray-900/20 border-t-gray-900 rounded-full animate-spin" />
+  Loading...
+</button>
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+
+/* Input with accent focus */
+<input 
+  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent focus:border-accent"
+  type="text"
+/>
+
+/* Checkbox with accent color */
+<input 
+  type="checkbox"
+  className="text-accent focus:ring-accent"
+/>
+
+/* ============================================
+   CARDS & CONTAINERS
+   ============================================ */
+
+/* Card with accent border on hover */
+<div className="border border-gray-200 rounded-lg p-4 hover:border-accent transition-colors">
+  Content
+</div>
+
+/* Highlighted card */
+<div className="border-2 border-accent bg-accent/5 rounded-lg p-4">
+  Important Content
+</div>
+
+/* ============================================
+   NOTIFICATIONS & ALERTS
+   ============================================ */
+
+/* Success notification with accent */
+<div className="bg-accent/10 border-l-4 border-accent p-4 rounded">
+  <p className="text-accent-dark font-medium">Success!</p>
+</div>
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+
+/* Active nav item */
+<a className="px-3 py-2 rounded-lg bg-accent text-gray-900 font-medium">
+  Active Page
+</a>
+
+/* Nav item hover */
+<a className="px-3 py-2 rounded-lg hover:bg-accent/10 hover:text-accent-dark transition-colors">
+  Page Link
+</a>
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+/* Table row hover */
+<tr className="hover:bg-accent/5 transition-colors">
+  <td>Data</td>
+</tr>
+
+/* Selected row */
+<tr className="bg-accent/10 border-l-4 border-accent">
+  <td>Selected Data</td>
+</tr>

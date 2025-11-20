@@ -11,9 +11,9 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200';
-      case 'warning': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200';
-      default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200';
+      case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-600 border-red-200';
+      case 'warning': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-600 border-yellow-200';
+      default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-accent-light border-blue-200';
     }
   };
 
@@ -33,10 +33,10 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Active Alerts</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Active Alerts</div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {unacknowledgedAlerts.length}
                 </div>
@@ -44,10 +44,10 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
               <Bell className="w-8 h-8 text-red-600" />
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">SLA Breached</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">SLA Breached</div>
                 <div className="text-3xl font-bold text-red-600">
                   {breachedIssues.length}
                 </div>
@@ -55,10 +55,10 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">At Risk</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">At Risk</div>
                 <div className="text-3xl font-bold text-yellow-600">
                   {atRiskIssues.length}
                 </div>
@@ -66,10 +66,10 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
               <Clock className="w-8 h-8 text-yellow-600" />
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Active Rules</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Active Rules</div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {slaRules.filter(r => r.enabled).length}
                 </div>
@@ -81,7 +81,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
 
         {/* Unacknowledged Alerts */}
         {unacknowledgedAlerts.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Unacknowledged Alerts
             </h3>
@@ -104,14 +104,14 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                         </span>
                       </div>
                       <p className="text-sm mb-2">{alert.message}</p>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                      <div className="text-xs text-gray-600 dark:text-gray-200">
                         Triggered {new Date(alert.triggeredAt).toLocaleString()}
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
                       <button
                         onClick={() => acknowledgeAlert(alert._id, 'current-user')}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                        className="px-3 py-1 bg-accent text-gray-900 rounded text-sm hover:bg-accent-hover"
                       >
                         Acknowledge
                       </button>
@@ -130,7 +130,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
         )}
 
         {/* SLA Rules */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             SLA Rules
           </h3>
@@ -145,15 +145,15 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                     <div className="font-medium text-gray-900 dark:text-white mb-1">
                       {rule.name}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-gray-600 dark:text-gray-200">
                       Threshold: {rule.threshold} {rule.unit}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       rule.enabled
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                        : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-400'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-600'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
                     }`}>
                       {rule.enabled ? 'Enabled' : 'Disabled'}
                     </span>
@@ -166,7 +166,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
 
         {/* Breached & At-Risk Issues */}
         {(breachedIssues.length > 0 || atRiskIssues.length > 0) && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               SLA Status
             </h3>
@@ -178,7 +178,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                       <div className="font-medium text-gray-900 dark:text-white mb-1">
                         {issue.title}
                       </div>
-                      <div className="text-sm text-red-600 dark:text-red-400">
+                      <div className="text-sm text-red-600 dark:text-red-600">
                         SLA Breached - Deadline: {issue.slaDeadline?.toLocaleString()}
                       </div>
                     </div>
@@ -195,7 +195,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                       <div className="font-medium text-gray-900 dark:text-white mb-1">
                         {issue.title}
                       </div>
-                      <div className="text-sm text-yellow-600 dark:text-yellow-400">
+                      <div className="text-sm text-yellow-600 dark:text-yellow-600">
                         At Risk - Deadline: {issue.slaDeadline?.toLocaleString()}
                       </div>
                     </div>

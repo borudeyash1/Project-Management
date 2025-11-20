@@ -276,7 +276,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   return (
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-white border-b border-gray-300 p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Content Production</h1>
@@ -293,7 +293,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Set status</span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
             
             <div className="flex items-center gap-2">
@@ -301,14 +301,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 {getUniqueAssignees().slice(0, 3).map(assignee => (
                   <div
                     key={assignee._id}
-                    className="w-8 h-8 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center border-2 border-white"
+                    className="w-8 h-8 rounded-full bg-accent text-gray-900 text-xs flex items-center justify-center border-2 border-white"
                     title={assignee.name}
                   >
                     {assignee.initials || assignee.name.charAt(0)}
                   </div>
                 ))}
                 {getUniqueAssignees().length > 3 && (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 text-xs flex items-center justify-center border-2 border-white">
+                  <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-600 text-xs flex items-center justify-center border-2 border-white">
                     +{getUniqueAssignees().length - 3}
                   </div>
                 )}
@@ -321,18 +321,18 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             </button>
             
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent w-64"
               />
             </div>
             
             <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <HelpCircle className="w-5 h-5 text-gray-400" />
+              <HelpCircle className="w-5 h-5 text-gray-600" />
             </button>
           </div>
         </div>
@@ -342,7 +342,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">All tasks</span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
             
             <button
@@ -354,7 +354,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             </button>
             
             <div className="flex items-center gap-2">
-              <SortAsc className="w-4 h-4 text-gray-400" />
+              <SortAsc className="w-4 h-4 text-gray-600" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -425,7 +425,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             return (
               <div
                 key={column._id}
-                className={`flex-shrink-0 w-80 bg-white rounded-lg border border-gray-200 ${
+                className={`flex-shrink-0 w-80 bg-white rounded-lg border border-gray-300 ${
                   draggedOverColumn === column._id ? 'ring-2 ring-blue-500 bg-blue-50' : ''
                 }`}
                 onDragOver={(e) => handleDragOver(e, column._id)}
@@ -448,13 +448,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         onClick={() => handleCreateTask(column._id)}
                         className="p-1 hover:bg-gray-100 rounded"
                       >
-                        <Plus className="w-4 h-4 text-gray-400" />
+                        <Plus className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
                         onClick={() => setShowColumnMenu(showColumnMenu === column._id ? null : column._id)}
                         className="p-1 hover:bg-gray-100 rounded"
                       >
-                        <MoreVertical className="w-4 h-4 text-gray-400" />
+                        <MoreVertical className="w-4 h-4 text-gray-600" />
                       </button>
                     </div>
                   </div>
@@ -501,7 +501,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         setSelectedTask(task);
                         setShowTaskModal(true);
                       }}
-                      className="bg-white border border-gray-200 rounded-lg p-3 cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-300"
+                      className="bg-white border border-gray-300 rounded-lg p-3 cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-300"
                     >
                       {/* Labels */}
                       {task.labels.length > 0 && (
@@ -544,14 +544,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         <div className="flex items-center gap-2">
                           {/* Assignee Avatar */}
                           <div
-                            className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center"
+                            className="w-6 h-6 rounded-full bg-accent text-gray-900 text-xs flex items-center justify-center"
                             title={task.assignee.name}
                           >
                             {task.assignee.initials || task.assignee.name.charAt(0)}
                           </div>
                           
                           {/* Task Counts */}
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
                             {task.comments.length > 0 && (
                               <div className="flex items-center gap-1">
                                 <MessageSquare className="w-3 h-3" />
@@ -577,7 +577,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         {task.dueDate && (
                           <div className={`text-xs px-2 py-1 rounded ${
                             new Date(task.dueDate) < new Date() && !task.isCompleted
-                              ? 'bg-red-100 text-red-600'
+                              ? 'bg-red-200 text-red-800'
                               : 'bg-gray-100 text-gray-600'
                           }`}>
                             {formatDate(task.dueDate)}
@@ -589,7 +589,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
                   {/* Empty State */}
                   {columnTasks.length === 0 && (
-                    <div className="text-center text-gray-400 py-8">
+                    <div className="text-center text-gray-600 py-8">
                       <div className="w-12 h-12 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center">
                         <Plus className="w-6 h-6" />
                       </div>
@@ -614,7 +614,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -704,7 +704,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 </button>
                 <button
                   onClick={() => setShowTaskModal(false)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Save Changes
                 </button>

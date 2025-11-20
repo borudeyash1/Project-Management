@@ -68,7 +68,7 @@ const DesktopHandshake: React.FC = () => {
       >
         <div className="text-4xl mb-6">⚡</div>
         <h1 className="text-2xl font-bold mb-3">Finishing Desktop Sign-in</h1>
-        <p className={`text-sm mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+        <p className={`text-sm mb-6 ${isDarkMode ? "text-gray-700" : "text-gray-600"}`}>
           Hold tight while we connect this browser session with the Sartthi Desktop app.
         </p>
 
@@ -96,7 +96,7 @@ const DesktopHandshake: React.FC = () => {
             </button>
             <button
               className={`w-full px-4 py-3 rounded-xl text-sm font-semibold border ${
-                isDarkMode ? "border-gray-700 text-gray-200" : "border-gray-200 text-gray-700"
+                isDarkMode ? "border-gray-700 text-gray-200" : "border-gray-300 text-gray-700"
               }`}
               onClick={() => {
                 clearDesktopFlowIntent();
@@ -110,7 +110,7 @@ const DesktopHandshake: React.FC = () => {
 
         {status === "error" && (
           <div className="space-y-4">
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-red-600">{error}</p>
             <button
               className="w-full px-4 py-3 rounded-xl text-sm font-semibold text-white bg-red-500/90 hover:bg-red-500"
               onClick={fetchDesktopToken}
@@ -119,7 +119,7 @@ const DesktopHandshake: React.FC = () => {
             </button>
             <button
               className={`w-full px-4 py-3 rounded-xl text-sm font-semibold border ${
-                isDarkMode ? "border-gray-700 text-gray-200" : "border-gray-200 text-gray-700"
+                isDarkMode ? "border-gray-700 text-gray-200" : "border-gray-300 text-gray-700"
               }`}
               onClick={() => navigate("/login?source=desktop")}
             >

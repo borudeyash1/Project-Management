@@ -107,7 +107,7 @@ const GoalsPage: React.FC = () => {
         project: {
           _id: 'p1',
           name: 'E-commerce Platform',
-          color: 'bg-blue-500'
+          color: 'bg-accent'
         },
         milestones: [
           { _id: 'm1', title: 'Complete Module 1', description: 'React Fundamentals', completed: true, completedDate: new Date('2024-02-01'), dueDate: new Date('2024-02-01') },
@@ -288,7 +288,7 @@ const GoalsPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'text-green-600 bg-green-100';
-      case 'in_progress': return 'text-blue-600 bg-blue-100';
+      case 'in_progress': return 'text-accent-dark bg-blue-100';
       case 'not_started': return 'text-gray-600 bg-gray-100';
       case 'paused': return 'text-yellow-600 bg-yellow-100';
       case 'cancelled': return 'text-red-600 bg-red-100';
@@ -299,7 +299,7 @@ const GoalsPage: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
+      case 'high': return 'text-orange-600 bg-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -309,9 +309,9 @@ const GoalsPage: React.FC = () => {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'personal': return 'text-purple-600 bg-purple-100';
-      case 'team': return 'text-blue-600 bg-blue-100';
+      case 'team': return 'text-accent-dark bg-blue-100';
       case 'project': return 'text-green-600 bg-green-100';
-      case 'company': return 'text-orange-600 bg-orange-100';
+      case 'company': return 'text-orange-600 bg-orange-200';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -391,7 +391,7 @@ const GoalsPage: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Goals & Objectives</h1>
@@ -401,7 +401,7 @@ const GoalsPage: React.FC = () => {
             {canCreateGoals() && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Plus className="w-4 h-4" />
                 New Goal
@@ -418,17 +418,17 @@ const GoalsPage: React.FC = () => {
             {/* Stats Cards */}
             {goalStats && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Total Goals</p>
                       <p className="text-2xl font-bold text-gray-900">{goalStats.totalGoals}</p>
                     </div>
-                    <Target className="w-8 h-8 text-blue-500" />
+                    <Target className="w-8 h-8 text-accent" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Completed</p>
@@ -438,17 +438,17 @@ const GoalsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">In Progress</p>
                       <p className="text-2xl font-bold text-gray-900">{goalStats.inProgressGoals}</p>
                     </div>
-                    <Play className="w-8 h-8 text-blue-500" />
+                    <Play className="w-8 h-8 text-accent" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Avg Progress</p>
@@ -461,17 +461,17 @@ const GoalsPage: React.FC = () => {
             )}
 
             {/* Filters and Search */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search goals..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -480,7 +480,7 @@ const GoalsPage: React.FC = () => {
                   <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Types</option>
                     <option value="personal">Personal</option>
@@ -492,7 +492,7 @@ const GoalsPage: React.FC = () => {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Status</option>
                     <option value="not_started">Not Started</option>
@@ -505,7 +505,7 @@ const GoalsPage: React.FC = () => {
                   <select
                     value={filterCategory}
                     onChange={(e) => setFilterCategory(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Categories</option>
                     <option value="productivity">Productivity</option>
@@ -519,7 +519,7 @@ const GoalsPage: React.FC = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="due_date">Due Date</option>
                     <option value="created">Created</option>
@@ -558,13 +558,13 @@ const GoalsPage: React.FC = () => {
               {viewMode === 'grid' && (
                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredGoals.map(goal => (
-                    <div key={goal._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={goal._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-gray-900 truncate">{goal.title}</h3>
                           <p className="text-sm text-gray-600 mt-1 line-clamp-2">{goal.description}</p>
                         </div>
-                        <button className="text-gray-400 hover:text-gray-600 ml-2">
+                        <button className="text-gray-600 hover:text-gray-600 ml-2">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -596,13 +596,13 @@ const GoalsPage: React.FC = () => {
                           <span className="text-gray-600">Progress</span>
                           <span className="font-medium">{goal.progress}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-300 rounded-full h-2">
                           <div
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                            className="bg-accent h-2 rounded-full transition-all duration-300"
                             style={{ width: `${goal.progress}%` }}
                           />
                         </div>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center justify-between text-sm text-gray-600">
                           <span>Due: {formatDate(goal.targetDate)}</span>
                           <span>{goal.milestones.filter(m => m.completed).length}/{goal.milestones.length} milestones</span>
                         </div>
@@ -652,7 +652,7 @@ const GoalsPage: React.FC = () => {
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{goal.description}</p>
                           
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
                             <span>Due: {formatDate(goal.targetDate)}</span>
                             <span>{goal.milestones.filter(m => m.completed).length}/{goal.milestones.length} milestones</span>
                             <span>Created by {goal.createdBy.name}</span>
@@ -661,26 +661,26 @@ const GoalsPage: React.FC = () => {
                         
                         <div className="text-right">
                           <div className="text-sm font-medium text-gray-900 mb-1">{goal.progress}%</div>
-                          <div className="w-24 bg-gray-200 rounded-full h-2 mb-2">
+                          <div className="w-24 bg-gray-300 rounded-full h-2 mb-2">
                             <div
-                              className="bg-blue-500 h-2 rounded-full"
+                              className="bg-accent h-2 rounded-full"
                               style={{ width: `${goal.progress}%` }}
                             />
                           </div>
-                          <div className="text-xs text-gray-500">{goal.category}</div>
+                          <div className="text-xs text-gray-600">{goal.category}</div>
                         </div>
                         
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedGoal(goal)}
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                            className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                             <MessageSquare className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                             <MoreVertical className="w-4 h-4" />
                           </button>
                         </div>
@@ -696,7 +696,7 @@ const GoalsPage: React.FC = () => {
                     {filteredGoals.map(goal => (
                       <div key={goal._id} className="flex items-start gap-4">
                         <div className="flex-shrink-0">
-                          <div className={`w-4 h-4 rounded-full ${goal.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'}`} />
+                          <div className={`w-4 h-4 rounded-full ${goal.status === 'completed' ? 'bg-green-500' : 'bg-accent'}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2">
@@ -710,15 +710,15 @@ const GoalsPage: React.FC = () => {
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{goal.description}</p>
                           
-                          <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                             <span>Start: {formatDate(goal.startDate)}</span>
                             <span>Due: {formatDate(goal.targetDate)}</span>
                             <span>Progress: {goal.progress}%</span>
                           </div>
                           
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full bg-gray-300 rounded-full h-2">
                             <div
-                              className="bg-blue-500 h-2 rounded-full"
+                              className="bg-accent h-2 rounded-full"
                               style={{ width: `${goal.progress}%` }}
                             />
                           </div>
@@ -751,15 +751,15 @@ const GoalsPage: React.FC = () => {
 
             {/* Recent Activity */}
             {goalStats && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">Recent Activity</h3>
                 <div className="space-y-3">
                   {goalStats.recentActivity.map(activity => (
                     <div key={activity._id} className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                      <div className="w-2 h-2 bg-accent rounded-full mt-2" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-900">{activity.goal}</p>
-                        <p className="text-xs text-gray-500">{activity.user} • {formatDate(activity.timestamp)}</p>
+                        <p className="text-xs text-gray-600">{activity.user} • {formatDate(activity.timestamp)}</p>
                       </div>
                     </div>
                   ))}
@@ -769,7 +769,7 @@ const GoalsPage: React.FC = () => {
 
             {/* Category Breakdown */}
             {goalStats && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">Goals by Category</h3>
                 <div className="space-y-3">
                   {goalStats.topCategories.map(category => (
@@ -777,9 +777,9 @@ const GoalsPage: React.FC = () => {
                       <span className="text-sm text-gray-600 capitalize">{category.category}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-gray-900">{category.completed}/{category.count}</span>
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
+                        <div className="w-16 bg-gray-300 rounded-full h-2">
                           <div
-                            className="bg-blue-500 h-2 rounded-full"
+                            className="bg-accent h-2 rounded-full"
                             style={{ width: `${category.count > 0 ? (category.completed / category.count) * 100 : 0}%` }}
                           />
                         </div>
@@ -791,7 +791,7 @@ const GoalsPage: React.FC = () => {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
@@ -840,7 +840,7 @@ const GoalsPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setSelectedGoal(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-600 hover:text-gray-600"
                 >
                   ×
                 </button>
@@ -856,9 +856,9 @@ const GoalsPage: React.FC = () => {
                     <span className="text-sm text-gray-600">Overall Progress</span>
                     <span className="text-sm font-medium text-gray-900">{selectedGoal.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="w-full bg-gray-300 rounded-full h-3">
                     <div
-                      className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+                      className="bg-accent h-3 rounded-full transition-all duration-300"
                       style={{ width: `${selectedGoal.progress}%` }}
                     />
                   </div>
@@ -870,7 +870,7 @@ const GoalsPage: React.FC = () => {
                 <h4 className="text-lg font-medium text-gray-900 mb-3">Milestones</h4>
                 <div className="space-y-3">
                   {selectedGoal.milestones.map(milestone => (
-                    <div key={milestone._id} className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg">
+                    <div key={milestone._id} className="flex items-start gap-3 p-3 border border-gray-300 rounded-lg">
                       <button
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
                           milestone.completed
@@ -887,7 +887,7 @@ const GoalsPage: React.FC = () => {
                         {milestone.description && (
                           <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
                         )}
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           Due: {formatDate(milestone.dueDate)}
                           {milestone.completedDate && (
                             <span className="ml-2">Completed: {formatDate(milestone.completedDate)}</span>
@@ -932,14 +932,14 @@ const GoalsPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="p-6 border-t border-gray-200 flex justify-end gap-2">
+            <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedGoal(null)}
                 className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Close
               </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
                 Edit Goal
               </button>
             </div>

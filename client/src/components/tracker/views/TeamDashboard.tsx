@@ -70,12 +70,12 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
 
   const getColorClasses = (color: string) => {
     const colors = {
-      blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-      green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-      purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-      yellow: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400',
-      red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-      orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
+      blue: 'bg-blue-100 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light',
+      green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-600',
+      purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-600',
+      yellow: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-600',
+      red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-600',
+      orange: 'bg-orange-200 dark:bg-orange-900/30 text-orange-600 dark:text-orange-500',
       indigo: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
     };
     return colors[color as keyof typeof colors] || colors.blue;
@@ -96,20 +96,20 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
             return (
               <div
                 key={idx}
-                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg ${getColorClasses(stat.color)}`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-200">
                     {stat.trend}
                   </span>
                 </div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                   {stat.value}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-600 dark:text-gray-200">
                   {stat.label}
                 </div>
               </div>
@@ -120,7 +120,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Utilization Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Weekly Utilization
             </h3>
@@ -131,14 +131,14 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                 return (
                   <div key={day}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-700">
                         {day}
                       </span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-gray-600 dark:text-gray-200">
                         {hours.toFixed(1)}h / 8h
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
                           percent > 90 ? 'bg-green-500' : percent > 70 ? 'bg-yellow-500' : 'bg-red-500'
@@ -153,7 +153,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
           </div>
 
           {/* Billable vs Non-Billable */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Billable Breakdown
             </h3>
@@ -184,7 +184,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                   <div className="text-3xl font-bold text-gray-900 dark:text-white">
                     {teamMetrics.billablePercent.toFixed(0)}%
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-gray-200">
                     Billable
                   </div>
                 </div>
@@ -192,46 +192,46 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-600">
                   {((teamMetrics.totalHoursWeek * teamMetrics.billablePercent) / 100).toFixed(1)}h
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Billable</div>
+                <div className="text-xs text-gray-600 dark:text-gray-200">Billable</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                <div className="text-2xl font-bold text-gray-600 dark:text-gray-200">
                   {(teamMetrics.totalHoursWeek * (1 - teamMetrics.billablePercent / 100)).toFixed(1)}h
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Non-Billable</div>
+                <div className="text-xs text-gray-600 dark:text-gray-200">Non-Billable</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Recent Time Entries
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <tr className="border-b border-gray-300 dark:border-gray-600">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                     User
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                     Task
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                     Project
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                     Duration
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                     Status
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                     Billable
                   </th>
                 </tr>
@@ -240,15 +240,15 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                 {recentEntries.map(entry => (
                   <tr
                     key={entry._id}
-                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                       {entry.userName}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-200">
                       {entry.taskTitle || 'No task'}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-200">
                       {entry.projectName || 'No project'}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white font-medium">
@@ -256,18 +256,18 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                     </td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        entry.status === 'running' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                        entry.status === 'approved' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
+                        entry.status === 'running' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-600' :
+                        entry.status === 'approved' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-accent-light' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                       }`}>
                         {entry.status}
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       {entry.billable ? (
-                        <span className="text-green-600 dark:text-green-400">✓</span>
+                        <span className="text-green-600 dark:text-green-600">✓</span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-600">-</span>
                       )}
                     </td>
                   </tr>

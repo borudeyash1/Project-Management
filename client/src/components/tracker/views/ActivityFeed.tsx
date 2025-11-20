@@ -42,7 +42,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
       case 'warning':
         return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30';
       default:
-        return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30';
+        return 'text-accent-dark bg-blue-100 dark:bg-blue-900/30';
     }
   };
 
@@ -76,10 +76,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 p-4">
         <div className="flex items-center gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-700 mb-1">
               Event Type
             </label>
             <select
@@ -96,7 +96,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-700 mb-1">
               Severity
             </label>
             <select
@@ -121,7 +121,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
             return (
               <div
                 key={event._id}
-                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
                   <div className={`p-3 rounded-lg ${getColor(event.severity)}`}>
@@ -133,15 +133,15 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
                         <span className="font-medium text-gray-900 dark:text-white">
                           {event.actorName}
                         </span>
-                        <span className="text-gray-600 dark:text-gray-400 mx-2">•</span>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-gray-600 dark:text-gray-300 mx-2">•</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-200">
                           {formatTime(event.timestamp)}
                         </span>
                       </div>
                       {event.severity && event.severity !== 'info' && (
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          event.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
-                          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          event.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-600' :
+                          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-600'
                         }`}>
                           {event.severity}
                         </span>
@@ -151,7 +151,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
                       {event.description}
                     </p>
                     {(event.taskTitle || event.projectName) && (
-                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-200">
                         {event.taskTitle && (
                           <span className="flex items-center gap-1">
                             <CheckCircle className="w-4 h-4" />
@@ -174,8 +174,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
 
           {filteredEvents.length === 0 && (
             <div className="text-center py-12">
-              <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">No activity events found</p>
+              <Activity className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-200">No activity events found</p>
             </div>
           )}
         </div>

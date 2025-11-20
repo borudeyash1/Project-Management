@@ -61,52 +61,52 @@ const WorkspaceSettings: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Workspace Settings</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
           Manage workspace configuration and preferences
         </p>
       </div>
 
       {/* Visibility Settings */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Globe className="w-5 h-5 text-blue-600" />
+          <Globe className="w-5 h-5 text-accent-dark" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Visibility</h2>
         </div>
         
         <div className="space-y-3">
-          <label className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <input
               type="radio"
               name="visibility"
               checked={visibility === 'public'}
               onChange={() => setVisibility('public')}
-              className="w-4 h-4 text-blue-600"
+              className="w-4 h-4 text-accent-dark"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4 text-green-600" />
                 <span className="font-medium text-gray-900 dark:text-gray-100">Public</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                 Anyone can discover and request to join this workspace
               </p>
             </div>
           </label>
 
-          <label className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <input
               type="radio"
               name="visibility"
               checked={visibility === 'private'}
               onChange={() => setVisibility('private')}
-              className="w-4 h-4 text-blue-600"
+              className="w-4 h-4 text-accent-dark"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <EyeOff className="w-4 h-4 text-gray-600" />
                 <span className="font-medium text-gray-900 dark:text-gray-100">Private</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                 Only invited members can access this workspace
               </p>
             </div>
@@ -115,13 +115,13 @@ const WorkspaceSettings: React.FC = () => {
       </div>
 
       {/* Region-Based Visibility */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Globe className="w-5 h-5 text-blue-600" />
+          <Globe className="w-5 h-5 text-accent-dark" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Regional Visibility</h2>
         </div>
         
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
           Select regions where your workspace will be visible
         </p>
 
@@ -129,13 +129,13 @@ const WorkspaceSettings: React.FC = () => {
           {regions.map((region) => (
             <label
               key={region.code}
-              className="flex items-center gap-2 p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              className="flex items-center gap-2 p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
             >
               <input
                 type="checkbox"
                 checked={selectedRegions.includes(region.code)}
                 onChange={() => toggleRegion(region.code)}
-                className="w-4 h-4 text-blue-600 rounded"
+                className="w-4 h-4 text-accent-dark rounded"
               />
               <span className="text-sm text-gray-900 dark:text-gray-100">{region.name}</span>
             </label>
@@ -144,15 +144,15 @@ const WorkspaceSettings: React.FC = () => {
       </div>
 
       {/* Appearance Settings */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Palette className="w-5 h-5 text-blue-600" />
+          <Palette className="w-5 h-5 text-accent-dark" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Appearance</h2>
         </div>
 
         {/* Theme Color */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-3">
             Theme Color
           </label>
           <div className="grid grid-cols-6 gap-3">
@@ -174,7 +174,7 @@ const WorkspaceSettings: React.FC = () => {
 
         {/* Background Image */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-3">
             Background Image
           </label>
           <div className="flex items-center gap-4">
@@ -183,12 +183,12 @@ const WorkspaceSettings: React.FC = () => {
                 <img src={backgroundImage} alt="Background" className="h-full w-full object-cover rounded-lg" />
               ) : (
                 <div className="text-center">
-                  <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 dark:text-gray-400">No image selected</p>
+                  <ImageIcon className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 dark:text-gray-200">No image selected</p>
                 </div>
               )}
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <Upload className="w-4 h-4" />
               Upload
             </button>
@@ -197,35 +197,35 @@ const WorkspaceSettings: React.FC = () => {
       </div>
 
       {/* Permissions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Shield className="w-5 h-5 text-blue-600" />
+          <Shield className="w-5 h-5 text-accent-dark" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Permissions</h2>
         </div>
 
         <div className="space-y-3">
-          <label className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <label className="flex items-center justify-between p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Allow Member Invites</div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Members can invite others to the workspace</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Members can invite others to the workspace</p>
             </div>
-            <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" defaultChecked />
+            <input type="checkbox" className="w-5 h-5 text-accent-dark rounded" defaultChecked />
           </label>
 
-          <label className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <label className="flex items-center justify-between p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Project Creation</div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Allow all members to create projects</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Allow all members to create projects</p>
             </div>
-            <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" />
+            <input type="checkbox" className="w-5 h-5 text-accent-dark rounded" />
           </label>
 
-          <label className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <label className="flex items-center justify-between p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Require Join Approval</div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Join requests must be approved by owner</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Join requests must be approved by owner</p>
             </div>
-            <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" defaultChecked />
+            <input type="checkbox" className="w-5 h-5 text-accent-dark rounded" defaultChecked />
           </label>
         </div>
       </div>
@@ -234,14 +234,14 @@ const WorkspaceSettings: React.FC = () => {
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <Trash2 className="w-5 h-5 text-red-600" />
-          <h2 className="text-lg font-semibold text-red-900 dark:text-red-400">Danger Zone</h2>
+          <h2 className="text-lg font-semibold text-red-900 dark:text-red-600">Danger Zone</h2>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-red-200 dark:border-red-800 rounded-lg">
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Transfer Ownership</div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Transfer workspace to another member</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Transfer workspace to another member</p>
             </div>
             <button className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
               Transfer
@@ -251,7 +251,7 @@ const WorkspaceSettings: React.FC = () => {
           <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-red-200 dark:border-red-800 rounded-lg">
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Archive Workspace</div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Archive this workspace and all its data</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Archive this workspace and all its data</p>
             </div>
             <button className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
               Archive
@@ -260,8 +260,8 @@ const WorkspaceSettings: React.FC = () => {
 
           <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-red-200 dark:border-red-800 rounded-lg">
             <div>
-              <div className="font-medium text-red-900 dark:text-red-400">Delete Workspace</div>
-              <p className="text-sm text-red-600 dark:text-red-400">Permanently delete this workspace and all data</p>
+              <div className="font-medium text-red-900 dark:text-red-600">Delete Workspace</div>
+              <p className="text-sm text-red-600 dark:text-red-600">Permanently delete this workspace and all data</p>
             </div>
             <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
               Delete
@@ -271,13 +271,13 @@ const WorkspaceSettings: React.FC = () => {
       </div>
 
       {/* Save Button */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-300 dark:border-gray-600">
+        <button className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
           Cancel
         </button>
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Save className="w-4 h-4" />
           Save Changes

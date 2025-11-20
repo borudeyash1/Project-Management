@@ -87,7 +87,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'low': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-blue-600 bg-blue-50 border-blue-200';
+      default: return 'text-accent-dark bg-blue-50 border-blue-200';
     }
   };
 
@@ -102,7 +102,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
   };
 
   const TaskItem = ({ task }: { task: Task }) => (
-    <div className="group flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+    <div className="group flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:shadow-md transition-shadow">
       {/* Checkbox */}
       <button
         onClick={() => handleToggleComplete(task._id)}
@@ -111,7 +111,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
         {task.status === 'done' ? (
           <CheckCircle className="w-5 h-5 text-green-600" />
         ) : (
-          <Circle className="w-5 h-5 text-gray-400 hover:text-blue-600" />
+          <Circle className="w-5 h-5 text-gray-600 hover:text-accent-dark" />
         )}
       </button>
 
@@ -126,7 +126,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
           {getPriorityIcon(task.priority)}
         </div>
         
-        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-200">
           {task.dueDate && (
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
@@ -143,7 +143,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
             </span>
           )}
           {task.project && (
-            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded">
               {task.project}
             </span>
           )}
@@ -193,13 +193,13 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       >
         <div className="flex items-center gap-3">
           {(expandedSections as any)[sectionKey] ? (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
+            <ChevronDown className="w-5 h-5 text-gray-600" />
           ) : (
-            <ChevronRight className="w-5 h-5 text-gray-500" />
+            <ChevronRight className="w-5 h-5 text-gray-600" />
           )}
           <Icon className={`w-5 h-5 ${color}`} />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-          <span className="px-2 py-0.5 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+          <span className="px-2 py-0.5 text-xs font-medium bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-700 rounded-full">
             {count}
           </span>
         </div>
@@ -210,7 +210,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
           {tasks.length > 0 ? (
             tasks.map(task => <TaskItem key={task._id} task={task} />)
           ) : (
-            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+            <div className="p-8 text-center text-gray-600 dark:text-gray-200">
               No tasks in this section
             </div>
           )}
@@ -222,11 +222,11 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">My Work</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {myTasks.length} active tasks
             </p>
           </div>
@@ -255,7 +255,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
             tasks={todayTasks}
             sectionKey="today"
             icon={Calendar}
-            color="text-blue-600"
+            color="text-accent-dark"
           />
 
           {/* This Week */}
@@ -279,12 +279,12 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
           />
 
           {myTasks.length === 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-12 text-center">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 All caught up!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-200">
                 You have no active tasks. Great job!
               </p>
             </div>

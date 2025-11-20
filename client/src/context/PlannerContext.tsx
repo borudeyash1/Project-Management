@@ -150,7 +150,7 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const [columns] = useState<Column[]>([
     { id: 'todo', name: 'To Do', color: 'bg-gray-400', order: 1 },
-    { id: 'in-progress', name: 'In Progress', color: 'bg-blue-500', wip: 3, order: 2 },
+    { id: 'in-progress', name: 'In Progress', color: 'bg-accent', wip: 3, order: 2 },
     { id: 'review', name: 'Review', color: 'bg-yellow-500', order: 3 },
     { id: 'done', name: 'Done', color: 'bg-green-500', order: 4 }
   ]);

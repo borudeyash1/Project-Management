@@ -465,18 +465,18 @@ const Settings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">Username</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{settingsData?.account.username}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{settingsData?.account.username}</p>
             </div>
-            <button className="text-blue-600 hover:text-blue-700">
+            <button className="text-accent-dark hover:text-blue-700">
               <Edit className="w-4 h-4" />
             </button>
           </div>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">Email</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{settingsData?.account.email}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{settingsData?.account.email}</p>
             </div>
-            <button className="text-blue-600 hover:text-blue-700">
+            <button className="text-accent-dark hover:text-blue-700">
               <Edit className="w-4 h-4" />
             </button>
           </div>
@@ -489,15 +489,15 @@ const Settings: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Shield className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-gray-100">Two-Factor Authentication</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Add an extra layer of security</p>
               </div>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.account.twoFactorEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                settingsData?.account.twoFactorEnabled ? 'bg-accent' : 'bg-gray-300'
               }`}
               onClick={() => {
                 const newValue = !settingsData?.account.twoFactorEnabled;
@@ -517,15 +517,15 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-gray-100">Login Notifications</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Get notified of new logins</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Get notified of new logins</p>
               </div>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.account.loginNotifications ? 'bg-blue-600' : 'bg-gray-200'
+                settingsData?.account.loginNotifications ? 'bg-accent' : 'bg-gray-300'
               }`}
               onClick={() => {
                 const newValue = !settingsData?.account.loginNotifications;
@@ -551,7 +551,7 @@ const Settings: React.FC = () => {
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Session Management</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Timeout (minutes)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Session Timeout (minutes)</label>
             <input
               type="number"
               value={settingsData?.account.sessionTimeout}
@@ -563,7 +563,7 @@ const Settings: React.FC = () => {
                 } : null);
                 handleSaveSettings('account', { ...settingsData?.account, sessionTimeout: newValue });
               }}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               min="5"
               max="480"
             />
@@ -598,12 +598,12 @@ const Settings: React.FC = () => {
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <Mail className="w-5 h-5 text-gray-600 dark:text-gray-200" />
             <h3 className="font-medium text-gray-900 dark:text-gray-100">Email Notifications</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settingsData?.notifications.email.enabled ? 'bg-blue-600' : 'bg-gray-200'
+              settingsData?.notifications.email.enabled ? 'bg-accent' : 'bg-gray-300'
             }`}
             onClick={() => {
               const newValue = !settingsData?.notifications.email.enabled;
@@ -634,7 +634,7 @@ const Settings: React.FC = () => {
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    value ? 'bg-blue-600' : 'bg-gray-200'
+                    value ? 'bg-accent' : 'bg-gray-300'
                   }`}
                   onClick={() => {
                     const newValue = !value;
@@ -667,12 +667,12 @@ const Settings: React.FC = () => {
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
             <h3 className="font-medium text-gray-900 dark:text-gray-100">Push Notifications</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settingsData?.notifications.push.enabled ? 'bg-blue-600' : 'bg-gray-200'
+              settingsData?.notifications.push.enabled ? 'bg-accent' : 'bg-gray-300'
             }`}
             onClick={() => {
               const newValue = !settingsData?.notifications.push.enabled;
@@ -703,7 +703,7 @@ const Settings: React.FC = () => {
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    value ? 'bg-blue-600' : 'bg-gray-200'
+                    value ? 'bg-accent' : 'bg-gray-300'
                   }`}
                   onClick={() => {
                     const newValue = !value;
@@ -736,12 +736,12 @@ const Settings: React.FC = () => {
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-200" />
             <h3 className="font-medium text-gray-900 dark:text-gray-100">Desktop Notifications</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settingsData?.notifications.desktop.enabled ? 'bg-blue-600' : 'bg-gray-200'
+              settingsData?.notifications.desktop.enabled ? 'bg-accent' : 'bg-gray-300'
             }`}
             onClick={() => {
               const newValue = !settingsData?.notifications.desktop.enabled;
@@ -772,7 +772,7 @@ const Settings: React.FC = () => {
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    value ? 'bg-blue-600' : 'bg-gray-200'
+                    value ? 'bg-accent' : 'bg-gray-300'
                   }`}
                   onClick={() => {
                     const newValue = !value;
@@ -814,7 +814,7 @@ const Settings: React.FC = () => {
               key={theme}
               className={`px-4 py-2 rounded-lg border transition-colors ${
                 settingsData?.appearance.theme === theme
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-accent text-gray-900 border-accent-dark'
                   : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
               onClick={() => {
@@ -866,7 +866,7 @@ const Settings: React.FC = () => {
               key={size}
               className={`px-4 py-2 rounded-lg border transition-colors ${
                 settingsData?.appearance.fontSize === size
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-accent text-gray-900 border-accent-dark'
                   : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
               onClick={() => {
@@ -892,7 +892,7 @@ const Settings: React.FC = () => {
               key={density}
               className={`px-4 py-2 rounded-lg border transition-colors ${
                 settingsData?.appearance.density === density
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-accent text-gray-900 border-accent-dark'
                   : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
               onClick={() => {
@@ -916,11 +916,11 @@ const Settings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">Animations</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Enable smooth transitions and animations</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Enable smooth transitions and animations</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.appearance.animations ? 'bg-blue-600' : 'bg-gray-200'
+                settingsData?.appearance.animations ? 'bg-accent' : 'bg-gray-300'
               }`}
               onClick={() => {
                 const newValue = !settingsData?.appearance.animations;
@@ -941,11 +941,11 @@ const Settings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">Reduced Motion</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Minimize animations for accessibility</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Minimize animations for accessibility</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.appearance.reducedMotion ? 'bg-blue-600' : 'bg-gray-200'
+                settingsData?.appearance.reducedMotion ? 'bg-accent' : 'bg-gray-300'
               }`}
               onClick={() => {
                 const newValue = !settingsData?.appearance.reducedMotion;
@@ -976,9 +976,9 @@ const Settings: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} Plan</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Next billing: {new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-200">Next billing: {new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString()}</p>
           </div>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
             Upgrade Plan
           </button>
         </div>
@@ -989,23 +989,23 @@ const Settings: React.FC = () => {
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Usage</h3>
         <div className="space-y-4">
           <div>
-            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
               <span>Projects</span>
               <span>{settingsData?.billing.usage.projects} / {settingsData?.billing.usage.maxProjects}</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-300 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full"
+                className="bg-accent h-2 rounded-full"
                 style={{ width: `${(settingsData?.billing.usage.projects || 0) / (settingsData?.billing.usage.maxProjects || 1) * 100}%` }}
               />
             </div>
           </div>
           <div>
-            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
               <span>Storage</span>
               <span>{settingsData?.billing.usage.storage} GB / {settingsData?.billing.usage.maxStorage} GB</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-300 rounded-full h-2">
               <div
                 className="bg-green-600 h-2 rounded-full"
                 style={{ width: `${(settingsData?.billing.usage.storage || 0) / (settingsData?.billing.usage.maxStorage || 1) * 100}%` }}
@@ -1013,11 +1013,11 @@ const Settings: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
               <span>Team Members</span>
               <span>{settingsData?.billing.usage.teamMembers} / {settingsData?.billing.usage.maxTeamMembers}</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-300 rounded-full h-2">
               <div
                 className="bg-purple-600 h-2 rounded-full"
                 style={{ width: `${(settingsData?.billing.usage.teamMembers || 0) / (settingsData?.billing.usage.maxTeamMembers || 1) * 100}%` }}
@@ -1038,7 +1038,7 @@ const Settings: React.FC = () => {
               <p className="text-sm text-gray-600">Expires 12/25</p>
             </div>
           </div>
-          <button className="text-blue-600 hover:text-blue-700">
+          <button className="text-accent-dark hover:text-blue-700">
             <Edit className="w-4 h-4" />
           </button>
         </div>
@@ -1076,12 +1076,12 @@ const Settings: React.FC = () => {
       {/* Data Export */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Export Data</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Download a copy of your data in various formats</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Download a copy of your data in various formats</p>
         <div className="flex gap-3">
           <select
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="json">JSON</option>
             <option value="csv">CSV</option>
@@ -1089,7 +1089,7 @@ const Settings: React.FC = () => {
           </select>
           <button
             onClick={() => setShowExportData(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Download className="w-4 h-4" />
             Export Data
@@ -1104,11 +1104,11 @@ const Settings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">Enable Auto Backup</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Automatically backup your data</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">Automatically backup your data</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.data.autoBackup ? 'bg-blue-600' : 'bg-gray-200'
+                settingsData?.data.autoBackup ? 'bg-accent' : 'bg-gray-300'
               }`}
               onClick={() => {
                 const newValue = !settingsData?.data.autoBackup;
@@ -1128,7 +1128,7 @@ const Settings: React.FC = () => {
           </div>
           {settingsData?.data.autoBackup && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Backup Frequency</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Backup Frequency</label>
               <select
                 value={settingsData.data.backupFrequency}
                 onChange={(e) => {
@@ -1138,7 +1138,7 @@ const Settings: React.FC = () => {
                   } : null);
                   handleSaveSettings('data', { ...settingsData?.data, backupFrequency: e.target.value as 'daily' | 'weekly' | 'monthly' });
                 }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -1153,7 +1153,7 @@ const Settings: React.FC = () => {
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Data Location</h3>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Data Center</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Primary Data Center</label>
           <select
             value={settingsData?.data.dataLocation}
             onChange={(e) => {
@@ -1163,7 +1163,7 @@ const Settings: React.FC = () => {
               } : null);
               handleSaveSettings('data', { ...settingsData?.data, dataLocation: e.target.value as 'us' | 'eu' | 'asia' });
             }}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="us">United States</option>
             <option value="eu">Europe</option>
@@ -1179,11 +1179,11 @@ const Settings: React.FC = () => {
       <div className="p-4 sm:p-6">
         <div className="bg-white border border-border rounded-xl p-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
             <div className="space-y-4">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
             </div>
           </div>
         </div>
@@ -1193,15 +1193,15 @@ const Settings: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6">
-      <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-700 rounded-xl">
+      <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
         {/* Header */}
-        <div className="p-6 border-b border-border dark:border-gray-700">
+        <div className="p-6 border-b border-border dark:border-gray-600">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Settings</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your account settings and preferences</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Manage your account settings and preferences</p>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-border dark:border-gray-700">
+        <div className="border-b border-border dark:border-gray-600">
           <nav className="flex space-x-8 px-6 overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -1211,8 +1211,8 @@ const Settings: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                      ? 'border-accent text-accent-dark dark:text-accent-light'
+                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -1241,11 +1241,11 @@ const Settings: React.FC = () => {
               <AlertTriangle className="w-6 h-6 text-red-600" />
               <h3 className="text-lg font-semibold text-red-900">Delete Account</h3>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-gray-700 dark:text-gray-700 mb-4">
               This action cannot be undone. All your data will be permanently deleted.
             </p>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reason for deletion</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Reason for deletion</label>
               <textarea
                 value={deleteReason}
                 onChange={(e) => setDeleteReason(e.target.value)}
@@ -1267,7 +1267,7 @@ const Settings: React.FC = () => {
                   setShowDeleteAccount(false);
                   setDeleteReason('');
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>
@@ -1281,14 +1281,14 @@ const Settings: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Export Data</h3>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-gray-700 dark:text-gray-700 mb-4">
               This will download a copy of all your data in {exportFormat.toUpperCase()} format.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={handleExportData}
                 disabled={saving}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {saving ? 'Exporting...' : 'Export Data'}
               </button>

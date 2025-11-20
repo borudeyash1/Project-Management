@@ -210,7 +210,7 @@ const WorkspaceOwner: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -221,14 +221,14 @@ const WorkspaceOwner: React.FC = () => {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Projects</p>
               <p className="text-2xl font-semibold text-gray-900">{projects.length}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <Building2 className="w-6 h-6 text-blue-600" />
+              <Building2 className="w-6 h-6 text-accent-dark" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm text-green-600">
@@ -237,7 +237,7 @@ const WorkspaceOwner: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Active Clients</p>
@@ -253,7 +253,7 @@ const WorkspaceOwner: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Team Members</p>
@@ -269,7 +269,7 @@ const WorkspaceOwner: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
@@ -287,16 +287,16 @@ const WorkspaceOwner: React.FC = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <Plus className="w-4 h-4 text-blue-600" />
+              <Plus className="w-4 h-4 text-accent-dark" />
             </div>
             <div className="flex-1">
               <p className="text-sm text-gray-900">New project "Mobile App Development" created</p>
-              <p className="text-xs text-gray-500">2 hours ago</p>
+              <p className="text-xs text-gray-600">2 hours ago</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -305,7 +305,7 @@ const WorkspaceOwner: React.FC = () => {
             </div>
             <div className="flex-1">
               <p className="text-sm text-gray-900">Alex Rodriguez joined the workspace</p>
-              <p className="text-xs text-gray-500">5 hours ago</p>
+              <p className="text-xs text-gray-600">5 hours ago</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -314,7 +314,7 @@ const WorkspaceOwner: React.FC = () => {
             </div>
             <div className="flex-1">
               <p className="text-sm text-gray-900">Project "Website Redesign" updated</p>
-              <p className="text-xs text-gray-500">1 day ago</p>
+              <p className="text-xs text-gray-600">1 day ago</p>
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@ const WorkspaceOwner: React.FC = () => {
         </div>
                 <button
                   onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'client' })}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Client
@@ -340,7 +340,7 @@ const WorkspaceOwner: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {clients.map((client) => (
-          <div key={client._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={client._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{client.name}</h4>
@@ -350,7 +350,7 @@ const WorkspaceOwner: React.FC = () => {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(client.status)}`}>
                   {client.status}
                 </span>
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <MoreVertical className="w-4 h-4" />
                 </button>
               </div>
@@ -381,7 +381,7 @@ const WorkspaceOwner: React.FC = () => {
                 <span className="text-gray-600">${client.totalValue.toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-2">
-                <button className="text-blue-600 hover:text-blue-700">
+                <button className="text-accent-dark hover:text-blue-700">
                   <Edit className="w-4 h-4" />
                 </button>
                 <button className="text-red-600 hover:text-red-700">
@@ -404,7 +404,7 @@ const WorkspaceOwner: React.FC = () => {
         </div>
         <button
           onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'inviteEmployee' })}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <UserPlus className="w-4 h-4" />
           Invite Employee
@@ -426,7 +426,7 @@ const WorkspaceOwner: React.FC = () => {
                   />
                   <div>
                     <p className="text-sm font-medium text-gray-900">{employee.fullName}</p>
-                    <p className="text-xs text-gray-500">{employee.email}</p>
+                    <p className="text-xs text-gray-600">{employee.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -452,7 +452,7 @@ const WorkspaceOwner: React.FC = () => {
       {/* Active Employees */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {employees.filter(e => e.status === 'active').map((employee) => (
-          <div key={employee._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={employee._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
                 <img
@@ -486,14 +486,14 @@ const WorkspaceOwner: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <button className="text-blue-600 hover:text-blue-700 text-sm">
+              <button className="text-accent-dark hover:text-blue-700 text-sm">
                 View Profile
               </button>
               <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <Edit className="w-4 h-4" />
                 </button>
-                <button className="text-red-400 hover:text-red-600">
+                <button className="text-red-600 hover:text-red-600">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -531,7 +531,7 @@ const WorkspaceOwner: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project) => (
-          <div key={project._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={project._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{project.name}</h4>
@@ -552,9 +552,9 @@ const WorkspaceOwner: React.FC = () => {
                 <span className="text-gray-600">Progress</span>
                 <span className="font-medium">{project.progress}%</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-300 rounded-full h-2">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-accent h-2 rounded-full transition-all duration-300"
                   style={{ width: `${project.progress}%` }}
                 ></div>
               </div>
@@ -580,14 +580,14 @@ const WorkspaceOwner: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <button className="text-blue-600 hover:text-blue-700 text-sm">
+              <button className="text-accent-dark hover:text-blue-700 text-sm">
                 View Project
               </button>
               <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <Edit className="w-4 h-4" />
                 </button>
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <MoreVertical className="w-4 h-4" />
                 </button>
               </div>
@@ -606,7 +606,7 @@ const WorkspaceOwner: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Project Performance</h4>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -624,7 +624,7 @@ const WorkspaceOwner: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Team Productivity</h4>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -643,7 +643,7 @@ const WorkspaceOwner: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-lg font-semibold text-gray-900">Export Reports</h4>
           <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
@@ -653,20 +653,20 @@ const WorkspaceOwner: React.FC = () => {
         </div>
         <p className="text-sm text-gray-600 mb-4">Generate comprehensive reports for clients and stakeholders</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+          <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <FileText className="w-8 h-8 text-accent-dark mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-900">Project Report</p>
-            <p className="text-xs text-gray-500">Detailed project progress</p>
+            <p className="text-xs text-gray-600">Detailed project progress</p>
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
             <BarChart3 className="w-8 h-8 text-green-600 mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-900">Analytics Report</p>
-            <p className="text-xs text-gray-500">Performance metrics</p>
+            <p className="text-xs text-gray-600">Performance metrics</p>
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
             <DollarSign className="w-8 h-8 text-purple-600 mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-900">Financial Report</p>
-            <p className="text-xs text-gray-500">Revenue and costs</p>
+            <p className="text-xs text-gray-600">Revenue and costs</p>
           </button>
         </div>
       </div>
@@ -717,8 +717,8 @@ const WorkspaceOwner: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   <Icon className="w-4 h-4" />

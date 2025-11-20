@@ -299,7 +299,7 @@ export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue
         className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
           active 
             ? 'bg-gradient-to-br from-yellow-500 to-orange-600 text-white shadow-lg shadow-orange-500/50' 
-            : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 backdrop-blur-md'
+            : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-700 hover:bg-white dark:hover:bg-gray-700 backdrop-blur-md'
         } ${className}`}
         aria-label={tooltip}
       >

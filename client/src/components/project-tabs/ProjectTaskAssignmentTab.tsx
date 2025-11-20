@@ -307,7 +307,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
     switch (priority) {
       case 'low': return 'bg-gray-100 text-gray-700';
       case 'medium': return 'bg-blue-100 text-blue-700';
-      case 'high': return 'bg-orange-100 text-orange-700';
+      case 'high': return 'bg-orange-200 text-orange-700';
       case 'critical': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
@@ -340,8 +340,8 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
   if (!isProjectManager) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+      <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
+        <User className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
         <p className="text-gray-600">Only the Project Manager can assign and manage tasks.</p>
       </div>
@@ -350,7 +350,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Task Assignment</h3>
@@ -360,7 +360,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Assign New Task
@@ -370,14 +370,14 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
         {/* Tasks List */}
         <div className="space-y-3">
           {tasks.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-12 text-gray-600">
+              <FileText className="w-12 h-12 mx-auto mb-3 text-gray-600" />
               <p className="font-medium">No tasks assigned yet</p>
               <p className="text-sm mt-1">Create your first task to get started</p>
             </div>
           ) : (
             tasks.map((task) => (
-              <div key={task._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={task._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900 mb-1">{task.title}</h4>
@@ -409,7 +409,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => openEditModal(task)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      className="p-2 text-accent-dark hover:bg-blue-50 rounded-lg"
                       title="Edit Task"
                     >
                       <Edit className="w-4 h-4" />
@@ -430,14 +430,14 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-gray-200">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Start Date</p>
+                    <p className="text-xs text-gray-600 mb-1">Start Date</p>
                     <p className="text-sm text-gray-900 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {new Date(task.startDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Due Date</p>
+                    <p className="text-xs text-gray-600 mb-1">Due Date</p>
                     <p className="text-sm text-gray-900 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {new Date(task.dueDate).toLocaleDateString()}
@@ -450,7 +450,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <button
                       onClick={() => setExpandedTaskId(expandedTaskId === task._id ? null : task._id)}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                      className="text-sm font-medium text-accent-dark hover:text-blue-700 flex items-center gap-1"
                     >
                       <CheckCircle className="w-4 h-4" />
                       {task.subtasks.filter(st => st.completed).length} / {task.subtasks.length} Subtasks Completed
@@ -465,7 +465,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                               type="checkbox"
                               checked={subtask.completed}
                               onChange={() => handleToggleSubtask(task._id, subtask._id)}
-                              className="w-4 h-4 text-blue-600 rounded"
+                              className="w-4 h-4 text-accent-dark rounded"
                             />
                             <span className={`flex-1 text-sm ${subtask.completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
                               {subtask.title}
@@ -491,7 +491,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                           />
                           <button
                             onClick={() => handleAddSubtask(task._id)}
-                            className="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                            className="px-2 py-1 bg-accent text-gray-900 text-sm rounded hover:bg-accent-hover"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -509,7 +509,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       <div className="space-y-1 mb-2">
                         {task.links.map((link, index) => (
                           <div key={index} className="flex items-center gap-2 group text-sm">
-                            <a href={link} target="_blank" rel="noopener noreferrer" className="flex-1 text-blue-600 hover:underline truncate">
+                            <a href={link} target="_blank" rel="noopener noreferrer" className="flex-1 text-accent-dark hover:underline truncate">
                               {link}
                             </a>
                             <button
@@ -533,7 +533,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       />
                       <button
                         onClick={() => handleAddLink(task._id)}
-                        className="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="px-2 py-1 bg-accent text-gray-900 text-sm rounded hover:bg-accent-hover"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -543,12 +543,12 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-500">Progress</span>
+                    <span className="text-xs text-gray-600">Progress</span>
                     <span className="text-xs font-medium text-gray-900">{task.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all"
+                      className="bg-accent h-2 rounded-full transition-all"
                       style={{ width: `${task.progress}%` }}
                     />
                   </div>
@@ -556,7 +556,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
                 {/* PM Actions */}
                 {task.status === 'completed' && !task.isFinished && (
-                  <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-2">
+                  <div className="mt-3 pt-3 border-t border-gray-300 flex items-center gap-2">
                     <button
                       onClick={() => handleVerifyTask(task)}
                       className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
@@ -584,7 +584,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       {task.rating && (
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <span key={star} className={star <= task.rating! ? 'text-yellow-400' : 'text-gray-300'}>
+                            <span key={star} className={star <= task.rating! ? 'text-yellow-600' : 'text-gray-700'}>
                               ⭐
                             </span>
                           ))}
@@ -613,11 +613,11 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
             {/* Rating Criteria */}
             <div className="space-y-6">
               {/* 1. Timeliness */}
-              <div className="border-b border-gray-200 pb-4">
+              <div className="border-b border-gray-300 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-blue-600" />
+                      <Clock className="w-4 h-4 text-accent-dark" />
                       Timeliness
                     </h4>
                     <p className="text-xs text-gray-600 mt-1">
@@ -635,7 +635,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       onClick={() => setRatingDetails({...ratingDetails, timeliness: star})}
                       className="text-3xl transition-transform hover:scale-110"
                     >
-                      <span className={star <= ratingDetails.timeliness ? 'text-yellow-400' : 'text-gray-300'}>
+                      <span className={star <= ratingDetails.timeliness ? 'text-yellow-600' : 'text-gray-700'}>
                         ⭐
                       </span>
                     </button>
@@ -644,7 +644,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               </div>
 
               {/* 2. Quality of Work */}
-              <div className="border-b border-gray-200 pb-4">
+              <div className="border-b border-gray-300 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -666,7 +666,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       onClick={() => setRatingDetails({...ratingDetails, quality: star})}
                       className="text-3xl transition-transform hover:scale-110"
                     >
-                      <span className={star <= ratingDetails.quality ? 'text-yellow-400' : 'text-gray-300'}>
+                      <span className={star <= ratingDetails.quality ? 'text-yellow-600' : 'text-gray-700'}>
                         ⭐
                       </span>
                     </button>
@@ -675,7 +675,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               </div>
 
               {/* 3. Communication */}
-              <div className="border-b border-gray-200 pb-4">
+              <div className="border-b border-gray-300 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -697,7 +697,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       onClick={() => setRatingDetails({...ratingDetails, communication: star})}
                       className="text-3xl transition-transform hover:scale-110"
                     >
-                      <span className={star <= ratingDetails.communication ? 'text-yellow-400' : 'text-gray-300'}>
+                      <span className={star <= ratingDetails.communication ? 'text-yellow-600' : 'text-gray-700'}>
                         ⭐
                       </span>
                     </button>
@@ -706,7 +706,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               </div>
 
               {/* 4. Completeness */}
-              <div className="border-b border-gray-200 pb-4">
+              <div className="border-b border-gray-300 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -728,7 +728,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       onClick={() => setRatingDetails({...ratingDetails, completeness: star})}
                       className="text-3xl transition-transform hover:scale-110"
                     >
-                      <span className={star <= ratingDetails.completeness ? 'text-yellow-400' : 'text-gray-300'}>
+                      <span className={star <= ratingDetails.completeness ? 'text-yellow-600' : 'text-gray-700'}>
                         ⭐
                       </span>
                     </button>
@@ -746,7 +746,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-blue-600">
+                    <div className="text-3xl font-bold text-accent-dark">
                       {ratingDetails.timeliness && ratingDetails.quality && 
                        ratingDetails.communication && ratingDetails.completeness
                         ? ((ratingDetails.timeliness + ratingDetails.quality + 
@@ -767,7 +767,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   value={ratingDetails.comments}
                   onChange={(e) => setRatingDetails({...ratingDetails, comments: e.target.value})}
                   placeholder="Provide specific feedback about the task performance..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent resize-none"
                   rows={3}
                 />
               </div>
@@ -779,7 +779,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                 onClick={handleRateTask}
                 disabled={!ratingDetails.timeliness || !ratingDetails.quality || 
                          !ratingDetails.communication || !ratingDetails.completeness}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
               >
                 Submit Evaluation
               </button>
@@ -866,7 +866,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <option value="link-submission">Link Submission</option>
                   <option value="review">Review/Approval</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-600 mt-1">
                   {taskForm.taskType === 'general' && 'Regular task with subtasks and progress tracking'}
                   {taskForm.taskType === 'status-update' && 'Employee provides status updates only'}
                   {taskForm.taskType === 'file-submission' && 'Employee must upload file(s) to complete'}
@@ -954,7 +954,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     onChange={(e) => setTaskForm({ ...taskForm, progress: parseInt(e.target.value) })}
                     className="w-full"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-600 mt-1">
                     Progress is automatically calculated based on completed subtasks
                   </p>
                 </div>
@@ -964,7 +964,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               <div className="flex items-center gap-3 pt-4">
                 <button
                   onClick={editingTask ? handleUpdateTask : handleCreateTask}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   {editingTask ? 'Update Task' : 'Assign Task'}
                 </button>

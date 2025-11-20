@@ -175,7 +175,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
     switch (priority) {
       case 'low': return 'bg-gray-100 text-gray-700';
       case 'medium': return 'bg-blue-100 text-blue-700';
-      case 'high': return 'bg-orange-100 text-orange-700';
+      case 'high': return 'bg-orange-200 text-orange-700';
       case 'critical': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
@@ -214,7 +214,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">My Tasks</h3>
@@ -229,7 +229,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent"
             >
               <option value="all">All Tasks</option>
               <option value="pending">Pending</option>
@@ -246,7 +246,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'list' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="List View"
@@ -258,7 +258,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('kanban')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'kanban' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="Kanban Board"
@@ -270,7 +270,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('calendar')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'calendar' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="Calendar View"
@@ -282,7 +282,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('gantt')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'gantt' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="Gantt Chart"
@@ -294,7 +294,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('table')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'table' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="Table View"
@@ -306,7 +306,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('dashboard')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'dashboard' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="Dashboard View"
@@ -318,7 +318,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={() => setViewMode('workload')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
                 viewMode === 'workload' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
               title="Workload View"
@@ -336,7 +336,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <p className="text-2xl font-bold text-gray-900">{myTasks.length}</p>
           </div>
           <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-xs text-blue-600 mb-1">In Progress</p>
+            <p className="text-xs text-accent-dark mb-1">In Progress</p>
             <p className="text-2xl font-bold text-blue-700">
               {myTasks.filter(t => t.status === 'in-progress').length}
             </p>
@@ -359,8 +359,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {viewMode === 'list' && (
           <div className="space-y-3">
             {filteredTasks.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <User className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <div className="text-center py-12 text-gray-600">
+                <User className="w-12 h-12 mx-auto mb-3 text-gray-600" />
                 <p className="font-medium">No tasks found</p>
                 <p className="text-sm mt-1">
                   {filterStatus === 'all' 
@@ -375,7 +375,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${
                   isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
                     ? 'border-red-300 bg-red-50' 
-                    : 'border-gray-200 bg-white'
+                    : 'border-gray-300 bg-white'
                 }`}
               >
                 {/* Task Header */}
@@ -451,14 +451,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4 mb-3 pb-3 border-b border-gray-200">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Start Date</p>
+                    <p className="text-xs text-gray-600 mb-1">Start Date</p>
                     <p className="text-sm text-gray-900 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {new Date(task.startDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Due Date</p>
+                    <p className="text-xs text-gray-600 mb-1">Due Date</p>
                     <p className={`text-sm flex items-center gap-1 ${
                       isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
                         ? 'text-red-600 font-semibold' 
@@ -473,12 +473,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {/* Progress Bar */}
                 <div className="mb-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-500">Progress</span>
+                    <span className="text-xs text-gray-600">Progress</span>
                     <span className="text-xs font-medium text-gray-900">{task.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all"
+                      className="bg-accent h-2 rounded-full transition-all"
                       style={{ width: `${task.progress}%` }}
                     />
                   </div>
@@ -501,7 +501,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                                 type="checkbox"
                                 checked={subtask.completed}
                                 onChange={() => handleToggleSubtask(task._id, subtask._id)}
-                                className="w-4 h-4 text-blue-600 rounded"
+                                className="w-4 h-4 text-accent-dark rounded"
                                 disabled={task.isFinished}
                               />
                               <span className={`text-sm ${subtask.completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
@@ -530,10 +530,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                               type="file"
                               multiple
                               onChange={(e) => handleFileUpload(task._id, e)}
-                              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer"
+                              className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer"
                             />
                           </label>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-600 mt-1">
                             Upload files required for this task
                           </p>
                         </div>
@@ -646,11 +646,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             onChange={(e) => setStatusUpdate({ ...statusUpdate, [task._id]: e.target.value })}
                             placeholder="Enter your status update here..."
                             rows={3}
-                            className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                            className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent resize-none"
                           />
                           <button
                             onClick={() => handleAddStatusUpdate(task._id)}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                            className="px-4 py-2 bg-accent text-gray-900 text-sm rounded-lg hover:bg-accent-hover"
                           >
                             Submit Update
                           </button>
@@ -672,7 +672,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                               href={link} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="block text-sm text-blue-600 hover:underline truncate"
+                              className="block text-sm text-accent-dark hover:underline truncate"
                             >
                               {link}
                             </a>
@@ -691,7 +691,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         <div className="space-y-1 pl-4">
                           {task.files.map((file) => (
                             <div key={file._id} className="flex items-center gap-2">
-                              <Upload className="w-3 h-3 text-gray-500" />
+                              <Upload className="w-3 h-3 text-gray-600" />
                               <span className="text-sm text-gray-700">{file.name}</span>
                             </div>
                           ))}
@@ -705,7 +705,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         <p className="text-sm font-medium text-gray-700 mb-1">Task Rating</p>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <span key={star} className={star <= task.rating! ? 'text-yellow-400 text-lg' : 'text-gray-300 text-lg'}>
+                            <span key={star} className={star <= task.rating! ? 'text-yellow-600 text-lg' : 'text-gray-700 text-lg'}>
                               ⭐
                             </span>
                           ))}
@@ -734,7 +734,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             >
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center justify-between">
                 <span>Pending</span>
-                <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                <span className="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">
                   {filteredTasks.filter(t => t.status === 'pending').length}
                 </span>
               </h3>
@@ -745,7 +745,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     onClick={() => handleTaskClick(task)}
-                    className={`bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${
+                    className={`bg-white border border-gray-300 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${
                       draggedTask?._id === task._id ? 'opacity-50' : ''
                     }`}
                   >
@@ -763,7 +763,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         {task.priority}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-xs text-gray-600">
                       <Clock className="w-3 h-3" />
                       {new Date(task.dueDate).toLocaleDateString()}
                     </div>
@@ -809,12 +809,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         {task.priority}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <Clock className="w-3 h-3" />
                       {new Date(task.dueDate).toLocaleDateString()}
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
-                      <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${task.progress}%` }}></div>
+                    <div className="w-full bg-gray-300 rounded-full h-1.5">
+                      <div className="bg-accent h-1.5 rounded-full" style={{ width: `${task.progress}%` }}></div>
                     </div>
                   </div>
                 ))}
@@ -858,7 +858,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         {task.priority}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-xs text-gray-600">
                       <CheckCircle className="w-3 h-3 text-green-600" />
                       Completed
                     </div>
@@ -910,7 +910,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     </div>
                     {task.rating && (
                       <div className="flex items-center gap-1 text-xs">
-                        <span className="text-yellow-400">⭐</span>
+                        <span className="text-yellow-600">⭐</span>
                         <span className="text-gray-600">{task.rating}/5</span>
                       </div>
                     )}
@@ -968,7 +968,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         }`}
                       >
                         <div className={`text-sm font-semibold mb-1 ${
-                          isToday ? 'text-blue-600' : 'text-gray-700'
+                          isToday ? 'text-accent-dark' : 'text-gray-700'
                         }`}>
                           {day}
                         </div>
@@ -983,7 +983,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                               className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:shadow-sm transition-shadow ${
                                 task.status === 'completed' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
                                 task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' :
-                                'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                'bg-gray-100 text-gray-700 hover:bg-gray-300'
                               }`}
                               title={task.title}
                             >
@@ -991,7 +991,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             </div>
                           ))}
                           {tasksOnDay.length > 2 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-600">
                               +{tasksOnDay.length - 2} more
                             </div>
                           )}
@@ -1009,12 +1009,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
         {/* Gantt Chart View */}
         {viewMode === 'gantt' && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 overflow-x-auto">
+          <div className="bg-white rounded-lg border border-gray-300 p-6 overflow-x-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Gantt Chart Timeline</h3>
             
             <div className="min-w-[800px]">
               {/* Timeline Header */}
-              <div className="flex border-b border-gray-200 pb-2 mb-4">
+              <div className="flex border-b border-gray-300 pb-2 mb-4">
                 <div className="w-48 font-semibold text-sm text-gray-700">Task</div>
                 <div className="flex-1 grid grid-cols-7 gap-1 text-xs text-gray-600 text-center">
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
@@ -1057,7 +1057,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       <div 
                         className={`absolute h-6 rounded flex items-center px-2 text-xs text-white ${
                           task.status === 'completed' ? 'bg-green-500' :
-                          task.status === 'in-progress' ? 'bg-blue-500' :
+                          task.status === 'in-progress' ? 'bg-accent' :
                           task.status === 'blocked' ? 'bg-red-500' :
                           'bg-gray-400'
                         }`}
@@ -1078,7 +1078,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
         {/* Table View */}
         {viewMode === 'table' && (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+          <div className="bg-white rounded-lg border border-gray-300 overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -1101,7 +1101,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   >
                     <td className="px-4 py-3">
                       <div className="font-medium text-sm text-gray-900">{task.title}</div>
-                      <div className="text-xs text-gray-500 truncate max-w-xs">{task.description}</div>
+                      <div className="text-xs text-gray-600 truncate max-w-xs">{task.description}</div>
                     </td>
                     <td className="px-4 py-3">
                       {task.taskType && (() => {
@@ -1125,9 +1125,9 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
+                        <div className="flex-1 bg-gray-300 rounded-full h-2 max-w-[100px]">
                           <div 
-                            className="bg-blue-600 h-2 rounded-full" 
+                            className="bg-accent h-2 rounded-full" 
                             style={{ width: `${task.progress}%` }}
                           />
                         </div>
@@ -1143,11 +1143,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <td className="px-4 py-3">
                       {task.rating ? (
                         <div className="flex items-center gap-1">
-                          <span className="text-yellow-400">⭐</span>
+                          <span className="text-yellow-600">⭐</span>
                           <span className="text-sm text-gray-700">{task.rating}</span>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400">-</span>
+                        <span className="text-xs text-gray-600">-</span>
                       )}
                     </td>
                   </tr>
@@ -1210,7 +1210,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             {/* Charts Row */}
             <div className="grid grid-cols-2 gap-6">
               {/* Task Distribution by Status */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Distribution</h3>
                 <div className="space-y-3">
                   {['pending', 'in-progress', 'completed', 'verified', 'blocked'].map(status => {
@@ -1222,7 +1222,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           <span className="text-sm text-gray-700 capitalize">{status}</span>
                           <span className="text-sm font-medium text-gray-900">{count}</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-300 rounded-full h-2">
                           <div 
                             className={`h-2 rounded-full ${getStatusColor(status).replace('text-', 'bg-').replace('100', '500')}`}
                             style={{ width: `${percentage}%` }}
@@ -1235,7 +1235,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </div>
 
               {/* Priority Breakdown */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Priority Breakdown</h3>
                 <div className="space-y-3">
                   {['critical', 'high', 'medium', 'low'].map(priority => {
@@ -1247,7 +1247,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           <span className="text-sm text-gray-700 capitalize">{priority}</span>
                           <span className="text-sm font-medium text-gray-900">{count}</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-300 rounded-full h-2">
                           <div 
                             className={`h-2 rounded-full ${getPriorityColor(priority).replace('text-', 'bg-').replace('100', '500')}`}
                             style={{ width: `${percentage}%` }}
@@ -1261,7 +1261,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </div>
 
             {/* Recent Tasks */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-300 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Tasks</h3>
               <div className="space-y-2">
                 {filteredTasks.slice(0, 5).map(task => (
@@ -1277,15 +1277,15 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       })()}
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">{task.title}</p>
-                        <p className="text-xs text-gray-500">Due: {new Date(task.dueDate).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-600">Due: {new Date(task.dueDate).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(task.status)}`}>
                         {task.status}
                       </span>
-                      <div className="w-16 bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${task.progress}%` }} />
+                      <div className="w-16 bg-gray-300 rounded-full h-2">
+                        <div className="bg-accent h-2 rounded-full" style={{ width: `${task.progress}%` }} />
                       </div>
                     </div>
                   </div>
@@ -1297,13 +1297,13 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
         {/* Workload View */}
         {viewMode === 'workload' && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="bg-white rounded-lg border border-gray-300 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">My Workload Overview</h3>
             
             {/* Workload Summary */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-blue-600 mb-1">Total Workload</p>
+                <p className="text-sm text-accent-dark mb-1">Total Workload</p>
                 <p className="text-2xl font-bold text-blue-700">{myTasks.length} tasks</p>
               </div>
               <div className="bg-green-50 rounded-lg p-4">
@@ -1341,10 +1341,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   }
                   
                   return (
-                    <div key={week} className="border border-gray-200 rounded-lg p-4">
+                    <div key={week} className="border border-gray-300 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h5 className="font-medium text-gray-900">{week}</h5>
-                        <span className="text-sm text-gray-500">{weekTasks.length} tasks</span>
+                        <span className="text-sm text-gray-600">{weekTasks.length} tasks</span>
                       </div>
                       <div className="space-y-2">
                         {weekTasks.slice(0, 3).map(task => (
@@ -1356,15 +1356,15 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             <span className={`w-2 h-2 rounded-full ${
                               task.priority === 'critical' ? 'bg-red-500' :
                               task.priority === 'high' ? 'bg-orange-500' :
-                              task.priority === 'medium' ? 'bg-blue-500' :
+                              task.priority === 'medium' ? 'bg-accent' :
                               'bg-gray-400'
                             }`} />
                             <span className="flex-1 text-gray-700 truncate">{task.title}</span>
-                            <span className="text-xs text-gray-500">{new Date(task.dueDate).toLocaleDateString()}</span>
+                            <span className="text-xs text-gray-600">{new Date(task.dueDate).toLocaleDateString()}</span>
                           </div>
                         ))}
                         {weekTasks.length > 3 && (
-                          <p className="text-xs text-gray-500 pl-4">+{weekTasks.length - 3} more tasks</p>
+                          <p className="text-xs text-gray-600 pl-4">+{weekTasks.length - 3} more tasks</p>
                         )}
                       </div>
                     </div>
@@ -1386,7 +1386,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4 flex items-center justify-between">
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold text-gray-900">{selectedTaskForModal.title}</h2>
                   <div className="flex items-center gap-2 mt-2">
@@ -1409,7 +1409,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 </div>
                 <button
                   onClick={() => setSelectedTaskForModal(null)}
-                  className="text-gray-400 hover:text-gray-600 p-2"
+                  className="text-gray-600 hover:text-gray-600 p-2"
                 >
                   <ChevronUp className="w-6 h-6 rotate-45" />
                 </button>
@@ -1451,9 +1451,9 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <h3 className="text-sm font-semibold text-gray-700">Progress</h3>
                     <span className="text-sm font-medium text-gray-900">{selectedTaskForModal.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="w-full bg-gray-300 rounded-full h-3">
                     <div 
-                      className="bg-blue-600 h-3 rounded-full transition-all"
+                      className="bg-accent h-3 rounded-full transition-all"
                       style={{ width: `${selectedTaskForModal.progress}%` }}
                     />
                   </div>
@@ -1473,7 +1473,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             type="checkbox"
                             checked={subtask.completed}
                             onChange={() => handleToggleSubtask(selectedTaskForModal._id, subtask._id)}
-                            className="w-4 h-4 text-blue-600 rounded"
+                            className="w-4 h-4 text-accent-dark rounded"
                             disabled={selectedTaskForModal.isFinished}
                           />
                           <span className={`text-sm ${subtask.completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
@@ -1495,7 +1495,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <div className="space-y-2">
                       {selectedTaskForModal.files.map((file) => (
                         <div key={file._id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                          <Upload className="w-4 h-4 text-gray-500" />
+                          <Upload className="w-4 h-4 text-gray-600" />
                           <span className="text-sm text-gray-700 flex-1">{file.name}</span>
                         </div>
                       ))}
@@ -1517,7 +1517,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           href={link} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="block text-sm text-blue-600 hover:underline p-2 bg-gray-50 rounded"
+                          className="block text-sm text-accent-dark hover:underline p-2 bg-gray-50 rounded"
                         >
                           {link}
                         </a>
@@ -1532,7 +1532,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <h3 className="text-sm font-semibold text-gray-700 mb-2">Task Rating</h3>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} className={star <= selectedTaskForModal.rating! ? 'text-yellow-400 text-2xl' : 'text-gray-300 text-2xl'}>
+                        <span key={star} className={star <= selectedTaskForModal.rating! ? 'text-yellow-600 text-2xl' : 'text-gray-700 text-2xl'}>
                           ⭐
                         </span>
                       ))}
@@ -1545,10 +1545,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </div>
 
               {/* Modal Footer */}
-              <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
+              <div className="sticky bottom-0 bg-gray-50 border-t border-gray-300 px-6 py-4 flex items-center justify-end gap-3">
                 <button
                   onClick={() => setSelectedTaskForModal(null)}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-300 rounded-lg transition-colors"
                 >
                   Close
                 </button>

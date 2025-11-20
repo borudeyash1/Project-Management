@@ -60,7 +60,7 @@ const WorkspaceOverview: React.FC = () => {
       label: 'Active Projects',
       value: activeProjects,
       icon: FolderKanban,
-      color: 'text-blue-600',
+      color: 'text-accent-dark',
       bgColor: 'bg-blue-100',
       change: '+4% MoM'
     },
@@ -77,7 +77,7 @@ const WorkspaceOverview: React.FC = () => {
       value: '$18.4k',
       icon: DollarSign,
       color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
+      bgColor: 'bg-orange-200',
       change: '+4% MoM'
     },
     {
@@ -101,14 +101,14 @@ const WorkspaceOverview: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+            <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center text-gray-900 font-bold text-xl">
               {currentWorkspace?.name.charAt(0)}
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {currentWorkspace?.name}
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-200">
                 You are viewing the workspace area
               </p>
             </div>
@@ -117,7 +117,7 @@ const WorkspaceOverview: React.FC = () => {
         {isOwner && (
           <button
             onClick={() => navigate(`/workspace/${state.currentWorkspace}/projects/new`)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Project
@@ -132,9 +132,9 @@ const WorkspaceOverview: React.FC = () => {
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-200">{stat.label}</span>
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                     <Icon className={`w-4 h-4 ${stat.color}`} />
                   </div>
@@ -146,12 +146,12 @@ const WorkspaceOverview: React.FC = () => {
                   </div>
                   {/* Progress bar for some stats */}
                   {stat.label === 'Active Projects' && (
-                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-600" style={{ width: '72%' }} />
+                    <div className="w-16 h-2 bg-gray-300 rounded-full overflow-hidden">
+                      <div className="h-full bg-accent" style={{ width: '72%' }} />
                     </div>
                   )}
                   {stat.label === 'Utilization' && (
-                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="w-16 h-2 bg-gray-300 rounded-full overflow-hidden">
                       <div className="h-full bg-green-600" style={{ width: avgProgress + '%' }} />
                     </div>
                   )}
@@ -164,30 +164,30 @@ const WorkspaceOverview: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart Placeholder */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Project Progress
           </h3>
-          <div className="h-64 flex items-center justify-center text-gray-400">
+          <div className="h-64 flex items-center justify-center text-gray-600">
             Chart placeholder - Project timeline and progress visualization
           </div>
         </div>
 
         {/* Upcoming Milestones */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Upcoming Milestones
             </h3>
-            <button className="text-sm text-blue-600 hover:text-blue-700">View</button>
+            <button className="text-sm text-accent-dark hover:text-blue-700">View</button>
           </div>
           <div className="space-y-3">
             {upcomingMilestones.map((milestone, index) => (
               <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <Clock className="w-4 h-4 text-gray-400 mt-1" />
+                <Clock className="w-4 h-4 text-gray-600 mt-1" />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900 dark:text-gray-100">{milestone.name}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">{milestone.date}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-200">{milestone.date}</div>
                 </div>
                 <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
                   {milestone.project}
@@ -204,7 +204,7 @@ const WorkspaceOverview: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
           <button
             onClick={() => navigate(`/workspace/${state.currentWorkspace}/projects`)}
-            className="text-sm text-blue-600 hover:text-blue-700"
+            className="text-sm text-accent-dark hover:text-blue-700"
           >
             View all
           </button>
@@ -214,14 +214,14 @@ const WorkspaceOverview: React.FC = () => {
             <div
               key={project._id}
               onClick={() => navigate(`/project/${project._id}`)}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                     {project.name}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                     {project.description}
                   </p>
                 </div>
@@ -236,20 +236,20 @@ const WorkspaceOverview: React.FC = () => {
               
               {/* Progress Bar */}
               <div className="mb-3">
-                <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
                   <span>Progress</span>
                   <span>{project.progress}%</span>
                 </div>
-                <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-600 transition-all"
+                    className="h-full bg-accent transition-all"
                     style={{ width: `${project.progress}%` }}
                   />
                 </div>
               </div>
 
               {/* Project Stats */}
-              <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-200">
                 <div className="flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   <span>{project.completedTasksCount}/{project.totalTasksCount}</span>

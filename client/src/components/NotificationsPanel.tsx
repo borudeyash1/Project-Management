@@ -131,7 +131,7 @@ const NotificationsPanel: React.FC = () => {
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       case 'info':
       default:
-        return <Info className="w-5 h-5 text-blue-500" />;
+        return <Info className="w-5 h-5 text-accent" />;
     }
   };
 
@@ -160,13 +160,13 @@ const NotificationsPanel: React.FC = () => {
         {/* Header */}
         <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center gap-3">
-            <Bell className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <Bell className={`w-6 h-6 ${isDarkMode ? 'text-accent-light' : 'text-accent-dark'}`} />
             <div>
               <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Notifications
               </h2>
               {unreadCount > 0 && (
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                   {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
                 </p>
               )}
@@ -176,27 +176,27 @@ const NotificationsPanel: React.FC = () => {
             onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'notifications' })}
             className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
-            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
           </button>
         </div>
 
         {/* Actions */}
         {notifications.length > 0 && (
-          <div className={`flex items-center justify-between px-6 py-3 border-b ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'}`}>
+          <div className={`flex items-center justify-between px-6 py-3 border-b ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-300 bg-gray-50'}`}>
             <button
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
               className={`text-sm font-medium ${
                 unreadCount === 0
-                  ? isDarkMode ? 'text-gray-600' : 'text-gray-400'
-                  : isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                  ? isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                  : isDarkMode ? 'text-accent-light hover:text-blue-700' : 'text-accent-dark hover:text-blue-700'
               } disabled:cursor-not-allowed`}
             >
               Mark all as read
             </button>
             <button
               onClick={clearAll}
-              className={`text-sm font-medium ${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
+              className={`text-sm font-medium ${isDarkMode ? 'text-red-600 hover:text-red-700' : 'text-red-600 hover:text-red-700'}`}
             >
               Clear all
             </button>
@@ -207,11 +207,11 @@ const NotificationsPanel: React.FC = () => {
         <div className="flex-1 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Bell className={`w-16 h-16 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'} mb-4`} />
-              <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'} mb-2`}>
+              <Bell className={`w-16 h-16 ${isDarkMode ? 'text-gray-600' : 'text-gray-700'} mb-4`} />
+              <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-900'} mb-2`}>
                 No notifications
               </h3>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                 You're all caught up!
               </p>
             </div>
@@ -235,14 +235,14 @@ const NotificationsPanel: React.FC = () => {
                           {notif.title}
                         </p>
                         {!notif.read && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-1 flex-shrink-0"></div>
+                          <div className="w-2 h-2 bg-accent rounded-full mt-1 flex-shrink-0"></div>
                         )}
                       </div>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
                         {notif.message}
                       </p>
                       <div className="flex items-center justify-between mt-2">
-                        <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                           {new Date(notif.createdAt).toLocaleString()}
                         </p>
                         <div className="flex items-center gap-2">
@@ -274,10 +274,10 @@ const NotificationsPanel: React.FC = () => {
                               deleteNotification(notif._id);
                             }}
                             className={`opacity-0 group-hover:opacity-100 p-1 rounded ${
-                              isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
+                              isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'
                             } transition-opacity`}
                           >
-                            <Trash2 className={`w-3 h-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                            <Trash2 className={`w-3 h-3 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
                           </button>
                         </div>
                       </div>

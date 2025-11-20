@@ -75,11 +75,11 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
       >
         <CurrentIcon className="w-4 h-4 text-gray-600" />
         <span className="text-sm font-medium text-gray-900">{currentMode.label}</span>
-        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
           <div className="p-2">
             {/* Personal Mode */}
             <button
@@ -93,10 +93,10 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
               <Home className="w-4 h-4" />
               <div>
                 <div className="font-medium">Personal Mode</div>
-                <div className="text-xs text-gray-500">Individual workspace</div>
+                <div className="text-xs text-gray-600">Individual workspace</div>
               </div>
               {state.mode === 'Personal' && (
-                <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full" />
+                <div className="ml-auto w-2 h-2 bg-accent rounded-full" />
               )}
             </button>
 
@@ -105,7 +105,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
 
             {/* Workspace Modes */}
             <div className="space-y-1">
-              <div className="px-3 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <div className="px-3 py-1 text-xs font-medium text-gray-600 uppercase tracking-wide">
                 Workspaces
               </div>
               {state.workspaces.map(workspace => (
@@ -126,12 +126,12 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                         <Crown className="w-3 h-3 text-yellow-500" />
                       )}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-600">
                       {workspace.memberCount} members • {workspace.type}
                     </div>
                   </div>
                   {state.mode === 'Workspace' && state.currentWorkspace === workspace._id && (
-                    <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full" />
+                    <div className="ml-auto w-2 h-2 bg-accent rounded-full" />
                   )}
                 </button>
               ))}
@@ -139,7 +139,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
 
             {/* Quick Actions */}
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="px-3 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <div className="px-3 py-1 text-xs font-medium text-gray-600 uppercase tracking-wide">
                 Quick Actions
               </div>
               <div className="space-y-1">
@@ -153,7 +153,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                   <Building className="w-4 h-4" />
                   <div>
                     <div className="font-medium">Create Workspace</div>
-                    <div className="text-xs text-gray-500">Start a new team workspace</div>
+                    <div className="text-xs text-gray-600">Start a new team workspace</div>
                   </div>
                 </button>
                 <button
@@ -167,7 +167,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                   <Users className="w-4 h-4" />
                   <div>
                     <div className="font-medium">Discover Workspaces</div>
-                    <div className="text-xs text-gray-500">Find and join teams</div>
+                    <div className="text-xs text-gray-600">Find and join teams</div>
                   </div>
                 </button>
               </div>

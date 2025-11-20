@@ -74,7 +74,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Project Team</h3>
@@ -85,7 +85,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
           {(isOwner || isProjectManager) && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <UserPlus className="w-4 h-4" />
               Add Member
@@ -116,8 +116,8 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         {/* Team Members List */}
         <div className="space-y-3">
           {projectTeam.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-12 text-gray-600">
+              <Users className="w-12 h-12 mx-auto mb-3 text-gray-600" />
               <p className="font-medium">No team members yet</p>
               <p className="text-sm mt-1">Add members from your workspace to get started</p>
             </div>
@@ -125,11 +125,11 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
             projectTeam.map((member) => (
               <div
                 key={member._id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                className="flex items-center justify-between p-4 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
+                    <Users className="w-5 h-5 text-accent-dark" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                       )}
                     </div>
                     <p className="text-sm text-gray-600">{member.email}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-600">
                       Added {new Date(member.addedAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -189,7 +189,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               <h3 className="text-lg font-semibold text-gray-900">Add Team Member</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -202,14 +202,14 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                   Select Member from Workspace
                 </label>
                 {availableMembers.length === 0 ? (
-                  <p className="text-sm text-gray-500 p-3 bg-gray-50 rounded">
+                  <p className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
                     All workspace members are already in this project
                   </p>
                 ) : (
                   <select
                     value={selectedMemberId}
                     onChange={(e) => setSelectedMemberId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
                     <option value="">Choose a member...</option>
                     {availableMembers.map((member: any) => (
@@ -229,7 +229,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as 'project-manager' | 'member')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   disabled={!isOwner && selectedRole === 'project-manager'}
                 >
                   <option value="member">Member</option>
@@ -238,7 +238,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                   )}
                 </select>
                 {!isOwner && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-600 mt-1">
                     Only workspace owner can assign project manager
                   </p>
                 )}
@@ -254,7 +254,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                 <button
                   onClick={handleAddMember}
                   disabled={!selectedMemberId || availableMembers.length === 0}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   Add Member
                 </button>

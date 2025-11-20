@@ -88,7 +88,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Invite Team Member
             </h2>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
               Invite someone to join your workspace
             </p>
           </div>
@@ -96,7 +96,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
             onClick={handleClose}
             className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
-            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
           </button>
         </div>
 
@@ -105,7 +105,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
           <div className="space-y-6">
             {/* Invite Method Selection */}
             <div>
-              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Invite Method
               </label>
               <div className="flex gap-4">
@@ -114,32 +114,32 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                   className={`flex-1 p-4 rounded-lg border-2 transition-colors ${
                     inviteMethod === 'email'
                       ? isDarkMode
-                        ? 'border-blue-500 bg-blue-900/30'
-                        : 'border-blue-500 bg-blue-50'
+                        ? 'border-accent bg-blue-900/30'
+                        : 'border-accent bg-blue-50'
                       : isDarkMode
                       ? 'border-gray-700 hover:bg-gray-700'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      : 'border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <Mail className={`w-6 h-6 mx-auto mb-2 ${inviteMethod === 'email' ? 'text-blue-600' : isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <Mail className={`w-6 h-6 mx-auto mb-2 ${inviteMethod === 'email' ? 'text-accent-dark' : isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
                   <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Email Invite</div>
-                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Send invitation via email</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Send invitation via email</div>
                 </button>
                 <button
                   onClick={() => setInviteMethod('link')}
                   className={`flex-1 p-4 rounded-lg border-2 transition-colors ${
                     inviteMethod === 'link'
                       ? isDarkMode
-                        ? 'border-blue-500 bg-blue-900/30'
-                        : 'border-blue-500 bg-blue-50'
+                        ? 'border-accent bg-blue-900/30'
+                        : 'border-accent bg-blue-50'
                       : isDarkMode
                       ? 'border-gray-700 hover:bg-gray-700'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      : 'border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <Copy className={`w-6 h-6 mx-auto mb-2 ${inviteMethod === 'link' ? 'text-blue-600' : isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <Copy className={`w-6 h-6 mx-auto mb-2 ${inviteMethod === 'link' ? 'text-accent-dark' : isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
                   <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Invite Link</div>
-                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Generate shareable link</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Generate shareable link</div>
                 </button>
               </div>
             </div>
@@ -149,7 +149,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               <>
                 {/* Email Input */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                     Email Address *
                   </label>
                   <input
@@ -159,15 +159,15 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                     placeholder="colleague@company.com"
                     className={`w-full px-4 py-3 rounded-lg border ${
                       isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                    } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    } focus:ring-2 focus:ring-accent focus:border-accent`}
                   />
                 </div>
 
                 {/* Personal Message */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                     Personal Message (Optional)
                   </label>
                   <textarea
@@ -177,9 +177,9 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                     rows={3}
                     className={`w-full px-4 py-3 rounded-lg border ${
                       isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                    } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    } focus:ring-2 focus:ring-accent focus:border-accent`}
                   />
                 </div>
               </>
@@ -191,14 +191,14 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                 {!inviteLink ? (
                   <button
                     onClick={handleGenerateLink}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                   >
                     <Copy className="w-5 h-5" />
                     Generate Invite Link
                   </button>
                 ) : (
-                  <div className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-200 bg-gray-50'}`}>
-                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <div className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-300 bg-gray-50'}`}>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                       Invite Link
                     </label>
                     <div className="flex gap-2">
@@ -217,7 +217,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                           linkCopied
                             ? 'bg-green-600 text-white'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-accent text-gray-900 hover:bg-accent-hover'
                         }`}
                       >
                         {linkCopied ? (
@@ -233,7 +233,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                         )}
                       </button>
                     </div>
-                    <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                       Share this link with anyone you want to invite. The link expires in 7 days.
                     </p>
                   </div>
@@ -243,7 +243,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
 
             {/* Role Selection */}
             <div>
-              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Assign Role *
               </label>
               <div className="space-y-2">
@@ -253,11 +253,11 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                     className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                       role === roleOption.value
                         ? isDarkMode
-                          ? 'bg-blue-900/30 border-2 border-blue-500'
-                          : 'bg-blue-50 border-2 border-blue-500'
+                          ? 'bg-blue-900/30 border-2 border-accent'
+                          : 'bg-blue-50 border-2 border-accent'
                         : isDarkMode
                         ? 'bg-gray-700/50 border-2 border-gray-700 hover:bg-gray-700'
-                        : 'bg-gray-50 border-2 border-gray-200 hover:bg-gray-100'
+                        : 'bg-gray-50 border-2 border-gray-300 hover:bg-gray-100'
                     }`}
                   >
                     <input
@@ -272,7 +272,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                       <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         {roleOption.label}
                       </div>
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                         {roleOption.description}
                       </div>
                     </div>
@@ -283,7 +283,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               {/* Custom Role Input */}
               {role === 'custom' && (
                 <div className="mt-4">
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                     Enter Custom Role
                   </label>
                   <input
@@ -293,9 +293,9 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                     placeholder="e.g., Consultant, Contractor, Advisor..."
                     className={`w-full px-4 py-2 rounded-lg border ${
                       isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                    } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    } focus:ring-2 focus:ring-accent focus:border-accent`}
                   />
                 </div>
               )}
@@ -309,8 +309,8 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
             onClick={handleClose}
             className={`px-4 py-2 rounded-lg font-medium ${
               isDarkMode
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-700 text-gray-700 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-300'
             }`}
           >
             Cancel
@@ -321,8 +321,8 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               disabled={!email.trim() || (role === 'custom' && !customRole.trim())}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
                 !email.trim() || (role === 'custom' && !customRole.trim())
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-accent text-gray-900 hover:bg-accent-hover'
               }`}
             >
               <UserPlus className="w-4 h-4" />

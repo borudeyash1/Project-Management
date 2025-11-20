@@ -212,27 +212,27 @@ const ReportsPage: React.FC = () => {
 
     const mockTimeTrackingData: TimeTrackingData[] = [
       { date: '2024-03-14', hours: 8.5, billableHours: 7.5, projects: [
-        { name: 'E-commerce Platform', hours: 5, color: 'bg-blue-500' },
+        { name: 'E-commerce Platform', hours: 5, color: 'bg-accent' },
         { name: 'Mobile App', hours: 2.5, color: 'bg-green-500' },
         { name: 'Dashboard Redesign', hours: 1, color: 'bg-purple-500' }
       ]},
       { date: '2024-03-15', hours: 8, billableHours: 7, projects: [
-        { name: 'E-commerce Platform', hours: 6, color: 'bg-blue-500' },
+        { name: 'E-commerce Platform', hours: 6, color: 'bg-accent' },
         { name: 'Mobile App', hours: 1.5, color: 'bg-green-500' },
         { name: 'Dashboard Redesign', hours: 0.5, color: 'bg-purple-500' }
       ]},
       { date: '2024-03-16', hours: 7.5, billableHours: 6.5, projects: [
-        { name: 'E-commerce Platform', hours: 4, color: 'bg-blue-500' },
+        { name: 'E-commerce Platform', hours: 4, color: 'bg-accent' },
         { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
         { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
       ]},
       { date: '2024-03-17', hours: 8.2, billableHours: 7.8, projects: [
-        { name: 'E-commerce Platform', hours: 5.5, color: 'bg-blue-500' },
+        { name: 'E-commerce Platform', hours: 5.5, color: 'bg-accent' },
         { name: 'Mobile App', hours: 1.2, color: 'bg-green-500' },
         { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
       ]},
       { date: '2024-03-18', hours: 8, billableHours: 7.2, projects: [
-        { name: 'E-commerce Platform', hours: 4.5, color: 'bg-blue-500' },
+        { name: 'E-commerce Platform', hours: 4.5, color: 'bg-accent' },
         { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
         { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
       ]}
@@ -258,10 +258,10 @@ const ReportsPage: React.FC = () => {
   const getReportColor = (type: string) => {
     switch (type) {
       case 'productivity': return 'text-green-600 bg-green-100';
-      case 'time': return 'text-blue-600 bg-blue-100';
+      case 'time': return 'text-accent-dark bg-blue-100';
       case 'team': return 'text-purple-600 bg-purple-100';
       case 'financial': return 'text-yellow-600 bg-yellow-100';
-      case 'project': return 'text-orange-600 bg-orange-100';
+      case 'project': return 'text-orange-600 bg-orange-200';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -339,7 +339,7 @@ const ReportsPage: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Reports & Analytics</h1>
@@ -362,7 +362,7 @@ const ReportsPage: React.FC = () => {
             )}
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               New Report
@@ -377,13 +377,13 @@ const ReportsPage: React.FC = () => {
           <div className="lg:col-span-3 space-y-6">
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Total Hours</p>
                     <p className="text-2xl font-bold text-gray-900">{getTotalHours().toFixed(1)}h</p>
                   </div>
-                  <Clock className="w-8 h-8 text-blue-500" />
+                  <Clock className="w-8 h-8 text-accent" />
                 </div>
                 <div className="flex items-center mt-2">
                   <ArrowUp className="w-4 h-4 text-green-500" />
@@ -391,7 +391,7 @@ const ReportsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Billable Hours</p>
@@ -405,7 +405,7 @@ const ReportsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Team Productivity</p>
@@ -419,7 +419,7 @@ const ReportsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Project Progress</p>
@@ -435,13 +435,13 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex items-center gap-3">
                   <select
                     value={reportType}
                     onChange={(e) => setReportType(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Reports</option>
                     <option value="productivity">Productivity</option>
@@ -454,7 +454,7 @@ const ReportsPage: React.FC = () => {
                   <select
                     value={dateRange}
                     onChange={(e) => setDateRange(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="7d">Last 7 days</option>
                     <option value="30d">Last 30 days</option>
@@ -464,10 +464,10 @@ const ReportsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 ml-auto">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                  <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                     <RefreshCw className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                  <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                     <Filter className="w-4 h-4" />
                   </button>
                 </div>
@@ -494,7 +494,7 @@ const ReportsPage: React.FC = () => {
                             {report.type}
                           </span>
                           {report.isPublic && (
-                            <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium text-blue-600 bg-blue-100">
+                            <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium text-accent-dark bg-blue-100">
                               Public
                             </span>
                           )}
@@ -502,7 +502,7 @@ const ReportsPage: React.FC = () => {
                         
                         <p className="text-sm text-gray-600 mb-3">{report.description}</p>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
                           <span>Created {report.createdAt.toLocaleDateString()}</span>
                           <span>Updated {report.updatedAt.toLocaleDateString()}</span>
                           <div className="flex items-center gap-1">
@@ -518,19 +518,19 @@ const ReportsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedReport(report)}
-                          className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                          className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         {canExportReports() && (
                           <button
                             onClick={() => exportReport(report)}
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                            className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                           >
                             <Download className="w-4 h-4" />
                           </button>
                         )}
-                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                        <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -564,22 +564,22 @@ const ReportsPage: React.FC = () => {
             )}
 
             {/* Project Performance */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Project Performance</h3>
               <div className="space-y-3">
                 {projectMetrics.map(project => (
                   <div key={project._id} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-900">{project.name}</span>
-                      <span className="text-sm text-gray-500">{project.progress}%</span>
+                      <span className="text-sm text-gray-600">{project.progress}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-300 rounded-full h-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-accent h-2 rounded-full transition-all duration-300"
                         style={{ width: `${project.progress}%` }}
                       />
                     </div>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-gray-600">
                       <span>{project.completedTasks}/{project.totalTasks} tasks</span>
                       <span>${project.spent.toLocaleString()}/${project.budget.toLocaleString()}</span>
                     </div>
@@ -589,7 +589,7 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Team Leaderboard */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Team Leaderboard</h3>
               <div className="space-y-3">
                 {teamPerformance
@@ -608,7 +608,7 @@ const ReportsPage: React.FC = () => {
                             className="w-6 h-6 rounded-full"
                           />
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
                             <span className="text-xs font-medium text-gray-600">
                               {member.name.charAt(0)}
                             </span>
@@ -616,12 +616,12 @@ const ReportsPage: React.FC = () => {
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-500">{member.role}</p>
+                          <p className="text-xs text-gray-600">{member.role}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">{member.productivityScore}%</p>
-                        <p className="text-xs text-gray-500">{member.completionRate}% tasks</p>
+                        <p className="text-xs text-gray-600">{member.completionRate}% tasks</p>
                       </div>
                     </div>
                   ))}
@@ -629,7 +629,7 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
@@ -667,7 +667,7 @@ const ReportsPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setSelectedReport(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-600 hover:text-gray-600"
                 >
                   ×
                 </button>
@@ -680,7 +680,7 @@ const ReportsPage: React.FC = () => {
               </pre>
             </div>
             
-            <div className="p-6 border-t border-gray-200 flex justify-end gap-2">
+            <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedReport(null)}
                 className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -690,7 +690,7 @@ const ReportsPage: React.FC = () => {
               {canExportReports() && (
                 <button
                   onClick={() => exportReport(selectedReport)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Export
                 </button>

@@ -110,7 +110,7 @@ const TrackerPage: React.FC = () => {
       {
         _id: 'p1',
         name: 'E-commerce Platform',
-        color: 'bg-blue-500',
+        color: 'bg-accent',
         totalTime: 270,
         billableTime: 270,
         tasks: [
@@ -297,7 +297,7 @@ const TrackerPage: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Time Tracker</h1>
@@ -306,7 +306,7 @@ const TrackerPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowAddEntry(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Clock className="w-4 h-4" />
               Add Entry
@@ -320,7 +320,7 @@ const TrackerPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Timer Section */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-300 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">Timer</h2>
                 <div className="flex items-center gap-2">
@@ -348,7 +348,7 @@ const TrackerPage: React.FC = () => {
                       isPaused ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-blue-50'
                     }`}>
                       <div className="text-4xl font-mono font-bold mb-2 ${
-                        isPaused ? 'text-yellow-600' : 'text-blue-600'
+                        isPaused ? 'text-yellow-600' : 'text-accent-dark'
                       }">
                         {formatElapsedTime(elapsedTime)}
                       </div>
@@ -382,13 +382,13 @@ const TrackerPage: React.FC = () => {
                   ) : (
                     <div className="text-center p-8">
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Clock className="w-8 h-8 text-gray-400" />
+                        <Clock className="w-8 h-8 text-gray-600" />
                       </div>
                       <h3 className="text-lg font-medium text-gray-900 mb-2">No active timer</h3>
                       <p className="text-gray-600 mb-4">Start tracking time for your tasks</p>
                       <button
                         onClick={() => setShowAddEntry(true)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                       >
                         <Play className="w-4 h-4" />
                         Start Timer
@@ -417,17 +417,17 @@ const TrackerPage: React.FC = () => {
               {activeTab === 'entries' && (
                 <div className="space-y-4">
                   {timeEntries.map(entry => (
-                    <div key={entry._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div key={entry._id} className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className={`w-3 h-3 rounded-full ${entry.projectId === 'p1' ? 'bg-blue-500' : 'bg-green-500'}`} />
+                          <div className={`w-3 h-3 rounded-full ${entry.projectId === 'p1' ? 'bg-accent' : 'bg-green-500'}`} />
                           <h3 className="font-medium text-gray-900">{entry.taskTitle}</h3>
-                          <span className="text-sm text-gray-500">{entry.projectName}</span>
+                          <span className="text-sm text-gray-600">{entry.projectName}</span>
                         </div>
                         {entry.description && (
                           <p className="text-sm text-gray-600 mb-2">{entry.description}</p>
                         )}
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
                           <span>{formatTime(entry.startTime)}</span>
                           {entry.endTime && <span>- {formatTime(entry.endTime)}</span>}
                           <span>{formatDuration(entry.duration)}</span>
@@ -443,7 +443,7 @@ const TrackerPage: React.FC = () => {
                             <span className="text-sm">Running</span>
                           </div>
                         )}
-                        <button className="p-2 text-gray-400 hover:text-gray-600">
+                        <button className="p-2 text-gray-600 hover:text-gray-600">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -456,13 +456,13 @@ const TrackerPage: React.FC = () => {
                 <div className="space-y-6">
                   {canUseAdvancedAnalytics() ? (
                     <div className="text-center py-8">
-                      <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Advanced Reports</h3>
                       <p className="text-gray-600">Detailed time tracking reports and analytics</p>
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <Crown className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <Crown className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Upgrade Required</h3>
                       <p className="text-gray-600">Advanced reports are available in Pro and Ultra plans</p>
                     </div>
@@ -489,7 +489,7 @@ const TrackerPage: React.FC = () => {
             </div>
 
             {/* Projects */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Projects</h3>
               <div className="space-y-3">
                 {projects.map(project => (
@@ -498,7 +498,7 @@ const TrackerPage: React.FC = () => {
                       <div className={`w-3 h-3 rounded-full ${project.color}`} />
                       <span className="text-sm font-medium text-gray-900">{project.name}</span>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-gray-600">
                       {formatDuration(project.totalTime)}
                     </div>
                   </div>
@@ -507,14 +507,14 @@ const TrackerPage: React.FC = () => {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Recent Activity</h3>
               <div className="space-y-2">
                 {timeEntries.slice(0, 5).map(entry => (
                   <div key={entry._id} className="flex items-center gap-2 text-sm">
-                    <div className={`w-2 h-2 rounded-full ${entry.projectId === 'p1' ? 'bg-blue-500' : 'bg-green-500'}`} />
+                    <div className={`w-2 h-2 rounded-full ${entry.projectId === 'p1' ? 'bg-accent' : 'bg-green-500'}`} />
                     <span className="text-gray-900">{entry.taskTitle}</span>
-                    <span className="text-gray-500 ml-auto">{formatDuration(entry.duration)}</span>
+                    <span className="text-gray-600 ml-auto">{formatDuration(entry.duration)}</span>
                   </div>
                 ))}
               </div>
@@ -531,7 +531,7 @@ const TrackerPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">Start Timer</h3>
               <button
                 onClick={() => setShowAddEntry(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 ×
               </button>
@@ -543,7 +543,7 @@ const TrackerPage: React.FC = () => {
                 <select
                   value={selectedProject}
                   onChange={(e) => setSelectedProject(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
                   <option value="">Select project</option>
                   {projects.map(project => (
@@ -557,7 +557,7 @@ const TrackerPage: React.FC = () => {
                 <select
                   value={selectedTask}
                   onChange={(e) => setSelectedTask(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
                   <option value="">Select task</option>
                   {selectedProject && projects.find(p => p._id === selectedProject)?.tasks.map(task => (
@@ -572,7 +572,7 @@ const TrackerPage: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="What are you working on?"
                 />
               </div>
@@ -587,7 +587,7 @@ const TrackerPage: React.FC = () => {
                 <button
                   onClick={startTracking}
                   disabled={!selectedProject || !selectedTask}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Start Timer
                 </button>

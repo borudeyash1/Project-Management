@@ -204,7 +204,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Add Team Member
             </h2>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
               Select a member from your workspace and assign a role
             </p>
           </div>
@@ -212,7 +212,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             onClick={handleClose}
             className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
-            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
           </button>
         </div>
 
@@ -221,11 +221,11 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
           <div className="space-y-6">
             {/* Search Members */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Search Workspace Members
               </label>
               <div className="relative">
-                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
                 <input
                   type="text"
                   value={searchTerm}
@@ -233,21 +233,21 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                   placeholder="Search by name, email, or role..."
                   className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
             </div>
 
             {/* Member List */}
             <div>
-              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Available Members ({filteredMembers.length})
               </label>
               <div className={`border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} max-h-64 overflow-y-auto`}>
                 {filteredMembers.length === 0 ? (
-                  <div className={`p-8 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <div className={`p-8 text-center ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                     {searchTerm ? 'No members found matching your search' : 'All workspace members are already in this project'}
                   </div>
                 ) : (
@@ -259,8 +259,8 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                         className={`w-full p-4 text-left transition-colors ${
                           selectedMember?._id === member._id
                             ? isDarkMode
-                              ? 'bg-blue-900/30 border-l-4 border-blue-500'
-                              : 'bg-blue-50 border-l-4 border-blue-500'
+                              ? 'bg-blue-900/30 border-l-4 border-accent'
+                              : 'bg-blue-50 border-l-4 border-accent'
                             : isDarkMode
                             ? 'hover:bg-gray-700'
                             : 'hover:bg-gray-50'
@@ -268,9 +268,9 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                            isDarkMode ? 'bg-gray-700' : 'bg-gray-300'
                           }`}>
-                            <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
                               {member.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
@@ -278,16 +278,16 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                             <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                               {member.name}
                             </h4>
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                               {member.email}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                               {member.workspaceRole}
                             </p>
                             {member.department && (
-                              <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                                 {member.department}
                               </p>
                             )}
@@ -302,8 +302,8 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
 
             {/* Role Selection */}
             {selectedMember && (
-              <div className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-200 bg-gray-50'}`}>
-                <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <div className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-300 bg-gray-50'}`}>
+                <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   Select Role for {selectedMember.name}
                 </label>
                 <div className="space-y-2">
@@ -313,11 +313,11 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                       className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                         selectedRole === role.value
                           ? isDarkMode
-                            ? 'bg-blue-900/30 border-2 border-blue-500'
-                            : 'bg-blue-50 border-2 border-blue-500'
+                            ? 'bg-blue-900/30 border-2 border-accent'
+                            : 'bg-blue-50 border-2 border-accent'
                           : isDarkMode
                           ? 'bg-gray-800 border-2 border-gray-700 hover:bg-gray-700'
-                          : 'bg-white border-2 border-gray-200 hover:bg-gray-50'
+                          : 'bg-white border-2 border-gray-300 hover:bg-gray-50'
                       }`}
                     >
                       <input
@@ -332,7 +332,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                         <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                           {role.label}
                         </div>
-                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                           {role.description}
                         </div>
                       </div>
@@ -343,7 +343,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                 {/* Custom Role Input */}
                 {selectedRole === 'custom' && (
                   <div className="mt-4">
-                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                       Enter Custom Role
                     </label>
                     <input
@@ -353,9 +353,9 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                       placeholder="e.g., Technical Lead, Consultant, Advisor..."
                       className={`w-full px-4 py-2 rounded-lg border ${
                         isDarkMode
-                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                      } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                      } focus:ring-2 focus:ring-accent focus:border-accent`}
                     />
                   </div>
                 )}
@@ -370,8 +370,8 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             onClick={handleClose}
             className={`px-4 py-2 rounded-lg font-medium ${
               isDarkMode
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-700 text-gray-700 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-300'
             }`}
           >
             Cancel
@@ -381,8 +381,8 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             disabled={!selectedMember || (selectedRole === 'custom' && !customRole.trim())}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
               !selectedMember || (selectedRole === 'custom' && !customRole.trim())
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-accent text-gray-900 hover:bg-accent-hover'
             }`}
           >
             <UserPlus className="w-4 h-4" />

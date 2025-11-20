@@ -40,9 +40,9 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
   
   const getPlanIcon = (plan: string) => {
     switch (plan) {
-      case 'pro': return <Zap className="w-5 h-5 text-blue-500" />;
+      case 'pro': return <Zap className="w-5 h-5 text-accent" />;
       case 'ultra': return <Crown className="w-5 h-5 text-purple-500" />;
-      default: return <Star className="w-5 h-5 text-gray-500" />;
+      default: return <Star className="w-5 h-5 text-gray-600" />;
     }
   };
   
@@ -50,7 +50,7 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
     switch (plan) {
       case 'pro': return 'border-blue-200 bg-blue-50';
       case 'ultra': return 'border-purple-200 bg-purple-50';
-      default: return 'border-gray-200 bg-gray-50';
+      default: return 'border-gray-300 bg-gray-50';
     }
   };
   
@@ -69,7 +69,7 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
         onClick={() => setShowPricingModal(true)}
         className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
           requiredPlan === 'pro' 
-            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+            ? 'bg-accent hover:bg-accent-hover text-gray-900' 
             : 'bg-purple-600 hover:bg-purple-700 text-white'
         } ${className}`}
       >
@@ -128,25 +128,25 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
   
   const getPlanIcon = (plan: string) => {
     switch (plan) {
-      case 'free': return <Star className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />;
-      case 'pro': return <Zap className="w-4 h-4 text-blue-500" />;
+      case 'free': return <Star className={`w-4 h-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />;
+      case 'pro': return <Zap className="w-4 h-4 text-accent" />;
       case 'ultra': return <Crown className="w-4 h-4 text-purple-500" />;
-      default: return <Star className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />;
+      default: return <Star className={`w-4 h-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />;
     }
   };
   
   const getPlanColor = (plan: string) => {
     if (isDarkMode) {
       switch (plan) {
-        case 'free': return 'text-gray-400 bg-gray-700';
-        case 'pro': return 'text-blue-400 bg-blue-900/50';
-        case 'ultra': return 'text-purple-400 bg-purple-900/50';
-        default: return 'text-gray-400 bg-gray-700';
+        case 'free': return 'text-gray-600 bg-gray-700';
+        case 'pro': return 'text-accent-light bg-blue-900/50';
+        case 'ultra': return 'text-purple-600 bg-purple-900/50';
+        default: return 'text-gray-600 bg-gray-700';
       }
     }
     switch (plan) {
       case 'free': return 'text-gray-600 bg-gray-100';
-      case 'pro': return 'text-blue-600 bg-blue-100';
+      case 'pro': return 'text-accent-dark bg-blue-100';
       case 'ultra': return 'text-purple-600 bg-purple-100';
       default: return 'text-gray-600 bg-gray-100';
     }
@@ -169,7 +169,7 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
             {userPlan !== 'ultra' && (
               <button
                 onClick={() => setShowPricingModal(true)}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-accent-dark hover:text-blue-700 font-medium"
               >
                 Upgrade
               </button>
@@ -177,7 +177,7 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
           </div>
           
           <div className={`text-xs mt-1 ${
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            isDarkMode ? 'text-gray-600' : 'text-gray-600'
           }`}>
             {planInfo.limits.workspaces === -1 ? 'Unlimited' : planInfo.limits.workspaces} workspaces • 
             {planInfo.limits.projects === -1 ? 'Unlimited' : planInfo.limits.projects} projects • 

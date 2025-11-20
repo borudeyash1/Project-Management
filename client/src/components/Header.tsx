@@ -59,13 +59,13 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-700 flex items-center justify-between px-4 sm:px-6">
+    <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6">
       <div className="flex items-center gap-3">
         {/* Theme Toggle */}
         <AnimatedThemeToggler />
         
         <button
-          className="p-2 rounded-lg border border-border dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 md:hidden"
+          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 md:hidden"
           onClick={toggleSidebar}
         >
           {state.sidebar.collapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
@@ -79,7 +79,7 @@ const Header: React.FC = () => {
             <div className="text-sm font-semibold tracking-tight dark:text-gray-100">
               <SparklesText>Sartthi</SparklesText>
             </div>
-            <div className="text-xs text-slate-500 dark:text-gray-400">Project & Payroll Suite</div>
+            <div className="text-xs text-slate-500 dark:text-gray-200">Project & Payroll Suite</div>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ const Header: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
             <input
               type="text"
-              className="w-64 rounded-lg border border-border dark:border-gray-700 bg-white dark:bg-gray-700 dark:text-gray-100 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+              className="w-64 rounded-lg border border-border dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
               placeholder="Search projects, tasks, people..."
             />
           </div>
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
 
         {/* Notifications */}
         <button
-          className="p-2 rounded-lg border border-border dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 relative"
+          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 relative"
           onClick={toggleNotifications}
         >
           <Bell className="w-4 h-4" />
@@ -113,7 +113,7 @@ const Header: React.FC = () => {
 
         {/* Settings */}
         <button
-          className="p-2 rounded-lg border border-border dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-300"
+          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-700"
           onClick={() => navigate('/settings')}
         >
           <Settings className="w-4 h-4" />
@@ -140,8 +140,8 @@ const Header: React.FC = () => {
 
           {/* User Dropdown */}
           {state.userMenu && (
-            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg shadow-lg z-50">
-              <div className="p-4 border-b border-border dark:border-gray-700">
+            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50">
+              <div className="p-4 border-b border-border dark:border-gray-600">
                 <UserDisplay
                   name={state.userProfile.fullName}
                   plan={state.userProfile.subscription?.plan || 'free'}
@@ -150,12 +150,12 @@ const Header: React.FC = () => {
                   badgePosition="right"
                   className="mb-2"
                 />
-                <div className="text-sm text-slate-500 dark:text-gray-400">{state.userProfile.email}</div>
+                <div className="text-sm text-slate-500 dark:text-gray-200">{state.userProfile.email}</div>
               </div>
 
               <div className="p-2">
                 <button
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-300 text-sm"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-700 text-sm"
                   onClick={() => {
                     navigate('/profile');
                     dispatch({ type: 'TOGGLE_USER_MENU' });
@@ -166,7 +166,7 @@ const Header: React.FC = () => {
                 </button>
 
                 <button
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-300 text-sm"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-700 text-sm"
                   onClick={() => {
                     navigate('/settings');
                     dispatch({ type: 'TOGGLE_USER_MENU' });
@@ -177,14 +177,14 @@ const Header: React.FC = () => {
                 </button>
 
                 <div className="mt-2 mb-2 rounded-lg bg-slate-50 dark:bg-gray-900/40 px-3 py-2">
-                  <div className="text-[11px] font-semibold text-slate-500 dark:text-gray-400 mb-1 uppercase">
+                  <div className="text-[11px] font-semibold text-slate-500 dark:text-gray-300 mb-1 uppercase">
                     Test User Role
                   </div>
                   <div className="flex flex-wrap gap-1">
                     <button
                       className={`flex-1 min-w-[60px] px-2 py-1 text-[11px] rounded-full border ${
                         state.roles.currentUserRole === 'owner'
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-accent text-gray-900 border-accent-dark'
                           : 'bg-white text-slate-600 border-slate-200'
                       }`}
                       onClick={() => handleTestRoleChange('owner')}
@@ -194,7 +194,7 @@ const Header: React.FC = () => {
                     <button
                       className={`flex-1 min-w-[60px] px-2 py-1 text-[11px] rounded-full border ${
                         state.roles.currentUserRole === 'project-manager'
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-accent text-gray-900 border-accent-dark'
                           : 'bg-white text-slate-600 border-slate-200'
                       }`}
                       onClick={() => handleTestRoleChange('project-manager')}
@@ -204,7 +204,7 @@ const Header: React.FC = () => {
                     <button
                       className={`flex-1 min-w-[60px] px-2 py-1 text-[11px] rounded-full border ${
                         state.roles.currentUserRole === 'employee'
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-accent text-gray-900 border-accent-dark'
                           : 'bg-white text-slate-600 border-slate-200'
                       }`}
                       onClick={() => handleTestRoleChange('employee')}
@@ -212,7 +212,7 @@ const Header: React.FC = () => {
                       Employee
                     </button>
                   </div>
-                  <div className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
+                  <div className="mt-1 text-[10px] text-slate-400 dark:text-gray-300">
                     Testing only  changes affect visible tabs and permissions.
                   </div>
                 </div>
@@ -220,7 +220,7 @@ const Header: React.FC = () => {
                 <hr className="my-2" />
 
                 <button
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm text-red-600 dark:text-red-400"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm text-red-600 dark:text-red-600"
                   onClick={handleLogout}
                 >
                   <LogOut className="w-4 h-4" />

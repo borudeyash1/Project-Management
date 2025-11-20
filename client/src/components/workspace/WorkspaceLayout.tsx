@@ -15,7 +15,7 @@ const WorkspaceLayout: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             No Workspace Selected
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-200">
             Please select a workspace from the sidebar
           </p>
         </div>

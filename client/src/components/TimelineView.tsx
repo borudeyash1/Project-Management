@@ -297,7 +297,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="border-b border-gray-200 p-4">
+      <div className="border-b border-gray-300 p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <h2 className="text-xl font-semibold text-gray-900">Timeline View</h2>
@@ -317,7 +317,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
               <button
                 onClick={goToToday}
-                className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-3 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
                 Today
               </button>
@@ -362,7 +362,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
             
             <button
               onClick={() => setShowCreateTask(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               New Task
@@ -379,12 +379,12 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 key={index}
                 className={`flex-1 text-center py-2 text-sm font-medium ${
                   date.toDateString() === today.toDateString() 
-                    ? 'bg-blue-100 text-blue-900 border-l-2 border-blue-500' 
+                    ? 'bg-blue-100 text-blue-900 border-l-2 border-accent' 
                     : 'text-gray-700'
                 }`}
               >
                 <div>{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-600">
                   {date.toLocaleDateString('en-US', { weekday: 'short' })}
                 </div>
               </div>
@@ -403,19 +403,19 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               return (
                 <div
                   key={category.id}
-                  className="border-b border-gray-200 p-4 min-h-[120px]"
+                  className="border-b border-gray-300 p-4 min-h-[120px]"
                   style={{ backgroundColor: category.color }}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-gray-900 text-sm">{category.name}</h3>
-                    <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                    <span className="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">
                       {categoryTasks.length}
                     </span>
                   </div>
                   
                   {/* Drop zone for dragging tasks */}
                   <div
-                    className="h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm"
+                    className="h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-600 text-sm"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.preventDefault();
@@ -447,8 +447,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({
 
             {/* Today Line */}
             {dates.some(date => date.toDateString() === today.toDateString()) && (
-              <div className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-10">
-                <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+              <div className="absolute top-0 bottom-0 w-0.5 bg-accent z-10">
+                <div className="absolute -top-1 -left-1 w-3 h-3 bg-accent rounded-full"></div>
               </div>
             )}
 
@@ -520,7 +520,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -602,7 +602,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 </button>
                 <button
                   onClick={() => setShowTaskModal(false)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Save Changes
                 </button>

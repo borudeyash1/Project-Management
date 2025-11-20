@@ -150,7 +150,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
+      case 'high': return 'text-orange-600 bg-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -217,7 +217,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           New Task
@@ -235,7 +235,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium text-gray-900">{column.title}</h3>
-              <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded-full">
+              <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
                 {getTasksByStatus(column.id).length}
               </span>
             </div>
@@ -247,7 +247,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
                   draggable
                   onDragStart={(e) => handleDragStart(e, task._id)}
                   onClick={() => handleTaskClick(task)}
-                  className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-white rounded-lg border border-gray-300 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 >
                   {/* Task Header */}
                   <div className="flex items-start justify-between mb-3">
@@ -256,7 +256,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
                     </h4>
                     <div className="flex items-center gap-1">
                       <span className="text-xs">{getPriorityIcon(task.priority)}</span>
-                      <button className="text-gray-400 hover:text-gray-600">
+                      <button className="text-gray-600 hover:text-gray-600">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </div>
@@ -276,9 +276,9 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
                         <span>Milestones</span>
                         <span>{getCompletedMilestones(task.milestones)}/{getTotalMilestones(task.milestones)}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div className="w-full bg-gray-300 rounded-full h-1.5">
                         <div
-                          className="bg-blue-600 h-1.5 rounded-full transition-all"
+                          className="bg-accent h-1.5 rounded-full transition-all"
                           style={{
                             width: `${(getCompletedMilestones(task.milestones) / getTotalMilestones(task.milestones)) * 100}%`
                           }}
@@ -299,7 +299,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
                         </span>
                       ))}
                       {task.tags.length > 3 && (
-                        <span className="text-xs text-gray-500">+{task.tags.length - 3}</span>
+                        <span className="text-xs text-gray-600">+{task.tags.length - 3}</span>
                       )}
                     </div>
                   )}
@@ -314,7 +314,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
 
                       {/* Due Date */}
                       {task.dueDate && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <Calendar className="w-3 h-3" />
                           <span>{new Date(task.dueDate).toLocaleDateString()}</span>
                         </div>
@@ -335,7 +335,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
 
                       {/* Attachments */}
                       {task.attachments.length > 0 && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <Paperclip className="w-3 h-3" />
                           <span>{task.attachments.length}</span>
                         </div>
@@ -343,7 +343,7 @@ const DragDropTaskBoard: React.FC<DragDropTaskBoardProps> = ({
 
                       {/* Comments */}
                       {task.comments.length > 0 && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <MessageSquare className="w-3 h-3" />
                           <span>{task.comments.length}</span>
                         </div>
@@ -426,13 +426,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
               >
                 <Edit className="w-4 h-4" />
               </button>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
               >
                 ×
               </button>
@@ -450,7 +450,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   type="text"
                   value={editData.title}
                   onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 />
               </div>
               <div>
@@ -459,7 +459,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   value={editData.description}
                   onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -468,7 +468,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   <select
                     value={editData.priority}
                     onChange={(e) => setEditData({ ...editData, priority: e.target.value as Task['priority'] })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -482,7 +482,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     type="date"
                     value={editData.dueDate}
                     onChange={(e) => setEditData({ ...editData, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                 </div>
               </div>
@@ -495,7 +495,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Save
                 </button>
@@ -532,7 +532,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                           {milestone.title}
                         </span>
                         {milestone.dueDate && (
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-600">
                             {new Date(milestone.dueDate).toLocaleDateString()}
                           </span>
                         )}

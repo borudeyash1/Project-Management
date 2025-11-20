@@ -51,21 +51,21 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
             onDrop={() => handleDrop(column.id)}
           >
             {/* Column Header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-4 border-b border-gray-300 dark:border-gray-600">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${column.color}`} />
                   <h3 className="font-semibold text-gray-900 dark:text-white">{column.name}</h3>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-gray-600 dark:text-gray-200">
                     {filteredTasks(column.id).length}
                   </span>
                 </div>
-                <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded">
+                <button className="p-1 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700 rounded">
                   <MoreVertical className="w-4 h-4" />
                 </button>
               </div>
               {column.wip && (
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-gray-600 dark:text-gray-200">
                   WIP Limit: {filteredTasks(column.id).length}/{column.wip}
                 </div>
               )}
@@ -86,7 +86,7 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
               {/* Add Task Button */}
               <button
                 onClick={() => addTask(column.id)}
-                className="w-full p-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center gap-2"
+                className="w-full p-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Add Task

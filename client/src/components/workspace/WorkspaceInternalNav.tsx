@@ -94,7 +94,7 @@ const WorkspaceInternalNav: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
       <div className="px-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-1 overflow-x-auto">
           {visibleTabs.map((tab) => {
@@ -107,8 +107,8 @@ const WorkspaceInternalNav: React.FC = () => {
                 onClick={() => navigate(tab.path)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   active
-                    ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
+                    ? 'border-accent-dark text-accent-dark dark:text-accent-light'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -120,7 +120,7 @@ const WorkspaceInternalNav: React.FC = () => {
         {isOwner && (
           <button
             onClick={handleQuickInvite}
-            className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-accent text-gray-900 hover:bg-accent-hover transition-colors"
           >
             <UserPlus className="w-4 h-4" />
             Add member

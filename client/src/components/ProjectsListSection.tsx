@@ -113,7 +113,7 @@ const ProjectsListSection: React.FC = () => {
                     <td className="py-3 pr-3">{project.client}</td>
                     <td className="py-3 pr-3">
                       <span className={`text-xs px-2 py-1 rounded-full border ${
-                        project.status === 'active' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                        project.status === 'active' ? 'bg-blue-50 text-accent-dark border-blue-200' :
                         project.status === 'on-hold' ? 'bg-slate-100 text-slate-700 border-border' :
                         'bg-emerald-50 text-emerald-600 border-emerald-200'
                       }`}>

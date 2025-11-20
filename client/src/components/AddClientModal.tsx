@@ -81,7 +81,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Add New Client
             </h2>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
               Add a new client to your workspace
             </p>
           </div>
@@ -89,7 +89,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
             onClick={handleClose}
             className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
-            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
           </button>
         </div>
 
@@ -98,7 +98,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
           <div className="space-y-6">
             {/* Client Name */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 <User className="w-4 h-4 inline mr-2" />
                 Client Name *
               </label>
@@ -111,16 +111,16 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                 required
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
 
             {/* Email and Phone */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   <Mail className="w-4 h-4 inline mr-2" />
                   Email *
                 </label>
@@ -133,14 +133,14 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                   required
                   className={`w-full px-4 py-3 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   <Phone className="w-4 h-4 inline mr-2" />
                   Phone
                 </label>
@@ -152,9 +152,9 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                   placeholder="+1 (555) 123-4567"
                   className={`w-full px-4 py-3 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
             </div>
@@ -162,7 +162,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
             {/* Company and Contact Person */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   <Building className="w-4 h-4 inline mr-2" />
                   Company
                 </label>
@@ -174,14 +174,14 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                   placeholder="Company name"
                   className={`w-full px-4 py-3 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   <Briefcase className="w-4 h-4 inline mr-2" />
                   Contact Person
                 </label>
@@ -193,16 +193,16 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                   placeholder="Primary contact"
                   className={`w-full px-4 py-3 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
             </div>
 
             {/* Address */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 <MapPin className="w-4 h-4 inline mr-2" />
                 Address
               </label>
@@ -214,15 +214,15 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                 placeholder="City, State, Country"
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
 
             {/* Website */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Website
               </label>
               <input
@@ -233,15 +233,15 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                 placeholder="https://www.example.com"
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Notes
               </label>
               <textarea
@@ -252,9 +252,9 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
                 rows={3}
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
           </div>
@@ -267,15 +267,15 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
             onClick={handleClose}
             className={`px-4 py-2 rounded-lg font-medium ${
               isDarkMode
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-700 text-gray-700 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-300'
             }`}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+            className="px-4 py-2 bg-accent text-gray-900 rounded-lg font-medium hover:bg-accent-hover"
           >
             Add Client
           </button>

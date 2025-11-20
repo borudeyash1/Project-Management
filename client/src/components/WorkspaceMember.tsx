@@ -191,7 +191,7 @@ const WorkspaceMember: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -202,14 +202,14 @@ const WorkspaceMember: React.FC = () => {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">My Projects</p>
               <p className="text-2xl font-semibold text-gray-900">{projects.length}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <Building2 className="w-6 h-6 text-blue-600" />
+              <Building2 className="w-6 h-6 text-accent-dark" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm text-green-600">
@@ -218,7 +218,7 @@ const WorkspaceMember: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Assigned Tasks</p>
@@ -228,13 +228,13 @@ const WorkspaceMember: React.FC = () => {
               <CheckSquare className="w-6 h-6 text-purple-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm text-blue-600">
+          <div className="mt-4 flex items-center text-sm text-accent-dark">
             <CheckSquare className="w-4 h-4 mr-1" />
             <span>{tasks.filter(t => t.status === 'completed').length} completed</span>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Notifications</p>
@@ -250,7 +250,7 @@ const WorkspaceMember: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Hours This Week</p>
@@ -270,19 +270,19 @@ const WorkspaceMember: React.FC = () => {
       </div>
 
       {/* Recent Notifications */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Recent Notifications</h3>
-          <button className="text-blue-600 hover:text-blue-700 text-sm">View All</button>
+          <button className="text-accent-dark hover:text-blue-700 text-sm">View All</button>
         </div>
         <div className="space-y-4">
           {notifications.slice(0, 3).map((notification) => (
             <div key={notification._id} className={`flex items-start gap-3 p-3 rounded-lg ${!notification.isRead ? 'bg-blue-50' : 'bg-gray-50'}`}>
-              <div className={`w-2 h-2 rounded-full mt-2 ${!notification.isRead ? 'bg-blue-600' : 'bg-gray-400'}`}></div>
+              <div className={`w-2 h-2 rounded-full mt-2 ${!notification.isRead ? 'bg-accent' : 'bg-gray-400'}`}></div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">{notification.title}</p>
                 <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
-                <p className="text-xs text-gray-500 mt-1">{notification.createdAt.toLocaleDateString()}</p>
+                <p className="text-xs text-gray-600 mt-1">{notification.createdAt.toLocaleDateString()}</p>
               </div>
             </div>
           ))}
@@ -290,11 +290,11 @@ const WorkspaceMember: React.FC = () => {
       </div>
 
       {/* Upcoming Deadlines */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Deadlines</h3>
         <div className="space-y-4">
           {tasks.filter(t => t.status !== 'completed' && new Date(t.dueDate) > new Date()).slice(0, 3).map((task) => (
-            <div key={task._id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+            <div key={task._id} className="flex items-center justify-between p-3 border border-gray-300 rounded-lg">
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">{task.title}</p>
                 <p className="text-xs text-gray-600">{task.project}</p>
@@ -303,7 +303,7 @@ const WorkspaceMember: React.FC = () => {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
                   {task.priority}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-600">
                   Due {task.dueDate.toLocaleDateString()}
                 </span>
               </div>
@@ -401,7 +401,7 @@ const WorkspaceMember: React.FC = () => {
 
   const renderProfile = () => (
     <div className="space-y-6">
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Personal Information</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -410,7 +410,7 @@ const WorkspaceMember: React.FC = () => {
             <input
               type="text"
               defaultValue="John Doe"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
           
@@ -419,7 +419,7 @@ const WorkspaceMember: React.FC = () => {
             <input
               type="email"
               defaultValue="john.doe@workspace.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
           
@@ -428,7 +428,7 @@ const WorkspaceMember: React.FC = () => {
             <input
               type="tel"
               defaultValue="+1-555-0123"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
           
@@ -437,7 +437,7 @@ const WorkspaceMember: React.FC = () => {
             <input
               type="text"
               defaultValue="Jane Doe - +1-555-0456"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
           
@@ -446,7 +446,7 @@ const WorkspaceMember: React.FC = () => {
             <input
               type="text"
               defaultValue="Engineering"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
           
@@ -455,7 +455,7 @@ const WorkspaceMember: React.FC = () => {
             <input
               type="text"
               defaultValue="Frontend Developer"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
         </div>
@@ -465,18 +465,18 @@ const WorkspaceMember: React.FC = () => {
           <textarea
             rows={4}
             defaultValue="Experienced frontend developer with expertise in React, TypeScript, and modern web technologies."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
           />
         </div>
         
         <div className="mt-6 flex justify-end">
-          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
             Save Changes
           </button>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Face Scan for Attendance</h3>
         <p className="text-sm text-gray-600 mb-4">
           Capture your face once so the system can verify you during automatic attendance.
@@ -487,7 +487,7 @@ const WorkspaceMember: React.FC = () => {
               ref={videoRef}
               autoPlay
               muted
-              className="w-full rounded-lg border border-gray-200 bg-gray-100"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100"
             />
             <canvas ref={canvasRef} className="hidden" />
             {facePreview && (
@@ -507,7 +507,7 @@ const WorkspaceMember: React.FC = () => {
               type="button"
               onClick={handleCaptureFaceScan}
               disabled={faceSaving}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-gray-900 hover:bg-accent-hover disabled:opacity-60"
             >
               {faceSaving ? 'Saving...' : 'Capture & Save Face Scan'}
             </button>
@@ -529,14 +529,14 @@ const WorkspaceMember: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
             <input
               type="text"
               placeholder="Search conversations..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
             <Plus className="w-4 h-4" />
             New Chat
           </button>
@@ -546,7 +546,7 @@ const WorkspaceMember: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chat List */}
         <div className="lg:col-span-1">
-          <div className="bg-white border border-gray-200 rounded-lg">
+          <div className="bg-white border border-gray-300 rounded-lg">
             <div className="p-4 border-b border-gray-200">
               <h4 className="font-medium text-gray-900">Recent Conversations</h4>
             </div>
@@ -554,13 +554,13 @@ const WorkspaceMember: React.FC = () => {
               <div className="p-4 hover:bg-gray-50 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
+                    <Users className="w-5 h-5 text-accent-dark" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">Website Redesign Team</p>
-                    <p className="text-xs text-gray-500">Mike Chen: "Great work on the homepage!"</p>
+                    <p className="text-xs text-gray-600">Mike Chen: "Great work on the homepage!"</p>
                   </div>
-                  <span className="text-xs text-gray-400">2m</span>
+                  <span className="text-xs text-gray-600">2m</span>
                 </div>
               </div>
               <div className="p-4 hover:bg-gray-50 cursor-pointer">
@@ -570,9 +570,9 @@ const WorkspaceMember: React.FC = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">Emily Davis</p>
-                    <p className="text-xs text-gray-500">"Can we discuss the API integration?"</p>
+                    <p className="text-xs text-gray-600">"Can we discuss the API integration?"</p>
                   </div>
-                  <span className="text-xs text-gray-400">1h</span>
+                  <span className="text-xs text-gray-600">1h</span>
                 </div>
               </div>
             </div>
@@ -581,15 +581,15 @@ const WorkspaceMember: React.FC = () => {
 
         {/* Chat Area */}
         <div className="lg:col-span-2">
-          <div className="bg-white border border-gray-200 rounded-lg h-96 flex flex-col">
+          <div className="bg-white border border-gray-300 rounded-lg h-96 flex flex-col">
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Users className="w-4 h-4 text-blue-600" />
+                  <Users className="w-4 h-4 text-accent-dark" />
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Website Redesign Team</p>
-                  <p className="text-xs text-gray-500">4 members</p>
+                  <p className="text-xs text-gray-600">4 members</p>
                 </div>
               </div>
             </div>
@@ -599,14 +599,14 @@ const WorkspaceMember: React.FC = () => {
                 <div className="flex justify-start">
                   <div className="max-w-xs bg-gray-100 rounded-lg p-3">
                     <p className="text-sm text-gray-900">Hey team! How's the homepage design coming along?</p>
-                    <p className="text-xs text-gray-500 mt-1">Mike Chen • 2 minutes ago</p>
+                    <p className="text-xs text-gray-600 mt-1">Mike Chen • 2 minutes ago</p>
                   </div>
                 </div>
                 
                 <div className="flex justify-end">
-                  <div className="max-w-xs bg-blue-600 text-white rounded-lg p-3">
+                  <div className="max-w-xs bg-accent text-gray-900 rounded-lg p-3">
                     <p className="text-sm">Great work on the homepage!</p>
-                    <p className="text-xs text-blue-200 mt-1">You • 1 minute ago</p>
+                    <p className="text-xs text-blue-700 mt-1">You • 1 minute ago</p>
                   </div>
                 </div>
               </div>
@@ -617,9 +617,9 @@ const WorkspaceMember: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Type a message..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 />
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
                   Send
                 </button>
               </div>
@@ -632,10 +632,10 @@ const WorkspaceMember: React.FC = () => {
 
   const renderChatbot = () => (
     <div className="space-y-6">
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-300 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <Bot className="w-6 h-6 text-blue-600" />
+            <Bot className="w-6 h-6 text-accent-dark" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">AI Assistant</h3>
@@ -645,28 +645,28 @@ const WorkspaceMember: React.FC = () => {
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="p-4 border border-gray-300 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-2">Pending Tasks</h4>
               <p className="text-sm text-gray-600">You have {tasks.filter(t => t.status === 'pending').length} pending tasks</p>
-              <button className="mt-2 text-blue-600 hover:text-blue-700 text-sm">View Details →</button>
+              <button className="mt-2 text-accent-dark hover:text-blue-700 text-sm">View Details →</button>
             </div>
             
-            <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="p-4 border border-gray-300 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-2">Upcoming Deadlines</h4>
               <p className="text-sm text-gray-600">2 tasks due this week</p>
-              <button className="mt-2 text-blue-600 hover:text-blue-700 text-sm">View Details →</button>
+              <button className="mt-2 text-accent-dark hover:text-blue-700 text-sm">View Details →</button>
             </div>
             
-            <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="p-4 border border-gray-300 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-2">Project Progress</h4>
               <p className="text-sm text-gray-600">Average progress: 50%</p>
-              <button className="mt-2 text-blue-600 hover:text-blue-700 text-sm">View Details →</button>
+              <button className="mt-2 text-accent-dark hover:text-blue-700 text-sm">View Details →</button>
             </div>
             
-            <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="p-4 border border-gray-300 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-2">Time Tracking</h4>
               <p className="text-sm text-gray-600">26 hours logged this week</p>
-              <button className="mt-2 text-blue-600 hover:text-blue-700 text-sm">View Details →</button>
+              <button className="mt-2 text-accent-dark hover:text-blue-700 text-sm">View Details →</button>
             </div>
           </div>
         </div>
@@ -699,7 +699,7 @@ const WorkspaceMember: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900">Personal Planner</h3>
           <p className="text-sm text-gray-600">Manage your personal tasks and reminders</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
           <Plus className="w-4 h-4" />
           Add Task
         </button>
@@ -707,26 +707,26 @@ const WorkspaceMember: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* To-Do List */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <h4 className="font-medium text-gray-900 mb-4">Today's Tasks</h4>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
+              <input type="checkbox" className="w-4 h-4 text-accent-dark rounded" />
               <span className="text-sm text-gray-900">Review code changes</span>
             </div>
             <div className="flex items-center gap-3">
-              <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
+              <input type="checkbox" className="w-4 h-4 text-accent-dark rounded" />
               <span className="text-sm text-gray-900">Update project documentation</span>
             </div>
             <div className="flex items-center gap-3">
-              <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" defaultChecked />
-              <span className="text-sm text-gray-500 line-through">Attend team meeting</span>
+              <input type="checkbox" className="w-4 h-4 text-accent-dark rounded" defaultChecked />
+              <span className="text-sm text-gray-600 line-through">Attend team meeting</span>
             </div>
           </div>
         </div>
 
         {/* Reminders */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           <h4 className="font-medium text-gray-900 mb-4">Reminders</h4>
           <div className="space-y-3">
             <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
@@ -737,7 +737,7 @@ const WorkspaceMember: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-              <Calendar className="w-4 h-4 text-blue-600" />
+              <Calendar className="w-4 h-4 text-accent-dark" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">Team standup meeting</p>
                 <p className="text-xs text-gray-600">Tomorrow at 9:00 AM</p>
@@ -758,19 +758,19 @@ const WorkspaceMember: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
             <input
               type="text"
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
           <select
             value={selectedFilter}
             onChange={(e) => setSelectedFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
           >
             <option value="all">All Projects</option>
             <option value="active">Active</option>
@@ -782,7 +782,7 @@ const WorkspaceMember: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project) => (
-          <div key={project._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={project._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{project.name}</h4>
@@ -803,9 +803,9 @@ const WorkspaceMember: React.FC = () => {
                 <span className="text-gray-600">Progress</span>
                 <span className="font-medium">{project.progress}%</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-300 rounded-full h-2">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-accent h-2 rounded-full transition-all duration-300"
                   style={{ width: `${project.progress}%` }}
                 ></div>
               </div>
@@ -831,11 +831,11 @@ const WorkspaceMember: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <button className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm">
+              <button className="inline-flex items-center gap-2 text-accent-dark hover:text-blue-700 text-sm">
                 Enter Project
                 <ArrowRight className="w-4 h-4" />
               </button>
-              <button className="text-gray-400 hover:text-gray-600">
+              <button className="text-gray-600 hover:text-gray-600">
                 <Eye className="w-4 h-4" />
               </button>
             </div>
@@ -890,8 +890,8 @@ const WorkspaceMember: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   <Icon className="w-4 h-4" />

@@ -52,8 +52,8 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-lg animate-fade-in">
-              <Zap className={`${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} size={16} />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Trusted by 10,000+ teams worldwide</span>
+              <Zap className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} size={16} />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>Trusted by 10,000+ teams worldwide</span>
             </div>
             <h1 className={`text-5xl md:text-7xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6 animate-fade-in-up`}>
               Project Management
@@ -61,7 +61,7 @@ const LandingPage: React.FC = () => {
                 Made Simple
               </span>
             </h1>
-            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200`}>
+            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200`}>
               Streamline your projects, collaborate with your team, and achieve your goals with our intuitive project management platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
@@ -74,7 +74,7 @@ const LandingPage: React.FC = () => {
               </Link>
               <Link
                 to="/user-guide"
-                className={`border-2 ${isDarkMode ? 'border-gray-600 text-gray-300 hover:border-yellow-400 hover:text-yellow-400 hover:bg-yellow-400/10' : 'border-gray-300 text-gray-700 hover:border-yellow-600 hover:text-yellow-600 hover:bg-yellow-50'} px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 transform shadow-lg`}
+                className={`border-2 ${isDarkMode ? 'border-gray-300 text-gray-100 hover:border-yellow-400 hover:text-yellow-400 hover:bg-yellow-400/10' : 'border-gray-300 text-gray-800 hover:border-yellow-600 hover:text-yellow-600 hover:bg-yellow-50'} px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 transform shadow-lg`}
               >
                 Learn More
               </Link>
@@ -95,7 +95,7 @@ const LandingPage: React.FC = () => {
                       <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     </div>
-                    <div className={`flex-1 text-center text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className={`flex-1 text-center text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
                       Sartthi Dashboard
                     </div>
                   </div>
@@ -110,7 +110,7 @@ const LandingPage: React.FC = () => {
                             <TrendingUp className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Projects</div>
+                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>Active Projects</div>
                             <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>24</div>
                           </div>
                         </div>
@@ -121,7 +121,7 @@ const LandingPage: React.FC = () => {
                             <CheckCircle className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Completed</div>
+                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>Completed</div>
                             <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>156</div>
                           </div>
                         </div>
@@ -132,7 +132,7 @@ const LandingPage: React.FC = () => {
                             <Clock className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>In Progress</div>
+                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>In Progress</div>
                             <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>12</div>
                           </div>
                         </div>
@@ -143,7 +143,7 @@ const LandingPage: React.FC = () => {
                     <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                       <div className="flex items-center justify-between mb-4">
                         <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Progress</div>
-                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Last 7 days</div>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>Last 7 days</div>
                       </div>
                       <div className="flex items-end gap-2 h-32">
                         {[40, 65, 45, 80, 60, 90, 75].map((height, i) => (
@@ -170,16 +170,16 @@ const LandingPage: React.FC = () => {
             {/* Trust Indicators */}
             <div className="mt-12 flex flex-wrap justify-center items-center gap-8 opacity-70 animate-fade-in-up animation-delay-800">
               <div className="flex items-center gap-2">
-                <CheckCircle className={`${isDarkMode ? 'text-green-400' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>No credit card required</span>
+                <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
+                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className={`${isDarkMode ? 'text-green-400' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>14-day free trial</span>
+                <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
+                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>14-day free trial</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className={`${isDarkMode ? 'text-green-400' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Cancel anytime</span>
+                <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
+                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>Cancel anytime</span>
               </div>
             </div>
           </div>
@@ -188,13 +188,13 @@ const LandingPage: React.FC = () => {
         {/* Features Section */}
         <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className={`text-center mb-16 ${featuresVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700'} text-sm font-semibold mb-4`}>
+            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-600' : 'bg-yellow-100 text-yellow-800'} text-sm font-semibold mb-4`}>
               FEATURES
             </span>
             <h2 className={`text-4xl md:text-5xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
               Everything you need to manage projects
             </h2>
-            <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto`}>
+            <p className={`text-xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} max-w-2xl mx-auto`}>
               Powerful features designed to help you and your team succeed
             </p>
           </div>
@@ -208,7 +208,7 @@ const LandingPage: React.FC = () => {
                 </svg>
               </div>
               <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-yellow-500 transition-colors`}>Task Management</h3>
-              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+              <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
                 Create, assign, and track tasks with ease. Keep your team organized and on track with powerful task management tools.
               </p>
             </div>
@@ -219,7 +219,7 @@ const LandingPage: React.FC = () => {
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-orange-500 transition-colors`}>Team Collaboration</h3>
-              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+              <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
                 Work together seamlessly with real-time updates and communication tools that keep everyone in sync.
               </p>
             </div>
@@ -230,7 +230,7 @@ const LandingPage: React.FC = () => {
                 <BarChart3 className="w-8 h-8 text-white" />
               </div>
               <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-purple-500 transition-colors`}>Analytics & Reports</h3>
-              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+              <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
                 Get insights into your project performance with detailed analytics and comprehensive reports.
               </p>
             </div>

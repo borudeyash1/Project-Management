@@ -529,7 +529,7 @@ const AdvancedAnalytics: React.FC = () => {
                 {projectAnalytics.filter(p => p.status === 'active').length}
               </p>
             </div>
-            <Activity className="w-8 h-8 text-blue-600" />
+            <Activity className="w-8 h-8 text-accent-dark" />
           </div>
         </div>
         
@@ -581,9 +581,9 @@ const AdvancedAnalytics: React.FC = () => {
                     <span className="text-sm font-medium text-gray-900">{project.name}</span>
                     <span className="text-sm text-gray-600">{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-accent h-2 rounded-full transition-all duration-300"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -610,7 +610,7 @@ const AdvancedAnalytics: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-400" />
+                  <Star className="w-4 h-4 text-yellow-600" />
                   <span className="text-sm font-medium text-gray-900">{member.metrics.overallRating}</span>
                 </div>
               </div>
@@ -628,7 +628,7 @@ const AdvancedAnalytics: React.FC = () => {
         <select
           value={selectedProject}
           onChange={(e) => setSelectedProject(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
         >
           <option value="all">All Projects</option>
           {projectAnalytics.map(project => (
@@ -655,9 +655,9 @@ const AdvancedAnalytics: React.FC = () => {
                     <span className="text-sm font-medium text-gray-700">Progress</span>
                     <span className="text-sm text-gray-600">{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-accent h-2 rounded-full"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -817,7 +817,7 @@ const AdvancedAnalytics: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Reports</h3>
         <button
           onClick={() => setShowCreateReportModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create Report
@@ -826,11 +826,11 @@ const AdvancedAnalytics: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {reports.map(report => (
-          <div key={report._id} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+          <div key={report._id} className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                  <FileText className="w-5 h-5 text-accent-dark" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">{report.name}</h4>
@@ -838,10 +838,10 @@ const AdvancedAnalytics: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <Download className="w-4 h-4" />
                 </button>
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <MoreVertical className="w-4 h-4" />
                 </button>
               </div>
@@ -938,8 +938,8 @@ const AdvancedAnalytics: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   title={tab.description}
                 >
@@ -971,7 +971,7 @@ const AdvancedAnalytics: React.FC = () => {
             <span className="font-medium">{message.text}</span>
             <button
               onClick={() => setMessage(null)}
-              className="ml-2 text-gray-400 hover:text-gray-600"
+              className="ml-2 text-gray-600 hover:text-gray-600"
             >
               <X className="w-4 h-4" />
             </button>

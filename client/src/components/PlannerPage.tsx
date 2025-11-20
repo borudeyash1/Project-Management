@@ -84,7 +84,7 @@ const PlannerPage: React.FC = () => {
         project: {
           _id: 'p1',
           name: 'E-commerce Platform',
-          color: 'bg-blue-500'
+          color: 'bg-accent'
         },
         assignee: {
           _id: 'u1',
@@ -112,7 +112,7 @@ const PlannerPage: React.FC = () => {
         project: {
           _id: 'p1',
           name: 'E-commerce Platform',
-          color: 'bg-blue-500'
+          color: 'bg-accent'
         },
         assignee: {
           _id: 'u2',
@@ -165,7 +165,7 @@ const PlannerPage: React.FC = () => {
         type: 'meeting',
         priority: 'high',
         project: 'E-commerce Platform',
-        color: 'bg-blue-500'
+        color: 'bg-accent'
       },
       {
         _id: 'e2',
@@ -206,7 +206,7 @@ const PlannerPage: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
+      case 'high': return 'text-orange-600 bg-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -216,7 +216,7 @@ const PlannerPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'in-progress': return 'text-blue-600 bg-blue-100';
+      case 'in-progress': return 'text-accent-dark bg-blue-100';
       case 'completed': return 'text-green-600 bg-green-100';
       case 'cancelled': return 'text-red-600 bg-red-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -377,7 +377,7 @@ const PlannerPage: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Planner</h1>
@@ -416,7 +416,7 @@ const PlannerPage: React.FC = () => {
                 });
                 setShowTaskModal(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               Add Task
@@ -429,13 +429,13 @@ const PlannerPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar View */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-300 p-6">
               {/* Calendar Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setCurrentDate(new Date(currentDate.getTime() - (viewMode === 'week' ? 7 : 1) * 24 * 60 * 60 * 1000))}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                    className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -446,7 +446,7 @@ const PlannerPage: React.FC = () => {
                   </h2>
                   <button
                     onClick={() => setCurrentDate(new Date(currentDate.getTime() + (viewMode === 'week' ? 7 : 1) * 24 * 60 * 60 * 1000))}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                    className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -464,7 +464,7 @@ const PlannerPage: React.FC = () => {
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day Headers */}
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
                       {day}
                     </div>
                   ))}
@@ -480,16 +480,16 @@ const PlannerPage: React.FC = () => {
                       <div
                         key={index}
                         onClick={() => handleDateClick(day)}
-                        className={`min-h-24 p-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${
                           isToday ? 'bg-blue-50 border-blue-200' : ''
                         } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-sm font-medium ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+                          <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900'}`}>
                             {day.getDate()}
                           </span>
                           {dayTasks.length > 0 && (
-                            <span className="text-xs text-gray-500">{dayTasks.length}</span>
+                            <span className="text-xs text-gray-600">{dayTasks.length}</span>
                           )}
                         </div>
                         
@@ -505,7 +505,7 @@ const PlannerPage: React.FC = () => {
                             </div>
                           ))}
                           {dayTasks.length > 2 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-600">
                               +{dayTasks.length - 2} more
                             </div>
                           )}
@@ -527,10 +527,10 @@ const PlannerPage: React.FC = () => {
                     });
                     
                     return (
-                      <div key={time} className="flex gap-2 border-b border-gray-100 pb-2">
-                        <div className="w-16 text-sm text-gray-500 pt-1">{time}</div>
+                      <div key={time} className="flex gap-2 border-b border-gray-300 pb-2">
+                        <div className="w-16 text-sm text-gray-600 pt-1">{time}</div>
                         <div 
-                          className="flex-1 min-h-12 border border-gray-200 rounded-lg p-2 cursor-pointer hover:bg-gray-50"
+                          className="flex-1 min-h-12 border border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-50"
                           onClick={() => handleDateClick(currentDate, time)}
                         >
                           {tasksAtTime.map(task => (
@@ -549,7 +549,7 @@ const PlannerPage: React.FC = () => {
               {viewMode === 'month' && (
                 <div className="grid grid-cols-7 gap-1">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
                       {day}
                     </div>
                   ))}
@@ -564,14 +564,14 @@ const PlannerPage: React.FC = () => {
                       <div
                         key={index}
                         onClick={() => handleDateClick(day)}
-                        className={`min-h-20 p-1 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                        className={`min-h-20 p-1 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${
                           isToday ? 'bg-blue-50 border-blue-200' : ''
                         } ${isSelected ? 'ring-2 ring-blue-500' : ''} ${
                           !isCurrentMonth ? 'opacity-40' : ''
                         }`}
                       >
                         <div className="text-xs font-medium mb-1 ${
-                          isToday ? 'text-blue-600' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                          isToday ? 'text-accent-dark' : isCurrentMonth ? 'text-gray-900' : 'text-gray-600'
                         }">
                           {day.getDate()}
                         </div>
@@ -585,7 +585,7 @@ const PlannerPage: React.FC = () => {
                             </div>
                           ))}
                           {dayTasks.length > 2 && (
-                            <div className="text-[10px] text-gray-500">+{dayTasks.length - 2}</div>
+                            <div className="text-[10px] text-gray-600">+{dayTasks.length - 2}</div>
                           )}
                         </div>
                       </div>
@@ -615,7 +615,7 @@ const PlannerPage: React.FC = () => {
             )}
 
             {/* Today's Tasks */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Today's Tasks</h3>
               <div className="space-y-2">
                 {getTasksForDate(new Date()).slice(0, 5).map(task => (
@@ -642,20 +642,20 @@ const PlannerPage: React.FC = () => {
                           {task.priority}
                         </span>
                         {task.project && (
-                          <span className="text-xs text-gray-500">{task.project.name}</span>
+                          <span className="text-xs text-gray-600">{task.project.name}</span>
                         )}
                       </div>
                     </div>
                   </div>
                 ))}
                 {getTasksForDate(new Date()).length === 0 && (
-                  <p className="text-sm text-gray-500 text-center py-4">No tasks for today</p>
+                  <p className="text-sm text-gray-600 text-center py-4">No tasks for today</p>
                 )}
               </div>
             </div>
 
             {/* Upcoming Events */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Upcoming Events</h3>
               <div className="space-y-2">
                 {events.slice(0, 5).map(event => (
@@ -663,20 +663,20 @@ const PlannerPage: React.FC = () => {
                     <div className={`w-2 h-2 rounded-full ${event.color}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-600">
                         {formatDate(event.start)} at {formatTime(event.start)}
                       </p>
                     </div>
                   </div>
                 ))}
                 {events.length === 0 && (
-                  <p className="text-sm text-gray-500 text-center py-4">No upcoming events</p>
+                  <p className="text-sm text-gray-600 text-center py-4">No upcoming events</p>
                 )}
               </div>
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Quick Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -711,7 +711,7 @@ const PlannerPage: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-900">Create New Task</h2>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -725,7 +725,7 @@ const PlannerPage: React.FC = () => {
                   type="text"
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   placeholder="Enter task title"
                 />
               </div>
@@ -736,7 +736,7 @@ const PlannerPage: React.FC = () => {
                 <textarea
                   value={newTask.description}
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   rows={3}
                   placeholder="Add task description"
                 />
@@ -750,7 +750,7 @@ const PlannerPage: React.FC = () => {
                     type="date"
                     value={newTask.dueDate}
                     onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                 </div>
                 <div>
@@ -759,7 +759,7 @@ const PlannerPage: React.FC = () => {
                     type="time"
                     value={newTask.dueTime}
                     onChange={(e) => setNewTask({ ...newTask, dueTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                 </div>
               </div>
@@ -771,7 +771,7 @@ const PlannerPage: React.FC = () => {
                   <select
                     value={newTask.priority}
                     onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -787,7 +787,7 @@ const PlannerPage: React.FC = () => {
                     step="0.5"
                     value={newTask.estimatedDuration}
                     onChange={(e) => setNewTask({ ...newTask, estimatedDuration: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                 </div>
               </div>
@@ -801,7 +801,7 @@ const PlannerPage: React.FC = () => {
                 <select
                   value={newTask.reminder}
                   onChange={(e) => setNewTask({ ...newTask, reminder: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="15min">15 minutes before</option>
                   <option value="30min">30 minutes before</option>
@@ -817,7 +817,7 @@ const PlannerPage: React.FC = () => {
                   type="text"
                   placeholder="Enter tags separated by commas"
                   onChange={(e) => setNewTask({ ...newTask, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
             </div>
@@ -832,7 +832,7 @@ const PlannerPage: React.FC = () => {
               <button
                 onClick={handleCreateTask}
                 disabled={!newTask.title || !newTask.dueDate || !newTask.dueTime}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Create Task
               </button>

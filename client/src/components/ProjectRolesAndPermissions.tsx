@@ -241,12 +241,12 @@ const ProjectRolesAndPermissions: React.FC = () => {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'workspace-owner': return <Crown className="w-4 h-4 text-yellow-500" />;
-      case 'project-manager': return <Star className="w-4 h-4 text-blue-500" />;
+      case 'project-manager': return <Star className="w-4 h-4 text-accent" />;
       case 'developer': return <Code className="w-4 h-4 text-green-500" />;
       case 'designer': return <Palette className="w-4 h-4 text-purple-500" />;
       case 'tester': return <CheckCircle className="w-4 h-4 text-orange-500" />;
       case 'analyst': return <BarChart3 className="w-4 h-4 text-indigo-500" />;
-      default: return <User className="w-4 h-4 text-gray-500" />;
+      default: return <User className="w-4 h-4 text-gray-600" />;
     }
   };
 
@@ -256,7 +256,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
       case 'project-manager': return 'bg-blue-100 text-blue-800';
       case 'developer': return 'bg-green-100 text-green-800';
       case 'designer': return 'bg-purple-100 text-purple-800';
-      case 'tester': return 'bg-orange-100 text-orange-800';
+      case 'tester': return 'bg-orange-200 text-orange-800';
       case 'analyst': return 'bg-indigo-100 text-indigo-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -277,19 +277,19 @@ const ProjectRolesAndPermissions: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Team Members</h3>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search members..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
           <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Roles</option>
             <option value="workspace-owner">Workspace Owner</option>
@@ -303,13 +303,13 @@ const ProjectRolesAndPermissions: React.FC = () => {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Status</option>
             <option value="online">Online</option>
             <option value="offline">Offline</option>
           </select>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
             <Plus className="w-4 h-4" />
             Invite Member
           </button>
@@ -334,7 +334,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
                 setSelectedUser(user);
                 setShowUserModal(true);
               }}
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -369,7 +369,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Performance:</span>
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400" />
+                    <Star className="w-4 h-4 text-yellow-600" />
                     <span className="text-sm font-medium text-gray-900">{user.performance.rating}</span>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Custom Roles</h3>
         <button
           onClick={() => setShowRoleModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create Role
@@ -416,7 +416,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-blue-600" />
+                  <Shield className="w-5 h-5 text-accent-dark" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">{role.name}</h4>
@@ -424,10 +424,10 @@ const ProjectRolesAndPermissions: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-gray-600">
+                <button className="text-gray-600 hover:text-gray-600">
                   <Edit className="w-4 h-4" />
                 </button>
-                <button className="text-gray-400 hover:text-red-600">
+                <button className="text-gray-600 hover:text-red-600">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -474,7 +474,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Permission Categories</h3>
         <button
           onClick={() => setShowPermissionModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Permission
@@ -482,7 +482,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
       </div>
 
       {['project', 'task', 'user', 'workspace', 'analytics', 'settings'].map(category => (
-        <div key={category} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div key={category} className="bg-white rounded-lg border border-gray-300 overflow-hidden">
           <div className="p-4 bg-gray-50 border-b border-gray-200">
             <h4 className="font-semibold text-gray-900 capitalize">{category} Permissions</h4>
             <p className="text-sm text-gray-600">
@@ -495,7 +495,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
               {allPermissions
                 .filter(permission => permission.category === category)
                 .map(permission => (
-                  <div key={permission._id} className="p-3 border border-gray-200 rounded-lg">
+                  <div key={permission._id} className="p-3 border border-gray-300 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium text-gray-900">{permission.name}</h5>
                       <span className={`px-2 py-1 rounded-full text-xs ${getPermissionLevelColor(permission.level)}`}>
@@ -532,7 +532,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
             </div>
             <button
               onClick={() => setShowUserModal(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-600 hover:text-gray-600"
             >
               <X className="w-5 h-5" />
             </button>
@@ -582,7 +582,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Overall Rating:</span>
                     <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
+                      <Star className="w-4 h-4 text-yellow-600" />
                       <span className="text-sm font-medium text-gray-900">{selectedUser.performance.rating}</span>
                     </div>
                   </div>
@@ -618,7 +618,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {projectRole.permissions.map(permission => (
-                        <span key={permission} className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">
+                        <span key={permission} className="px-2 py-1 bg-gray-300 text-gray-700 text-xs rounded-full">
                           {permission}
                         </span>
                       ))}
@@ -632,7 +632,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
               <h3 className="font-semibold text-gray-900 mb-4">Global Permissions</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {selectedUser.permissions.map(permission => (
-                  <div key={permission._id} className="p-3 border border-gray-200 rounded-lg">
+                  <div key={permission._id} className="p-3 border border-gray-300 rounded-lg">
                     <div className="flex items-center justify-between mb-1">
                       <h5 className="font-medium text-gray-900">{permission.name}</h5>
                       <span className={`px-2 py-1 rounded-full text-xs ${getPermissionLevelColor(permission.level)}`}>
@@ -646,7 +646,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
             </div>
 
             <div className="flex gap-3">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
                 Edit Permissions
               </button>
               <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
@@ -710,8 +710,8 @@ const ProjectRolesAndPermissions: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   title={tab.description}
                 >

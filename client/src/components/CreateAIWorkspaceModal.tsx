@@ -218,7 +218,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
           <select
             value={workspaceData.type}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, type: e.target.value as any }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="startup">Startup</option>
             <option value="agency">Agency</option>
@@ -234,7 +234,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
           <select
             value={workspaceData.industry}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, industry: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="">Select Industry</option>
             {industryOptions.map(industry => (
@@ -248,7 +248,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
           <select
             value={workspaceData.teamSize}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, teamSize: e.target.value as any }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="1-5">1-5 people</option>
             <option value="6-20">6-20 people</option>
@@ -263,7 +263,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
           <select
             value={workspaceData.budget}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, budget: e.target.value as any }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="free">Free</option>
             <option value="basic">Basic ($10/month)</option>
@@ -288,7 +288,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
                     setWorkspaceData(prev => ({ ...prev, goals: prev.goals.filter(g => g !== goal) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{goal}</span>
             </label>
@@ -323,7 +323,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
                     setWorkspaceData(prev => ({ ...prev, features: prev.features.filter(f => f !== feature) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{feature}</span>
             </label>
@@ -346,7 +346,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
                     setWorkspaceData(prev => ({ ...prev, integrations: prev.integrations.filter(i => i !== integration) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{integration}</span>
             </label>
@@ -359,7 +359,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         <select
           value={workspaceData.timeline}
           onChange={(e) => setWorkspaceData(prev => ({ ...prev, timeline: e.target.value as any }))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
         >
           <option value="immediate">Immediate</option>
           <option value="1-month">Within 1 month</option>
@@ -382,7 +382,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
 
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <Building className="w-6 h-6 text-blue-600" />
+          <Building className="w-6 h-6 text-accent-dark" />
           <div>
             <h4 className="font-semibold text-gray-900">{workspaceData.name}</h4>
             <p className="text-sm text-gray-600">{workspaceData.description}</p>
@@ -444,7 +444,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <Zap className="w-5 h-5 text-blue-600 mt-0.5" />
+          <Zap className="w-5 h-5 text-accent-dark mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900">AI Recommendations</h4>
             <p className="text-sm text-blue-700 mt-1">
@@ -467,7 +467,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
             {step === 2 && 'Customize Features'}
             {step === 3 && 'Review & Create'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -479,7 +479,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
               <span>Step {step} of 3</span>
               <span>{Math.round((step / 3) * 100)}% Complete</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-300 rounded-full h-2">
               <div
                 className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${(step / 3) * 100}%` }}
@@ -506,7 +506,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               Next
               <ArrowRight className="w-4 h-4 inline ml-2" />

@@ -235,7 +235,7 @@ const AdminLogin: React.FC = () => {
               <div className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Admin Portal
               </div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                 Sartthi
               </div>
             </div>
@@ -254,7 +254,7 @@ const AdminLogin: React.FC = () => {
                 <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
                   Admin Login
                 </h2>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                   Secure access for administrators only
                 </p>
               </div>
@@ -296,9 +296,9 @@ const AdminLogin: React.FC = () => {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`} />
+                      <EyeOff className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-slate-400'}`} />
                     ) : (
-                      <Eye className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`} />
+                      <Eye className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-slate-400'}`} />
                     )}
                   </button>
                 </div>
@@ -317,7 +317,7 @@ const AdminLogin: React.FC = () => {
                   <div className={`w-full border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-4 text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+                  <span className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-4 text-sm font-medium ${isDarkMode ? 'text-gray-600' : 'text-slate-500'}`}>
                     or
                   </span>
                 </div>
@@ -336,7 +336,7 @@ const AdminLogin: React.FC = () => {
                 Continue with Google
               </button>
 
-              <div className={`text-center text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} pt-4`}>
+              <div className={`text-center text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} pt-4`}>
                 <Shield className="w-4 h-4 inline mr-1" />
                 Protected by 2FA and OTP verification
               </div>
@@ -351,8 +351,8 @@ const AdminLogin: React.FC = () => {
                 <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-3`}>
                   Verify Admin Access
                 </h3>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-6`}>
-                  Enter the 6-digit code sent to <strong className={isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}>{formData.email}</strong>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-slate-600'} mb-6`}>
+                  Enter the 6-digit code sent to <strong className={isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}>{formData.email}</strong>
                 </p>
               </div>
 
@@ -383,7 +383,7 @@ const AdminLogin: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowOtpVerification(false)}
-                className={`w-full text-sm ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                className={`w-full text-sm ${isDarkMode ? 'text-gray-600 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
               >
                 ← Back to login
               </button>

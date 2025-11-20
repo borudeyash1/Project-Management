@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Info, BookOpen, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown, BadgeDollarSign } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
-import sartthi_logo from '../images/sartthi_logo.jpg';
+// Logo is now in public folder
 
 interface Release {
   _id: string;
@@ -78,8 +78,8 @@ const SharedNavbar: React.FC = () => {
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
-      case 'windows': return <Monitor className="w-5 h-5 text-blue-500" />;
-      case 'macos': return <Apple className="w-5 h-5 text-gray-400" />;
+      case 'windows': return <Monitor className="w-5 h-5 text-accent" />;
+      case 'macos': return <Apple className="w-5 h-5 text-gray-600" />;
       case 'linux': return <HardDrive className="w-5 h-5 text-orange-500" />;
       default: return <Download className="w-5 h-5" />;
     }
@@ -99,12 +99,12 @@ const SharedNavbar: React.FC = () => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center gap-3">
-                <img src={sartthi_logo} alt="Sartthi Logo" className="h-10 w-auto rounded-lg shadow-md" />
+                <img src="/logo.svg" alt="Sartthi Logo" className="h-12 w-auto" />
                 <div className="flex flex-col">
                   <span className={`text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>
                     Sartthi
                   </span>
-                  <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} -mt-1`}>
+                  <span className={`text-xs ${isDarkMode ? 'text-gray-200' : 'text-gray-700'} -mt-1 font-medium`}>
                     Project & Payroll Suite
                   </span>
                 </div>
@@ -117,28 +117,28 @@ const SharedNavbar: React.FC = () => {
             <div className="ml-10 flex items-baseline space-x-8">
               <Link
                 to="/"
-                className={`${isActive('/') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <Home size={16} />
                 Home
               </Link>
               <Link
                 to="/about"
-                className={`${isActive('/about') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/about') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <Info size={16} />
                 About
               </Link>
               <Link
                 to="/user-guide"
-                className={`${isActive('/user-guide') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/user-guide') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <BookOpen size={16} />
                 User Guide
               </Link>
               <Link
                 to="/pricing"
-                className={`${isActive('/pricing') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/pricing') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <BadgeDollarSign size={16} />
                 Pricing
@@ -148,7 +148,7 @@ const SharedNavbar: React.FC = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                  className={`${isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600'} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                  className={`${isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600'} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
                 >
                   <Download size={16} />
                   Download
@@ -158,11 +158,11 @@ const SharedNavbar: React.FC = () => {
                 {/* Dropdown Menu */}
                 {showDownloadMenu && (
                   <div className={`absolute right-0 mt-2 w-80 rounded-xl shadow-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} overflow-hidden z-50`}>
-                    <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'}`}>
+                    <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-300 bg-gray-50'}`}>
                       <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         Download Desktop App
                       </h3>
-                      <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                      <p className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mt-1`}>
                         Latest versions available
                       </p>
                     </div>
@@ -174,8 +174,8 @@ const SharedNavbar: React.FC = () => {
                         </div>
                       ) : releases.length === 0 ? (
                         <div className="px-4 py-8 text-center">
-                          <Download className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
-                          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          <Download className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             No releases available yet
                           </p>
                         </div>
@@ -184,7 +184,7 @@ const SharedNavbar: React.FC = () => {
                           {/* Latest Releases Section */}
                           {releases.some(r => r.isLatest) && (
                             <>
-                              <div className={`px-4 py-2 text-xs font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} uppercase tracking-wider`}>
+                              <div className={`px-4 py-2 text-xs font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} uppercase tracking-wider`}>
                                 Latest Releases
                               </div>
                               {releases.filter(r => r.isLatest).map((release) => (
@@ -205,14 +205,14 @@ const SharedNavbar: React.FC = () => {
                                         Latest
                                       </span>
                                     </div>
-                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                       {release.versionName} • v{release.version}
                                     </p>
-                                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-0.5`}>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mt-0.5`}>
                                       {release.architecture} • {formatFileSize(release.fileSize)}
                                     </p>
                                   </div>
-                                  <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                  <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
                                 </button>
                               ))}
                             </>
@@ -221,7 +221,7 @@ const SharedNavbar: React.FC = () => {
                           {/* Previous Releases Section */}
                           {releases.some(r => !r.isLatest) && (
                             <>
-                              <div className={`px-4 py-2 mt-2 text-xs font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} uppercase tracking-wider`}>
+                              <div className={`px-4 py-2 mt-2 text-xs font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} uppercase tracking-wider`}>
                                 Previous Releases
                               </div>
                               {releases.filter(r => !r.isLatest).map((release) => (
@@ -237,14 +237,14 @@ const SharedNavbar: React.FC = () => {
                                     <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} capitalize`}>
                                       {release.platform}
                                     </p>
-                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                                       {release.versionName} • v{release.version}
                                     </p>
-                                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-0.5`}>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-0.5`}>
                                       {release.architecture} • {formatFileSize(release.fileSize)}
                                     </p>
                                   </div>
-                                  <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                  <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
                                 </button>
                               ))}
                             </>
@@ -253,8 +253,8 @@ const SharedNavbar: React.FC = () => {
                       )}
                     </div>
 
-                    <div className={`px-4 py-3 border-t ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'}`}>
-                      <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-600'} text-center`}>
+                    <div className={`px-4 py-3 border-t ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-300 bg-gray-50'}`}>
+                      <p className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-center`}>
                         Choose your platform to download
                       </p>
                     </div>
@@ -268,7 +268,7 @@ const SharedNavbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link
               to="/login"
-              className={`${isActive('/login') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-700 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+              className={`${isActive('/login') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
             >
               <LogIn size={16} />
               Login

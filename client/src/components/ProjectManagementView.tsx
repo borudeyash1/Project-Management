@@ -364,7 +364,7 @@ const ProjectManagementView: React.FC = () => {
     switch (priority) {
       case 'low': return 'bg-gray-100 text-gray-800';
       case 'medium': return 'bg-blue-100 text-blue-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'critical': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -431,12 +431,12 @@ const ProjectManagementView: React.FC = () => {
                 }`}
               >
                 <div className="font-medium">{project.name}</div>
-                <div className="text-sm text-gray-500">{project.description}</div>
+                <div className="text-sm text-gray-600">{project.description}</div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(project.status)}`}>
                     {project.status}
                   </span>
-                  <span className="text-xs text-gray-500">{project.progress}% complete</span>
+                  <span className="text-xs text-gray-600">{project.progress}% complete</span>
                 </div>
               </button>
             ))}
@@ -463,7 +463,7 @@ const ProjectManagementView: React.FC = () => {
     ];
 
     return (
-      <div className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto">
+      <div className="w-64 bg-white border-r border-gray-300 h-full overflow-y-auto">
         <div className="p-4 border-b border-gray-200">
           <h3 className="font-semibold text-gray-900">Project Management</h3>
           <p className="text-sm text-gray-600">Manage your project efficiently</p>
@@ -501,7 +501,7 @@ const ProjectManagementView: React.FC = () => {
               <p className="text-sm font-medium text-gray-600">Total Tasks</p>
               <p className="text-2xl font-semibold text-gray-900">{tasks.length}</p>
             </div>
-            <CheckSquare className="w-8 h-8 text-blue-600" />
+            <CheckSquare className="w-8 h-8 text-accent-dark" />
           </div>
         </div>
         
@@ -551,9 +551,9 @@ const ProjectManagementView: React.FC = () => {
                     <span className="text-sm font-medium text-gray-900">{project.name}</span>
                     <span className="text-sm text-gray-600">{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-accent h-2 rounded-full transition-all duration-300"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -570,21 +570,21 @@ const ProjectManagementView: React.FC = () => {
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <div className="flex-1">
                 <p className="text-sm text-gray-900">Task "Design User Interface" completed</p>
-                <p className="text-xs text-gray-500">2 hours ago</p>
+                <p className="text-xs text-gray-600">2 hours ago</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-accent rounded-full"></div>
               <div className="flex-1">
                 <p className="text-sm text-gray-900">New task "Backend API Development" assigned</p>
-                <p className="text-xs text-gray-500">4 hours ago</p>
+                <p className="text-xs text-gray-600">4 hours ago</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
               <div className="flex-1">
                 <p className="text-sm text-gray-900">Deadline extension requested</p>
-                <p className="text-xs text-gray-500">6 hours ago</p>
+                <p className="text-xs text-gray-600">6 hours ago</p>
               </div>
             </div>
           </div>
@@ -599,19 +599,19 @@ const ProjectManagementView: React.FC = () => {
         <h2 className="text-xl font-semibold text-gray-900">Task Board</h2>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -637,7 +637,7 @@ const ProjectManagementView: React.FC = () => {
               <h3 className="font-semibold text-gray-900 capitalize">
                 {status.replace('-', ' ')}
               </h3>
-              <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+              <span className="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">
                 {tasks.filter(t => t.status === status).length}
               </span>
             </div>
@@ -654,7 +654,7 @@ const ProjectManagementView: React.FC = () => {
                       setSelectedTask(task);
                       setShowTaskModal(true);
                     }}
-                    className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+                    className="bg-white p-4 rounded-lg border border-gray-300 cursor-pointer hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-gray-900 text-sm">{task.title}</h4>
@@ -674,23 +674,23 @@ const ProjectManagementView: React.FC = () => {
                         />
                         <span className="text-xs text-gray-600">{task.assignee.name}</span>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-600">
                         {new Date(task.dueDate).toLocaleDateString()}
                       </span>
                     </div>
                     
                     {task.milestones.length > 0 && (
                       <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                           <span>Milestones</span>
                           <span>
                             {task.milestones.filter(m => m.status === 'completed').length}/
                             {task.milestones.length}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div className="w-full bg-gray-300 rounded-full h-1">
                           <div
-                            className="bg-blue-600 h-1 rounded-full"
+                            className="bg-accent h-1 rounded-full"
                             style={{
                               width: `${(task.milestones.filter(m => m.status === 'completed').length / task.milestones.length) * 100}%`
                             }}
@@ -717,7 +717,7 @@ const ProjectManagementView: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900">{selectedTask.title}</h2>
             <button
               onClick={() => setShowTaskModal(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-600 hover:text-gray-600"
             >
               <X className="w-5 h-5" />
             </button>
@@ -773,7 +773,7 @@ const ProjectManagementView: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={milestone.status === 'completed'}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
                       />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">{milestone.title}</p>
@@ -801,7 +801,7 @@ const ProjectManagementView: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-medium text-gray-900">{comment.author.name}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-600">
                           {new Date(comment.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -814,10 +814,10 @@ const ProjectManagementView: React.FC = () => {
               <div className="mt-4">
                 <textarea
                   placeholder="Add a comment..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   rows={3}
                 />
-                <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="mt-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
                   Add Comment
                 </button>
               </div>
@@ -843,7 +843,7 @@ const ProjectManagementView: React.FC = () => {
           <div className="p-6">
             <div className="space-y-4">
               {workloadRequests.map(request => (
-                <div key={request._id} className="p-4 border border-gray-200 rounded-lg">
+                <div key={request._id} className="p-4 border border-gray-300 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-900">
                       {teamMembers.find(m => m._id === request.employeeId)?.name}
@@ -875,7 +875,7 @@ const ProjectManagementView: React.FC = () => {
           <div className="p-6">
             <div className="space-y-4">
               {deadlineRequests.map(request => (
-                <div key={request._id} className="p-4 border border-gray-200 rounded-lg">
+                <div key={request._id} className="p-4 border border-gray-300 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-900">
                       {teamMembers.find(m => m._id === request.employeeId)?.name}
@@ -920,17 +920,17 @@ const ProjectManagementView: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tasks Completed</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">On-Time Delivery</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quality Score</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Rank</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Rating</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Tasks Completed</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">On-Time Delivery</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Quality Score</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -941,7 +941,7 @@ const ProjectManagementView: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {index === 0 && <Trophy className="w-5 h-5 text-yellow-500 mr-2" />}
-                        {index === 1 && <Medal className="w-5 h-5 text-gray-400 mr-2" />}
+                        {index === 1 && <Medal className="w-5 h-5 text-gray-600 mr-2" />}
                         {index === 2 && <Award className="w-5 h-5 text-orange-500 mr-2" />}
                         <span className="text-sm font-medium text-gray-900">#{index + 1}</span>
                       </div>
@@ -955,13 +955,13 @@ const ProjectManagementView: React.FC = () => {
                         />
                         <div>
                           <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                          <div className="text-sm text-gray-500">{member.designation}</div>
+                          <div className="text-sm text-gray-600">{member.designation}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                        <Star className="w-4 h-4 text-yellow-600 mr-1" />
                         <span className="text-sm text-gray-900">{member.performance.rating}</span>
                       </div>
                     </td>
@@ -1002,7 +1002,7 @@ const ProjectManagementView: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <Building className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Project Selected</h3>
           <p className="text-gray-600">Please select a project to view its management interface.</p>
         </div>
@@ -1015,7 +1015,7 @@ const ProjectManagementView: React.FC = () => {
       {renderProjectManagerSidebar()}
       
       <div className="flex-1 flex flex-col">
-        <div className="bg-white border-b border-gray-200 p-4">
+        <div className="bg-white border-b border-gray-300 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {renderProjectSelector()}

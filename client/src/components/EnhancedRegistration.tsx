@@ -611,13 +611,13 @@ const EnhancedRegistration: React.FC = () => {
           </div>
 
           {otpTimer > 0 ? (
-            <p className="text-center text-sm text-gray-500">Resend OTP in {otpTimer} seconds</p>
+            <p className="text-center text-sm text-gray-600">Resend OTP in {otpTimer} seconds</p>
           ) : (
             <button
               type="button"
               onClick={handleResendOtp}
               disabled={loading}
-              className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              className="w-full px-4 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
             >
               Resend OTP
             </button>
@@ -704,7 +704,7 @@ const EnhancedRegistration: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, contactNumber: '' }))}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-600"
                     >
                       ✕
                     </button>
@@ -729,7 +729,7 @@ const EnhancedRegistration: React.FC = () => {
                     className="absolute right-3 top-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
+                    {showPassword ? <EyeOff className="w-5 h-5 text-gray-600" /> : <Eye className="w-5 h-5 text-gray-600" />}
                   </button>
                 </div>
               </div>
@@ -755,7 +755,7 @@ const EnhancedRegistration: React.FC = () => {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-sm text-gray-500">or</span>
+                  <span className="bg-white px-3 text-sm text-gray-600">or</span>
                 </div>
               </div>
             )}
@@ -923,7 +923,7 @@ const EnhancedRegistration: React.FC = () => {
                   <div key={index} className="flex items-center justify-between bg-white p-3 rounded-lg border">
                     <div className="flex items-center space-x-3">
                       <span className="font-medium">{skill.name}</span>
-                      <span className="text-sm text-gray-500">({skill.level})</span>
+                      <span className="text-sm text-gray-600">({skill.level})</span>
                       <span className="text-xs bg-gray-100 px-2 py-1 rounded">{skill.category}</span>
                     </div>
                     <button
@@ -972,7 +972,7 @@ const EnhancedRegistration: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => addGoal('shortTerm')}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent transition-colors text-sm font-medium"
                 >
                   Add Short-term Goal
                 </button>
@@ -1146,7 +1146,7 @@ const EnhancedRegistration: React.FC = () => {
                 <button
                   type="button"
                   onClick={addInterest}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent transition-colors text-sm font-medium"
                 >
                   Add Interest
                 </button>
