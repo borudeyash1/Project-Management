@@ -1,53 +1,42 @@
-# VPS Node.js Fix - Remove NVM and Use System Node.js 18
+# VPS Deployment - Complete Guide
 
-## Problem: NVM is overriding system Node.js
+## Prerequisites
 
-Your VPS has NVM installed which is using v24.11.1 instead of the system Node.js 18.
-
-## Solution: Remove NVM or Use NVM to Install Node.js 18
-
-### Option 1: Remove NVM (Recommended)
-
+### 1. Install Node.js 18 LTS
 ```bash
 ssh saurabh@srv1132332
 
-# 1. Remove NVM completely
-rm -rf ~/.nvm
-rm -rf ~/.npm
+# Remove NVM if it exists
+rm -rf ~/.nvm ~/.npm
 
-# 2. Edit ~/.bashrc to remove NVM lines
+# Edit .bashrc to remove NVM lines
 nano ~/.bashrc
+# Delete any lines containing "nvm"
+# Save: Ctrl+X, Y, Enter
 
-# Find and DELETE these lines (or similar):
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# Save: Ctrl+X, then Y, then Enter
-
-# 3. Reload shell
+# Reload shell
 source ~/.bashrc
 
-# 4. Verify Node.js 18 is now active
-which node  # Should show /usr/bin/node
-node -v     # Should show v18.20.8
-
-# 5. If still showing wrong path, update PATH
-export PATH="/usr/bin:$PATH"
-echo 'export PATH="/usr/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### Option 2: Use NVM to Install Node.js 18 (Alternative)
-
-```bash
-# Use NVM to install and use Node.js 18
-nvm install 18
-nvm use 18
-nvm alias default 18
+# Install Node.js 18
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 # Verify
-node -v  # Should show v18.x.x
+node -v  # Should show v18.20.8
+npm -v
+```
+
+### 2. Install PM2 (Process Manager)
+```bash
+# Install PM2 globally
+sudo npm install -g pm2
+
+# Verify
+pm2 --version
+
+# Setup PM2 to start on boot
+pm2 startup
+# Follow the command it gives you (usually starts with 'sudo env PATH=...')
 ```
 
 ## Deploy Application
@@ -59,30 +48,74 @@ cd ~/Project-Management
 git reset --hard
 git pull origin main
 
-# Install dependencies with correct Node version
+# Install server dependencies
 cd server
 rm -rf node_modules package-lock.json
 npm install
 
-cd ../client  
+# Build TypeScript
+npm run build
+
+# Install client dependencies and build
+cd ../client
 rm -rf node_modules package-lock.json build
 npm install
 npm run build
 
-# Restart PM2
+# Go back to root
 cd ..
-pm2 delete server  # Delete old process
+```
+
+## Start/Restart Server with PM2
+
+### First Time Setup
+```bash
+# Start server with PM2
 pm2 start server/dist/server.js --name server
 
-# Check logs
+# Save PM2 process list
+pm2 save
+
+# Check status
+pm2 status
+```
+
+### Restart After Updates
+```bash
+# Restart server
+pm2 restart server
+
+# Or reload (zero-downtime)
+pm2 reload server
+```
+
+## Monitor & Logs
+
+```bash
+# View logs
+pm2 logs server
+
+# View last 50 lines
 pm2 logs server --lines 50
+
+# Monitor in real-time
+pm2 monit
+
+# Check status
+pm2 status
+
+# Stop server
+pm2 stop server
+
+# Delete from PM2
+pm2 delete server
 ```
 
 ## Verify R2 Upload Works
 
-After deployment, upload a release and check logs:
-
+After deployment, test R2 upload:
 ```bash
+# Watch logs for R2 activity
 pm2 logs server | grep "R2"
 ```
 
@@ -91,25 +124,59 @@ Should see:
 ✅ [R2-SDK] File uploaded successfully
 ```
 
-NOT:
-```
-❌ [R2-SDK] Upload failed: SSL error
-```
+## Quick Deploy Script
 
-## Quick Commands (Copy-Paste)
-
+Create a deploy script:
 ```bash
-# Remove NVM
-rm -rf ~/.nvm ~/.npm
-nano ~/.bashrc  # Remove NVM lines, save with Ctrl+X
-source ~/.bashrc
-node -v  # Verify v18
-
-# Deploy
-cd ~/Project-Management
-git reset --hard && git pull origin main
-cd server && rm -rf node_modules package-lock.json && npm install
-cd ../client && rm -rf node_modules package-lock.json build && npm install && npm run build
-cd .. && pm2 restart server
-pm2 logs server
+nano ~/deploy.sh
 ```
+
+Add:
+```bash
+#!/bin/bash
+cd ~/Project-Management
+git pull origin main
+cd server && npm install && npm run build
+cd ../client && npm install && npm run build
+cd ..
+pm2 restart server
+pm2 logs server --lines 20
+```
+
+Make executable:
+```bash
+chmod +x ~/deploy.sh
+```
+
+Use:
+```bash
+~/deploy.sh
+```
+
+## Troubleshooting
+
+### Port 5000 in use
+```bash
+pm2 stop server
+pm2 delete server
+pm2 start server/dist/server.js --name server
+```
+
+### Check what's using port 5000
+```bash
+sudo lsof -i :5000
+```
+
+### Environment variables
+Make sure `.env` exists in `~/Project-Management/server/`:
+```bash
+cd ~/Project-Management/server
+ls -la .env
+```
+
+### MongoDB connection
+```bash
+pm2 logs server | grep "MongoDB"
+```
+
+Should see: `Connected to MongoDB`
