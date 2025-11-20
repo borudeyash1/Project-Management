@@ -21,7 +21,9 @@ type AdminDockPosition = 'top' | 'bottom' | 'left' | 'right';
 
 const ADMIN_DOCK_POSITION_KEY = 'adminDockPosition';
 const ADMIN_DOCK_LOCK_KEY = 'adminDockLocked';
-const ADMIN_DOCK_SAFE_OFFSET = 132;
+const DOCK_EDGE_GAP = 12;
+const DOCK_TOP_OFFSET = 48;
+const DOCK_BOTTOM_OFFSET = 50;
 const MotionAdminDockWrapper = motion.div as React.ComponentType<any>;
 
 interface AdminDockIconProps {
@@ -30,6 +32,7 @@ interface AdminDockIconProps {
   onClick?: () => void;
   active?: boolean;
   tooltip?: string;
+  orientation?: 'horizontal' | 'vertical';
 }
 
 const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'middle', className = '' }) => {
@@ -37,6 +40,8 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
   const dragControls = useDragControls();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const [dockSize, setDockSize] = useState({ width: 0, height: 0 });
   const bodyPaddingRef = useRef<{ top: string; bottom: string; left: string; right: string } | null>(null);
   const [dockPosition, setDockPosition] = useState<AdminDockPosition>(() => {
     if (typeof window === 'undefined') return 'bottom';
@@ -100,6 +105,7 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
   const startDrag = useCallback(
     (event: React.PointerEvent) => {
       if (isLocked) return;
+      event.preventDefault();
       dragControls.start(event);
     },
     [dragControls, isLocked]
@@ -107,8 +113,58 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
 
   const isVertical = dockPosition === 'left' || dockPosition === 'right';
   const blurPosition = dockPosition === 'top' ? 'top' : dockPosition === 'bottom' ? 'bottom' : null;
-  const controlsAlignment = isVertical ? 'top-2 right-2 flex-col' : 'top-2 right-2 flex-row';
-  const dockStyle = useMemo(() => ({ cursor: isLocked ? 'default' : 'grab', x, y }), [isLocked, x, y]);
+  const controlPositionStyles = useMemo(() => {
+    if (isVertical) {
+      return { top: '0.75rem', right: '-2.5rem', flexDirection: 'column' as const };
+    }
+    return { top: '-2.25rem', right: '1rem', flexDirection: 'row' as const };
+  }, [isVertical]);
+
+  const anchorStyle = useMemo(() => {
+    const base: React.CSSProperties = {
+      cursor: isLocked ? 'default' : 'grab',
+      pointerEvents: 'none',
+      x,
+      y
+    } as React.CSSProperties;
+    if (dockPosition === 'top') {
+      return {
+        ...base,
+        top: DOCK_TOP_OFFSET,
+        left: '50%',
+        marginLeft: dockSize.width ? `${-dockSize.width / 2}px` : undefined
+      };
+    }
+    if (dockPosition === 'bottom') {
+      return {
+        ...base,
+        bottom: DOCK_BOTTOM_OFFSET,
+        left: '50%',
+        marginLeft: dockSize.width ? `${-dockSize.width / 2}px` : undefined
+      };
+    }
+    if (dockPosition === 'left') {
+      return { ...base, left: DOCK_EDGE_GAP, top: '15%', bottom: '15%' };
+    }
+    return { ...base, right: DOCK_EDGE_GAP, top: '15%', bottom: '15%' };
+  }, [dockPosition, dockSize.width, isLocked, x, y]);
+
+  useEffect(() => {
+    if (!dockRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      setDockSize({ width, height });
+    });
+    observer.observe(dockRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const safeOffset = useMemo(() => {
+    const measured = dockSize.width ? dockSize.width + DOCK_EDGE_GAP * 2 : 96;
+    return `${Math.max(measured, 96)}px`;
+  }, [dockSize.width]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -123,12 +179,16 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
     }
 
     const base = bodyPaddingRef.current;
-    const offsetValue = `${ADMIN_DOCK_SAFE_OFFSET}px`;
-    body.style.paddingTop = dockPosition === 'top' ? offsetValue : base?.top || '';
-    body.style.paddingBottom = dockPosition === 'bottom' ? offsetValue : base?.bottom || '';
-    body.style.paddingLeft = dockPosition === 'left' ? offsetValue : base?.left || '';
-    body.style.paddingRight = dockPosition === 'right' ? offsetValue : base?.right || '';
-  }, [dockPosition]);
+    const isSideDock = dockPosition === 'left' || dockPosition === 'right';
+    body.style.paddingTop = base?.top || '';
+    body.style.paddingBottom = base?.bottom || '';
+    body.style.paddingLeft = dockPosition === 'left' ? safeOffset : base?.left || '';
+    body.style.paddingRight = dockPosition === 'right' ? safeOffset : base?.right || '';
+    if (!isSideDock) {
+      body.style.paddingLeft = base?.left || '';
+      body.style.paddingRight = base?.right || '';
+    }
+  }, [dockPosition, safeOffset]);
 
   useEffect(() => {
     return () => {
@@ -145,7 +205,7 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
   return (
     <>
       {/* Progressive Blur Background */}
-      {blurPosition && (
+      {blurPosition && dockPosition !== 'top' && (
         <div
           className={`fixed ${blurPosition === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 h-40 pointer-events-none z-40`}
         >
@@ -155,90 +215,100 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
 
       {/* Admin Dock Container */}
       <MotionAdminDockWrapper
-        className={`fixed z-50 transform ${getPositionClasses()} ${className}`}
+        className={`fixed z-50 ${className}`}
         drag={!isLocked}
         dragControls={dragControls}
-        dragListener={false}
+        dragListener={!isLocked}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
-        style={dockStyle as any}
+        style={anchorStyle as any}
         onMouseMove={(e: React.MouseEvent) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
       >
         <div
+          ref={dockRef}
           style={{
-            background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.95) 0%, rgba(249, 115, 22, 0.85) 100%)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
             position: 'relative',
             display: 'flex',
-            alignItems: isVertical ? 'center' : 'flex-end',
-            justifyContent: 'center',
+            alignItems: isVertical ? 'flex-start' : 'center',
+            justifyContent: 'flex-start',
             flexDirection: isVertical ? 'column' : 'row',
-            gap: '0.25rem',
-            padding: '1rem 1.5rem',
-            borderRadius: '1rem',
-            boxShadow: '0 25px 50px -12px rgb(249 115 22 / 0.4)',
-            overflow: 'visible'
+            gap: isVertical ? '0.75rem' : '0.75rem',
+            padding: isVertical ? '5rem 1.15rem 1.5rem 1.15rem' : '0.85rem 1.5rem 0.85rem 3.5rem',
+            borderRadius: isVertical ? '1.5rem' : '1rem',
+            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+            overflow: 'hidden',
+            minWidth: isVertical ? '80px' : undefined,
+            maxHeight: isVertical ? '70vh' : undefined,
+            pointerEvents: 'auto',
+            cursor: isLocked ? 'default' : 'grab'
           }}
         >
-          <div className={`absolute ${controlsAlignment} gap-2 z-20`}>
-            <button
-              type="button"
-              onPointerDown={startDrag}
-              className="p-1.5 rounded-full bg-white/70 text-orange-700 shadow hover:bg-white"
-              title={isLocked ? 'Unlock to drag' : 'Drag dock'}
-            >
-              <GripVertical className="w-4 h-4" />
-            </button>
+          <div
+            className="absolute gap-2 z-20 pointer-events-auto"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              ...controlPositionStyles
+            }}
+          >
             <button
               type="button"
               onClick={() => setIsLocked((prev) => !prev)}
-              className="p-1.5 rounded-full bg-white/70 text-orange-700 shadow hover:bg-white"
-              title={isLocked ? 'Unlock dock' : 'Lock dock'}
+              className="p-1.5 rounded-full bg-white/70 text-gray-700 shadow hover:bg-white"
+              title={isLocked ? 'Lock dock' : 'Unlock dock'}
             >
               {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
             </button>
           </div>
           {/* Glass Effect Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-400/40 via-orange-500/20 to-transparent backdrop-blur-2xl" />
-          
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-700/40 dark:via-gray-800/20 dark:to-transparent backdrop-blur-2xl" />
+
           {/* Border Gradient */}
-          <div 
-            className="absolute inset-0 rounded-2xl border border-orange-300/50" 
+          <div
+            className="absolute inset-0 rounded-2xl border border-white/30 dark:border-gray-600/30"
             style={{
-              background: 'linear-gradient(135deg, rgba(251,146,60,0.2) 0%, rgba(249,115,22,0.1) 100%)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
               maskComposite: 'exclude',
               padding: '1px'
-            }} 
+            }}
           />
-          
+
           {/* Content */}
           <div
             style={{
               position: 'relative',
               zIndex: 10,
               display: 'flex',
-              alignItems: isVertical ? 'center' : 'flex-end',
-              justifyContent: 'center',
+              alignItems: isVertical ? 'flex-start' : 'flex-end',
+              justifyContent: isVertical ? 'flex-start' : 'center',
               flexDirection: isVertical ? 'column' : 'row',
-              gap: '0.25rem'
+              gap: '0.75rem',
+              overflowX: isVertical ? 'hidden' : 'auto',
+              overflowY: isVertical ? 'auto' : 'hidden',
+              scrollbarWidth: 'none',
+              width: '100%',
+              maxHeight: '100%'
             }}
+            className="scrollbar-hide"
           >
             {React.Children.map(children, (child) => {
               if (React.isValidElement(child)) {
-                return React.cloneElement(child, { mouseX } as any);
+                return React.cloneElement(child, { mouseX, orientation: isVertical ? 'vertical' : 'horizontal' } as any);
               }
               return child;
             })}
           </div>
-          
+
           {/* Bottom Glow - Orange for Admin */}
           {dockPosition === 'bottom' && (
-            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-orange-500/30 to-transparent blur-xl" />
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-orange-500/20 to-transparent blur-xl" />
           )}
           {dockPosition === 'top' && (
-            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-b from-orange-500/30 to-transparent blur-xl" />
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-b from-orange-500/20 to-transparent blur-xl" />
           )}
         </div>
       </MotionAdminDockWrapper>
@@ -249,13 +319,14 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
 // Memoize to prevent re-animation on navigation
 export const AdminDock = React.memo(AdminDockComponent);
 
-export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue<number> }> = ({ 
-  children, 
-  className = '', 
-  onClick, 
+export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue<number> }> = ({
+  children,
+  className = '',
+  onClick,
   active = false,
   tooltip,
-  mouseX: parentMouseX
+  mouseX: parentMouseX,
+  orientation = 'horizontal'
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const defaultMouseX = useMotionValue(Infinity);
@@ -265,57 +336,60 @@ export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue
     return val - bounds.x - bounds.width / 2;
   });
 
-  // Keep width constant, only change margins to push icons apart
-  const width = 56; // Fixed size, no enlargement
-  
+  // Keep width constant, base size
+  const width = 56;
+
+  const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
+  const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
+
   // Add margin to push adjacent icons away
   const marginSync = useTransform(distance, [-150, 0, 150], [0, 16, 0]);
-  const marginLeft = useSpring(marginSync, { mass: 0.1, stiffness: 150, damping: 12 });
-  const marginRight = useSpring(marginSync, { mass: 0.1, stiffness: 150, damping: 12 });
+  const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
+  const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
 
   return (
     <div className="group relative">
       <motion.div
         ref={ref}
-        style={{ 
+        style={{
           width,
           marginLeft,
-          marginRight
+          marginRight,
+          scale
         }}
       >
         {/* Tooltip - Shows on hover */}
         {tooltip && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-2xl z-[9999]">
+          <div className={`absolute ${orientation === 'vertical' ? 'left-full ml-3 top-1/2 -translate-y-1/2' : 'bottom-full mb-3 left-1/2 -translate-x-1/2'} px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-2xl z-[9999]`}>
             {tooltip}
             {/* Tooltip arrow */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-[1px]">
-              <div className="border-[7px] border-transparent border-t-orange-600" />
+            <div className={`absolute ${orientation === 'vertical' ? 'right-full top-1/2 -translate-y-1/2 mr-[1px]' : 'top-full left-1/2 -translate-x-1/2 -mt-[1px]'}`}>
+              <div className={`${orientation === 'vertical' ? 'border-[7px] border-transparent border-r-orange-600' : 'border-[7px] border-transparent border-t-orange-600'}`} />
             </div>
           </div>
         )}
-        
+
         <button
-        onClick={onClick}
-        className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
-          active 
-            ? 'bg-gradient-to-br from-yellow-500 to-orange-600 text-white shadow-lg shadow-orange-500/50' 
-            : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-700 hover:bg-white dark:hover:bg-gray-700 backdrop-blur-md'
-        } ${className}`}
-        aria-label={tooltip}
-      >
-        {/* Glass shine effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        {/* Icon content */}
-        <div className="relative z-10 pointer-events-none">
-          {children}
-        </div>
-        
-        {/* Active indicator glow */}
-        {active && (
-          <div className="absolute inset-0 bg-gradient-to-t from-orange-400/30 to-transparent blur-sm" />
-        )}
-      </button>
+          onClick={onClick}
+          className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${active
+            ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/50'
+            : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-700 hover:bg-white/80 dark:hover:bg-gray-700/80 backdrop-blur-md'
+            } ${className}`}
+          aria-label={tooltip}
+        >
+          {/* Glass shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+          {/* Icon content */}
+          <div className="relative z-10 pointer-events-none">
+            {children}
+          </div>
+
+          {/* Active indicator glow */}
+          {active && (
+            <div className="absolute inset-0 bg-gradient-to-t from-orange-400/30 to-transparent blur-sm" />
+          )}
+        </button>
       </motion.div>
     </div>
   );
