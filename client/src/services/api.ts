@@ -33,7 +33,7 @@ export interface CustomBillingResponse {
   };
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.sartthi.com/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 class ApiService {
   private baseURL: string;
@@ -49,7 +49,7 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    
+
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ class ApiService {
       const response = await fetch(url, config);
       console.log(`🔍 [DEBUG] Response status: ${response.status}`);
       console.log(`🔍 [DEBUG] Response ok: ${response.ok}`);
-      
+
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
@@ -112,12 +112,12 @@ class ApiService {
 
   async register(userData: RegisterRequest): Promise<{ requiresOtpVerification: boolean; email: string; userId: string }> {
     console.log('🔍 [DEBUG] API Service - register method called with:', userData);
-    
+
     const response = await this.request<any>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
-    
+
     console.log('🔍 [DEBUG] API Service - request completed, response:', response);
 
     // For manual registration, we don't set token immediately, as OTP verification is pending
@@ -301,7 +301,7 @@ class ApiService {
     });
     const body = await response.json().catch(() => ({}));
     if (response.ok) {
-      return { data: body.data }; 
+      return { data: body.data };
     }
     if (response.status === 402 && body.requiresCustomBilling) {
       return { requiresCustomBilling: true, billing: body.billing };
