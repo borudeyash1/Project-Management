@@ -138,12 +138,17 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
     const r2Key = `releases/${file.filename}`;
     const downloadUrl = await uploadToR2(fileBuffer, r2Key, file.mimetype);
 
-    // Delete local file after successful upload to R2
-    try {
-      await fs.promises.unlink(file.path);
-      console.log('🗑️ [RELEASES] Local file deleted after R2 upload');
-    } catch (unlinkError) {
-      console.warn('⚠️ [RELEASES] Failed to delete local file:', unlinkError);
+    // Delete local file ONLY if we successfully uploaded to R2 (URL starts with http)
+    // If it fell back to local storage (URL starts with /uploads), we need to keep the file!
+    if (downloadUrl.startsWith('http') && !downloadUrl.includes('localhost')) {
+      try {
+        await fs.promises.unlink(file.path);
+        console.log('🗑️ [RELEASES] Local file deleted after R2 upload');
+      } catch (unlinkError) {
+        console.warn('⚠️ [RELEASES] Failed to delete local file:', unlinkError);
+      }
+    } else {
+      console.log('📁 [RELEASES] File kept locally (R2 fallback or local dev)');
     }
 
     const release = await DesktopRelease.create({
@@ -237,19 +242,27 @@ export const deleteRelease = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
-    // Delete file from R2
+    // Delete file from R2 or local storage
     try {
-      const r2Key = extractR2Key(release.downloadUrl || release.filePath);
+      // Extract the key from either downloadUrl or filePath
+      let r2Key = release.filePath;
+
+      // If downloadUrl contains a full URL, extract the key
+      if (release.downloadUrl) {
+        r2Key = extractR2Key(release.downloadUrl);
+      }
+
+      console.log('🗑️ [RELEASES] Deleting file with key:', r2Key);
       await deleteFromR2(r2Key);
-      console.log('🗑️ [RELEASES] File deleted from R2');
-    } catch (r2Error) {
-      console.warn('⚠️ [RELEASES] Failed to delete from R2:', r2Error);
-      // Continue with database deletion even if R2 deletion fails
+      console.log('✅ [RELEASES] File deleted from storage');
+    } catch (storageError) {
+      console.warn('⚠️ [RELEASES] Failed to delete from storage:', storageError);
+      // Continue with database deletion even if storage deletion fails
     }
 
     await DesktopRelease.findByIdAndDelete(id);
 
-    console.log('✅ [RELEASES] Release deleted');
+    console.log('✅ [RELEASES] Release deleted from database');
 
     res.status(200).json({
       success: true,
@@ -273,13 +286,13 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
 
     // Try to find by old-style download URL or by R2 key
     let release = await DesktopRelease.findOne({
-      downloadUrl: `/api/releases/download/${filename}`
+      downloadUrl: { $regex: filename }
     });
 
     // If not found, try finding by R2 key in filePath
     if (!release) {
       release = await DesktopRelease.findOne({
-        filePath: `releases/${filename}`
+        filePath: { $regex: filename }
       });
     }
 

@@ -68,10 +68,10 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Serve uploaded files (development only)
-if (process.env.NODE_ENV === 'development') {
-  app.use('/uploads', express.static('uploads'));
-}
+// Serve uploaded files (fallback for local storage)
+import path from 'path';
+const uploadsPath = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 // Routes
 app.use("/api/auth", authRoutes);

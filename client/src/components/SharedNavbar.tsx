@@ -72,7 +72,30 @@ const SharedNavbar: React.FC = () => {
   };
 
   const handleDownload = (release: Release) => {
-    window.open(`http://localhost:5000${release.downloadUrl}`, '_blank');
+    // If URL is absolute (starts with http), use it directly
+    if (release.downloadUrl.startsWith('http')) {
+      window.open(release.downloadUrl, '_blank');
+    } else {
+      // Otherwise prepend the API base URL (assuming it's relative)
+      // Use the configured API URL, or infer from window location in production, or fallback to localhost in dev
+      let baseUrl = process.env.REACT_APP_API_URL;
+
+      if (!baseUrl) {
+        if (process.env.NODE_ENV === 'production') {
+          // In production, if no API URL is set, assume relative to current origin or specific API subdomain
+          // If the app is served from the same domain as API (e.g. via proxy), use empty string
+          // If we are on sartthi.com, the API might be at /api or on a subdomain
+          baseUrl = '';
+        } else {
+          baseUrl = 'http://localhost:5000';
+        }
+      }
+
+      // Remove trailing slash if present to avoid double slashes
+      baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+
+      window.open(`${baseUrl}${release.downloadUrl}`, '_blank');
+    }
     setShowDownloadMenu(false);
   };
 

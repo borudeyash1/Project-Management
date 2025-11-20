@@ -32,7 +32,10 @@ export const uploadToR2 = async (
         console.log('📁 [LOCAL] Storing file locally:', key);
         const localPath = path.join(LOCAL_STORAGE_PATH, path.basename(key));
         fs.writeFileSync(localPath, fileBuffer);
-        const publicUrl = `/uploads/releases/${path.basename(key)}`;
+
+        // Use production domain or localhost for development
+        const baseUrl = process.env.API_BASE_URL || process.env.BACKEND_URL || 'http://localhost:5000';
+        const publicUrl = `${baseUrl}/uploads/releases/${path.basename(key)}`;
         console.log('✅ [LOCAL] File stored:', publicUrl);
         return publicUrl;
     }
@@ -42,20 +45,25 @@ export const uploadToR2 = async (
  * Delete file - removes from local storage or R2
  */
 export const deleteFromR2 = async (key: string): Promise<void> => {
-    // Try local first
+    // ALWAYS try to delete local file first to prevent pile-up
+    // This ensures that even if it's an R2 file but we have a local copy (e.g. from failed cleanup), it gets removed
     const localPath = path.join(LOCAL_STORAGE_PATH, path.basename(key));
     if (fs.existsSync(localPath)) {
-        console.log('🗑️ [LOCAL] Deleting local file:', key);
-        fs.unlinkSync(localPath);
-        console.log('✅ [LOCAL] File deleted');
-        return;
+        try {
+            console.log('🗑️ [LOCAL] Deleting local file:', key);
+            fs.unlinkSync(localPath);
+            console.log('✅ [LOCAL] File deleted');
+        } catch (err) {
+            console.warn('⚠️ [LOCAL] Failed to delete local file:', err);
+        }
     }
 
-    // Otherwise try R2
+    // Then try R2 (unless we know for sure it was ONLY local, but trying R2 doesn't hurt)
     try {
         await deleteFromR2SDK(key);
     } catch (error) {
-        console.warn('Failed to delete from R2:', error);
+        // If it wasn't on R2, that's fine.
+        console.warn('ℹ️ [HYBRID] R2 deletion skipped or failed (might be local-only):', error);
     }
 };
 
@@ -63,8 +71,10 @@ export const deleteFromR2 = async (key: string): Promise<void> => {
  * Extract key from URL
  */
 export const extractR2Key = (url: string): string => {
-    if (url.startsWith('/uploads/')) {
-        return url.replace('/uploads/releases/', '');
+    if (url.startsWith('/uploads/') || url.includes('/uploads/releases/')) {
+        // Extract filename from local URL
+        const match = url.match(/\/uploads\/releases\/(.+)$/);
+        return (match && match[1]) ? match[1] : url.replace('/uploads/releases/', '');
     }
     return extractR2KeySDK(url);
 };
