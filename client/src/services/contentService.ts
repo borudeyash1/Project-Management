@@ -31,7 +31,9 @@ export const getAllBanners = async (): Promise<ContentBanner[]> => {
 
 // Get active banners for a specific route (public)
 export const getActiveBanners = async (route: string): Promise<ContentBanner[]> => {
+    console.log('[contentService] Fetching active banners for route:', route);
     const response = await api.get(`/content/banners/active?route=${encodeURIComponent(route)}`);
+    console.log('[contentService] Active banners response:', response.data);
     return response.data.data || [];
 };
 

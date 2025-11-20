@@ -16,10 +16,12 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
 
   const loadBanners = async () => {
     try {
+      console.log('[ContentBanner] Loading banners for route:', route);
       const data = await getActiveBanners(route);
+      console.log('[ContentBanner] Banners received:', data);
       setBanners(data);
     } catch (error) {
-      console.error('Failed to load banners:', error);
+      console.error('[ContentBanner] Failed to load banners:', error);
     }
   };
 
