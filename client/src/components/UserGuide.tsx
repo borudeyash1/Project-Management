@@ -113,7 +113,7 @@ const UserGuide: React.FC = () => {
   ];
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'} relative overflow-hidden`}>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'} relative overflow-hidden`}>
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className={`absolute top-32 left-16 w-80 h-80 ${isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-200/20'} rounded-full blur-3xl animate-pulse`}></div>
@@ -135,12 +135,12 @@ const UserGuide: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-lg">
-              <BookOpen className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} size={18} />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Complete Documentation</span>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 shadow-lg ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
+              <BookOpen className="w-4 h-4" />
+              <span className="text-sm font-medium">Complete Documentation</span>
             </div>
             <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              User <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Guide</span>
+              User <span className="text-accent">Guide</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               Everything you need to know to get the most out of Sartthi.
@@ -150,7 +150,7 @@ const UserGuide: React.FC = () => {
           {/* Quick Start */}
           <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16`}>
             <div className="flex items-center gap-3 mb-8">
-              <div className={`w-12 h-12 ${isDarkMode ? 'bg-gradient-to-br from-yellow-500 to-orange-500' : 'bg-gradient-to-br from-yellow-400 to-orange-400'} rounded-xl flex items-center justify-center shadow-lg`}>
+              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shadow-lg">
                 <Rocket className="w-6 h-6 text-white" />
               </div>
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Start</h2>
@@ -189,7 +189,7 @@ const UserGuide: React.FC = () => {
                   className={`w-full px-8 py-6 text-left flex items-center justify-between ${isDarkMode ? 'hover:bg-gray-800/80' : 'hover:bg-white/90'} transition-colors duration-200 rounded-2xl`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-yellow-500 to-orange-500' : 'bg-gradient-to-br from-yellow-400 to-orange-400'} rounded-xl flex items-center justify-center shadow-lg`}>
+                    <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg">
                       <span className="text-white font-bold">{index + 1}</span>
                     </div>
                     <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{section.title}</h3>

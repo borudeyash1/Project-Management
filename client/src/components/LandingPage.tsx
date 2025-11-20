@@ -39,11 +39,11 @@ const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'} relative overflow-hidden`}>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-br from-amber-50 via-white to-white'} relative overflow-hidden`}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-20 left-10 w-72 h-72 ${isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-200/30'} rounded-full blur-3xl animate-pulse`}></div>
-        <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-200/30'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+        <div className={`absolute top-20 left-10 w-72 h-72 ${isDarkMode ? 'bg-accent/10' : 'bg-amber-200/30'} rounded-full blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? 'bg-accent/10' : 'bg-amber-200/30'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
       </div>
       <SharedNavbar />
 
@@ -51,13 +51,13 @@ const LandingPage: React.FC = () => {
       <div className="pt-16 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-lg animate-fade-in">
-              <Zap className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} size={16} />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>Trusted by 10,000+ teams worldwide</span>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 shadow-lg animate-fade-in ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
+              <Zap className="w-4 h-4" />
+              <span className="text-sm font-medium">Trusted by 10,000+ teams worldwide</span>
             </div>
             <h1 className={`text-5xl md:text-7xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6 animate-fade-in-up`}>
               Project Management
-              <span className={`block bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 via-orange-500 to-red-500' : 'from-yellow-600 via-orange-600 to-red-600'} bg-clip-text text-transparent mt-2`}>
+              <span className="block text-accent mt-2">
                 Made Simple
               </span>
             </h1>
@@ -67,14 +67,14 @@ const LandingPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
               <Link
                 to="/register"
-                className={`group bg-gradient-to-r ${isDarkMode ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' : 'from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700'} text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl hover:shadow-yellow-500/50 hover:scale-105 transform`}
+                className="group bg-accent hover:bg-accent-hover text-gray-900 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl hover:shadow-accent/50 hover:scale-105 transform"
               >
                 Get Started Free
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/user-guide"
-                className={`border-2 ${isDarkMode ? 'border-gray-300 text-gray-100 hover:border-yellow-400 hover:text-yellow-400 hover:bg-yellow-400/10' : 'border-gray-300 text-gray-800 hover:border-yellow-600 hover:text-yellow-600 hover:bg-yellow-50'} px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 transform shadow-lg`}
+                className={`border-2 ${isDarkMode ? 'border-gray-300 text-gray-100 hover:border-accent hover:text-accent hover:bg-accent/10' : 'border-gray-300 text-gray-800 hover:border-accent hover:text-accent hover:bg-amber-50'} px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 transform shadow-lg`}
               >
                 Learn More
               </Link>
@@ -147,7 +147,7 @@ const LandingPage: React.FC = () => {
                       </div>
                       <div className="flex items-end gap-2 h-32">
                         {[40, 65, 45, 80, 60, 90, 75].map((height, i) => (
-                          <div key={i} className="flex-1 bg-gradient-to-t from-yellow-500 to-orange-500 rounded-t animate-slide-in-up" style={{ height: `${height}%`, animationDelay: `${i * 0.1}s` }}></div>
+                          <div key={i} className="flex-1 bg-gradient-to-t from-amber-400 to-amber-300 rounded-t animate-slide-in-up" style={{ height: `${height}%`, animationDelay: `${i * 0.1}s` }}></div>
                         ))}
                       </div>
                     </div>
@@ -155,7 +155,7 @@ const LandingPage: React.FC = () => {
                     {/* Floating Play Button */}
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <button className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm shadow-2xl flex items-center justify-center hover:scale-110 transition-transform duration-300 animate-bounce-subtle">
-                        <Play className="w-8 h-8 text-yellow-600 ml-1" fill="currentColor" />
+                        <Play className="w-8 h-8 text-accent ml-1" fill="currentColor" />
                       </button>
                     </div>
                   </div>
@@ -163,7 +163,7 @@ const LandingPage: React.FC = () => {
                 
                 {/* Floating Elements Around Mockup */}
                 <div className="absolute -top-8 -left-8 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl shadow-xl animate-float animation-delay-300 opacity-80"></div>
-                <div className="absolute -bottom-8 -right-8 w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
+                <div className="absolute -bottom-8 -right-8 w-20 h-20 bg-accent rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
               </div>
             </div>
 
@@ -188,7 +188,7 @@ const LandingPage: React.FC = () => {
         {/* Features Section */}
         <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className={`text-center mb-16 ${featuresVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-600' : 'bg-yellow-100 text-yellow-800'} text-sm font-semibold mb-4`}>
+            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-accent/20 text-accent' : 'bg-amber-100 text-amber-700'} text-sm font-semibold mb-4`}>
               FEATURES
             </span>
             <h2 className={`text-4xl md:text-5xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
@@ -202,12 +202,12 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className={`group ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border-gray-700/20 hover:bg-gray-800/70' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer ${featuresVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-              <div className={`w-16 h-16 ${isDarkMode ? 'bg-gradient-to-br from-yellow-500 to-orange-500' : 'bg-gradient-to-br from-yellow-400 to-orange-400'} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-yellow-500 transition-colors`}>Task Management</h3>
+              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>Task Management</h3>
               <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
                 Create, assign, and track tasks with ease. Keep your team organized and on track with powerful task management tools.
               </p>
@@ -215,10 +215,10 @@ const LandingPage: React.FC = () => {
 
             {/* Feature 2 */}
             <div className={`group ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border-gray-700/20 hover:bg-gray-800/70' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer ${featuresVisible ? 'animate-fade-in-up animation-delay-200' : 'opacity-0'}`}>
-              <div className={`w-16 h-16 ${isDarkMode ? 'bg-gradient-to-br from-orange-500 to-red-500' : 'bg-gradient-to-br from-orange-400 to-red-400'} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-orange-500 transition-colors`}>Team Collaboration</h3>
+              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>Team Collaboration</h3>
               <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
                 Work together seamlessly with real-time updates and communication tools that keep everyone in sync.
               </p>
@@ -238,7 +238,7 @@ const LandingPage: React.FC = () => {
         </div>
 
         {/* CTA Section */}
-        <div className={`relative bg-gradient-to-r ${isDarkMode ? 'from-yellow-600 via-orange-600 to-red-600' : 'from-yellow-500 via-orange-500 to-red-500'} py-24 overflow-hidden`}>
+        <div className="relative bg-accent py-24 overflow-hidden">
           {/* Decorative Elements */}
           <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>

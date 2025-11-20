@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Users, Activity, Settings, LogOut, AlertTriangle } from 'lucide-react';
+import { Shield, Users, Activity, Settings, LogOut, AlertTriangle, FileText } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
@@ -289,6 +289,15 @@ const AdminDashboard: React.FC = () => {
               <Activity className={`w-6 h-6 ${isDarkMode ? 'text-indigo-500' : 'text-indigo-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Desktop Releases</p>
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage app versions</p>
+            </button>
+
+            <button 
+              onClick={() => navigate('/admin/docs')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
+            >
+              <FileText className={`w-6 h-6 ${isDarkMode ? 'text-blue-500' : 'text-blue-600'} mb-2`} />
+              <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Documentation</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage help articles</p>
             </button>
           </div>
         </div>
