@@ -138,9 +138,11 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
     const r2Key = `releases/${file.filename}`;
     const downloadUrl = await uploadToR2(fileBuffer, r2Key, file.mimetype);
 
-    // Delete local file ONLY if we successfully uploaded to R2 (URL starts with http)
-    // If it fell back to local storage (URL starts with /uploads), we need to keep the file!
-    if (downloadUrl.startsWith('http') && !downloadUrl.includes('localhost')) {
+    // Delete local file ONLY if we successfully uploaded to R2
+    // We check if it's NOT localhost AND NOT a local /uploads/ URL
+    const isLocalUrl = downloadUrl.includes('localhost') || downloadUrl.includes('/uploads/');
+
+    if (downloadUrl.startsWith('http') && !isLocalUrl) {
       try {
         await fs.promises.unlink(file.path);
         console.log('🗑️ [RELEASES] Local file deleted after R2 upload');
