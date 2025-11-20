@@ -106,7 +106,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'bg-red-100 text-red-700 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'high': return 'bg-orange-200 text-orange-700 border-orange-200';
       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
       case 'low': return 'bg-gray-100 text-gray-700 border-gray-200';
       default: return 'bg-blue-100 text-blue-700 border-blue-200';
@@ -120,25 +120,25 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Toolbar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Navigation */}
             <button
               onClick={handlePrevious}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setCurrentDate(new Date())}
-              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
+              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
             >
               Today
             </button>
             <button
               onClick={handleNext}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -159,8 +159,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                   onClick={() => setMode(m)}
                   className={`px-3 py-2 text-sm font-medium ${
                     mode === m
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
                   {m.charAt(0).toUpperCase() + m.slice(1)}
@@ -175,10 +175,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
       <div className="flex-1 overflow-auto p-6">
         {/* Month View */}
         {mode === 'month' && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+            <div className="grid grid-cols-7 border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div key={day} className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-700">
                   {day}
                 </div>
               ))}
@@ -190,7 +190,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min-h-32 p-2 border-r border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-inner transition-colors relative group ${
+                    className={`min-h-32 p-2 border-r border-b border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-inner transition-colors relative group ${
                       isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                     } ${
                       !isCurrentMonth(day) ? 'opacity-40' : ''
@@ -198,10 +198,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                   >
                     {/* Add Task Indicator on Hover */}
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Plus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <Plus className="w-4 h-4 text-accent-dark dark:text-accent-light" />
                     </div>
                     <div className={`text-sm font-medium mb-2 ${
-                      isToday(day) ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'
+                      isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
                     }`}>
                       {day.getDate()}
                     </div>
@@ -215,7 +215,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                         </div>
                       ))}
                       {dayTasks.length > 3 && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400">+{dayTasks.length - 3} more</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-200">+{dayTasks.length - 3} more</div>
                       )}
                     </div>
                   </div>
@@ -227,15 +227,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
 
         {/* Week View */}
         {mode === 'week' && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+            <div className="grid grid-cols-7 border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
               {weekDays.map((day, idx) => (
-                <div key={idx} className="px-4 py-3 text-center border-r border-gray-200 dark:border-gray-700">
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div key={idx} className="px-4 py-3 text-center border-r border-gray-300 dark:border-gray-600">
+                  <div className="text-xs text-gray-600 dark:text-gray-200">
                     {day.toLocaleDateString('en-US', { weekday: 'short' })}
                   </div>
                   <div className={`text-lg font-semibold mt-1 ${
-                    isToday(day) ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'
+                    isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
                   }`}>
                     {day.getDate()}
                   </div>
@@ -249,13 +249,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min-h-96 p-3 border-r border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors relative group ${
+                    className={`min-h-96 p-3 border-r border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors relative group ${
                       isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                     }`}
                   >
                     {/* Add Task Indicator on Hover */}
                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Plus className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <Plus className="w-5 h-5 text-accent-dark dark:text-accent-light" />
                     </div>
                     <div className="space-y-2">
                       {dayTasks.map(task => (
@@ -285,7 +285,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
 
         {/* Day View */}
         {mode === 'day' && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
             <div className="space-y-px">
               {timeSlots.map(time => {
                 const tasksAtTime = filteredTasks.filter(task => {
@@ -296,8 +296,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                 });
 
                 return (
-                  <div key={time} className="flex border-b border-gray-200 dark:border-gray-700">
-                    <div className="w-20 flex-shrink-0 px-4 py-3 text-sm text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700">
+                  <div key={time} className="flex border-b border-gray-300 dark:border-gray-600">
+                    <div className="w-20 flex-shrink-0 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
                       {time}
                     </div>
                     <div
@@ -306,7 +306,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                     >
                       {/* Add Task Indicator on Hover */}
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Plus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <Plus className="w-4 h-4 text-accent-dark dark:text-accent-light" />
                       </div>
                       <div className="space-y-1">
                         {tasksAtTime.map(task => (

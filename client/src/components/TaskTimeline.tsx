@@ -139,11 +139,11 @@ const TaskTimeline: React.FC<TaskTimelineProps> = ({
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return 'text-gray-500';
-      case 'medium': return 'text-blue-500';
+      case 'low': return 'text-gray-600';
+      case 'medium': return 'text-accent';
       case 'high': return 'text-orange-500';
       case 'critical': return 'text-red-500';
-      default: return 'text-gray-500';
+      default: return 'text-gray-600';
     }
   };
 
@@ -236,7 +236,7 @@ Generated at ${new Date().toLocaleString()}`;
               {getPriorityIcon(task.priority)}
             </div>
           </div>
-          <p className={`text-sm ${isCompleted ? 'text-gray-400' : 'text-gray-600'} mb-2`}>
+          <p className={`text-sm ${isCompleted ? 'text-gray-600' : 'text-gray-600'} mb-2`}>
             {task.description}
           </p>
         </div>
@@ -267,30 +267,30 @@ Generated at ${new Date().toLocaleString()}`;
 
       {task.milestones.length > 0 && (
         <div className="mb-3">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
             <span>Milestones</span>
             <span>
               {task.milestones.filter(m => m.status === 'completed').length}/
               {task.milestones.length}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-300 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-accent h-2 rounded-full transition-all duration-300"
               style={{ width: `${calculateTaskProgress(task)}%` }}
             />
           </div>
         </div>
       )}
 
-      <div className="flex items-center justify-between text-xs text-gray-500">
+      <div className="flex items-center justify-between text-xs text-gray-600">
         <span>Due: {formatDate(task.dueDate)}</span>
         <span>{task.actualHours}h / {task.estimatedHours}h</span>
       </div>
 
       {task.notes && task.notes.length > 0 && (
         <div className="mt-3 pt-3 border-t border-gray-200">
-          <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+          <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
             <MessageSquare className="w-3 h-3" />
             <span>{task.notes.length} note{task.notes.length !== 1 ? 's' : ''}</span>
           </div>
@@ -298,16 +298,16 @@ Generated at ${new Date().toLocaleString()}`;
             {task.notes.slice(0, 2).map(note => (
               <div key={note._id} className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
                 <div className="flex items-center gap-1 mb-1">
-                  {note.type === 'ai-generated' && <Bot className="w-3 h-3 text-blue-500" />}
+                  {note.type === 'ai-generated' && <Bot className="w-3 h-3 text-accent" />}
                   <span className="font-medium">{note.author.name}</span>
-                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-600">•</span>
                   <span>{formatTime(note.createdAt)}</span>
                 </div>
                 <p className="line-clamp-2">{note.content}</p>
               </div>
             ))}
             {task.notes.length > 2 && (
-              <div className="text-xs text-blue-600">
+              <div className="text-xs text-accent-dark">
                 +{task.notes.length - 2} more notes
               </div>
             )}
@@ -318,7 +318,7 @@ Generated at ${new Date().toLocaleString()}`;
   );
 
   const renderTimelineHeader = () => (
-    <div className="bg-gray-50 border-b border-gray-200 p-4">
+    <div className="bg-gray-50 border-b border-gray-300 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-900">Task Timeline</h2>
@@ -341,7 +341,7 @@ Generated at ${new Date().toLocaleString()}`;
           </div>
           <button
             onClick={() => setCurrentTime(new Date())}
-            className="p-1 text-gray-400 hover:text-gray-600"
+            className="p-1 text-gray-600 hover:text-gray-600"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -358,7 +358,7 @@ Generated at ${new Date().toLocaleString()}`;
         <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
+              <MessageSquare className="w-5 h-5 text-accent-dark" />
               <h3 className="text-lg font-semibold text-gray-900">
                 {editingNote ? 'Edit Note' : 'Add Note'} - {selectedTask.title}
               </h3>
@@ -369,7 +369,7 @@ Generated at ${new Date().toLocaleString()}`;
                 setEditingNote(null);
                 setNoteContent('');
               }}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-600 hover:text-gray-600"
             >
               <X className="w-5 h-5" />
             </button>
@@ -385,7 +385,7 @@ Generated at ${new Date().toLocaleString()}`;
                   value="manual"
                   checked={noteType === 'manual'}
                   onChange={(e) => setNoteType(e.target.value as 'manual' | 'ai-generated')}
-                  className="w-4 h-4 text-blue-600"
+                  className="w-4 h-4 text-accent-dark"
                 />
                 <label htmlFor="manual" className="text-sm font-medium text-gray-700">
                   Manual Note
@@ -399,7 +399,7 @@ Generated at ${new Date().toLocaleString()}`;
                   value="ai-generated"
                   checked={noteType === 'ai-generated'}
                   onChange={(e) => setNoteType(e.target.value as 'manual' | 'ai-generated')}
-                  className="w-4 h-4 text-blue-600"
+                  className="w-4 h-4 text-accent-dark"
                 />
                 <label htmlFor="ai" className="text-sm font-medium text-gray-700">
                   AI Generated
@@ -410,7 +410,7 @@ Generated at ${new Date().toLocaleString()}`;
             {noteType === 'ai-generated' && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-4 h-4 text-blue-600" />
+                  <Bot className="w-4 h-4 text-accent-dark" />
                   <span className="text-sm font-medium text-blue-900">AI Assistant</span>
                 </div>
                 <p className="text-sm text-blue-700">
@@ -427,7 +427,7 @@ Generated at ${new Date().toLocaleString()}`;
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 placeholder={noteType === 'ai-generated' ? 'AI will generate content...' : 'Enter your note...'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 rows={8}
                 disabled={noteType === 'ai-generated' && isGeneratingAI}
               />
@@ -435,7 +435,7 @@ Generated at ${new Date().toLocaleString()}`;
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-gray-400" />
+                <Tag className="w-4 h-4 text-gray-600" />
                 <input
                   type="text"
                   placeholder="Add tags (optional)"
@@ -446,7 +446,7 @@ Generated at ${new Date().toLocaleString()}`;
                 <input
                   type="checkbox"
                   id="important"
-                  className="w-4 h-4 text-blue-600"
+                  className="w-4 h-4 text-accent-dark"
                 />
                 <label htmlFor="important" className="text-sm text-gray-700">
                   Mark as important
@@ -469,7 +469,7 @@ Generated at ${new Date().toLocaleString()}`;
             {noteType === 'ai-generated' && !isGeneratingAI && (
               <button
                 onClick={() => generateAINote(selectedTask)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Bot className="w-4 h-4" />
                 Generate AI Note
@@ -508,7 +508,7 @@ Generated at ${new Date().toLocaleString()}`;
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-accent rounded-full"></div>
                 <h3 className="text-lg font-semibold text-gray-900">Active Tasks</h3>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                   {activeTasks.length}
@@ -518,7 +518,7 @@ Generated at ${new Date().toLocaleString()}`;
                 <div className="text-sm text-gray-600">
                   {activeTasks.filter(t => t.status === 'in-progress').length} in progress
                 </div>
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                 <div className="text-sm text-gray-600">
                   {activeTasks.filter(t => t.status === 'pending').length} pending
                 </div>
@@ -565,9 +565,9 @@ Generated at ${new Date().toLocaleString()}`;
                   setNoteType('manual');
                   setShowNoteModal(true);
                 }}
-                className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                className="flex items-center gap-3 p-4 bg-white border border-gray-300 rounded-lg hover:shadow-md transition-shadow"
               >
-                <MessageSquare className="w-5 h-5 text-blue-600" />
+                <MessageSquare className="w-5 h-5 text-accent-dark" />
                 <div className="text-left">
                   <div className="font-medium text-gray-900">Add Manual Note</div>
                   <div className="text-sm text-gray-600">Create a custom note</div>
@@ -579,7 +579,7 @@ Generated at ${new Date().toLocaleString()}`;
                   setNoteType('ai-generated');
                   setShowNoteModal(true);
                 }}
-                className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                className="flex items-center gap-3 p-4 bg-white border border-gray-300 rounded-lg hover:shadow-md transition-shadow"
               >
                 <Bot className="w-5 h-5 text-purple-600" />
                 <div className="text-left">
@@ -588,7 +588,7 @@ Generated at ${new Date().toLocaleString()}`;
                 </div>
               </button>
               
-              <button className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+              <button className="flex items-center gap-3 p-4 bg-white border border-gray-300 rounded-lg hover:shadow-md transition-shadow">
                 <BarChart3 className="w-5 h-5 text-green-600" />
                 <div className="text-left">
                   <div className="font-medium text-gray-900">View Analytics</div>

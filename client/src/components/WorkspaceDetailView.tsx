@@ -46,11 +46,11 @@ const WorkspaceDetailView: React.FC = () => {
     return (
       <div className="h-full bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <Building className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Workspace Not Found</h2>
           <button
             onClick={() => navigate('/manage-workspace')}
-            className="text-blue-600 hover:text-blue-700"
+            className="text-accent-dark hover:text-blue-700"
           >
             Back to Workspaces
           </button>
@@ -70,7 +70,7 @@ const WorkspaceDetailView: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -81,7 +81,7 @@ const WorkspaceDetailView: React.FC = () => {
             </button>
             <div>
               <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-                <Building className="w-6 h-6 text-blue-600" />
+                <Building className="w-6 h-6 text-accent-dark" />
                 {workspace.name}
               </h1>
               <p className="text-gray-600 mt-1">{workspace.description || 'No description'}</p>
@@ -93,8 +93,8 @@ const WorkspaceDetailView: React.FC = () => {
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
           {/* Tabs */}
-          <div className="bg-white rounded-lg border border-gray-200 mb-6">
-            <div className="flex border-b border-gray-200 overflow-x-auto">
+          <div className="bg-white rounded-lg border border-gray-300 mb-6">
+            <div className="flex border-b border-gray-300 overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -103,7 +103,7 @@ const WorkspaceDetailView: React.FC = () => {
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors whitespace-nowrap ${
                       activeTab === tab.id
-                        ? 'text-blue-600 border-b-2 border-blue-600'
+                        ? 'text-accent-dark border-b-2 border-accent-dark'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >

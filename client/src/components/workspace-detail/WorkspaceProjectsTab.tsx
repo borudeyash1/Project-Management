@@ -178,7 +178,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
       case 'on-hold': return 'bg-yellow-100 text-yellow-700';
       case 'completed': return 'bg-blue-100 text-blue-700';
       case 'cancelled': return 'bg-red-100 text-red-700';
-      case 'abandoned': return 'bg-orange-100 text-orange-700';
+      case 'abandoned': return 'bg-orange-200 text-orange-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -199,7 +199,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
     switch (priority) {
       case 'low': return 'bg-gray-100 text-gray-700';
       case 'medium': return 'bg-blue-100 text-blue-700';
-      case 'high': return 'bg-orange-100 text-orange-700';
+      case 'high': return 'bg-orange-200 text-orange-700';
       case 'critical': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
@@ -227,7 +227,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Workspace Projects</h3>
@@ -238,7 +238,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
           {isWorkspaceOwner && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
               Create Project
@@ -265,8 +265,8 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
 
         {/* Projects List */}
         {filteredProjects.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <FolderOpen className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+          <div className="text-center py-12 text-gray-600">
+            <FolderOpen className="w-12 h-12 mx-auto mb-3 text-gray-600" />
             <p className="font-medium">No projects yet</p>
             <p className="text-sm mt-1">Projects will appear here</p>
           </div>
@@ -277,14 +277,14 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                 <div className="flex items-center gap-2 mb-3">
                   <Briefcase className="w-4 h-4 text-gray-600" />
                   <h4 className="font-semibold text-gray-900">{clientName}</h4>
-                  <span className="text-sm text-gray-500">({clientProjects.length})</span>
+                  <span className="text-sm text-gray-600">({clientProjects.length})</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {clientProjects.map((project: any) => (
                     <div 
                       key={project._id}
-                      className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      className="bg-white border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
                       {/* Project Header */}
                       <div className="flex items-start justify-between mb-3">
@@ -324,9 +324,9 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                           </div>
                         )}
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                          <div className="flex-1 bg-gray-300 rounded-full h-2">
                             <div 
-                              className="bg-blue-600 h-2 rounded-full transition-all"
+                              className="bg-accent h-2 rounded-full transition-all"
                               style={{ width: `${project.progress || 0}%` }}
                             />
                           </div>
@@ -349,7 +349,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                       <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
                         <button
                           onClick={() => navigate(`/project-view/${project._id}`)}
-                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-sm bg-accent text-gray-900 rounded hover:bg-accent-hover"
                         >
                           <Eye className="w-3 h-3" />
                           View
@@ -391,7 +391,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   setShowStatusModal(false);
                   setSelectedProjectForStatus(null);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -404,67 +404,67 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
             <div className="space-y-2">
               <button
                 onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'planning')}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-left"
               >
                 <Clock className="w-5 h-5 text-gray-600" />
                 <div>
                   <div className="font-medium text-gray-900">Planning</div>
-                  <div className="text-xs text-gray-500">Project is in planning phase</div>
+                  <div className="text-xs text-gray-600">Project is in planning phase</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'active')}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-left"
               >
                 <Play className="w-5 h-5 text-green-600" />
                 <div>
                   <div className="font-medium text-gray-900">Active</div>
-                  <div className="text-xs text-gray-500">Project is actively being worked on</div>
+                  <div className="text-xs text-gray-600">Project is actively being worked on</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'on-hold')}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-left"
               >
                 <Pause className="w-5 h-5 text-yellow-600" />
                 <div>
                   <div className="font-medium text-gray-900">On Hold</div>
-                  <div className="text-xs text-gray-500">Project is temporarily paused</div>
+                  <div className="text-xs text-gray-600">Project is temporarily paused</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'completed')}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-left"
               >
-                <CheckCircle className="w-5 h-5 text-blue-600" />
+                <CheckCircle className="w-5 h-5 text-accent-dark" />
                 <div>
                   <div className="font-medium text-gray-900">Completed</div>
-                  <div className="text-xs text-gray-500">Project is successfully completed</div>
+                  <div className="text-xs text-gray-600">Project is successfully completed</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'cancelled')}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-left"
               >
                 <XCircle className="w-5 h-5 text-red-600" />
                 <div>
                   <div className="font-medium text-gray-900">Cancelled</div>
-                  <div className="text-xs text-gray-500">Project was cancelled</div>
+                  <div className="text-xs text-gray-600">Project was cancelled</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleUpdateProjectStatus(selectedProjectForStatus._id, 'abandoned')}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-left"
               >
                 <Archive className="w-5 h-5 text-orange-600" />
                 <div>
                   <div className="font-medium text-gray-900">Abandoned</div>
-                  <div className="text-xs text-gray-500">Project was abandoned</div>
+                  <div className="text-xs text-gray-600">Project was abandoned</div>
                 </div>
               </button>
             </div>
@@ -480,7 +480,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               <h3 className="text-lg font-semibold text-gray-900">Create New Project</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -496,7 +496,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   type="text"
                   value={projectForm.name}
                   onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   placeholder="Enter project name"
                 />
               </div>
@@ -510,7 +510,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   value={projectForm.description}
                   onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   placeholder="Enter project description"
                 />
               </div>
@@ -523,7 +523,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                 <select
                   value={projectForm.client}
                   onChange={(e) => setProjectForm({ ...projectForm, client: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
                   <option value="">Select a client...</option>
                   {workspaceClients.map((client) => (
@@ -543,7 +543,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   <select
                     value={projectForm.status}
                     onChange={(e) => setProjectForm({ ...projectForm, status: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
                     <option value="planning">Planning</option>
                     <option value="active">Active</option>
@@ -559,7 +559,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   <select
                     value={projectForm.priority}
                     onChange={(e) => setProjectForm({ ...projectForm, priority: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -579,7 +579,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                     type="date"
                     value={projectForm.startDate}
                     onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   />
                 </div>
 
@@ -591,7 +591,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                     type="date"
                     value={projectForm.dueDate}
                     onChange={(e) => setProjectForm({ ...projectForm, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   />
                 </div>
               </div>
@@ -606,7 +606,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                     type="number"
                     value={projectForm.budgetEstimated}
                     onChange={(e) => setProjectForm({ ...projectForm, budgetEstimated: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                     placeholder="0"
                   />
                 </div>
@@ -619,7 +619,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                     type="number"
                     value={projectForm.budgetActual}
                     onChange={(e) => setProjectForm({ ...projectForm, budgetActual: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                     placeholder="0"
                   />
                 </div>
@@ -634,7 +634,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   type="text"
                   value={projectForm.tags}
                   onChange={(e) => setProjectForm({ ...projectForm, tags: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   placeholder="e.g., Web, Mobile, Design"
                 />
               </div>
@@ -643,7 +643,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               <div className="flex items-center gap-3 pt-4">
                 <button
                   onClick={handleCreateProject}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Create Project
                 </button>

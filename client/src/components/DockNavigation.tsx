@@ -143,7 +143,7 @@ const DockNavigation: React.FC = () => {
             tooltip="More Workspaces"
           >
             <Building className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-accent text-gray-900 text-xs rounded-full w-4 h-4 flex items-center justify-center">
               +{state.workspaces.length - 3}
             </span>
           </DockIcon>
@@ -171,7 +171,7 @@ const DockNavigation: React.FC = () => {
         <DockIcon
           onClick={handleLogout}
           tooltip="Logout"
-          className="!bg-red-100 dark:!bg-red-900/30 !text-red-600 dark:!text-red-400 hover:!bg-red-200 dark:hover:!bg-red-900/50"
+          className="!bg-red-100 dark:!bg-red-900/30 !text-red-600 dark:!text-red-600 hover:!bg-red-200 dark:hover:!bg-red-900/50"
         >
           <LogOut className="w-5 h-5" />
         </DockIcon>
@@ -194,7 +194,7 @@ const DockNavigation: React.FC = () => {
             {/* My Workspaces */}
             {state.workspaces.filter(w => w.owner === state.userProfile._id).length > 0 && (
               <div className="mb-4">
-                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
                   My Workspaces
                 </div>
                 <div className="space-y-2">
@@ -211,12 +211,12 @@ const DockNavigation: React.FC = () => {
                         }}
                         className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       >
-                        <Building className="w-5 h-5 text-blue-600" />
+                        <Building className="w-5 h-5 text-accent-dark" />
                         <div className="flex-1 text-left">
                           <div className="font-medium text-gray-900 dark:text-gray-100">
                             {workspace.name}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-gray-600 dark:text-gray-200">
                             {workspace.memberCount} members
                           </div>
                         </div>
@@ -229,7 +229,7 @@ const DockNavigation: React.FC = () => {
             {/* Joined Workspaces */}
             {state.workspaces.filter(w => w.owner !== state.userProfile._id).length > 0 && (
               <div>
-                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
                   Joined Workspaces
                 </div>
                 <div className="space-y-2">
@@ -251,7 +251,7 @@ const DockNavigation: React.FC = () => {
                           <div className="font-medium text-gray-900 dark:text-gray-100">
                             {workspace.name}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-gray-600 dark:text-gray-200">
                             {workspace.memberCount} members
                           </div>
                         </div>

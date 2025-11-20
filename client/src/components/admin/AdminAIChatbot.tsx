@@ -260,7 +260,7 @@ What would you like to know?`,
       case 'warning':
         return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
       case 'info':
-        return <CheckCircle className="w-4 h-4 text-blue-500" />;
+        return <CheckCircle className="w-4 h-4 text-accent" />;
       default:
         return null;
     }
@@ -274,7 +274,7 @@ What would you like to know?`,
       
       <div className="relative flex flex-col h-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-orange-500 to-red-500">
+        <div className="flex items-center justify-between p-4 border-b border-gray-300 dark:border-gray-600 bg-gradient-to-r from-orange-500 to-red-500">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               <Shield className="w-5 h-5 text-orange-600" />
@@ -302,7 +302,7 @@ What would you like to know?`,
               <div className={`flex max-w-2xl ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                   message.type === 'user' 
-                    ? 'bg-blue-500 text-white ml-2' 
+                    ? 'bg-accent text-gray-900 ml-2' 
                     : 'bg-orange-500 text-white mr-2'
                 }`}>
                   {message.type === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -310,11 +310,11 @@ What would you like to know?`,
                 
                 <div className={`rounded-lg px-4 py-3 ${
                   message.type === 'user'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-accent text-gray-900'
                     : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-md'
                 }`}>
                   {message.severity && (
-                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-300 dark:border-gray-600">
                       {getSeverityIcon(message.severity)}
                       <span className="text-xs font-semibold uppercase">
                         {message.severity}
@@ -325,7 +325,7 @@ What would you like to know?`,
                     {message.content}
                   </div>
                   <p className={`text-xs mt-2 ${
-                    message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+                    message.type === 'user' ? 'text-blue-100' : 'text-gray-600 dark:text-gray-200'
                   }`}>
                     {formatTime(message.timestamp)}
                   </p>
@@ -343,7 +343,7 @@ What would you like to know?`,
                 <div className="bg-white dark:bg-gray-800 rounded-lg px-4 py-3 shadow-md">
                   <div className="flex items-center space-x-2">
                     <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
-                    <span className="text-sm text-gray-600 dark:text-gray-300">Analyzing data...</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-700">Analyzing data...</span>
                   </div>
                 </div>
               </div>
@@ -355,8 +355,8 @@ What would you like to know?`,
 
         {/* Suggestions */}
         {messages.length > 0 && messages[messages.length - 1].suggestions && !isLoading && (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+          <div className="p-4 border-t border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Quick actions:
             </p>
@@ -365,7 +365,7 @@ What would you like to know?`,
                 <button
                   key={index}
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="px-3 py-1.5 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-orange-50 dark:hover:bg-gray-600 hover:border-orange-300 transition-colors text-gray-700 dark:text-gray-300"
+                  className="px-3 py-1.5 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-orange-50 dark:hover:bg-gray-600 hover:border-orange-300 transition-colors text-gray-700 dark:text-gray-700"
                 >
                   {suggestion}
                 </button>
@@ -375,7 +375,7 @@ What would you like to know?`,
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
           <div className="flex space-x-2">
             <input
               ref={inputRef}

@@ -25,7 +25,7 @@ const ProjectOverview: React.FC = () => {
       label: 'Total Tasks',
       value: project.totalTasksCount,
       icon: CheckCircle,
-      color: 'text-blue-600',
+      color: 'text-accent-dark',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30'
     },
     {
@@ -40,7 +40,7 @@ const ProjectOverview: React.FC = () => {
       value: project.totalTasksCount - project.completedTasksCount,
       icon: Activity,
       color: 'text-orange-600',
-      bgColor: 'bg-orange-100 dark:bg-orange-900/30'
+      bgColor: 'bg-orange-200 dark:bg-orange-900/30'
     },
     {
       label: 'Team Members',
@@ -68,7 +68,7 @@ const ProjectOverview: React.FC = () => {
       {/* Project Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{project.name}</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">{project.description}</p>
+        <p className="text-gray-600 dark:text-gray-300 mt-1">{project.description}</p>
       </div>
 
       {/* Stats Grid */}
@@ -76,9 +76,9 @@ const ProjectOverview: React.FC = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-200">{stat.label}</span>
                 <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                   <Icon className={`w-5 h-5 ${stat.color}`} />
                 </div>
@@ -90,12 +90,12 @@ const ProjectOverview: React.FC = () => {
       </div>
 
       {/* Progress Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Progress</h2>
-          <span className="text-2xl font-bold text-blue-600">{project.progress}%</span>
+          <span className="text-2xl font-bold text-accent-dark">{project.progress}%</span>
         </div>
-        <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="w-full h-4 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
             style={{ width: `${project.progress}%` }}
@@ -103,19 +103,19 @@ const ProjectOverview: React.FC = () => {
         </div>
         <div className="grid grid-cols-3 gap-4 mt-4">
           <div className="text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Start Date</div>
+            <div className="text-sm text-gray-600 dark:text-gray-200">Start Date</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
               {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not set'}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Due Date</div>
+            <div className="text-sm text-gray-600 dark:text-gray-200">Due Date</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
               {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'Not set'}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Days Remaining</div>
+            <div className="text-sm text-gray-600 dark:text-gray-200">Days Remaining</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
               {project.dueDate ? Math.ceil((new Date(project.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : '-'}
             </div>
@@ -125,7 +125,7 @@ const ProjectOverview: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Milestones */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Target className="w-5 h-5" />
@@ -137,17 +137,17 @@ const ProjectOverview: React.FC = () => {
               <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <div className={`w-3 h-3 rounded-full ${
                   milestone.status === 'completed' ? 'bg-green-500' :
-                  milestone.status === 'in-progress' ? 'bg-blue-500' :
+                  milestone.status === 'in-progress' ? 'bg-accent' :
                   'bg-gray-300'
                 }`} />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900 dark:text-gray-100">{milestone.name}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{milestone.date}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-200">{milestone.date}</div>
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ${
-                  milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                  milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                  'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+                  milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
+                  milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light' :
+                  'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
                 }`}>
                   {milestone.status}
                 </span>
@@ -157,7 +157,7 @@ const ProjectOverview: React.FC = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Activity className="w-5 h-5" />
@@ -168,7 +168,7 @@ const ProjectOverview: React.FC = () => {
             {recentActivity.map((activity, index) => (
               <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Users className="w-4 h-4 text-blue-600" />
+                  <Users className="w-4 h-4 text-accent-dark" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900 dark:text-gray-100">
@@ -176,7 +176,7 @@ const ProjectOverview: React.FC = () => {
                     {' '}{activity.action}{' '}
                     <span className="font-medium">{activity.item}</span>
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activity.time}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{activity.time}</p>
                 </div>
               </div>
             ))}
@@ -185,22 +185,22 @@ const ProjectOverview: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-            <CheckCircle className="w-6 h-6 text-blue-600" />
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <CheckCircle className="w-6 h-6 text-accent-dark" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Add Task</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <Users className="w-6 h-6 text-purple-600" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Add Member</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <Calendar className="w-6 h-6 text-green-600" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Schedule</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <TrendingUp className="w-6 h-6 text-orange-600" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">View Reports</span>
           </button>

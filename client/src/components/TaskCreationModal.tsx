@@ -203,13 +203,13 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">Create New Task</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
@@ -224,7 +224,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               type="text"
               value={taskData.title}
               onChange={(e) => setTaskData({ ...taskData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               placeholder="Enter task title"
             />
           </div>
@@ -238,7 +238,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               value={taskData.description}
               onChange={(e) => setTaskData({ ...taskData, description: e.target.value })}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               placeholder="Describe the task in detail..."
             />
           </div>
@@ -253,7 +253,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               <select
                 value={taskData.taskType}
                 onChange={(e) => setTaskData({ ...taskData, taskType: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
                 <option value="task">📋 Task</option>
                 <option value="bug">🐛 Bug</option>
@@ -272,7 +272,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               <select
                 value={taskData.category}
                 onChange={(e) => setTaskData({ ...taskData, category: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
                 <option value="development">💻 Development</option>
                 <option value="design">🎨 Design</option>
@@ -295,7 +295,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               <select
                 value={taskData.assigneeId}
                 onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
                 <option value="">Select team member</option>
                 {projectTeam.map((member) => (
@@ -314,7 +314,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               <select
                 value={taskData.priority}
                 onChange={(e) => setTaskData({ ...taskData, priority: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -335,7 +335,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 type="date"
                 value={taskData.dueDate}
                 onChange={(e) => setTaskData({ ...taskData, dueDate: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               />
             </div>
 
@@ -348,7 +348,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 type="number"
                 value={taskData.estimatedHours}
                 onChange={(e) => setTaskData({ ...taskData, estimatedHours: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 placeholder="0"
                 min="0"
                 step="0.5"
@@ -364,7 +364,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <select
               value={taskData.status}
               onChange={(e) => setTaskData({ ...taskData, status: e.target.value as any })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             >
               <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
@@ -385,12 +385,12 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   value={newSubtask}
                   onChange={(e) => setNewSubtask(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Add a subtask..."
                 />
                 <button
                   onClick={handleAddSubtask}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   Add
@@ -398,7 +398,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               </div>
 
               {subtasks.length > 0 && (
-                <div className="border border-gray-200 rounded-lg p-3 space-y-2">
+                <div className="border border-gray-300 rounded-lg p-3 space-y-2">
                   {subtasks.map((subtask) => (
                     <div key={subtask.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                       <span className="text-sm text-gray-700">{subtask.title}</span>
@@ -428,7 +428,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Add a tag..."
                 />
                 <button
@@ -472,11 +472,11 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 type="file"
                 multiple
                 onChange={handleFileUpload}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               />
 
               {taskData.attachments.length > 0 && (
-                <div className="border border-gray-200 rounded-lg p-3 space-y-2">
+                <div className="border border-gray-300 rounded-lg p-3 space-y-2">
                   {taskData.attachments.map((file, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                       <span className="text-sm text-gray-700">
@@ -508,7 +508,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   value={newLink}
                   onChange={(e) => setNewLink(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddLink()}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="https://example.com"
                 />
                 <button
@@ -521,14 +521,14 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               </div>
 
               {taskData.links.length > 0 && (
-                <div className="border border-gray-200 rounded-lg p-3 space-y-2">
+                <div className="border border-gray-300 rounded-lg p-3 space-y-2">
                   {taskData.links.map((link, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                       <a
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline truncate flex-1"
+                        className="text-sm text-accent-dark hover:underline truncate flex-1"
                       >
                         {link}
                       </a>
@@ -547,7 +547,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
+        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-300 px-6 py-4 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
@@ -556,7 +556,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             Create Task
           </button>

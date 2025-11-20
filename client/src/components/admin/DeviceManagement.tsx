@@ -176,7 +176,7 @@ const DeviceManagement: React.FC = () => {
       case 'high': return 'text-orange-500 bg-orange-500/10';
       case 'medium': return 'text-yellow-500 bg-yellow-500/10';
       case 'low': return 'text-green-500 bg-green-500/10';
-      default: return 'text-gray-500 bg-gray-500/10';
+      default: return 'text-gray-600 bg-gray-500/10';
     }
   };
 
@@ -246,7 +246,7 @@ const DeviceManagement: React.FC = () => {
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               🔒 Device Security Management
             </h1>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Monitor and manage authorized devices with security insights
             </p>
           </div>
@@ -264,19 +264,19 @@ const DeviceManagement: React.FC = () => {
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Devices</p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Total Devices</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {stats.total}
                 </p>
               </div>
-              <Shield className="w-8 h-8 text-blue-500" />
+              <Shield className="w-8 h-8 text-accent" />
             </div>
           </div>
 
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Now</p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Active Now</p>
                 <p className={`text-2xl font-bold text-green-500 mt-1`}>
                   {stats.active}
                 </p>
@@ -288,24 +288,24 @@ const DeviceManagement: React.FC = () => {
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>High Risk</p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>High Risk</p>
                 <p className={`text-2xl font-bold ${stats.highRisk > 0 ? 'text-red-500' : isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {stats.highRisk}
                 </p>
               </div>
-              <AlertTriangle className={`w-8 h-8 ${stats.highRisk > 0 ? 'text-red-500' : 'text-gray-400'}`} />
+              <AlertTriangle className={`w-8 h-8 ${stats.highRisk > 0 ? 'text-red-500' : 'text-gray-600'}`} />
             </div>
           </div>
 
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Suspicious</p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Suspicious</p>
                 <p className={`text-2xl font-bold ${stats.suspicious > 0 ? 'text-orange-500' : isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {stats.suspicious}
                 </p>
               </div>
-              <XCircle className={`w-8 h-8 ${stats.suspicious > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
+              <XCircle className={`w-8 h-8 ${stats.suspicious > 0 ? 'text-orange-500' : 'text-gray-600'}`} />
             </div>
           </div>
         </div>
@@ -313,7 +313,7 @@ const DeviceManagement: React.FC = () => {
         {/* Search and Filter */}
         <div className="flex gap-4 mb-6">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
             <input
               type="text"
               placeholder="Search by device name, ID, IP, or location..."
@@ -363,24 +363,24 @@ const DeviceManagement: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 mb-3">
                     {device.ipAddress && (
                       <div className="flex items-center gap-2">
-                        <Globe className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Globe className={`w-4 h-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                           {device.ipAddress}
                         </span>
                       </div>
                     )}
                     {device.location && (
                       <div className="flex items-center gap-2">
-                        <MapPin className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <MapPin className={`w-4 h-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                           {device.location}
                         </span>
                       </div>
                     )}
                     {device.lastAccess && (
                       <div className="flex items-center gap-2">
-                        <Clock className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Clock className={`w-4 h-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                           {new Date(device.lastAccess).toLocaleString()}
                         </span>
                       </div>
@@ -395,7 +395,7 @@ const DeviceManagement: React.FC = () => {
                     )}
                   </div>
                   
-                  <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} space-y-1 font-mono`}>
+                  <div className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} space-y-1 font-mono`}>
                     <p className="break-all">
                       <span className="font-semibold">ID:</span> {device.deviceId.substring(0, 32)}...
                     </p>
@@ -434,7 +434,7 @@ const DeviceManagement: React.FC = () => {
         </div>
 
         {filteredDevices.length === 0 && (
-          <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          <div className={`text-center py-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
             <Shield className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-semibold mb-2">
               {searchTerm || filterRisk !== 'all' ? 'No devices match your filters' : 'No devices added yet'}
@@ -459,10 +459,10 @@ const DeviceManagement: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent User Sessions</h2>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Last 200 logins across browser & desktop</p>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Last 200 logins across browser & desktop</p>
           </div>
           <div className="flex gap-2 text-xs">
-            <span className="px-2 py-1 rounded bg-purple-500/10 text-purple-400 font-semibold">Desktop: {stats.desktopSessions}</span>
+            <span className="px-2 py-1 rounded bg-purple-500/10 text-purple-600 font-semibold">Desktop: {stats.desktopSessions}</span>
             <span className="px-2 py-1 rounded bg-teal-500/10 text-teal-400 font-semibold">Browser: {stats.browserSessions}</span>
           </div>
         </div>
@@ -470,7 +470,7 @@ const DeviceManagement: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} uppercase text-xs tracking-wider`}>
+              <tr className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase text-xs tracking-wider`}>
                 <th className="py-2 text-left">User</th>
                 <th className="py-2 text-left">Runtime</th>
                 <th className="py-2 text-left">IP / Device</th>
@@ -482,21 +482,21 @@ const DeviceManagement: React.FC = () => {
                 <tr key={`${session.userId}-${session.loginTime}`} className={`${isDarkMode ? 'border-gray-700' : 'border-gray-200'} border-t`}>
                   <td className="py-2">
                     <div className="font-semibold">{session.fullName || 'Unknown User'}</div>
-                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-xs`}>{session.email}</div>
+                    <div className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-xs`}>{session.email}</div>
                   </td>
                   <td className="py-2">
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${session.runtime === 'desktop' ? 'bg-purple-500/10 text-purple-300' : 'bg-teal-500/10 text-teal-400'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${session.runtime === 'desktop' ? 'bg-purple-500/10 text-purple-700' : 'bg-teal-500/10 text-teal-400'}`}>
                         {session.runtime ? session.runtime.toUpperCase() : 'BROWSER'}
                       </span>
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${session.source === 'desktop' ? 'bg-blue-500/10 text-blue-300' : 'bg-green-500/10 text-green-400'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${session.source === 'desktop' ? 'bg-accent/10 text-blue-700' : 'bg-green-500/10 text-green-600'}`}>
                         {session.source ? session.source.toUpperCase() : 'WEB'}
                       </span>
                     </div>
                   </td>
                   <td className="py-2">
                     <div className="font-mono text-xs break-all">{session.ipAddress || 'Unknown IP'}</div>
-                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-xs`}>{session.deviceInfo?.platform || session.userAgent?.split(' ')[0] || 'Unknown Device'}</div>
+                    <div className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-xs`}>{session.deviceInfo?.platform || session.userAgent?.split(' ')[0] || 'Unknown Device'}</div>
                   </td>
                   <td className="py-2 text-xs">
                     {new Date(session.loginTime).toLocaleString()}
@@ -505,7 +505,7 @@ const DeviceManagement: React.FC = () => {
               ))}
               {sessions.length === 0 && (
                 <tr>
-                  <td colSpan={4} className={`py-6 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <td colSpan={4} className={`py-6 text-center ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                     No recent session data found.
                   </td>
                 </tr>
@@ -549,7 +549,7 @@ const DeviceManagement: React.FC = () => {
 
             <div className="space-y-4">
               <div>
-                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                   Device ID *
                 </label>
                 <input
@@ -562,7 +562,7 @@ const DeviceManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                   Device Name *
                 </label>
                 <input
@@ -575,7 +575,7 @@ const DeviceManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                   Notes (Optional)
                 </label>
                 <textarea

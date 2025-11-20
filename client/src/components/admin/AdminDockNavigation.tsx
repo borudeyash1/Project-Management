@@ -103,7 +103,7 @@ const AdminDockNavigation: React.FC = () => {
       <AdminDockIcon
         onClick={handleLogout}
         tooltip="Logout"
-        className="!bg-red-100 dark:!bg-red-900/30 !text-red-600 dark:!text-red-400 hover:!bg-red-200 dark:hover:!bg-red-900/50"
+        className="!bg-red-100 dark:!bg-red-900/30 !text-red-600 dark:!text-red-600 hover:!bg-red-200 dark:hover:!bg-red-900/50"
       >
         <LogOut className="w-5 h-5" />
       </AdminDockIcon>

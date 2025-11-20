@@ -119,7 +119,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
       {/* Employee View */}
       {!isProjectManager && (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="bg-white rounded-lg border border-gray-300 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">My Requests</h3>
@@ -129,7 +129,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
                 New Request
@@ -139,14 +139,14 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
             {/* My Requests List */}
             <div className="space-y-3">
               {myRequests.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <div className="text-center py-12 text-gray-600">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-medium">No requests yet</p>
                   <p className="text-sm mt-1">Create a request to manage your workload</p>
                 </div>
               ) : (
                 myRequests.map((request) => (
-                  <div key={request._id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={request._id} className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -174,7 +174,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                         {new Date(request.requestedDeadline).toLocaleDateString()}
                       </p>
                     )}
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-gray-600 mt-2">
                       Requested on {new Date(request.requestedAt).toLocaleString()}
                     </p>
                   </div>
@@ -187,7 +187,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
 
       {/* Project Manager View */}
       {isProjectManager && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-300 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Pending Requests</h3>
@@ -200,14 +200,14 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
           {/* Pending Requests List */}
           <div className="space-y-3">
             {pendingApprovals.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <div className="text-center py-12 text-gray-600">
+                <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-600" />
                 <p className="font-medium">No pending requests</p>
                 <p className="text-sm mt-1">All requests have been processed</p>
               </div>
             ) : (
               pendingApprovals.map((request) => (
-                <div key={request._id} className="border border-gray-200 rounded-lg p-4 bg-yellow-50">
+                <div key={request._id} className="border border-gray-300 rounded-lg p-4 bg-yellow-50">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -244,7 +244,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                       </>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mb-3">
+                  <p className="text-xs text-gray-600 mb-3">
                     Requested by Employee on {new Date(request.requestedAt).toLocaleString()}
                   </p>
 
@@ -374,7 +374,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               <div className="flex items-center gap-3 pt-4">
                 <button
                   onClick={handleCreateRequest}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Submit Request
                 </button>

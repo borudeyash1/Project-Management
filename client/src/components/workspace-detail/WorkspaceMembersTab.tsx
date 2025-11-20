@@ -262,7 +262,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Workspace Members</h3>
@@ -273,7 +273,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
           {canManageMembers && (
             <button
               onClick={() => setShowInviteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <UserPlus className="w-4 h-4" />
               Invite Member
@@ -283,32 +283,32 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
 
         {/* Search Bar */}
         <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
           <input
             type="text"
             placeholder="Search members by username or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
           />
         </div>
 
         {/* Members List */}
         <div className="space-y-3">
           {filteredMembers.length === 0 && !searchQuery ? (
-            <div className="text-center py-12 text-gray-500">
-              <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-12 text-gray-600">
+              <Users className="w-12 h-12 mx-auto mb-3 text-gray-600" />
               <p className="font-medium">No members yet</p>
               <p className="text-sm mt-1">Invite team members to collaborate on projects</p>
             </div>
           ) : filteredMembers.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Search className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-12 text-gray-600">
+              <Search className="w-12 h-12 mx-auto mb-3 text-gray-600" />
               <p>No members found matching "{searchQuery}"</p>
             </div>
           ) : (
             filteredMembers.map((member) => (
-              <div key={member._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+              <div key={member._id} className="flex items-center justify-between p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
                     {member.name.charAt(0).toUpperCase()}
@@ -360,7 +360,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
 
       {/* Contact Admin / Owner info for regular members */}
       {!canManageMembers && workspace && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-300 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Contact workspace admin</h3>
           <p className="text-sm text-gray-600 mb-4">
             For changes to workspace members or settings, please reach out to an owner or admin.
@@ -424,7 +424,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
 
       {/* Join Requests (owners/admins only) */}
       {canManageMembers && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Join Requests</h3>
@@ -438,8 +438,8 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         </div>
 
         {joinRequests.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <AlertCircle className="w-10 h-10 mb-2 text-gray-300" />
+          <div className="flex flex-col items-center justify-center py-10 text-gray-600">
+            <AlertCircle className="w-10 h-10 mb-2 text-gray-700" />
             <p className="font-medium">No requests yet</p>
             <p className="text-sm">Requests from Discover Workspace will appear here.</p>
           </div>
@@ -448,7 +448,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
             {joinRequests.map((request) => (
               <div
                 key={request.id}
-                className="p-4 border border-gray-200 rounded-lg flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+                className="p-4 border border-gray-300 rounded-lg flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold">
@@ -460,8 +460,8 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                       <Mail className="w-3 h-3" />
                       {request.email}
                     </p>
-                    {request.message && <p className="text-sm text-gray-500 mt-1">{request.message}</p>}
-                    <p className="text-xs text-gray-400 mt-1">
+                    {request.message && <p className="text-sm text-gray-600 mt-1">{request.message}</p>}
+                    <p className="text-xs text-gray-600 mt-1">
                       Requested {request.requestedAt.toLocaleString()}
                     </p>
                   </div>
@@ -511,7 +511,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Invite Member</h3>
               <button onClick={() => setShowInviteModal(false)}>
-                <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                <X className="w-5 h-5 text-gray-600 hover:text-gray-600" />
               </button>
             </div>
             
@@ -525,9 +525,9 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="Enter username or email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-600 mt-1">
                   The user will receive an invitation to join this workspace
                 </p>
               </div>
@@ -537,16 +537,16 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   Search platform directory
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                   <input
                     type="text"
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
                     placeholder="Search by name or email"
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                   {filteredDirectoryUsers.length > 0 && (
-                    <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                    <div className="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                       {filteredDirectoryUsers.map((user) => (
                         <button
                           key={user.id}
@@ -554,13 +554,13 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                           className="w-full px-4 py-2 text-left hover:bg-gray-50 flex flex-col"
                         >
                           <span className="font-medium text-gray-900">{user.name}</span>
-                          <span className="text-sm text-gray-500">{user.email}</span>
+                          <span className="text-sm text-gray-600">{user.email}</span>
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-600 mt-1">
                   Pull users who are already on the platform without re-typing their email.
                 </p>
               </div>
@@ -574,7 +574,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                 </button>
                 <button
                   onClick={() => handleInviteMember()}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                 >
                   Send Invite
                 </button>

@@ -29,11 +29,11 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
                 onClick={() => setReportType(report.id)}
                 className={`p-4 rounded-lg border-2 transition-all ${
                   reportType === report.id
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                    ? 'border-accent bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-300'
                 }`}
               >
-                <Icon className="w-6 h-6 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
+                <Icon className="w-6 h-6 mx-auto mb-2 text-accent-dark dark:text-accent-light" />
                 <div className="text-sm font-medium text-gray-900 dark:text-white">
                   {report.label}
                 </div>
@@ -42,12 +42,12 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
           })}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               {reports.find(r => r.id === reportType)?.label}
             </h2>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
               <Download className="w-4 h-4" />
               Export CSV
             </button>
@@ -57,20 +57,20 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Hours</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Hours</div>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
                   {teamMetrics.totalHoursWeek.toFixed(1)}
                 </div>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Billable %</div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Billable %</div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-600">
                   {teamMetrics.billablePercent.toFixed(0)}%
                 </div>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Overtime</div>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Overtime</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-500">
                   {teamMetrics.overtimeHours.toFixed(1)}h
                 </div>
               </div>
@@ -80,31 +80,31 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                       Project
                     </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                       Hours
                     </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                       Billable
                     </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
                       Non-Billable
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {['Project A', 'Project B', 'Project C'].map(project => (
-                    <tr key={project} className="border-t border-gray-200 dark:border-gray-700">
+                    <tr key={project} className="border-t border-gray-300 dark:border-gray-600">
                       <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">{project}</td>
                       <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
                         {(Math.random() * 40).toFixed(1)}h
                       </td>
-                      <td className="py-3 px-4 text-sm text-right text-green-600 dark:text-green-400">
+                      <td className="py-3 px-4 text-sm text-right text-green-600 dark:text-green-600">
                         {(Math.random() * 30).toFixed(1)}h
                       </td>
-                      <td className="py-3 px-4 text-sm text-right text-gray-600 dark:text-gray-400">
+                      <td className="py-3 px-4 text-sm text-right text-gray-600 dark:text-gray-200">
                         {(Math.random() * 10).toFixed(1)}h
                       </td>
                     </tr>

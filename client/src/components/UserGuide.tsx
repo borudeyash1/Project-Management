@@ -127,7 +127,7 @@ const UserGuide: React.FC = () => {
           {/* Back Button */}
           <Link
             to="/"
-            className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
+            className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-600 hover:text-yellow-700' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
           >
             <ArrowLeft size={18} />
             Back to Home
@@ -136,13 +136,13 @@ const UserGuide: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-lg">
-              <BookOpen className={`${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} size={18} />
+              <BookOpen className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} size={18} />
               <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Complete Documentation</span>
             </div>
             <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
               User <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Guide</span>
             </h1>
-            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
+            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               Everything you need to know to get the most out of Sartthi.
             </p>
           </div>
@@ -161,21 +161,21 @@ const UserGuide: React.FC = () => {
                   <span className="text-white font-bold text-2xl">1</span>
                 </div>
                 <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Sign Up</h3>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm leading-relaxed`}>Create your free account in seconds</p>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>Create your free account in seconds</p>
               </div>
               <div className="text-center group">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">2</span>
                 </div>
                 <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Create Workspace</h3>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm leading-relaxed`}>Set up your team workspace</p>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>Set up your team workspace</p>
               </div>
               <div className="text-center group">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">3</span>
                 </div>
                 <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Start Managing</h3>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm leading-relaxed`}>Create projects and tasks</p>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>Create projects and tasks</p>
               </div>
             </div>
           </div>
@@ -195,7 +195,7 @@ const UserGuide: React.FC = () => {
                     <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{section.title}</h3>
                   </div>
                   <div className={`${expandedSection === section.id ? 'rotate-180' : ''} transition-transform duration-300`}>
-                    <ChevronDown size={24} className={`${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+                    <ChevronDown size={24} className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} />
                   </div>
                 </button>
                 {expandedSection === section.id && (

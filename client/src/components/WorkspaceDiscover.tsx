@@ -199,13 +199,13 @@ const WorkspaceDiscover: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search workspaces..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               />
             </div>
 
@@ -229,7 +229,7 @@ const WorkspaceDiscover: React.FC = () => {
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
                   <option value="all">All Types</option>
                   <option value="personal">Personal</option>
@@ -244,7 +244,7 @@ const WorkspaceDiscover: React.FC = () => {
                 <select
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
                   <option value="all">All Regions</option>
                   <option value="North America">North America</option>
@@ -265,16 +265,16 @@ const WorkspaceDiscover: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, index) => (
                 <div key={index} className="bg-gray-100 rounded-lg p-6 animate-pulse">
-                  <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-300 rounded mb-4"></div>
-                  <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-400 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-400 rounded mb-4"></div>
+                  <div className="h-3 bg-gray-400 rounded w-2/3"></div>
                 </div>
               ))}
             </div>
           ) : filteredWorkspaces.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredWorkspaces.map((workspace) => (
-                <div key={workspace._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div key={workspace._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
                   {/* Workspace Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -283,7 +283,7 @@ const WorkspaceDiscover: React.FC = () => {
                         {workspace.settings.isPublic ? (
                           <Eye className="w-4 h-4 text-green-600" />
                         ) : (
-                          <EyeOff className="w-4 h-4 text-gray-400" />
+                          <EyeOff className="w-4 h-4 text-gray-600" />
                         )}
                       </div>
                       <p className="text-sm text-gray-600 line-clamp-2">{workspace.description}</p>
@@ -298,7 +298,7 @@ const WorkspaceDiscover: React.FC = () => {
                         {workspace.type.charAt(0).toUpperCase() + workspace.type.slice(1)}
                       </span>
                       {workspace.region && (
-                        <span className="text-xs text-gray-500">{workspace.region}</span>
+                        <span className="text-xs text-gray-600">{workspace.region}</span>
                       )}
                     </div>
                     
@@ -321,7 +321,7 @@ const WorkspaceDiscover: React.FC = () => {
                   {/* Join Button */}
                   <button
                     onClick={() => handleJoinRequest(workspace._id)}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                   >
                     Send Join Request
                   </button>
@@ -330,7 +330,7 @@ const WorkspaceDiscover: React.FC = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
+              <div className="text-gray-600 mb-4">
                 <Building2 className="w-12 h-12 mx-auto" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces found</h3>
@@ -343,7 +343,7 @@ const WorkspaceDiscover: React.FC = () => {
                   setSelectedType('all');
                   setSelectedRegion('all');
                 }}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="text-accent-dark hover:text-blue-700 font-medium"
               >
                 Clear all filters
               </button>

@@ -114,7 +114,7 @@ const PlannerPage: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Planner</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-200">
             {format(startOfWeekDate, 'MMM d')} - {format(addDays(startOfWeekDate, 6), 'MMM d, yyyy')}
           </p>
         </div>
@@ -129,20 +129,20 @@ const PlannerPage: React.FC = () => {
           <div className="flex border border-gray-300 dark:border-gray-600 rounded-md">
             <button
               onClick={goToPreviousWeek}
-              className="px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="px-2 py-1.5 text-gray-600 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               &lt;
             </button>
             <button
               onClick={goToNextWeek}
-              className="px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-l border-gray-300 dark:border-gray-600"
+              className="px-2 py-1.5 text-gray-600 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 border-l border-gray-300 dark:border-gray-600"
             >
               &gt;
             </button>
           </div>
           <button
             onClick={() => setIsCreatingEvent(true)}
-            className="ml-2 px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center"
+            className="ml-2 px-4 py-1.5 text-sm font-medium text-gray-900 bg-accent rounded-md hover:bg-accent-hover flex items-center"
           >
             <Plus size={16} className="mr-1" />
             New Event
@@ -153,16 +153,16 @@ const PlannerPage: React.FC = () => {
       {/* Calendar Grid */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         {/* Days Header */}
-        <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-7 border-b border-gray-300 dark:border-gray-600">
           {weekDays.map((day, index) => (
             <div 
               key={index} 
               className={`py-2 text-center font-medium ${isSameDay(day, new Date()) ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-gray-50 dark:bg-gray-800'}`}
             >
-              <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-sm text-gray-600 dark:text-gray-200">
                 {format(day, 'EEE')}
               </div>
-              <div className={`mt-1 text-lg ${isSameDay(day, new Date()) ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-900 dark:text-white'}`}>
+              <div className={`mt-1 text-lg ${isSameDay(day, new Date()) ? 'text-accent-dark dark:text-accent-light font-bold' : 'text-gray-900 dark:text-white'}`}>
                 {format(day, 'd')}
               </div>
             </div>
@@ -192,7 +192,7 @@ const PlannerPage: React.FC = () => {
                       }}
                     >
                       <div className="font-medium truncate">{event.title}</div>
-                      <div className="text-gray-500 dark:text-gray-400 text-xs flex items-center">
+                      <div className="text-gray-600 dark:text-gray-300 text-xs flex items-center">
                         <ClockIcon size={10} className="mr-1" />
                         {format(eventStart, 'h:mm a')}
                         {eventEnd && ` - ${format(eventEnd, 'h:mm a')}`}
@@ -215,24 +215,24 @@ const PlannerPage: React.FC = () => {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">{selectedEvent.title}</h3>
                 <button
                   onClick={() => setSelectedEvent(null)}
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                  className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
                 >
                   <X size={20} />
                 </button>
               </div>
               
               {selectedEvent.description && (
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{selectedEvent.description}</p>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-700">{selectedEvent.description}</p>
               )}
               
               <div className="mt-4 space-y-3">
                 <div className="flex items-start">
-                  <CalendarIcon size={16} className="mt-0.5 mr-2 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                  <CalendarIcon size={16} className="mt-0.5 mr-2 text-gray-600 dark:text-gray-300 flex-shrink-0" />
                   <div>
                     <p className="text-sm text-gray-900 dark:text-white">
                       {format(new Date(selectedEvent.start), 'EEEE, MMMM d, yyyy')}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-200">
                       {format(new Date(selectedEvent.start), 'h:mm a')}
                       {selectedEvent.end && ` - ${format(new Date(selectedEvent.end), 'h:mm a')}`}
                     </p>
@@ -241,14 +241,14 @@ const PlannerPage: React.FC = () => {
                 
                 {selectedEvent.participants && selectedEvent.participants.length > 0 && (
                   <div className="flex items-start">
-                    <Users size={16} className="mt-0.5 mr-2 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                    <Users size={16} className="mt-0.5 mr-2 text-gray-600 dark:text-gray-300 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Participants</p>
                       <div className="space-y-1">
                         {selectedEvent.participants.map((participant, idx) => (
                           <div key={idx} className="flex items-center">
                             <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
+                            <span className="text-sm text-gray-600 dark:text-gray-700">
                               {participant.userId} • {participant.status}
                             </span>
                           </div>
@@ -293,7 +293,7 @@ const PlannerPage: React.FC = () => {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">New Event</h3>
                 <button
                   onClick={() => setIsCreatingEvent(false)}
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                  className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
                 >
                   <X size={20} />
                 </button>
@@ -301,13 +301,13 @@ const PlannerPage: React.FC = () => {
               
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                     Title
                   </label>
                   <input
                     type="text"
                     id="event-title"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
                     placeholder="Event title"
@@ -316,26 +316,26 @@ const PlannerPage: React.FC = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="event-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="event-start" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                       Start
                     </label>
                     <input
                       type="datetime-local"
                       id="event-start"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                       value={newEvent.start ? (newEvent.start instanceof Date ? newEvent.start.toISOString().slice(0, 16) : newEvent.start) : ''}
                       onChange={(e) => setNewEvent({...newEvent, start: e.target.value ? new Date(e.target.value) : new Date()})}
                     />
                   </div>
                   
                   <div>
-                    <label htmlFor="event-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="event-end" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                       End
                     </label>
                     <input
                       type="datetime-local"
                       id="event-end"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                       value={newEvent.end ? (newEvent.end instanceof Date ? newEvent.end.toISOString().slice(0, 16) : newEvent.end) : ''}
                       onChange={(e) => setNewEvent({...newEvent, end: e.target.value ? new Date(e.target.value) : new Date()})}
                     />
@@ -343,13 +343,13 @@ const PlannerPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                     Description (Optional)
                   </label>
                   <textarea
                     id="event-description"
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                     value={newEvent.description || ''}
                     onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                     placeholder="Add details about your event"
@@ -360,17 +360,17 @@ const PlannerPage: React.FC = () => {
                   <input
                     type="checkbox"
                     id="event-allday"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
                     checked={newEvent.allDay || false}
                     onChange={(e) => setNewEvent({...newEvent, allDay: e.target.checked})}
                   />
-                  <label htmlFor="event-allday" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                  <label htmlFor="event-allday" className="ml-2 block text-sm text-gray-700 dark:text-gray-700">
                     All day event
                   </label>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                     Color
                   </label>
                   <div className="flex space-x-2">
@@ -392,14 +392,14 @@ const PlannerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsCreatingEvent(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleCreateEvent}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 bg-accent border border-transparent rounded-md shadow-sm hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
                 >
                   Create Event
                 </button>

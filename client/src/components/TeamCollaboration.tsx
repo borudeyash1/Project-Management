@@ -621,19 +621,19 @@ const TeamCollaboration: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Channels</h3>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search channels..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Types</option>
             <option value="public">Public</option>
@@ -642,7 +642,7 @@ const TeamCollaboration: React.FC = () => {
           </select>
           <button
             onClick={() => setShowChannelModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Channel
@@ -662,7 +662,7 @@ const TeamCollaboration: React.FC = () => {
             <div
               key={channel._id}
               onClick={() => setSelectedChannel(channel)}
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -703,7 +703,7 @@ const TeamCollaboration: React.FC = () => {
                   <div className="pt-3 border-t border-gray-200">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-gray-900">{channel.lastMessage.author}</span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-600">
                         {new Date(channel.lastMessage.timestamp).toLocaleDateString()}
                       </span>
                     </div>
@@ -722,7 +722,7 @@ const TeamCollaboration: React.FC = () => {
       return (
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <MessageSquare className="w-16 h-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a Channel</h3>
             <p className="text-gray-600">Choose a channel to start messaging.</p>
           </div>
@@ -733,7 +733,7 @@ const TeamCollaboration: React.FC = () => {
     return (
       <div className="flex flex-col h-full">
         {/* Channel Header */}
-        <div className="p-4 border-b border-gray-200 bg-white">
+        <div className="p-4 border-b border-gray-300 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -745,13 +745,13 @@ const TeamCollaboration: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="p-2 text-gray-400 hover:text-gray-600">
+              <button className="p-2 text-gray-600 hover:text-gray-600">
                 <Phone className="w-4 h-4" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600">
+              <button className="p-2 text-gray-600 hover:text-gray-600">
                 <Video className="w-4 h-4" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600">
+              <button className="p-2 text-gray-600 hover:text-gray-600">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
@@ -772,11 +772,11 @@ const TeamCollaboration: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-gray-900">{message.author.name}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-600">
                       {new Date(message.createdAt).toLocaleTimeString()}
                     </span>
                     {message.isEdited && (
-                      <span className="text-xs text-gray-500">(edited)</span>
+                      <span className="text-xs text-gray-600">(edited)</span>
                     )}
                   </div>
                   <p className="text-gray-700 mb-2">{message.content}</p>
@@ -785,9 +785,9 @@ const TeamCollaboration: React.FC = () => {
                     <div className="space-y-2 mb-2">
                       {message.attachments.map(attachment => (
                         <div key={attachment._id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                          <FileText className="w-4 h-4 text-gray-500" />
+                          <FileText className="w-4 h-4 text-gray-600" />
                           <span className="text-sm text-gray-700">{attachment.name}</span>
-                          <button className="text-blue-600 hover:text-blue-800">
+                          <button className="text-accent-dark hover:text-blue-800">
                             <Download className="w-4 h-4" />
                           </button>
                         </div>
@@ -800,7 +800,7 @@ const TeamCollaboration: React.FC = () => {
                       {message.reactions.map(reaction => (
                         <button
                           key={reaction._id}
-                          className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-sm hover:bg-gray-200"
+                          className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-sm hover:bg-gray-300"
                         >
                           <span>{reaction.emoji}</span>
                           <span>{reaction.count}</span>
@@ -814,9 +814,9 @@ const TeamCollaboration: React.FC = () => {
         </div>
 
         {/* Message Input */}
-        <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="p-4 border-t border-gray-300 bg-white">
           <div className="flex items-center gap-3">
-            <button className="p-2 text-gray-400 hover:text-gray-600">
+            <button className="p-2 text-gray-600 hover:text-gray-600">
               <Paperclip className="w-4 h-4" />
             </button>
             <div className="flex-1 relative">
@@ -833,20 +833,20 @@ const TeamCollaboration: React.FC = () => {
                     handleSendMessage();
                   }
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
               {isTyping && (
-                <div className="absolute -top-8 left-0 text-xs text-gray-500">
+                <div className="absolute -top-8 left-0 text-xs text-gray-600">
                   {typingUsers.length > 0 && `${typingUsers.join(', ')} typing...`}
                 </div>
               )}
             </div>
-            <button className="p-2 text-gray-400 hover:text-gray-600">
+            <button className="p-2 text-gray-600 hover:text-gray-600">
               <Smile className="w-4 h-4" />
             </button>
             <button
               onClick={handleSendMessage}
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="p-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Send className="w-4 h-4" />
             </button>
@@ -862,13 +862,13 @@ const TeamCollaboration: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Team Members</h3>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search members..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
         </div>
@@ -889,7 +889,7 @@ const TeamCollaboration: React.FC = () => {
                 setSelectedMember(member);
                 setShowMemberModal(true);
               }}
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -907,10 +907,10 @@ const TeamCollaboration: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <button className="p-2 text-gray-600 hover:text-gray-600">
                     <MessageSquare className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <button className="p-2 text-gray-600 hover:text-gray-600">
                     <Phone className="w-4 h-4" />
                   </button>
                 </div>
@@ -963,19 +963,19 @@ const TeamCollaboration: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Documents</h3>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
           <select
             value={filterProject}
             onChange={(e) => setFilterProject(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Projects</option>
             <option value="p1">E-commerce Platform</option>
@@ -983,7 +983,7 @@ const TeamCollaboration: React.FC = () => {
           </select>
           <button
             onClick={() => setShowDocumentModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Document
@@ -1000,11 +1000,11 @@ const TeamCollaboration: React.FC = () => {
             return matchesSearch && matchesProject;
           })
           .map(doc => (
-            <div key={doc._id} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+            <div key={doc._id} className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-blue-600" />
+                    <FileText className="w-5 h-5 text-accent-dark" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">{doc.name}</h4>
@@ -1012,10 +1012,10 @@ const TeamCollaboration: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="text-gray-400 hover:text-gray-600">
+                  <button className="text-gray-600 hover:text-gray-600">
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button className="text-gray-400 hover:text-gray-600">
+                  <button className="text-gray-600 hover:text-gray-600">
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 </div>
@@ -1082,7 +1082,7 @@ const TeamCollaboration: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Polls</h3>
         <button
           onClick={() => setShowPollModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create Poll
@@ -1120,9 +1120,9 @@ const TeamCollaboration: React.FC = () => {
                     <span className="text-sm font-medium text-gray-900">{option.text}</span>
                     <span className="text-sm text-gray-600">{option.votes} votes</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-accent h-2 rounded-full"
                       style={{ width: `${(option.votes / poll.totalVotes) * 100}%` }}
                     />
                   </div>
@@ -1202,8 +1202,8 @@ const TeamCollaboration: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   title={tab.description}
                 >

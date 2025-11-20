@@ -105,7 +105,7 @@ const RemindersPage: React.FC = () => {
         project: {
           _id: 'p1',
           name: 'E-commerce Platform',
-          color: 'bg-blue-500'
+          color: 'bg-accent'
         },
         assignee: {
           _id: 'u1',
@@ -158,7 +158,7 @@ const RemindersPage: React.FC = () => {
         project: {
           _id: 'p1',
           name: 'E-commerce Platform',
-          color: 'bg-blue-500'
+          color: 'bg-accent'
         },
         assignee: {
           _id: 'u3',
@@ -188,7 +188,7 @@ const RemindersPage: React.FC = () => {
         project: {
           _id: 'p1',
           name: 'E-commerce Platform',
-          color: 'bg-blue-500'
+          color: 'bg-accent'
         },
         tags: ['standup', 'daily'],
         notifications: [
@@ -208,7 +208,7 @@ const RemindersPage: React.FC = () => {
         type: 'meeting',
         priority: 'high',
         project: 'E-commerce Platform',
-        color: 'bg-blue-500',
+        color: 'bg-accent',
         allDay: false
       },
       {
@@ -242,7 +242,7 @@ const RemindersPage: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
+      case 'high': return 'text-orange-600 bg-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -414,7 +414,7 @@ const RemindersPage: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Reminders & Calendar</h1>
@@ -425,7 +425,7 @@ const RemindersPage: React.FC = () => {
             {permission === 'default' && (
               <button
                 onClick={requestPermission}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-accent-dark text-accent-dark rounded-lg hover:bg-blue-50"
               >
                 <Bell className="w-4 h-4" />
                 Enable Notifications
@@ -448,7 +448,7 @@ const RemindersPage: React.FC = () => {
                 Export
               </button>
               {showExportMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-300 py-1 z-10">
                   <button
                     onClick={() => handleExport('all')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -476,7 +476,7 @@ const RemindersPage: React.FC = () => {
                 setSelectedReminder(null);
                 setShowAddModal(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               Add Reminder
@@ -490,18 +490,18 @@ const RemindersPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Search and Filters */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 {/* Search */}
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search reminders..."
                       value={searchQuery}
                       onChange={(e) => handleSearch(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -511,7 +511,7 @@ const RemindersPage: React.FC = () => {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
@@ -522,7 +522,7 @@ const RemindersPage: React.FC = () => {
                   <select
                     value={filterPriority}
                     onChange={(e) => setFilterPriority(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Priority</option>
                     <option value="urgent">Urgent</option>
@@ -602,7 +602,7 @@ const RemindersPage: React.FC = () => {
                             <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
                           )}
                           
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
                             <span>{formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}</span>
                             {reminder.project && (
                               <div className="flex items-center gap-1">
@@ -611,12 +611,12 @@ const RemindersPage: React.FC = () => {
                               </div>
                             )}
                             {reminder.recurring && (
-                              <span className="text-blue-600">Recurring</span>
+                              <span className="text-accent-dark">Recurring</span>
                             )}
                           </div>
                         </div>
                         
-                        <button className="text-gray-400 hover:text-gray-600">
+                        <button className="text-gray-600 hover:text-gray-600">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -627,13 +627,13 @@ const RemindersPage: React.FC = () => {
             )}
 
             {viewMode === 'calendar' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 {/* Calendar Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setCurrentDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000))}
-                      className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                      className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -642,7 +642,7 @@ const RemindersPage: React.FC = () => {
                     </h2>
                     <button
                       onClick={() => setCurrentDate(new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000))}
-                      className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                      className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -659,7 +659,7 @@ const RemindersPage: React.FC = () => {
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day Headers */}
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
                       {day}
                     </div>
                   ))}
@@ -675,16 +675,16 @@ const RemindersPage: React.FC = () => {
                       <div
                         key={index}
                         onClick={() => setSelectedDate(day)}
-                        className={`min-h-24 p-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${
                           isToday ? 'bg-blue-50 border-blue-200' : ''
                         } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-sm font-medium ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+                          <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900'}`}>
                             {day.getDate()}
                           </span>
                           {(dayReminders.length + dayEvents.length) > 0 && (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-600">
                               {dayReminders.length + dayEvents.length}
                             </span>
                           )}
@@ -703,7 +703,7 @@ const RemindersPage: React.FC = () => {
                             </div>
                           ))}
                           {dayReminders.length > 2 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-600">
                               +{dayReminders.length - 2} more
                             </div>
                           )}
@@ -733,7 +733,7 @@ const RemindersPage: React.FC = () => {
                     <div key={column.status} className={`rounded-lg border-2 border-dashed ${column.color} p-4`}>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-medium text-gray-900">{column.title}</h3>
-                        <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded-full">
+                        <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
                           {columnReminders.length}
                         </span>
                       </div>
@@ -741,7 +741,7 @@ const RemindersPage: React.FC = () => {
                         {columnReminders.map(reminder => (
                           <div
                             key={reminder._id}
-                            className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm"
+                            className="bg-white rounded-lg border border-gray-300 p-3 shadow-sm"
                           >
                             <div className="flex items-start gap-2 mb-2">
                               {getTypeIcon(reminder.type)}
@@ -749,7 +749,7 @@ const RemindersPage: React.FC = () => {
                             </div>
                             <p className="text-xs text-gray-600 mb-2">{reminder.description}</p>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-gray-600">
                                 {formatDate(reminder.dueDate)} {formatTime(reminder.dueDate)}
                               </span>
                               <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(reminder.priority)}`}>
@@ -785,7 +785,7 @@ const RemindersPage: React.FC = () => {
             )}
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Quick Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -820,7 +820,7 @@ const RemindersPage: React.FC = () => {
             </div>
 
             {/* Upcoming Deadlines */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Upcoming Deadlines</h3>
               <div className="space-y-2">
                 {reminders
@@ -835,14 +835,14 @@ const RemindersPage: React.FC = () => {
                       }`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900">{reminder.title}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-600">
                           {formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}
                         </p>
                       </div>
                     </div>
                   ))}
                 {reminders.filter(r => !r.completed && new Date(r.dueDate) >= new Date()).length === 0 && (
-                  <p className="text-sm text-gray-500 text-center py-4">No upcoming deadlines</p>
+                  <p className="text-sm text-gray-600 text-center py-4">No upcoming deadlines</p>
                 )}
               </div>
             </div>

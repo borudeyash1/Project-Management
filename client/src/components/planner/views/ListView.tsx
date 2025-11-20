@@ -124,7 +124,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
+      case 'high': return 'text-orange-600 bg-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -142,7 +142,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ChevronDown className="w-4 h-4 text-gray-400" />;
+    if (sortField !== field) return <ChevronDown className="w-4 h-4 text-gray-600" />;
     return sortDirection === 'asc' 
       ? <ChevronUp className="w-4 h-4 text-blue-600" />
       : <ChevronDown className="w-4 h-4 text-blue-600" />;
@@ -151,7 +151,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Toolbar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Group By */}
@@ -170,7 +170,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
             {/* Bulk Actions */}
             {selectedTasks.length > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
                   {selectedTasks.length} selected
                 </span>
                 <select
@@ -194,7 +194,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
             )}
           </div>
 
-          <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg">
+          <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg">
             <Download className="w-4 h-4" />
             Export
           </button>
@@ -206,14 +206,14 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
         {Object.entries(groupedTasks).map(([groupName, groupTasks]) => (
           <div key={groupName} className="mb-6">
             {groupBy !== 'none' && (
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 px-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-700 mb-3 px-2">
                 {groupName} ({groupTasks.length})
               </h3>
             )}
             
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
                   <tr>
                     <th className="w-12 px-4 py-3">
                       <input
@@ -224,7 +224,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       />
                     </th>
                     <th
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                       onClick={() => handleSort('title')}
                     >
                       <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       </div>
                     </th>
                     <th
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                       onClick={() => handleSort('status')}
                     >
                       <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       </div>
                     </th>
                     <th
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                       onClick={() => handleSort('priority')}
                     >
                       <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       </div>
                     </th>
                     <th
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                       onClick={() => handleSort('assignees')}
                     >
                       <div className="flex items-center gap-2">
@@ -260,7 +260,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       </div>
                     </th>
                     <th
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                       onClick={() => handleSort('dueDate')}
                     >
                       <div className="flex items-center gap-2">
@@ -268,7 +268,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                         <SortIcon field="dueDate" />
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       Tags
                     </th>
                     <th className="w-12 px-4 py-3"></th>
@@ -310,7 +310,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                             {task.status === 'done' ? (
                               <CheckSquare className="w-4 h-4 text-green-600" />
                             ) : (
-                              <Square className="w-4 h-4 text-gray-400" />
+                              <Square className="w-4 h-4 text-gray-600" />
                             )}
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
                               {task.title}
@@ -333,14 +333,14 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                           {task.assignees.slice(0, 3).map((assignee, idx) => (
                             <div
                               key={idx}
-                              className="w-7 h-7 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800 flex items-center justify-center text-white text-xs font-medium"
+                              className="w-7 h-7 rounded-full bg-blue-500 border-2 border-white dark:border-gray-700 flex items-center justify-center text-white text-xs font-medium"
                               title={assignee}
                             >
                               {assignee[0].toUpperCase()}
                             </div>
                           ))}
                           {task.assignees.length > 3 && (
-                            <div className="w-7 h-7 rounded-full bg-gray-400 border-2 border-white dark:border-gray-800 flex items-center justify-center text-white text-xs font-medium">
+                            <div className="w-7 h-7 rounded-full bg-gray-400 border-2 border-white dark:border-gray-700 flex items-center justify-center text-white text-xs font-medium">
                               +{task.assignees.length - 3}
                             </div>
                           )}
@@ -348,7 +348,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       </td>
                       <td className="px-4 py-3">
                         {task.dueDate ? (
-                          <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-200">
                             <Calendar className="w-4 h-4" />
                             {new Date(task.dueDate).toLocaleDateString('en-US', {
                               month: 'short',
@@ -356,7 +356,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                             })}
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-400">-</span>
+                          <span className="text-sm text-gray-600">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -364,19 +364,19 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                           {task.tags.slice(0, 2).map(tag => (
                             <span
                               key={tag}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded"
                             >
                               <Tag className="w-3 h-3" />
                               {tag}
                             </span>
                           ))}
                           {task.tags.length > 2 && (
-                            <span className="text-xs text-gray-500">+{task.tags.length - 2}</span>
+                            <span className="text-xs text-gray-600">+{task.tags.length - 2}</span>
                           )}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded">
+                        <button className="p-1 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700 rounded">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </td>
@@ -389,8 +389,8 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
         ))}
 
         {sortedTasks.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No tasks found</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-12 text-center">
+            <p className="text-gray-600 dark:text-gray-200">No tasks found</p>
           </div>
         )}
       </div>

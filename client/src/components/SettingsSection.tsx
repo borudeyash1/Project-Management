@@ -325,21 +325,21 @@ const SettingsSection: React.FC = () => {
       {/* Avatar Section */}
       <div className="flex items-center gap-6">
         <div className="relative">
-          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+          <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
             {profile.avatar ? (
               <img src={profile.avatar} alt="Profile" className="w-24 h-24 rounded-full object-cover" />
             ) : (
-              <User className="w-12 h-12 text-gray-400" />
+              <User className="w-12 h-12 text-gray-600" />
             )}
           </div>
-          <button className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700">
+          <button className="absolute bottom-0 right-0 w-8 h-8 bg-accent text-gray-900 rounded-full flex items-center justify-center hover:bg-accent-hover">
             <Camera className="w-4 h-4" />
           </button>
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{profile.name}</h3>
           <p className="text-gray-600">{profile.jobTitle}</p>
-          <button className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+          <button className="mt-2 text-sm text-accent-dark hover:text-blue-700">
             Change Avatar
           </button>
         </div>
@@ -353,7 +353,7 @@ const SettingsSection: React.FC = () => {
             type="text"
             value={profile.name}
             onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             disabled={!isEditing}
           />
         </div>
@@ -363,7 +363,7 @@ const SettingsSection: React.FC = () => {
             type="email"
             value={profile.email}
             onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             disabled={!isEditing}
           />
         </div>
@@ -373,7 +373,7 @@ const SettingsSection: React.FC = () => {
             type="tel"
             value={profile.phone}
             onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             disabled={!isEditing}
           />
         </div>
@@ -383,7 +383,7 @@ const SettingsSection: React.FC = () => {
             type="text"
             value={profile.jobTitle}
             onChange={(e) => setProfile({ ...profile, jobTitle: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             disabled={!isEditing}
           />
         </div>
@@ -393,7 +393,7 @@ const SettingsSection: React.FC = () => {
             type="text"
             value={profile.department}
             onChange={(e) => setProfile({ ...profile, department: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             disabled={!isEditing}
           />
         </div>
@@ -403,7 +403,7 @@ const SettingsSection: React.FC = () => {
             type="text"
             value={profile.location}
             onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             disabled={!isEditing}
           />
         </div>
@@ -416,7 +416,7 @@ const SettingsSection: React.FC = () => {
           value={profile.bio}
           onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           disabled={!isEditing}
           placeholder="Tell us about yourself..."
         />
@@ -432,7 +432,7 @@ const SettingsSection: React.FC = () => {
           <select
             value={profile.language}
             onChange={(e) => setProfile({ ...profile, language: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="English">English</option>
             <option value="Spanish">Spanish</option>
@@ -446,7 +446,7 @@ const SettingsSection: React.FC = () => {
           <select
             value={profile.timezone}
             onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="America/Los_Angeles">Pacific Time</option>
             <option value="America/Denver">Mountain Time</option>
@@ -462,7 +462,7 @@ const SettingsSection: React.FC = () => {
           <select
             value={profile.dateFormat}
             onChange={(e) => setProfile({ ...profile, dateFormat: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -474,7 +474,7 @@ const SettingsSection: React.FC = () => {
           <select
             value={profile.timeFormat}
             onChange={(e) => setProfile({ ...profile, timeFormat: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="12h">12-hour (AM/PM)</option>
             <option value="24h">24-hour</option>
@@ -485,7 +485,7 @@ const SettingsSection: React.FC = () => {
           <select
             value={profile.currency}
             onChange={(e) => setProfile({ ...profile, currency: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
@@ -504,7 +504,7 @@ const SettingsSection: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Addresses</h3>
         <button
           onClick={addAddress}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
         >
           <MapPin className="w-4 h-4" />
           Add Address
@@ -513,7 +513,7 @@ const SettingsSection: React.FC = () => {
 
       <div className="space-y-4">
         {addresses.map((address) => (
-          <div key={address._id} className="border border-gray-200 rounded-lg p-4">
+          <div key={address._id} className="border border-gray-300 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
@@ -528,7 +528,7 @@ const SettingsSection: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => updateAddress(address._id, { isDefault: true })}
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-accent-dark hover:text-blue-700"
                   disabled={address.isDefault}
                 >
                   Set Default
@@ -548,7 +548,7 @@ const SettingsSection: React.FC = () => {
                   type="text"
                   value={address.street}
                   onChange={(e) => updateAddress(address._id, { street: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div>
@@ -557,7 +557,7 @@ const SettingsSection: React.FC = () => {
                   type="text"
                   value={address.city}
                   onChange={(e) => updateAddress(address._id, { city: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div>
@@ -566,7 +566,7 @@ const SettingsSection: React.FC = () => {
                   type="text"
                   value={address.state}
                   onChange={(e) => updateAddress(address._id, { state: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div>
@@ -575,7 +575,7 @@ const SettingsSection: React.FC = () => {
                   type="text"
                   value={address.zipCode}
                   onChange={(e) => updateAddress(address._id, { zipCode: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div className="md:col-span-2">
@@ -583,7 +583,7 @@ const SettingsSection: React.FC = () => {
                 <select
                   value={address.country}
                   onChange={(e) => updateAddress(address._id, { country: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 >
                   <option value="United States">United States</option>
                   <option value="Canada">Canada</option>
@@ -606,7 +606,7 @@ const SettingsSection: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Payment Methods</h3>
         <button
           onClick={addPaymentMethod}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
         >
           <CreditCard className="w-4 h-4" />
           Add Payment Method
@@ -615,10 +615,10 @@ const SettingsSection: React.FC = () => {
 
       <div className="space-y-4">
         {paymentMethods.map((method) => (
-          <div key={method._id} className="border border-gray-200 rounded-lg p-4">
+          <div key={method._id} className="border border-gray-300 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-6 bg-blue-600 rounded flex items-center justify-center">
+                <div className="w-10 h-6 bg-accent rounded flex items-center justify-center">
                   <CardIcon className="w-4 h-4 text-white" />
                 </div>
                 <div>
@@ -634,7 +634,7 @@ const SettingsSection: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => updatePaymentMethod(method._id, { isDefault: true })}
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-accent-dark hover:text-blue-700"
                   disabled={method.isDefault}
                 >
                   Set Default
@@ -694,7 +694,7 @@ const SettingsSection: React.FC = () => {
                   email: { ...notifications.email, [key]: !value }
                 })}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  value ? 'bg-blue-600' : 'bg-gray-200'
+                  value ? 'bg-accent' : 'bg-gray-300'
                 }`}
               >
                 <span
@@ -734,7 +734,7 @@ const SettingsSection: React.FC = () => {
                   push: { ...notifications.push, [key]: !value }
                 })}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  value ? 'bg-blue-600' : 'bg-gray-200'
+                  value ? 'bg-accent' : 'bg-gray-300'
                 }`}
               >
                 <span
@@ -772,7 +772,7 @@ const SettingsSection: React.FC = () => {
                   sms: { ...notifications.sms, [key]: !value }
                 })}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  value ? 'bg-blue-600' : 'bg-gray-200'
+                  value ? 'bg-accent' : 'bg-gray-300'
                 }`}
               >
                 <span
@@ -801,7 +801,7 @@ const SettingsSection: React.FC = () => {
             <select
               value={privacy.profileVisibility}
               onChange={(e) => setPrivacy({ ...privacy, profileVisibility: e.target.value as any })}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="public">Public</option>
               <option value="workspace">Workspace Only</option>
@@ -822,7 +822,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={() => setPrivacy({ ...privacy, showEmail: !privacy.showEmail })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                privacy.showEmail ? 'bg-blue-600' : 'bg-gray-200'
+                privacy.showEmail ? 'bg-accent' : 'bg-gray-300'
               }`}
             >
               <span
@@ -840,7 +840,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={() => setPrivacy({ ...privacy, showPhone: !privacy.showPhone })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                privacy.showPhone ? 'bg-blue-600' : 'bg-gray-200'
+                privacy.showPhone ? 'bg-accent' : 'bg-gray-300'
               }`}
             >
               <span
@@ -858,7 +858,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={() => setPrivacy({ ...privacy, showLocation: !privacy.showLocation })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                privacy.showLocation ? 'bg-blue-600' : 'bg-gray-200'
+                privacy.showLocation ? 'bg-accent' : 'bg-gray-300'
               }`}
             >
               <span
@@ -876,7 +876,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={() => setPrivacy({ ...privacy, showActivity: !privacy.showActivity })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                privacy.showActivity ? 'bg-blue-600' : 'bg-gray-200'
+                privacy.showActivity ? 'bg-accent' : 'bg-gray-300'
               }`}
             >
               <span
@@ -894,7 +894,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={() => setPrivacy({ ...privacy, allowDirectMessages: !privacy.allowDirectMessages })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                privacy.allowDirectMessages ? 'bg-blue-600' : 'bg-gray-200'
+                privacy.allowDirectMessages ? 'bg-accent' : 'bg-gray-300'
               }`}
             >
               <span
@@ -917,7 +917,7 @@ const SettingsSection: React.FC = () => {
           <button
             onClick={() => setTheme({ ...theme, mode: 'light' })}
             className={`p-4 border-2 rounded-lg text-center ${
-              theme.mode === 'light' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+              theme.mode === 'light' ? 'border-accent bg-blue-50' : 'border-gray-200'
             }`}
           >
             <Sun className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
@@ -927,20 +927,20 @@ const SettingsSection: React.FC = () => {
           <button
             onClick={() => setTheme({ ...theme, mode: 'dark' })}
             className={`p-4 border-2 rounded-lg text-center ${
-              theme.mode === 'dark' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+              theme.mode === 'dark' ? 'border-accent bg-blue-50' : 'border-gray-200'
             }`}
           >
-            <Moon className="w-8 h-8 mx-auto mb-2 text-blue-500" />
+            <Moon className="w-8 h-8 mx-auto mb-2 text-accent" />
             <h4 className="font-medium text-gray-900">Dark</h4>
             <p className="text-sm text-gray-600">Easy on the eyes</p>
           </button>
           <button
             onClick={() => setTheme({ ...theme, mode: 'system' })}
             className={`p-4 border-2 rounded-lg text-center ${
-              theme.mode === 'system' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+              theme.mode === 'system' ? 'border-accent bg-blue-50' : 'border-gray-200'
             }`}
           >
-            <MonitorIcon className="w-8 h-8 mx-auto mb-2 text-gray-500" />
+            <MonitorIcon className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <h4 className="font-medium text-gray-900">System</h4>
             <p className="text-sm text-gray-600">Follow system preference</p>
           </button>
@@ -963,7 +963,7 @@ const SettingsSection: React.FC = () => {
                 type="text"
                 value={theme.primaryColor}
                 onChange={(e) => setTheme({ ...theme, primaryColor: e.target.value })}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
             </div>
           </div>
@@ -980,7 +980,7 @@ const SettingsSection: React.FC = () => {
                 type="text"
                 value={theme.accentColor}
                 onChange={(e) => setTheme({ ...theme, accentColor: e.target.value })}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
             </div>
           </div>
@@ -998,7 +998,7 @@ const SettingsSection: React.FC = () => {
             <select
               value={theme.fontSize}
               onChange={(e) => setTheme({ ...theme, fontSize: e.target.value as any })}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="small">Small</option>
               <option value="medium">Medium</option>
@@ -1013,7 +1013,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={() => setTheme({ ...theme, compactMode: !theme.compactMode })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                theme.compactMode ? 'bg-blue-600' : 'bg-gray-200'
+                theme.compactMode ? 'bg-accent' : 'bg-gray-300'
               }`}
             >
               <span
@@ -1038,27 +1038,27 @@ const SettingsSection: React.FC = () => {
         </h3>
         
         {!showPasswordForm ? (
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
             <div>
               <h4 className="font-medium text-gray-900">Password</h4>
               <p className="text-sm text-gray-600">Last changed 3 months ago</p>
             </div>
             <button
               onClick={() => setShowPasswordForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               Change Password
             </button>
           </div>
         ) : (
-          <div className="p-4 border border-gray-200 rounded-lg space-y-4">
+          <div className="p-4 border border-gray-300 rounded-lg space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
               <input
                 type="password"
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
             </div>
             <div>
@@ -1067,7 +1067,7 @@ const SettingsSection: React.FC = () => {
                 type="password"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
             </div>
             <div>
@@ -1076,14 +1076,14 @@ const SettingsSection: React.FC = () => {
                 type="password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               />
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={handlePasswordChange}
                 disabled={saving}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Password'}
               </button>
@@ -1107,7 +1107,7 @@ const SettingsSection: React.FC = () => {
           <Shield className="w-5 h-5" />
           Two-Factor Authentication
         </h3>
-        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+        <div className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
           <div>
             <h4 className="font-medium text-gray-900">2FA Status</h4>
             <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
@@ -1122,9 +1122,9 @@ const SettingsSection: React.FC = () => {
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Sessions</h3>
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
             <div className="flex items-center gap-3">
-              <Monitor className="w-5 h-5 text-gray-400" />
+              <Monitor className="w-5 h-5 text-gray-600" />
               <div>
                 <h4 className="font-medium text-gray-900">Current Session</h4>
                 <p className="text-sm text-gray-600">Windows • Chrome • San Francisco, CA</p>
@@ -1134,9 +1134,9 @@ const SettingsSection: React.FC = () => {
               Current
             </span>
           </div>
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
             <div className="flex items-center gap-3">
-              <Smartphone className="w-5 h-5 text-gray-400" />
+              <Smartphone className="w-5 h-5 text-gray-600" />
               <div>
                 <h4 className="font-medium text-gray-900">Mobile App</h4>
                 <p className="text-sm text-gray-600">iOS • iPhone • Last active 2 hours ago</p>
@@ -1150,7 +1150,7 @@ const SettingsSection: React.FC = () => {
       </div>
 
       {/* Account Deletion */}
-      <div className="border-t border-gray-200 pt-6">
+      <div className="border-t border-gray-300 pt-6">
         <h3 className="text-lg font-semibold text-red-600 mb-4">Danger Zone</h3>
         <div className="p-4 border border-red-200 rounded-lg bg-red-50">
           <h4 className="font-medium text-red-900 mb-2">Delete Account</h4>
@@ -1194,7 +1194,7 @@ const SettingsSection: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
@@ -1212,7 +1212,7 @@ const SettingsSection: React.FC = () => {
             <button
               onClick={isEditing ? handleSave : () => setIsEditing(true)}
               disabled={saving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50"
             >
               {saving ? (
                 <>
@@ -1232,7 +1232,7 @@ const SettingsSection: React.FC = () => {
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
+        <div className="w-64 bg-white border-r border-gray-300 min-h-screen">
           <nav className="p-4">
             <div className="space-y-1">
               {tabs.map((tab) => {
@@ -1278,7 +1278,7 @@ const SettingsSection: React.FC = () => {
             <span className="font-medium">{message.text}</span>
             <button
               onClick={() => setMessage(null)}
-              className="ml-2 text-gray-400 hover:text-gray-600"
+              className="ml-2 text-gray-600 hover:text-gray-600"
             >
               <X className="w-4 h-4" />
             </button>

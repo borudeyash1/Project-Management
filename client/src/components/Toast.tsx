@@ -21,14 +21,14 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
   const getIcon = () => {
     switch (toast.type) {
       case 'success':
-        return <CheckCircle className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />;
+        return <CheckCircle className={`w-5 h-5 ${isDarkMode ? 'text-green-600' : 'text-green-600'}`} />;
       case 'error':
-        return <XCircle className={`w-5 h-5 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />;
+        return <XCircle className={`w-5 h-5 ${isDarkMode ? 'text-red-600' : 'text-red-600'}`} />;
       case 'warning':
-        return <AlertTriangle className={`w-5 h-5 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />;
+        return <AlertTriangle className={`w-5 h-5 ${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} />;
       case 'info':
       default:
-        return <Info className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />;
+        return <Info className={`w-5 h-5 ${isDarkMode ? 'text-accent-light' : 'text-accent-dark'}`} />;
     }
   };
 
@@ -42,7 +42,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
         return isDarkMode ? 'bg-yellow-800 border-yellow-600' : 'bg-yellow-50 border-yellow-200';
       case 'info':
       default:
-        return isDarkMode ? 'bg-blue-800 border-blue-600' : 'bg-blue-50 border-blue-200';
+        return isDarkMode ? 'bg-blue-800 border-accent-dark' : 'bg-blue-50 border-blue-200';
     }
   };
 

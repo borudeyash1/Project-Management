@@ -133,7 +133,7 @@ const AdminDashboard: React.FC = () => {
                 <h1 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   Admin Dashboard
                 </h1>
-                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                   Sartthi Management Portal
                 </p>
               </div>
@@ -144,7 +144,7 @@ const AdminDashboard: React.FC = () => {
                 <p className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   {adminData.name}
                 </p>
-                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                   {adminData.role.replace('_', ' ').toUpperCase()}
                 </p>
               </div>
@@ -153,7 +153,7 @@ const AdminDashboard: React.FC = () => {
                 className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                 title="Logout"
               >
-                <LogOut className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                <LogOut className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
               </button>
             </div>
           </div>
@@ -172,7 +172,7 @@ const AdminDashboard: React.FC = () => {
               <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Welcome back, {adminData.name}!
               </h2>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
                 You have full administrative access to Sartthi
               </p>
             </div>
@@ -184,7 +184,7 @@ const AdminDashboard: React.FC = () => {
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Users</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Total Users</p>
                 <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-2`}>
                   {loading ? (
                     <span className="animate-pulse">...</span>
@@ -193,8 +193,8 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-500" />
+              <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-accent" />
               </div>
             </div>
           </div>
@@ -202,7 +202,7 @@ const AdminDashboard: React.FC = () => {
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Sessions</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Active Sessions</p>
                 <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-2`}>
                   {loading ? (
                     <span className="animate-pulse">...</span>
@@ -220,9 +220,9 @@ const AdminDashboard: React.FC = () => {
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>System Status</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>System Status</p>
                 <p className={`text-3xl font-bold ${
-                  loading ? 'text-gray-400' :
+                  loading ? 'text-gray-600' :
                   dashboardStats.systemStatus === 'Healthy' ? 'text-green-500' :
                   dashboardStats.systemStatus === 'Warning' ? 'text-yellow-500' : 'text-red-500'
                 } mt-2`}>
@@ -248,67 +248,67 @@ const AdminDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button 
               onClick={() => navigate('/admin/users')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
               <Users className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Manage Users</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>View and edit users</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>View and edit users</p>
             </button>
 
             <button 
               onClick={() => navigate('/admin/devices')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
-              <Shield className={`w-6 h-6 ${isDarkMode ? 'text-blue-500' : 'text-blue-600'} mb-2`} />
+              <Shield className={`w-6 h-6 ${isDarkMode ? 'text-accent' : 'text-accent-dark'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Security</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Manage devices & access</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage devices & access</p>
             </button>
 
             <button 
               onClick={() => navigate('/admin/analytics')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
               <Activity className={`w-6 h-6 ${isDarkMode ? 'text-green-500' : 'text-green-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Analytics</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>View system metrics</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>View system metrics</p>
             </button>
 
             <button 
               onClick={() => navigate('/admin/settings')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
               <Settings className={`w-6 h-6 ${isDarkMode ? 'text-purple-500' : 'text-purple-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Settings</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Configure system</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Configure system</p>
             </button>
 
             <button 
               onClick={() => navigate('/admin/releases')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors text-left`}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
               <Activity className={`w-6 h-6 ${isDarkMode ? 'text-indigo-500' : 'text-indigo-600'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Desktop Releases</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Manage app versions</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage app versions</p>
             </button>
           </div>
         </div>
 
         {/* Admin Info */}
         <div className={`${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'} border rounded-xl p-6 mt-8`}>
-          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3`}>
+          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-3`}>
             Your Admin Profile
           </h3>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Email:</span>
+              <span className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Email:</span>
               <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{adminData.email}</span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Role:</span>
+              <span className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Role:</span>
               <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{adminData.role}</span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Admin ID:</span>
+              <span className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Admin ID:</span>
               <span className={`text-sm font-mono ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{adminData.id}</span>
             </div>
           </div>
@@ -327,17 +327,17 @@ const AdminDashboard: React.FC = () => {
                 <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   Confirm Logout
                 </h3>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                   Are you sure you want to end your admin session?
                 </p>
               </div>
             </div>
 
             <div className={`${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50'} rounded-lg p-4 mb-6`}>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 This will:
               </p>
-              <ul className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-2 space-y-1 ml-4`}>
+              <ul className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2 space-y-1 ml-4`}>
                 <li>• Clear your admin session</li>
                 <li>• Remove authentication tokens</li>
                 <li>• Redirect you to the login page</li>

@@ -126,14 +126,14 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
           <div className="flex rounded-lg border border-gray-300 overflow-hidden text-sm">
             <button
               type="button"
-              className={`px-3 py-1 ${mode === 'manual' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+              className={`px-3 py-1 ${mode === 'manual' ? 'bg-accent text-gray-900' : 'bg-white text-gray-700'}`}
               onClick={() => setMode('manual')}
             >
               Manual
             </button>
             <button
               type="button"
-              className={`px-3 py-1 ${mode === 'automatic' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+              className={`px-3 py-1 ${mode === 'automatic' ? 'bg-accent text-gray-900' : 'bg-white text-gray-700'}`}
               onClick={() => setMode('automatic')}
             >
               Automatic
@@ -149,7 +149,7 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
             <button
               type="button"
               onClick={handleStartAttendance}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg text-sm hover:bg-accent-hover"
             >
               Start Attendance
             </button>
@@ -159,7 +159,7 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-60"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg text-sm hover:bg-accent-hover disabled:opacity-60"
             >
               {saving ? 'Saving...' : 'Save Attendance'}
             </button>
@@ -168,13 +168,13 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+        <div className="lg:col-span-2 bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-300 flex items-center justify-between">
             <h4 className="font-medium text-gray-900 text-sm">Team Attendance - {selectedDate}</h4>
-            {loading && <span className="text-xs text-gray-500">Loading...</span>}
+            {loading && <span className="text-xs text-gray-600">Loading...</span>}
           </div>
           {mode === 'automatic' && (
-            <div className="p-4 border-b border-gray-200 text-sm text-gray-600 bg-gray-50">
+            <div className="p-4 border-b border-gray-300 text-sm text-gray-600 bg-gray-50">
               Automatic attendance is based on employee self check-in (location + face verification). You can
               still review the summary on the right.
             </div>
@@ -190,15 +190,15 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
               <table className="min-w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-500">Member</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-500">Role</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-500">Status</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Member</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Role</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {team.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="px-4 py-6 text-center text-gray-500">
+                      <td colSpan={3} className="px-4 py-6 text-center text-gray-600">
                         No team members found for this project.
                       </td>
                     </tr>
@@ -207,10 +207,10 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
                     const rec = memberStatusMap[member._id];
                     const currentStatus = rec?.status || 'absent';
                     return (
-                      <tr key={member._id} className="border-t border-gray-100">
+                      <tr key={member._id} className="border-t border-gray-300">
                         <td className="px-4 py-2">
                           <div className="font-medium text-gray-900">{member.name}</div>
-                          <div className="text-xs text-gray-500">{member.email}</div>
+                          <div className="text-xs text-gray-600">{member.email}</div>
                         </td>
                         <td className="px-4 py-2 text-gray-700 capitalize">{member.role || 'member'}</td>
                         <td className="px-4 py-2">
@@ -262,7 +262,7 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
           )}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4 text-sm">
+        <div className="bg-white border border-gray-300 rounded-lg p-4 space-y-4 text-sm">
           <h4 className="font-medium text-gray-900">Today&apos;s Summary</h4>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -275,10 +275,10 @@ const ProjectAttendanceManagerTab: React.FC<ProjectAttendanceManagerTabProps> = 
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Work From Home</span>
-              <span className="font-semibold text-blue-600">{wfhCount}</span>
+              <span className="font-semibold text-accent-dark">{wfhCount}</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-600">
             Manual changes are only allowed for the current day, as enforced by the backend.
           </p>
         </div>

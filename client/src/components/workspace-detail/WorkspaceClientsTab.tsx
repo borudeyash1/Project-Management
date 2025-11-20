@@ -189,7 +189,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Clients</h3>
@@ -200,7 +200,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
           {isWorkspaceOwner && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Client
@@ -210,15 +210,15 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
 
         {/* Clients Grid */}
         {clients.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+          <div className="text-center py-12 text-gray-600">
+            <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-600" />
             <p className="font-medium">No clients yet</p>
             <p className="text-sm mt-1">Add a client to start creating projects for them</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clients.map((client) => (
-              <div key={client._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow group">
+              <div key={client._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow group">
                 <div className="flex items-start justify-between mb-3">
                   <div 
                     className="flex-1 cursor-pointer"
@@ -230,8 +230,8 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                       window.dispatchEvent(new CustomEvent('switchToProjectsTab', { detail: { clientId: client._id } }));
                     }}
                   >
-                    <h4 className="font-semibold text-gray-900 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
-                      <Briefcase className="w-4 h-4 text-blue-600" />
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2 group-hover:text-accent-dark transition-colors">
+                      <Briefcase className="w-4 h-4 text-accent-dark" />
                       {client.name}
                     </h4>
                     {client.company && (
@@ -240,7 +240,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                         {client.company}
                       </p>
                     )}
-                    <p className="text-xs text-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="text-xs text-accent-dark mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       Click to view projects →
                     </p>
                   </div>
@@ -251,7 +251,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                           e.stopPropagation();
                           handleEditClient(client);
                         }}
-                        className="text-blue-600 hover:text-blue-700 p-1"
+                        className="text-accent-dark hover:text-blue-700 p-1"
                         title="Edit Client"
                       >
                         <Edit className="w-4 h-4" />
@@ -284,7 +284,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                   {client.website && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <Globe className="w-3 h-3" />
-                      <a href={client.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">
+                      <a href={client.website} target="_blank" rel="noopener noreferrer" className="text-accent-dark hover:underline truncate">
                         {client.website.replace(/^https?:\/\//, '')}
                       </a>
                     </div>
@@ -311,7 +311,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                 {editingClient ? 'Edit Client' : 'Add Client'}
               </h3>
               <button onClick={handleCloseModal}>
-                <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                <X className="w-5 h-5 text-gray-600 hover:text-gray-600" />
               </button>
             </div>
             
@@ -325,7 +325,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                     type="text"
                     value={clientForm.name}
                     onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     placeholder="John Doe"
                   />
                 </div>
@@ -338,7 +338,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                     type="text"
                     value={clientForm.company}
                     onChange={(e) => setClientForm({ ...clientForm, company: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     placeholder="Acme Corp"
                   />
                 </div>
@@ -353,7 +353,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                     type="email"
                     value={clientForm.email}
                     onChange={(e) => setClientForm({ ...clientForm, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -366,7 +366,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                     type="tel"
                     value={clientForm.phone}
                     onChange={(e) => setClientForm({ ...clientForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     placeholder="+1 (555) 000-0000"
                   />
                 </div>
@@ -380,7 +380,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                   type="url"
                   value={clientForm.website}
                   onChange={(e) => setClientForm({ ...clientForm, website: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="https://example.com"
                 />
               </div>
@@ -393,7 +393,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                   type="text"
                   value={clientForm.address}
                   onChange={(e) => setClientForm({ ...clientForm, address: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="123 Main St, City, State, ZIP"
                 />
               </div>
@@ -406,7 +406,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                   value={clientForm.notes}
                   onChange={(e) => setClientForm({ ...clientForm, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Additional notes about the client..."
                 />
               </div>
@@ -420,7 +420,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                 </button>
                 <button
                   onClick={handleAddClient}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                 >
                   {editingClient ? 'Update Client' : 'Add Client'}
                 </button>

@@ -196,8 +196,8 @@ const TeamPage: React.FC = () => {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-1">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500 border-b-2 border-gray-300"></div>
-          <p className="text-sm text-gray-500">Loading your teams...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-accent border-b-2 border-gray-300"></div>
+          <p className="text-sm text-gray-600">Loading your teams...</p>
         </div>
       </div>
     );
@@ -218,7 +218,7 @@ const TeamPage: React.FC = () => {
       case 'active': return 'text-green-600 bg-green-100';
       case 'inactive': return 'text-gray-600 bg-gray-100';
       case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'away': return 'text-orange-600 bg-orange-100';
+      case 'away': return 'text-orange-600 bg-orange-200';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -226,7 +226,7 @@ const TeamPage: React.FC = () => {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin': return 'text-red-600 bg-red-100';
-      case 'manager': return 'text-blue-600 bg-blue-100';
+      case 'manager': return 'text-accent-dark bg-blue-100';
       case 'member': return 'text-green-600 bg-green-100';
       case 'viewer': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
@@ -271,7 +271,7 @@ const TeamPage: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Team Management</h1>
@@ -290,7 +290,7 @@ const TeamPage: React.FC = () => {
             {canManageTeam() && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Plus className="w-4 h-4" />
                 Add Member
@@ -307,17 +307,17 @@ const TeamPage: React.FC = () => {
             {/* Stats Cards */}
             {teamStats && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Total Members</p>
                       <p className="text-2xl font-bold text-gray-900">{teamStats.totalMembers}</p>
                     </div>
-                    <Users className="w-8 h-8 text-blue-500" />
+                    <Users className="w-8 h-8 text-accent" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Active Members</p>
@@ -327,7 +327,7 @@ const TeamPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Pending Invites</p>
@@ -337,7 +337,7 @@ const TeamPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Avg Productivity</p>
@@ -350,7 +350,7 @@ const TeamPage: React.FC = () => {
             )}
 
             {/* Tab Navigation */}
-            <div className="bg-white rounded-lg border border-gray-200 p-1">
+            <div className="bg-white rounded-lg border border-gray-300 p-1">
               <div className="flex items-center gap-2">
                 {[
                   { id: 'members', label: 'Team Members', icon: Users },
@@ -366,7 +366,7 @@ const TeamPage: React.FC = () => {
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         activeTab === tab.id
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-accent text-gray-900'
                           : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     >
@@ -379,17 +379,17 @@ const TeamPage: React.FC = () => {
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search team members..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -398,7 +398,7 @@ const TeamPage: React.FC = () => {
                   <select
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Roles</option>
                     <option value="admin">Admin</option>
@@ -410,7 +410,7 @@ const TeamPage: React.FC = () => {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
@@ -451,7 +451,7 @@ const TeamPage: React.FC = () => {
               {viewMode === 'grid' && (
                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredMembers.map(member => (
-                    <div key={member._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={member._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start gap-3 mb-3">
                         <UserDisplay
                           name={member.name}
@@ -475,7 +475,7 @@ const TeamPage: React.FC = () => {
                           </div>
                         </div>
                         
-                        <button className="text-gray-400 hover:text-gray-600">
+                        <button className="text-gray-600 hover:text-gray-600">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -521,7 +521,7 @@ const TeamPage: React.FC = () => {
                             className="w-10 h-10 rounded-full"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
                             <span className="text-sm font-medium text-gray-600">
                               {member.name.charAt(0)}
                             </span>
@@ -550,14 +550,14 @@ const TeamPage: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedMember(member)}
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                            className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                             <MessageSquare className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                             <MoreVertical className="w-4 h-4" />
                           </button>
                         </div>
@@ -572,13 +572,13 @@ const TeamPage: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Productivity</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Member</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Role</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Department</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Productivity</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Last Active</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -593,7 +593,7 @@ const TeamPage: React.FC = () => {
                                   className="w-8 h-8 rounded-full"
                                 />
                               ) : (
-                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
                                   <span className="text-xs font-medium text-gray-600">
                                     {member.name.charAt(0)}
                                   </span>
@@ -601,7 +601,7 @@ const TeamPage: React.FC = () => {
                               )}
                               <div>
                                 <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                <div className="text-sm text-gray-500">{member.email}</div>
+                                <div className="text-sm text-gray-600">{member.email}</div>
                               </div>
                             </div>
                           </td>
@@ -619,21 +619,21 @@ const TeamPage: React.FC = () => {
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{member.department}</td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <div className="w-16 bg-gray-200 rounded-full h-2">
+                              <div className="w-16 bg-gray-300 rounded-full h-2">
                                 <div
-                                  className="bg-blue-500 h-2 rounded-full"
+                                  className="bg-accent h-2 rounded-full"
                                   style={{ width: `${member.performance.productivityScore}%` }}
                                 />
                               </div>
                               <span className="text-sm text-gray-900">{member.performance.productivityScore}%</span>
                             </div>
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{formatLastActive(member.lastActive)}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{formatLastActive(member.lastActive)}</td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => setSelectedMember(member)}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="text-accent-dark hover:text-blue-900"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -656,11 +656,11 @@ const TeamPage: React.FC = () => {
 
             {/* Organization Chart View */}
             {activeTab === 'orgchart' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Organization Chart</h2>
                 <p className="text-gray-600 mb-6">Visual representation of team hierarchy and reporting structure</p>
-                <div className="text-center py-12 text-gray-500">
-                  <Target className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <div className="text-center py-12 text-gray-600">
+                  <Target className="w-16 h-16 mx-auto mb-4 text-gray-600" />
                   <p className="text-lg font-medium">Organization Chart Coming Soon</p>
                   <p className="text-sm mt-2">Visual hierarchy with drag-drop, reporting lines, and role-based coloring</p>
                 </div>
@@ -669,18 +669,18 @@ const TeamPage: React.FC = () => {
 
             {/* Capacity Planning View */}
             {activeTab === 'capacity' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Capacity Planning</h2>
                 <p className="text-gray-600 mb-6">Workload distribution and resource allocation across team</p>
                 <div className="space-y-4">
                   {filteredMembers.map(member => (
-                    <div key={member._id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={member._id} className="border border-gray-300 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           {member.avatar ? (
                             <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full" />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
                               <span className="text-sm font-medium text-gray-600">{member.name.charAt(0)}</span>
                             </div>
                           )}
@@ -691,7 +691,7 @@ const TeamPage: React.FC = () => {
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-gray-900">85%</div>
-                          <div className="text-xs text-gray-500">Utilization</div>
+                          <div className="text-xs text-gray-600">Utilization</div>
                         </div>
                       </div>
                       <div className="space-y-2">
@@ -699,8 +699,8 @@ const TeamPage: React.FC = () => {
                           <span className="text-gray-600">Weekly Capacity</span>
                           <span className="font-medium">34h / 40h</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }} />
+                        <div className="w-full bg-gray-300 rounded-full h-2">
+                          <div className="bg-accent h-2 rounded-full" style={{ width: '85%' }} />
                         </div>
                         <div className="grid grid-cols-3 gap-2 mt-3">
                           {member.projects.map(project => (
@@ -719,7 +719,7 @@ const TeamPage: React.FC = () => {
 
             {/* Skills Matrix View */}
             {activeTab === 'skills' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Skills Matrix</h2>
                 <p className="text-gray-600 mb-6">Team capabilities and expertise levels</p>
                 <div className="overflow-x-auto">
@@ -734,13 +734,13 @@ const TeamPage: React.FC = () => {
                     </thead>
                     <tbody>
                       {filteredMembers.map(member => (
-                        <tr key={member._id} className="border-b border-gray-100 hover:bg-gray-50">
+                        <tr key={member._id} className="border-b border-gray-300 hover:bg-gray-50">
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               {member.avatar ? (
                                 <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full" />
                               ) : (
-                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
                                   <span className="text-xs font-medium text-gray-600">{member.name.charAt(0)}</span>
                                 </div>
                               )}
@@ -756,7 +756,7 @@ const TeamPage: React.FC = () => {
                                   {[1, 2, 3, 4].map(star => (
                                     <Star
                                       key={star}
-                                      className={`w-4 h-4 ${star <= level ? 'text-yellow-500 fill-current' : 'text-gray-300'}`}
+                                      className={`w-4 h-4 ${star <= level ? 'text-yellow-500 fill-current' : 'text-gray-700'}`}
                                     />
                                   ))}
                                 </div>
@@ -773,40 +773,40 @@ const TeamPage: React.FC = () => {
 
             {/* Team Health View */}
             {activeTab === 'health' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-gray-300 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Team Health Dashboard</h2>
                 <p className="text-gray-600 mb-6">Monitor team well-being and identify potential issues</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium text-gray-900">Burnout Risk</h3>
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                         <span className="text-lg font-bold text-green-600">25</span>
                       </div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-300 rounded-full h-2">
                       <div className="bg-green-500 h-2 rounded-full" style={{ width: '25%' }} />
                     </div>
                     <p className="text-xs text-gray-600 mt-2">Low risk - Team is well-balanced</p>
                   </div>
 
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium text-gray-900">Satisfaction</h3>
                       <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-lg font-bold text-blue-600">4.2</span>
+                        <span className="text-lg font-bold text-accent-dark">4.2</span>
                       </div>
                     </div>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map(star => (
-                        <Star key={star} className={`w-5 h-5 ${star <= 4 ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                        <Star key={star} className={`w-5 h-5 ${star <= 4 ? 'text-yellow-500 fill-current' : 'text-gray-700'}`} />
                       ))}
                     </div>
                     <p className="text-xs text-gray-600 mt-2">High satisfaction score</p>
                   </div>
 
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium text-gray-900">Retention Risk</h3>
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -826,12 +826,12 @@ const TeamPage: React.FC = () => {
                     const colorClass = riskLevel === 'low' ? 'bg-green-500' : riskLevel === 'medium' ? 'bg-yellow-500' : 'bg-red-500';
                     
                     return (
-                      <div key={member._id} className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg">
+                      <div key={member._id} className="flex items-center gap-4 p-3 border border-gray-300 rounded-lg">
                         <div className="flex items-center gap-3 flex-1">
                           {member.avatar ? (
                             <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full" />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
                               <span className="text-sm font-medium text-gray-600">{member.name.charAt(0)}</span>
                             </div>
                           )}
@@ -843,9 +843,9 @@ const TeamPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <div className="text-right">
                             <div className="text-lg font-bold text-gray-900">{healthScore}</div>
-                            <div className="text-xs text-gray-500">Health Score</div>
+                            <div className="text-xs text-gray-600">Health Score</div>
                           </div>
-                          <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="w-24 bg-gray-300 rounded-full h-2">
                             <div className={`${colorClass} h-2 rounded-full`} style={{ width: `${healthScore}%` }} />
                           </div>
                         </div>
@@ -877,15 +877,15 @@ const TeamPage: React.FC = () => {
 
             {/* Recent Activity */}
             {teamStats && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-300 p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">Recent Activity</h3>
                 <div className="space-y-3">
                   {teamStats.recentActivity.map(activity => (
                     <div key={activity._id} className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                      <div className="w-2 h-2 bg-accent rounded-full mt-2" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-900">{activity.description}</p>
-                        <p className="text-xs text-gray-500">{formatLastActive(activity.timestamp)}</p>
+                        <p className="text-xs text-gray-600">{formatLastActive(activity.timestamp)}</p>
                       </div>
                     </div>
                   ))}
@@ -894,7 +894,7 @@ const TeamPage: React.FC = () => {
             )}
 
             {/* Top Performers */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Top Performers</h3>
               <div className="space-y-3">
                 {teamMembers
@@ -913,7 +913,7 @@ const TeamPage: React.FC = () => {
                             className="w-6 h-6 rounded-full"
                           />
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
                             <span className="text-xs font-medium text-gray-600">
                               {member.name.charAt(0)}
                             </span>
@@ -921,14 +921,14 @@ const TeamPage: React.FC = () => {
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-500">{member.role}</p>
+                          <p className="text-xs text-gray-600">{member.role}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">{member.performance.productivityScore}%</p>
                         <div className="flex items-center">
                           <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                          <span className="text-xs text-gray-500 ml-1">{member.performance.averageRating}</span>
+                          <span className="text-xs text-gray-600 ml-1">{member.performance.averageRating}</span>
                         </div>
                       </div>
                     </div>
@@ -953,7 +953,7 @@ const TeamPage: React.FC = () => {
                       className="w-16 h-16 rounded-full"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center">
                       <span className="text-2xl font-medium text-gray-600">
                         {selectedMember.name.charAt(0)}
                       </span>
@@ -975,7 +975,7 @@ const TeamPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setSelectedMember(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-600 hover:text-gray-600"
                 >
                   ×
                 </button>
@@ -1049,7 +1049,7 @@ const TeamPage: React.FC = () => {
                 <h4 className="text-lg font-medium text-gray-900 mb-3">Current Projects</h4>
                 <div className="space-y-3">
                   {selectedMember.projects.map(project => (
-                    <div key={project._id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div key={project._id} className="flex items-center justify-between p-3 border border-gray-300 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${project.color}`} />
                         <div>
@@ -1059,9 +1059,9 @@ const TeamPage: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">{project.progress}%</p>
-                        <div className="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                        <div className="w-16 bg-gray-300 rounded-full h-2 mt-1">
                           <div
-                            className="bg-blue-500 h-2 rounded-full"
+                            className="bg-accent h-2 rounded-full"
                             style={{ width: `${project.progress}%` }}
                           />
                         </div>
@@ -1072,14 +1072,14 @@ const TeamPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="p-6 border-t border-gray-200 flex justify-end gap-2">
+            <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedMember(null)}
                 className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Close
               </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
                 Edit Member
               </button>
             </div>

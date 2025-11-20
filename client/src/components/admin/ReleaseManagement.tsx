@@ -194,8 +194,8 @@ const ReleaseManagement: React.FC = () => {
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
-      case 'windows': return <Monitor className="w-5 h-5 text-blue-500" />;
-      case 'macos': return <Apple className="w-5 h-5 text-gray-400" />;
+      case 'windows': return <Monitor className="w-5 h-5 text-accent" />;
+      case 'macos': return <Apple className="w-5 h-5 text-gray-600" />;
       case 'linux': return <HardDrive className="w-5 h-5 text-orange-500" />;
       default: return <Package className="w-5 h-5" />;
     }
@@ -225,7 +225,7 @@ const ReleaseManagement: React.FC = () => {
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Desktop App Releases
             </h1>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Manage desktop application versions for Windows, macOS, and Linux
             </p>
           </div>
@@ -245,19 +245,19 @@ const ReleaseManagement: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Releases</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Total Releases</p>
                   <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                     {stats.totalReleases}
                   </p>
                 </div>
-                <Package className="w-8 h-8 text-blue-500" />
+                <Package className="w-8 h-8 text-accent" />
               </div>
             </div>
 
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Downloads</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Total Downloads</p>
                   <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                     {stats.totalDownloads}
                   </p>
@@ -270,11 +270,11 @@ const ReleaseManagement: React.FC = () => {
               <div key={platform._id} className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} capitalize`}>{platform._id}</p>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} capitalize`}>{platform._id}</p>
                     <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                       {platform.downloads}
                     </p>
-                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>
+                    <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
                       {platform.count} releases
                     </p>
                   </div>
@@ -291,22 +291,22 @@ const ReleaseManagement: React.FC = () => {
             <table className="w-full">
               <thead className={isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}>
                 <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Version
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Platform
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     File
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Downloads
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Status
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Actions
                   </th>
                 </tr>
@@ -319,7 +319,7 @@ const ReleaseManagement: React.FC = () => {
                         <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                           {release.versionName}
                         </div>
-                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                           v{release.version}
                         </div>
                       </div>
@@ -327,17 +327,17 @@ const ReleaseManagement: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         {getPlatformIcon(release.platform)}
-                        <span className={`text-sm capitalize ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <span className={`text-sm capitalize ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                           {release.platform} ({release.architecture})
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
                           {release.fileName}
                         </div>
-                        <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                           {formatFileSize(release.fileSize)}
                         </div>
                       </div>
@@ -345,7 +345,7 @@ const ReleaseManagement: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <Download className="w-4 h-4 text-green-500" />
-                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
                           {release.downloadCount}
                         </span>
                       </div>
@@ -371,7 +371,7 @@ const ReleaseManagement: React.FC = () => {
                           className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                           title={release.isLatest ? 'Unmark as latest' : 'Mark as latest'}
                         >
-                          <CheckCircle className={`w-5 h-5 ${release.isLatest ? 'text-green-500' : 'text-gray-400'}`} />
+                          <CheckCircle className={`w-5 h-5 ${release.isLatest ? 'text-green-500' : 'text-gray-600'}`} />
                         </button>
                         <button
                           onClick={() => handleDeleteRelease(release._id, release.fileName)}
@@ -408,7 +408,7 @@ const ReleaseManagement: React.FC = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                       Version *
                     </label>
                     <input
@@ -421,7 +421,7 @@ const ReleaseManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                       Version Name *
                     </label>
                     <input
@@ -435,7 +435,7 @@ const ReleaseManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                     Description *
                   </label>
                   <input
@@ -448,7 +448,7 @@ const ReleaseManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                     Release Notes *
                   </label>
                   <textarea
@@ -462,7 +462,7 @@ const ReleaseManagement: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                       Platform *
                     </label>
                     <select
@@ -477,7 +477,7 @@ const ReleaseManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                       Architecture *
                     </label>
                     <select
@@ -493,7 +493,7 @@ const ReleaseManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
                     Upload File *
                   </label>
                   <div className={`border-2 border-dashed ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-lg p-6`}>
@@ -508,12 +508,12 @@ const ReleaseManagement: React.FC = () => {
                       htmlFor="file-upload"
                       className="flex flex-col items-center cursor-pointer"
                     >
-                      <Upload className={`w-12 h-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`} />
-                      <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <Upload className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-2`} />
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                         {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
                       </span>
                       {selectedFile && (
-                        <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>
+                        <span className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
                           {formatFileSize(selectedFile.size)}
                         </span>
                       )}
@@ -529,7 +529,7 @@ const ReleaseManagement: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, isLatest: e.target.checked })}
                     className="w-4 h-4 text-yellow-500 rounded focus:ring-yellow-500"
                   />
-                  <label htmlFor="isLatest" className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label htmlFor="isLatest" className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                     Mark as latest version
                   </label>
                 </div>

@@ -286,7 +286,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
                   onClick={() => setProjectData(prev => ({ ...prev, type: type.value as any }))}
                   className={`p-3 rounded-lg border text-left transition-colors ${
                     projectData.type === type.value
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      ? 'border-accent bg-blue-50 text-blue-700'
                       : 'border-gray-300 hover:bg-gray-50'
                   }`}
                 >
@@ -304,7 +304,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
             <select
               value={projectData.category}
               onChange={(e) => setProjectData(prev => ({ ...prev, category: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="">Select Category</option>
               {categoryOptions.map(category => (
@@ -318,7 +318,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
             <select
               value={projectData.priority}
               onChange={(e) => setProjectData(prev => ({ ...prev, priority: e.target.value as any }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -334,7 +334,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
               min="1"
               value={projectData.teamSize}
               onChange={(e) => setProjectData(prev => ({ ...prev, teamSize: parseInt(e.target.value) }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
 
@@ -345,7 +345,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
               min="0"
               value={projectData.budget}
               onChange={(e) => setProjectData(prev => ({ ...prev, budget: parseInt(e.target.value) }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
         </div>
@@ -358,7 +358,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
             type="date"
             value={projectData.startDate}
             onChange={(e) => setProjectData(prev => ({ ...prev, startDate: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           />
         </div>
         <div>
@@ -367,7 +367,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
             type="date"
             value={projectData.endDate}
             onChange={(e) => setProjectData(prev => ({ ...prev, endDate: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           />
         </div>
       </div>
@@ -387,7 +387,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
                     setProjectData(prev => ({ ...prev, goals: prev.goals.filter(g => g !== goal) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{goal}</span>
             </label>
@@ -422,7 +422,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
                     setProjectData(prev => ({ ...prev, deliverables: prev.deliverables.filter(d => d !== deliverable) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{deliverable}</span>
             </label>
@@ -445,7 +445,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
                     setProjectData(prev => ({ ...prev, resources: prev.resources.filter(r => r !== resource) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{resource}</span>
             </label>
@@ -468,7 +468,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
                     setProjectData(prev => ({ ...prev, risks: prev.risks.filter(r => r !== risk) }));
                   }
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
               />
               <span className="ml-2 text-sm text-gray-700">{risk}</span>
             </label>
@@ -484,7 +484,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
             ...prev, 
             customizations: { ...prev.customizations, methodology: e.target.value as any }
           }))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
         >
           <option value="agile">Agile</option>
           <option value="waterfall">Waterfall</option>
@@ -508,7 +508,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
 
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <FolderPlus className="w-6 h-6 text-blue-600" />
+          <FolderPlus className="w-6 h-6 text-accent-dark" />
           <div>
             <h4 className="font-semibold text-gray-900">{projectData.name}</h4>
             <p className="text-sm text-gray-600">{projectData.description}</p>
@@ -541,9 +541,9 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
               <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
                 <div>
                   <span className="font-medium text-sm">{phase.name}</span>
-                  <span className="ml-2 text-xs text-gray-500">{phase.duration} days</span>
+                  <span className="ml-2 text-xs text-gray-600">{phase.duration} days</span>
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-600">
                   {phase.tasks.length} tasks
                 </div>
               </div>
@@ -565,7 +565,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <Zap className="w-5 h-5 text-blue-600 mt-0.5" />
+          <Zap className="w-5 h-5 text-accent-dark mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900">AI Project Optimization</h4>
             <p className="text-sm text-blue-700 mt-1">
@@ -589,7 +589,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
             {step === 2 && 'Project Details'}
             {step === 3 && 'Review & Create'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -601,7 +601,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
               <span>Step {step} of 3</span>
               <span>{Math.round((step / 3) * 100)}% Complete</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-300 rounded-full h-2">
               <div
                 className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${(step / 3) * 100}%` }}
@@ -628,7 +628,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               Next
               <ArrowRight className="w-4 h-4 inline ml-2" />

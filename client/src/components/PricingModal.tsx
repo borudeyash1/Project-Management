@@ -215,7 +215,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-600 hover:text-gray-600 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -255,7 +255,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {loading && (
-              <div className="col-span-full text-center text-gray-500 py-8">Loading subscription plans...</div>
+              <div className="col-span-full text-center text-gray-600 py-8">Loading subscription plans...</div>
             )}
             {!loading && sortedPlans.map((plan) => {
               const planKey = plan.planKey;
@@ -274,13 +274,13 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                   onClick={() => setSelectedPlan(planKey)}
                   className={`relative rounded-xl border-2 transition-all duration-200 cursor-pointer ${
                     isSelected
-                      ? 'border-blue-500 shadow-lg scale-[1.01]'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-accent shadow-lg scale-[1.01]'
+                      : 'border-gray-300 hover:border-gray-300'
                   }`}
                 >
                   {planKey === 'pro' && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                      <span className="bg-accent text-gray-900 px-4 py-1 rounded-full text-sm font-medium">
                         Most Popular
                       </span>
                     </div>
@@ -340,10 +340,10 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                       <div className="space-y-3">
                         {Object.entries(plan.features).map(([featureKey, enabled]) => (
                           <div key={featureKey} className="flex items-start gap-3 p-2 rounded-lg">
-                            <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${enabled ? 'text-green-500' : 'text-gray-300'}`} />
+                            <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${enabled ? 'text-green-500' : 'text-gray-700'}`} />
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
-                                <span className={`text-sm font-medium ${enabled ? 'text-gray-900' : 'text-gray-500'}`}>
+                                <span className={`text-sm font-medium ${enabled ? 'text-gray-900' : 'text-gray-600'}`}>
                                   {featureKey.replace(/([A-Z])/g, ' $1')}
                                 </span>
                               </div>
@@ -364,9 +364,9 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                       }}
                       className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
                         planKey === 'pro'
-                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          ? 'bg-accent text-gray-900 hover:bg-accent-hover'
                           : planKey === 'free'
-                          ? 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                          ? 'bg-gray-100 text-gray-900 hover:bg-gray-300'
                           : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500'
                       } shadow-md`}
                     >
@@ -383,7 +383,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-6 border-t border-gray-300 bg-gray-50">
           <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
@@ -406,32 +406,32 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 space-y-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm uppercase tracking-wide text-gray-400">Selected plan</p>
+                <p className="text-sm uppercase tracking-wide text-gray-600">Selected plan</p>
                 <h3 className="text-2xl font-semibold text-gray-900">{detailPlan.displayName}</h3>
                 <p className="text-sm text-gray-600 mt-1">{detailPlan.summary}</p>
               </div>
-              <button onClick={() => setDetailPlan(null)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setDetailPlan(null)} className="text-gray-600 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="rounded-xl border border-gray-200 p-4 bg-gray-50">
+            <div className="rounded-xl border border-gray-300 p-4 bg-gray-50">
               <h4 className="font-semibold text-gray-900 mb-3">What you’ll get</h4>
               <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
                 <div>
-                  <p className="text-gray-500">Workspaces</p>
+                  <p className="text-gray-600">Workspaces</p>
                   <p className="font-semibold">{detailPlan.limits.maxWorkspaces === -1 ? 'Unlimited' : detailPlan.limits.maxWorkspaces}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Projects</p>
+                  <p className="text-gray-600">Projects</p>
                   <p className="font-semibold">{detailPlan.limits.maxProjects === -1 ? 'Unlimited' : detailPlan.limits.maxProjects}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Team members</p>
+                  <p className="text-gray-600">Team members</p>
                   <p className="font-semibold">{detailPlan.limits.maxTeamMembers === -1 ? 'Unlimited' : detailPlan.limits.maxTeamMembers}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Storage</p>
+                  <p className="text-gray-600">Storage</p>
                   <p className="font-semibold">{detailPlan.limits.storageInGB} GB</p>
                 </div>
               </div>
@@ -443,7 +443,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                 <button
                   onClick={handleSendVerification}
                   disabled={otpLoading}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-60"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-accent text-gray-900 font-semibold hover:bg-accent-hover disabled:opacity-60"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   {otpLoading ? 'Sending...' : 'Send verification code'}
@@ -468,7 +468,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                     <button
                       onClick={handleVerifyOtp}
                       disabled={otpLoading}
-                      className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                      className="flex-1 px-4 py-2 rounded-lg bg-accent text-gray-900 hover:bg-accent-hover disabled:opacity-60"
                     >
                       {otpLoading ? 'Verifying...' : 'Verify code'}
                     </button>

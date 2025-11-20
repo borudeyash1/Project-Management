@@ -446,14 +446,14 @@ const Profile: React.FC = () => {
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
           />
-          <button className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 hover:bg-blue-700 transition-colors">
+          <button className="absolute bottom-0 right-0 bg-accent text-gray-900 rounded-full p-2 hover:bg-accent-hover transition-colors">
             <Camera className="w-4 h-4" />
           </button>
         </div>
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{profileData?.fullName}</h2>
-          <p className="text-gray-600 dark:text-gray-300">{profileData?.designation} • {profileData?.department}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Member since {new Date(profileData?.joinDate || '').toLocaleDateString()}</p>
+          <p className="text-gray-600 dark:text-gray-700">{profileData?.designation} • {profileData?.department}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-200">Member since {new Date(profileData?.joinDate || '').toLocaleDateString()}</p>
         </div>
       </div>
 
@@ -462,9 +462,9 @@ const Profile: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <User className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Full Name</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.fullName}</p>
               </div>
             </div>
@@ -473,7 +473,7 @@ const Profile: React.FC = () => {
                 setEditingField('fullName');
                 setEditValue(profileData?.fullName || '');
               }}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-accent-dark hover:text-blue-700"
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -481,9 +481,9 @@ const Profile: React.FC = () => {
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Mail className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Email</p>
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.email}</p>
                   {profileData?.isEmailVerified && (
@@ -497,7 +497,7 @@ const Profile: React.FC = () => {
                 setEditingField('email');
                 setEditValue(profileData?.email || '');
               }}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-accent-dark hover:text-blue-700"
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -505,9 +505,9 @@ const Profile: React.FC = () => {
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Phone className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Phone</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.contactNumber}</p>
               </div>
             </div>
@@ -516,7 +516,7 @@ const Profile: React.FC = () => {
                 setEditingField('contactNumber');
                 setEditValue(profileData?.contactNumber || '');
               }}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-accent-dark hover:text-blue-700"
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -526,9 +526,9 @@ const Profile: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
-              <Building className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Building className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Department</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Department</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.department}</p>
               </div>
             </div>
@@ -537,7 +537,7 @@ const Profile: React.FC = () => {
                 setEditingField('department');
                 setEditValue(profileData?.department || '');
               }}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-accent-dark hover:text-blue-700"
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -545,9 +545,9 @@ const Profile: React.FC = () => {
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Location</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.location}</p>
               </div>
             </div>
@@ -556,7 +556,7 @@ const Profile: React.FC = () => {
                 setEditingField('location');
                 setEditValue(profileData?.location || '');
               }}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-accent-dark hover:text-blue-700"
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -564,9 +564,9 @@ const Profile: React.FC = () => {
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Date of Birth</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">Date of Birth</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{new Date(profileData?.dateOfBirth || '').toLocaleDateString()}</p>
               </div>
             </div>
@@ -575,7 +575,7 @@ const Profile: React.FC = () => {
                 setEditingField('dateOfBirth');
                 setEditValue(profileData?.dateOfBirth || '');
               }}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-accent-dark hover:text-blue-700"
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -592,12 +592,12 @@ const Profile: React.FC = () => {
               setEditingField('about');
               setEditValue(profileData?.about || '');
             }}
-            className="text-blue-600 hover:text-blue-700"
+            className="text-accent-dark hover:text-blue-700"
           >
             <Edit className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-gray-700 dark:text-gray-300">{profileData?.about}</p>
+        <p className="text-gray-700 dark:text-gray-700">{profileData?.about}</p>
       </div>
 
       {/* Security Section */}
@@ -605,7 +605,7 @@ const Profile: React.FC = () => {
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Security</h3>
         <button
           onClick={() => setShowPasswordForm(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Key className="w-4 h-4" />
           Change Password
@@ -635,7 +635,7 @@ const Profile: React.FC = () => {
                 key={theme}
                 className={`px-4 py-2 rounded-lg border transition-colors ${
                   currentTheme === theme
-                    ? 'bg-blue-600 text-white border-blue-600'
+                    ? 'bg-accent text-gray-900 border-accent-dark'
                     : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
                 onClick={() => {
@@ -667,12 +667,12 @@ const Profile: React.FC = () => {
             {Object.entries(notifications).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
                 <span className="font-medium text-gray-900 dark:text-gray-100">{key.charAt(0).toUpperCase() + key.slice(1)} Notifications</span>
               </div>
               <button
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  value ? 'bg-blue-600' : 'bg-gray-200'
+                  value ? 'bg-accent' : 'bg-gray-300'
                 }`}
                 onClick={() => {
                   const newValue = !value;
@@ -710,7 +710,7 @@ const Profile: React.FC = () => {
           <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Privacy</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profile Visibility</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Profile Visibility</label>
               <select
                 value={privacy.profileVisibility}
                 onChange={(e) => {
@@ -731,7 +731,7 @@ const Profile: React.FC = () => {
                     profileVisibility: e.target.value as 'public' | 'private' | 'workspace'
                   });
                 }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             >
               <option value="public">Public</option>
               <option value="workspace">Workspace Only</option>
@@ -744,7 +744,7 @@ const Profile: React.FC = () => {
                 <span className="font-medium text-gray-900 dark:text-gray-100">Show {key.charAt(0).toUpperCase() + key.slice(1)}</span>
                 <button
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    value ? 'bg-blue-600' : 'bg-gray-200'
+                    value ? 'bg-accent' : 'bg-gray-300'
                   }`}
                   onClick={() => {
                     const newValue = !value;
@@ -787,7 +787,7 @@ const Profile: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Addresses</h3>
         <button
           onClick={() => setShowAddAddress(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Address
@@ -799,7 +799,7 @@ const Profile: React.FC = () => {
           <div key={address.id} className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-200" />
                 <span className="font-medium capitalize text-gray-900 dark:text-gray-100">{address.type} Address</span>
                 {address.isDefault && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Default</span>
@@ -809,7 +809,7 @@ const Profile: React.FC = () => {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="text-sm text-gray-700 dark:text-gray-700">
               <p>{address.street}</p>
               <p>{address.city}, {address.state} {address.zipCode}</p>
               <p>{address.country}</p>
@@ -826,7 +826,7 @@ const Profile: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Payment Methods</h3>
         <button
           onClick={() => setShowAddPayment(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Payment Method
@@ -838,7 +838,7 @@ const Profile: React.FC = () => {
           <div key={payment.id} className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-200" />
                 <span className="font-medium text-gray-900 dark:text-gray-100">{payment.brand} •••• {payment.last4}</span>
                 {payment.isDefault && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Default</span>
@@ -848,7 +848,7 @@ const Profile: React.FC = () => {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="text-sm text-gray-700 dark:text-gray-700">
               <p>Expires {payment.expiryMonth}/{payment.expiryYear}</p>
             </div>
           </div>
@@ -869,10 +869,10 @@ const Profile: React.FC = () => {
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-gray-100">{achievement.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{achievement.description}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{achievement.description}</p>
               </div>
             </div>
-            <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center justify-between text-xs text-gray-600">
               <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full capitalize">
                 {achievement.category}
               </span>
@@ -892,15 +892,15 @@ const Profile: React.FC = () => {
           <div key={key} className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
-                {key.includes('Tasks') && <Target className="w-5 h-5 text-blue-600" />}
-                {key.includes('Projects') && <Building className="w-5 h-5 text-blue-600" />}
-                {key.includes('Workspaces') && <Globe className="w-5 h-5 text-blue-600" />}
-                {key.includes('Streak') && <Zap className="w-5 h-5 text-blue-600" />}
-                {key.includes('Hours') && <Clock className="w-5 h-5 text-blue-600" />}
+                {key.includes('Tasks') && <Target className="w-5 h-5 text-accent-dark" />}
+                {key.includes('Projects') && <Building className="w-5 h-5 text-accent-dark" />}
+                {key.includes('Workspaces') && <Globe className="w-5 h-5 text-accent-dark" />}
+                {key.includes('Streak') && <Zap className="w-5 h-5 text-accent-dark" />}
+                {key.includes('Hours') && <Clock className="w-5 h-5 text-accent-dark" />}
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
               </div>
             </div>
           </div>
@@ -914,11 +914,11 @@ const Profile: React.FC = () => {
       <div className="p-4 sm:p-6">
         <div className="bg-white border border-border rounded-xl p-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
             <div className="space-y-4">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
             </div>
           </div>
         </div>
@@ -928,15 +928,15 @@ const Profile: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6">
-      <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-700 rounded-xl">
+      <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
         {/* Header */}
-        <div className="p-6 border-b border-border dark:border-gray-700">
+        <div className="p-6 border-b border-border dark:border-gray-600">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your personal information and preferences</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Manage your personal information and preferences</p>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-border dark:border-gray-700">
+        <div className="border-b border-border dark:border-gray-600">
           <nav className="flex space-x-8 px-6 overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -946,8 +946,8 @@ const Profile: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                      ? 'border-accent text-accent-dark dark:text-accent-light'
+                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -978,14 +978,14 @@ const Profile: React.FC = () => {
               type={editingField === 'email' ? 'email' : editingField === 'contactNumber' ? 'tel' : editingField === 'dateOfBirth' ? 'date' : 'text'}
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4"
               placeholder={`Enter ${editingField}`}
             />
             <div className="flex gap-3">
               <button
                 onClick={() => handleSaveField(editingField, editValue)}
                 disabled={saving}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save'}
               </button>
@@ -1015,7 +1015,7 @@ const Profile: React.FC = () => {
                   type="password"
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div>
@@ -1024,7 +1024,7 @@ const Profile: React.FC = () => {
                   type="password"
                   value={passwordData.newPassword}
                   onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div>
@@ -1033,7 +1033,7 @@ const Profile: React.FC = () => {
                   type="password"
                   value={passwordData.confirmPassword}
                   onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
             </div>
@@ -1041,7 +1041,7 @@ const Profile: React.FC = () => {
               <button
                 onClick={handlePasswordChange}
                 disabled={saving}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {saving ? 'Changing...' : 'Change Password'}
               </button>
@@ -1070,7 +1070,7 @@ const Profile: React.FC = () => {
                 <select
                   value={newAddress.type}
                   onChange={(e) => setNewAddress(prev => ({ ...prev, type: e.target.value as 'home' | 'work' | 'billing' }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 >
                   <option value="home">Home</option>
                   <option value="work">Work</option>
@@ -1083,7 +1083,7 @@ const Profile: React.FC = () => {
                   type="text"
                   value={newAddress.street}
                   onChange={(e) => setNewAddress(prev => ({ ...prev, street: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -1093,7 +1093,7 @@ const Profile: React.FC = () => {
                     type="text"
                     value={newAddress.city}
                     onChange={(e) => setNewAddress(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   />
                 </div>
                 <div>
@@ -1102,7 +1102,7 @@ const Profile: React.FC = () => {
                     type="text"
                     value={newAddress.state}
                     onChange={(e) => setNewAddress(prev => ({ ...prev, state: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   />
                 </div>
               </div>
@@ -1113,7 +1113,7 @@ const Profile: React.FC = () => {
                     type="text"
                     value={newAddress.zipCode}
                     onChange={(e) => setNewAddress(prev => ({ ...prev, zipCode: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   />
                 </div>
                 <div>
@@ -1122,7 +1122,7 @@ const Profile: React.FC = () => {
                     type="text"
                     value={newAddress.country}
                     onChange={(e) => setNewAddress(prev => ({ ...prev, country: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   />
                 </div>
               </div>
@@ -1131,7 +1131,7 @@ const Profile: React.FC = () => {
                   type="checkbox"
                   checked={newAddress.isDefault}
                   onChange={(e) => setNewAddress(prev => ({ ...prev, isDefault: e.target.checked }))}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
                 />
                 <label className="ml-2 text-sm text-gray-700">Set as default address</label>
               </div>
@@ -1140,7 +1140,7 @@ const Profile: React.FC = () => {
               <button
                 onClick={handleAddAddress}
                 disabled={saving}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {saving ? 'Adding...' : 'Add Address'}
               </button>
@@ -1179,7 +1179,7 @@ const Profile: React.FC = () => {
                   value={newPayment.cardNumber}
                   onChange={(e) => setNewPayment(prev => ({ ...prev, cardNumber: e.target.value }))}
                   placeholder="1234 5678 9012 3456"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -1190,7 +1190,7 @@ const Profile: React.FC = () => {
                     value={newPayment.expiryMonth}
                     onChange={(e) => setNewPayment(prev => ({ ...prev, expiryMonth: e.target.value }))}
                     placeholder="MM"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   />
                 </div>
                 <div>
@@ -1200,7 +1200,7 @@ const Profile: React.FC = () => {
                     value={newPayment.expiryYear}
                     onChange={(e) => setNewPayment(prev => ({ ...prev, expiryYear: e.target.value }))}
                     placeholder="YYYY"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   />
                 </div>
               </div>
@@ -1210,7 +1210,7 @@ const Profile: React.FC = () => {
                   type="text"
                   value={newPayment.name}
                   onChange={(e) => setNewPayment(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 />
               </div>
               <div className="flex items-center">
@@ -1218,7 +1218,7 @@ const Profile: React.FC = () => {
                   type="checkbox"
                   checked={newPayment.isDefault}
                   onChange={(e) => setNewPayment(prev => ({ ...prev, isDefault: e.target.checked }))}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
                 />
                 <label className="ml-2 text-sm text-gray-700">Set as default payment method</label>
               </div>
@@ -1227,7 +1227,7 @@ const Profile: React.FC = () => {
               <button
                 onClick={handleAddPayment}
                 disabled={saving}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {saving ? 'Adding...' : 'Add Payment Method'}
               </button>

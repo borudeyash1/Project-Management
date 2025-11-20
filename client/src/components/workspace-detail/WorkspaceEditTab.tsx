@@ -78,7 +78,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
   return (
     <div className="space-y-6">
       {/* Workspace Information */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Workspace Information</h3>
         
         <div className="space-y-4">
@@ -91,7 +91,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 placeholder="Enter workspace name"
               />
             </div>
@@ -103,7 +103,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
                 <option value="personal">Personal</option>
                 <option value="team">Team</option>
@@ -120,7 +120,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               placeholder="Describe your workspace"
             />
           </div>
@@ -134,7 +134,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
               <select
                 value={formData.region}
                 onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
                 <option value="North America">North America</option>
                 <option value="Europe">Europe</option>
@@ -154,7 +154,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
                 type="email"
                 value={formData.contactEmail}
                 onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 placeholder="contact@example.com"
               />
             </div>
@@ -170,7 +170,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
                 type="tel"
                 value={formData.contactPhone}
                 onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 placeholder="+1 (555) 000-0000"
               />
             </div>
@@ -184,7 +184,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 placeholder="https://example.com"
               />
             </div>
@@ -198,7 +198,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
               type="text"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               placeholder="123 Main St, City, State, ZIP"
             />
           </div>
@@ -206,11 +206,11 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
       </div>
 
       {/* Privacy & Permissions */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Privacy & Permissions</h3>
         
         <div className="space-y-4">
-          <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.isPublic}
@@ -228,7 +228,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.allowMemberInvites}
@@ -243,7 +243,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.requireApproval}
@@ -264,7 +264,7 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
       <div className="flex justify-end gap-3">
         <button
           onClick={handleSave}
-          className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Save className="w-4 h-4" />
           Save Changes

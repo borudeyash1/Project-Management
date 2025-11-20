@@ -125,7 +125,7 @@ const ProjectInternalNav: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
       <div className="px-6">
         <div className="flex items-center gap-1 overflow-x-auto">
           {visibleTabs.map((tab) => {
@@ -138,8 +138,8 @@ const ProjectInternalNav: React.FC = () => {
                 onClick={() => navigate(tab.path)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   active
-                    ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
+                    ? 'border-accent-dark text-accent-dark dark:text-accent-light'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

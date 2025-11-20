@@ -186,7 +186,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -196,7 +196,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+        <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               {isEditing ? (
@@ -204,7 +204,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   type="text"
                   value={editedTask.title}
                   onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-                  className="text-xl font-semibold text-gray-900 border-b-2 border-blue-500 focus:outline-none w-full"
+                  className="text-xl font-semibold text-gray-900 border-b-2 border-accent focus:outline-none w-full"
                 />
               ) : (
                 <h2 className="text-xl font-semibold text-gray-900">{task.title}</h2>
@@ -252,7 +252,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
           </div>
@@ -271,7 +271,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     value={editedTask.description}
                     onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                 ) : (
                   <p className="text-gray-700">{task.description || 'No description provided'}</p>
@@ -285,7 +285,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   <select
                     value={editedTask.status}
                     onChange={(e) => handleStatusChange(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                     disabled={task.status === 'completed' && !isManager}
                   >
                     <option value="pending">Pending</option>
@@ -343,12 +343,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         value={newSubtask}
                         onChange={(e) => setNewSubtask(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Add new subtask..."
                       />
                       <button
                         onClick={handleAddSubtask}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -363,8 +363,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div className="space-y-2">
                   {canEdit && (
                     <div>
-                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 cursor-pointer transition-colors">
-                        <Upload className="w-5 h-5 text-gray-400" />
+                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-accent cursor-pointer transition-colors">
+                        <Upload className="w-5 h-5 text-gray-600" />
                         <span className="text-sm text-gray-600">Upload files</span>
                         <input
                           type="file"
@@ -381,13 +381,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       {editedTask.attachments.map((file: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            <FileText className="w-4 h-4 text-gray-600 flex-shrink-0" />
                             <span className="text-sm text-gray-700 truncate">{file.name}</span>
                           </div>
                           <a
                             href={file.url}
                             download
-                            className="p-1 text-blue-600 hover:bg-blue-50 rounded ml-2"
+                            className="p-1 text-accent-dark hover:bg-blue-50 rounded ml-2"
                           >
                             <Download className="w-4 h-4" />
                           </a>
@@ -409,7 +409,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         value={newLink}
                         onChange={(e) => setNewLink(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleAddLink()}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="https://example.com"
                       />
                       <button
@@ -431,8 +431,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                         >
-                          <LinkIcon className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm text-blue-600 hover:underline truncate">{link}</span>
+                          <LinkIcon className="w-4 h-4 text-accent-dark" />
+                          <span className="text-sm text-accent-dark hover:underline truncate">{link}</span>
                         </a>
                       ))}
                     </div>
@@ -451,7 +451,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     <div key={comment._id} className="p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium text-sm text-gray-900">{comment.author.name}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-600">
                           {new Date(comment.createdAt).toLocaleString()}
                         </span>
                       </div>
@@ -466,12 +466,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Add a comment..."
                       />
                       <button
                         onClick={handleAddComment}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                       >
                         Send
                       </button>
@@ -490,7 +490,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Assigned To</p>
                   <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-gray-400" />
+                    <User className="w-4 h-4 text-gray-600" />
                     <span className="text-sm font-medium text-gray-900">
                       {task.assignee?.name || 'Unassigned'}
                     </span>
@@ -500,7 +500,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Due Date</p>
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <Calendar className="w-4 h-4 text-gray-600" />
                     <span className="text-sm text-gray-900">
                       {new Date(task.dueDate).toLocaleDateString()}
                     </span>
@@ -510,7 +510,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Estimated Hours</p>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-400" />
+                    <Clock className="w-4 h-4 text-gray-600" />
                     <span className="text-sm text-gray-900">{task.estimatedHours}h</span>
                   </div>
                 </div>
@@ -518,7 +518,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Priority</p>
                   <div className="flex items-center gap-2">
-                    <Flag className="w-4 h-4 text-gray-400" />
+                    <Flag className="w-4 h-4 text-gray-600" />
                     <span className={`text-sm font-medium capitalize ${
                       task.priority === 'critical' ? 'text-red-600' :
                       task.priority === 'high' ? 'text-orange-600' :
@@ -555,9 +555,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     <span className="text-gray-600">Completion</span>
                     <span className="font-medium text-gray-900">{editedTask.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-300 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-accent h-2 rounded-full transition-all duration-300"
                       style={{ width: `${editedTask.progress}%` }}
                     />
                   </div>

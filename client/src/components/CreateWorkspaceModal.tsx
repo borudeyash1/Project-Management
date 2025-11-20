@@ -167,7 +167,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
           <div key={plan.planKey} className="border rounded-xl p-4 shadow-sm bg-white">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold capitalize">{plan.displayName}</h3>
-              <span className="text-xs uppercase tracking-wide text-gray-500">{plan.planKey}</span>
+              <span className="text-xs uppercase tracking-wide text-gray-600">{plan.planKey}</span>
             </div>
             <p className="text-sm text-gray-600 mt-2 line-clamp-3">{plan.summary}</p>
             <div className="mt-3 text-sm">
@@ -184,7 +184,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                 <span>{plan.limits.maxProjects}</span>
               </div>
             </div>
-            <div className="mt-3 text-sm text-gray-500">
+            <div className="mt-3 text-sm text-gray-600">
               ${plan.monthlyPrice.toFixed(2)}/mo or ${plan.yearlyPrice.toFixed(2)}/yr
             </div>
           </div>
@@ -208,7 +208,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 errors.name ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter workspace name"
@@ -223,7 +223,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               placeholder="Describe your workspace"
               rows={3}
             />
@@ -236,7 +236,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             >
               <option value="personal">Personal</option>
               <option value="team">Team</option>
@@ -252,7 +252,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               type="text"
               value={formData.organizationName}
               onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 errors.organizationName ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter organization name"
@@ -268,7 +268,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               type="email"
               value={formData.contactEmail}
               onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 errors.contactEmail ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter contact email"
@@ -283,7 +283,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
             <select
               value={formData.region}
               onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             >
               <option value="North America">North America</option>
               <option value="Europe">Europe</option>
@@ -302,7 +302,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     <div className="space-y-6">
       <div className="text-center">
         <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-          <Mail className="w-6 h-6 text-blue-600" />
+          <Mail className="w-6 h-6 text-accent-dark" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Verify Your Email</h3>
         <p className="text-gray-600">
@@ -318,7 +318,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
           type="text"
           value={formData.otp}
           onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg tracking-widest ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-center text-lg tracking-widest ${
             errors.otp ? 'border-red-300' : 'border-gray-300'
           }`}
           placeholder="Enter 6-digit code"
@@ -330,7 +330,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
       <div className="text-center">
         <button
           onClick={handleResendOTP}
-          className="text-blue-600 hover:text-blue-700 text-sm"
+          className="text-accent-dark hover:text-blue-700 text-sm"
         >
           Didn't receive the code? Resend
         </button>
@@ -462,13 +462,13 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-gray-200">
           <div>
-            <p className="text-xs uppercase tracking-widest text-gray-400">
+            <p className="text-xs uppercase tracking-widest text-gray-600">
               {step < 4 ? `Step ${step} of 3` : 'Completed'}
             </p>
             <h2 className="text-xl font-semibold text-gray-900 mt-1">{stepMeta.title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{stepMeta.subtitle}</p>
+            <p className="text-sm text-gray-600 mt-1">{stepMeta.subtitle}</p>
           </div>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={handleClose} className="text-gray-600 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -491,7 +491,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               <button
                 onClick={handleSendOTP}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {loading ? 'Sending...' : 'Verify user'}
               </button>
@@ -509,7 +509,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               <button
                 onClick={handleVerifyOTP}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {loading ? 'Verifying...' : 'Verify Code'}
               </button>
@@ -537,7 +537,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
           {step === 4 && (
             <button
               onClick={handleClose}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               Get Started
           </button>

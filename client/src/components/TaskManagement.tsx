@@ -532,7 +532,7 @@ const mockColumns: Column[] = [
     switch (priority) {
       case 'low': return 'bg-gray-100 text-gray-800';
       case 'medium': return 'bg-blue-100 text-blue-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'high': return 'bg-orange-200 text-orange-800';
       case 'critical': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -632,19 +632,19 @@ const mockColumns: Column[] = [
         <h2 className="text-xl font-semibold text-gray-900">Task Board</h2>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
             />
           </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -655,7 +655,7 @@ const mockColumns: Column[] = [
           <select
             value={filterProject}
             onChange={(e) => setFilterProject(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="all">All Projects</option>
             {projects.map(project => (
@@ -664,7 +664,7 @@ const mockColumns: Column[] = [
           </select>
           <button
             onClick={() => setShowCreateTask(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Task
@@ -689,14 +689,14 @@ const mockColumns: Column[] = [
               <h3 className="font-semibold text-gray-900 capitalize">
                 {status.replace('-', ' ')}
               </h3>
-              <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+              <span className="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">
                 {tasks.filter((t: Task) => t.status === status).length}
               </span>
             </div>
             
             <div className="space-y-3">
               {draggedOverColumn === status && draggedTask && draggedTask.status !== status && (
-                <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-blue-600 text-sm font-medium">
+                <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-accent-dark text-sm font-medium">
                   Drop "{draggedTask.title}" here
                 </div>
               )}
@@ -712,7 +712,7 @@ const mockColumns: Column[] = [
                       setSelectedTask(task);
                       setShowTaskModal(true);
                     }}
-                    className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-300 hover:scale-105"
+                    className="bg-white p-4 rounded-lg border border-gray-300 cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-300 hover:scale-105"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-gray-900 text-sm">{task.title}</h4>
@@ -740,23 +740,23 @@ const mockColumns: Column[] = [
                         />
                         <span className="text-xs text-gray-600">{task.assignee.name}</span>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-600">
                         {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
                       </span>
                     </div>
                     
                     {task.milestones.length > 0 && (
                       <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                           <span>Milestones</span>
                           <span>
                             {task.milestones.filter((m: Milestone) => m.status === 'completed').length}/
                             {task.milestones.length}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div className="w-full bg-gray-300 rounded-full h-1">
                           <div
-                            className="bg-blue-600 h-1 rounded-full"
+                            className="bg-accent h-1 rounded-full"
                             style={{
                               width: `${(task.milestones.length > 0 ? (task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100 : 0)}%`
                             }}
@@ -782,8 +782,8 @@ const mockColumns: Column[] = [
                   </div>
                 ))}
               {tasks.filter((task: Task) => task.status === status).length === 0 && !draggedOverColumn && (
-                <div className="text-center text-gray-400 text-sm py-8">
-                  <div className="w-12 h-12 mx-auto mb-2 bg-gray-200 rounded-full flex items-center justify-center">
+                <div className="text-center text-gray-600 text-sm py-8">
+                  <div className="w-12 h-12 mx-auto mb-2 bg-gray-300 rounded-full flex items-center justify-center">
                     <Plus className="w-6 h-6" />
                   </div>
                   <p>No {status.replace('-', ' ')} tasks</p>
@@ -803,19 +803,19 @@ const mockColumns: Column[] = [
                 <h2 className="text-xl font-semibold text-gray-900">Task List</h2>
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search tasks..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                     />
                   </div>
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   >
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
@@ -826,7 +826,7 @@ const mockColumns: Column[] = [
                   <select
                     value={filterPriority}
                     onChange={(e) => setFilterPriority(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   >
                     <option value="all">All Priority</option>
                     <option value="low">Low</option>
@@ -837,7 +837,7 @@ const mockColumns: Column[] = [
                   <select
                     value={filterAssignee}
                     onChange={(e) => setFilterAssignee(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   >
                     <option value="all">All Assignees</option>
                     {teamMembers.map(member => (
@@ -846,7 +846,7 @@ const mockColumns: Column[] = [
                   </select>
                   <button
                     onClick={() => setShowCreateTask(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Add Task
@@ -854,19 +854,19 @@ const mockColumns: Column[] = [
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Task</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Project</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Assignee</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Priority</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Due Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Progress</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -875,13 +875,13 @@ const mockColumns: Column[] = [
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10">
-                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <CheckSquare className="h-5 w-5 text-gray-500" />
+                                <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                  <CheckSquare className="h-5 w-5 text-gray-600" />
                                 </div>
                               </div>
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-900">{task.title}</div>
-                                <div className="text-sm text-gray-500">{task.description}</div>
+                                <div className="text-sm text-gray-600">{task.description}</div>
                               </div>
                             </div>
                           </td>
@@ -903,7 +903,7 @@ const mockColumns: Column[] = [
                               />
                               <div>
                                 <div className="text-sm font-medium text-gray-900">{task.assignee.name}</div>
-                                <div className="text-sm text-gray-500">{task.assignee.email}</div>
+                                <div className="text-sm text-gray-600">{task.assignee.email}</div>
                               </div>
                             </div>
                           </td>
@@ -922,9 +922,9 @@ const mockColumns: Column[] = [
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                              <div className="w-16 bg-gray-300 rounded-full h-2 mr-2">
                                 <div
-                                  className="bg-blue-600 h-2 rounded-full"
+                                  className="bg-accent h-2 rounded-full"
                                   style={{
                                     width: `${(task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100}%`
                                   }}
@@ -945,7 +945,7 @@ const mockColumns: Column[] = [
                                   setSelectedTask(task);
                                   setShowTaskModal(true);
                                 }}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="text-accent-dark hover:text-blue-900"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -1058,7 +1058,7 @@ const mockColumns: Column[] = [
               </span>
               <button
                 onClick={goToToday}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-3 py-1 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
                 Today
               </button>
@@ -1072,7 +1072,7 @@ const mockColumns: Column[] = [
             </button>
             <button
               onClick={() => setShowCreateTask(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Task
@@ -1080,8 +1080,8 @@ const mockColumns: Column[] = [
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="grid grid-cols-7 gap-px bg-gray-200">
+        <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+          <div className="grid grid-cols-7 gap-px bg-gray-300">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
               <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
                 {day}
@@ -1089,7 +1089,7 @@ const mockColumns: Column[] = [
             ))}
           </div>
           
-          <div className="grid grid-cols-7 gap-px bg-gray-200">
+          <div className="grid grid-cols-7 gap-px bg-gray-300">
             {calendarDays.map((day, i) => {
               const dayTasks = getTasksForDate(day.date);
               const isTodayDate = isToday(day.date);
@@ -1106,8 +1106,8 @@ const mockColumns: Column[] = [
                 >
                   <div className={`text-sm mb-1 ${
                     isTodayDate 
-                      ? 'bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center font-semibold' 
-                      : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                      ? 'bg-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center font-semibold' 
+                      : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-600'
                   }`}>
                     {day.date.getDate()}
                   </div>
@@ -1137,7 +1137,7 @@ const mockColumns: Column[] = [
                       );
                     })}
                     {dayTasks.length > 3 && (
-                      <div className="text-xs text-gray-500 text-center py-1">
+                      <div className="text-xs text-gray-600 text-center py-1">
                         +{dayTasks.length - 3} more
                       </div>
                     )}
@@ -1160,7 +1160,7 @@ const mockColumns: Column[] = [
               <p className="text-sm font-medium text-gray-600">Total Tasks</p>
               <p className="text-2xl font-semibold text-gray-900">{tasks.length}</p>
             </div>
-            <CheckSquare className="w-8 h-8 text-blue-600" />
+            <CheckSquare className="w-8 h-8 text-accent-dark" />
           </div>
         </div>
         
@@ -1214,7 +1214,7 @@ const mockColumns: Column[] = [
                   <div className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded-full ${
                       status === 'pending' ? 'bg-gray-400' :
-                      status === 'in-progress' ? 'bg-blue-400' :
+                      status === 'in-progress' ? 'bg-accent-light' :
                       status === 'completed' ? 'bg-green-400' : 'bg-red-400'
                     }`} />
                     <span className="text-sm font-medium text-gray-900 capitalize">
@@ -1222,11 +1222,11 @@ const mockColumns: Column[] = [
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
+                    <div className="w-20 bg-gray-300 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
                           status === 'pending' ? 'bg-gray-400' :
-                          status === 'in-progress' ? 'bg-blue-400' :
+                          status === 'in-progress' ? 'bg-accent-light' :
                           status === 'completed' ? 'bg-green-400' : 'bg-red-400'
                         }`}
                         style={{ width: `${percentage}%` }}
@@ -1257,7 +1257,7 @@ const mockColumns: Column[] = [
                     <span className="text-sm font-medium text-gray-900">{project.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
+                    <div className="w-20 bg-gray-300 rounded-full h-2">
                       <div
                         className="h-2 rounded-full"
                         style={{ 
@@ -1281,7 +1281,7 @@ const mockColumns: Column[] = [
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">Task Templates</h2>
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
           <Plus className="w-4 h-4" />
           Create Template
         </button>
@@ -1296,7 +1296,7 @@ const mockColumns: Column[] = [
           { name: 'Testing Task', description: 'Template for testing tasks', category: 'QA' },
           { name: 'Documentation', description: 'Template for documentation tasks', category: 'General' }
         ].map((template, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+          <div key={index} className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-gray-900">{template.name}</h3>
               <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
@@ -1339,7 +1339,7 @@ const mockColumns: Column[] = [
               </button>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-600 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1362,7 +1362,7 @@ const mockColumns: Column[] = [
                         <input
                           type="checkbox"
                           checked={milestone.status === 'completed'}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
                         />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{milestone.title}</p>
@@ -1384,7 +1384,7 @@ const mockColumns: Column[] = [
                         <input
                           type="checkbox"
                           checked={subtask.status === 'completed'}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
                         />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{subtask.title}</p>
@@ -1404,9 +1404,9 @@ const mockColumns: Column[] = [
                     {selectedTask.attachments.map(attachment => (
                       <div key={attachment._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                         {attachment.type === 'file' ? (
-                          <FileText className="w-5 h-5 text-gray-500" />
+                          <FileText className="w-5 h-5 text-gray-600" />
                         ) : (
-                          <Link className="w-5 h-5 text-gray-500" />
+                          <Link className="w-5 h-5 text-gray-600" />
                         )}
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{attachment.name}</p>
@@ -1417,7 +1417,7 @@ const mockColumns: Column[] = [
                             }
                           </p>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-800">
+                        <button className="text-accent-dark hover:text-blue-800">
                           <Download className="w-4 h-4" />
                         </button>
                       </div>
@@ -1438,7 +1438,7 @@ const mockColumns: Column[] = [
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-sm font-medium text-gray-900">{comment.author.name}</span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-600">
                               {new Date(comment.createdAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -1451,10 +1451,10 @@ const mockColumns: Column[] = [
                   <div className="mt-4">
                     <textarea
                       placeholder="Add a comment..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                       rows={3}
                     />
-                    <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <button className="mt-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
                       Add Comment
                     </button>
                   </div>
@@ -1527,7 +1527,7 @@ const mockColumns: Column[] = [
                         setShowTaskModal(false);
                         setShowEditTask(true);
                       }}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                     >
                       Edit Task
                     </button>
@@ -1563,11 +1563,11 @@ const mockColumns: Column[] = [
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] overflow-y-auto py-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+          <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-800 z-10">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Create New Task</h2>
             <button
               onClick={() => setShowCreateTask(false)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1605,7 +1605,7 @@ const mockColumns: Column[] = [
           >
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Task Title *
               </label>
               <input
@@ -1613,33 +1613,33 @@ const mockColumns: Column[] = [
                 name="title"
                 required
                 placeholder="Enter task title"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Description
               </label>
               <textarea
                 name="description"
                 rows={4}
                 placeholder="Enter task description"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Priority and Status */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Priority *
                 </label>
                 <select
                   name="priority"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -1648,13 +1648,13 @@ const mockColumns: Column[] = [
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Status *
                 </label>
                 <select
                   name="status"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
@@ -1666,13 +1666,13 @@ const mockColumns: Column[] = [
 
             {/* Assignee */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Assignee *
               </label>
               <select
                 name="assignee"
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="">Select Assignee</option>
                 {teamMembers.map(member => (
@@ -1686,12 +1686,12 @@ const mockColumns: Column[] = [
             {/* Project and Due Date */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Project
                 </label>
                 <select
                   name="project"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="">No Project</option>
                   {state.projects.map(project => (
@@ -1700,13 +1700,13 @@ const mockColumns: Column[] = [
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Due Date
                 </label>
                 <input
                   type="date"
                   name="dueDate"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -1714,18 +1714,18 @@ const mockColumns: Column[] = [
             {/* Start Date and Estimated Hours */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Start Date
                 </label>
                 <input
                   type="date"
                   name="startDate"
                   defaultValue={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Estimated Hours
                 </label>
                 <input
@@ -1734,36 +1734,36 @@ const mockColumns: Column[] = [
                   min="0"
                   step="0.5"
                   placeholder="0"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Tags (comma separated)
               </label>
               <input
                 type="text"
                 name="tags"
                 placeholder="e.g., frontend, urgent, bug-fix"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-300 dark:border-gray-600">
               <button
                 type="button"
                 onClick={() => setShowCreateTask(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="px-4 py-2 text-gray-700 dark:text-gray-700 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 Create Task
               </button>
@@ -1781,11 +1781,11 @@ const mockColumns: Column[] = [
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] overflow-y-auto py-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+          <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-800 z-10">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit Task</h2>
             <button
               onClick={() => setShowEditTask(false)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1823,7 +1823,7 @@ const mockColumns: Column[] = [
           >
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Task Title *
               </label>
               <input
@@ -1832,13 +1832,13 @@ const mockColumns: Column[] = [
                 required
                 defaultValue={selectedTask.title}
                 placeholder="Enter task title"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Description
               </label>
               <textarea
@@ -1846,21 +1846,21 @@ const mockColumns: Column[] = [
                 rows={4}
                 defaultValue={selectedTask.description}
                 placeholder="Enter task description"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Priority and Status */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Priority *
                 </label>
                 <select
                   name="priority"
                   required
                   defaultValue={selectedTask.priority}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -1869,14 +1869,14 @@ const mockColumns: Column[] = [
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Status *
                 </label>
                 <select
                   name="status"
                   required
                   defaultValue={selectedTask.status}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
@@ -1888,14 +1888,14 @@ const mockColumns: Column[] = [
 
             {/* Assignee */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Assignee *
               </label>
               <select
                 name="assignee"
                 required
                 defaultValue={selectedTask.assignee._id}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 {teamMembers.map(member => (
                   <option key={member._id} value={member._id}>
@@ -1908,13 +1908,13 @@ const mockColumns: Column[] = [
             {/* Project and Due Date */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Project
                 </label>
                 <select
                   name="project"
                   defaultValue={selectedTask.projectId}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="">No Project</option>
                   {state.projects.map(project => (
@@ -1923,14 +1923,14 @@ const mockColumns: Column[] = [
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Due Date
                 </label>
                 <input
                   type="date"
                   name="dueDate"
                   defaultValue={selectedTask.dueDate ? new Date(selectedTask.dueDate).toISOString().split('T')[0] : ''}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -1938,18 +1938,18 @@ const mockColumns: Column[] = [
             {/* Start Date and Estimated Hours */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Start Date
                 </label>
                 <input
                   type="date"
                   name="startDate"
                   defaultValue={new Date(selectedTask.startDate).toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Estimated Hours
                 </label>
                 <input
@@ -1958,14 +1958,14 @@ const mockColumns: Column[] = [
                   min="0"
                   step="0.5"
                   defaultValue={selectedTask.estimatedHours}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 Tags (comma separated)
               </label>
               <input
@@ -1973,22 +1973,22 @@ const mockColumns: Column[] = [
                 name="tags"
                 defaultValue={selectedTask.tags.join(', ')}
                 placeholder="e.g., frontend, urgent, bug-fix"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-300 dark:border-gray-600">
               <button
                 type="button"
                 onClick={() => setShowEditTask(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="px-4 py-2 text-gray-700 dark:text-gray-700 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 Save Changes
               </button>
@@ -2009,7 +2009,7 @@ const mockColumns: Column[] = [
             <h3 className="text-lg font-semibold text-gray-900">Time Tracking</h3>
             <button
               onClick={() => setShowTimeTracking(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-600 hover:text-gray-600"
             >
               <X className="w-5 h-5" />
             </button>
@@ -2027,7 +2027,7 @@ const mockColumns: Column[] = [
               <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
               <textarea
                 placeholder="What did you work on?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 rows={3}
               />
             </div>
@@ -2125,7 +2125,7 @@ const mockColumns: Column[] = [
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setShowCreateTask(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 New Task
@@ -2145,8 +2145,8 @@ const mockColumns: Column[] = [
                   onClick={() => setActiveView(view.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeView === view.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   title={view.description}
                 >

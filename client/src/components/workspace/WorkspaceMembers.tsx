@@ -108,7 +108,7 @@ const WorkspaceMembers: React.FC = () => {
       case 'admin':
         return { icon: Shield, color: 'text-purple-600', bg: 'bg-purple-100', label: 'Admin' };
       case 'manager':
-        return { icon: UserIcon, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Manager' };
+        return { icon: UserIcon, color: 'text-accent-dark', bg: 'bg-blue-100', label: 'Manager' };
       default:
         return { icon: UserIcon, color: 'text-gray-600', bg: 'bg-gray-100', label: 'Member' };
     }
@@ -202,14 +202,14 @@ const WorkspaceMembers: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Members</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
             Manage workspace members and their roles
           </p>
         </div>
         {isOwner && (
           <button
             onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <UserPlus className="w-4 h-4" />
             Invite Members
@@ -220,19 +220,19 @@ const WorkspaceMembers: React.FC = () => {
       {/* Search and Filters */}
       <div className="flex items-center gap-4">
         <div className="flex-1 relative">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
           <input
             type="text"
             placeholder="Search members..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
           />
         </div>
         <select
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value)}
-          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
         >
           <option value="all">All Roles</option>
           <option value="owner">Owner</option>
@@ -251,7 +251,7 @@ const WorkspaceMembers: React.FC = () => {
           return (
             <div
               key={member._id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-3">
                 <UserDisplay
@@ -263,7 +263,7 @@ const WorkspaceMembers: React.FC = () => {
                   showBadge={true}
                 />
                 {isOwner && member.role !== 'owner' && (
-                  <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                  <button className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700">
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 )}
@@ -271,8 +271,8 @@ const WorkspaceMembers: React.FC = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{member.email}</span>
+                  <Mail className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-600 dark:text-gray-200">{member.email}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -282,19 +282,19 @@ const WorkspaceMembers: React.FC = () => {
                       {roleBadge.label}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-gray-600 dark:text-gray-200">
                     {member.position}
                   </span>
                 </div>
 
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-gray-600 dark:text-gray-200">
                   Joined {member.joinedAt.toLocaleDateString()}
                 </div>
               </div>
 
               {isOwner && member.role !== 'owner' && (
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <Edit className="w-3 h-3" />
                     Edit Role
                   </button>
@@ -311,11 +311,11 @@ const WorkspaceMembers: React.FC = () => {
       {/* Stats */}
       {/* Join Requests */}
       {isOwner && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Join Requests</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-200">
                 Requests submitted from Discover Workspace are listed here.
               </p>
             </div>
@@ -324,8 +324,8 @@ const WorkspaceMembers: React.FC = () => {
             </span>
           </div>
           {joinRequests.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-              <AlertCircle className="w-10 h-10 mb-2 text-gray-300" />
+            <div className="flex flex-col items-center justify-center py-10 text-gray-600">
+              <AlertCircle className="w-10 h-10 mb-2 text-gray-700" />
               <p className="font-medium">No requests right now</p>
               <p className="text-sm">Learners who apply from Discover will appear here.</p>
             </div>
@@ -334,18 +334,18 @@ const WorkspaceMembers: React.FC = () => {
               {joinRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+                  className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
                 >
                   <div>
                     <p className="font-medium text-gray-900 dark:text-gray-100">{request.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
                       <Mail className="w-4 h-4" />
                       {request.email}
                     </p>
                     {request.message && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{request.message}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{request.message}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Requested {request.requestedAt.toLocaleString()}
                     </p>
                   </div>
@@ -393,13 +393,13 @@ const WorkspaceMembers: React.FC = () => {
           <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Invite member</h3>
-              <button onClick={() => setShowInviteModal(false)} className="text-gray-500 hover:text-gray-700">
+              <button onClick={() => setShowInviteModal(false)} className="text-gray-600 hover:text-gray-700">
                 ✕
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                   Email or username
                 </label>
                 <input
@@ -407,24 +407,24 @@ const WorkspaceMembers: React.FC = () => {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="someone@example.com"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                   Search platform directory
                 </label>
                 <div className="relative">
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-gray-600 absolute left-3 top-1/2 transform -translate-y-1/2" />
                   <input
                     type="text"
                     value={directoryQuery}
                     onChange={(e) => setDirectoryQuery(e.target.value)}
                     placeholder="Type a name or email"
-                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                   {filteredDirectory.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                       {filteredDirectory.map((user) => (
                         <button
                           key={user.id}
@@ -432,13 +432,13 @@ const WorkspaceMembers: React.FC = () => {
                           className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                           <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-200">{user.email}</p>
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                   Quickly invite existing platform members without retyping their details.
                 </p>
               </div>
@@ -446,13 +446,13 @@ const WorkspaceMembers: React.FC = () => {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => setShowInviteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleInvite()}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
                 Send Invite
               </button>
@@ -461,24 +461,24 @@ const WorkspaceMembers: React.FC = () => {
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Members</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Members</div>
           <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{members.length}</div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Active</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Active</div>
           <div className="text-2xl font-bold text-green-600">
             {members.filter(m => m.status === 'active').length}
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Admins</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Admins</div>
           <div className="text-2xl font-bold text-purple-600">
             {members.filter(m => m.role === 'admin').length}
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Pending requests</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Pending requests</div>
           <div className="text-2xl font-bold text-orange-600">
             {joinRequests.filter((req) => req.status === 'pending').length}
           </div>

@@ -23,7 +23,7 @@ const About: React.FC = () => {
           {/* Back Button */}
           <Link
             to="/"
-            className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
+            className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-600 hover:text-yellow-700' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
           >
             <ArrowLeft size={18} />
             Back to Home
@@ -31,13 +31,13 @@ const About: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-20">
-            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700'} text-sm font-semibold mb-6`}>
+            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-600' : 'bg-yellow-100 text-yellow-700'} text-sm font-semibold mb-6`}>
               ABOUT US
             </span>
             <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
               About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Sartthi</span>
             </h1>
-            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
+            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               We're building the future of project management, one feature at a time.
             </p>
           </div>
@@ -50,7 +50,7 @@ const About: React.FC = () => {
               </div>
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>
             </div>
-            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed`}>
+            <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed`}>
               At Sartthi, we believe that great projects start with great tools. Our mission is to simplify project management 
               and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable 
               solutions that help teams collaborate effectively and achieve their goals.
@@ -66,34 +66,34 @@ const About: React.FC = () => {
                 </div>
                 <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>What We Offer</h3>
               </div>
-              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">Comprehensive project tracking and management</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">Real-time collaboration tools</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">Advanced analytics and reporting</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">Seamless team communication</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">Customizable workflows</span>
                 </li>
@@ -107,7 +107,7 @@ const About: React.FC = () => {
                 </div>
                 <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose Sartthi</h3>
               </div>
-              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
@@ -150,7 +150,7 @@ const About: React.FC = () => {
               </div>
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Team</h2>
             </div>
-            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
+            <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
               Sartthi is built by a passionate team of developers, designers, and project management experts 
               who understand the challenges of modern team collaboration. We're constantly working to improve 
               our platform and add new features based on user feedback.
@@ -161,21 +161,21 @@ const About: React.FC = () => {
                   <span className="text-white font-bold text-2xl">D</span>
                 </div>
                 <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Development Team</h4>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Building the future</p>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>Building the future</p>
               </div>
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">D</span>
                 </div>
                 <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Design Team</h4>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Creating beautiful experiences</p>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>Creating beautiful experiences</p>
               </div>
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">S</span>
                 </div>
                 <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Support Team</h4>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Always here to help</p>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>Always here to help</p>
               </div>
             </div>
           </div>
@@ -191,9 +191,9 @@ const About: React.FC = () => {
                 <h3 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
                   The Tech Factory Headquarters
                 </h3>
-                <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} space-y-4`}>
+                <div className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} space-y-4`}>
                   <div className="flex items-start gap-3">
-                    <MapPin size={20} className={`${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'} mt-1 flex-shrink-0`} />
+                    <MapPin size={20} className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'} mt-1 flex-shrink-0`} />
                     <div>
                       <p className="font-medium">Address:</p>
                       <p>Kaushalya Nagar, Ahmednagar - Aurangabad Rd</p>
@@ -202,7 +202,7 @@ const About: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'} mt-1 flex-shrink-0`}>
+                    <div className={`w-5 h-5 ${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'} mt-1 flex-shrink-0`}>
                       🕒
                     </div>
                     <div>
@@ -213,7 +213,7 @@ const About: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'} mt-1 flex-shrink-0`}>
+                    <div className={`w-5 h-5 ${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'} mt-1 flex-shrink-0`}>
                       📞
                     </div>
                     <div>

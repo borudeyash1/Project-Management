@@ -101,7 +101,7 @@ const AdminLoginWrapper: React.FC = () => {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg font-semibold">Verifying Device...</p>
-          <p className="text-gray-400 text-sm mt-2">Please wait while we check your authorization</p>
+          <p className="text-gray-600 text-sm mt-2">Please wait while we check your authorization</p>
         </div>
       </div>
     );

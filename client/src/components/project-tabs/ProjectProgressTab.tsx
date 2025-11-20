@@ -23,15 +23,15 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
   return (
     <div className="space-y-6">
       {/* Overall Progress */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Overall Progress</h3>
         
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">Project Completion</span>
-            <span className="text-2xl font-bold text-blue-600">{project?.progress || 0}%</span>
+            <span className="text-2xl font-bold text-accent-dark">{project?.progress || 0}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-4">
+          <div className="w-full bg-gray-300 rounded-full h-4">
             <div
               className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all"
               style={{ width: `${project?.progress || 0}%` }}
@@ -46,8 +46,8 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
             <p className="text-sm text-gray-600">Completed</p>
           </div>
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <Clock className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-blue-600">{inProgressTasks}</p>
+            <Clock className="w-8 h-8 text-accent-dark mx-auto mb-2" />
+            <p className="text-2xl font-bold text-accent-dark">{inProgressTasks}</p>
             <p className="text-sm text-gray-600">In Progress</p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -64,7 +64,7 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
       </div>
 
       {/* Timeline Progress */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Timeline Progress</h3>
         
         <div className="space-y-4">
@@ -109,7 +109,7 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
       </div>
 
       {/* Task Completion Rate */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-300 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Task Completion Rate</h3>
         
         <div className="space-y-4">
@@ -123,11 +123,11 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-700">Completion Rate</span>
-            <span className="font-semibold text-blue-600">{completionRate}%</span>
+            <span className="font-semibold text-accent-dark">{completionRate}%</span>
           </div>
           
           <div className="pt-4 border-t border-gray-200">
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-300 rounded-full h-3">
               <div
                 className="bg-green-600 h-3 rounded-full transition-all"
                 style={{ width: `${completionRate}%` }}
@@ -139,7 +139,7 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
 
       {/* Budget Progress */}
       {project?.budget && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-300 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Budget Progress</h3>
           
           <div className="space-y-4">
@@ -151,7 +151,7 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-700">Actual Spent</span>
-              <span className="font-semibold text-blue-600">
+              <span className="font-semibold text-accent-dark">
                 ${project.budget.actual?.toLocaleString() || '0'}
               </span>
             </div>
@@ -165,12 +165,12 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
             </div>
             
             <div className="pt-4 border-t border-gray-200">
-              <div className="w-full bg-gray-200 rounded-full h-3">
+              <div className="w-full bg-gray-300 rounded-full h-3">
                 <div
                   className={`h-3 rounded-full transition-all ${
                     project.budget.actual > project.budget.estimated 
                       ? 'bg-red-600' 
-                      : 'bg-blue-600'
+                      : 'bg-accent'
                   }`}
                   style={{ 
                     width: `${Math.min(
@@ -187,12 +187,12 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
 
       {/* Milestones */}
       {project?.milestones && project.milestones.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-300 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Milestones</h3>
           
           <div className="space-y-3">
             {project.milestones.map((milestone: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+              <div key={idx} className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   milestone.completed ? 'bg-green-100' : 'bg-gray-100'
                 }`}>

@@ -104,7 +104,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Create New Project
             </h2>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
               Add a new project to your workspace
             </p>
           </div>
@@ -112,7 +112,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
             onClick={handleClose}
             className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
-            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+            <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
           </button>
         </div>
 
@@ -121,7 +121,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
           <div className="space-y-6">
             {/* Project Name */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Project Name *
               </label>
               <input
@@ -133,15 +133,15 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                 required
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 Description
               </label>
               <textarea
@@ -152,15 +152,15 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                 rows={3}
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
 
             {/* Client Selection */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 <Briefcase className="w-4 h-4 inline mr-2" />
                 Client *
               </label>
@@ -173,7 +173,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                   isDarkMode
                     ? 'bg-gray-700 border-gray-600 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               >
                 <option value="">Select a client</option>
                 {workspaceClients.map(client => (
@@ -182,14 +182,14 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                   </option>
                 ))}
               </select>
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                 Select the client this project belongs to
               </p>
             </div>
 
             {/* Project Manager Selection */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 <Users className="w-4 h-4 inline mr-2" />
                 Project Manager
               </label>
@@ -201,7 +201,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                   isDarkMode
                     ? 'bg-gray-700 border-gray-600 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               >
                 <option value="">Select a project manager (optional)</option>
                 {workspaceMembers.map((member) => (
@@ -210,7 +210,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                   </option>
                 ))}
               </select>
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                 Choose who will manage this project. They must be part of this workspace.
               </p>
             </div>
@@ -218,7 +218,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
             {/* Status and Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   Status
                 </label>
                 <select
@@ -229,7 +229,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 >
                   <option value="planning">Planning</option>
                   <option value="active">Active</option>
@@ -239,7 +239,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   Priority
                 </label>
                 <select
@@ -250,7 +250,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -263,7 +263,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
             {/* Dates */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   <Calendar className="w-4 h-4 inline mr-2" />
                   Start Date
                 </label>
@@ -276,12 +276,12 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                   <Calendar className="w-4 h-4 inline mr-2" />
                   End Date
                 </label>
@@ -294,14 +294,14 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               </div>
             </div>
 
             {/* Budget */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 <DollarSign className="w-4 h-4 inline mr-2" />
                 Budget
               </label>
@@ -315,15 +315,15 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                 step="0.01"
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
 
             {/* Tags */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
                 <Tag className="w-4 h-4 inline mr-2" />
                 Tags
               </label>
@@ -335,9 +335,9 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
                 placeholder="web, mobile, design (comma separated)"
                 className={`w-full px-4 py-3 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } focus:ring-2 focus:ring-accent focus:border-accent`}
               />
             </div>
           </div>
@@ -350,15 +350,15 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
             onClick={handleClose}
             className={`px-4 py-2 rounded-lg font-medium ${
               isDarkMode
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-700 text-gray-700 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-300'
             }`}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+            className="px-4 py-2 bg-accent text-gray-900 rounded-lg font-medium hover:bg-accent-hover"
           >
             Create Project
           </button>

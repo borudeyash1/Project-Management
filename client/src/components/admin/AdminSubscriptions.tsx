@@ -131,7 +131,7 @@ const AdminSubscriptions: React.FC = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-t-blue-500 border-gray-200"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-t-accent border-gray-200"></div>
       </div>
     );
   }
@@ -141,7 +141,7 @@ const AdminSubscriptions: React.FC = () => {
       <div className="max-w-6xl mx-auto py-12 px-4 space-y-10">
         <header className="space-y-2">
           <h1 className="text-3xl font-bold">Subscription Plans</h1>
-          <p className="text-sm text-gray-500">Update feature descriptions, limits, and pricing that drive the workspace experience.</p>
+          <p className="text-sm text-gray-600">Update feature descriptions, limits, and pricing that drive the workspace experience.</p>
         </header>
 
         <section className="grid gap-4 md:grid-cols-3">
@@ -151,12 +151,12 @@ const AdminSubscriptions: React.FC = () => {
               <button
                 key={action.label}
                 onClick={() => window.location.assign(action.path)}
-                className={`flex flex-col gap-1 rounded-2xl border p-4 text-left transition hover:border-orange-500 hover:bg-orange-50/50 ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}
+                className={`flex flex-col gap-1 rounded-2xl border p-4 text-left transition hover:border-orange-500 hover:bg-orange-50/50 ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-300 bg-white'}`}
               >
                 <div className="flex items-center gap-3 text-base font-semibold">
                   <Icon className="h-5 w-5" /> {action.label}
                 </div>
-                <p className="text-xs text-gray-400">{action.subtitle}</p>
+                <p className="text-xs text-gray-600">{action.subtitle}</p>
               </button>
             );
           })}
@@ -166,16 +166,16 @@ const AdminSubscriptions: React.FC = () => {
           {plans.map((plan) => (
             <div
               key={plan.planKey}
-              className={`border rounded-2xl p-5 shadow-lg ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}
+              className={`border rounded-2xl p-5 shadow-lg ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-xl font-semibold capitalize">{plan.displayName}</h2>
-                  <p className="text-xs uppercase tracking-wide text-gray-500">{plan.planKey}</p>
+                  <p className="text-xs uppercase tracking-wide text-gray-600">{plan.planKey}</p>
                 </div>
                 <div className="text-right text-sm">
                   <div className="font-semibold">${plan.monthlyPrice.toFixed(2)} / mo</div>
-                  <div className="text-gray-400 text-xs">${plan.yearlyPrice.toFixed(2)} / year</div>
+                  <div className="text-gray-600 text-xs">${plan.yearlyPrice.toFixed(2)} / year</div>
                 </div>
               </div>
 
@@ -238,7 +238,7 @@ const AdminSubscriptions: React.FC = () => {
               <div className="mt-4 text-sm space-y-2">
                 {(['personal', 'team', 'enterprise'] as const).map((tier) => (
                   <div key={tier} className="flex justify-between">
-                    <span className="capitalize text-xs text-gray-500">{tier} fee</span>
+                    <span className="capitalize text-xs text-gray-600">{tier} fee</span>
                     <input
                       type="number"
                       className="w-28 rounded-lg border p-2 text-right"
@@ -252,7 +252,7 @@ const AdminSubscriptions: React.FC = () => {
               <div className="mt-4 space-y-1 text-xs">
                 {Object.entries(plan.features).map(([feature, enabled]) => (
                   <label key={feature} className="flex items-center justify-between text-sm">
-                    <span className="capitalize text-gray-500">{feature.replace(/([A-Z])/g, ' $1')}</span>
+                    <span className="capitalize text-gray-600">{feature.replace(/([A-Z])/g, ' $1')}</span>
                     <input
                       type="checkbox"
                       checked={enabled}

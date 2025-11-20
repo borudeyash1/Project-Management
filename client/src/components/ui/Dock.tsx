@@ -376,7 +376,7 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
         className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
           active 
             ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50' 
-            : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-700/80 backdrop-blur-md'
+            : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-700 hover:bg-white/80 dark:hover:bg-gray-700/80 backdrop-blur-md'
         } ${className}`}
         aria-label={tooltip}
       >

@@ -52,7 +52,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
       case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'low': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-blue-600 bg-blue-50 border-blue-200';
+      default: return 'text-accent-dark bg-blue-50 border-blue-200';
     }
   };
 
@@ -60,7 +60,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600">
           <div className="flex-1">
             {isEditing ? (
               <input
@@ -78,13 +78,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
@@ -92,7 +92,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Edit
               </button>
@@ -105,7 +105,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"
+              className="p-2 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700 rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
@@ -119,7 +119,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
             <div className="col-span-2 space-y-6">
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Description
                 </label>
                 {isEditing ? (
@@ -131,7 +131,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     placeholder="Add description..."
                   />
                 ) : (
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-200">
                     {task.description || 'No description'}
                   </p>
                 )}
@@ -139,7 +139,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
 
               {/* Subtasks */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <CheckSquare className="w-4 h-4 inline mr-1" />
                   Subtasks ({task.subtasks.filter(st => st.completed).length}/{task.subtasks.length})
                 </label>
@@ -150,7 +150,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                         type="checkbox"
                         checked={subtask.completed}
                         onChange={() => toggleSubtask(task._id, subtask._id)}
-                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        className="w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent"
                       />
                       <span className={`flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white'}`}>
                         {subtask.title}
@@ -168,7 +168,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     />
                     <button
                       onClick={handleAddSubtask}
-                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                     >
                       Add
                     </button>
@@ -178,7 +178,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
 
               {/* Comments */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <MessageSquare className="w-4 h-4 inline mr-1" />
                   Comments ({task.comments.length})
                 </label>
@@ -187,11 +187,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     <div key={comment._id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium text-sm text-gray-900 dark:text-white">{comment.author}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-600 dark:text-gray-200">
                           {new Date(comment.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{comment.content}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-200">{comment.content}</p>
                     </div>
                   ))}
                 </div>
@@ -206,7 +206,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   />
                   <button
                     onClick={handleAddComment}
-                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                   >
                     Comment
                   </button>
@@ -218,7 +218,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
             <div className="space-y-4">
               {/* Status */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   Status
                 </label>
                 {isEditing ? (
@@ -241,7 +241,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
 
               {/* Priority */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Flag className="w-4 h-4 inline mr-1" />
                   Priority
                 </label>
@@ -265,7 +265,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
 
               {/* Due Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
                   Due Date
                 </label>
@@ -277,7 +277,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 ) : (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-600 dark:text-gray-200">
                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
                   </span>
                 )}
@@ -285,7 +285,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
 
               {/* Estimated Time */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Clock className="w-4 h-4 inline mr-1" />
                   Estimated Time
                 </label>
@@ -299,7 +299,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 ) : (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-600 dark:text-gray-200">
                     {task.estimatedTime ? `${task.estimatedTime} hours` : 'Not set'}
                   </span>
                 )}
@@ -307,7 +307,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
 
               {/* Assignees */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <User className="w-4 h-4 inline mr-1" />
                   Assignees
                 </label>
@@ -315,20 +315,20 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   {task.assignees.map(assignee => (
                     <span
                       key={assignee}
-                      className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg"
+                      className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded-lg"
                     >
                       {assignee}
                     </span>
                   ))}
                   {task.assignees.length === 0 && (
-                    <span className="text-sm text-gray-400">No assignees</span>
+                    <span className="text-sm text-gray-600">No assignees</span>
                   )}
                 </div>
               </div>
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Tag className="w-4 h-4 inline mr-1" />
                   Tags
                 </label>
@@ -342,18 +342,18 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     </span>
                   ))}
                   {task.tags.length === 0 && (
-                    <span className="text-sm text-gray-400">No tags</span>
+                    <span className="text-sm text-gray-600">No tags</span>
                   )}
                 </div>
               </div>
 
               {/* Attachments */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Paperclip className="w-4 h-4 inline mr-1" />
                   Attachments
                 </label>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
                   {task.attachments.length} file(s)
                 </span>
               </div>

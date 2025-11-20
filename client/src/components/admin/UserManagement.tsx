@@ -222,7 +222,7 @@ const UserManagement: React.FC = () => {
   const getPlanBadgeColor = (plan: string) => {
     switch (plan) {
       case 'free': return 'bg-gray-500/10 text-gray-500';
-      case 'pro': return 'bg-blue-500/10 text-blue-500';
+      case 'pro': return 'bg-accent/10 text-accent';
       case 'ultra': return 'bg-purple-500/10 text-purple-500';
       default: return 'bg-gray-500/10 text-gray-500';
     }
@@ -244,7 +244,7 @@ const UserManagement: React.FC = () => {
           <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             User Management
           </h1>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
             Manage all users, subscriptions, and permissions
           </p>
         </div>
@@ -255,19 +255,19 @@ const UserManagement: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Users</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Total Users</p>
                   <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                     {stats.totalUsers}
                   </p>
                 </div>
-                <Users className="w-8 h-8 text-blue-500" />
+                <Users className="w-8 h-8 text-accent" />
               </div>
             </div>
 
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Users</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Active Users</p>
                   <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                     {stats.activeUsers}
                   </p>
@@ -279,19 +279,19 @@ const UserManagement: React.FC = () => {
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pro Users</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Pro Users</p>
                   <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                     {stats.subscriptions.pro}
                   </p>
                 </div>
-                <Award className="w-8 h-8 text-blue-500" />
+                <Award className="w-8 h-8 text-accent" />
               </div>
             </div>
 
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Ultra Users</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Ultra Users</p>
                   <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                     {stats.subscriptions.ultra}
                   </p>
@@ -307,7 +307,7 @@ const UserManagement: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
               <input
                 type="text"
                 placeholder="Search users..."
@@ -370,22 +370,22 @@ const UserManagement: React.FC = () => {
             <table className="w-full">
               <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                 <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     User
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Contact
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Subscription
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Status
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Joined
                   </th>
-                  <th className={`px-6 py-3 text-right text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
+                  <th className={`px-6 py-3 text-right text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
                     Actions
                   </th>
                 </tr>
@@ -402,18 +402,18 @@ const UserManagement: React.FC = () => {
                           <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             {user.fullName}
                           </div>
-                          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                             @{user.username}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
                         {user.email}
                       </div>
                       {user.contactNumber && (
-                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                           {user.contactNumber}
                         </div>
                       )}
@@ -431,12 +431,12 @@ const UserManagement: React.FC = () => {
                           <XCircle className="w-5 h-5 text-red-500" />
                         )}
                         <div title={user.isEmailVerified ? "Email Verified" : "Email Not Verified"}>
-                          <Mail className={`w-5 h-5 ${user.isEmailVerified ? 'text-blue-500' : 'text-gray-400'}`} />
+                          <Mail className={`w-5 h-5 ${user.isEmailVerified ? 'text-accent' : 'text-gray-600'}`} />
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
                         {new Date(user.createdAt).toLocaleDateString()}
                       </div>
                     </td>
@@ -451,7 +451,7 @@ const UserManagement: React.FC = () => {
                           className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
                           title="Change Subscription"
                         >
-                          <CreditCard className="w-5 h-5 text-blue-500" />
+                          <CreditCard className="w-5 h-5 text-accent" />
                         </button>
 
                         {/* Verify Email */}
@@ -496,7 +496,7 @@ const UserManagement: React.FC = () => {
 
           {/* Pagination */}
           <div className={`px-6 py-4 flex items-center justify-between border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
+            <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-700'}`}>
               Page {page} of {totalPages}
             </div>
             <div className="flex gap-2">
@@ -525,7 +525,7 @@ const UserManagement: React.FC = () => {
               <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
                 Change Subscription
               </h3>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-6`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-6`}>
                 Change subscription plan for {selectedUser.fullName}
               </p>
 
@@ -537,25 +537,25 @@ const UserManagement: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Free Plan</p>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Basic features</p>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Basic features</p>
                     </div>
                     {selectedUser.subscription.plan === 'free' && (
-                      <CheckCircle className="w-6 h-6 text-gray-500" />
+                      <CheckCircle className="w-6 h-6 text-gray-600" />
                     )}
                   </div>
                 </button>
 
                 <button
                   onClick={() => handleUpdateSubscription(selectedUser._id, 'pro')}
-                  className={`w-full p-4 rounded-xl border-2 ${selectedUser.subscription.plan === 'pro' ? 'border-blue-500 bg-blue-500/10' : isDarkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
+                  className={`w-full p-4 rounded-xl border-2 ${selectedUser.subscription.plan === 'pro' ? 'border-accent bg-accent/10' : isDarkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pro Plan</p>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Advanced features</p>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Advanced features</p>
                     </div>
                     {selectedUser.subscription.plan === 'pro' && (
-                      <CheckCircle className="w-6 h-6 text-blue-500" />
+                      <CheckCircle className="w-6 h-6 text-accent" />
                     )}
                   </div>
                 </button>
@@ -567,7 +567,7 @@ const UserManagement: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Ultra Plan</p>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>All features</p>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>All features</p>
                     </div>
                     {selectedUser.subscription.plan === 'ultra' && (
                       <CheckCircle className="w-6 h-6 text-purple-500" />

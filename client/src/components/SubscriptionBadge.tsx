@@ -19,7 +19,7 @@ const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({
       case 'pro':
         return {
           icon: Star,
-          color: 'text-blue-500',
+          color: 'text-accent',
           bgColor: 'bg-blue-100',
           tooltip: 'Pro User - Advanced features unlocked',
           glow: 'shadow-blue-500/25'
@@ -36,7 +36,7 @@ const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({
       default:
         return {
           icon: Circle,
-          color: 'text-gray-400',
+          color: 'text-gray-600',
           bgColor: 'bg-gray-100',
           tooltip: 'Free User',
           glow: 'shadow-gray-500/10'

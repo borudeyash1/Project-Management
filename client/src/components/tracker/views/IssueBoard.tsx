@@ -11,7 +11,7 @@ const IssueBoard: React.FC<IssueBoardProps> = ({ searchQuery }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const columns = [
-    { id: 'reported', label: 'Reported', color: 'bg-gray-200' },
+    { id: 'reported', label: 'Reported', color: 'bg-gray-300' },
     { id: 'investigating', label: 'Investigating', color: 'bg-yellow-200' },
     { id: 'in_progress', label: 'In Progress', color: 'bg-blue-200' },
     { id: 'resolved', label: 'Resolved', color: 'bg-green-200' }
@@ -41,16 +41,16 @@ const IssueBoard: React.FC<IssueBoardProps> = ({ searchQuery }) => {
       <div className="flex gap-4 h-full min-w-max">
         {columns.map(column => (
           <div key={column.id} className="flex-shrink-0 w-80 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-4 border-b border-gray-300 dark:border-gray-600">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">{column.label}</h3>
-                  <span className="text-sm text-gray-500">{filteredIssues(column.id).length}</span>
+                  <span className="text-sm text-gray-600">{filteredIssues(column.id).length}</span>
                 </div>
                 {column.id === 'reported' && (
                   <button
                     onClick={() => setShowCreateModal(true)}
-                    className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
+                    className="p-1 text-accent-dark hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -68,23 +68,23 @@ const IssueBoard: React.FC<IssueBoardProps> = ({ searchQuery }) => {
                       {issue.title}
                     </h4>
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      issue.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
-                      issue.severity === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' :
-                      issue.severity === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
+                      issue.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-600' :
+                      issue.severity === 'high' ? 'bg-orange-200 text-orange-800 dark:bg-orange-900/30 dark:text-orange-500' :
+                      issue.severity === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-600' :
+                      'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                     }`}>
                       {issue.severity}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                     {issue.description}
                   </p>
                   {issue.linkedTaskTitle && (
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">
                       Task: {issue.linkedTaskTitle}
                     </div>
                   )}
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-200">
                     <div className="flex items-center gap-1">
                       <User className="w-3 h-3" />
                       {issue.assigneeName || 'Unassigned'}

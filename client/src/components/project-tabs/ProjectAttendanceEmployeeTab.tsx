@@ -151,7 +151,7 @@ const ProjectAttendanceEmployeeTab: React.FC<ProjectAttendanceEmployeeTabProps> 
 
     return (
       <div className="mt-3">
-        <div className="grid grid-cols-7 text-xs font-medium text-gray-500 mb-1">
+        <div className="grid grid-cols-7 text-xs font-medium text-gray-600 mb-1">
           <div>Sun</div>
           <div>Mon</div>
           <div>Tue</div>
@@ -231,7 +231,7 @@ const ProjectAttendanceEmployeeTab: React.FC<ProjectAttendanceEmployeeTabProps> 
                   {rec.status.replace(/-/g, ' ')}
                 </span>
               ) : (
-                <span className="text-[10px] text-gray-400">No record</span>
+                <span className="text-[10px] text-gray-600">No record</span>
               )}
             </div>
           );
@@ -263,7 +263,7 @@ const ProjectAttendanceEmployeeTab: React.FC<ProjectAttendanceEmployeeTabProps> 
             type="button"
             onClick={handleMarkToday}
             disabled={marking}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-60"
+            className="px-4 py-2 bg-accent text-gray-900 rounded-lg text-sm hover:bg-accent-hover disabled:opacity-60"
           >
             {todayRecord ? 'Update Today\'s Attendance' : "Mark Today\'s Attendance"}
           </button>
@@ -272,8 +272,8 @@ const ProjectAttendanceEmployeeTab: React.FC<ProjectAttendanceEmployeeTabProps> 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg">
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+        <div className="bg-white border border-gray-300 rounded-lg">
+          <div className="px-4 py-3 border-b border-gray-300 flex items-center justify-between">
             <h4 className="font-medium text-gray-900 text-sm">Today</h4>
           </div>
           <div className="p-4 text-sm">
@@ -285,32 +285,32 @@ const ProjectAttendanceEmployeeTab: React.FC<ProjectAttendanceEmployeeTabProps> 
                     {todayRecord.status.replace(/-/g, ' ')}
                   </span>
                 </p>
-                <p className="text-xs text-gray-500">Marked via {todayRecord.mode} mode.</p>
+                <p className="text-xs text-gray-600">Marked via {todayRecord.mode} mode.</p>
               </div>
             ) : (
-              <p className="text-gray-500">You haven&apos;t marked attendance for today yet.</p>
+              <p className="text-gray-600">You haven&apos;t marked attendance for today yet.</p>
             )}
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+        <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-300 flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900 text-sm">Attendance Calendar</h4>
-              <p className="text-xs text-gray-500">View your attendance week-wise or month-wise.</p>
+              <p className="text-xs text-gray-600">View your attendance week-wise or month-wise.</p>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <div className="flex rounded-md border border-gray-300 overflow-hidden">
                 <button
                   type="button"
-                  className={`px-2 py-1 ${viewMode === 'week' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+                  className={`px-2 py-1 ${viewMode === 'week' ? 'bg-accent text-gray-900' : 'bg-white text-gray-700'}`}
                   onClick={() => setViewMode('week')}
                 >
                   Week
                 </button>
                 <button
                   type="button"
-                  className={`px-2 py-1 ${viewMode === 'month' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+                  className={`px-2 py-1 ${viewMode === 'month' ? 'bg-accent text-gray-900' : 'bg-white text-gray-700'}`}
                   onClick={() => setViewMode('month')}
                 >
                   Month
@@ -367,19 +367,19 @@ const ProjectAttendanceEmployeeTab: React.FC<ProjectAttendanceEmployeeTabProps> 
           </div>
           <div className="p-4 text-sm">
             {history.length === 0 ? (
-              <div className="text-gray-500 text-center text-xs">No attendance records found for this range.</div>
+              <div className="text-gray-600 text-center text-xs">No attendance records found for this range.</div>
             ) : viewMode === 'month' ? (
               renderMonthGrid()
             ) : (
               renderWeekRow()
             )}
-            <div className="mt-4 flex items-center gap-4 text-[11px] text-gray-500">
+            <div className="mt-4 flex items-center gap-4 text-[11px] text-gray-600">
               <div className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded-full bg-green-400 inline-block"></span>
                 <span>Present</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded-full bg-blue-400 inline-block"></span>
+                <span className="w-3 h-3 rounded-full bg-accent-light inline-block"></span>
                 <span>Work from home</span>
               </div>
               <div className="flex items-center gap-1">

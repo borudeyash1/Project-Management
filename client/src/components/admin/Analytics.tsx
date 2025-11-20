@@ -103,7 +103,7 @@ const Analytics: React.FC = () => {
       <div className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen pb-32`}>
         <div className="text-center py-12">
           <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />
-          <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>No analytics data available</p>
+          <p className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>No analytics data available</p>
         </div>
         <AdminDockNavigation />
       </div>
@@ -119,7 +119,7 @@ const Analytics: React.FC = () => {
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               📊 Analytics Dashboard
             </h1>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Comprehensive insights and predictions
             </p>
           </div>
@@ -136,8 +136,8 @@ const Analytics: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <Users className="w-6 h-6 text-blue-500" />
+              <div className="p-3 bg-accent/10 rounded-lg">
+                <Users className="w-6 h-6 text-accent" />
               </div>
               <span className={`text-sm font-medium ${analytics.growth.weeklyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {analytics.growth.weeklyGrowthRate >= 0 ? '+' : ''}{analytics.growth.weeklyGrowthRate.toFixed(1)}%
@@ -146,10 +146,10 @@ const Analytics: React.FC = () => {
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {analytics.overview.totalUsers.toLocaleString()}
             </h3>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Total Users
             </p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
               +{analytics.overview.usersLast30Days} this month
             </p>
           </div>
@@ -164,10 +164,10 @@ const Analytics: React.FC = () => {
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {analytics.overview.activeLast30Days.toLocaleString()}
             </h3>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Active Users (30d)
             </p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
               {analytics.engagement.engagementRate.toFixed(1)}% engagement rate
             </p>
           </div>
@@ -184,10 +184,10 @@ const Analytics: React.FC = () => {
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {analytics.predictions.nextMonthUsers.toLocaleString()}
             </h3>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Predicted Next Month
             </p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
               {analytics.predictions.trend === 'growing' ? '📈 Growing' : '📉 Declining'}
             </p>
           </div>
@@ -204,10 +204,10 @@ const Analytics: React.FC = () => {
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {analytics.overview.inactive90Days.toLocaleString()}
             </h3>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Dormant Users
             </p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
               Churn rate: {analytics.engagement.churnRate.toFixed(1)}%
             </p>
           </div>
@@ -230,19 +230,19 @@ const Analytics: React.FC = () => {
             </h3>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Daily Growth Rate</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Daily Growth Rate</span>
                 <span className={`font-semibold ${analytics.growth.dailyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {analytics.growth.dailyGrowthRate >= 0 ? '+' : ''}{analytics.growth.dailyGrowthRate.toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Weekly Growth Rate</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Weekly Growth Rate</span>
                 <span className={`font-semibold ${analytics.growth.weeklyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {analytics.growth.weeklyGrowthRate >= 0 ? '+' : ''}{analytics.growth.weeklyGrowthRate.toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Avg Daily Growth</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Avg Daily Growth</span>
                 <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   {analytics.growth.avgDailyGrowth} users/day
                 </span>
@@ -256,19 +256,19 @@ const Analytics: React.FC = () => {
             </h3>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Total Devices</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Total Devices</span>
                 <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   {analytics.devices.total}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Active Devices</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Active Devices</span>
                 <span className="font-semibold text-green-500">
                   {analytics.devices.active}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Suspicious Devices</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Suspicious Devices</span>
                 <span className={`font-semibold ${analytics.devices.suspicious > 0 ? 'text-red-500' : 'text-green-500'}`}>
                   {analytics.devices.suspicious}
                 </span>

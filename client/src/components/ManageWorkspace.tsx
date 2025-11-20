@@ -37,14 +37,14 @@ const ManageWorkspace: React.FC = () => {
     return (
       <div className="h-full bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">No Workspaces to Manage</h2>
           <p className="text-gray-600 mb-6">
             You don't own any workspaces yet. Create a workspace to start managing it.
           </p>
           <button
             onClick={() => navigate('/workspace')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
           >
             <Plus className="w-5 h-5" />
             Create Workspace
@@ -57,11 +57,11 @@ const ManageWorkspace: React.FC = () => {
   return (
     <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-blue-600" />
+              <Shield className="w-6 h-6 text-accent-dark" />
               Manage Workspaces
             </h1>
             <p className="text-gray-600 mt-1">Manage all your owned workspaces</p>
@@ -69,7 +69,7 @@ const ManageWorkspace: React.FC = () => {
           
           <button
             onClick={() => navigate('/workspace')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
           >
             <Plus className="w-4 h-4" />
             Create Workspace
@@ -80,15 +80,15 @@ const ManageWorkspace: React.FC = () => {
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
           {/* Search Bar */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+          <div className="bg-white rounded-lg border border-gray-300 p-4 mb-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search workspaces by name, description, or type..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               />
             </div>
           </div>
@@ -96,10 +96,10 @@ const ManageWorkspace: React.FC = () => {
           {/* Workspace Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredWorkspaces.map((workspace) => (
-              <div key={workspace._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+              <div key={workspace._id} className="bg-white rounded-lg border border-gray-300 p-6 hover:shadow-lg transition-shadow">
                 {/* Workspace Icon */}
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <Building className="w-6 h-6 text-blue-600" />
+                  <Building className="w-6 h-6 text-accent-dark" />
                 </div>
 
                 {/* Workspace Info */}
@@ -111,11 +111,11 @@ const ManageWorkspace: React.FC = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="flex items-center gap-2 text-sm">
-                    <Users className="w-4 h-4 text-gray-400" />
+                    <Users className="w-4 h-4 text-gray-600" />
                     <span className="text-gray-600">{workspace.memberCount} members</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <MapPin className="w-4 h-4 text-gray-600" />
                     <span className="text-gray-600">{workspace.region}</span>
                   </div>
                 </div>
@@ -143,7 +143,7 @@ const ManageWorkspace: React.FC = () => {
                 {/* Actions */}
                 <button
                   onClick={() => handleVisitWorkspace(workspace._id)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                 >
                   Visit Workspace
                   <ArrowRight className="w-4 h-4" />
@@ -155,7 +155,7 @@ const ManageWorkspace: React.FC = () => {
           {/* Empty State */}
           {filteredWorkspaces.length === 0 && searchQuery && (
             <div className="text-center py-12">
-              <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <Search className="w-12 h-12 text-gray-600 mx-auto mb-3" />
               <p className="text-gray-600">No workspaces found matching "{searchQuery}"</p>
             </div>
           )}
