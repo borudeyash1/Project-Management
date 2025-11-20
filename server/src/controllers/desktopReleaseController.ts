@@ -3,8 +3,7 @@ import DesktopRelease from '../models/DesktopRelease';
 import { AuthenticatedRequest } from '../types';
 import path from 'path';
 import fs from 'fs';
-import zlib from 'zlib';
-import { Readable } from 'stream';
+import { uploadToR2, deleteFromR2, extractR2Key } from '../services/r2Service';
 
 // Get all releases (public)
 export const getAllReleases = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -14,11 +13,11 @@ export const getAllReleases = async (req: AuthenticatedRequest, res: Response): 
     console.log('🔍 [RELEASES] Fetching releases...');
 
     const filter: any = { isActive: true };
-    
+
     if (platform) {
       filter.platform = platform;
     }
-    
+
     if (latest === 'true') {
       filter.isLatest = true;
     }
@@ -48,9 +47,9 @@ export const getLatestReleases = async (req: AuthenticatedRequest, res: Response
   try {
     console.log('🔍 [RELEASES] Fetching latest releases...');
 
-    const latestReleases = await DesktopRelease.find({ 
-      isLatest: true, 
-      isActive: true 
+    const latestReleases = await DesktopRelease.find({
+      isLatest: true,
+      isActive: true
     })
       .populate('uploadedBy', 'name email')
       .sort({ releaseDate: -1 })
@@ -132,22 +131,19 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
-    // Create download URL
-    const downloadUrl = `/api/releases/download/${file.filename}`;
-
-    // Read uploaded file into memory so it can be stored in Mongo
+    // Read uploaded file from disk
     const fileBuffer = await fs.promises.readFile(file.path);
-    let storedBuffer = fileBuffer;
-    let isCompressed = false;
 
+    // Upload to R2
+    const r2Key = `releases/${file.filename}`;
+    const downloadUrl = await uploadToR2(fileBuffer, r2Key, file.mimetype);
+
+    // Delete local file after successful upload to R2
     try {
-      const compressed = zlib.gzipSync(fileBuffer);
-      if (compressed.length < fileBuffer.length) {
-        storedBuffer = compressed;
-        isCompressed = true;
-      }
-    } catch (compressionError) {
-      console.warn('⚠️ [RELEASES] Failed to compress file, storing raw buffer.', compressionError);
+      await fs.promises.unlink(file.path);
+      console.log('🗑️ [RELEASES] Local file deleted after R2 upload');
+    } catch (unlinkError) {
+      console.warn('⚠️ [RELEASES] Failed to delete local file:', unlinkError);
     }
 
     const release = await DesktopRelease.create({
@@ -159,11 +155,9 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
       architecture,
       fileName: file.originalname,
       fileSize: file.size,
-      filePath: file.path,
-      downloadUrl,
-      fileData: storedBuffer,
+      filePath: r2Key, // Store R2 key instead of local path
+      downloadUrl, // R2 public URL
       fileContentType: file.mimetype,
-      isCompressed,
       isLatest: isLatest === 'true',
       uploadedBy: adminId
     });
@@ -243,10 +237,14 @@ export const deleteRelease = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
-    // Delete file from filesystem
-    if (fs.existsSync(release.filePath)) {
-      fs.unlinkSync(release.filePath);
-      console.log('🗑️ [RELEASES] File deleted from filesystem');
+    // Delete file from R2
+    try {
+      const r2Key = extractR2Key(release.downloadUrl || release.filePath);
+      await deleteFromR2(r2Key);
+      console.log('🗑️ [RELEASES] File deleted from R2');
+    } catch (r2Error) {
+      console.warn('⚠️ [RELEASES] Failed to delete from R2:', r2Error);
+      // Continue with database deletion even if R2 deletion fails
     }
 
     await DesktopRelease.findByIdAndDelete(id);
@@ -273,9 +271,17 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
 
     console.log('🔍 [RELEASES] Download request for:', filename);
 
-    const release = await DesktopRelease.findOne({ 
-      downloadUrl: `/api/releases/download/${filename}` 
+    // Try to find by old-style download URL or by R2 key
+    let release = await DesktopRelease.findOne({
+      downloadUrl: `/api/releases/download/${filename}`
     });
+
+    // If not found, try finding by R2 key in filePath
+    if (!release) {
+      release = await DesktopRelease.findOne({
+        filePath: `releases/${filename}`
+      });
+    }
 
     if (!release) {
       res.status(404).json({
@@ -285,66 +291,14 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
       return;
     }
 
-    const streamFromDisk = () => {
-      if (!release.filePath || !fs.existsSync(release.filePath)) {
-        return false;
-      }
-
-      res.setHeader('Content-Type', release.fileContentType || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${release.fileName}"`);
-      res.setHeader('Content-Length', release.fileSize);
-
-      const fileStream = fs.createReadStream(release.filePath);
-      fileStream.on('error', (streamError) => {
-        console.error('❌ [RELEASES] Error streaming file from disk:', streamError);
-        if (!res.headersSent) {
-          res.status(500).json({ success: false, message: 'Failed to download release' });
-        } else {
-          res.destroy(streamError);
-        }
-      });
-      fileStream.pipe(res);
-      return true;
-    };
-
-    const streamFromDatabase = () => {
-      if (!release.fileData || !release.fileData.length) {
-        return false;
-      }
-
-      res.setHeader('Content-Type', release.fileContentType || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${release.fileName}"`);
-      res.setHeader('Content-Length', release.fileSize);
-
-      const bufferStream = Readable.from(release.fileData);
-      const payloadStream = release.isCompressed ? bufferStream.pipe(zlib.createGunzip()) : bufferStream;
-
-      payloadStream.on('error', (streamError) => {
-        console.error('❌ [RELEASES] Error streaming file from database:', streamError);
-        if (!res.headersSent) {
-          res.status(500).json({ success: false, message: 'Failed to download release' });
-        } else {
-          res.destroy(streamError);
-        }
-      });
-
-      payloadStream.pipe(res);
-      return true;
-    };
-
-    if (!streamFromDisk() && !streamFromDatabase()) {
-      res.status(404).json({
-        success: false,
-        message: 'File not found'
-      });
-      return;
-    }
-
-    // Increment download count after successfully initiating the stream
+    // Increment download count
     release.downloadCount += 1;
     await release.save();
 
-    console.log('✅ [RELEASES] Starting download, count:', release.downloadCount);
+    console.log('✅ [RELEASES] Redirecting to R2, count:', release.downloadCount);
+
+    // Redirect to R2 public URL
+    res.redirect(release.downloadUrl);
   } catch (error: any) {
     console.error('❌ [RELEASES] Error downloading release:', error);
     res.status(500).json({
@@ -367,12 +321,12 @@ export const getReleaseStats = async (req: AuthenticatedRequest, res: Response):
 
     const platformStats = await DesktopRelease.aggregate([
       { $match: { isActive: true } },
-      { 
-        $group: { 
-          _id: '$platform', 
+      {
+        $group: {
+          _id: '$platform',
           count: { $sum: 1 },
           downloads: { $sum: '$downloadCount' }
-        } 
+        }
       }
     ]);
 
