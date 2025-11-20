@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, ExternalLink, Award, Users, Zap, Shield } from 'luci
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
+import ContentBanner from './ContentBanner';
 
 const About: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -16,6 +17,7 @@ const About: React.FC = () => {
         <div className={`absolute bottom-40 left-20 w-96 h-96 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-200/20'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
       </div>
       <SharedNavbar />
+      <ContentBanner route="/about" />
 
       {/* Content */}
       <div className="pt-16 relative z-10">

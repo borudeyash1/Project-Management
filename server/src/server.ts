@@ -29,6 +29,9 @@ import homeRoutes from "./routes/home";
 import plannerRoutes from "./routes/planner";
 import subscriptionsRoutes from "./routes/subscriptions";
 import attendanceRoutes from "./routes/attendance";
+import documentationRoutes from "./routes/documentation";
+import activityRoutes from "./routes/activity";
+import contentRoutes from "./routes/content";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 
 // Load environment variables
@@ -65,6 +68,11 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// Serve uploaded files (development only)
+if (process.env.NODE_ENV === 'development') {
+  app.use('/uploads', express.static('uploads'));
+}
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -89,6 +97,9 @@ app.use("/api/home", homeRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/inbox", inboxRoutes);
+app.use("/api/docs", documentationRoutes);
+app.use("/api/activities", activityRoutes);
+app.use("/api/content", contentRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

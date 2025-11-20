@@ -8,50 +8,66 @@ import {
   Eye,
   Save,
   X,
-  ChevronDown,
-  ChevronUp,
   Video,
   Search,
   ArrowLeft
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import { docsStorage, DocArticle } from '../../services/docsStorage';
+import { useApp } from '../../context/AppContext';
+import * as documentationService from '../../services/documentationService';
 
-
+interface DocArticle {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  category: string;
+  subcategory?: string;
+  videoUrl?: string;
+  order: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const AdminDocs: React.FC = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const { addToast } = useApp();
   const [articles, setArticles] = useState<DocArticle[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentArticle, setCurrentArticle] = useState<Partial<DocArticle> | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
 
-  // Sample categories
   const categories = [
     { value: 'all', label: 'All Categories' },
     { value: 'getting-started', label: 'Getting Started' },
     { value: 'user-guide', label: 'User Guide' },
     { value: 'api-reference', label: 'API Reference' },
-    { value: 'tutorials', label: 'Tutorials' }
+    { value: 'tutorials', label: 'Tutorials' },
+    { value: 'faq', label: 'FAQ' },
+    { value: 'custom', label: '✨ Custom Category' }
   ];
 
-  // Load articles from storage
   useEffect(() => {
     loadArticles();
+  }, [selectedCategory]);
 
-    // Listen for storage changes
-    const unsubscribe = docsStorage.onStorageChange(() => {
-      loadArticles();
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const loadArticles = () => {
-    const allArticles = docsStorage.getAllArticles();
-    setArticles(allArticles);
+  const loadArticles = async () => {
+    try {
+      setLoading(true);
+      const data = await documentationService.getAdminDocs(selectedCategory);
+      setArticles(data);
+    } catch (error: any) {
+      console.error('Failed to load documentation:', error);
+      addToast('Failed to load documentation articles', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateNew = () => {
@@ -72,26 +88,45 @@ const AdminDocs: React.FC = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    if (!currentArticle) return;
+  const handleSave = async () => {
+    if (!currentArticle || !currentArticle.title || !currentArticle.slug || !currentArticle.content) {
+      addToast('Please fill in all required fields', 'error');
+      return;
+    }
 
-    // Save to localStorage via docsStorage
-    docsStorage.saveArticle(currentArticle);
+    try {
+      setSaving(true);
+      if (currentArticle._id) {
+        await documentationService.updateDoc(currentArticle._id, currentArticle);
+        addToast('Documentation updated successfully', 'success');
+      } else {
+        await documentationService.createDoc(currentArticle);
+        addToast('Documentation created successfully', 'success');
+      }
 
-    // Reload articles
-    loadArticles();
-
-    setIsEditing(false);
-    setCurrentArticle(null);
+      await loadArticles();
+      setIsEditing(false);
+      setCurrentArticle(null);
+    } catch (error: any) {
+      console.error('Failed to save documentation:', error);
+      addToast(error.response?.data?.message || 'Failed to save documentation', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this article?')) {
-      // Delete from localStorage via docsStorage
-      docsStorage.deleteArticle(id);
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this article?')) {
+      return;
+    }
 
-      // Reload articles
-      loadArticles();
+    try {
+      await documentationService.deleteDoc(id);
+      addToast('Documentation deleted successfully', 'success');
+      await loadArticles();
+    } catch (error: any) {
+      console.error('Failed to delete documentation:', error);
+      addToast('Failed to delete documentation', 'error');
     }
   };
 
@@ -103,13 +138,11 @@ const AdminDocs: React.FC = () => {
   const filteredArticles = articles.filter(article => {
     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'}`}>
-      {/* Header */}
       <div className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border-b sticky top-0 z-10 backdrop-blur-sm`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -144,10 +177,8 @@ const AdminDocs: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isEditing ? (
-          /* Editor View */
           <div className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border rounded-2xl p-8 shadow-xl`}>
             <div className="space-y-6">
-              {/* Title */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Title *
@@ -157,14 +188,13 @@ const AdminDocs: React.FC = () => {
                   value={currentArticle?.title || ''}
                   onChange={(e) => setCurrentArticle(prev => ({ ...prev, title: e.target.value }))}
                   className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
                     } focus:outline-none focus:ring-2 focus:ring-accent`}
                   placeholder="Enter article title"
                 />
               </div>
 
-              {/* Slug */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Slug (URL) *
@@ -174,33 +204,61 @@ const AdminDocs: React.FC = () => {
                   value={currentArticle?.slug || ''}
                   onChange={(e) => setCurrentArticle(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
                   className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
                     } focus:outline-none focus:ring-2 focus:ring-accent`}
                   placeholder="article-url-slug"
                 />
               </div>
 
-              {/* Category */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Category *
                 </label>
                 <select
-                  value={currentArticle?.category || ''}
-                  onChange={(e) => setCurrentArticle(prev => ({ ...prev, category: e.target.value }))}
+                  value={currentArticle?.category === 'custom' || !categories.find(c => c.value === currentArticle?.category) ? 'custom' : currentArticle?.category || ''}
+                  onChange={(e) => {
+                    if (e.target.value === 'custom') {
+                      setCurrentArticle(prev => ({ ...prev, category: customCategory || 'custom' }));
+                    } else {
+                      setCurrentArticle(prev => ({ ...prev, category: e.target.value }));
+                      setCustomCategory('');
+                    }
+                  }}
                   className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
                     } focus:outline-none focus:ring-2 focus:ring-accent`}
                 >
                   {categories.filter(cat => cat.value !== 'all').map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
                   ))}
                 </select>
+
+                {/* Custom Category Input */}
+                {(currentArticle?.category === 'custom' || !categories.find(c => c.value === currentArticle?.category)) && (
+                  <div className="mt-3">
+                    <input
+                      type="text"
+                      value={customCategory || (currentArticle?.category !== 'custom' ? currentArticle?.category : '') || ''}
+                      onChange={(e) => {
+                        const value = e.target.value.toLowerCase().replace(/\s+/g, '-');
+                        setCustomCategory(value);
+                        setCurrentArticle(prev => ({ ...prev, category: value }));
+                      }}
+                      className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                        } focus:outline-none focus:ring-2 focus:ring-accent`}
+                      placeholder="Enter custom category (e.g., advanced-features)"
+                    />
+                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Use lowercase with hyphens (e.g., "my-custom-category")
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {/* Video URL */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Video URL (Optional)
@@ -212,49 +270,29 @@ const AdminDocs: React.FC = () => {
                     value={currentArticle?.videoUrl || ''}
                     onChange={(e) => setCurrentArticle(prev => ({ ...prev, videoUrl: e.target.value }))}
                     className={`flex-1 px-4 py-3 rounded-lg border ${isDarkMode
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
+                      ? 'bg-gray-700 border-gray-600 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
                       } focus:outline-none focus:ring-2 focus:ring-accent`}
                     placeholder="https://youtube.com/watch?v=..."
                   />
                 </div>
-                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  YouTube or Vimeo embed URL
-                </p>
               </div>
 
-              {/* Content - Markdown Editor */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Content (Markdown) *
                 </label>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {/* Editor */}
-                  <div>
-                    <textarea
-                      value={currentArticle?.content || ''}
-                      onChange={(e) => setCurrentArticle(prev => ({ ...prev, content: e.target.value }))}
-                      className={`w-full h-96 px-4 py-3 rounded-lg border ${isDarkMode
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                        } focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm`}
-                      placeholder="# Heading&#10;&#10;Your content here in **Markdown** format..."
-                    />
-                  </div>
-                  {/* Preview */}
-                  <div className={`h-96 overflow-y-auto px-4 py-3 rounded-lg border ${isDarkMode
-                      ? 'bg-gray-900 border-gray-600'
-                      : 'bg-gray-50 border-gray-300'
-                    }`}>
-                    <div className={`prose ${isDarkMode ? 'prose-invert' : ''} max-w-none`}>
-                      <p className="text-sm text-gray-400 mb-4">Preview:</p>
-                      {currentArticle?.content || <p className="text-gray-500 italic">No content yet...</p>}
-                    </div>
-                  </div>
-                </div>
+                <textarea
+                  value={currentArticle?.content || ''}
+                  onChange={(e) => setCurrentArticle(prev => ({ ...prev, content: e.target.value }))}
+                  className={`w-full h-96 px-4 py-3 rounded-lg border ${isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                    } focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm`}
+                  placeholder="# Heading&#10;&#10;Your content here in **Markdown** format..."
+                />
               </div>
 
-              {/* Published Status */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -268,20 +306,20 @@ const AdminDocs: React.FC = () => {
                 </label>
               </div>
 
-              {/* Actions */}
               <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-gray-900 rounded-lg font-medium transition-colors"
+                  disabled={saving}
+                  className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-gray-900 rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
                   <Save className="w-5 h-5" />
-                  Save Article
+                  {saving ? 'Saving...' : 'Save Article'}
                 </button>
                 <button
                   onClick={handleCancel}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${isDarkMode
-                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                      : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                    ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
                     }`}
                 >
                   <X className="w-5 h-5" />
@@ -291,9 +329,7 @@ const AdminDocs: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* List View */
           <div>
-            {/* Filters */}
             <div className="mb-6 flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
@@ -304,8 +340,8 @@ const AdminDocs: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className={`w-full pl-10 pr-4 py-3 rounded-lg border ${isDarkMode
-                        ? 'bg-gray-800 border-gray-700 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
+                      ? 'bg-gray-800 border-gray-700 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
                       } focus:outline-none focus:ring-2 focus:ring-accent`}
                   />
                 </div>
@@ -314,8 +350,8 @@ const AdminDocs: React.FC = () => {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className={`px-4 py-3 rounded-lg border ${isDarkMode
-                    ? 'bg-gray-800 border-gray-700 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
+                  ? 'bg-gray-800 border-gray-700 text-white'
+                  : 'bg-white border-gray-300 text-gray-900'
                   } focus:outline-none focus:ring-2 focus:ring-accent`}
               >
                 {categories.map(cat => (
@@ -324,24 +360,27 @@ const AdminDocs: React.FC = () => {
               </select>
             </div>
 
-            {/* Articles List */}
-            <div className="space-y-4">
-              {filteredArticles.length === 0 ? (
-                <div className={`${isDarkMode ? 'bg-gray-800/60' : 'bg-white'} rounded-2xl p-12 text-center`}>
-                  <FileText className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
-                  <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    No Articles Found
-                  </h3>
-                  <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                    {searchQuery || selectedCategory !== 'all'
-                      ? 'Try adjusting your filters'
-                      : 'Create your first documentation article'}
-                  </p>
-                </div>
-              ) : (
-                filteredArticles.map((article) => (
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : filteredArticles.length === 0 ? (
+              <div className={`${isDarkMode ? 'bg-gray-800/60' : 'bg-white'} rounded-2xl p-12 text-center`}>
+                <FileText className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  No Articles Found
+                </h3>
+                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                  {searchQuery || selectedCategory !== 'all'
+                    ? 'Try adjusting your filters'
+                    : 'Create your first documentation article'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredArticles.map((article) => (
                   <div
-                    key={article.id}
+                    key={article._id}
                     className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border rounded-xl p-6 hover:shadow-lg transition-shadow`}
                   >
                     <div className="flex items-start justify-between">
@@ -351,8 +390,8 @@ const AdminDocs: React.FC = () => {
                             {article.title}
                           </h3>
                           <span className={`px-2 py-1 rounded text-xs font-medium ${article.isPublished
-                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                              : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
                             }`}>
                             {article.isPublished ? 'Published' : 'Draft'}
                           </span>
@@ -380,7 +419,7 @@ const AdminDocs: React.FC = () => {
                           <Edit className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleDelete(article.id)}
+                          onClick={() => handleDelete(article._id)}
                           className={`p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors`}
                           title="Delete"
                         >
@@ -389,9 +428,9 @@ const AdminDocs: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

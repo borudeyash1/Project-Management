@@ -18,9 +18,29 @@ import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import SEO from './SEO';
-import { docsStorage, DocArticle, DocCategory } from '../services/docsStorage';
+import * as documentationService from '../services/documentationService';
 
+interface DocArticle {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  category: string;
+  subcategory?: string;
+  videoUrl?: string;
+  order: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
+interface DocCategory {
+  name: string;
+  slug: string;
+  icon: string;
+  articles: DocArticle[];
+  expanded: boolean;
+}
 
 const Docs: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
@@ -30,34 +50,66 @@ const Docs: React.FC = () => {
   const [currentArticle, setCurrentArticle] = useState<DocArticle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load categories and articles from storage
-  const loadDocs = () => {
-    const loadedCategories = docsStorage.getArticlesGroupedByCategory();
-    setCategories(loadedCategories);
+  // Category metadata
+  const categoryMetadata: Record<string, { name: string; icon: string }> = {
+    'getting-started': { name: 'Getting Started', icon: '🚀' },
+    'user-guide': { name: 'User Guide', icon: '📖' },
+    'api-reference': { name: 'API Reference', icon: '⚙️' },
+    'tutorials': { name: 'Tutorials', icon: '🎓' },
+    'faq': { name: 'FAQ', icon: '❓' }
+  };
+
+  // Load articles from API
+  const loadDocs = async () => {
+    try {
+      setLoading(true);
+      const articles = await documentationService.getAllDocs();
+      
+      // Group articles by category
+      const grouped: Record<string, DocArticle[]> = {};
+      articles.forEach(article => {
+        if (!grouped[article.category]) {
+          grouped[article.category] = [];
+        }
+        grouped[article.category].push(article);
+      });
+
+      // Convert to category array
+      const categoriesArray: DocCategory[] = Object.keys(grouped).map(categorySlug => {
+        const meta = categoryMetadata[categorySlug] || { name: categorySlug, icon: '📄' };
+        return {
+          name: meta.name,
+          slug: categorySlug,
+          icon: meta.icon,
+          articles: grouped[categorySlug].sort((a, b) => a.order - b.order),
+          expanded: true
+        };
+      });
+
+      setCategories(categoriesArray);
+    } catch (error) {
+      console.error('Failed to load documentation:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Initial load
     loadDocs();
-
-    // Listen for storage changes (real-time sync across tabs)
-    const unsubscribe = docsStorage.onStorageChange(() => {
-      loadDocs();
-    });
-
-    return unsubscribe;
   }, []);
 
   useEffect(() => {
     // Load article based on slug
     if (slug) {
-      const article = docsStorage.getArticleBySlug(slug);
-      if (article && article.isPublished) {
-        setCurrentArticle(article);
-      } else {
-        setCurrentArticle(null);
-      }
+      documentationService.getDocBySlug(slug).then(article => {
+        if (article && article.isPublished) {
+          setCurrentArticle(article);
+        } else {
+          setCurrentArticle(null);
+        }
+      });
     } else {
       // Load first article by default
       const firstArticle = categories[0]?.articles[0];
@@ -153,9 +205,9 @@ const Docs: React.FC = () => {
               <div className="ml-8 mt-2 space-y-1">
                 {category.articles.map((article) => (
                   <button
-                    key={article.id}
+                    key={article._id}
                     onClick={() => selectArticle(article)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${currentArticle?.id === article.id
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${currentArticle?._id === article._id
                       ? isDarkMode
                         ? 'bg-accent/20 text-accent'
                         : 'bg-accent/10 text-accent-dark'

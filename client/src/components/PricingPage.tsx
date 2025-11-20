@@ -6,6 +6,7 @@ import SharedFooter from './SharedFooter';
 import PricingModal from './PricingModal';
 import api, { SubscriptionPlanData } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import ContentBanner from './ContentBanner';
 
 const planIconMap: Record<'free' | 'pro' | 'ultra', React.ReactNode> = {
   free: <Users className="w-8 h-8 text-emerald-500" />,
@@ -67,6 +68,7 @@ const PricingPage: React.FC = () => {
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <SharedNavbar />
+      <ContentBanner route="/pricing" />
 
       <main className="flex-1 pt-24 pb-16">
         <section className={`px-4 ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'}`}>
