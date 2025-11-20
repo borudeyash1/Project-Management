@@ -33,9 +33,16 @@ export const uploadToR2 = async (
         const localPath = path.join(LOCAL_STORAGE_PATH, path.basename(key));
         fs.writeFileSync(localPath, fileBuffer);
 
-        // Use production domain or localhost for development
-        const baseUrl = process.env.API_BASE_URL || process.env.BACKEND_URL || 'http://localhost:5000';
-        const publicUrl = `${baseUrl}/uploads/releases/${path.basename(key)}`;
+        // In production, use relative URL (browser will use current domain)
+        // In development, use absolute localhost URL
+        let publicUrl: string;
+        if (process.env.NODE_ENV === 'production') {
+            publicUrl = `/uploads/releases/${path.basename(key)}`;
+        } else {
+            const baseUrl = process.env.API_BASE_URL || process.env.BACKEND_URL || 'http://localhost:5000';
+            publicUrl = `${baseUrl}/uploads/releases/${path.basename(key)}`;
+        }
+
         console.log('✅ [LOCAL] File stored:', publicUrl);
         return publicUrl;
     }
