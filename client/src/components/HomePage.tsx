@@ -17,7 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/homeService';
 import CalendarWidget from './dashboard/CalendarWidget';
 import ReportsWidget from './dashboard/ReportsWidget';
-import ExpandedStatCard from './dashboard/ExpandedStatCard'; // Import ExpandedStatCard component
+import ExpandedStatCard from './dashboard/ExpandedStatCard';
+import ContentBanner from './ContentBanner';
 
 interface QuickTask {
   _id: string;
@@ -351,6 +352,9 @@ const HomePage: React.FC = () => {
 
   return (
     <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Content Banner */}
+      <ContentBanner route="/" />
+
       {/* Header */}
       <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
         <div className="flex items-center justify-between">

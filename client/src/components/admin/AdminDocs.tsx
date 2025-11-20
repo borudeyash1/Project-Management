@@ -54,7 +54,19 @@ const AdminDocs: React.FC = () => {
   ];
 
   useEffect(() => {
-    loadArticles();
+    // Check and set admin token first
+    const adminToken = localStorage.getItem('adminToken');
+    if (adminToken) {
+      localStorage.setItem('accessToken', adminToken);
+      // Small delay to ensure token is set in API service
+      setTimeout(() => {
+        loadArticles();
+      }, 100);
+    } else {
+      setLoading(false);
+      addToast('Please log in as admin', 'error');
+      window.location.href = '/my-admin/login';
+    }
   }, [selectedCategory]);
 
   const loadArticles = async () => {
