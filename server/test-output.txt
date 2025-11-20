@@ -1,0 +1,58 @@
+﻿≡ƒº¬ [TEST] Testing R2 upload...
+≡ƒôì [TEST] R2 Endpoint: https://78c2ede87a819fb5b4f9156c1ac.r2.cloudflarestorage.com
+≡ƒôì [TEST] R2 Bucket: sartthi-storage
+≡ƒôì [TEST] R2 Public URL: https://pub-9108044e554148a7b07616508d5c70de.r2.dev
+
+≡ƒôü [TEST] Reading file: D:\YASH\Project Management\server\uploads\releases\release-1763583782895-249177728.exe
+Γ£à [TEST] File read successfully: 1.86 MB
+
+≡ƒôñ [TEST] Uploading to R2...
+   Key: releases/release-1763583782895-249177728.exe
+≡ƒôñ [R2] Uploading file: releases/release-1763583782895-249177728.exe
+node.exe : Γ¥î [R2] Upload 
+failed: Error: getaddrinfo 
+ENOTFOUND s3.auto.amazonaws.com
+At C:\Program 
+Files\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS 
+$args
++   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : N 
+   otSpecified: (Γ¥î [R2] Uplo  
+  ad...o.amazonaws.com:String   
+ ) [], RemoteException
+    + FullyQualifiedErrorId : N 
+   ativeCommandError
+ 
+    at 
+GetAddrInfoReqWrap.onlookupall 
+[as oncomplete] 
+(node:dns:120:26) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 
+'s3.auto.amazonaws.com',
+  '$metadata': { attempts: 3, 
+totalRetryDelay: 195 }
+}
+
+Γ¥î [TEST] Error: Failed to 
+upload file to R2: getaddrinfo 
+ENOTFOUND s3.auto.amazonaws.com
+Stack: Error: Failed to upload 
+file to R2: getaddrinfo 
+ENOTFOUND s3.auto.amazonaws.com
+    at uploadToR2 
+(D:\YASH\Project Management\serv
+er\src\services\r2Service.ts:51:
+15)
+    at 
+processTicksAndRejections (node:
+internal/process/task_queues:105
+:5)
+    at async testR2Upload 
+(D:\YASH\Project Management\serv
+er\src\scripts\testR2Upload.ts:3
+5:27)
