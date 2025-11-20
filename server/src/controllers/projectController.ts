@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { AuthenticatedRequest, ApiResponse, IProject } from '../types';
 import { PlanName, SUBSCRIPTION_LIMITS, requiresWorkspaceForProjects } from '../config/subscriptionLimits';
 import { sendEmail } from '../services/emailService';
+import { createActivity } from '../utils/activityUtils';
 
 // Create project
 export const createProject = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -97,6 +98,16 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
     // Populate the project with owner details
     await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
+    // Create activity
+    await createActivity(
+      user._id,
+      'project_created',
+      `Created project: ${project.name}`,
+      `New project "${project.name}" was created`,
+      'Project',
+      project._id
+    );
+
     const response: ApiResponse<IProject> = {
       success: true,
       message: 'Project created successfully',
@@ -151,8 +162,8 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
         workspace: null,
         isActive: true
       })
-      .populate('teamMembers.user', 'fullName email avatarUrl')
-      .sort({ createdAt: -1 });
+        .populate('teamMembers.user', 'fullName email avatarUrl')
+        .sort({ createdAt: -1 });
 
       res.status(200).json({
         success: true,
@@ -203,8 +214,8 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
       workspace: resolvedWorkspaceId,
       isActive: true
     })
-    .populate('teamMembers.user', 'fullName email avatarUrl')
-    .sort({ createdAt: -1 });
+      .populate('teamMembers.user', 'fullName email avatarUrl')
+      .sort({ createdAt: -1 });
 
     const response: ApiResponse<IProject[]> = {
       success: true,
@@ -236,7 +247,7 @@ export const getProject = async (req: AuthenticatedRequest, res: Response): Prom
         { 'teamMembers.user': userId }
       ]
     })
-    .populate('teamMembers.user', 'fullName email avatarUrl');
+      .populate('teamMembers.user', 'fullName email avatarUrl');
 
     if (!project) {
       res.status(404).json({
@@ -288,7 +299,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
 
     // Update project
     Object.assign(project, updateData);
-    
+
     // Convert date strings to Date objects if provided
     if (updateData.startDate) {
       project.startDate = new Date(updateData.startDate);
@@ -301,6 +312,16 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     }
 
     await project.save();
+
+    // Create activity
+    await createActivity(
+      userId,
+      'project_updated',
+      `Updated project: ${project.name}`,
+      `Project "${project.name}" was updated`,
+      'Project',
+      project._id
+    );
 
     await project.populate('owner', 'fullName email avatarUrl');
     await project.populate('teamMembers.user', 'fullName email avatarUrl');
@@ -463,7 +484,7 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     }
 
     // Remove member
-    (project as any).teamMembers = ((project as any).teamMembers || []).filter((member: any) => 
+    (project as any).teamMembers = ((project as any).teamMembers || []).filter((member: any) =>
       member.user.toString() !== memberId
     );
     await project.save();
@@ -511,7 +532,7 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
     }
 
     // Update member role
-    const member = ((project as any).teamMembers || []).find((member: any) => 
+    const member = ((project as any).teamMembers || []).find((member: any) =>
       member.user.toString() === memberId
     );
     if (member) {

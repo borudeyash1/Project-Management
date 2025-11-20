@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Task from '../models/Task';
 import Project from '../models/Project';
 import { ApiResponse } from '../types';
+import { createActivity } from '../utils/activityUtils';
 
 // Map frontend-style status values to backend Task.status
 const mapFrontendStatusToBackend = (status?: string): string | undefined => {
@@ -38,7 +39,7 @@ const mapFrontendPriorityToBackend = (priority?: string): string | undefined => 
   }
 };
 
-// GET /api/tasks?projectId=...
+// GET /api/tasks?projectId=...&status=...&priority=...
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
   try {
     const authUser = (req as any).user;
@@ -47,11 +48,31 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const { projectId } = req.query as { projectId?: string };
+    const { projectId, status, priority } = req.query as {
+      projectId?: string;
+      status?: string;
+      priority?: string;
+    };
     const filter: any = {};
 
     if (projectId) {
       filter.project = projectId;
+    }
+
+    // Add status filtering
+    if (status) {
+      const backendStatus = mapFrontendStatusToBackend(status);
+      if (backendStatus) {
+        filter.status = backendStatus;
+      }
+    }
+
+    // Add priority filtering
+    if (priority) {
+      const backendPriority = mapFrontendPriorityToBackend(priority);
+      if (backendPriority) {
+        filter.priority = backendPriority;
+      }
     }
 
     const tasks = await Task.find(filter).sort({ dueDate: 1, createdAt: -1 });
@@ -155,6 +176,16 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
 
     await task.save();
 
+    // Create activity
+    await createActivity(
+      authUser._id,
+      'task_created',
+      `Created task: ${task.title}`,
+      `New task "${task.title}" was created`,
+      'Task',
+      String(task._id)
+    );
+
     const response: ApiResponse = {
       success: true,
       message: 'Task created successfully',
@@ -207,7 +238,30 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     if (estimatedHours !== undefined) task.estimatedHours = estimatedHours;
     if (progress !== undefined) task.progress = progress;
 
+    const oldStatus = task.status;
     await task.save();
+
+    // Create activity for task update
+    const isCompleted = oldStatus !== 'done' && task.status === 'done';
+    if (isCompleted) {
+      await createActivity(
+        authUser._id,
+        'task_completed',
+        `Completed task: ${task.title}`,
+        `Task "${task.title}" was marked as completed`,
+        'Task',
+        String(task._id)
+      );
+    } else {
+      await createActivity(
+        authUser._id,
+        'task_updated',
+        `Updated task: ${task.title}`,
+        `Task "${task.title}" was updated`,
+        'Task',
+        String(task._id)
+      );
+    }
 
     const response: ApiResponse = {
       success: true,

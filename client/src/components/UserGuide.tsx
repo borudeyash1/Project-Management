@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Rocket, CheckCircle2 } 
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
+import ContentBanner from './ContentBanner';
 
 const UserGuide: React.FC = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -120,6 +121,7 @@ const UserGuide: React.FC = () => {
         <div className={`absolute bottom-32 right-16 w-80 h-80 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-200/20'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
       </div>
       <SharedNavbar />
+      <ContentBanner route="/user-guide" />
 
       {/* Content */}
       <div className="pt-16 relative z-10">

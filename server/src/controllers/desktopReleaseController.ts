@@ -3,7 +3,7 @@ import DesktopRelease from '../models/DesktopRelease';
 import { AuthenticatedRequest } from '../types';
 import path from 'path';
 import fs from 'fs';
-import { uploadToR2, deleteFromR2, extractR2Key } from '../services/r2Service';
+import { uploadToR2, deleteFromR2, extractR2Key } from '../services/r2ServiceHybrid';
 
 // Get all releases (public)
 export const getAllReleases = async (req: AuthenticatedRequest, res: Response): Promise<void> => {

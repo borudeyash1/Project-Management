@@ -8,11 +8,18 @@ const ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
 const SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
 const ENDPOINT = process.env.R2_ENDPOINT || '';
 
-// Custom HTTPS agent with relaxed SSL settings
+// Custom HTTPS agent with enhanced SSL/TLS settings for Node.js 22 compatibility
 const httpsAgent = new https.Agent({
     rejectUnauthorized: false,
     keepAlive: true,
     maxSockets: 50,
+    // Add TLS 1.2 and 1.3 support
+    minVersion: 'TLSv1.2',
+    maxVersion: 'TLSv1.3',
+    // Enable legacy SSL support
+    secureOptions: 0,
+    // Increase timeout
+    timeout: 60000,
 });
 
 /**

@@ -53,6 +53,7 @@ import About from './components/About';
 import UserGuide from './components/UserGuide';
 import Docs from './components/Docs';
 import PricingPage from './components/PricingPage';
+import ActivityPage from './components/ActivityPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -63,6 +64,7 @@ import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import AdminDocs from './components/admin/AdminDocs';
+import AdminContent from './components/admin/AdminContent';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -149,6 +151,7 @@ const AppContent: React.FC = () => {
         <Route path="/admin/releases" element={<ReleaseManagement />} />
         <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
         <Route path="/admin/docs" element={<AdminDocs />} />
+        <Route path="/admin/content" element={<AdminContent />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={
@@ -159,7 +162,14 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         } />
 
-
+        <Route
+          path="/activity"
+          element={
+            <ProtectedRoute>
+              <ActivityPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/projects" element={
           <ProtectedRoute>

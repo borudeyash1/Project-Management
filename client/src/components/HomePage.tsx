@@ -15,7 +15,6 @@ import { useTheme } from '../context/ThemeContext';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/homeService';
-import QuickLinks from './dashboard/QuickLinks';
 import CalendarWidget from './dashboard/CalendarWidget';
 import ReportsWidget from './dashboard/ReportsWidget';
 import ExpandedStatCard from './dashboard/ExpandedStatCard'; // Import ExpandedStatCard component
@@ -436,13 +435,10 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Links */}
-        <QuickLinks />
-
         {/* Main Content Grid - 2 Equal Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             {/* Plan Status */}
             <PlanStatus />
 
@@ -544,8 +540,8 @@ const HomePage: React.FC = () => {
                     >
                       {task.completed && <CheckCircle className="w-3 h-3" />}
                     </button>
-                    <div className="flex-1">
-                      <p className={`text-sm ${task.completed
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm truncate ${task.completed
                         ? isDarkMode
                           ? 'line-through text-gray-500'
                           : 'line-through text-gray-500'
@@ -559,7 +555,7 @@ const HomePage: React.FC = () => {
                         <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>{task.project}</p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
                         {task.priority}
                       </span>
@@ -588,10 +584,10 @@ const HomePage: React.FC = () => {
               <div className="space-y-4">
                 {recentActivity.map(activity => (
                   <div key={activity._id} className="flex items-start gap-3">
-                    <div className={`w-8 h-8 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full flex items-center justify-center`}>
+                    <div className={`w-8 h-8 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full flex items-center justify-center flex-shrink-0`}>
                       {getActivityIcon(activity.type)}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activity.title}</p>
                       <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{activity.description}</p>
                       <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>
@@ -643,11 +639,11 @@ const HomePage: React.FC = () => {
               <div className="space-y-4">
                 {teamActivity.map(activity => (
                   <div key={activity._id} className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
                       }`}>
                       <User className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                         <span className="font-medium">{activity.user}</span>{' '}
                         <span className={getActionColor(activity.action)}>{activity.action}</span>{' '}
@@ -664,7 +660,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             {/* AI Assistant */}
             {canUseAI() && (
               <div className={`rounded-lg p-6 shadow-lg ${isDarkMode

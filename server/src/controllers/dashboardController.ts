@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../types';
 import Task from '../models/Task';
 import Project from '../models/Project';
 import { Reminder } from '../models/Reminder';
+import Activity from '../models/Activity';
 
 const mapUserSummary = (user: any) => {
   if (!user) {
@@ -32,7 +33,7 @@ export const getDashboardData = async (
       return;
     }
 
-    const [tasks, projects, reminders] = await Promise.all([
+    const [tasks, projects, reminders, activities] = await Promise.all([
       Task.find({
         $or: [{ assignee: userId }, { reporter: userId }],
         isActive: { $ne: false },
@@ -61,6 +62,10 @@ export const getDashboardData = async (
         .sort({ dueDate: 1 })
         .limit(10)
         .lean(),
+      Activity.find({ user: userId })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean(),
     ]);
 
     const quickTasks = (tasks || []).slice(0, 8).map((task) => ({
@@ -71,16 +76,16 @@ export const getDashboardData = async (
       priority: task.priority,
     }));
 
-    const recentActivity = (tasks || []).slice(0, 10).map((task) => ({
-      _id: task._id,
-      type: task.status === 'done' ? 'task_completed' : 'task_updated',
-      title: task.title,
-      description:
-        task.status === 'done'
-          ? 'Task marked as completed'
-          : 'Task updated',
-      timestamp: task.updatedAt ?? task.createdAt,
-      user: mapUserSummary(task.assignee) || mapUserSummary(task.reporter),
+    const recentActivity = (activities || []).map((activity) => ({
+      _id: activity._id,
+      type: activity.type,
+      title: activity.title,
+      description: activity.description,
+      timestamp: activity.createdAt,
+      user: {
+        _id: userId,
+        name: req.user?.fullName || req.user?.email || 'You',
+      },
     }));
 
     const dashboardProjects = (projects || []).map((project) => {
@@ -116,9 +121,9 @@ export const getDashboardData = async (
         priority: task.priority,
         project: task.project
           ? {
-              _id: (task.project as any)._id,
-              name: (task.project as any).name,
-            }
+            _id: (task.project as any)._id,
+            name: (task.project as any).name,
+          }
           : undefined,
       }));
 

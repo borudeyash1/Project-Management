@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle, Users, BarChart3, Zap, Play, TrendingUp, Clock
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
+import ContentBanner from './ContentBanner';
 
 const LandingPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -46,6 +47,7 @@ const LandingPage: React.FC = () => {
         <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? 'bg-accent/10' : 'bg-amber-200/30'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
       </div>
       <SharedNavbar />
+      <ContentBanner route="/" />
 
       {/* Hero Section */}
       <div className="pt-16 relative z-10">
