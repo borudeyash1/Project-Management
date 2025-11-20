@@ -71,7 +71,9 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // Serve uploaded files (fallback for local storage)
 import path from 'path';
 const uploadsPath = path.join(__dirname, '../uploads');
+// Serve at both root and /api to handle different client configurations
 app.use('/uploads', express.static(uploadsPath));
+app.use('/api/uploads', express.static(uploadsPath));
 
 // Routes
 app.use("/api/auth", authRoutes);
