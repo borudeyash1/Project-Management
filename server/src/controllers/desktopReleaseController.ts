@@ -136,21 +136,25 @@ export const createRelease = async (req: AuthenticatedRequest, res: Response): P
 
     // Upload to R2
     const r2Key = `releases/${file.filename}`;
+    console.log('📤 [RELEASES] Uploading file:', file.filename);
     const downloadUrl = await uploadToR2(fileBuffer, r2Key, file.mimetype);
+    console.log('📥 [RELEASES] Upload complete. Download URL:', downloadUrl);
 
     // Delete local file ONLY if we successfully uploaded to R2
     // We check if it's NOT localhost AND NOT a local /uploads/ URL
     const isLocalUrl = downloadUrl.includes('localhost') || downloadUrl.includes('/uploads/');
+    console.log('🔍 [RELEASES] Checking if local URL:', { downloadUrl, isLocalUrl });
 
     if (downloadUrl.startsWith('http') && !isLocalUrl) {
       try {
+        console.log('🗑️ [RELEASES] Deleting temp file (uploaded to R2):', file.path);
         await fs.promises.unlink(file.path);
-        console.log('🗑️ [RELEASES] Local file deleted after R2 upload');
+        console.log('✅ [RELEASES] Local file deleted after R2 upload');
       } catch (unlinkError) {
         console.warn('⚠️ [RELEASES] Failed to delete local file:', unlinkError);
       }
     } else {
-      console.log('📁 [RELEASES] File kept locally (R2 fallback or local dev)');
+      console.log('📁 [RELEASES] File kept locally (R2 fallback or local dev). Path:', file.path);
     }
 
     const release = await DesktopRelease.create({
