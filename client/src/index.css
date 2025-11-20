@@ -30,7 +30,13 @@
     color-scheme: dark;
   }
 
-  /* Ensure root element has dark background */
+  /* Ensure root element has dark background with smooth transition */
+  #root {
+    background-color: #F7F9FC;
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+  }
+
   .dark #root {
     background-color: #111827;
     min-height: 100vh;
@@ -74,98 +80,98 @@
   .dark .text-gray-400 {
     color: #D1D5DB !important;
   }
-  
+
   /* Improved color contrast in dark mode */
   .dark .text-blue-700,
   .dark .text-blue-600 {
     color: #93C5FD !important;
   }
-  
+
   .dark .text-blue-800 {
     color: #BFDBFE !important;
   }
-  
+
   .dark .text-green-700,
   .dark .text-green-600 {
     color: #86EFAC !important;
   }
-  
+
   .dark .text-green-800 {
     color: #BBF7D0 !important;
   }
-  
+
   .dark .text-orange-700,
   .dark .text-orange-600 {
     color: #FDBA74 !important;
   }
-  
+
   .dark .text-orange-800 {
     color: #FED7AA !important;
   }
-  
+
   .dark .text-yellow-700,
   .dark .text-yellow-600 {
     color: #FDE047 !important;
   }
-  
+
   .dark .text-yellow-800 {
     color: #FEF08A !important;
   }
-  
+
   .dark .text-red-700,
   .dark .text-red-600 {
     color: #FCA5A5 !important;
   }
-  
+
   .dark .text-red-800 {
     color: #FECACA !important;
   }
-  
+
   .dark .text-purple-700,
   .dark .text-purple-600 {
     color: #C4B5FD !important;
   }
-  
+
   .dark .text-purple-800 {
     color: #DDD6FE !important;
   }
-  
+
   /* Additional dark mode improvements for better contrast */
   .dark .text-gray-200 {
     color: #E5E7EB !important;
   }
-  
+
   .dark .text-gray-300 {
     color: #D1D5DB !important;
   }
-  
+
   /* Cyan/Teal colors for dark mode */
   .dark .text-cyan-200,
   .dark .text-cyan-300 {
     color: #A5F3FC !important;
   }
-  
+
   /* Ensure all badge text is visible in dark mode */
   .dark .text-blue-200 {
     color: #BFDBFE !important;
   }
-  
+
   .dark .text-green-200 {
     color: #BBF7D0 !important;
   }
-  
+
   .dark .text-orange-200 {
     color: #FED7AA !important;
   }
-  
+
   .dark .text-yellow-200 {
     color: #FEF08A !important;
   }
-  
+
   .dark .text-red-200 {
     color: #FECACA !important;
   }
-  
+
   .dark .text-purple-200 {
     color: #DDD6FE !important;
   }
@@ -277,6 +283,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -293,6 +300,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -304,6 +312,7 @@
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -315,6 +324,7 @@
     opacity: 0;
     transform: translateX(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -326,6 +336,7 @@
     opacity: 0;
     transform: translateX(30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -337,6 +348,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -344,18 +356,24 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
 }
 
 @keyframes pulse-slow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -365,6 +383,7 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -375,6 +394,7 @@
     opacity: 0;
     transform: translateY(100px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -382,9 +402,12 @@
 }
 
 @keyframes bounce-subtle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -493,9 +516,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }

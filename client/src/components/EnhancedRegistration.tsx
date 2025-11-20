@@ -1277,9 +1277,14 @@ const EnhancedRegistration: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'}`}>
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'} relative overflow-hidden`}>
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-20 left-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+      </div>
       <SharedNavbar />
-      <section className="min-h-screen flex pt-16">
+      <section className="min-h-screen flex pt-16 relative z-10">
         <div className="hidden lg:flex w-1/2 bg-white border-r border-border relative">
           <img
             src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
@@ -1304,13 +1309,7 @@ const EnhancedRegistration: React.FC = () => {
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             <div className="flex items-center gap-3 mb-8">
-              <div className="h-9 w-9 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
-                TF
-              </div>
-              <div>
-                <div className="text-base font-semibold tracking-tight">Sartthi</div>
-                <div className="text-xs text-slate-500">Project & Payroll Suite</div>
-              </div>
+              <img src="/logo.png" alt="Sartthi Logo" className="h-7 w-auto" />
             </div>
 
             <div className="flex items-center justify-center space-x-4 mb-6">
@@ -1340,7 +1339,7 @@ const EnhancedRegistration: React.FC = () => {
               })}
             </div>
 
-            <form className="bg-white border border-border rounded-xl p-8">
+            <form className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border backdrop-blur-sm rounded-2xl p-8 shadow-2xl`}>
               {renderStepContent()}
 
               {!showOtpVerification && (

@@ -351,15 +351,15 @@ const Auth: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900" : "bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50"} relative overflow-hidden`}
+      className={`min-h-screen ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950" : "bg-gradient-to-br from-amber-50 via-white to-white"} relative overflow-hidden`}
     >
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className={`absolute top-20 left-10 w-96 h-96 ${isDarkMode ? "bg-yellow-500/10" : "bg-yellow-200/20"} rounded-full blur-3xl animate-pulse`}
+          className={`absolute top-20 left-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse`}
         ></div>
         <div
-          className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-orange-500/10" : "bg-orange-200/20"} rounded-full blur-3xl animate-pulse delay-1000`}
+          className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse delay-1000`}
         ></div>
       </div>
       <SharedNavbar />
@@ -391,21 +391,7 @@ const Auth: React.FC = () => {
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             <div className="flex items-center gap-3 mb-10">
-              <div className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold tracking-tight bg-gradient-to-br from-yellow-500 to-orange-500 shadow-lg">
-                TF
-              </div>
-              <div>
-                <div
-                  className={`text-xl font-bold tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"}`}
-                >
-                  Sartthi
-                </div>
-                <div
-                  className={`text-sm ${isDarkMode ? "text-gray-600" : "text-slate-500"}`}
-                >
-                  Project & Payroll Suite
-                </div>
-              </div>
+              <img src="/logo.png" alt="Sartthi Logo" className="h-7 w-auto" />
             </div>
 
             <div
@@ -414,7 +400,7 @@ const Auth: React.FC = () => {
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "login"
-                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                    ? "bg-accent text-gray-900 shadow-md"
                     : `${isDarkMode ? "text-gray-600 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
                 }`}
                 onClick={switchToLogin}
@@ -424,7 +410,7 @@ const Auth: React.FC = () => {
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "register"
-                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                    ? "bg-accent text-gray-900 shadow-md"
                     : `${isDarkMode ? "text-gray-600 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
                 }`}
                 onClick={switchToRegister}
@@ -516,7 +502,7 @@ const Auth: React.FC = () => {
                   >
                     <input type="checkbox" className="peer sr-only" />
                     <span
-                      className={`relative inline-flex h-6 w-11 rounded-full ${isDarkMode ? "bg-gray-600" : "bg-slate-200"} transition-colors peer-checked:bg-gradient-to-r peer-checked:from-yellow-500 peer-checked:to-orange-500 shadow-inner`}
+                      className={`relative inline-flex h-6 w-11 rounded-full ${isDarkMode ? "bg-gray-600" : "bg-slate-200"} transition-colors peer-checked:bg-accent shadow-inner`}
                     >
                       <span className="absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-md transition-all peer-checked:left-6"></span>
                     </span>
@@ -532,7 +518,7 @@ const Auth: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                  className="w-full px-4 py-3.5 rounded-xl text-gray-900 text-base font-bold bg-accent hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? "Signing in..." : "Continue"}
                 </button>
@@ -573,7 +559,7 @@ const Auth: React.FC = () => {
                 className={`${isDarkMode ? "bg-gray-800/60 border-gray-700/50" : "bg-white border-gray-200"} border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                  <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
                     <span className="text-3xl">📧</span>
                   </div>
                   <h3
@@ -614,7 +600,7 @@ const Auth: React.FC = () => {
                   type="button"
                   onClick={handleOtpVerification}
                   disabled={loading || otp.join("").length !== 6}
-                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                  className="w-full px-4 py-3.5 rounded-xl text-gray-900 text-base font-bold bg-accent hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? "Verifying..." : "Verify OTP"}
                 </button>

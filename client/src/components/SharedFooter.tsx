@@ -13,7 +13,7 @@ const SharedFooter: React.FC = () => {
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-6">
-              <div className={`text-3xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>
+              <div className="text-3xl font-bold text-accent">
                 The Tech Factory
               </div>
             </div>

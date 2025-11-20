@@ -9,7 +9,7 @@ const About: React.FC = () => {
   const { isDarkMode } = useTheme();
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-yellow-900 to-orange-900' : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50'} relative overflow-hidden`}>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'} relative overflow-hidden`}>
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className={`absolute top-40 right-20 w-96 h-96 ${isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-200/20'} rounded-full blur-3xl animate-pulse`}></div>
@@ -31,11 +31,11 @@ const About: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-20">
-            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-yellow-500/20 text-yellow-600' : 'bg-yellow-100 text-yellow-700'} text-sm font-semibold mb-6`}>
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
               ABOUT US
             </span>
             <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              About <span className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>Sartthi</span>
+              About <span className="text-accent">Sartthi</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
               We're building the future of project management, one feature at a time.
@@ -45,7 +45,7 @@ const About: React.FC = () => {
           {/* Mission Section */}
           <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16 hover:shadow-3xl transition-shadow duration-300`}>
             <div className="flex items-center gap-3 mb-6">
-              <div className={`w-12 h-12 ${isDarkMode ? 'bg-gradient-to-br from-yellow-500 to-orange-500' : 'bg-gradient-to-br from-yellow-400 to-orange-400'} rounded-xl flex items-center justify-center shadow-lg`}>
+              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shadow-lg">
                 <Award className="w-6 h-6 text-white" />
               </div>
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>

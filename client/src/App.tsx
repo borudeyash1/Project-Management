@@ -4,6 +4,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PlannerProvider } from './context/PlannerContext';
 import { TrackerProvider } from './context/TrackerContext';
+import { HelmetProvider } from 'react-helmet-async';
 import Auth from './components/Auth';
 import DesktopHandshake from './components/DesktopHandshake';
 import DesktopShell from './components/DesktopShell';
@@ -50,6 +51,7 @@ import TaskManagement from './components/TaskManagement';
 import LandingPage from './components/LandingPage';
 import About from './components/About';
 import UserGuide from './components/UserGuide';
+import Docs from './components/Docs';
 import PricingPage from './components/PricingPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
@@ -60,6 +62,7 @@ import Analytics from './components/admin/Analytics';
 import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
+import AdminDocs from './components/admin/AdminDocs';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -128,6 +131,8 @@ const AppContent: React.FC = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/user-guide" element={<UserGuide />} />
+        <Route path="/docs" element={<Docs />} />
+        <Route path="/docs/:slug" element={<Docs />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
@@ -143,6 +148,7 @@ const AppContent: React.FC = () => {
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/releases" element={<ReleaseManagement />} />
         <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+        <Route path="/admin/docs" element={<AdminDocs />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={
@@ -367,17 +373,19 @@ const AppContent: React.FC = () => {
 // Main App Component
 const App: React.FC = () => {
   return (
-    <Router>
-      <ThemeProvider>
-        <AppProvider>
-          <PlannerProvider>
-            <TrackerProvider>
-              <AppContent />
-            </TrackerProvider>
-          </PlannerProvider>
-        </AppProvider>
-      </ThemeProvider>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <ThemeProvider>
+          <AppProvider>
+            <PlannerProvider>
+              <TrackerProvider>
+                <AppContent />
+              </TrackerProvider>
+            </PlannerProvider>
+          </AppProvider>
+        </ThemeProvider>
+      </Router>
+    </HelmetProvider>
   );
 };
 

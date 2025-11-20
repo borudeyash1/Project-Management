@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Info, BookOpen, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown, BadgeDollarSign } from 'lucide-react';
+import { Home, Info, BookOpen, FileText, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown, BadgeDollarSign } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 // Logo is now in public folder
@@ -98,16 +98,8 @@ const SharedNavbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Link to="/" className="flex items-center gap-3">
-                <img src="/logo.svg" alt="Sartthi Logo" className="h-12 w-auto" />
-                <div className="flex flex-col">
-                  <span className={`text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-yellow-400 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>
-                    Sartthi
-                  </span>
-                  <span className={`text-xs ${isDarkMode ? 'text-gray-200' : 'text-gray-700'} -mt-1 font-medium`}>
-                    Project & Payroll Suite
-                  </span>
-                </div>
+              <Link to="/" className="flex items-center">
+                <img src="/logo.png" alt="Sartthi Logo" className="h-8 w-auto" />
               </Link>
             </div>
           </div>
@@ -117,28 +109,35 @@ const SharedNavbar: React.FC = () => {
             <div className="ml-10 flex items-baseline space-x-8">
               <Link
                 to="/"
-                className={`${isActive('/') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <Home size={16} />
                 Home
               </Link>
               <Link
                 to="/about"
-                className={`${isActive('/about') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/about') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <Info size={16} />
                 About
               </Link>
               <Link
                 to="/user-guide"
-                className={`${isActive('/user-guide') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/user-guide') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <BookOpen size={16} />
                 User Guide
               </Link>
               <Link
+                to="/docs"
+                className={`${isActive('/docs') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+              >
+                <FileText size={16} />
+                Docs
+              </Link>
+              <Link
                 to="/pricing"
-                className={`${isActive('/pricing') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                className={`${isActive('/pricing') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
               >
                 <BadgeDollarSign size={16} />
                 Pricing
@@ -148,7 +147,7 @@ const SharedNavbar: React.FC = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                  className={`${isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600'} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+                  className={`${isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent'} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
                 >
                   <Download size={16} />
                   Download
@@ -268,21 +267,21 @@ const SharedNavbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link
               to="/login"
-              className={`${isActive('/login') ? (isDarkMode ? 'text-yellow-400' : 'text-yellow-600') : (isDarkMode ? 'text-gray-200 hover:text-yellow-400' : 'text-gray-800 hover:text-yellow-600')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
+              className={`${isActive('/login') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
             >
               <LogIn size={16} />
               Login
             </Link>
             <Link
               to="/register"
-              className={`bg-gradient-to-r ${isDarkMode ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' : 'from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700'} text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
+              className={`bg-accent hover:bg-accent-hover text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
             >
               <UserPlus size={16} />
               Register
             </Link>
             <button
               onClick={toggleTheme}
-              className={`${isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-700'} p-2 rounded-lg transition-colors duration-200`}
+              className={`text-accent hover:text-accent-dark p-2 rounded-lg transition-colors duration-200`}
               title="Toggle Theme"
             >
               <Palette size={20} />
