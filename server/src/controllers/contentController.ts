@@ -26,6 +26,7 @@ export const getAllBanners = async (req: AuthenticatedRequest, res: Response): P
 export const getActiveBanners = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const { route } = req.query;
+        console.log('📋 [CONTENT] Fetching active banners for route:', route);
 
         if (!route) {
             res.status(400).json({
@@ -36,6 +37,7 @@ export const getActiveBanners = async (req: AuthenticatedRequest, res: Response)
         }
 
         const now = new Date();
+        console.log('🕐 [CONTENT] Current time:', now);
 
         const banners = await ContentBanner.find({
             isActive: true,
@@ -49,6 +51,9 @@ export const getActiveBanners = async (req: AuthenticatedRequest, res: Response)
         })
             .sort({ priority: -1, createdAt: -1 })
             .select('-createdBy -__v');
+
+        console.log('✅ [CONTENT] Found', banners.length, 'active banners for route:', route);
+        console.log('📦 [CONTENT] Banners:', JSON.stringify(banners, null, 2));
 
         res.status(200).json({
             success: true,
