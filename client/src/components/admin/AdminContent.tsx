@@ -714,7 +714,7 @@ const AdminContent: React.FC = () => {
 
                 {/* Banner Preview */}
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden backdrop-blur-sm">
-                  {currentBanner?.imageUrl && currentBanner.imageUrl.startsWith('data:image') ? (
+                  {currentBanner?.imageUrl && currentBanner.type === 'image' ? (
                     /* Show exported canvas image */
                     <div className="relative w-full" style={{ height: `${currentBanner?.height || 88}px` }}>
                       <img

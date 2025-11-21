@@ -75,6 +75,45 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
   const renderBanner = (banner: IBanner) => {
     const isCustom = banner.placement === 'custom';
 
+    // If this is a canvas-exported banner (type === 'image' and imageUrl exists),
+    // render it as a simple image without background styling
+    if (banner.type === 'image' && banner.imageUrl) {
+      return (
+        <div
+          key={banner._id}
+          className={`w-full left-0 ${isCustom ? '' : banner.placement === 'top' ? 'top-0' : 'bottom-0'
+            } z-50 shadow-lg`}
+          style={{
+            height: `${banner.height}px`,
+            position: isCustom ? 'absolute' : 'fixed',
+            // Custom placement coordinates
+            ...(isCustom && banner.customX !== undefined && { left: `${banner.customX}px` }),
+            ...(isCustom && banner.customY !== undefined && { top: `${banner.customY}px` }),
+            ...(isCustom && banner.customWidth && { width: `${banner.customWidth}px` }),
+          }}
+        >
+          <div className="relative w-full h-full">
+            <img
+              src={banner.imageUrl}
+              alt={banner.title}
+              className="w-full h-full object-cover"
+              style={{
+                borderRadius: banner.borderRadius ? `${banner.borderRadius}px` : '0px',
+              }}
+            />
+            {/* Close Button */}
+            <button
+              onClick={() => handleClose(banner._id)}
+              className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 rounded-full transition-colors backdrop-blur-sm"
+              aria-label="Close banner"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     // Construct background style based on backgroundType
     const getBackgroundStyle = () => {
       const bgType = banner.backgroundType || 'solid';
