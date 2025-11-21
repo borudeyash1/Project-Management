@@ -252,7 +252,7 @@ const CanvasEditorPage: React.FC = () => {
             <div className="max-w-[98vw] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     {/* Properties Sidebar */}
-                    <div className={`lg:col-span-1 ${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border rounded-2xl p-6 shadow-xl h-fit sticky top-24`}>
+                    <div className={`lg:col-span-1 ${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border rounded-2xl p-6 shadow-xl sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto`}>
                         <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             Banner Properties
                         </h3>
