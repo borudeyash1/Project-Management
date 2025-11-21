@@ -26,6 +26,13 @@ export interface ContentBanner {
     customX?: number;
     customY?: number;
     customWidth?: number;
+    // Advanced backgrounds
+    backgroundType?: 'solid' | 'gradient' | 'image' | 'transparent';
+    gradientStart?: string;
+    gradientEnd?: string;
+    gradientDirection?: string;
+    // Font
+    fontFamily?: string;
     createdBy: string;
     createdAt: string;
     updatedAt: string;
