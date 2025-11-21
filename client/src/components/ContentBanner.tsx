@@ -17,9 +17,9 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
         const now = Date.now();
         const valid = new Set<string>();
 
-        // Filter out expired dismissals (older than 24 hours)
+        // Filter out expired dismissals (older than 1 hour)
         Object.entries(parsed).forEach(([id, timestamp]: [string, any]) => {
-          if (now - timestamp < 24 * 60 * 60 * 1000) {
+          if (now - timestamp < 1 * 60 * 60 * 1000) {
             valid.add(id);
           }
         });
@@ -75,17 +75,51 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
   const renderBanner = (banner: IBanner) => {
     const isCustom = banner.placement === 'custom';
 
+    // Construct background style based on backgroundType
+    const getBackgroundStyle = () => {
+      const bgType = banner.backgroundType || 'solid';
+
+      switch (bgType) {
+        case 'gradient':
+          if (banner.gradientStart && banner.gradientEnd) {
+            return {
+              background: `linear-gradient(${banner.gradientDirection || 'to right'}, ${banner.gradientStart}, ${banner.gradientEnd})`
+            };
+          }
+          return { backgroundColor: banner.backgroundColor };
+
+        case 'transparent':
+          return { background: 'transparent' };
+
+        case 'image':
+          // Image backgrounds would use imageUrl as background-image
+          if (banner.imageUrl) {
+            return {
+              backgroundImage: `url(${banner.imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            };
+          }
+          return { backgroundColor: banner.backgroundColor };
+
+        case 'solid':
+        default:
+          return { backgroundColor: banner.backgroundColor };
+      }
+    };
+
     return (
       <div
         key={banner._id}
         className={`w-full left-0 ${isCustom ? '' : banner.placement === 'top' ? 'top-0' : 'bottom-0'
           } z-50 backdrop-blur-md bg-opacity-90 shadow-lg border-b border-white/10`}
         style={{
-          backgroundColor: banner.backgroundColor,
+          ...getBackgroundStyle(),
           color: banner.textColor,
           height: `${banner.height}px`,
           position: isCustom ? 'absolute' : 'fixed',
           borderRadius: banner.borderRadius ? `${banner.borderRadius}px` : '0px',
+          fontFamily: banner.fontFamily || 'Inter, sans-serif',
           // Custom placement coordinates
           ...(isCustom && banner.customX !== undefined && { left: `${banner.customX}px` }),
           ...(isCustom && banner.customY !== undefined && { top: `${banner.customY}px` }),
