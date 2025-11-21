@@ -1,6 +1,9 @@
 import { Response } from 'express';
 import ContentBanner from '../models/ContentBanner';
 import { AuthenticatedRequest } from '../types';
+import path from 'path';
+import fs from 'fs';
+import { uploadToR2, deleteFromR2, extractR2Key } from '../services/r2ServiceHybrid';
 
 // Get all banners (admin only)
 export const getAllBanners = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -94,7 +97,10 @@ export const createBanner = async (req: AuthenticatedRequest, res: Response): Pr
             isActive,
             startDate,
             endDate,
-            priority
+            priority,
+            customX,
+            customY,
+            customWidth
         } = req.body;
 
         const banner = await ContentBanner.create({
@@ -111,6 +117,9 @@ export const createBanner = async (req: AuthenticatedRequest, res: Response): Pr
             startDate: startDate ? new Date(startDate) : null,
             endDate: endDate ? new Date(endDate) : null,
             priority,
+            customX,
+            customY,
+            customWidth,
             createdBy: adminId
         });
 
@@ -174,8 +183,9 @@ export const updateBanner = async (req: AuthenticatedRequest, res: Response): Pr
 export const deleteBanner = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
+        console.log('🗑️ [CONTENT] Deleting banner:', id);
 
-        const banner = await ContentBanner.findByIdAndDelete(id);
+        const banner = await ContentBanner.findById(id);
 
         if (!banner) {
             res.status(404).json({
@@ -184,6 +194,19 @@ export const deleteBanner = async (req: AuthenticatedRequest, res: Response): Pr
             });
             return;
         }
+
+        // Delete image from storage if it exists
+        if (banner.imageUrl) {
+            try {
+                const r2Key = extractR2Key(banner.imageUrl);
+                console.log('🗑️ [CONTENT] Deleting banner image:', r2Key);
+                await deleteFromR2(r2Key, 'banners');
+            } catch (err) {
+                console.warn('⚠️ [CONTENT] Failed to delete banner image:', err);
+            }
+        }
+
+        await ContentBanner.findByIdAndDelete(id);
 
         res.status(200).json({
             success: true,
@@ -211,8 +234,21 @@ export const uploadBannerImage = async (req: AuthenticatedRequest, res: Response
 
         console.log('📤 [CONTENT] Banner image uploaded:', req.file.filename);
 
-        // Return the server URL for the uploaded image
-        const imageUrl = `/uploads/banners/${req.file.filename}`;
+        // Read uploaded file from disk
+        const fileBuffer = await fs.promises.readFile(req.file.path);
+
+        // Upload to R2 (or fallback to local)
+        // Use 'banners' as subfolder
+        const r2Key = `banners/${req.file.filename}`;
+        const imageUrl = await uploadToR2(fileBuffer, r2Key, req.file.mimetype, 'banners');
+
+        // Delete the temp file from multer
+        try {
+            await fs.promises.unlink(req.file.path);
+            console.log('✅ [CONTENT] Temp file deleted');
+        } catch (err) {
+            console.warn('⚠️ [CONTENT] Failed to delete temp file:', err);
+        }
 
         res.status(200).json({
             success: true,
