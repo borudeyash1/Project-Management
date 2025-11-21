@@ -554,6 +554,24 @@ class ApiService {
     return data;
   }
 
+  async upload<T = any>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        ...(this.token && { Authorization: `Bearer ${this.token}` })
+      },
+      body: formData
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data?.message || `Upload failed: ${response.statusText}`);
+    }
+
+    return data;
+  }
+
   async get<T = any>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'GET',

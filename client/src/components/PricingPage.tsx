@@ -76,7 +76,7 @@ const PricingPage: React.FC = () => {
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
               <Sparkles className="w-4 h-4" /> Flexible pricing for every workspace
             </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold mt-6 tracking-tight">
+            <h1 className="text-3xl md:text-5xl font-extrabold mt-6 tracking-tight">
               Unlock Sartthi&apos;s full Project & Payroll suite
             </h1>
             <p className="mt-4 text-lg text-gray-600 dark:text-gray-700 max-w-3xl mx-auto">
@@ -129,13 +129,12 @@ const PricingPage: React.FC = () => {
                 {sortedPlans.map((plan) => (
                   <div
                     key={plan.planKey}
-                    className={`relative rounded-3xl border-2 p-8 shadow-lg transition-all ${
-                      plan.planKey === 'pro'
-                        ? 'border-accent shadow-blue-100'
-                        : plan.planKey === 'ultra'
+                    className={`relative rounded-3xl border-2 p-8 shadow-lg transition-all ${plan.planKey === 'pro'
+                      ? 'border-accent shadow-blue-100'
+                      : plan.planKey === 'ultra'
                         ? 'border-purple-500 shadow-purple-100'
                         : 'border-gray-200'
-                    } ${isDarkMode ? 'bg-gray-800 border-opacity-50' : 'bg-white'}`}
+                      } ${isDarkMode ? 'bg-gray-800 border-opacity-50' : 'bg-white'}`}
                   >
                     {plan.planKey === 'pro' && (
                       <span className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-accent text-gray-900 text-xs font-semibold shadow-md">
@@ -169,27 +168,23 @@ const PricingPage: React.FC = () => {
                         <span className="text-gray-600">Team members</span>
                         <span className="font-semibold">{plan.limits.maxTeamMembers === -1 ? 'Unlimited' : plan.limits.maxTeamMembers}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Storage</span>
-                        <span className="font-semibold">{plan.limits.storageInGB} GB</span>
-                      </div>
+
                     </div>
 
                     <button
                       onClick={() => handleChoosePlan(plan)}
-                      className={`mt-8 w-full inline-flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold transition-all ${
-                        plan.planKey === 'pro'
-                          ? 'bg-accent text-gray-900 hover:bg-accent-hover'
-                          : plan.planKey === 'ultra'
+                      className={`mt-8 w-full inline-flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold transition-all ${plan.planKey === 'pro'
+                        ? 'bg-accent text-gray-900 hover:bg-accent-hover'
+                        : plan.planKey === 'ultra'
                           ? 'bg-purple-600 text-white hover:bg-purple-700'
                           : 'bg-gray-100 text-gray-900 hover:bg-gray-300'
-                      } ${isDarkMode && plan.planKey === 'free' ? 'bg-gray-700 text-white hover:bg-gray-600' : ''}`}
+                        } ${isDarkMode && plan.planKey === 'free' ? 'bg-gray-700 text-white hover:bg-gray-600' : ''}`}
                     >
                       {plan.planKey === 'free'
                         ? 'Get Started Free'
                         : plan.planKey === 'pro'
-                        ? 'Choose Pro User'
-                        : 'Choose Ultra'}
+                          ? 'Choose Pro User'
+                          : 'Choose Ultra'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -235,14 +230,16 @@ const PricingPage: React.FC = () => {
 
       <SharedFooter />
 
-      {modalOpen && (
-        <PricingModal
-          isOpen={modalOpen}
-          presetPlanKey={presetPlan ?? undefined}
-          onClose={() => setModalOpen(false)}
-        />
-      )}
-    </div>
+      {
+        modalOpen && (
+          <PricingModal
+            isOpen={modalOpen}
+            presetPlanKey={presetPlan ?? undefined}
+            onClose={() => setModalOpen(false)}
+          />
+        )
+      }
+    </div >
   );
 };
 

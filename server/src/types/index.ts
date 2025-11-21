@@ -66,7 +66,6 @@ export interface IUser extends Document {
       maxWorkspaces: number;
       maxProjects: number;
       maxTeamMembers: number;
-      maxStorage: number; // GB
       aiAssistance: boolean;
       advancedAnalytics: boolean;
       customIntegrations: boolean;
@@ -226,7 +225,6 @@ export interface ISubscriptionPlan extends Document {
     maxWorkspaces: number;
     maxProjects: number;
     maxTeamMembers: number;
-    storageInGB: number;
   };
   features: {
     aiAccess: boolean;

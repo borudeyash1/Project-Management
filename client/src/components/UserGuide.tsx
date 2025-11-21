@@ -22,10 +22,10 @@ const UserGuide: React.FC = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">1. Create Your Account</h4>
           <p className="text-gray-600">Sign up for a free account to get started with Sartthi.</p>
-          
+
           <h4 className="font-semibold text-gray-900">2. Set Up Your Workspace</h4>
           <p className="text-gray-600">Create your first workspace and invite team members.</p>
-          
+
           <h4 className="font-semibold text-gray-900">3. Create Your First Project</h4>
           <p className="text-gray-600">Start by creating a project and adding tasks.</p>
         </div>
@@ -38,10 +38,10 @@ const UserGuide: React.FC = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">Creating Projects</h4>
           <p className="text-gray-600">Click the "Create Project" button to start a new project. Fill in the project details including name, description, and timeline.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Project Settings</h4>
           <p className="text-gray-600">Configure project settings, team permissions, and notification preferences.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Project Analytics</h4>
           <p className="text-gray-600">Track project progress with built-in analytics and reporting tools.</p>
         </div>
@@ -54,10 +54,10 @@ const UserGuide: React.FC = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">Creating Tasks</h4>
           <p className="text-gray-600">Add tasks to your projects with detailed descriptions, due dates, and assignees.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Task Status</h4>
           <p className="text-gray-600">Update task status: Todo, In Progress, Completed, or On Hold.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Task Dependencies</h4>
           <p className="text-gray-600">Set up task dependencies to ensure proper workflow order.</p>
         </div>
@@ -70,10 +70,10 @@ const UserGuide: React.FC = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">Inviting Team Members</h4>
           <p className="text-gray-600">Invite team members to your workspace and assign them to projects.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Role Management</h4>
           <p className="text-gray-600">Assign different roles and permissions to team members.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Communication</h4>
           <p className="text-gray-600">Use comments and mentions to communicate within tasks and projects.</p>
         </div>
@@ -86,10 +86,10 @@ const UserGuide: React.FC = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">Project Analytics</h4>
           <p className="text-gray-600">View detailed analytics on project progress, team performance, and time tracking.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Custom Reports</h4>
           <p className="text-gray-600">Generate custom reports for stakeholders and team members.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Export Data</h4>
           <p className="text-gray-600">Export project data in various formats for external analysis.</p>
         </div>
@@ -102,10 +102,10 @@ const UserGuide: React.FC = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900">Common Issues</h4>
           <p className="text-gray-600">Find solutions to common problems and frequently asked questions.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Performance Tips</h4>
           <p className="text-gray-600">Optimize your Sartthi experience with these performance tips.</p>
-          
+
           <h4 className="font-semibold text-gray-900">Contact Support</h4>
           <p className="text-gray-600">Get help from our support team when you need it.</p>
         </div>
@@ -141,7 +141,7 @@ const UserGuide: React.FC = () => {
               <BookOpen className="w-4 h-4" />
               <span className="text-sm font-medium">Complete Documentation</span>
             </div>
-            <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
+            <h1 className={`text-4xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
               User <span className="text-accent">Guide</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
@@ -215,7 +215,7 @@ const UserGuide: React.FC = () => {
             <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            
+
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
                 <CheckCircle2 className="text-white" size={18} />

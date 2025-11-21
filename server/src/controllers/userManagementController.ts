@@ -5,11 +5,11 @@ import { AuthenticatedRequest } from '../types';
 // Get all users with pagination and filters
 export const getAllUsers = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
-      subscription = '', 
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      subscription = '',
       isActive = '',
       sortBy = 'createdAt',
       sortOrder = 'desc'
@@ -177,7 +177,7 @@ export const updateSubscription = async (req: AuthenticatedRequest, res: Respons
             maxWorkspaces: 1,
             maxProjects: 3,
             maxTeamMembers: 5,
-            maxStorage: 1,
+
             aiAssistance: true,
             advancedAnalytics: false,
             customIntegrations: false,
@@ -192,7 +192,7 @@ export const updateSubscription = async (req: AuthenticatedRequest, res: Respons
             maxWorkspaces: 5,
             maxProjects: 20,
             maxTeamMembers: 20,
-            maxStorage: 10,
+
             aiAssistance: true,
             advancedAnalytics: true,
             customIntegrations: true,
@@ -207,7 +207,7 @@ export const updateSubscription = async (req: AuthenticatedRequest, res: Respons
             maxWorkspaces: 999,
             maxProjects: 999,
             maxTeamMembers: 999,
-            maxStorage: 100,
+
             aiAssistance: true,
             advancedAnalytics: true,
             customIntegrations: true,

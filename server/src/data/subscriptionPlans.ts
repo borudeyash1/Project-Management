@@ -10,7 +10,6 @@ export type SubscriptionPlanSeed = {
     maxWorkspaces: number;
     maxProjects: number;
     maxTeamMembers: number;
-    storageInGB: number;
   };
   features: {
     aiAccess: boolean;
@@ -42,8 +41,7 @@ export const defaultSubscriptionPlans: SubscriptionPlanSeed[] = [
     limits: {
       maxWorkspaces: 1,
       maxProjects: 1,
-      maxTeamMembers: 5,
-      storageInGB: 1
+      maxTeamMembers: 5
     },
     features: {
       aiAccess: false,
@@ -73,8 +71,7 @@ export const defaultSubscriptionPlans: SubscriptionPlanSeed[] = [
     limits: {
       maxWorkspaces: 5,
       maxProjects: 5,
-      maxTeamMembers: 100,
-      storageInGB: 100
+      maxTeamMembers: 100
     },
     features: {
       aiAccess: true,
@@ -104,8 +101,7 @@ export const defaultSubscriptionPlans: SubscriptionPlanSeed[] = [
     limits: {
       maxWorkspaces: 10,
       maxProjects: 20,
-      maxTeamMembers: 30,
-      storageInGB: 500
+      maxTeamMembers: 30
     },
     features: {
       aiAccess: true,
