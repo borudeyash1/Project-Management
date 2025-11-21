@@ -23,7 +23,7 @@ interface BannerCanvasEditorProps {
     height?: number;
     backgroundColor?: string;
     backgroundImage?: string;
-    backgroundType?: 'color' | 'image' | 'transparent' | 'gradient';
+    backgroundType?: 'solid' | 'image' | 'transparent' | 'gradient';
     initialText?: string;
     initialImage?: string;
     textColor?: string;
@@ -45,7 +45,7 @@ export interface BannerCanvasEditorRef {
 }
 
 type Tool = 'select' | 'line' | 'rectangle' | 'circle' | 'text' | 'pen' | 'eraser';
-type BackgroundType = 'color' | 'image' | 'transparent' | 'gradient';
+type BackgroundType = 'solid' | 'image' | 'transparent' | 'gradient';
 
 interface DrawingElement {
     type: 'line' | 'rectangle' | 'circle' | 'text' | 'path' | 'image';
@@ -73,7 +73,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         height = 400,
         backgroundColor = '#ffffff',
         backgroundImage,
-        backgroundType: initialBackgroundType = 'color',
+        backgroundType: initialBackgroundType = 'solid',
         initialText,
         initialImage,
         textColor = '#000000',
@@ -117,6 +117,8 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
     const [editingTextValue, setEditingTextValue] = useState('');
     const [cursorStyle, setCursorStyle] = useState('default');
     const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [imageUrlInput, setImageUrlInput] = useState('');
 
     // Initialize with banner content
     useEffect(() => {
@@ -170,6 +172,14 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         setBgColor(backgroundColor);
     }, [backgroundColor]);
 
+    useEffect(() => {
+        setBackgroundType(initialBackgroundType);
+    }, [initialBackgroundType]);
+
+    useEffect(() => {
+        setBgImage(backgroundImage || '');
+    }, [backgroundImage]);
+
     // Sync textColor to selected element
     useEffect(() => {
         if (selectedElement !== null) {
@@ -202,7 +212,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         if (onContentChange) {
             onContentChange(elements);
         }
-    }, [elements, bgColor, bgImage, backgroundType, borderRadius, width, height]);
+    }, [elements, bgColor, bgImage, backgroundType, borderRadius, width, height, gradientStart, gradientEnd, gradientDirection]);
 
     const redraw = () => {
         const canvas = canvasRef.current;
@@ -226,9 +236,20 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         }
 
         // Draw background
-        if (backgroundType === 'color') {
+        if (backgroundType === 'solid') {
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, width, height);
+        } else if (backgroundType === 'transparent') {
+            // Draw checkerboard pattern
+            const size = 20;
+            const rows = Math.ceil(height / size);
+            const cols = Math.ceil(width / size);
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    ctx.fillStyle = (i + j) % 2 === 0 ? '#ffffff' : '#e0e0e0';
+                    ctx.fillRect(j * size, i * size, size, size);
+                }
+            }
         } else if (backgroundType === 'gradient') {
             let grad;
             switch (gradientDirection) {
@@ -261,7 +282,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                 imageCache.current[bgImage] = img;
             }
 
-            if (img.complete) {
+            if (img.complete && img.naturalWidth > 0) {
                 // TODO: Implement background image transforms (x, y, scale)
                 ctx.drawImage(img, 0, 0, width, height);
             }
@@ -1023,7 +1044,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                         <TextIcon size={20} />
                     </button>
                     <button
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => setShowImageModal(true)}
                         className="p-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
                         title="Add Image"
                     >
@@ -1149,6 +1170,102 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                     </button>
                 </div>
             </div>
+
+            {/* Image Selection Modal */}
+            {showImageModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowImageModal(false)}>
+                    <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 max-w-md w-full mx-4`} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Add Image</h3>
+
+                        <div className="space-y-4">
+                            {/* Local File Upload */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                                    Upload from Computer
+                                </label>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className={`w-full px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                />
+                            </div>
+
+                            {/* Divider */}
+                            <div className="flex items-center gap-2">
+                                <div className={`flex-1 h-px ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}`} />
+                                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>or</span>
+                                <div className={`flex-1 h-px ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}`} />
+                            </div>
+
+                            {/* Online URL */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                                    Image URL
+                                </label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={imageUrlInput}
+                                        onChange={(e) => setImageUrlInput(e.target.value)}
+                                        placeholder="https://example.com/image.jpg"
+                                        className={`flex-1 px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            if (imageUrlInput.trim()) {
+                                                const img = new Image();
+                                                img.crossOrigin = 'anonymous';
+                                                img.onload = () => {
+                                                    const newElement: DrawingElement = {
+                                                        type: 'image',
+                                                        x: width / 2 - 100,
+                                                        y: height / 2 - 100,
+                                                        width: 200,
+                                                        height: 200,
+                                                        imageData: imageUrlInput,
+                                                        color: '#000000',
+                                                        strokeWidth: 0,
+                                                        isDraggable: true
+                                                    };
+                                                    const newElements = [...elements, newElement];
+                                                    setElements(newElements);
+                                                    addToHistory(newElements);
+                                                    setTool('select');
+                                                    setSelectedElement(newElements.length - 1);
+                                                    setShowImageModal(false);
+                                                    setImageUrlInput('');
+                                                    addToast('Image added successfully', 'success');
+                                                };
+                                                img.onerror = () => {
+                                                    addToast('Failed to load image from URL', 'error');
+                                                };
+                                                img.src = imageUrlInput;
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-6">
+                            <button
+                                onClick={() => {
+                                    setShowImageModal(false);
+                                    setImageUrlInput('');
+                                }}
+                                className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 });

@@ -21,7 +21,7 @@ interface BannerData {
     imageHeight?: number;
     padding?: number;
     borderRadius?: number;
-    backgroundType?: 'color' | 'image' | 'transparent' | 'gradient';
+    backgroundType?: 'solid' | 'image' | 'transparent' | 'gradient';
     gradientStart?: string;
     gradientEnd?: string;
     gradientDirection?: string;
@@ -153,7 +153,12 @@ const CanvasEditorPage: React.FC = () => {
         const finalData = {
             ...bannerData,
             imageUrl: exportedImage,
-            type: 'image' as const // Set to image type since we're using canvas export
+            type: 'image' as const, // Set to image type since we're using canvas export
+            backgroundType: bannerData.backgroundType,
+            gradientStart: bannerData.gradientStart,
+            gradientEnd: bannerData.gradientEnd,
+            gradientDirection: bannerData.gradientDirection,
+            fontFamily: bannerData.fontFamily
         };
 
         // Notify parent window
@@ -287,17 +292,17 @@ const CanvasEditorPage: React.FC = () => {
                                     Background
                                 </label>
                                 <select
-                                    value={bannerData.backgroundType || 'color'}
+                                    value={bannerData.backgroundType || 'solid'}
                                     onChange={(e) => updateBannerProperty('backgroundType', e.target.value)}
                                     className={`w-full px-3 py-2 rounded-lg border mb-2 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                 >
-                                    <option value="color">Solid Color</option>
+                                    <option value="solid">Solid Color</option>
                                     <option value="gradient">Gradient</option>
                                     <option value="image">Image</option>
                                     <option value="transparent">Transparent</option>
                                 </select>
 
-                                {(!bannerData.backgroundType || bannerData.backgroundType === 'color') && (
+                                {(!bannerData.backgroundType || bannerData.backgroundType === 'solid') && (
                                     <div className="flex gap-2">
                                         <input
                                             type="color"
@@ -356,6 +361,38 @@ const CanvasEditorPage: React.FC = () => {
                                             <option value="to bottom right">Diagonal (TL-BR)</option>
                                             <option value="to top right">Diagonal (BL-TR)</option>
                                         </select>
+                                    </div>
+                                )}
+
+                                {bannerData.backgroundType === 'image' && (
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onload = (event) => {
+                                                            updateBannerProperty('imageUrl', event.target?.result as string);
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className={`flex-1 px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs">or</span>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter image URL"
+                                            value={bannerData.imageUrl || ''}
+                                            onChange={(e) => updateBannerProperty('imageUrl', e.target.value)}
+                                            className={`w-full px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                        />
                                     </div>
                                 )}
                             </div>
@@ -513,8 +550,8 @@ const CanvasEditorPage: React.FC = () => {
                                 width={bannerData.imageWidth || Math.min(1200, window.innerWidth - 400)}
                                 height={bannerData.height || 200}
                                 backgroundColor={bannerData.backgroundColor}
-                                backgroundImage={(bannerData.type === 'image' || bannerData.type === 'both') ? bannerData.imageUrl : undefined}
-                                backgroundType={bannerData.backgroundType || 'color'}
+                                backgroundImage={bannerData.backgroundType === 'image' ? bannerData.imageUrl : undefined}
+                                backgroundType={bannerData.backgroundType || 'solid'}
                                 gradientStart={bannerData.gradientStart}
                                 gradientEnd={bannerData.gradientEnd}
                                 gradientDirection={bannerData.gradientDirection}
