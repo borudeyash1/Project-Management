@@ -59,8 +59,36 @@ const AdminContent: React.FC = () => {
 
       if (event.data.type === 'CANVAS_COMPLETE' && event.data.data) {
         console.log('Canvas editing complete:', event.data.data);
-        setCurrentBanner(event.data.data);
-        addToast('Canvas changes applied!', 'success');
+        const canvasData = event.data.data;
+
+        // Merge canvas data with current banner (which has title, content, routes)
+        const mergedData = { ...currentBanner, ...canvasData };
+        setCurrentBanner(mergedData);
+
+        // Auto-save if all required fields are present
+        if (mergedData.title && mergedData.content && mergedData.routes && mergedData.routes.length > 0) {
+          (async () => {
+            try {
+              if (mergedData._id) {
+                await contentService.updateBanner(mergedData._id, mergedData);
+                addToast('Banner updated successfully!', 'success');
+              } else {
+                await contentService.createBanner(mergedData);
+                addToast('Banner created successfully!', 'success');
+              }
+              await loadBanners();
+              setIsEditing(false);
+              setCurrentBanner(null);
+            } catch (error: any) {
+              console.error('Failed to save:', error);
+              addToast('Canvas applied. Please save manually.', 'warning');
+              setIsEditing(true);
+            }
+          })();
+        } else {
+          addToast('Canvas changes applied! Please complete the form and save.', 'info');
+          setIsEditing(true);
+        }
       }
 
       if (event.data.type === 'REQUEST_BANNER_DATA') {
@@ -855,16 +883,24 @@ const AdminContent: React.FC = () => {
 
                     {/* Preview */}
                     <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
-                      <div
-                        style={{
-                          backgroundColor: banner.backgroundColor,
-                          color: banner.textColor,
-                          height: `${Math.min(banner.height, 80)}px`
-                        }}
-                        className="rounded-lg flex items-center justify-center px-4 text-sm"
-                      >
-                        {banner.content}
-                      </div>
+                      {banner.type === 'image' && banner.imageUrl ? (
+                        <div className="rounded-lg overflow-hidden" style={{ height: `${Math.min(banner.height, 120)}px` }}>
+                          <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-contain" />
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            background: banner.backgroundType === 'gradient' && banner.gradientStart && banner.gradientEnd
+                              ? `linear-gradient(${banner.gradientDirection || 'to right'}, ${banner.gradientStart}, ${banner.gradientEnd})`
+                              : banner.backgroundColor,
+                            color: banner.textColor,
+                            height: `${Math.min(banner.height, 80)}px`
+                          }}
+                          className="rounded-lg flex items-center justify-center px-4 text-sm"
+                        >
+                          {banner.content}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
