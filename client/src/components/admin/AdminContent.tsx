@@ -13,11 +13,13 @@ import {
   Type,
   Calendar,
   MapPin,
-  Palette
+  Palette,
+  Move
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import * as contentService from '../../services/contentService';
+import CustomPlacementModal from './CustomPlacementModal';
 import { ContentBanner } from '../../services/contentService';
 
 const AdminContent: React.FC = () => {
@@ -30,6 +32,7 @@ const AdminContent: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isPlacementModalOpen, setIsPlacementModalOpen] = useState(false);
 
   const availableRoutes = [
     { value: '/', label: 'Home (Landing Page)' },
@@ -498,7 +501,7 @@ const AdminContent: React.FC = () => {
                     Placement
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {['top', 'bottom', 'custom'].map(placement => (
+                    {['top', 'bottom', 'popup', 'custom'].map(placement => (
                       <button
                         key={placement}
                         onClick={() => setCurrentBanner(prev => ({ ...prev, placement: placement as any }))}
@@ -513,6 +516,15 @@ const AdminContent: React.FC = () => {
                       </button>
                     ))}
                   </div>
+                  {currentBanner?.placement === 'custom' && (
+                    <button
+                      onClick={() => setIsPlacementModalOpen(true)}
+                      className="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2"
+                    >
+                      <Move className="w-4 h-4" />
+                      Configure Custom Placement
+                    </button>
+                  )}
                 </div>
 
                 {/* Routes */}
@@ -861,6 +873,27 @@ const AdminContent: React.FC = () => {
           </div>
         )}
       </div>
+      {isPlacementModalOpen && currentBanner && (
+        <CustomPlacementModal
+          isOpen={isPlacementModalOpen}
+          onClose={() => setIsPlacementModalOpen(false)}
+          onSave={(data) => {
+            setCurrentBanner(prev => ({
+              ...prev,
+              customX: data.x,
+              customY: data.y,
+              customWidth: data.width
+            }));
+            setIsPlacementModalOpen(false);
+          }}
+          initialData={{
+            x: currentBanner.customX || 50,
+            y: currentBanner.customY || 50,
+            width: currentBanner.customWidth || 300
+          }}
+          bannerPreviewUrl={currentBanner.imageUrl}
+        />
+      )}
     </div>
   );
 };

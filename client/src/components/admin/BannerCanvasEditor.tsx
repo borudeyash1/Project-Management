@@ -23,7 +23,7 @@ interface BannerCanvasEditorProps {
     height?: number;
     backgroundColor?: string;
     backgroundImage?: string;
-    backgroundType?: 'color' | 'image' | 'transparent';
+    backgroundType?: 'color' | 'image' | 'transparent' | 'gradient';
     initialText?: string;
     initialImage?: string;
     textColor?: string;
@@ -32,6 +32,10 @@ interface BannerCanvasEditorProps {
     fontFamily?: string;
     padding?: number;
     borderRadius?: number;
+    brushSize?: number;
+    gradientStart?: string;
+    gradientEnd?: string;
+    gradientDirection?: string;
     onExport?: (dataUrl: string) => void;
     onContentChange?: (elements: DrawingElement[]) => void;
 }
@@ -41,7 +45,7 @@ export interface BannerCanvasEditorRef {
 }
 
 type Tool = 'select' | 'line' | 'rectangle' | 'circle' | 'text' | 'pen' | 'eraser';
-type BackgroundType = 'color' | 'image' | 'transparent';
+type BackgroundType = 'color' | 'image' | 'transparent' | 'gradient';
 
 interface DrawingElement {
     type: 'line' | 'rectangle' | 'circle' | 'text' | 'path' | 'image';
@@ -78,6 +82,10 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         fontFamily = 'Arial',
         padding = 0,
         borderRadius = 0,
+        brushSize = 5,
+        gradientStart = '#ffffff',
+        gradientEnd = '#000000',
+        gradientDirection = 'to right',
         onExport,
         onContentChange
     } = props;
@@ -108,6 +116,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
     const [editingText, setEditingText] = useState<number | null>(null);
     const [editingTextValue, setEditingTextValue] = useState('');
     const [cursorStyle, setCursorStyle] = useState('default');
+    const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
 
     // Initialize with banner content
     useEffect(() => {
@@ -220,6 +229,28 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         if (backgroundType === 'color') {
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, width, height);
+        } else if (backgroundType === 'gradient') {
+            let grad;
+            switch (gradientDirection) {
+                case 'to right':
+                    grad = ctx.createLinearGradient(0, 0, width, 0);
+                    break;
+                case 'to bottom':
+                    grad = ctx.createLinearGradient(0, 0, 0, height);
+                    break;
+                case 'to bottom right':
+                    grad = ctx.createLinearGradient(0, 0, width, height);
+                    break;
+                case 'to top right':
+                    grad = ctx.createLinearGradient(0, height, width, 0);
+                    break;
+                default:
+                    grad = ctx.createLinearGradient(0, 0, width, 0);
+            }
+            grad.addColorStop(0, gradientStart);
+            grad.addColorStop(1, gradientEnd);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
         } else if (backgroundType === 'image' && bgImage) {
             let img = imageCache.current[bgImage];
             if (!img) {
@@ -231,6 +262,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
             }
 
             if (img.complete) {
+                // TODO: Implement background image transforms (x, y, scale)
                 ctx.drawImage(img, 0, 0, width, height);
             }
         }
@@ -609,6 +641,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const pos = getMousePos(e);
+        setMousePos(pos);
 
         // Update cursor based on hover state
         if (tool === 'select' && selectedElement !== null && !isDrawing && elements[selectedElement]) {
@@ -619,7 +652,10 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                 setCursorStyle(newCursor);
             }
         } else if (!isDrawing) {
-            if (cursorStyle !== 'default') {
+            if (tool === 'pen' || tool === 'eraser') {
+                // Custom cursor for pen/eraser
+                if (cursorStyle !== 'none') setCursorStyle('none');
+            } else if (cursorStyle !== 'default') {
                 setCursorStyle('default');
             }
         }
@@ -739,7 +775,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                     x: 0,
                     y: 0,
                     color: tool === 'eraser' ? bgColor : color,
-                    strokeWidth: strokeWidth,
+                    strokeWidth: brushSize || strokeWidth,
                     points: currentPath
                 };
                 const newElements = [...elements, newElement];
@@ -799,9 +835,21 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
         }
     };
 
-    const clearCanvas = () => {
-        setElements([]);
-        addToHistory([]);
+    const handleDelete = () => {
+        if (selectedElement !== null) {
+            const newElements = elements.filter((_, index) => index !== selectedElement);
+            setElements(newElements);
+            addToHistory(newElements);
+            setSelectedElement(null);
+        } else {
+            // Smart Delete: If nothing selected, clear all (with confirmation if not empty)
+            if (elements.length > 0) {
+                if (window.confirm('Are you sure you want to clear the entire canvas?')) {
+                    setElements([]);
+                    addToHistory([]);
+                }
+            }
+        }
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -995,7 +1043,7 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                     <button onClick={redo} className="p-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300" title="Redo">
                         <Redo size={20} />
                     </button>
-                    <button onClick={clearCanvas} className="p-2 rounded bg-red-100 text-red-600 hover:bg-red-200" title="Clear">
+                    <button onClick={handleDelete} className="p-2 rounded bg-red-100 text-red-600 hover:bg-red-200" title="Delete Selected / Clear All">
                         <Trash2 size={20} />
                     </button>
                 </div>
@@ -1019,11 +1067,30 @@ const BannerCanvasEditor = forwardRef<BannerCanvasEditorRef, BannerCanvasEditorP
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseUp}
+                        onMouseLeave={() => {
+                            handleMouseUp();
+                            setMousePos(null);
+                        }}
                         onDoubleClick={handleDoubleClick}
                         style={{ cursor: cursorStyle }}
                         className="border-2 border-gray-300 rounded-lg shadow-lg"
                     />
+
+                    {/* Brush/Eraser Cursor Preview */}
+                    {mousePos && (tool === 'pen' || tool === 'eraser') && !isDrawing && (
+                        <div
+                            className="pointer-events-none absolute border border-gray-500 rounded-full"
+                            style={{
+                                left: mousePos.x + padding,
+                                top: mousePos.y + padding,
+                                width: brushSize,
+                                height: brushSize,
+                                transform: 'translate(-50%, -50%)',
+                                backgroundColor: tool === 'eraser' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.1)',
+                                borderColor: tool === 'eraser' ? '#000' : color
+                            }}
+                        />
+                    )}
 
                     {/* Text Editing Overlay */}
                     {editingText !== null && (() => {

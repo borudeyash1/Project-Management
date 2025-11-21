@@ -21,6 +21,10 @@ interface BannerData {
     imageHeight?: number;
     padding?: number;
     borderRadius?: number;
+    backgroundType?: 'color' | 'image' | 'transparent' | 'gradient';
+    gradientStart?: string;
+    gradientEnd?: string;
+    gradientDirection?: string;
 }
 
 const CanvasEditorPage: React.FC = () => {
@@ -48,6 +52,7 @@ const CanvasEditorPage: React.FC = () => {
     const [exportedImage, setExportedImage] = useState<string | null>(null);
     const [autoSaving, setAutoSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const [brushSize, setBrushSize] = useState(5);
 
     // Listen for banner data from parent window
     useEffect(() => {
@@ -276,25 +281,83 @@ const CanvasEditorPage: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Background Color */}
+                            {/* Background */}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                                     Background
                                 </label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="color"
-                                        value={bannerData.backgroundColor}
-                                        onChange={(e) => updateBannerProperty('backgroundColor', e.target.value)}
-                                        className="w-12 h-10 rounded cursor-pointer"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={bannerData.backgroundColor}
-                                        onChange={(e) => updateBannerProperty('backgroundColor', e.target.value)}
-                                        className={`flex-1 px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                                    />
-                                </div>
+                                <select
+                                    value={bannerData.backgroundType || 'color'}
+                                    onChange={(e) => updateBannerProperty('backgroundType', e.target.value)}
+                                    className={`w-full px-3 py-2 rounded-lg border mb-2 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                >
+                                    <option value="color">Solid Color</option>
+                                    <option value="gradient">Gradient</option>
+                                    <option value="image">Image</option>
+                                    <option value="transparent">Transparent</option>
+                                </select>
+
+                                {(!bannerData.backgroundType || bannerData.backgroundType === 'color') && (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="color"
+                                            value={bannerData.backgroundColor}
+                                            onChange={(e) => updateBannerProperty('backgroundColor', e.target.value)}
+                                            className="w-12 h-10 rounded cursor-pointer"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={bannerData.backgroundColor}
+                                            onChange={(e) => updateBannerProperty('backgroundColor', e.target.value)}
+                                            className={`flex-1 px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                        />
+                                    </div>
+                                )}
+
+                                {bannerData.backgroundType === 'gradient' && (
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2 items-center">
+                                            <span className="text-xs w-12">Start</span>
+                                            <input
+                                                type="color"
+                                                value={bannerData.gradientStart || '#ffffff'}
+                                                onChange={(e) => updateBannerProperty('gradientStart', e.target.value)}
+                                                className="w-8 h-8 rounded cursor-pointer"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={bannerData.gradientStart || '#ffffff'}
+                                                onChange={(e) => updateBannerProperty('gradientStart', e.target.value)}
+                                                className={`flex-1 px-2 py-1 text-sm rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                            />
+                                        </div>
+                                        <div className="flex gap-2 items-center">
+                                            <span className="text-xs w-12">End</span>
+                                            <input
+                                                type="color"
+                                                value={bannerData.gradientEnd || '#000000'}
+                                                onChange={(e) => updateBannerProperty('gradientEnd', e.target.value)}
+                                                className="w-8 h-8 rounded cursor-pointer"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={bannerData.gradientEnd || '#000000'}
+                                                onChange={(e) => updateBannerProperty('gradientEnd', e.target.value)}
+                                                className={`flex-1 px-2 py-1 text-sm rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                            />
+                                        </div>
+                                        <select
+                                            value={bannerData.gradientDirection || 'to right'}
+                                            onChange={(e) => updateBannerProperty('gradientDirection', e.target.value)}
+                                            className={`w-full px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                        >
+                                            <option value="to right">Left to Right</option>
+                                            <option value="to bottom">Top to Bottom</option>
+                                            <option value="to bottom right">Diagonal (TL-BR)</option>
+                                            <option value="to top right">Diagonal (BL-TR)</option>
+                                        </select>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Text Color */}
@@ -424,6 +487,21 @@ const CanvasEditorPage: React.FC = () => {
                                     className="w-full"
                                 />
                             </div>
+
+                            {/* Brush Size */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                                    Brush/Eraser Size: {brushSize}px
+                                </label>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="50"
+                                    value={brushSize}
+                                    onChange={(e) => setBrushSize(parseInt(e.target.value))}
+                                    className="w-full"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -436,7 +514,10 @@ const CanvasEditorPage: React.FC = () => {
                                 height={bannerData.height || 200}
                                 backgroundColor={bannerData.backgroundColor}
                                 backgroundImage={(bannerData.type === 'image' || bannerData.type === 'both') ? bannerData.imageUrl : undefined}
-                                backgroundType="color"
+                                backgroundType={bannerData.backgroundType || 'color'}
+                                gradientStart={bannerData.gradientStart}
+                                gradientEnd={bannerData.gradientEnd}
+                                gradientDirection={bannerData.gradientDirection}
                                 initialText={(bannerData.type === 'text' || bannerData.type === 'both') ? bannerData.content : undefined}
                                 initialImage={(bannerData.type === 'image' || bannerData.type === 'both') ? bannerData.imageUrl : undefined}
                                 textColor={bannerData.textColor}
@@ -445,6 +526,7 @@ const CanvasEditorPage: React.FC = () => {
                                 fontFamily={bannerData.fontFamily || 'Arial'}
                                 padding={bannerData.padding}
                                 borderRadius={bannerData.borderRadius}
+                                brushSize={brushSize}
                                 onExport={handleExport}
                             />
                         </div>
