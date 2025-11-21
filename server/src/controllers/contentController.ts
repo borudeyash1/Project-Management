@@ -197,3 +197,34 @@ export const deleteBanner = async (req: AuthenticatedRequest, res: Response): Pr
         });
     }
 };
+
+// Upload banner image (admin only)
+export const uploadBannerImage = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        if (!req.file) {
+            res.status(400).json({
+                success: false,
+                message: 'No file uploaded'
+            });
+            return;
+        }
+
+        console.log('📤 [CONTENT] Banner image uploaded:', req.file.filename);
+
+        // Return the server URL for the uploaded image
+        const imageUrl = `/uploads/banners/${req.file.filename}`;
+
+        res.status(200).json({
+            success: true,
+            message: 'Image uploaded successfully',
+            data: { imageUrl }
+        });
+    } catch (error: any) {
+        console.error('❌ [CONTENT] Upload banner image error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to upload image'
+        });
+    }
+};
+

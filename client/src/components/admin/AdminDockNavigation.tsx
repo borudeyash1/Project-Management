@@ -8,7 +8,9 @@ import {
   Rocket,
   ShieldCheck,
   CreditCard,
-  LogOut
+  LogOut,
+  FileText,
+  Megaphone
 } from 'lucide-react';
 import { AdminDock, AdminDockIcon, AdminDockDivider } from '../ui/AdminDock';
 
@@ -30,6 +32,8 @@ const AdminDockNavigation: React.FC = () => {
     { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, path: '/admin/subscriptions' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
     { id: 'releases', label: 'Releases', icon: Rocket, path: '/admin/releases' },
+    { id: 'docs', label: 'Documentation', icon: FileText, path: '/admin/docs' },
+    { id: 'content', label: 'Content', icon: Megaphone, path: '/admin/content' },
     { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/settings' }
   ];
 
@@ -39,7 +43,7 @@ const AdminDockNavigation: React.FC = () => {
 
   const handleLogout = () => {
     console.log(' [ADMIN DOCK] Logging out...');
-    
+
     // Get admin name before clearing
     const adminData = localStorage.getItem('adminData');
     let adminName = 'Admin';
@@ -51,14 +55,14 @@ const AdminDockNavigation: React.FC = () => {
         console.error('Failed to parse admin data:', e);
       }
     }
-    
+
     // Clear all admin session data from localStorage
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
     localStorage.removeItem('accessToken');
-    
+
     console.log(' [ADMIN DOCK] Session cleared, redirecting to login...');
-    
+
     // Show success message
     const toastEvent = new CustomEvent('showToast', {
       detail: {
@@ -67,14 +71,14 @@ const AdminDockNavigation: React.FC = () => {
       }
     });
     window.dispatchEvent(toastEvent);
-    
+
     // Redirect to admin login
     navigate('/my-admin/login', { replace: true });
   };
 
   const isActive = (path: string) => {
-    return location.pathname === path || 
-           (path !== '/admin/dashboard' && location.pathname.startsWith(path));
+    return location.pathname === path ||
+      (path !== '/admin/dashboard' && location.pathname.startsWith(path));
   };
 
   return (
@@ -83,7 +87,7 @@ const AdminDockNavigation: React.FC = () => {
       {adminNavItems.map((item) => {
         const Icon = item.icon;
         const active = isActive(item.path);
-        
+
         return (
           <AdminDockIcon
             key={item.id}

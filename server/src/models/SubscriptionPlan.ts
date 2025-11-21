@@ -10,7 +10,6 @@ export interface ISubscriptionPlan extends Document {
     maxWorkspaces: number;
     maxProjects: number;
     maxTeamMembers: number;
-    storageInGB: number;
   };
   features: {
     aiAccess: boolean;
@@ -70,20 +69,6 @@ const subscriptionPlanSchema = new Schema<ISubscriptionPlan>({
     default: 0
   },
   yearlyPrice: {
-    type: Number,
-    default: 0
-  },
-  limits: {
-    maxWorkspaces: { type: Number, default: 1 },
-    maxProjects: { type: Number, default: 3 },
-    maxTeamMembers: { type: Number, default: 5 },
-    storageInGB: { type: Number, default: 1 }
-  },
-  features: {
-    aiAccess: { type: Boolean, default: false },
-    adsEnabled: { type: Boolean, default: true },
-    collaboratorAccess: { type: Boolean, default: false },
-    customStorageIntegration: { type: Boolean, default: false },
     desktopAppAccess: { type: Boolean, default: false },
     automaticScheduling: { type: Boolean, default: false },
     realtimeAISuggestions: { type: Boolean, default: false }

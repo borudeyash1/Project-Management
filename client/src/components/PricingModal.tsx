@@ -2,11 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   X,
   Check,
-  Star,
   Zap,
   Crown,
   Users,
-  Bot,
   Shield,
   Headphones,
   Gift,
@@ -83,6 +81,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
     if (!isOpen || !presetPlanKey || !plans.length) return;
     if (detailPlan && detailPlan.planKey === presetPlanKey) return;
     openPlanDetail(presetPlanKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, presetPlanKey, plans]);
 
   const openPlanDetail = (planKey: 'free' | 'pro' | 'ultra') => {
@@ -220,27 +219,25 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
               <X className="w-6 h-6" />
             </button>
           </div>
-          
+
           {/* Billing Toggle */}
           <div className="flex items-center justify-center mt-6">
             <div className="bg-gray-100 rounded-lg p-1 flex">
               <button
                 onClick={() => setBillingCycle('monthly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  billingCycle === 'monthly'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${billingCycle === 'monthly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBillingCycle('yearly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                  billingCycle === 'yearly'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors relative ${billingCycle === 'yearly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 Yearly
                 <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
@@ -265,18 +262,17 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                 planKey === 'free'
                   ? 'Get Started Free'
                   : planKey === 'pro'
-                  ? 'Choose Pro User'
-                  : 'Choose Ultra User';
+                    ? 'Choose Pro User'
+                    : 'Choose Ultra User';
 
               return (
                 <div
                   key={plan.planKey}
                   onClick={() => setSelectedPlan(planKey)}
-                  className={`relative rounded-xl border-2 transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? 'border-accent shadow-lg scale-[1.01]'
-                      : 'border-gray-300 hover:border-gray-300'
-                  }`}
+                  className={`relative rounded-xl border-2 transition-all duration-200 cursor-pointer ${isSelected
+                    ? 'border-accent shadow-lg scale-[1.01]'
+                    : 'border-gray-300 hover:border-gray-300'
+                    }`}
                 >
                   {planKey === 'pro' && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -285,7 +281,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="p-6">
                     {/* Plan Header */}
                     <div className="text-center mb-6">
@@ -327,56 +323,52 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                           <span className="text-gray-600">Team Members:</span>
                           <span className="font-medium">{plan.limits.maxTeamMembers === -1 ? 'Unlimited' : plan.limits.maxTeamMembers}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Storage:</span>
-                          <span className="font-medium">{plan.limits.storageInGB}GB</span>
-                        </div>
                       </div>
                     </div>
-
-                    {/* Features */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Features</h4>
-                      <div className="space-y-3">
-                        {Object.entries(plan.features).map(([featureKey, enabled]) => (
-                          <div key={featureKey} className="flex items-start gap-3 p-2 rounded-lg">
-                            <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${enabled ? 'text-green-500' : 'text-gray-700'}`} />
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className={`text-sm font-medium ${enabled ? 'text-gray-900' : 'text-gray-600'}`}>
-                                  {featureKey.replace(/([A-Z])/g, ' $1')}
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-600 mt-1">
-                                {enabled ? 'Included' : 'Not included'}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* CTA Button */}
-                    <button
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openPlanDetail(planKey);
-                      }}
-                      className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                        planKey === 'pro'
-                          ? 'bg-accent text-gray-900 hover:bg-accent-hover'
-                          : planKey === 'free'
-                          ? 'bg-gray-100 text-gray-900 hover:bg-gray-300'
-                          : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500'
-                      } shadow-md`}
-                    >
-                      {buttonLabel}
-                      {planKey !== 'free' && (
-                        <ArrowRight className="w-4 h-4 inline ml-2" />
-                      )}
-                    </button>
                   </div>
+
+                  {/* Features */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-3">Features</h4>
+                    <div className="space-y-3">
+                      {Object.entries(plan.features).map(([featureKey, enabled]) => (
+                        <div key={featureKey} className="flex items-start gap-3 p-2 rounded-lg">
+                          <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${enabled ? 'text-green-500' : 'text-gray-700'}`} />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-sm font-medium ${enabled ? 'text-gray-900' : 'text-gray-600'}`}>
+                                {featureKey.replace(/([A-Z])/g, ' $1')}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">
+                              {enabled ? 'Included' : 'Not included'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openPlanDetail(planKey);
+                    }}
+                    className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${planKey === 'pro'
+                      ? 'bg-accent text-gray-900 hover:bg-accent-hover'
+                      : planKey === 'free'
+                        ? 'bg-gray-100 text-gray-900 hover:bg-gray-300'
+                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500'
+                      } shadow-md`}
+                  >
+                    {buttonLabel}
+                    {planKey !== 'free' && (
+                      <ArrowRight className="w-4 h-4 inline ml-2" />
+                    )}
+                  </button>
                 </div>
+
               );
             })}
           </div>
@@ -401,38 +393,32 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
         </div>
       </div>
 
-      {detailPlan && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[110] px-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 space-y-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-wide text-gray-600">Selected plan</p>
-                <h3 className="text-2xl font-semibold text-gray-900">{detailPlan.displayName}</h3>
-                <p className="text-sm text-gray-600 mt-1">{detailPlan.summary}</p>
-              </div>
-              <button onClick={() => setDetailPlan(null)} className="text-gray-600 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="rounded-xl border border-gray-300 p-4 bg-gray-50">
-              <h4 className="font-semibold text-gray-900 mb-3">What you’ll get</h4>
-              <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
+      {
+        detailPlan && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[110] px-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 space-y-5">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-gray-600">Workspaces</p>
-                  <p className="font-semibold">{detailPlan.limits.maxWorkspaces === -1 ? 'Unlimited' : detailPlan.limits.maxWorkspaces}</p>
+                  <p className="text-sm uppercase tracking-wide text-gray-600">Selected plan</p>
+                  <h3 className="text-2xl font-semibold text-gray-900">{detailPlan.displayName}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{detailPlan.summary}</p>
                 </div>
-                <div>
-                  <p className="text-gray-600">Projects</p>
-                  <p className="font-semibold">{detailPlan.limits.maxProjects === -1 ? 'Unlimited' : detailPlan.limits.maxProjects}</p>
+                <button onClick={() => setDetailPlan(null)} className="text-gray-600 hover:text-gray-600">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="rounded-xl border border-gray-300 p-4 bg-gray-50">
+                <h4 className="font-semibold text-gray-900 mb-3">What you’ll get</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
+                  <div>
+                    <p className="text-gray-600">Workspaces</p>
+                    <p className="font-semibold">{detailPlan.limits.maxWorkspaces === -1 ? 'Unlimited' : detailPlan.limits.maxWorkspaces}</p>
+                  </div>
                 </div>
                 <div>
                   <p className="text-gray-600">Team members</p>
                   <p className="font-semibold">{detailPlan.limits.maxTeamMembers === -1 ? 'Unlimited' : detailPlan.limits.maxTeamMembers}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Storage</p>
-                  <p className="font-semibold">{detailPlan.limits.storageInGB} GB</p>
                 </div>
               </div>
             </div>
@@ -504,9 +490,9 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
               )}
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 

@@ -65,6 +65,7 @@ import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import AdminDocs from './components/admin/AdminDocs';
 import AdminContent from './components/admin/AdminContent';
+import CanvasEditorPage from './components/admin/CanvasEditorPage';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -140,7 +141,7 @@ const AppContent: React.FC = () => {
         <Route path="/register" element={<Auth />} />
         <Route path="/desktop-handshake" element={<DesktopHandshake />} />
         <Route path="/desktop-shell" element={<DesktopShell />} />
-        
+
         {/* Admin Routes - Hidden */}
         <Route path="/my-admin/login" element={<AdminLoginWrapper />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -152,6 +153,7 @@ const AppContent: React.FC = () => {
         <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
         <Route path="/admin/docs" element={<AdminDocs />} />
         <Route path="/admin/content" element={<AdminContent />} />
+        <Route path="/admin/canvas-editor" element={<CanvasEditorPage />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={
@@ -359,9 +361,9 @@ const AppContent: React.FC = () => {
       </Routes>
 
       {/* Modals */}
-      <CreateWorkspaceModal 
-        isOpen={state.modals.createWorkspace} 
-        onClose={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' })} 
+      <CreateWorkspaceModal
+        isOpen={state.modals.createWorkspace}
+        onClose={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' })}
       />
       <WorkloadDeadlineModal />
       <TaskDetailsModal />

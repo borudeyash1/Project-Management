@@ -15,6 +15,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import * as documentationService from '../../services/documentationService';
+import AdminDockNavigation from './AdminDockNavigation';
 
 interface DocArticle {
   _id: string;
@@ -446,6 +447,7 @@ const AdminDocs: React.FC = () => {
           </div>
         )}
       </div>
+      <AdminDockNavigation />
     </div>
   );
 };
