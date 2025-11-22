@@ -454,7 +454,8 @@ const Settings: React.FC = () => {
     { id: 'account', label: 'Account', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'billing', label: 'Billing', icon: CreditCard }
+    { id: 'billing', label: 'Billing', icon: CreditCard },
+    { id: 'data', label: 'Data & Export', icon: Database }
   ];
 
   const renderAccount = () => (
