@@ -55,8 +55,10 @@ export const createWorkspace: RequestHandler = async (req, res) => {
     const plan = await SubscriptionPlan.findOne({ planKey });
     const ownerWorkspaceCount = await Workspace.countDocuments({ owner: userId });
 
-    if (plan && plan.limits?.maxWorkspaces !== -1 && ownerWorkspaceCount >= plan.limits.maxWorkspaces) {
-      const billing = buildBillingResponse(plan, type, Number(estimatedMembers));
+    // Check workspace limits (default to unlimited if plan or limits not found)
+    const maxWorkspaces = plan?.limits?.maxWorkspaces ?? -1;
+    if (maxWorkspaces !== -1 && ownerWorkspaceCount >= maxWorkspaces) {
+      const billing = buildBillingResponse(plan || {}, type, Number(estimatedMembers));
       res.status(402).json({
         success: false,
         message: 'Workspace limit reached for your current subscription.',

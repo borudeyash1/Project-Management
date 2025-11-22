@@ -6,9 +6,7 @@ import {
   Download, Trash2, Plus, Minus, Star, Award, Trophy, Target, Zap, BarChart3
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { useTheme } from '../context/ThemeContext';
 import apiService from '../services/api';
-import { renderProfessional, renderSkillsLearning, renderWorkPreferences, renderGoals } from './ProfileTabs';
 
 interface ProfileData {
   fullName: string;
@@ -161,7 +159,6 @@ interface ProfileData {
 
 const Profile: React.FC = () => {
   const { state, dispatch } = useApp();
-  const { isDarkMode } = useTheme();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -235,12 +232,9 @@ const Profile: React.FC = () => {
     try {
       setLoading(true);
       const response = await apiService.getProfile();
-      console.log('✅ Profile API Response:', response);
-      console.log('✅ Profile data keys:', Object.keys(response || {}));
-      console.log('✅ Has profile object?:', !!response?.profile);
       setProfileData(response);
     } catch (error) {
-      console.error('❌ Failed to fetch profile:', error);
+      console.error('Failed to fetch profile:', error);
       // Use mock data for now
       setProfileData({
         fullName: state.userProfile?.fullName || 'John Doe',
@@ -593,13 +587,11 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'professional', label: 'Professional', icon: Building },
-    { id: 'skills', label: 'Skills & Learning', icon: Target },
-    { id: 'work-preferences', label: 'Work Preferences', icon: Clock },
-    { id: 'goals', label: 'Goals & Aspirations', icon: Trophy },
+    { id: 'preferences', label: 'Preferences', icon: Settings },
     { id: 'addresses', label: 'Addresses', icon: MapPin },
     { id: 'payments', label: 'Payment Methods', icon: CreditCard },
-    { id: 'achievements', label: 'Achievements', icon: Award }
+    { id: 'achievements', label: 'Achievements', icon: Award },
+    { id: 'activity', label: 'Activity', icon: BarChart3 }
   ];
 
   const renderPersonalInfo = () => (
@@ -1122,13 +1114,11 @@ const Profile: React.FC = () => {
         {/* Content */}
         <div className="p-6">
           {activeTab === 'personal' && renderPersonalInfo()}
-          {activeTab === 'professional' && renderProfessional({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
-          {activeTab === 'skills' && renderSkillsLearning({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
-          {activeTab === 'work-preferences' && renderWorkPreferences({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
-          {activeTab === 'goals' && renderGoals({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
+          {activeTab === 'preferences' && renderPreferences()}
           {activeTab === 'addresses' && renderAddresses()}
           {activeTab === 'payments' && renderPaymentMethods()}
           {activeTab === 'achievements' && renderAchievements()}
+          {activeTab === 'activity' && renderActivity()}
         </div>
       </div>
 

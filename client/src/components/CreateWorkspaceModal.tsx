@@ -380,8 +380,8 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="flex items-start gap-3">
           <Shield className="w-5 h-5 text-yellow-600 mt-0.5" />
           <div>
-            <h4 className="font-medium text-yellow-800">Billing overview</h4>
-            <p className="text-sm text-yellow-700 mt-1">
+            <h4 className="font-medium text-gray-900">Billing overview</h4>
+            <p className="text-sm text-gray-700 mt-1">
               Our billing system is pending a gateway, so once a plan limit triggers a custom fee we show the shortcut below.
             </p>
           </div>
@@ -406,7 +406,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-xs text-yellow-900">
+          <div className="flex items-center gap-2 text-xs text-gray-800">
             <span>Default template pricing applies: modify the plan in admin if you need custom limits.</span>
           </div>
         )}
