@@ -1,29 +1,30 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMessage extends Document {
-  workspace: string;
-  sender: string;
-  recipient: string;
+  workspace: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  recipient: mongoose.Types.ObjectId;
   content: string;
-  readBy: string[];
+  readBy: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 const messageSchema = new Schema<IMessage>({
   workspace: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Workspace',
     required: true,
     index: true,
   },
   sender: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'User',
     index: true,
   },
   recipient: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'User',
     index: true,
@@ -35,7 +36,7 @@ const messageSchema = new Schema<IMessage>({
   },
   readBy: [
     {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     },
   ],

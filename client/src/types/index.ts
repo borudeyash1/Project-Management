@@ -183,11 +183,13 @@ export interface WorkspaceMember {
   user: string;
   role: 'owner' | 'admin' | 'manager' | 'member';
   permissions: {
-    canCreateProject: boolean;
-    canManageEmployees: boolean;
-    canViewPayroll: boolean;
-    canExportReports: boolean;
-    canManageWorkspace: boolean;
+    canManageMembers: boolean;
+    canManageProjects: boolean;
+    canManageClients: boolean;
+    canUpdateWorkspaceDetails: boolean;
+    canManageCollaborators: boolean;
+    canManageInternalProjectSettings: boolean;
+    canAccessProjectManagerTabs: boolean;
   };
   joinedAt: Date;
   status: 'active' | 'pending' | 'suspended';
