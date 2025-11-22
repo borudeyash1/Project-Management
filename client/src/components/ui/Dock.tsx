@@ -342,8 +342,8 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
   const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
 
-  // Add margin to push adjacent icons away
-  const marginSync = useTransform(distance, [-150, 0, 150], [0, 16, 0]);
+  // Reduced margin to prevent excessive expansion - cap at 8px instead of 16px
+  const marginSync = useTransform(distance, [-150, 0, 150], [0, 8, 0]);
   const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
   const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
 
