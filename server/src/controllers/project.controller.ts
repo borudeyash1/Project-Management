@@ -47,10 +47,10 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
     await project.save();
 
     // Add project to team's projects
-    teamExists.projects.push(project._id);
+    teamExists.projects.push(project._id as any);
     await teamExists.save();
 
-    res.status(201).json(project);
+    return res.status(201).json(project);
   } catch (error: any) {
     console.error('Error creating project:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -88,7 +88,7 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
       .populate('team', 'name')
       .sort(sort);
 
-    res.json(projects);
+    return res.json(projects);
   } catch (error: any) {
     console.error('Error fetching projects:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -117,7 +117,7 @@ export const getProjectById = async (req: AuthenticatedRequest, res: Response) =
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
 
-    res.json(project);
+    return res.json(project);
   } catch (error: any) {
     console.error('Error fetching project:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -174,7 +174,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response) =>
 
     await project.save();
 
-    res.json(project);
+    return res.json(project);
   } catch (error: any) {
     console.error('Error updating project:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -204,9 +204,9 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response) =>
 
     // TODO: Delete associated tasks, milestones, etc.
 
-    await project.remove();
+    await project.deleteOne();
 
-    res.json({ message: 'Project deleted successfully' });
+    return res.json({ message: 'Project deleted successfully' });
   } catch (error: any) {
     console.error('Error deleting project:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
