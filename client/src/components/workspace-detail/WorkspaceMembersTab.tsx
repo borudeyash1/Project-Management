@@ -333,13 +333,22 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   }`}>
                     {member.status}
                   </span>
-                  {canManageMembers && (
+                  {canManageMembers && member.userId !== workspace?.owner && (
+
                     <button
+
                       onClick={() => handleRemoveMember(member._id)}
+
                       className="text-red-600 hover:text-red-700 p-1"
+
+                      title="Remove member"
+
                     >
+
                       <Trash2 className="w-4 h-4" />
+
                     </button>
+
                   )}
                 </div>
               </div>
