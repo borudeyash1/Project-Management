@@ -17,9 +17,9 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
         const now = Date.now();
         const valid = new Set<string>();
 
-        // Filter out expired dismissals (older than 24 hours)
+        // Filter out expired dismissals (older than 1 hour)
         Object.entries(parsed).forEach(([id, timestamp]: [string, any]) => {
-          if (now - timestamp < 24 * 60 * 60 * 1000) {
+          if (now - timestamp < 1 * 60 * 60 * 1000) {
             valid.add(id);
           }
         });
@@ -68,71 +68,153 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
   // Separate banners by placement
   const topBanners = visibleBanners.filter(b => b.placement === 'top');
   const bottomBanners = visibleBanners.filter(b => b.placement === 'bottom');
+  const customBanners = visibleBanners.filter(b => b.placement === 'custom');
 
   if (visibleBanners.length === 0) return null;
 
-  const renderBanner = (banner: IBanner) => (
-    <div
-      key={banner._id}
-      className={`w-full left-0 ${banner.placement === 'top' ? 'top-0' : 'bottom-0'
-        } z-50 backdrop-blur-md bg-opacity-90 shadow-lg border-b border-white/10`}
-      style={{
-        backgroundColor: banner.backgroundColor,
-        color: banner.textColor,
-        height: `${banner.height}px`,
-        position: 'fixed',
-        borderRadius: banner.borderRadius ? `${banner.borderRadius}px` : '0px',
-      }}
-    >
-      <div
-        className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4"
-        style={{
-          padding: banner.padding ? `0 ${banner.padding}px` : '0 16px',
-        }}
-      >
-        {/* Content */}
-        <div className="flex-1 flex items-center justify-center gap-4">
-          {/* Image */}
-          {(banner.type === 'image' || banner.type === 'both') && banner.imageUrl && (
+  const renderBanner = (banner: IBanner) => {
+    const isCustom = banner.placement === 'custom';
+
+    // If this is a canvas-exported banner (type === 'image' and imageUrl exists),
+    // render it as a simple image without background styling
+    if (banner.type === 'image' && banner.imageUrl) {
+      return (
+        <div
+          key={banner._id}
+          className={`w-full left-0 ${isCustom ? '' : banner.placement === 'top' ? 'top-0' : 'bottom-0'
+            } z-50 shadow-lg`}
+          style={{
+            height: `${banner.height}px`,
+            position: isCustom ? 'absolute' : 'fixed',
+            // Custom placement coordinates
+            ...(isCustom && banner.customX !== undefined && { left: `${banner.customX}px` }),
+            ...(isCustom && banner.customY !== undefined && { top: `${banner.customY}px` }),
+            ...(isCustom && banner.customWidth && { width: `${banner.customWidth}px` }),
+          }}
+        >
+          <div className="relative w-full h-full">
             <img
               src={banner.imageUrl}
               alt={banner.title}
-              className="h-full w-auto object-contain"
+              className="w-full h-full object-cover"
               style={{
-                maxHeight: `${banner.height * 0.8}px`,
-                height: banner.imageHeight ? `${banner.imageHeight}px` : 'auto',
-                width: banner.imageWidth ? `${banner.imageWidth}px` : 'auto',
+                borderRadius: banner.borderRadius ? `${banner.borderRadius}px` : '0px',
               }}
             />
-          )}
-
-          {/* Text */}
-          {(banner.type === 'text' || banner.type === 'both') && (
-            <div className="text-center sm:text-left">
-              <p
-                className="drop-shadow-sm"
-                style={{
-                  fontSize: banner.fontSize ? `${banner.fontSize}px` : '16px',
-                  fontWeight: banner.fontWeight || 700,
-                }}
-              >
-                {banner.content}
-              </p>
-            </div>
-          )}
+            {/* Close Button */}
+            <button
+              onClick={() => handleClose(banner._id)}
+              className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 rounded-full transition-colors backdrop-blur-sm"
+              aria-label="Close banner"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
         </div>
+      );
+    }
 
-        {/* Close Button */}
-        <button
-          onClick={() => handleClose(banner._id)}
-          className="p-1 hover:bg-white/20 rounded-full transition-colors flex-shrink-0 backdrop-blur-sm"
-          aria-label="Close banner"
+    // Construct background style based on backgroundType
+    const getBackgroundStyle = () => {
+      const bgType = banner.backgroundType || 'solid';
+
+      switch (bgType) {
+        case 'gradient':
+          if (banner.gradientStart && banner.gradientEnd) {
+            return {
+              background: `linear-gradient(${banner.gradientDirection || 'to right'}, ${banner.gradientStart}, ${banner.gradientEnd})`
+            };
+          }
+          return { backgroundColor: banner.backgroundColor };
+
+        case 'transparent':
+          return { background: 'transparent' };
+
+        case 'image':
+          // Image backgrounds would use imageUrl as background-image
+          if (banner.imageUrl) {
+            return {
+              backgroundImage: `url(${banner.imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            };
+          }
+          return { backgroundColor: banner.backgroundColor };
+
+        case 'solid':
+        default:
+          return { backgroundColor: banner.backgroundColor };
+      }
+    };
+
+    return (
+      <div
+        key={banner._id}
+        className={`w-full left-0 ${isCustom ? '' : banner.placement === 'top' ? 'top-0' : 'bottom-0'
+          } z-50 backdrop-blur-md bg-opacity-90 shadow-lg border-b border-white/10`}
+        style={{
+          ...getBackgroundStyle(),
+          color: banner.textColor,
+          height: `${banner.height}px`,
+          position: isCustom ? 'absolute' : 'fixed',
+          borderRadius: banner.borderRadius ? `${banner.borderRadius}px` : '0px',
+          fontFamily: banner.fontFamily || 'Inter, sans-serif',
+          // Custom placement coordinates
+          ...(isCustom && banner.customX !== undefined && { left: `${banner.customX}px` }),
+          ...(isCustom && banner.customY !== undefined && { top: `${banner.customY}px` }),
+          ...(isCustom && banner.customWidth && { width: `${banner.customWidth}px` }),
+        }}
+      >
+        <div
+          className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4"
+          style={{
+            padding: banner.padding ? `0 ${banner.padding}px` : '0 16px',
+          }}
         >
-          <X className="w-5 h-5" />
-        </button>
+          {/* Content */}
+          <div className="flex-1 flex items-center justify-center gap-4">
+            {/* Image */}
+            {(banner.type === 'image' || banner.type === 'both') && banner.imageUrl && (
+              <img
+                src={banner.imageUrl}
+                alt={banner.title}
+                className="h-full w-auto object-contain"
+                style={{
+                  maxHeight: `${banner.height * 0.8}px`,
+                  height: banner.imageHeight ? `${banner.imageHeight}px` : 'auto',
+                  width: banner.imageWidth ? `${banner.imageWidth}px` : 'auto',
+                }}
+              />
+            )}
+
+            {/* Text */}
+            {(banner.type === 'text' || banner.type === 'both') && (
+              <div className="text-center sm:text-left">
+                <p
+                  className="drop-shadow-sm"
+                  style={{
+                    fontSize: banner.fontSize ? `${banner.fontSize}px` : '16px',
+                    fontWeight: banner.fontWeight || 700,
+                  }}
+                >
+                  {banner.content}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Close Button */}
+          <button
+            onClick={() => handleClose(banner._id)}
+            className="p-1 hover:bg-white/20 rounded-full transition-colors flex-shrink-0 backdrop-blur-sm"
+            aria-label="Close banner"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <>
@@ -141,6 +223,9 @@ const ContentBanner: React.FC<ContentBannerProps> = ({ route }) => {
 
       {/* Bottom Banners */}
       {bottomBanners.map(renderBanner)}
+
+      {/* Custom Positioned Banners */}
+      {customBanners.map(renderBanner)}
     </>
   );
 };

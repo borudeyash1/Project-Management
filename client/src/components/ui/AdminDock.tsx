@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   motion,
   useMotionValue,
@@ -34,6 +35,11 @@ interface AdminDockIconProps {
   tooltip?: string;
   orientation?: 'horizontal' | 'vertical';
 }
+
+const TooltipPortal: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  if (typeof document === 'undefined') return null;
+  return createPortal(children, document.body);
+};
 
 const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'middle', className = '' }) => {
   const mouseX = useMotionValue(Infinity);
@@ -222,8 +228,6 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
         dragMomentum={false}
         onDragEnd={handleDragEnd}
         style={anchorStyle as any}
-        onMouseMove={(e: React.MouseEvent) => mouseX.set(e.pageX)}
-        onMouseLeave={() => mouseX.set(Infinity)}
       >
         <div
           ref={dockRef}
@@ -329,6 +333,8 @@ export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue
   orientation = 'horizontal'
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipCoords, setTooltipCoords] = useState<{ x: number; y: number; placement: 'left' | 'right' | 'top' | 'bottom' } | null>(null);
   const defaultMouseX = useMotionValue(Infinity);
 
   const distance = useTransform(parentMouseX || defaultMouseX, (val: number) => {
@@ -340,12 +346,12 @@ export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue
   const width = 56;
 
   const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
-  const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
+  const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 200, damping: 10 });
 
   // Add margin to push adjacent icons away
   const marginSync = useTransform(distance, [-150, 0, 150], [0, 16, 0]);
-  const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
-  const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
+  const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 1, stiffness: 80, damping: 20 });
+  const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 1, stiffness: 80, damping: 20 });
 
   return (
     <div className="group relative">
@@ -357,16 +363,78 @@ export const AdminDockIcon: React.FC<AdminDockIconProps & { mouseX?: MotionValue
           marginRight,
           scale
         }}
+        onHoverStart={() => {
+          setShowTooltip(true);
+          const bounds = ref.current?.getBoundingClientRect();
+          if (bounds) {
+            if (parentMouseX) {
+              parentMouseX.set(bounds.x + bounds.width / 2);
+            }
+
+            // Calculate tooltip position
+            let placement: 'left' | 'right' | 'top' | 'bottom' = 'top';
+            let x = 0;
+            let y = 0;
+            const gap = 12;
+
+            if (orientation === 'vertical') {
+              if (bounds.left > window.innerWidth / 2) {
+                placement = 'left';
+                x = bounds.left - gap;
+                y = bounds.top + bounds.height / 2;
+              } else {
+                placement = 'right';
+                x = bounds.right + gap;
+                y = bounds.top + bounds.height / 2;
+              }
+            } else {
+              if (bounds.top < window.innerHeight / 2) {
+                placement = 'bottom';
+                x = bounds.left + bounds.width / 2;
+                y = bounds.bottom + gap;
+              } else {
+                placement = 'top';
+                x = bounds.left + bounds.width / 2;
+                y = bounds.top - gap;
+              }
+            }
+            setTooltipCoords({ x, y, placement });
+          }
+        }}
+        onHoverEnd={() => {
+          setShowTooltip(false);
+          if (parentMouseX) {
+            parentMouseX.set(Infinity);
+          }
+        }}
       >
-        {/* Tooltip - Shows on hover */}
-        {tooltip && (
-          <div className={`absolute ${orientation === 'vertical' ? 'left-full ml-3 top-1/2 -translate-y-1/2' : 'bottom-full mb-3 left-1/2 -translate-x-1/2'} px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-2xl z-[9999]`}>
-            {tooltip}
-            {/* Tooltip arrow */}
-            <div className={`absolute ${orientation === 'vertical' ? 'right-full top-1/2 -translate-y-1/2 mr-[1px]' : 'top-full left-1/2 -translate-x-1/2 -mt-[1px]'}`}>
-              <div className={`${orientation === 'vertical' ? 'border-[7px] border-transparent border-r-orange-600' : 'border-[7px] border-transparent border-t-orange-600'}`} />
+        {/* Tooltip - Uses Portal to escape overflow clipping */}
+        {tooltip && showTooltip && tooltipCoords && (
+          <TooltipPortal>
+            <div
+              className="fixed px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg shadow-2xl z-[9999] pointer-events-none whitespace-nowrap transition-opacity duration-200"
+              style={{
+                left: tooltipCoords.x,
+                top: tooltipCoords.y,
+                transform:
+                  tooltipCoords.placement === 'left' ? 'translate(-100%, -50%)' :
+                    tooltipCoords.placement === 'right' ? 'translate(0, -50%)' :
+                      tooltipCoords.placement === 'top' ? 'translate(-50%, -100%)' :
+                        'translate(-50%, 0)',
+                opacity: showTooltip ? 1 : 0
+              }}
+            >
+              {tooltip}
+              {/* Arrow */}
+              <div
+                className={`absolute w-0 h-0 border-[6px] border-transparent ${tooltipCoords.placement === 'left' ? 'border-l-orange-600 left-full top-1/2 -translate-y-1/2' :
+                  tooltipCoords.placement === 'right' ? 'border-r-orange-600 right-full top-1/2 -translate-y-1/2' :
+                    tooltipCoords.placement === 'top' ? 'border-t-orange-600 top-full left-1/2 -translate-x-1/2' :
+                      'border-b-orange-600 bottom-full left-1/2 -translate-x-1/2'
+                  }`}
+              />
             </div>
-          </div>
+          </TooltipPortal>
         )}
 
         <button

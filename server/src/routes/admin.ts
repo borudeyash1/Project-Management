@@ -16,7 +16,16 @@ import {
   getRecentSessions
 } from '../controllers/adminController';
 import { getAdminAIResponse } from '../controllers/adminAIController';
-import { getAnalyticsData, getUserInsights } from '../controllers/analyticsController';
+import {
+  getAnalyticsData,
+  getUserInsights,
+  getDetailedUserGrowth,
+  getDetailedDeviceActivity,
+  getDetailedUserDistribution,
+  getDetailedDeviceRisk,
+  getDetailedGrowthMetrics,
+  getDetailedDeviceSecurity
+} from '../controllers/analyticsController';
 import {
   getAdminSubscriptionPlans,
   updateSubscriptionPlan,
@@ -116,6 +125,12 @@ router.get('/sessions/recent', getRecentSessions);
 // Analytics routes
 router.get('/analytics-data', getAnalyticsData);
 router.get('/user-insights', getUserInsights);
+router.get('/analytics/user-growth-detail', getDetailedUserGrowth);
+router.get('/analytics/device-activity-detail', getDetailedDeviceActivity);
+router.get('/analytics/user-distribution-detail', getDetailedUserDistribution);
+router.get('/analytics/device-risk-detail', getDetailedDeviceRisk);
+router.get('/analytics/growth-metrics-detail', getDetailedGrowthMetrics);
+router.get('/analytics/device-security-detail', getDetailedDeviceSecurity);
 // Subscription management
 router.get('/subscriptions', authenticate, getAdminSubscriptionPlans);
 router.put('/subscriptions/:planKey', authenticate, updateSubscriptionPlan);

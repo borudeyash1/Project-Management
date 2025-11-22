@@ -65,10 +65,10 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                         </div>
                                         <div className="flex flex-col items-end gap-2">
                                             <span className={`px-2 py-1 rounded text-xs font-medium ${task.priority === 'high' || task.priority === 'urgent'
-                                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
-                                                    : task.priority === 'medium'
-                                                        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-400'
-                                                        : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                                                ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
+                                                : task.priority === 'medium'
+                                                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-400'
+                                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                                                 }`}>
                                                 {task.priority}
                                             </span>
@@ -115,8 +115,8 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                             {project.name}
                                         </h4>
                                         <span className={`px-2 py-1 rounded text-xs font-medium ${project.status === 'active'
-                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
-                                                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                                            ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
+                                            : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                                             }`}>
                                             {project.status}
                                         </span>
@@ -223,10 +223,10 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                     <div className={`w-full rounded-full h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                         <div
                                             className={`h-3 rounded-full transition-all ${project.progress >= 80
-                                                    ? 'bg-green-600'
-                                                    : project.progress >= 50
-                                                        ? 'bg-blue-600'
-                                                        : 'bg-yellow-600'
+                                                ? 'bg-green-600'
+                                                : project.progress >= 50
+                                                    ? 'bg-blue-600'
+                                                    : 'bg-yellow-600'
                                                 }`}
                                             style={{ width: `${project.progress}%` }}
                                         />
@@ -257,9 +257,10 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
     };
 
     const MotionDiv = motion.div as any;
+    const AnimatePresenceComponent = AnimatePresence as any;
 
     return (
-        <AnimatePresence>
+        <AnimatePresenceComponent>
             <MotionDiv
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -278,7 +279,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                     {renderContent()}
                 </MotionDiv>
             </MotionDiv>
-        </AnimatePresence>
+        </AnimatePresenceComponent>
     );
 };
 

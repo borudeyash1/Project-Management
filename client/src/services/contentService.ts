@@ -9,7 +9,7 @@ export interface ContentBanner {
     backgroundColor: string;
     textColor: string;
     height: number;
-    placement: 'top' | 'bottom';
+    placement: 'top' | 'bottom' | 'custom';
     routes: string[];
     isActive: boolean;
     startDate?: string;
@@ -22,6 +22,17 @@ export interface ContentBanner {
     padding?: number;
     imageHeight?: number;
     imageWidth?: number;
+    // Custom placement coordinates
+    customX?: number;
+    customY?: number;
+    customWidth?: number;
+    // Advanced backgrounds
+    backgroundType?: 'solid' | 'gradient' | 'image' | 'transparent';
+    gradientStart?: string;
+    gradientEnd?: string;
+    gradientDirection?: string;
+    // Font
+    fontFamily?: string;
     createdBy: string;
     createdAt: string;
     updatedAt: string;

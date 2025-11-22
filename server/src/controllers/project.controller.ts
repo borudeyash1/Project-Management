@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../types';
 import { Project, IProject } from '../models/project.model';
 import { User } from '../models/user.model';
 import { Team } from '../models/team.model';
 import { validationResult } from 'express-validator';
 
-export const createProject = async (req: Request, res: Response) => {
+export const createProject = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -12,8 +13,11 @@ export const createProject = async (req: Request, res: Response) => {
     }
 
     const { name, description, startDate, endDate, status, priority, team, budget, client, tags } = req.body;
-    
+
     // Check if manager exists and is authorized
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const manager = await User.findById(req.user.id);
     if (!manager) {
       return res.status(404).json({ message: 'Manager not found' });
@@ -41,7 +45,7 @@ export const createProject = async (req: Request, res: Response) => {
     });
 
     await project.save();
-    
+
     // Add project to team's projects
     teamExists.projects.push(project._id);
     await teamExists.save();
@@ -53,17 +57,20 @@ export const createProject = async (req: Request, res: Response) => {
   }
 };
 
-export const getProjects = async (req: Request, res: Response) => {
+export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, priority, team, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
-    
+
     const query: any = {};
-    
+
     if (status) query.status = status;
     if (priority) query.priority = priority;
     if (team) query.team = team;
-    
+
     // Check user role
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const user = await User.findById(req.user.id);
     if (user?.role === 'member') {
       // Members can only see projects they're part of
@@ -72,15 +79,15 @@ export const getProjects = async (req: Request, res: Response) => {
         { manager: user._id }
       ];
     }
-    
+
     const sort: any = {};
     sort[sortBy as string] = sortOrder === 'asc' ? 1 : -1;
-    
+
     const projects = await Project.find(query)
       .populate('manager', 'name email avatar')
       .populate('team', 'name')
       .sort(sort);
-      
+
     res.json(projects);
   } catch (error: any) {
     console.error('Error fetching projects:', error);
@@ -88,25 +95,28 @@ export const getProjects = async (req: Request, res: Response) => {
   }
 };
 
-export const getProjectById = async (req: Request, res: Response) => {
+export const getProjectById = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const project = await Project.findById(req.params.id)
       .populate('manager', 'name email avatar')
       .populate('team', 'name members')
       .populate('team.members', 'name email avatar');
-      
+
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    
+
     // Check if user has access to this project
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const user = await User.findById(req.user.id);
-    if (user?.role === 'member' && 
-        !user.teams.includes(project.team._id) && 
-        project.manager._id.toString() !== req.user.id) {
+    if (user?.role === 'member' &&
+      !user.teams.includes(project.team._id) &&
+      project.manager._id.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
-    
+
     res.json(project);
   } catch (error: any) {
     console.error('Error fetching project:', error);
@@ -114,26 +124,29 @@ export const getProjectById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProject = async (req: Request, res: Response) => {
+export const updateProject = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    
+
     const { name, description, status, priority, progress, team, budget, client, tags } = req.body;
-    
+
     let project = await Project.findById(req.params.id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    
+
     // Check if user is authorized to update this project
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const user = await User.findById(req.user.id);
     if (user?.role !== 'admin' && project.manager.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to update this project' });
     }
-    
+
     // Update project fields
     project.name = name || project.name;
     project.description = description || project.description;
@@ -143,24 +156,24 @@ export const updateProject = async (req: Request, res: Response) => {
     if (budget !== undefined) project.budget = budget;
     if (client !== undefined) project.client = client;
     if (tags) project.tags = tags;
-    
+
     // Handle team change
     if (team && team !== project.team.toString()) {
       // Remove project from old team
       await Team.findByIdAndUpdate(project.team, {
         $pull: { projects: project._id }
       });
-      
+
       // Add project to new team
       await Team.findByIdAndUpdate(team, {
         $addToSet: { projects: project._id }
       });
-      
+
       project.team = team;
     }
-    
+
     await project.save();
-    
+
     res.json(project);
   } catch (error: any) {
     console.error('Error updating project:', error);
@@ -168,28 +181,31 @@ export const updateProject = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProject = async (req: Request, res: Response) => {
+export const deleteProject = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const project = await Project.findById(req.params.id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    
+
     // Check if user is authorized to delete this project
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const user = await User.findById(req.user.id);
     if (user?.role !== 'admin' && project.manager.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to delete this project' });
     }
-    
+
     // Remove project from team's projects array
     await Team.findByIdAndUpdate(project.team, {
       $pull: { projects: project._id }
     });
-    
+
     // TODO: Delete associated tasks, milestones, etc.
-    
+
     await project.remove();
-    
+
     res.json({ message: 'Project deleted successfully' });
   } catch (error: any) {
     console.error('Error deleting project:', error);
@@ -225,7 +241,7 @@ export const getProjectStats = async (req: Request, res: Response) => {
         }
       }
     ]);
-    
+
     res.json(stats);
   } catch (error: any) {
     console.error('Error fetching project stats:', error);

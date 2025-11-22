@@ -57,7 +57,7 @@ const LandingPage: React.FC = () => {
               <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">Trusted by 10,000+ teams worldwide</span>
             </div>
-            <h1 className={`text-5xl md:text-7xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6 animate-fade-in-up`}>
+            <h1 className={`text-4xl md:text-7xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6 animate-fade-in-up`}>
               Project Management
               <span className="block text-accent mt-2">
                 Made Simple
@@ -81,12 +81,12 @@ const LandingPage: React.FC = () => {
                 Learn More
               </Link>
             </div>
-            
+
             {/* Hero Mockup/Screenshot */}
             <div className="mt-16 mb-8 animate-fade-in-up animation-delay-600">
               <div className="relative max-w-5xl mx-auto">
                 {/* Floating Dashboard Mockup */}
-                <div 
+                <div
                   className={`relative rounded-2xl overflow-hidden shadow-2xl border-4 ${isDarkMode ? 'border-gray-700' : 'border-white'} animate-float`}
                   style={{ transform: `translateY(${scrollY * 0.1}px)` }}
                 >
@@ -101,7 +101,7 @@ const LandingPage: React.FC = () => {
                       Sartthi Dashboard
                     </div>
                   </div>
-                  
+
                   {/* Mockup Content - Gradient Placeholder */}
                   <div className={`relative h-96 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'} p-8`}>
                     {/* Simulated Dashboard Elements */}
@@ -140,7 +140,7 @@ const LandingPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Simulated Chart/Graph */}
                     <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                       <div className="flex items-center justify-between mb-4">
@@ -153,7 +153,7 @@ const LandingPage: React.FC = () => {
                         ))}
                       </div>
                     </div>
-                    
+
                     {/* Floating Play Button */}
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <button className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm shadow-2xl flex items-center justify-center hover:scale-110 transition-transform duration-300 animate-bounce-subtle">
@@ -162,7 +162,7 @@ const LandingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Floating Elements Around Mockup */}
                 <div className="absolute -top-8 -left-8 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl shadow-xl animate-float animation-delay-300 opacity-80"></div>
                 <div className="absolute -bottom-8 -right-8 w-20 h-20 bg-accent rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
@@ -193,7 +193,7 @@ const LandingPage: React.FC = () => {
             <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-accent/20 text-accent' : 'bg-amber-100 text-amber-700'} text-sm font-semibold mb-4`}>
               FEATURES
             </span>
-            <h2 className={`text-4xl md:text-5xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
+            <h2 className={`text-3xl md:text-5xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
               Everything you need to manage projects
             </h2>
             <p className={`text-xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} max-w-2xl mx-auto`}>
@@ -240,35 +240,39 @@ const LandingPage: React.FC = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="relative bg-accent py-24 overflow-hidden">
-          {/* Decorative Elements */}
-          <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to get started?
-            </h2>
-            <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
-              Join thousands of teams already using Sartthi to manage their projects efficiently.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/register"
-                className="group bg-white text-orange-600 px-10 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-2xl hover:scale-105 transform"
-              >
-                Start Your Free Trial
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/about"
-                className="border-2 border-white text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-xl hover:scale-105 transform"
-              >
-                Learn More About Us
-              </Link>
+        <div className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto relative">
+            <div className="relative bg-accent rounded-3xl overflow-hidden py-16 px-8 md:px-16 text-center shadow-2xl">
+              {/* Decorative Elements */}
+              <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+
+              <div className="relative z-10">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+                  Ready to get started?
+                </h2>
+                <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
+                  Join thousands of teams already using Sartthi to manage their projects efficiently.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    to="/register"
+                    className="group bg-white text-orange-600 px-10 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-2xl hover:scale-105 transform"
+                  >
+                    Start Your Free Trial
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link
+                    to="/about"
+                    className="border-2 border-white text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-xl hover:scale-105 transform"
+                  >
+                    Learn More About Us
+                  </Link>
+                </div>
+                <p className="text-white/80 text-sm mt-6">No credit card required • 14-day free trial • Cancel anytime</p>
+              </div>
             </div>
-            <p className="text-white/80 text-sm mt-6">No credit card required • 14-day free trial • Cancel anytime</p>
           </div>
         </div>
       </div>
