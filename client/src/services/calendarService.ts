@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 export interface CalendarEvent {
     date: string;
@@ -10,7 +10,7 @@ export interface CalendarEvent {
 
 export const getCalendarEvents = async (month: string): Promise<CalendarEvent[]> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/api/calendar/events`, {
+        const response = await axios.get(`${API_BASE_URL}/calendar/events`, {
             params: { month },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`

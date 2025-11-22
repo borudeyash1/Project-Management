@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 export interface ReportsSummary {
     tasksCompletedThisWeek: number;
@@ -14,7 +14,7 @@ export interface ReportsSummary {
 
 export const getReportsSummary = async (): Promise<ReportsSummary> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/api/reports/summary`, {
+        const response = await axios.get(`${API_BASE_URL}/reports/summary`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }

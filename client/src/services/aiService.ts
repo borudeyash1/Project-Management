@@ -20,13 +20,13 @@ class AIService {
   private defaultTimeout = 30000; // 30 seconds
 
   constructor() {
-    // Use REACT_APP_API_URL if provided, otherwise default to local backend
+    // Use REACT_APP_API_URL if provided, otherwise default to /api for production
     const envBase = process.env.REACT_APP_API_URL;
     // Remove trailing /api if present since we'll add full paths
     const cleanBase =
       envBase && envBase.trim().length > 0
         ? envBase.replace(/\/api\/?$/, "")
-        : "http://localhost:5000";
+        : "";
     this.baseURL = cleanBase;
   }
 
