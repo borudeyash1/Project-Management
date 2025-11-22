@@ -89,14 +89,9 @@ const SharedNavbar: React.FC = () => {
     if (release.downloadUrl.startsWith('http')) {
       window.open(release.downloadUrl, '_blank');
     } else {
-      let baseUrl = process.env.REACT_APP_API_URL;
-      if (!baseUrl) {
-        if (process.env.NODE_ENV === 'production') {
-          baseUrl = '';
-        } else {
-          baseUrl = 'http://localhost:5000';
-        }
-      }
+      let baseUrl = process.env.REACT_APP_API_URL || '/api';
+      // Remove /api suffix if present
+      baseUrl = baseUrl.replace(/\/api\/?$/, '');
       baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
       window.open(`${baseUrl}${release.downloadUrl}`, '_blank');
     }
