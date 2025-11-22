@@ -1,0 +1,47 @@
+diff --git a/client/src/components/ProjectViewDetailed.tsx b/client/src/components/ProjectViewDetailed.tsx
+index 1234567..abcdefg 100644
+--- a/client/src/components/ProjectViewDetailed.tsx
++++ b/client/src/components/ProjectViewDetailed.tsx
+@@ -235,13 +235,13 @@ const ProjectViewDetailed: React.FC = () => {
+   const [requests, setRequests] = useState<any[]>([]); // Workload/deadline requests
+   const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment (loaded from backend)
+ 
+-  // Map global test role from AppContext into the local role flags used in this component
+-  const currentUserRole = state.roles.currentUserRole === 'project-manager' ? 'manager' : state.roles.currentUserRole; // 'owner' | 'manager' | 'employee'
+-  const currentTestUserId =
+-    state.roles.currentUserRole === 'owner'
+-      ? 'user_owner_123'
+-      : state.roles.currentUserRole === 'project-manager'
+-      ? 'user_pm_456'
+-      : 'user_emp_789';
++  // Derive role from actual workspace and project membership
++  const project = state.projects.find(p => p._id === projectId);
++  const workspace = state.workspaces.find(w => w._id === project?.workspace);
++  const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
++  const isProjectManager = project?.teamMembers?.some(
++    (m: any) => m.user === state.userProfile._id && (m.role === 'project-manager' || m.permissions?.canManageProject)
++  ) || false;
++  const currentUserRole = isWorkspaceOwner ? 'owner' : isProjectManager ? 'manager' : 'employee';
++  const currentTestUserId = state.userProfile._id;
+ 
+   // Detect active view from URL path
+@@ -695,9 +695,9 @@ const ProjectViewDetailed: React.FC = () => {
+   };
+ 
+   const handleRoleChange = (role: 'owner' | 'project-manager' | 'employee') => {
+-    // Drive the global test role in AppContext
+-    dispatch({ type: 'SET_CURRENT_USER_ROLE', payload: role });
++    // Role switching is deprecated - roles are now derived from actual membership
++    console.warn('[ProjectViewDetailed] handleRoleChange is deprecated. Roles are now derived from workspace/project membership.');
+   };
+ 
+   const handleUserChange = (userId: string, userName: string, role: string) => {
+@@ -2025,7 +2025,7 @@ const ProjectViewDetailed: React.FC = () => {
+           <ProjectRequestsTab
+             projectId={activeProject?._id || ''}
+             currentUserId={currentTestUserId}
+-            isProjectManager={state.roles.currentUserRole === 'owner' || state.roles.currentUserRole === 'project-manager'}
++            isProjectManager={isProjectManager || isWorkspaceOwner}
+             requests={requests}
+             tasks={projectTasks}
+             onCreateRequest={handleCreateRequest}

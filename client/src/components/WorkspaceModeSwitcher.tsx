@@ -158,8 +158,8 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                 </button>
                 <button
                   onClick={() => {
-                    // Navigate to workspace discovery
-                    window.location.href = '/workspace';
+                    // Navigate to workspace discovery using React Router
+                    navigate('/workspace');
                     setIsOpen(false);
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 transition-colors"

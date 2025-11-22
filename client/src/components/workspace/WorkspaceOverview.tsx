@@ -44,7 +44,7 @@ const WorkspaceOverview: React.FC = () => {
     }
   }, [state]);
 
-  const isOwner = currentWorkspace?.owner === state.userProfile._id || state.roles.currentUserRole === 'owner';
+  const isOwner = currentWorkspace?.owner === state.userProfile._id;
 
   // Calculate stats
   const activeProjects = workspaceProjects.filter(p => p.status === 'active').length;
