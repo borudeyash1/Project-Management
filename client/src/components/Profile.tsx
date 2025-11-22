@@ -452,7 +452,7 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{profileData?.fullName}</h2>
-          <p className="text-gray-600 dark:text-gray-700">{profileData?.designation} • {profileData?.department}</p>
+          <p className="text-gray-600 dark:text-gray-300">{profileData?.designation} • {profileData?.department}</p>
           <p className="text-sm text-gray-600 dark:text-gray-200">Member since {new Date(profileData?.joinDate || '').toLocaleDateString()}</p>
         </div>
       </div>
@@ -460,7 +460,7 @@ const Profile: React.FC = () => {
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
               <User className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
@@ -479,7 +479,7 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
@@ -503,7 +503,7 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
@@ -524,7 +524,7 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
               <Building className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
@@ -543,7 +543,7 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
@@ -562,7 +562,7 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
               <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
@@ -584,7 +584,7 @@ const Profile: React.FC = () => {
       </div>
 
       {/* About Section */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-medium text-gray-900 dark:text-gray-100">About</h3>
           <button
@@ -597,11 +597,11 @@ const Profile: React.FC = () => {
             <Edit className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-gray-700 dark:text-gray-700">{profileData?.about}</p>
+        <p className="text-gray-700 dark:text-gray-300">{profileData?.about}</p>
       </div>
 
       {/* Security Section */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Security</h3>
         <button
           onClick={() => setShowPasswordForm(true)}
@@ -627,7 +627,7 @@ const Profile: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Theme Preferences */}
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Theme</h3>
           <div className="flex gap-3">
             {['light', 'dark', 'system'].map((theme) => (
@@ -661,7 +661,7 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Notification Preferences */}
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Notifications</h3>
           <div className="space-y-3">
             {Object.entries(notifications).map(([key, value]) => (
@@ -706,11 +706,11 @@ const Profile: React.FC = () => {
       </div>
 
         {/* Privacy Preferences */}
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Privacy</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Profile Visibility</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profile Visibility</label>
               <select
                 value={privacy.profileVisibility}
                 onChange={(e) => {
@@ -796,7 +796,7 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profileData?.addresses.map((address) => (
-          <div key={address.id} className="p-4 bg-gray-50 rounded-lg">
+          <div key={address.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-200" />
@@ -809,7 +809,7 @@ const Profile: React.FC = () => {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-700">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
               <p>{address.street}</p>
               <p>{address.city}, {address.state} {address.zipCode}</p>
               <p>{address.country}</p>
@@ -835,7 +835,7 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profileData?.paymentMethods.map((payment) => (
-          <div key={payment.id} className="p-4 bg-gray-50 rounded-lg">
+          <div key={payment.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-200" />
@@ -848,7 +848,7 @@ const Profile: React.FC = () => {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-700">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
               <p>Expires {payment.expiryMonth}/{payment.expiryYear}</p>
             </div>
           </div>
@@ -889,7 +889,7 @@ const Profile: React.FC = () => {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Activity Statistics</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(profileData?.activityStats || {}).map(([key, value]) => (
-          <div key={key} className="p-4 bg-gray-50 rounded-lg">
+          <div key={key} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
                 {key.includes('Tasks') && <Target className="w-5 h-5 text-accent-dark" />}
