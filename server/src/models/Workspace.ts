@@ -39,23 +39,31 @@ const workspaceSchema = new Schema<IWorkspace>({
       default: 'member'
     },
     permissions: {
-      canCreateProject: {
+      canManageMembers: {
         type: Boolean,
         default: false
       },
-      canManageEmployees: {
+      canManageProjects: {
         type: Boolean,
         default: false
       },
-      canViewPayroll: {
+      canManageClients: {
         type: Boolean,
         default: false
       },
-      canExportReports: {
+      canUpdateWorkspaceDetails: {
         type: Boolean,
         default: false
       },
-      canManageWorkspace: {
+      canManageCollaborators: {
+        type: Boolean,
+        default: false
+      },
+      canManageInternalProjectSettings: {
+        type: Boolean,
+        default: false
+      },
+      canAccessProjectManagerTabs: {
         type: Boolean,
         default: false
       }

@@ -1,193 +1,221 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
-import {
-  UserPlus,
-  Mail,
-  Shield,
-  Eye,
-  Edit,
-  Trash2,
-  Settings,
-  Search,
-  MoreVertical,
-  Check,
-  X,
-  Clock,
-  AlertCircle
-} from 'lucide-react';
+import { UserPlus, Users, User, Trash2, X, Mail, Shield } from 'lucide-react';
+import api from '../../services/api';
 
-interface Collaborator {
+interface WorkspaceMember {
   _id: string;
-  email: string;
-  name?: string;
-  privilege: 'view-only' | 'edit' | 'comment' | 'admin';
-  status: 'pending' | 'active' | 'inactive';
-  invitedBy: string;
-  invitedAt: Date;
-  lastActive?: Date;
+  user: {
+    _id: string;
+    fullName: string;
+    email: string;
+    username?: string;
+    avatarUrl?: string;
+  };
+  role: 'owner' | 'admin' | 'manager' | 'member';
+  permissions: {
+    canManageMembers: boolean;
+    canManageProjects: boolean;
+    canManageClients: boolean;
+    canUpdateWorkspaceDetails: boolean;
+    canManageCollaborators: boolean;
+    canManageInternalProjectSettings: boolean;
+    canAccessProjectManagerTabs: boolean;
+  };
+  status: 'active' | 'pending' | 'suspended';
+  joinedAt: Date;
 }
 
 const WorkspaceCollaborate: React.FC = () => {
   const { state, dispatch } = useApp();
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [selectedPrivilege, setSelectedPrivilege] = useState<'view-only' | 'edit' | 'comment' | 'admin'>('view-only');
-  const [inviteMessage, setInviteMessage] = useState('');
+  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'manager' | 'custom'>('manager');
+  const [isLoading, setIsLoading] = useState(false);
+  const [permissions, setPermissions] = useState({
+    canManageMembers: false,
+    canManageProjects: false,
+    canManageClients: false,
+    canUpdateWorkspaceDetails: false,
+    canManageCollaborators: false,
+    canManageInternalProjectSettings: false,
+    canAccessProjectManagerTabs: false
+  });
 
-  const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
-  const isOwner = currentWorkspace?.owner === state.userProfile._id;
-
-  // Mock collaborators data
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([
-    {
-      _id: '1',
-      email: 'john.doe@example.com',
-      name: 'John Doe',
-      privilege: 'edit',
-      status: 'active',
-      invitedBy: state.userProfile._id,
-      invitedAt: new Date('2024-01-15'),
-      lastActive: new Date('2024-03-20')
-    },
-    {
-      _id: '2',
-      email: 'jane.smith@example.com',
-      name: 'Jane Smith',
-      privilege: 'view-only',
-      status: 'active',
-      invitedBy: state.userProfile._id,
-      invitedAt: new Date('2024-02-10'),
-      lastActive: new Date('2024-03-19')
-    },
-    {
-      _id: '3',
-      email: 'bob.wilson@example.com',
-      privilege: 'comment',
-      status: 'pending',
-      invitedBy: state.userProfile._id,
-      invitedAt: new Date('2024-03-18')
-    }
-  ]);
-
-  const privileges = [
-    {
-      value: 'view-only',
-      label: 'View Only',
-      description: 'Can view all workspace content but cannot make changes',
-      icon: Eye,
-      permissions: ['View projects', 'View tasks', 'View documents', 'View team members']
-    },
-    {
-      value: 'comment',
-      label: 'Comment',
-      description: 'Can view and add comments but cannot edit',
-      icon: Mail,
-      permissions: ['All View permissions', 'Add comments', 'Reply to discussions']
-    },
-    {
-      value: 'edit',
-      label: 'Edit',
-      description: 'Can view, comment, and edit content',
-      icon: Edit,
-      permissions: ['All Comment permissions', 'Edit tasks', 'Edit documents', 'Create tasks']
-    },
-    {
-      value: 'admin',
-      label: 'Admin',
-      description: 'Full access except workspace deletion',
-      icon: Shield,
-      permissions: ['All Edit permissions', 'Manage team', 'Manage settings', 'Invite collaborators']
-    }
-  ];
-
-  const filteredCollaborators = collaborators.filter(collab =>
-    collab.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    collab.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const workspace = useMemo(
+    () => state.workspaces.find((w) => w._id === state.currentWorkspace),
+    [state.workspaces, state.currentWorkspace]
   );
 
-  const handleInviteCollaborator = () => {
-    if (!inviteEmail.trim()) {
-      alert('Please enter an email address');
-      return;
+  const currentWorkspaceId = state.currentWorkspace;
+
+  // Load workspace members
+  useEffect(() => {
+    if (currentWorkspaceId) {
+      loadMembers();
     }
+  }, [currentWorkspaceId]);
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(inviteEmail)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-
-    // Check if already invited
-    if (collaborators.some(c => c.email === inviteEmail)) {
-      alert('This email has already been invited');
-      return;
-    }
-
-    const newCollaborator: Collaborator = {
-      _id: Date.now().toString(),
-      email: inviteEmail,
-      privilege: selectedPrivilege,
-      status: 'pending',
-      invitedBy: state.userProfile._id,
-      invitedAt: new Date()
-    };
-
-    setCollaborators([...collaborators, newCollaborator]);
+  const loadMembers = async () => {
+    if (!currentWorkspaceId) return;
     
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        type: 'success',
-        message: `Invitation sent to ${inviteEmail} with ${selectedPrivilege} access`
+    try {
+      setIsLoading(true);
+      const response = await api.get(`/workspaces/${currentWorkspaceId}`);
+      if (response.data && response.data.members) {
+        setMembers(response.data.members);
       }
-    });
-
-    // Reset form
-    setInviteEmail('');
-    setSelectedPrivilege('view-only');
-    setInviteMessage('');
-    setShowInviteModal(false);
+    } catch (error) {
+      console.error('Failed to load members:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRemoveCollaborator = (collaboratorId: string) => {
-    if (window.confirm('Are you sure you want to remove this collaborator?')) {
-      setCollaborators(collaborators.filter(c => c._id !== collaboratorId));
+  // Get collaborators (admin/manager roles)
+  const collaborators = members.filter(m => 
+    m.role === 'admin' || m.role === 'manager'
+  );
+
+  // Get regular members who can be promoted
+  const promotableMembers = members.filter(m => 
+    m.role === 'member' && m.status === 'active'
+  );
+
+  // Update permissions based on role
+  useEffect(() => {
+    if (selectedRole === 'admin') {
+      // Administrator - Full permissions
+      setPermissions({
+        canManageMembers: true,
+        canManageProjects: true,
+        canManageClients: true,
+        canUpdateWorkspaceDetails: true,
+        canManageCollaborators: true,
+        canManageInternalProjectSettings: true,
+        canAccessProjectManagerTabs: true
+      });
+    } else if (selectedRole === 'manager') {
+      // Manager - Limited permissions
+      setPermissions({
+        canManageMembers: false,
+        canManageProjects: true,
+        canManageClients: true,
+        canUpdateWorkspaceDetails: false,
+        canManageCollaborators: false,
+        canManageInternalProjectSettings: true,
+        canAccessProjectManagerTabs: true
+      });
+    }
+    // For 'custom' role, don't change permissions - let user select manually
+  }, [selectedRole]);
+
+  const handlePromoteToCollaborator = async () => {
+    if (!selectedMemberId) {
       dispatch({
         type: 'ADD_TOAST',
         payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Please select a member to promote',
+          duration: 3000
+        }
+      });
+      return;
+    }
+
+    if (!currentWorkspaceId) return;
+
+    try {
+      await api.put(
+        `/workspaces/${currentWorkspaceId}/members/${selectedMemberId}/role`,
+        { 
+          role: selectedRole,
+          permissions: permissions
+        }
+      );
+
+      await loadMembers();
+      
+      setShowAddModal(false);
+      setSelectedMemberId('');
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
           type: 'success',
-          message: 'Collaborator removed successfully'
+          message: 'Member promoted to collaborator successfully!',
+          duration: 3000
+        }
+      });
+    } catch (error: any) {
+      console.error('Failed to promote member:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to promote member',
+          duration: 3000
         }
       });
     }
   };
 
-  const getPrivilegeColor = (privilege: string) => {
-    switch (privilege) {
-      case 'admin': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-600';
-      case 'edit': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light';
-      case 'comment': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-600';
-      case 'view-only': return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200';
-      default: return 'bg-gray-100 text-gray-700';
+  const handleDemoteCollaborator = async (memberId: string, memberName: string) => {
+    if (!window.confirm(`Remove ${memberName}'s collaborator role? They will become a regular member.`)) {
+      return;
+    }
+
+    if (!currentWorkspaceId) return;
+
+    try {
+      await api.put(
+        `/workspaces/${currentWorkspaceId}/members/${memberId}/role`,
+        { role: 'member' }
+      );
+
+      await loadMembers();
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Collaborator demoted to member',
+          duration: 3000
+        }
+      });
+    } catch (error: any) {
+      console.error('Failed to demote collaborator:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to demote collaborator',
+          duration: 3000
+        }
+      });
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600';
-      case 'pending': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-600';
-      case 'inactive': return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200';
-      default: return 'bg-gray-100 text-gray-700';
-    }
+  const getUserDisplay = (member: WorkspaceMember) => {
+    const user = member.user;
+    if (typeof user === 'string') return { name: user, email: '' };
+    return {
+      name: user.fullName || user.username || user.email || 'Unknown',
+      email: user.email || ''
+    };
   };
 
   const stats = [
     { label: 'Total Collaborators', value: collaborators.length, color: 'text-accent-dark' },
     { label: 'Active', value: collaborators.filter(c => c.status === 'active').length, color: 'text-green-600' },
     { label: 'Pending', value: collaborators.filter(c => c.status === 'pending').length, color: 'text-yellow-600' },
-    { label: 'Admins', value: collaborators.filter(c => c.privilege === 'admin').length, color: 'text-red-600' }
+    { label: 'Admins', value: collaborators.filter(c => c.role === 'admin').length, color: 'text-red-600' }
   ];
 
   return (
@@ -197,18 +225,17 @@ const WorkspaceCollaborate: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Collaborators</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            Invite external collaborators to your workspace
+            Promote workspace members to collaborators with admin or manager permissions
           </p>
         </div>
-        {isOwner && (
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-          >
-            <UserPlus className="w-4 h-4" />
-            Invite Collaborator
-          </button>
-        )}
+        <button
+          onClick={() => setShowAddModal(true)}
+          disabled={promotableMembers.length === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <UserPlus className="w-4 h-4" />
+          Invite Collaborator
+        </button>
       </div>
 
       {/* Stats */}
@@ -219,18 +246,6 @@ const WorkspaceCollaborate: React.FC = () => {
             <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
           </div>
         ))}
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
-        <input
-          type="text"
-          placeholder="Search collaborators..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-        />
       </div>
 
       {/* Collaborators List */}
@@ -254,224 +269,235 @@ const WorkspaceCollaborate: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   Last Active
                 </th>
-                {isOwner && (
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Actions
-                  </th>
-                )}
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredCollaborators.map((collaborator) => (
-                <tr key={collaborator._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                        <span className="text-accent-dark dark:text-accent-light font-medium">
-                          {collaborator.name ? collaborator.name.charAt(0).toUpperCase() : collaborator.email.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {collaborator.name || 'Pending'}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-200">
-                          {collaborator.email}
-                        </div>
-                      </div>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-600 dark:text-gray-300">
+                    Loading collaborators...
+                  </td>
+                </tr>
+              ) : collaborators.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12">
+                    <div className="text-center">
+                      <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                        No collaborators yet
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        Promote workspace members to help manage this workspace
+                      </p>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPrivilegeColor(collaborator.privilege)}`}>
-                      {collaborator.privilege}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(collaborator.status)}`}>
-                      {collaborator.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-200">
-                    {collaborator.invitedAt.toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-200">
-                    {collaborator.lastActive ? collaborator.lastActive.toLocaleDateString() : '-'}
-                  </td>
-                  {isOwner && (
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleRemoveCollaborator(collaborator._id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-600 dark:hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  )}
                 </tr>
-              ))}
+              ) : (
+                collaborators.map((collab) => {
+                  const { name, email } = getUserDisplay(collab);
+                  const isOwner = workspace?.owner === (typeof collab.user === 'string' ? collab.user : collab.user._id);
+                  
+                  return (
+                    <tr key={collab._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            collab.role === 'admin' ? 'bg-purple-100 dark:bg-purple-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
+                          }`}>
+                            <User className={`w-5 h-5 ${
+                              collab.role === 'admin' ? 'text-purple-600' : 'text-blue-600'
+                            }`} />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {name}
+                            </div>
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                              {email}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          collab.role === 'admin'
+                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                            : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                        }`}>
+                          {collab.role === 'admin' ? 'admin' : 'view-only'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          collab.status === 'active'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : collab.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+                        }`}>
+                          {collab.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                        {new Date(collab.joinedAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                        {new Date(collab.joinedAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        {!isOwner && (
+                          <button
+                            onClick={() => handleDemoteCollaborator(collab._id, name)}
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                            title="Remove collaborator role"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Empty State */}
-      {filteredCollaborators.length === 0 && (
-        <div className="text-center py-12">
-          <UserPlus className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-            No collaborators found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
-            {searchQuery ? 'Try adjusting your search' : 'Get started by inviting your first collaborator'}
-          </p>
-          {isOwner && !searchQuery && (
-            <button
-              onClick={() => setShowInviteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-            >
-              <UserPlus className="w-4 h-4" />
-              Invite Collaborator
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Invite Modal */}
-      {showInviteModal && (
+      {/* Add Collaborator Modal */}
+      {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            {/* Header */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full">
             <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600">
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                  Invite Collaborator
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                  Invite someone to collaborate on your workspace
-                </p>
-              </div>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                Promote to Collaborator
+              </h2>
               <button
-                onClick={() => setShowInviteModal(false)}
+                onClick={() => {
+                  setShowAddModal(false);
+                  setSelectedMemberId('');
+                }}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
-                <X className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+                <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
             </div>
+            
+            <div className="p-6 space-y-4">
+              {/* Member Selection Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Select Workspace Member
+                </label>
+                <select
+                  value={selectedMemberId}
+                  onChange={(e) => setSelectedMemberId(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                >
+                  <option value="">Choose a member to promote...</option>
+                  {promotableMembers.map((member) => {
+                    const { name, email } = getUserDisplay(member);
+                    return (
+                      <option key={member._id} value={member._id}>
+                        {name} ({email})
+                      </option>
+                    );
+                  })}
+                </select>
+                {promotableMembers.length === 0 && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    No members available to promote
+                  </p>
+                )}
+              </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-6">
-                {/* Email Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                    <Mail className="w-4 h-4 inline mr-2" />
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="collaborator@example.com"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent"
-                  />
-                </div>
+              {/* Role Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Collaborator Role
+                </label>
+                <select
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value as 'admin' | 'manager' | 'custom')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                >
+                  <option value="manager">Manager - Limited permissions</option>
+                  <option value="admin">Administrator - Full permissions</option>
+                  <option value="custom">Custom - Select your own permissions</option>
+                </select>
+              </div>
 
-                {/* Privilege Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-3">
-                    <Shield className="w-4 h-4 inline mr-2" />
-                    Access Privilege *
-                  </label>
-                  <div className="space-y-3">
-                    {privileges.map((privilege) => {
-                      const Icon = privilege.icon;
+              {/* Permissions Preview/Selection */}
+              <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {selectedRole === 'custom' ? 'Select Permissions:' : 'Permissions:'}
+                </p>
+                <div className="space-y-2 text-xs text-gray-600 dark:text-gray-300">
+                  {Object.entries(permissions).map(([key, value]) => {
+                    const labels: Record<string, string> = {
+                      canManageMembers: 'Manage Members',
+                      canManageProjects: 'Manage Projects',
+                      canManageClients: 'Manage Clients',
+                      canUpdateWorkspaceDetails: 'Update Workspace Details',
+                      canManageCollaborators: 'Manage Collaborators',
+                      canManageInternalProjectSettings: 'Manage Internal Project Settings',
+                      canAccessProjectManagerTabs: 'Access Project Manager Tabs'
+                    };
+                    
+                    if (selectedRole === 'custom') {
+                      // Interactive checkboxes for custom role
                       return (
-                        <label
-                          key={privilege.value}
-                          className={`flex items-start gap-3 p-4 rounded-lg cursor-pointer transition-colors border-2 ${
-                            selectedPrivilege === privilege.value
-                              ? 'border-accent bg-blue-50 dark:bg-blue-900/30'
-                              : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                          }`}
-                        >
+                        <label key={key} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 p-1 rounded">
                           <input
-                            type="radio"
-                            name="privilege"
-                            value={privilege.value}
-                            checked={selectedPrivilege === privilege.value}
-                            onChange={(e) => setSelectedPrivilege(e.target.value as any)}
-                            className="mt-1"
+                            type="checkbox"
+                            checked={value}
+                            onChange={(e) => setPermissions({
+                              ...permissions,
+                              [key]: e.target.checked
+                            })}
+                            className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent"
                           />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Icon className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-                              <span className="font-medium text-gray-900 dark:text-gray-100">
-                                {privilege.label}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                              {privilege.description}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {privilege.permissions.map((perm, idx) => (
-                                <span
-                                  key={idx}
-                                  className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
-                                >
-                                  <Check className="w-3 h-3 inline mr-1" />
-                                  {perm}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
+                          <span>{labels[key] || key}</span>
                         </label>
                       );
-                    })}
-                  </div>
-                </div>
-
-                {/* Optional Message */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                    Personal Message (Optional)
-                  </label>
-                  <textarea
-                    value={inviteMessage}
-                    onChange={(e) => setInviteMessage(e.target.value)}
-                    placeholder="Add a personal message to the invitation..."
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent"
-                  />
-                </div>
-
-                {/* Info Alert */}
-                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-accent-dark dark:text-accent-light mt-0.5" />
-                  <div className="text-sm text-blue-800 dark:text-blue-700">
-                    <p className="font-medium mb-1">About Collaborators</p>
-                    <p>
-                      Collaborators are external users who can access your workspace with specific permissions.
-                      They will receive an email invitation to join.
-                    </p>
-                  </div>
+                    } else {
+                      // Read-only display for admin/manager
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded flex items-center justify-center ${
+                            value ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-200 dark:bg-gray-600'
+                          }`}>
+                            {value && <span className="text-green-600 dark:text-green-400 font-bold text-xs">✓</span>}
+                          </div>
+                          <span>{labels[key] || key}</span>
+                        </div>
+                      );
+                    }
+                  })}
                 </div>
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-300 dark:border-gray-600">
               <button
-                onClick={() => setShowInviteModal(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-700 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+                onClick={() => {
+                  setShowAddModal(false);
+                  setSelectedMemberId('');
+                }}
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
-                onClick={handleInviteCollaborator}
-                className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+                onClick={handlePromoteToCollaborator}
+                disabled={!selectedMemberId}
+                className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <UserPlus className="w-4 h-4" />
-                Send Invitation
+                Promote Member
               </button>
             </div>
           </div>
