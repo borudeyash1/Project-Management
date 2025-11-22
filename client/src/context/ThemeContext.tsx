@@ -1,9 +1,31 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import apiService from '../services/api';
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  accentColor: string;
+  fontSize: 'small' | 'medium' | 'large';
+  density: 'compact' | 'comfortable' | 'spacious';
+  animations: boolean;
+  reducedMotion: boolean;
+}
 
 interface ThemeContextType {
   isDarkMode: boolean;
+  preferences: UserPreferences;
   toggleTheme: () => void;
+  updatePreferences: (prefs: Partial<UserPreferences>) => Promise<void>;
+  applyTheme: (theme: 'light' | 'dark' | 'system') => void;
 }
+
+const defaultPreferences: UserPreferences = {
+  theme: 'system',
+  accentColor: '#FBBF24',
+  fontSize: 'medium',
+  density: 'comfortable',
+  animations: true,
+  reducedMotion: false
+};
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
@@ -20,29 +42,217 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage for saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme === 'dark';
-  });
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const toggleTheme = () => {
-    const newTheme = !isDarkMode;
-    setIsDarkMode(newTheme);
-    // Save theme preference immediately
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-    // Refresh page to apply theme properly and avoid flash issues
-    window.location.reload();
+  // Check if user is authenticated
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  // Fetch preferences from API if authenticated
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      if (!isAuthenticated) {
+        // Load from localStorage for non-authenticated users
+        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+        const savedPrefs = localStorage.getItem('preferences');
+        
+        if (savedPrefs) {
+          try {
+            const parsed = JSON.parse(savedPrefs);
+            setPreferences(parsed);
+            applyAllSettings(parsed);
+          } catch (e) {
+            console.error('Failed to parse saved preferences:', e);
+          }
+        } else if (savedTheme) {
+          const prefs = { ...defaultPreferences, theme: savedTheme };
+          setPreferences(prefs);
+          applyAllSettings(prefs);
+        }
+        return;
+      }
+
+      try {
+        const response = await apiService.get<UserPreferences>('/users/preferences');
+        if (response.success && response.data) {
+          setPreferences(response.data);
+          applyAllSettings(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch preferences:', error);
+        // Fallback to localStorage
+        const savedPrefs = localStorage.getItem('preferences');
+        if (savedPrefs) {
+          try {
+            const parsed = JSON.parse(savedPrefs);
+            setPreferences(parsed);
+            applyAllSettings(parsed);
+          } catch (e) {
+            console.error('Failed to parse saved preferences:', e);
+          }
+        }
+      }
+    };
+
+    fetchPreferences();
+  }, [isAuthenticated]);
+
+  // Apply all theme settings
+  const applyAllSettings = (prefs: UserPreferences) => {
+    applyThemeMode(prefs.theme);
+    applyAccentColor(prefs.accentColor);
+    applyFontSize(prefs.fontSize);
+    applyDensity(prefs.density);
+    applyAnimations(prefs.animations, prefs.reducedMotion);
   };
 
+  // Apply theme mode (light/dark/system)
+  const applyThemeMode = (theme: 'light' | 'dark' | 'system') => {
+    let shouldBeDark = false;
+
+    if (theme === 'system') {
+      shouldBeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+      shouldBeDark = theme === 'dark';
+    }
+
+    setIsDarkMode(shouldBeDark);
+    
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  // Apply accent color
+  const applyAccentColor = (color: string) => {
+    document.documentElement.style.setProperty('--accent-color', color);
+    document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(color));
+  };
+
+  // Apply font size
+  const applyFontSize = (size: 'small' | 'medium' | 'large') => {
+    const sizes = {
+      small: '14px',
+      medium: '16px',
+      large: '18px'
+    };
+    document.documentElement.style.setProperty('--base-font-size', sizes[size]);
+    document.documentElement.setAttribute('data-font-size', size);
+  };
+
+  // Apply density
+  const applyDensity = (density: 'compact' | 'comfortable' | 'spacious') => {
+    const densities = {
+      compact: '0.75rem',
+      comfortable: '1rem',
+      spacious: '1.5rem'
+    };
+    document.documentElement.style.setProperty('--spacing-unit', densities[density]);
+    document.documentElement.setAttribute('data-density', density);
+  };
+
+  // Apply animations
+  const applyAnimations = (animations: boolean, reducedMotion: boolean) => {
+    if (reducedMotion || !animations) {
+      document.documentElement.style.setProperty('--animation-duration', '0ms');
+      document.documentElement.setAttribute('data-animations', 'false');
+    } else {
+      document.documentElement.style.setProperty('--animation-duration', '200ms');
+      document.documentElement.setAttribute('data-animations', 'true');
+    }
+  };
+
+  // Helper function to convert hex to RGB
+  const hexToRgb = (hex: string): string => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      : '251, 191, 36'; // Default yellow
+  };
+
+  // Toggle theme (for navbar button)
+  const toggleTheme = () => {
+    const newTheme: 'light' | 'dark' = isDarkMode ? 'light' : 'dark';
+    const newPrefs = { ...preferences, theme: newTheme };
+    setPreferences(newPrefs);
+    applyThemeMode(newTheme);
+    
+    // Save to localStorage
+    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('preferences', JSON.stringify(newPrefs));
+    
+    // Save to API if authenticated
+    if (isAuthenticated) {
+      updatePreferences({ theme: newTheme }).catch(console.error);
+    }
+  };
+
+  // Apply theme programmatically
+  const applyTheme = (theme: 'light' | 'dark' | 'system') => {
+    const newPrefs = { ...preferences, theme };
+    setPreferences(newPrefs);
+    applyThemeMode(theme);
+    
+    // Save to localStorage
+    localStorage.setItem('theme', theme);
+    localStorage.setItem('preferences', JSON.stringify(newPrefs));
+    
+    // Save to API if authenticated
+    if (isAuthenticated) {
+      updatePreferences({ theme }).catch(console.error);
+    }
+  };
+
+  // Update preferences
+  const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
+    const updated = { ...preferences, ...newPrefs };
+    setPreferences(updated);
+    applyAllSettings(updated);
+    
+    // Save to localStorage
+    localStorage.setItem('preferences', JSON.stringify(updated));
+    
+    // Save to API if authenticated
+    if (isAuthenticated) {
+      try {
+        await apiService.put('/users/preferences', newPrefs);
+      } catch (error) {
+        console.error('Failed to update preferences:', error);
+        throw error;
+      }
+    }
+  };
+
+  // Listen for system theme changes
   useEffect(() => {
-    // Save theme preference to localStorage
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
+    if (preferences.theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = (e: MediaQueryListEvent) => {
+        setIsDarkMode(e.matches);
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+      
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
+    }
+  }, [preferences.theme]);
 
   const value = {
     isDarkMode,
+    preferences,
     toggleTheme,
+    updatePreferences,
+    applyTheme,
   };
 
   return (

@@ -480,12 +480,12 @@ userSchema.index({ username: 1 }, { unique: true });
 userSchema.index({ 'refreshTokens.token': 1 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   // Only hash the password if it's new or has been modified
   if (!this.isModified('password') || this.password === undefined) {
     return next();
   }
-  
+
   try {
     const salt = await bcrypt.genSalt(12);
     // Ensure this.password is a string before hashing
@@ -497,7 +497,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   // If password is not set (e.g., for some OAuth users), it cannot be compared
   if (!this.password) {
     return false;
@@ -506,7 +506,7 @@ userSchema.methods.comparePassword = async function(candidatePassword: string): 
 };
 
 // Generate refresh token
-userSchema.methods.generateRefreshToken = function(): string {
+userSchema.methods.generateRefreshToken = function (): string {
   const crypto = require('crypto');
   const token = crypto.randomBytes(40).toString('hex');
   this.refreshTokens.push({ token });
@@ -514,12 +514,12 @@ userSchema.methods.generateRefreshToken = function(): string {
 };
 
 // Remove old refresh tokens
-userSchema.methods.removeRefreshToken = function(token: string): void {
+userSchema.methods.removeRefreshToken = function (token: string): void {
   this.refreshTokens = this.refreshTokens.filter((t: any) => t.token !== token);
 };
 
 // Transform JSON output
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.refreshTokens;

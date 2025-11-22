@@ -9,6 +9,7 @@ import {
   BarChart3, PieChart, TrendingUp, Activity, Target, Award
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 import apiService from '../services/api';
 
 interface SettingsData {
@@ -160,6 +161,7 @@ interface SettingsData {
 
 const Settings: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { preferences, updatePreferences: updateThemePreferences } = useTheme();
   const [settingsData, setSettingsData] = useState<SettingsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -813,21 +815,38 @@ const Settings: React.FC = () => {
             <button
               key={theme}
               className={`px-4 py-2 rounded-lg border transition-colors ${
-                settingsData?.appearance.theme === theme
-                  ? 'bg-accent text-gray-900 border-accent-dark'
+                preferences.theme === theme
+                  ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
                   : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
-              onClick={() => {
-                setSettingsData(prev => prev ? {
-                  ...prev,
-                  appearance: { ...prev.appearance, theme: theme as 'light' | 'dark' | 'system' }
-                } : null);
-                handleSaveSettings('appearance', { ...settingsData?.appearance, theme: theme as 'light' | 'dark' | 'system' });
+              onClick={async () => {
+                try {
+                  await updateThemePreferences({ theme: theme as 'light' | 'dark' | 'system' });
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'success',
+                      message: `Theme changed to ${theme}`,
+                      duration: 2000
+                    }
+                  });
+                } catch (error) {
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'error',
+                      message: 'Failed to update theme',
+                      duration: 3000
+                    }
+                  });
+                }
               }}
             >
               {theme === 'light' && <Sun className="w-4 h-4 inline mr-2" />}
               {theme === 'dark' && <Moon className="w-4 h-4 inline mr-2" />}
-              {theme === 'system' && <SettingsIcon className="w-4 h-4 inline mr-2" />}
+              {theme === 'system' && <Monitor className="w-4 h-4 inline mr-2" />}
               {theme.charAt(0).toUpperCase() + theme.slice(1)}
             </button>
           ))}
@@ -837,21 +856,41 @@ const Settings: React.FC = () => {
       {/* Accent Color */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Accent Color</h3>
-        <div className="flex gap-3">
-          {['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'].map((color) => (
+        <div className="flex gap-3 flex-wrap">
+          {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].map((color) => (
             <button
               key={color}
-              className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                settingsData?.appearance.accentColor === color ? 'border-gray-900 scale-110' : 'border-gray-300'
+              className={`w-10 h-10 rounded-full border-2 transition-all ${
+                preferences.accentColor === color 
+                  ? 'border-gray-900 dark:border-white scale-110 ring-2 ring-offset-2 ring-gray-900 dark:ring-white' 
+                  : 'border-gray-300 dark:border-gray-600 hover:scale-105'
               }`}
               style={{ backgroundColor: color }}
-              onClick={() => {
-                setSettingsData(prev => prev ? {
-                  ...prev,
-                  appearance: { ...prev.appearance, accentColor: color }
-                } : null);
-                handleSaveSettings('appearance', { ...settingsData?.appearance, accentColor: color });
+              onClick={async () => {
+                try {
+                  await updateThemePreferences({ accentColor: color });
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'success',
+                      message: 'Accent color updated',
+                      duration: 2000
+                    }
+                  });
+                } catch (error) {
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'error',
+                      message: 'Failed to update accent color',
+                      duration: 3000
+                    }
+                  });
+                }
               }}
+              title={color}
             />
           ))}
         </div>
@@ -865,16 +904,33 @@ const Settings: React.FC = () => {
             <button
               key={size}
               className={`px-4 py-2 rounded-lg border transition-colors ${
-                settingsData?.appearance.fontSize === size
-                  ? 'bg-accent text-gray-900 border-accent-dark'
+                preferences.fontSize === size
+                  ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
                   : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
-              onClick={() => {
-                setSettingsData(prev => prev ? {
-                  ...prev,
-                  appearance: { ...prev.appearance, fontSize: size as 'small' | 'medium' | 'large' }
-                } : null);
-                handleSaveSettings('appearance', { ...settingsData?.appearance, fontSize: size as 'small' | 'medium' | 'large' });
+              onClick={async () => {
+                try {
+                  await updateThemePreferences({ fontSize: size as 'small' | 'medium' | 'large' });
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'success',
+                      message: `Font size changed to ${size}`,
+                      duration: 2000
+                    }
+                  });
+                } catch (error) {
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'error',
+                      message: 'Failed to update font size',
+                      duration: 3000
+                    }
+                  });
+                }
               }}
             >
               {size.charAt(0).toUpperCase() + size.slice(1)}
@@ -891,16 +947,33 @@ const Settings: React.FC = () => {
             <button
               key={density}
               className={`px-4 py-2 rounded-lg border transition-colors ${
-                settingsData?.appearance.density === density
-                  ? 'bg-accent text-gray-900 border-accent-dark'
+                preferences.density === density
+                  ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
                   : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
               }`}
-              onClick={() => {
-                setSettingsData(prev => prev ? {
-                  ...prev,
-                  appearance: { ...prev.appearance, density: density as 'compact' | 'comfortable' | 'spacious' }
-                } : null);
-                handleSaveSettings('appearance', { ...settingsData?.appearance, density: density as 'compact' | 'comfortable' | 'spacious' });
+              onClick={async () => {
+                try {
+                  await updateThemePreferences({ density: density as 'compact' | 'comfortable' | 'spacious' });
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'success',
+                      message: `Density changed to ${density}`,
+                      duration: 2000
+                    }
+                  });
+                } catch (error) {
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'error',
+                      message: 'Failed to update density',
+                      duration: 3000
+                    }
+                  });
+                }
               }}
             >
               {density.charAt(0).toUpperCase() + density.slice(1)}
@@ -920,20 +993,19 @@ const Settings: React.FC = () => {
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.appearance.animations ? 'bg-accent' : 'bg-gray-300'
+                preferences.animations ? 'bg-accent' : 'bg-gray-300'
               }`}
-              onClick={() => {
-                const newValue = !settingsData?.appearance.animations;
-                setSettingsData(prev => prev ? {
-                  ...prev,
-                  appearance: { ...prev.appearance, animations: newValue }
-                } : null);
-                handleSaveSettings('appearance', { ...settingsData?.appearance, animations: newValue });
+              onClick={async () => {
+                try {
+                  await updateThemePreferences({ animations: !preferences.animations });
+                } catch (error) {
+                  console.error('Failed to update animations:', error);
+                }
               }}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settingsData?.appearance.animations ? 'translate-x-6' : 'translate-x-1'
+                  preferences.animations ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
             </button>
@@ -945,20 +1017,19 @@ const Settings: React.FC = () => {
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.appearance.reducedMotion ? 'bg-accent' : 'bg-gray-300'
+                preferences.reducedMotion ? 'bg-accent' : 'bg-gray-300'
               }`}
-              onClick={() => {
-                const newValue = !settingsData?.appearance.reducedMotion;
-                setSettingsData(prev => prev ? {
-                  ...prev,
-                  appearance: { ...prev.appearance, reducedMotion: newValue }
-                } : null);
-                handleSaveSettings('appearance', { ...settingsData?.appearance, reducedMotion: newValue });
+              onClick={async () => {
+                try {
+                  await updateThemePreferences({ reducedMotion: !preferences.reducedMotion });
+                } catch (error) {
+                  console.error('Failed to update reduced motion:', error);
+                }
               }}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settingsData?.appearance.reducedMotion ? 'translate-x-6' : 'translate-x-1'
+                  preferences.reducedMotion ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
             </button>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AnimatedThemeTogglerProps {
   className?: string;
@@ -11,42 +11,20 @@ export const AnimatedThemeToggler: React.FC<AnimatedThemeTogglerProps> = ({
   className = '', 
   duration = 400 
 }) => {
-  const { state, dispatch } = useApp();
-  const [isDark, setIsDark] = useState(state.settings.darkMode);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    setIsDark(state.settings.darkMode);
-  }, [state.settings.darkMode]);
-
-  const toggleTheme = () => {
+  const handleToggle = () => {
     if (isAnimating) return;
     
     setIsAnimating(true);
-    const newDarkMode = !isDark;
-    
-    // Update local state
-    setIsDark(newDarkMode);
-    
-    // Update global state
-    dispatch({ 
-      type: 'UPDATE_SETTINGS', 
-      payload: { darkMode: newDarkMode } 
-    });
-    
-    // Update document class
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
+    toggleTheme();
     setTimeout(() => setIsAnimating(false), duration);
   };
 
   return (
     <button
-      onClick={toggleTheme}
+      onClick={handleToggle}
       className={`relative p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors ${className}`}
       aria-label="Toggle theme"
       disabled={isAnimating}
@@ -55,7 +33,7 @@ export const AnimatedThemeToggler: React.FC<AnimatedThemeTogglerProps> = ({
         {/* Sun Icon */}
         <Sun
           className={`absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-${duration} ${
-            isDark
+            isDarkMode
               ? 'opacity-0 rotate-90 scale-0'
               : 'opacity-100 rotate-0 scale-100'
           }`}
@@ -63,8 +41,8 @@ export const AnimatedThemeToggler: React.FC<AnimatedThemeTogglerProps> = ({
         
         {/* Moon Icon */}
         <Moon
-          className={`absolute inset-0 w-5 h-5 text-accent transition-all duration-${duration} ${
-            isDark
+          className={`absolute inset-0 w-5 h-5 text-blue-400 transition-all duration-${duration} ${
+            isDarkMode
               ? 'opacity-100 rotate-0 scale-100'
               : 'opacity-0 -rotate-90 scale-0'
           }`}

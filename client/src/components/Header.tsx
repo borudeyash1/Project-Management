@@ -67,16 +67,9 @@ const Header: React.FC = () => {
           {state.sidebar.collapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
         </button>
 
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-md flex items-center justify-center text-white font-semibold tracking-tight bg-yellow-500">
-            S
-          </div>
-          <div className="hidden sm:block">
-            <div className="text-sm font-semibold tracking-tight dark:text-gray-100">
-              <SparklesText>Sartthi</SparklesText>
-            </div>
-            <div className="text-xs text-slate-500 dark:text-gray-200">Project & Payroll Suite</div>
-          </div>
+        {/* Sartthi Logo */}
+        <div className="flex items-center">
+          <img src="/2.png" alt="Sartthi Logo" className="h-6 w-auto m-2" />
         </div>
 
         {/* Workspace Mode Switcher */}

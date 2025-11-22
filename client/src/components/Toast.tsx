@@ -42,7 +42,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
         return isDarkMode ? 'bg-yellow-800 border-yellow-600' : 'bg-yellow-50 border-yellow-200';
       case 'info':
       default:
-        return isDarkMode ? 'bg-blue-800 border-accent-dark' : 'bg-blue-50 border-blue-200';
+        return isDarkMode ? 'bg-gray-800 border-accent' : 'bg-accent/10 border-accent';
     }
   };
 
@@ -56,7 +56,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
         return isDarkMode ? 'text-yellow-100' : 'text-yellow-800';
       case 'info':
       default:
-        return isDarkMode ? 'text-blue-100' : 'text-blue-800';
+        return isDarkMode ? 'text-gray-100' : 'text-gray-900';
     }
   };
 

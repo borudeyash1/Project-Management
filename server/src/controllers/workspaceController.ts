@@ -229,9 +229,9 @@ export const getUserWorkspaces = async (req: AuthenticatedRequest, res: Response
         { 'members.user': userId, 'members.status': 'active' }
       ]
     })
-    .populate('owner', 'fullName email avatarUrl')
-    .populate('members.user', 'fullName email avatarUrl')
-    .sort({ createdAt: -1 });
+      .populate('owner', 'fullName email avatarUrl')
+      .populate('members.user', 'fullName email avatarUrl')
+      .sort({ createdAt: -1 });
 
     const response: ApiResponse<IWorkspace[]> = {
       success: true,
@@ -262,8 +262,8 @@ export const getWorkspace = async (req: AuthenticatedRequest, res: Response): Pr
         { 'members.user': userId, 'members.status': 'active' }
       ]
     })
-    .populate('owner', 'fullName email avatarUrl')
-    .populate('members.user', 'fullName email avatarUrl');
+      .populate('owner', 'fullName email avatarUrl')
+      .populate('members.user', 'fullName email avatarUrl');
 
     if (!workspace) {
       res.status(404).json({
