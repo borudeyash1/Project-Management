@@ -15,6 +15,7 @@ import {
   sendWorkspaceInvite,
   acceptWorkspaceInvite
 } from '../controllers/workspaceController';
+import { sendMemberRemovalOtp, validateMemberRemovalOtp } from '../controllers/memberRemovalOtp';
 
 const router = express.Router();
 
@@ -33,6 +34,8 @@ router.delete('/:id', deleteWorkspace);
 
 // Member management & invitations
 router.post('/:id/members', addMember);
+router.post('/:id/members/removal-otp', sendMemberRemovalOtp);
+router.post('/:id/members/validate-removal-otp', validateMemberRemovalOtp);
 router.delete('/:id/members/:memberId', removeMember);
 router.put('/:id/members/:memberId/role', updateMemberRole);
 router.post('/:id/invite', sendWorkspaceInvite);

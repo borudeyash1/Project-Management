@@ -3,6 +3,7 @@ import { X, Building2, Mail, Shield, CreditCard, CheckCircle } from 'lucide-reac
 import { useApp } from '../context/AppContext';
 import api from '../services/api';
 import { SubscriptionPlanData, CustomBillingResponse } from '../services/api';
+import { WorkspaceSettings } from '../types';
 
 interface CreateWorkspaceModalProps {
   isOpen: boolean;
@@ -24,7 +25,8 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     organizationName: '',
     contactEmail: '',
     otp: '',
-    region: 'North America'
+    region: 'North America',
+    isPublic: false
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -122,8 +124,11 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         name: formData.name,
         description: formData.description,
         type: formData.type,
-        region: formData.region
-      });
+        region: formData.region,
+        settings: {
+          isPublic: formData.isPublic
+        } as Partial<WorkspaceSettings>
+      } as any);
       if (response.requiresCustomBilling && response.billing) {
         setCustomBilling(response.billing);
         dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'warning', message: 'Custom billing required for this workspace', duration: 4000 } });
@@ -154,7 +159,8 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
       contactEmail: '',
       organizationName: '',
       otp: '',
-      region: 'North America'
+      region: 'North America',
+      isPublic: false
     });
     setErrors({});
     onClose();
@@ -292,6 +298,26 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               <option value="Africa">Africa</option>
               <option value="Oceania">Oceania</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Workspace Visibility
+            </label>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isPublic}
+                  onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
+                  className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent"
+                />
+                <span className="text-sm text-gray-700">Make this workspace publicly discoverable</span>
+              </label>
+            </div>
+            <p className="text-xs text-gray-600 mt-1">
+              Public workspaces can be found and joined by other users. Private workspaces are invite-only.
+            </p>
           </div>
         </div>
       </div>

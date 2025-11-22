@@ -20,6 +20,7 @@ const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showOtpVerification, setShowOtpVerification] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [otpTimer, setOtpTimer] = useState(0);
   const [formData, setFormData] = useState<LoginRequest & RegisterRequest>({
@@ -170,7 +171,7 @@ const Auth: React.FC = () => {
       const loginData: LoginRequest = {
         email: formData.email,
         password: formData.password,
-        rememberMe: false,
+        rememberMe: rememberMe,
       };
 
       const response = await apiService.login(loginData);
@@ -246,6 +247,9 @@ const Auth: React.FC = () => {
 
       // Update user profile in context
       dispatch({ type: "SET_USER", payload: response.user });
+
+      // Load workspaces to ensure dock navigation shows correctly
+      await ensureWorkspaceAccess(response.user);
 
       showToast("Login successful! Welcome back!", "success");
 
@@ -498,13 +502,13 @@ const Auth: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-2">
                   <label
-                    className={`inline-flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-700" : "text-slate-700"} cursor-pointer font-medium`}
+                    className={`inline-flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-200" : "text-slate-700"} cursor-pointer font-medium`}
+                    onClick={() => setRememberMe(!rememberMe)}
                   >
-                    <input type="checkbox" className="peer sr-only" />
                     <span
-                      className={`relative inline-flex h-6 w-11 rounded-full ${isDarkMode ? "bg-gray-600" : "bg-slate-200"} transition-colors peer-checked:bg-accent shadow-inner`}
+                      className={`relative inline-flex h-6 w-11 rounded-full ${rememberMe ? "bg-accent" : (isDarkMode ? "bg-gray-600" : "bg-slate-200")} transition-colors shadow-inner`}
                     >
-                      <span className="absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-md transition-all peer-checked:left-6"></span>
+                      <span className={`absolute top-1 ${rememberMe ? "left-6" : "left-1"} h-4 w-4 rounded-full bg-white shadow-md transition-all`}></span>
                     </span>
                     Remember me
                   </label>

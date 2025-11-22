@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';
@@ -30,6 +31,7 @@ interface Workspace {
 
 const WorkspaceDiscover: React.FC = () => {
   const { state, dispatch } = useApp();
+  const navigate = useNavigate();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [filteredWorkspaces, setFilteredWorkspaces] = useState<Workspace[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,6 +55,7 @@ const WorkspaceDiscover: React.FC = () => {
 
     const loadWorkspaces = async () => {
       try {
+        // Load discover workspaces for display
         const apiWorkspaces = await api.getDiscoverWorkspaces();
         const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
           _id: ws._id,
@@ -72,6 +75,14 @@ const WorkspaceDiscover: React.FC = () => {
 
         setWorkspaces(normalized);
         setFilteredWorkspaces(normalized);
+
+        // Also refresh the global workspaces state to update dock navigation
+        try {
+          const userWorkspaces = await api.getWorkspaces();
+          dispatch({ type: 'SET_WORKSPACES', payload: userWorkspaces });
+        } catch (error) {
+          console.error('Failed to refresh user workspaces', error);
+        }
       } catch (error) {
         console.error('Failed to load workspaces for discovery', error);
       } finally {
@@ -108,10 +119,25 @@ const WorkspaceDiscover: React.FC = () => {
     setFilteredWorkspaces(filtered);
   }, [searchTerm, selectedType, selectedRegion, workspaces]);
 
+  // Check if user is already a member of the workspace
+  const isUserMember = (workspaceId: string) => {
+    return state.workspaces.some(w => w._id === workspaceId);
+  };
+
+  // Check if user is the owner of the workspace
+  const isUserOwner = (workspace: Workspace) => {
+    const ownerId = typeof workspace.owner === 'string' ? workspace.owner : workspace.owner._id;
+    return ownerId === state.userProfile._id;
+  };
+
   const handleJoinRequest = async (workspaceId: string) => {
     try {
-      // TODO: Implement actual join request API call
-      console.log('Joining workspace:', workspaceId);
+      await api.sendJoinRequest(workspaceId);
+      
+      // Refresh workspaces to update membership status
+      const userWorkspaces = await api.getWorkspaces();
+      dispatch({ type: 'SET_WORKSPACES', payload: userWorkspaces });
+      
       // Show success message
       dispatch({
         type: 'ADD_TOAST',
@@ -318,13 +344,31 @@ const WorkspaceDiscover: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Join Button */}
-                  <button
-                    onClick={() => handleJoinRequest(workspace._id)}
-                    className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-                  >
-                    Send Join Request
-                  </button>
+                  {/* Smart Action Button */}
+                  {isUserOwner(workspace) ? (
+                    <button
+                      onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
+                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Manage Workspace
+                    </button>
+                  ) : isUserMember(workspace._id) ? (
+                    <button
+                      onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
+                      className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Visit Workspace
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleJoinRequest(workspace._id)}
+                      className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+                    >
+                      Send Join Request
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

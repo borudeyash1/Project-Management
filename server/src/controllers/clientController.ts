@@ -1,7 +1,17 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Response } from 'express';
 import Client from '../models/Client';
 import Workspace from '../models/Workspace';
+import User from '../models/User';
 import { AuthenticatedRequest, ApiResponse } from '../types';
+import { sendEmail } from '../services/emailService';
+
+// OTP configuration
+const OTP_VALIDITY_MS = 5 * 60 * 1000; // 5 minutes
+
+// Generate 6-digit OTP
+const generateOTP = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 // Create client for a workspace
 export const createClient: RequestHandler = async (req, res) => {
@@ -152,7 +162,172 @@ export const updateClient: RequestHandler = async (req, res) => {
   }
 };
 
-// Delete client (soft delete)
+// Send OTP for client deletion
+export const sendClientDeletionOtp = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const currentUserId = req.user!._id;
+
+    // Find the client
+    const client = await Client.findById(id);
+    if (!client) {
+      res.status(404).json({
+        success: false,
+        message: 'Client not found'
+      });
+      return;
+    }
+
+    // Verify user has access to the workspace
+    const workspace = await Workspace.findOne({
+      _id: client.workspaceId,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + OTP_VALIDITY_MS);
+
+    // Store OTP in user document
+    const user = await User.findById(currentUserId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    const userAny = user as any;
+    userAny.otp = otp;
+    userAny.otpExpiry = otpExpiry;
+    await user.save();
+
+    // Send OTP via email
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Client Deletion OTP',
+        html: `<p>Your OTP for client deletion is: <strong>${otp}</strong></p><p>This OTP will expire in 5 minutes.</p><p>Client: <strong>${client.name}</strong></p>`
+      });
+    } catch (emailError) {
+      console.error('Failed to send OTP email:', emailError);
+      // Continue anyway - OTP is stored
+    }
+
+    console.log(`Client deletion OTP for user ${currentUserId}: ${otp}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent to your email'
+    });
+  } catch (error: any) {
+    console.error('Send client deletion OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Delete client with OTP verification
+export const deleteClientWithOtp = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { reason, otp } = req.query;
+    const currentUserId = req.user!._id;
+
+    // Verify OTP
+    const user = await User.findById(currentUserId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    const userAny = user as any;
+    if (!userAny.otp || !userAny.otpExpiry || userAny.otp !== otp) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+      return;
+    }
+
+    if (new Date() > userAny.otpExpiry) {
+      res.status(400).json({
+        success: false,
+        message: 'OTP has expired'
+      });
+      return;
+    }
+
+    // Find the client
+    const client = await Client.findById(id);
+    if (!client) {
+      res.status(404).json({
+        success: false,
+        message: 'Client not found'
+      });
+      return;
+    }
+
+    // Verify user has access to the workspace
+    const workspace = await Workspace.findOne({
+      _id: client.workspaceId,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    // Soft delete the client
+    client.status = 'inactive';
+    await client.save();
+
+    // Clear OTP
+    userAny.otp = undefined;
+    userAny.otpExpiry = undefined;
+    await user.save();
+
+    // Log the deletion with reason
+    console.log(`Client ${id} (${client.name}) deleted from workspace ${client.workspaceId} by ${currentUserId}. Reason: ${reason || 'Not specified'}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Client deleted successfully'
+    });
+  } catch (error: any) {
+    console.error('Delete client with OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Delete client (soft delete) - Legacy function without OTP
 export const deleteClient: RequestHandler = async (req, res) => {
   try {
     const { user } = (req as AuthenticatedRequest);
