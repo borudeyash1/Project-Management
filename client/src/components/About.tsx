@@ -36,7 +36,7 @@ const About: React.FC = () => {
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
               ABOUT US
             </span>
-            <h1 className={`text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
+            <h1 className={`text-4xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
               About <span className="text-accent">Sartthi</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
@@ -53,8 +53,8 @@ const About: React.FC = () => {
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed`}>
-              At Sartthi, we believe that great projects start with great tools. Our mission is to simplify project management 
-              and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable 
+              At Sartthi, we believe that great projects start with great tools. Our mission is to simplify project management
+              and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable
               solutions that help teams collaborate effectively and achieve their goals.
             </p>
           </div>
@@ -153,8 +153,8 @@ const About: React.FC = () => {
               <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Team</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
-              Sartthi is built by a passionate team of developers, designers, and project management experts 
-              who understand the challenges of modern team collaboration. We're constantly working to improve 
+              Sartthi is built by a passionate team of developers, designers, and project management experts
+              who understand the challenges of modern team collaboration. We're constantly working to improve
               our platform and add new features based on user feedback.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -275,7 +275,7 @@ const About: React.FC = () => {
             <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            
+
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Get in Touch</h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">

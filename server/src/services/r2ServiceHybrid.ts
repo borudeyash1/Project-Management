@@ -3,12 +3,23 @@ import fs from 'fs';
 import { uploadToR2 as uploadToR2SDK, deleteFromR2 as deleteFromR2SDK, extractR2Key as extractR2KeySDK } from './r2ServiceSDK';
 
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
-const LOCAL_STORAGE_PATH = path.join(__dirname, '../../uploads/releases');
+const UPLOADS_ROOT = path.join(__dirname, '../../uploads');
 
-// Ensure local storage directory exists
-if (!fs.existsSync(LOCAL_STORAGE_PATH)) {
-    fs.mkdirSync(LOCAL_STORAGE_PATH, { recursive: true });
+// Ensure uploads root exists
+if (!fs.existsSync(UPLOADS_ROOT)) {
+    fs.mkdirSync(UPLOADS_ROOT, { recursive: true });
 }
+
+/**
+ * Get local storage path for a specific subfolder
+ */
+const getLocalPath = (subfolder: string = 'releases'): string => {
+    const dir = path.join(UPLOADS_ROOT, subfolder);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    return dir;
+};
 
 /**
  * Upload file - tries R2 first, falls back to local storage on error
@@ -16,7 +27,8 @@ if (!fs.existsSync(LOCAL_STORAGE_PATH)) {
 export const uploadToR2 = async (
     fileBuffer: Buffer,
     key: string,
-    contentType: string
+    contentType: string,
+    subfolder: string = 'releases'
 ): Promise<string> => {
     // Try R2 first (even in development)
     try {
@@ -29,18 +41,21 @@ export const uploadToR2 = async (
         console.warn('Error:', error.message);
 
         // Fallback to local storage
-        console.log('📁 [LOCAL] Storing file locally:', key);
-        const localPath = path.join(LOCAL_STORAGE_PATH, path.basename(key));
+        const localStoragePath = getLocalPath(subfolder);
+        console.log(`📁 [LOCAL] Storing file locally in ${subfolder}:`, key);
+
+        const fileName = path.basename(key);
+        const localPath = path.join(localStoragePath, fileName);
         fs.writeFileSync(localPath, fileBuffer);
 
         // In production, use relative URL (browser will use current domain)
         // In development, use absolute localhost URL
         let publicUrl: string;
         if (process.env.NODE_ENV === 'production') {
-            publicUrl = `/uploads/releases/${path.basename(key)}`;
+            publicUrl = `/uploads/${subfolder}/${fileName}`;
         } else {
             const baseUrl = process.env.API_BASE_URL || process.env.BACKEND_URL || 'http://localhost:5000';
-            publicUrl = `${baseUrl}/uploads/releases/${path.basename(key)}`;
+            publicUrl = `${baseUrl}/uploads/${subfolder}/${fileName}`;
         }
 
         console.log('✅ [LOCAL] File stored:', publicUrl);
@@ -51,10 +66,11 @@ export const uploadToR2 = async (
 /**
  * Delete file - removes from local storage or R2
  */
-export const deleteFromR2 = async (key: string): Promise<void> => {
+export const deleteFromR2 = async (key: string, subfolder: string = 'releases'): Promise<void> => {
     // ALWAYS try to delete local file first to prevent pile-up
-    // This ensures that even if it's an R2 file but we have a local copy (e.g. from failed cleanup), it gets removed
-    const localPath = path.join(LOCAL_STORAGE_PATH, path.basename(key));
+    const localStoragePath = getLocalPath(subfolder);
+    const localPath = path.join(localStoragePath, path.basename(key));
+
     if (fs.existsSync(localPath)) {
         try {
             console.log('🗑️ [LOCAL] Deleting local file:', key);
@@ -78,10 +94,11 @@ export const deleteFromR2 = async (key: string): Promise<void> => {
  * Extract key from URL
  */
 export const extractR2Key = (url: string): string => {
-    if (url.startsWith('/uploads/') || url.includes('/uploads/releases/')) {
+    if (url.startsWith('/uploads/') || url.includes('/uploads/')) {
         // Extract filename from local URL
-        const match = url.match(/\/uploads\/releases\/(.+)$/);
-        return (match && match[1]) ? match[1] : url.replace('/uploads/releases/', '');
+        // Matches /uploads/anything/filename.ext
+        const match = url.match(/\/uploads\/[^\/]+\/(.+)$/);
+        return (match && match[1]) ? match[1] : path.basename(url);
     }
     return extractR2KeySDK(url);
 };

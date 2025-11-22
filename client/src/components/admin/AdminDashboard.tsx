@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Users, Activity, Settings, LogOut, AlertTriangle, FileText, Megaphone } from 'lucide-react';
+import { Shield, Users, Activity, Settings, LogOut, AlertTriangle, FileText, Megaphone, CreditCard } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
@@ -24,7 +24,7 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     // Clear any expired tokens first
     clearExpiredTokens();
-    
+
     // Check if admin is logged in
     const token = localStorage.getItem('adminToken');
     const admin = localStorage.getItem('adminData');
@@ -54,14 +54,14 @@ const AdminDashboard: React.FC = () => {
       const parsedAdmin = JSON.parse(admin);
       console.log('✅ [ADMIN DASHBOARD] Valid session found for:', parsedAdmin.email);
       setAdminData(parsedAdmin);
-      
+
       // Fetch dashboard stats
       fetchDashboardStats();
     } catch (error) {
       console.error('❌ [ADMIN DASHBOARD] Invalid admin data, clearing session');
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminData');
-      navigate('/my-admin/login', { replace: true});
+      navigate('/my-admin/login', { replace: true });
     }
   }, [navigate, addToast]);
 
@@ -69,7 +69,7 @@ const AdminDashboard: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.get('/admin/dashboard-stats');
-      
+
       if (response?.success) {
         setDashboardStats(response.data);
       }
@@ -82,23 +82,23 @@ const AdminDashboard: React.FC = () => {
 
   const handleLogout = () => {
     console.log('🔒 [ADMIN] Logging out...');
-    
+
     // Get admin name before clearing
     const adminName = adminData?.name || 'Admin';
-    
+
     // Clear all admin session data
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
     localStorage.removeItem('accessToken');
-    
+
     console.log('✅ [ADMIN] Session cleared, redirecting to login...');
-    
+
     // Show success message
     addToast(`Goodbye ${adminName}! You've been logged out successfully.`, 'success');
-    
+
     // Close the modal
     setShowLogoutConfirm(false);
-    
+
     // Redirect to admin login
     navigate('/my-admin/login', { replace: true });
   };
@@ -221,11 +221,10 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>System Status</p>
-                <p className={`text-3xl font-bold ${
-                  loading ? 'text-gray-600' :
-                  dashboardStats.systemStatus === 'Healthy' ? 'text-green-500' :
-                  dashboardStats.systemStatus === 'Warning' ? 'text-yellow-500' : 'text-red-500'
-                } mt-2`}>
+                <p className={`text-3xl font-bold ${loading ? 'text-gray-600' :
+                    dashboardStats.systemStatus === 'Healthy' ? 'text-green-500' :
+                      dashboardStats.systemStatus === 'Warning' ? 'text-yellow-500' : 'text-red-500'
+                  } mt-2`}>
                   {loading ? (
                     <span className="animate-pulse">...</span>
                   ) : (
@@ -246,7 +245,7 @@ const AdminDashboard: React.FC = () => {
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button 
+            <button
               onClick={() => navigate('/admin/users')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
@@ -255,7 +254,7 @@ const AdminDashboard: React.FC = () => {
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>View and edit users</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate('/admin/devices')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
@@ -264,7 +263,16 @@ const AdminDashboard: React.FC = () => {
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage devices & access</p>
             </button>
 
-            <button 
+            <button
+              onClick={() => navigate('/admin/subscriptions')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
+            >
+              <CreditCard className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-500'} mb-2`} />
+              <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Subscriptions</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage plans & billing</p>
+            </button>
+
+            <button
               onClick={() => navigate('/admin/analytics')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
@@ -273,7 +281,7 @@ const AdminDashboard: React.FC = () => {
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>View system metrics</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate('/admin/settings')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
@@ -282,7 +290,7 @@ const AdminDashboard: React.FC = () => {
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Configure system</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate('/admin/releases')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
@@ -291,7 +299,7 @@ const AdminDashboard: React.FC = () => {
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage app versions</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate('/admin/docs')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >
@@ -300,7 +308,7 @@ const AdminDashboard: React.FC = () => {
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage help articles</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate('/admin/content')}
               className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
             >

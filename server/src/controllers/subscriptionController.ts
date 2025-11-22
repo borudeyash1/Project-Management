@@ -435,7 +435,6 @@ export const upgradeSelfSubscription = async (req: AuthenticatedRequest, res: Re
     user.subscription.features.maxWorkspaces = plan.limits.maxWorkspaces === -1 ? unlimitedSentinel : plan.limits.maxWorkspaces;
     user.subscription.features.maxProjects = plan.limits.maxProjects === -1 ? unlimitedSentinel : plan.limits.maxProjects;
     user.subscription.features.maxTeamMembers = plan.limits.maxTeamMembers === -1 ? unlimitedSentinel : plan.limits.maxTeamMembers;
-    user.subscription.features.maxStorage = plan.limits.storageInGB;
     user.subscription.features.aiAssistance = plan.features.aiAccess;
     user.subscription.features.advancedAnalytics = !plan.features.adsEnabled;
     user.subscription.features.customIntegrations = plan.features.customStorageIntegration;

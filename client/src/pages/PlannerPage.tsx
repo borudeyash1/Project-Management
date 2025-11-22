@@ -26,12 +26,12 @@ const PlannerPage: React.FC = () => {
       setError(null);
       const startOfWeekDate = startOfWeek(currentDate, { weekStartsOn: 1 }); // Start week on Monday
       const endOfWeekDate = addDays(startOfWeekDate, 6);
-      
+
       const data = await getPlannerEvents({
         start: startOfWeekDate,
         end: endOfWeekDate,
       });
-      
+
       setEvents(data);
     } catch (err) {
       console.error('Error fetching events:', err);
@@ -50,7 +50,7 @@ const PlannerPage: React.FC = () => {
     try {
       const updatedEvent = await updateEventParticipation(eventId, status);
       setEvents(events.map(evt => evt._id === updatedEvent._id ? updatedEvent : evt));
-      
+
       if (selectedEvent?._id === eventId) {
         setSelectedEvent(updatedEvent);
       }
@@ -81,7 +81,7 @@ const PlannerPage: React.FC = () => {
   // Generate days for the week view
   const weekDays = [];
   const startOfWeekDate = startOfWeek(currentDate, { weekStartsOn: 1 });
-  
+
   for (let i = 0; i < 7; i++) {
     const day = addDays(startOfWeekDate, i);
     weekDays.push(day);
@@ -118,7 +118,7 @@ const PlannerPage: React.FC = () => {
             {format(startOfWeekDate, 'MMM d')} - {format(addDays(startOfWeekDate, 6), 'MMM d, yyyy')}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2 mt-4 md:mt-0">
           <button
             onClick={goToToday}
@@ -155,8 +155,8 @@ const PlannerPage: React.FC = () => {
         {/* Days Header */}
         <div className="grid grid-cols-7 border-b border-gray-300 dark:border-gray-600">
           {weekDays.map((day, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`py-2 text-center font-medium ${isSameDay(day, new Date()) ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-gray-50 dark:bg-gray-800'}`}
             >
               <div className="text-sm text-gray-600 dark:text-gray-200">
@@ -172,21 +172,21 @@ const PlannerPage: React.FC = () => {
         {/* Events Grid */}
         <div className="grid grid-cols-7 divide-x divide-gray-200 dark:divide-gray-700">
           {weekDays.map((day, dayIndex) => (
-            <div 
-              key={dayIndex} 
+            <div
+              key={dayIndex}
               className={`min-h-32 p-2 ${isSameDay(day, new Date()) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
             >
               <div className="space-y-1">
                 {getEventsForDay(day).map(event => {
                   const eventStart = typeof event.start === 'string' ? new Date(event.start) : event.start;
                   const eventEnd = event.end ? (typeof event.end === 'string' ? new Date(event.end) : event.end) : null;
-                  
+
                   return (
                     <div
                       key={event._id}
                       onClick={() => setSelectedEvent(event)}
                       className="p-2 text-xs rounded cursor-pointer truncate"
-                      style={{ 
+                      style={{
                         backgroundColor: `${event.color}20`,
                         borderLeft: `3px solid ${event.color}`,
                       }}
@@ -220,11 +220,11 @@ const PlannerPage: React.FC = () => {
                   <X size={20} />
                 </button>
               </div>
-              
+
               {selectedEvent.description && (
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-700">{selectedEvent.description}</p>
               )}
-              
+
               <div className="mt-4 space-y-3">
                 <div className="flex items-start">
                   <CalendarIcon size={16} className="mt-0.5 mr-2 text-gray-600 dark:text-gray-300 flex-shrink-0" />
@@ -238,7 +238,7 @@ const PlannerPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 {selectedEvent.participants && selectedEvent.participants.length > 0 && (
                   <div className="flex items-start">
                     <Users size={16} className="mt-0.5 mr-2 text-gray-600 dark:text-gray-300 flex-shrink-0" />
@@ -258,7 +258,7 @@ const PlannerPage: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="mt-6 flex space-x-2">
                 <button
                   onClick={() => handleParticipation(selectedEvent._id, 'accepted')}
@@ -274,7 +274,7 @@ const PlannerPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleParticipation(selectedEvent._id, 'tentative')}
-                  className="flex-1 px-4 py-2 bg-yellow-500 text-white text-sm font-medium rounded-md hover:bg-yellow-600"
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 text-sm font-medium rounded-md hover:bg-accent-hover"
                 >
                   Maybe
                 </button>
@@ -298,7 +298,7 @@ const PlannerPage: React.FC = () => {
                   <X size={20} />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
@@ -309,11 +309,11 @@ const PlannerPage: React.FC = () => {
                     id="event-title"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                     value={newEvent.title}
-                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                     placeholder="Event title"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="event-start" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
@@ -324,10 +324,10 @@ const PlannerPage: React.FC = () => {
                       id="event-start"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                       value={newEvent.start ? (newEvent.start instanceof Date ? newEvent.start.toISOString().slice(0, 16) : newEvent.start) : ''}
-                      onChange={(e) => setNewEvent({...newEvent, start: e.target.value ? new Date(e.target.value) : new Date()})}
+                      onChange={(e) => setNewEvent({ ...newEvent, start: e.target.value ? new Date(e.target.value) : new Date() })}
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="event-end" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                       End
@@ -337,11 +337,11 @@ const PlannerPage: React.FC = () => {
                       id="event-end"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                       value={newEvent.end ? (newEvent.end instanceof Date ? newEvent.end.toISOString().slice(0, 16) : newEvent.end) : ''}
-                      onChange={(e) => setNewEvent({...newEvent, end: e.target.value ? new Date(e.target.value) : new Date()})}
+                      onChange={(e) => setNewEvent({ ...newEvent, end: e.target.value ? new Date(e.target.value) : new Date() })}
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                     Description (Optional)
@@ -351,24 +351,24 @@ const PlannerPage: React.FC = () => {
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
                     value={newEvent.description || ''}
-                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                     placeholder="Add details about your event"
                   />
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
                     id="event-allday"
                     className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
                     checked={newEvent.allDay || false}
-                    onChange={(e) => setNewEvent({...newEvent, allDay: e.target.checked})}
+                    onChange={(e) => setNewEvent({ ...newEvent, allDay: e.target.checked })}
                   />
                   <label htmlFor="event-allday" className="ml-2 block text-sm text-gray-700 dark:text-gray-700">
                     All day event
                   </label>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
                     Color
@@ -380,14 +380,14 @@ const PlannerPage: React.FC = () => {
                         type="button"
                         className={`w-6 h-6 rounded-full ${newEvent.color === color ? 'ring-2 ring-offset-2 ring-gray-400' : ''}`}
                         style={{ backgroundColor: color }}
-                        onClick={() => setNewEvent({...newEvent, color})}
+                        onClick={() => setNewEvent({ ...newEvent, color })}
                         aria-label={`Select color ${color}`}
                       />
                     ))}
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6 flex justify-end space-x-3">
                 <button
                   type="button"

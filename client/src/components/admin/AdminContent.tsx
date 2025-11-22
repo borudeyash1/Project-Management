@@ -13,11 +13,13 @@ import {
   Type,
   Calendar,
   MapPin,
-  Palette
+  Palette,
+  Move
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import * as contentService from '../../services/contentService';
+import CustomPlacementModal from './CustomPlacementModal';
 import { ContentBanner } from '../../services/contentService';
 
 const AdminContent: React.FC = () => {
@@ -30,6 +32,7 @@ const AdminContent: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isPlacementModalOpen, setIsPlacementModalOpen] = useState(false);
 
   const availableRoutes = [
     { value: '/', label: 'Home (Landing Page)' },
@@ -43,6 +46,63 @@ const AdminContent: React.FC = () => {
   useEffect(() => {
     loadBanners();
   }, []);
+
+  useEffect(() => {
+    // Listen for canvas editor updates
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+
+      if (event.data.type === 'BANNER_UPDATE' && event.data.data) {
+        console.log('Received banner update from canvas:', event.data.data);
+        setCurrentBanner(event.data.data);
+      }
+
+      if (event.data.type === 'CANVAS_COMPLETE' && event.data.data) {
+        console.log('Canvas editing complete:', event.data.data);
+        const canvasData = event.data.data;
+
+        // Merge canvas data with current banner (which has title, content, routes)
+        const mergedData = { ...currentBanner, ...canvasData };
+        setCurrentBanner(mergedData);
+
+        // Auto-save if all required fields are present
+        if (mergedData.title && mergedData.content && mergedData.routes && mergedData.routes.length > 0) {
+          (async () => {
+            try {
+              if (mergedData._id) {
+                await contentService.updateBanner(mergedData._id, mergedData);
+                addToast('Banner updated successfully!', 'success');
+              } else {
+                await contentService.createBanner(mergedData);
+                addToast('Banner created successfully!', 'success');
+              }
+              await loadBanners();
+              setIsEditing(false);
+              setCurrentBanner(null);
+            } catch (error: any) {
+              console.error('Failed to save:', error);
+              addToast('Canvas applied. Please save manually.', 'warning');
+              setIsEditing(true);
+            }
+          })();
+        } else {
+          addToast('Canvas changes applied! Please complete the form and save.', 'info');
+          setIsEditing(true);
+        }
+      }
+
+      if (event.data.type === 'REQUEST_BANNER_DATA') {
+        // Send current banner data to canvas editor
+        event.source?.postMessage({
+          type: 'BANNER_DATA',
+          data: currentBanner
+        }, event.origin as any);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [currentBanner]);
 
   const loadBanners = async () => {
     try {
@@ -97,6 +157,11 @@ const AdminContent: React.FC = () => {
       return;
     }
 
+    if (currentBanner.height && currentBanner.height > 200) {
+      addToast('Banner height cannot exceed 200px', 'error');
+      return;
+    }
+
     try {
       setSaving(true);
       if (currentBanner._id) {
@@ -112,7 +177,8 @@ const AdminContent: React.FC = () => {
       setCurrentBanner(null);
     } catch (error: any) {
       console.error('Failed to save banner:', error);
-      addToast(error.response?.data?.message || 'Failed to save banner', 'error');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to save banner';
+      addToast(errorMessage, 'error');
     } finally {
       setSaving(false);
     }
@@ -462,12 +528,12 @@ const AdminContent: React.FC = () => {
                     <MapPin className="w-4 h-4 inline mr-1" />
                     Placement
                   </label>
-                  <div className="flex gap-2">
-                    {['top', 'bottom'].map(placement => (
+                  <div className="grid grid-cols-3 gap-2">
+                    {['top', 'bottom', 'popup', 'custom'].map(placement => (
                       <button
                         key={placement}
                         onClick={() => setCurrentBanner(prev => ({ ...prev, placement: placement as any }))}
-                        className={`flex-1 px-4 py-2 rounded-lg border transition-colors ${currentBanner?.placement === placement
+                        className={`px-4 py-2 rounded-lg border transition-colors ${currentBanner?.placement === placement
                           ? 'bg-accent text-gray-900 border-accent'
                           : isDarkMode
                             ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
@@ -478,6 +544,15 @@ const AdminContent: React.FC = () => {
                       </button>
                     ))}
                   </div>
+                  {currentBanner?.placement === 'custom' && (
+                    <button
+                      onClick={() => setIsPlacementModalOpen(true)}
+                      className="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2"
+                    >
+                      <Move className="w-4 h-4" />
+                      Configure Custom Placement
+                    </button>
+                  )}
                 </div>
 
                 {/* Routes */}
@@ -511,8 +586,13 @@ const AdminContent: React.FC = () => {
                     </label>
                     <input
                       type="datetime-local"
-                      value={currentBanner?.startDate ? new Date(currentBanner.startDate).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, startDate: e.target.value }))}
+                      value={currentBanner?.startDate ? (() => {
+                        const date = new Date(currentBanner.startDate);
+                        const offset = date.getTimezoneOffset();
+                        const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                        return localDate.toISOString().slice(0, 16);
+                      })() : ''}
+                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, startDate: e.target.value ? new Date(e.target.value).toISOString() : undefined }))}
                       className={`w-full px-4 py-2 rounded-lg border ${isDarkMode
                         ? 'bg-gray-700 border-gray-600 text-white'
                         : 'bg-white border-gray-300 text-gray-900'
@@ -526,8 +606,13 @@ const AdminContent: React.FC = () => {
                     </label>
                     <input
                       type="datetime-local"
-                      value={currentBanner?.endDate ? new Date(currentBanner.endDate).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, endDate: e.target.value }))}
+                      value={currentBanner?.endDate ? (() => {
+                        const date = new Date(currentBanner.endDate);
+                        const offset = date.getTimezoneOffset();
+                        const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                        return localDate.toISOString().slice(0, 16);
+                      })() : ''}
+                      onChange={(e) => setCurrentBanner(prev => ({ ...prev, endDate: e.target.value ? new Date(e.target.value).toISOString() : undefined }))}
                       className={`w-full px-4 py-2 rounded-lg border ${isDarkMode
                         ? 'bg-gray-700 border-gray-600 text-white'
                         : 'bg-white border-gray-300 text-gray-900'
@@ -593,87 +678,98 @@ const AdminContent: React.FC = () => {
 
             {/* Live Preview */}
             <div className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border rounded-2xl p-6 shadow-xl sticky top-24`}>
-              <div className="flex items-center gap-2 mb-4">
-                <Eye className="w-5 h-5" />
-                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Live Preview
-                </h2>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
+                  <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Live Preview
+                  </h2>
+                </div>
+                <button
+                  onClick={() => {
+                    const canvasUrl = `/admin/canvas-editor`;
+                    const canvasWindow = window.open(canvasUrl, '_blank');
+                    if (canvasWindow) {
+                      // Pass banner data via postMessage after window loads
+                      setTimeout(() => {
+                        canvasWindow.postMessage({
+                          type: 'BANNER_DATA',
+                          data: currentBanner
+                        }, window.location.origin);
+                      }, 500);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-gray-900 rounded-lg font-medium transition-colors"
+                  title="Open full-screen canvas editor in new tab"
+                >
+                  <Palette className="w-4 h-4" />
+                  Open Canvas Editor
+                </button>
               </div>
 
               <div className="space-y-4">
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  This is how your banner will appear. Drag elements to reposition:
+                  This is how your banner will appear on the public pages:
                 </p>
 
-                {/* Enhanced Preview with Drag & Drop */}
+                {/* Banner Preview */}
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden backdrop-blur-sm">
-                  <div
-                    style={{
-                      backgroundColor: currentBanner?.backgroundColor || '#FF006B',
-                      color: currentBanner?.textColor || '#FFFFFF',
-                      height: `${currentBanner?.height || 60}px`,
-                      borderRadius: currentBanner?.borderRadius ? `${currentBanner.borderRadius}px` : '0px',
-                      padding: currentBanner?.padding ? `${currentBanner.padding}px` : '16px',
-                    }}
-                    className="flex items-center justify-center relative backdrop-blur-md bg-opacity-90"
-                  >
-                    {/* Image */}
-                    {(currentBanner?.type === 'image' || currentBanner?.type === 'both') && currentBanner?.imageUrl && (
-                      <div
-                        draggable
-                        className="cursor-move hover:opacity-80 transition-opacity"
-                        onDragStart={(e) => {
-                          e.dataTransfer.effectAllowed = 'move';
-                          (e.target as HTMLElement).style.opacity = '0.5';
+                  {currentBanner?.imageUrl && currentBanner.type === 'image' ? (
+                    /* Show exported canvas image */
+                    <div className="relative w-full" style={{ height: `${currentBanner?.height || 88}px` }}>
+                      <img
+                        src={currentBanner.imageUrl}
+                        alt="Banner Preview"
+                        className="w-full h-full object-cover"
+                        style={{
+                          borderRadius: currentBanner?.borderRadius ? `${currentBanner.borderRadius}px` : '0px',
                         }}
-                        onDragEnd={(e) => {
-                          (e.target as HTMLElement).style.opacity = '1';
-                        }}
-                      >
-                        <img
-                          src={currentBanner.imageUrl}
-                          alt="Preview"
-                          className="object-contain"
-                          style={{
-                            maxHeight: `${(currentBanner.height || 60) * 0.8}px`,
-                            height: currentBanner.imageHeight ? `${currentBanner.imageHeight}px` : 'auto',
-                            width: currentBanner.imageWidth ? `${currentBanner.imageWidth}px` : 'auto',
-                          }}
-                        />
-                      </div>
-                    )}
+                      />
+                    </div>
+                  ) : (
+                    /* Show constructed preview */
+                    <div
+                      style={{
+                        backgroundColor: currentBanner?.backgroundColor || '#FF006B',
+                        color: currentBanner?.textColor || '#FFFFFF',
+                        height: `${currentBanner?.height || 88}px`,
+                        borderRadius: currentBanner?.borderRadius ? `${currentBanner.borderRadius}px` : '0px',
+                        padding: currentBanner?.padding ? `${currentBanner.padding}px` : '16px',
+                      }}
+                      className="flex items-center justify-center relative backdrop-blur-md bg-opacity-90"
+                    >
+                      {/* Image */}
+                      {(currentBanner?.type === 'image' || currentBanner?.type === 'both') && currentBanner?.imageUrl && (
+                        <div className="cursor-move hover:opacity-80 transition-opacity">
+                          <img
+                            src={currentBanner.imageUrl}
+                            alt="Preview"
+                            className="object-contain"
+                            style={{
+                              maxHeight: `${(currentBanner.height || 88) * 0.8}px`,
+                              height: currentBanner.imageHeight ? `${currentBanner.imageHeight}px` : 'auto',
+                              width: currentBanner.imageWidth ? `${currentBanner.imageWidth}px` : 'auto',
+                            }}
+                          />
+                        </div>
+                      )}
 
-                    {/* Text */}
-                    {(currentBanner?.type === 'text' || currentBanner?.type === 'both') && (
-                      <div
-                        draggable
-                        className={`cursor-move hover:opacity-80 transition-opacity ${currentBanner?.type === 'both' ? 'ml-4' : ''
-                          }`}
-                        onDragStart={(e) => {
-                          e.dataTransfer.effectAllowed = 'move';
-                          (e.target as HTMLElement).style.opacity = '0.5';
-                        }}
-                        onDragEnd={(e) => {
-                          (e.target as HTMLElement).style.opacity = '1';
-                        }}
-                      >
-                        <p
-                          className="text-center drop-shadow-sm select-none"
-                          style={{
-                            fontSize: currentBanner?.fontSize ? `${currentBanner.fontSize}px` : '16px',
-                            fontWeight: currentBanner?.fontWeight || 700,
-                          }}
-                        >
-                          {currentBanner?.content || 'Your content here...'}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Close Button */}
-                    <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded-full backdrop-blur-sm">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+                      {/* Text */}
+                      {(currentBanner?.type === 'text' || currentBanner?.type === 'both') && (
+                        <div className={`${currentBanner?.type === 'both' ? 'ml-4' : ''}`}>
+                          <p
+                            className="text-center drop-shadow-sm select-none"
+                            style={{
+                              fontSize: currentBanner?.fontSize ? `${currentBanner.fontSize}px` : '16px',
+                              fontWeight: currentBanner?.fontWeight || 700,
+                            }}
+                          >
+                            {currentBanner?.content || 'Your content here...'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Formatting Info */}
@@ -787,16 +883,24 @@ const AdminContent: React.FC = () => {
 
                     {/* Preview */}
                     <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
-                      <div
-                        style={{
-                          backgroundColor: banner.backgroundColor,
-                          color: banner.textColor,
-                          height: `${Math.min(banner.height, 80)}px`
-                        }}
-                        className="rounded-lg flex items-center justify-center px-4 text-sm"
-                      >
-                        {banner.content}
-                      </div>
+                      {banner.type === 'image' && banner.imageUrl ? (
+                        <div className="rounded-lg overflow-hidden" style={{ height: `${Math.min(banner.height, 120)}px` }}>
+                          <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-contain" />
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            background: banner.backgroundType === 'gradient' && banner.gradientStart && banner.gradientEnd
+                              ? `linear-gradient(${banner.gradientDirection || 'to right'}, ${banner.gradientStart}, ${banner.gradientEnd})`
+                              : banner.backgroundColor,
+                            color: banner.textColor,
+                            height: `${Math.min(banner.height, 80)}px`
+                          }}
+                          className="rounded-lg flex items-center justify-center px-4 text-sm"
+                        >
+                          {banner.content}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -805,6 +909,27 @@ const AdminContent: React.FC = () => {
           </div>
         )}
       </div>
+      {isPlacementModalOpen && currentBanner && (
+        <CustomPlacementModal
+          isOpen={isPlacementModalOpen}
+          onClose={() => setIsPlacementModalOpen(false)}
+          onSave={(data) => {
+            setCurrentBanner(prev => ({
+              ...prev,
+              customX: data.x,
+              customY: data.y,
+              customWidth: data.width
+            }));
+            setIsPlacementModalOpen(false);
+          }}
+          initialData={{
+            x: currentBanner.customX || 50,
+            y: currentBanner.customY || 50,
+            width: currentBanner.customWidth || 300
+          }}
+          bannerPreviewUrl={currentBanner.imageUrl}
+        />
+      )}
     </div>
   );
 };

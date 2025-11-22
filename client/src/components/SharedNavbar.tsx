@@ -1,9 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Info, BookOpen, FileText, LogIn, UserPlus, Palette, Download, Monitor, Apple, HardDrive, ChevronDown, BadgeDollarSign } from 'lucide-react';
+import {
+  Home,
+  Info,
+  BookOpen,
+  FileText,
+  BadgeDollarSign,
+  Download,
+  LogIn,
+  UserPlus,
+  Palette,
+  Monitor,
+  Apple,
+  HardDrive,
+  ChevronDown,
+  Menu,
+  X
+} from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
-// Logo is now in public folder
 
 interface Release {
   _id: string;
@@ -24,6 +39,7 @@ const SharedNavbar: React.FC = () => {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isActive = (path: string) => {
@@ -53,10 +69,8 @@ const SharedNavbar: React.FC = () => {
   const fetchReleases = async () => {
     try {
       setLoading(true);
-      // Fetch ALL releases, not just latest
       const response = await api.get('/releases');
       if (response?.success) {
-        // Sort releases: latest first, then by date
         const sortedReleases = response.data.sort((a: Release, b: Release) => {
           if (a.isLatest && !b.isLatest) return -1;
           if (!a.isLatest && b.isLatest) return 1;
@@ -72,28 +86,18 @@ const SharedNavbar: React.FC = () => {
   };
 
   const handleDownload = (release: Release) => {
-    // If URL is absolute (starts with http), use it directly
     if (release.downloadUrl.startsWith('http')) {
       window.open(release.downloadUrl, '_blank');
     } else {
-      // Otherwise prepend the API base URL (assuming it's relative)
-      // Use the configured API URL, or infer from window location in production, or fallback to localhost in dev
       let baseUrl = process.env.REACT_APP_API_URL;
-
       if (!baseUrl) {
         if (process.env.NODE_ENV === 'production') {
-          // In production, if no API URL is set, assume relative to current origin or specific API subdomain
-          // If the app is served from the same domain as API (e.g. via proxy), use empty string
-          // If we are on sartthi.com, the API might be at /api or on a subdomain
           baseUrl = '';
         } else {
           baseUrl = 'http://localhost:5000';
         }
       }
-
-      // Remove trailing slash if present to avoid double slashes
       baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-
       window.open(`${baseUrl}${release.downloadUrl}`, '_blank');
     }
     setShowDownloadMenu(false);
@@ -118,16 +122,17 @@ const SharedNavbar: React.FC = () => {
     <nav className={`fixed top-0 left-0 right-0 z-50 ${isDarkMode ? 'bg-gray-800/20 backdrop-blur-md border-b border-gray-700/20' : 'bg-white/20 backdrop-blur-md border-b border-white/20'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center">
-                <img src="/logo.png" alt="Sartthi Logo" className="h-8 w-auto" />
+                <img src="/2.png" alt="Sartthi Logo" className="h-7 w-auto" />
               </Link>
             </div>
           </div>
 
-          {/* Navigation Links */}
+          {/* Navigation Links - Desktop */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
               <Link
@@ -167,7 +172,7 @@ const SharedNavbar: React.FC = () => {
               </Link>
 
               {/* Download Dropdown */}
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative inline-block" ref={dropdownRef}>
                 <button
                   onClick={() => setShowDownloadMenu(!showDownloadMenu)}
                   className={`${isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent'} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
@@ -286,8 +291,25 @@ const SharedNavbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Auth Buttons and Theme Changer */}
-          <div className="flex items-center space-x-4">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className={`text-accent hover:text-accent-dark p-2 rounded-lg transition-colors duration-200`}
+              title="Toggle Theme"
+            >
+              <Palette size={20} />
+            </button>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={`p-2 rounded-md ${isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100'}`}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Auth Buttons - Desktop */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/login"
               className={`${isActive('/login') ? 'text-accent' : (isDarkMode ? 'text-gray-200 hover:text-accent' : 'text-gray-800 hover:text-accent')} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2`}
@@ -312,6 +334,82 @@ const SharedNavbar: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className={`md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+          <Link
+            to="/"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/') ? 'bg-accent/10 text-accent' : (isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100')}`}
+          >
+            <div className="flex items-center gap-2">
+              <Home size={18} />
+              Home
+            </div>
+          </Link>
+          <Link
+            to="/about"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/about') ? 'bg-accent/10 text-accent' : (isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100')}`}
+          >
+            <div className="flex items-center gap-2">
+              <Info size={18} />
+              About
+            </div>
+          </Link>
+          <Link
+            to="/user-guide"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/user-guide') ? 'bg-accent/10 text-accent' : (isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100')}`}
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen size={18} />
+              User Guide
+            </div>
+          </Link>
+          <Link
+            to="/docs"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/docs') ? 'bg-accent/10 text-accent' : (isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100')}`}
+          >
+            <div className="flex items-center gap-2">
+              <FileText size={18} />
+              Docs
+            </div>
+          </Link>
+          <Link
+            to="/pricing"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/pricing') ? 'bg-accent/10 text-accent' : (isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100')}`}
+          >
+            <div className="flex items-center gap-2">
+              <BadgeDollarSign size={18} />
+              Pricing
+            </div>
+          </Link>
+
+          <div className={`pt-4 pb-2 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} mt-2`}>
+            <Link
+              to="/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block px-3 py-2 rounded-md text-base font-medium ${isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-800 hover:bg-gray-100'}`}
+            >
+              <div className="flex items-center gap-2">
+                <LogIn size={18} />
+                Login
+              </div>
+            </Link>
+            <Link
+              to="/register"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-accent hover:bg-accent-hover mt-2 mx-2 text-center shadow-md"
+            >
+              Register
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

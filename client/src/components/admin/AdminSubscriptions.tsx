@@ -21,7 +21,6 @@ interface SubscriptionPlanPayload {
     maxWorkspaces: number;
     maxProjects: number;
     maxTeamMembers: number;
-    storageInGB: number;
   };
   features: {
     aiAccess: boolean;
@@ -210,26 +209,6 @@ const AdminSubscriptions: React.FC = () => {
                   <span className="w-24">Members</span>
                   <input
                     type="number"
-                    className="flex-1 rounded-lg border p-2"
-                    value={plan.limits.maxTeamMembers}
-                    onChange={(e) => handleFieldChange(plan.planKey, ['limits', 'maxTeamMembers'], Number(e.target.value))}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <span className="w-24">Storage</span>
-                  <input
-                    type="number"
-                    className="flex-1 rounded-lg border p-2"
-                    value={plan.limits.storageInGB}
-                    onChange={(e) => handleFieldChange(plan.planKey, ['limits', 'storageInGB'], Number(e.target.value))}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <span className="w-24">Per-head</span>
-                  <input
-                    type="number"
-                    className="flex-1 rounded-lg border p-2"
-                    value={plan.perHeadPrice}
                     onChange={(e) => handleFieldChange(plan.planKey, ['perHeadPrice'], Number(e.target.value))}
                   />
                 </div>

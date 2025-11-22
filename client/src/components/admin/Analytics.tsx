@@ -7,7 +7,16 @@ import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
 import AdminDockNavigation from './AdminDockNavigation';
 import AdminChatbotButton from './AdminChatbotButton';
 import AnalyticsCharts from './AnalyticsCharts';
+import AnalyticsDetailModal from './AnalyticsDetailModal';
 import api from '../../services/api';
+import {
+  UserGrowthDetail,
+  DeviceActivityDetail,
+  UserDistributionDetail,
+  DeviceRiskDetail,
+  GrowthMetricsDetail,
+  DeviceSecurityDetail
+} from './AnalyticsDetailViews';
 
 interface AnalyticsData {
   overview: {
@@ -62,11 +71,17 @@ const Analytics: React.FC = () => {
   const { isDarkMode } = useTheme();
   const { addToast } = useApp();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [expandedChart, setExpandedChart] = useState<string | null>(null);
+  const [chartDetailData, setChartDetailData] = useState<any>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   useEffect(() => {
+    // Clear any expired tokens first
     clearExpiredTokens();
+
+    // Check if admin is logged in
     const token = localStorage.getItem('adminToken');
     if (!token || !validateAdminToken(token)) {
       navigate('/my-admin/login', { replace: true });
@@ -87,6 +102,32 @@ const Analytics: React.FC = () => {
       addToast('Failed to load analytics', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChartClick = async (chartType: string) => {
+    setLoadingDetail(true);
+    setExpandedChart(chartType);
+
+    try {
+      const endpoints: { [key: string]: string } = {
+        userGrowth: '/admin/analytics/user-growth-detail',
+        deviceActivity: '/admin/analytics/device-activity-detail',
+        userDistribution: '/admin/analytics/user-distribution-detail',
+        deviceRisk: '/admin/analytics/device-risk-detail',
+        growthMetrics: '/admin/analytics/growth-metrics-detail',
+        deviceSecurity: '/admin/analytics/device-security-detail'
+      };
+
+      const response = await api.get(endpoints[chartType]);
+      if (response?.success) {
+        setChartDetailData(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch chart details:', error);
+      addToast('Failed to load details', 'error');
+    } finally {
+      setLoadingDetail(false);
     }
   };
 
@@ -220,11 +261,15 @@ const Analytics: React.FC = () => {
           deviceActivityTrend={analytics.devices.activityTrend.map(t => ({ date: t.date, value: t.active }))}
           userDistribution={analytics.engagement.userDistribution}
           devicesByRisk={analytics.devices.byRisk}
+          onChartClick={handleChartClick}
         />
 
         {/* Additional Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
+          <div
+            onClick={() => handleChartClick('growthMetrics')}
+            className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow`}
+          >
             <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
               Growth Metrics
             </h3>
@@ -250,7 +295,10 @@ const Analytics: React.FC = () => {
             </div>
           </div>
 
-          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6`}>
+          <div
+            onClick={() => handleChartClick('deviceSecurity')}
+            className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow`}
+          >
             <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
               Device Security
             </h3>
@@ -277,6 +325,43 @@ const Analytics: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      <AnalyticsDetailModal
+        isOpen={!!expandedChart}
+        onClose={() => {
+          setExpandedChart(null);
+          setChartDetailData(null);
+        }}
+        title={
+          expandedChart === 'userGrowth' ? 'User Growth Details' :
+            expandedChart === 'deviceActivity' ? 'Device Activity Details' :
+              expandedChart === 'userDistribution' ? 'User Distribution Details' :
+                expandedChart === 'deviceRisk' ? 'Device Risk Analysis' :
+                  expandedChart === 'growthMetrics' ? 'Growth Metrics Analysis' :
+                    expandedChart === 'deviceSecurity' ? 'Device Security Analysis' :
+                      'Analytics Details'
+        }
+      >
+        {loadingDetail ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+          </div>
+        ) : chartDetailData ? (
+          <>
+            {expandedChart === 'userGrowth' && <UserGrowthDetail data={chartDetailData} isDarkMode={isDarkMode} />}
+            {expandedChart === 'deviceActivity' && <DeviceActivityDetail data={chartDetailData} isDarkMode={isDarkMode} />}
+            {expandedChart === 'userDistribution' && <UserDistributionDetail data={chartDetailData} isDarkMode={isDarkMode} />}
+            {expandedChart === 'deviceRisk' && <DeviceRiskDetail data={chartDetailData} isDarkMode={isDarkMode} />}
+            {expandedChart === 'growthMetrics' && <GrowthMetricsDetail data={chartDetailData} isDarkMode={isDarkMode} />}
+            {expandedChart === 'deviceSecurity' && <DeviceSecurityDetail data={chartDetailData} isDarkMode={isDarkMode} />}
+          </>
+        ) : (
+          <div className="text-center py-12 opacity-50">
+            No details available
+          </div>
+        )}
+      </AnalyticsDetailModal>
 
       {/* Admin Dock Navigation */}
       <AdminDockNavigation />

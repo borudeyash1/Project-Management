@@ -22,6 +22,7 @@ interface AnalyticsChartsProps {
     high: number;
     critical: number;
   };
+  onChartClick?: (chartType: string) => void;
 }
 
 const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
@@ -29,7 +30,8 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
   userGrowthTrend,
   deviceActivityTrend,
   userDistribution,
-  devicesByRisk
+  devicesByRisk,
+  onChartClick
 }) => {
   // Line Chart Component
   const LineChart: React.FC<{ data: ChartData[]; title: string; color: string }> = ({ data, title, color }) => {
@@ -55,17 +57,17 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
         </h3>
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-32">
           {/* Grid lines */}
-          <line x1={padding} y1={padding} x2={padding} y2={height - padding} 
-                stroke={isDarkMode ? '#374151' : '#E5E7EB'} strokeWidth="0.5" />
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} 
-                stroke={isDarkMode ? '#374151' : '#E5E7EB'} strokeWidth="0.5" />
-          
+          <line x1={padding} y1={padding} x2={padding} y2={height - padding}
+            stroke={isDarkMode ? '#374151' : '#E5E7EB'} strokeWidth="0.5" />
+          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding}
+            stroke={isDarkMode ? '#374151' : '#E5E7EB'} strokeWidth="0.5" />
+
           {/* Area under curve */}
           <polygon points={areaPoints} fill={color} opacity="0.1" />
-          
+
           {/* Line */}
           <polyline points={points} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          
+
           {/* Data points */}
           {data.map((d, i) => {
             const x = (i / (data.length - 1)) * (width - 2 * padding) + padding;
@@ -90,8 +92,8 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
   };
 
   // Donut Chart Component
-  const DonutChart: React.FC<{ 
-    data: { label: string; value: number; color: string }[]; 
+  const DonutChart: React.FC<{
+    data: { label: string; value: number; color: string }[];
     title: string;
   }> = ({ data, title }) => {
     const total = data.reduce((sum, d) => sum + d.value, 0);
@@ -108,7 +110,7 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
       const angle = (percentage / 100) * 360;
       const startAngle = currentAngle;
       const endAngle = currentAngle + angle;
-      
+
       currentAngle = endAngle;
 
       const startRad = (startAngle * Math.PI) / 180;
@@ -147,8 +149,8 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
             ))}
             {/* Center hole */}
             <circle cx={centerX} cy={centerY} r={radius - strokeWidth} fill={isDarkMode ? '#1F2937' : '#FFFFFF'} />
-            <text x={centerX} y={centerY} textAnchor="middle" dy="0.3em" 
-                  className={`text-xs font-bold ${isDarkMode ? 'fill-gray-300' : 'fill-gray-700'}`}>
+            <text x={centerX} y={centerY} textAnchor="middle" dy="0.3em"
+              className={`text-xs font-bold ${isDarkMode ? 'fill-gray-300' : 'fill-gray-700'}`}>
               {total}
             </text>
           </svg>
@@ -171,8 +173,8 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
   };
 
   // Bar Chart Component
-  const BarChart: React.FC<{ 
-    data: { label: string; value: number; color: string }[]; 
+  const BarChart: React.FC<{
+    data: { label: string; value: number; color: string }[];
     title: string;
   }> = ({ data, title }) => {
     const maxValue = Math.max(...data.map(d => d.value), 1);
@@ -192,9 +194,9 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
                 </span>
               </div>
               <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'} rounded-full overflow-hidden`}>
-                <div 
+                <div
                   className="h-full rounded-full transition-all duration-500"
-                  style={{ 
+                  style={{
                     width: `${(item.value / maxValue) * 100}%`,
                     backgroundColor: item.color
                   }}
@@ -226,28 +228,36 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
     <div className="space-y-6">
       {/* Line Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LineChart 
-          data={userGrowthTrend} 
-          title="User Growth (Last 30 Days)" 
-          color="#3B82F6" 
-        />
-        <LineChart 
-          data={deviceActivityTrend} 
-          title="Device Activity (Last 7 Days)" 
-          color="#10B981" 
-        />
+        <div onClick={() => onChartClick?.('userGrowth')} className="cursor-pointer hover:shadow-lg transition-shadow">
+          <LineChart
+            data={userGrowthTrend}
+            title="User Growth (Last 30 Days)"
+            color="#3B82F6"
+          />
+        </div>
+        <div onClick={() => onChartClick?.('deviceActivity')} className="cursor-pointer hover:shadow-lg transition-shadow">
+          <LineChart
+            data={deviceActivityTrend}
+            title="Device Activity (Last 7 Days)"
+            color="#10B981"
+          />
+        </div>
       </div>
 
       {/* Donut and Bar Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DonutChart 
-          data={userDistributionData} 
-          title="User Distribution by Activity" 
-        />
-        <BarChart 
-          data={deviceRiskData} 
-          title="Devices by Risk Level" 
-        />
+        <div onClick={() => onChartClick?.('userDistribution')} className="cursor-pointer hover:shadow-lg transition-shadow">
+          <DonutChart
+            data={userDistributionData}
+            title="User Distribution by Activity"
+          />
+        </div>
+        <div onClick={() => onChartClick?.('deviceRisk')} className="cursor-pointer hover:shadow-lg transition-shadow">
+          <BarChart
+            data={deviceRiskData}
+            title="Devices by Risk Level"
+          />
+        </div>
       </div>
     </div>
   );
