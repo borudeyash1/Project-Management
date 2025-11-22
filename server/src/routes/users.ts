@@ -1,13 +1,15 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { 
-  getProfile, 
-  updateProfile, 
+import {
+  getProfile,
+  updateProfile,
   updateSettings,
   deleteAccount,
   uploadAvatar,
   searchUsers,
-  saveFaceScan
+  saveFaceScan,
+  getPreferences,
+  updatePreferences
 } from '../controllers/userController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -60,5 +62,9 @@ router.post('/face-scan', saveFaceScan);
 router.put('/settings', validateRequest, updateSettings);
 router.delete('/account', deleteAccount);
 router.post('/avatar', uploadAvatar);
+
+// Preferences routes
+router.get('/preferences', getPreferences);
+router.put('/preferences', validateRequest, updatePreferences);
 
 export default router;
