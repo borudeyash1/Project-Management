@@ -452,7 +452,7 @@ const HomePage: React.FC = () => {
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h2>
                 <button
                   onClick={() => setShowQuickAdd(!showQuickAdd)}
-                  className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg hover:opacity-90 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Task
@@ -466,7 +466,7 @@ const HomePage: React.FC = () => {
                     <button
                       onClick={() => setNewTaskType('task')}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'task'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-accent text-white'
                         : isDarkMode
                           ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -478,7 +478,7 @@ const HomePage: React.FC = () => {
                     <button
                       onClick={() => setNewTaskType('note')}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'note'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-accent text-white'
                         : isDarkMode
                           ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -490,7 +490,7 @@ const HomePage: React.FC = () => {
                     <button
                       onClick={() => setNewTaskType('checklist')}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'checklist'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-accent text-white'
                         : isDarkMode
                           ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -514,7 +514,7 @@ const HomePage: React.FC = () => {
                     />
                     <button
                       onClick={handleAddQuickTask}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90"
                     >
                       Add
                     </button>
@@ -731,7 +731,7 @@ const HomePage: React.FC = () => {
                       </div>
                       <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          className="bg-accent h-2 rounded-full transition-all"
                           style={{ width: `${project.progress}%` }}
                         />
                       </div>

@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
                 </button>
               </WorkspaceCreationRestriction>
               <button 
-                className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500"
+                className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-accent"
                 onClick={() => showToast('Quick add', 'info')}
               >
                 <Plus className="w-4 h-4 mr-1 inline-block" />
@@ -442,7 +442,7 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
                 Sort
               </button>
             </div>
-            <button className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-yellow-500">
+            <button className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-accent">
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />
               Add Project
             </button>

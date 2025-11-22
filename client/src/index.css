@@ -1,3 +1,56 @@
+/* Theme CSS Variables */
+:root {
+  /* Accent Color - Default Yellow */
+  --accent-color: #FBBF24;
+  --accent-color-rgb: 251, 191, 36;
+
+  /* Font Sizes */
+  --base-font-size: 16px;
+
+  /* Density/Spacing */
+  --spacing-unit: 1rem;
+
+  /* Animations */
+  --animation-duration: 200ms;
+}
+
+/* Font size variations */
+[data-font-size="small"] {
+  --base-font-size: 14px;
+}
+
+[data-font-size="medium"] {
+  --base-font-size: 16px;
+}
+
+[data-font-size="large"] {
+  --base-font-size: 18px;
+}
+
+/* Density variations */
+[data-density="compact"] {
+  --spacing-unit: 0.75rem;
+}
+
+[data-density="comfortable"] {
+  --spacing-unit: 1rem;
+}
+
+[data-density="spacious"] {
+  --spacing-unit: 1.5rem;
+}
+
+/* Animation control */
+[data-animations="false"] * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Apply font size to html for rem scaling */
+html {
+  font-size: var(--base-font-size);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

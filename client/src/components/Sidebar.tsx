@@ -269,7 +269,7 @@ const Sidebar: React.FC = () => {
           <div className="p-4 border-t border-border dark:border-gray-600">
             <div className="bg-slate-50 dark:bg-gray-700 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-6 rounded-md flex items-center justify-center text-white font-semibold text-xs bg-yellow-500">
+                <div className="h-6 w-6 rounded-md flex items-center justify-center text-white font-semibold text-xs bg-accent">
                   {state.currentWorkspace.charAt(0)}
                 </div>
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{state.currentWorkspace}</span>

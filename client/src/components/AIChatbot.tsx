@@ -135,19 +135,19 @@ What would you like to know?`,
       
       <div className="relative flex flex-col h-full max-w-4xl mx-auto bg-white shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-gradient-to-r from-yellow-500 to-orange-500">
+        <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-accent">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <Bot className="w-5 h-5 text-yellow-600" />
+              <Bot className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">AI Assistant</h3>
-              <p className="text-sm text-yellow-100">Powered by AI</p>
+              <h3 className="text-lg font-semibold text-gray-900">AI Assistant</h3>
+              <p className="text-sm text-gray-800">Powered by AI</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:text-yellow-200 transition-colors"
+            className="text-gray-900 hover:text-gray-700 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -164,7 +164,7 @@ What would you like to know?`,
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   message.type === 'user' 
                     ? 'bg-accent text-gray-900 ml-2' 
-                    : 'bg-yellow-500 text-white mr-2'
+                    : 'bg-gray-200 text-gray-700 mr-2'
                 }`}>
                   {message.type === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                 </div>
@@ -176,7 +176,7 @@ What would you like to know?`,
                 }`}>
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   <p className={`text-xs mt-1 ${
-                    message.type === 'user' ? 'text-blue-100' : 'text-gray-600'
+                    message.type === 'user' ? 'text-gray-700' : 'text-gray-600'
                   }`}>
                     {formatTime(message.timestamp)}
                   </p>
@@ -188,7 +188,7 @@ What would you like to know?`,
           {isLoading && (
             <div className="flex justify-start">
               <div className="flex max-w-xs lg:max-w-md">
-                <div className="w-8 h-8 rounded-full bg-yellow-500 text-white mr-2 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-700 mr-2 flex items-center justify-center">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div className="bg-gray-100 rounded-lg px-4 py-2">
@@ -231,13 +231,13 @@ What would you like to know?`,
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Ask me anything about your work..."
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={!inputMessage.trim() || isLoading}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />
             </button>

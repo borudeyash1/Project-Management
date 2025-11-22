@@ -103,16 +103,166 @@ export const searchUsers = async (req: any, res: Response): Promise<void> => {
 // Update user profile
 export const updateProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { fullName, contactNumber, designation, department, location, about } = req.body;
+    const {
+      fullName,
+      username,
+      contactNumber,
+      designation,
+      department,
+      location,
+      about,
+      profile
+    } = req.body;
+
     const user = req.user!;
 
-    // Update fields
+    // Update basic fields
     if (fullName) user.fullName = fullName;
+    if (username) user.username = username;
     if (contactNumber) user.contactNumber = contactNumber;
     if (designation) user.designation = designation;
     if (department) user.department = department;
     if (location) user.location = location;
     if (about) user.about = about;
+
+    // Update profile object (nested fields)
+    if (profile) {
+      if (!user.profile) {
+        user.profile = {};
+      }
+
+      // Professional Information
+      if (profile.jobTitle !== undefined) user.profile.jobTitle = profile.jobTitle;
+      if (profile.company !== undefined) user.profile.company = profile.company;
+      if (profile.industry !== undefined) user.profile.industry = profile.industry;
+      if (profile.experience !== undefined) user.profile.experience = profile.experience;
+      if (profile.skills !== undefined) user.profile.skills = profile.skills;
+
+      // Work Preferences
+      if (profile.workPreferences) {
+        if (!user.profile.workPreferences) {
+          user.profile.workPreferences = {};
+        }
+        if (profile.workPreferences.workStyle !== undefined) {
+          user.profile.workPreferences.workStyle = profile.workPreferences.workStyle;
+        }
+        if (profile.workPreferences.communicationStyle !== undefined) {
+          user.profile.workPreferences.communicationStyle = profile.workPreferences.communicationStyle;
+        }
+        if (profile.workPreferences.timeManagement !== undefined) {
+          user.profile.workPreferences.timeManagement = profile.workPreferences.timeManagement;
+        }
+        if (profile.workPreferences.preferredWorkingHours) {
+          if (!user.profile.workPreferences.preferredWorkingHours) {
+            user.profile.workPreferences.preferredWorkingHours = {};
+          }
+          if (profile.workPreferences.preferredWorkingHours.start !== undefined) {
+            user.profile.workPreferences.preferredWorkingHours.start = profile.workPreferences.preferredWorkingHours.start;
+          }
+          if (profile.workPreferences.preferredWorkingHours.end !== undefined) {
+            user.profile.workPreferences.preferredWorkingHours.end = profile.workPreferences.preferredWorkingHours.end;
+          }
+        }
+        if (profile.workPreferences.timezone !== undefined) {
+          user.profile.workPreferences.timezone = profile.workPreferences.timezone;
+        }
+      }
+
+      // Personality
+      if (profile.personality) {
+        if (!user.profile.personality) {
+          user.profile.personality = {};
+        }
+        if (profile.personality.traits !== undefined) {
+          user.profile.personality.traits = profile.personality.traits;
+        }
+        if (profile.personality.workingStyle !== undefined) {
+          user.profile.personality.workingStyle = profile.personality.workingStyle;
+        }
+        if (profile.personality.stressLevel !== undefined) {
+          user.profile.personality.stressLevel = profile.personality.stressLevel;
+        }
+        if (profile.personality.motivationFactors !== undefined) {
+          user.profile.personality.motivationFactors = profile.personality.motivationFactors;
+        }
+      }
+
+      // Goals
+      if (profile.goals) {
+        if (!user.profile.goals) {
+          user.profile.goals = {};
+        }
+        if (profile.goals.shortTerm !== undefined) {
+          user.profile.goals.shortTerm = profile.goals.shortTerm;
+        }
+        if (profile.goals.longTerm !== undefined) {
+          user.profile.goals.longTerm = profile.goals.longTerm;
+        }
+        if (profile.goals.careerAspirations !== undefined) {
+          user.profile.goals.careerAspirations = profile.goals.careerAspirations;
+        }
+      }
+
+      // Learning
+      if (profile.learning) {
+        if (!user.profile.learning) {
+          user.profile.learning = {};
+        }
+        if (profile.learning.interests !== undefined) {
+          user.profile.learning.interests = profile.learning.interests;
+        }
+        if (profile.learning.currentLearning !== undefined) {
+          user.profile.learning.currentLearning = profile.learning.currentLearning;
+        }
+        if (profile.learning.certifications !== undefined) {
+          user.profile.learning.certifications = profile.learning.certifications;
+        }
+      }
+
+      // Productivity
+      if (profile.productivity) {
+        if (!user.profile.productivity) {
+          user.profile.productivity = {};
+        }
+        if (profile.productivity.peakHours !== undefined) {
+          user.profile.productivity.peakHours = profile.productivity.peakHours;
+        }
+        if (profile.productivity.taskPreferences) {
+          if (!user.profile.productivity.taskPreferences) {
+            user.profile.productivity.taskPreferences = {};
+          }
+          Object.assign(user.profile.productivity.taskPreferences, profile.productivity.taskPreferences);
+        }
+        if (profile.productivity.workEnvironment) {
+          if (!user.profile.productivity.workEnvironment) {
+            user.profile.productivity.workEnvironment = {};
+          }
+          Object.assign(user.profile.productivity.workEnvironment, profile.productivity.workEnvironment);
+        }
+      }
+
+      // AI Preferences
+      if (profile.aiPreferences) {
+        if (!user.profile.aiPreferences) {
+          user.profile.aiPreferences = {};
+        }
+        if (profile.aiPreferences.assistanceLevel !== undefined) {
+          user.profile.aiPreferences.assistanceLevel = profile.aiPreferences.assistanceLevel;
+        }
+        if (profile.aiPreferences.preferredSuggestions !== undefined) {
+          user.profile.aiPreferences.preferredSuggestions = profile.aiPreferences.preferredSuggestions;
+        }
+        if (profile.aiPreferences.communicationStyle !== undefined) {
+          user.profile.aiPreferences.communicationStyle = profile.aiPreferences.communicationStyle;
+        }
+        if (profile.aiPreferences.notificationPreferences) {
+          if (!user.profile.aiPreferences.notificationPreferences) {
+            user.profile.aiPreferences.notificationPreferences = {};
+          }
+          Object.assign(user.profile.aiPreferences.notificationPreferences, profile.aiPreferences.notificationPreferences);
+        }
+      }
+    }
 
     await user.save();
 

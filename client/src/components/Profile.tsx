@@ -6,7 +6,9 @@ import {
   Download, Trash2, Plus, Minus, Star, Award, Trophy, Target, Zap, BarChart3
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 import apiService from '../services/api';
+import { renderProfessional, renderSkillsLearning, renderWorkPreferences, renderGoals } from './ProfileTabs';
 
 interface ProfileData {
   fullName: string;
@@ -22,6 +24,91 @@ interface ProfileData {
   joinDate: string;
   lastLogin: string;
   isEmailVerified: boolean;
+  profile?: {
+    jobTitle?: string;
+    company?: string;
+    industry?: string;
+    experience?: 'entry' | 'junior' | 'mid' | 'senior' | 'lead' | 'executive';
+    skills?: Array<{
+      name: string;
+      level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+      category: 'technical' | 'soft' | 'management' | 'creative' | 'analytical';
+    }>;
+    workPreferences?: {
+      workStyle?: 'collaborative' | 'independent' | 'mixed';
+      communicationStyle?: 'direct' | 'diplomatic' | 'analytical' | 'creative';
+      timeManagement?: 'structured' | 'flexible' | 'deadline-driven' | 'spontaneous';
+      preferredWorkingHours?: {
+        start?: string;
+        end?: string;
+      };
+      timezone?: string;
+    };
+    personality?: {
+      traits?: Array<{
+        name: string;
+        score: number;
+      }>;
+      workingStyle?: 'detail-oriented' | 'big-picture' | 'process-focused' | 'results-driven';
+      stressLevel?: 'low' | 'medium' | 'high';
+      motivationFactors?: Array<'recognition' | 'autonomy' | 'challenge' | 'security' | 'growth' | 'impact'>;
+    };
+    goals?: {
+      shortTerm?: Array<{
+        description: string;
+        targetDate?: string;
+        priority?: 'low' | 'medium' | 'high';
+      }>;
+      longTerm?: Array<{
+        description: string;
+        targetDate?: string;
+        priority?: 'low' | 'medium' | 'high';
+      }>;
+      careerAspirations?: string;
+    };
+    learning?: {
+      interests?: string[];
+      currentLearning?: Array<{
+        topic: string;
+        progress: number;
+        startDate?: string;
+        targetCompletion?: string;
+      }>;
+      certifications?: Array<{
+        name: string;
+        issuer: string;
+        dateEarned?: string;
+        expiryDate?: string;
+      }>;
+    };
+    productivity?: {
+      peakHours?: Array<{
+        start: string;
+        end: string;
+        dayOfWeek: string;
+      }>;
+      taskPreferences?: {
+        preferredTaskTypes?: Array<'creative' | 'analytical' | 'administrative' | 'collaborative' | 'technical'>;
+        taskComplexity?: 'simple' | 'moderate' | 'complex' | 'mixed';
+        deadlineSensitivity?: 'flexible' | 'moderate' | 'strict';
+      };
+      workEnvironment?: {
+        preferredEnvironment?: 'quiet' | 'moderate' | 'busy' | 'flexible';
+        collaborationPreference?: 'high' | 'medium' | 'low' | 'mixed';
+      };
+    };
+    aiPreferences?: {
+      assistanceLevel?: 'minimal' | 'moderate' | 'comprehensive';
+      preferredSuggestions?: Array<'task-prioritization' | 'time-estimation' | 'resource-allocation' | 'deadline-optimization' | 'skill-development'>;
+      communicationStyle?: 'formal' | 'casual' | 'technical' | 'friendly';
+      notificationPreferences?: {
+        taskReminders?: boolean;
+        deadlineAlerts?: boolean;
+        productivityInsights?: boolean;
+        skillRecommendations?: boolean;
+      };
+    };
+  };
   preferences: {
     theme: 'light' | 'dark' | 'system';
     notifications: {
@@ -74,6 +161,7 @@ interface ProfileData {
 
 const Profile: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { isDarkMode } = useTheme();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -147,9 +235,12 @@ const Profile: React.FC = () => {
     try {
       setLoading(true);
       const response = await apiService.getProfile();
+      console.log('✅ Profile API Response:', response);
+      console.log('✅ Profile data keys:', Object.keys(response || {}));
+      console.log('✅ Has profile object?:', !!response?.profile);
       setProfileData(response);
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
+      console.error('❌ Failed to fetch profile:', error);
       // Use mock data for now
       setProfileData({
         fullName: state.userProfile?.fullName || 'John Doe',
@@ -165,6 +256,79 @@ const Profile: React.FC = () => {
         joinDate: '2023-01-15',
         lastLogin: new Date().toISOString(),
         isEmailVerified: true,
+        profile: {
+          jobTitle: 'Senior Full Stack Developer',
+          company: 'Tech Innovations Inc.',
+          industry: 'Technology',
+          experience: 'senior',
+          skills: [
+            { name: 'React', level: 'expert', category: 'technical' },
+            { name: 'Node.js', level: 'advanced', category: 'technical' },
+            { name: 'Team Leadership', level: 'intermediate', category: 'management' }
+          ],
+          workPreferences: {
+            workStyle: 'mixed',
+            communicationStyle: 'direct',
+            timeManagement: 'structured',
+            preferredWorkingHours: {
+              start: '09:00',
+              end: '17:00'
+            },
+            timezone: 'America/Los_Angeles'
+          },
+          personality: {
+            traits: [
+              { name: 'Creativity', score: 8 },
+              { name: 'Analytical Thinking', score: 9 }
+            ],
+            workingStyle: 'results-driven',
+            stressLevel: 'medium',
+            motivationFactors: ['growth', 'challenge', 'autonomy']
+          },
+          goals: {
+            shortTerm: [
+              { description: 'Complete React certification', targetDate: '2024-06-30', priority: 'high' }
+            ],
+            longTerm: [
+              { description: 'Become a Tech Lead', targetDate: '2025-12-31', priority: 'high' }
+            ],
+            careerAspirations: 'Aspiring to lead innovative projects and mentor junior developers.'
+          },
+          learning: {
+            interests: ['AI/ML', 'Cloud Architecture', 'DevOps'],
+            currentLearning: [
+              { topic: 'AWS Solutions Architect', progress: 65, startDate: '2024-01-01', targetCompletion: '2024-06-30' }
+            ],
+            certifications: [
+              { name: 'AWS Certified Developer', issuer: 'Amazon', dateEarned: '2023-05-15' }
+            ]
+          },
+          productivity: {
+            peakHours: [
+              { start: '09:00', end: '12:00', dayOfWeek: 'monday' }
+            ],
+            taskPreferences: {
+              preferredTaskTypes: ['technical', 'analytical'],
+              taskComplexity: 'complex',
+              deadlineSensitivity: 'moderate'
+            },
+            workEnvironment: {
+              preferredEnvironment: 'moderate',
+              collaborationPreference: 'medium'
+            }
+          },
+          aiPreferences: {
+            assistanceLevel: 'moderate',
+            preferredSuggestions: ['task-prioritization', 'time-estimation'],
+            communicationStyle: 'friendly',
+            notificationPreferences: {
+              taskReminders: true,
+              deadlineAlerts: true,
+              productivityInsights: true,
+              skillRecommendations: false
+            }
+          }
+        },
         preferences: {
           theme: 'system',
           notifications: {
@@ -429,11 +593,13 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'preferences', label: 'Preferences', icon: Settings },
+    { id: 'professional', label: 'Professional', icon: Building },
+    { id: 'skills', label: 'Skills & Learning', icon: Target },
+    { id: 'work-preferences', label: 'Work Preferences', icon: Clock },
+    { id: 'goals', label: 'Goals & Aspirations', icon: Trophy },
     { id: 'addresses', label: 'Addresses', icon: MapPin },
     { id: 'payments', label: 'Payment Methods', icon: CreditCard },
-    { id: 'achievements', label: 'Achievements', icon: Award },
-    { id: 'activity', label: 'Activity', icon: BarChart3 }
+    { id: 'achievements', label: 'Achievements', icon: Award }
   ];
 
   const renderPersonalInfo = () => (
@@ -492,15 +658,10 @@ const Profile: React.FC = () => {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => {
-                setEditingField('email');
-                setEditValue(profileData?.email || '');
-              }}
-              className="text-accent-dark hover:text-blue-700"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+              <Lock className="w-4 h-4" />
+              <span className="text-xs">Non-editable</span>
+            </div>
           </div>
 
           <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -795,7 +956,7 @@ const Profile: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {profileData?.addresses.map((address) => (
+        {profileData?.addresses?.map((address) => (
           <div key={address.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -834,7 +995,7 @@ const Profile: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {profileData?.paymentMethods.map((payment) => (
+        {profileData?.paymentMethods?.map((payment) => (
           <div key={payment.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -861,7 +1022,7 @@ const Profile: React.FC = () => {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Achievements</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {profileData?.achievements.map((achievement) => (
+        {profileData?.achievements?.map((achievement) => (
           <div key={achievement.id} className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-yellow-100 rounded-lg">
@@ -961,11 +1122,13 @@ const Profile: React.FC = () => {
         {/* Content */}
         <div className="p-6">
           {activeTab === 'personal' && renderPersonalInfo()}
-          {activeTab === 'preferences' && renderPreferences()}
+          {activeTab === 'professional' && renderProfessional({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
+          {activeTab === 'skills' && renderSkillsLearning({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
+          {activeTab === 'work-preferences' && renderWorkPreferences({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
+          {activeTab === 'goals' && renderGoals({ profileData, setEditingField, setEditValue, handleSaveProfile: handleSaveField, isDarkMode })}
           {activeTab === 'addresses' && renderAddresses()}
           {activeTab === 'payments' && renderPaymentMethods()}
           {activeTab === 'achievements' && renderAchievements()}
-          {activeTab === 'activity' && renderActivity()}
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 cd ~/Project-Management
 git reset --hard
 git pull
-cd server && npm install
+cd server && npm install && npm run build
 cd ../client && npm install && npm run build
-pm2 restart server 
+pm2 restart server
