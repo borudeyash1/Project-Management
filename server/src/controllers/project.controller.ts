@@ -53,7 +53,7 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
     return res.status(201).json(project);
   } catch (error: any) {
     console.error('Error creating project:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -91,7 +91,7 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
     return res.json(projects);
   } catch (error: any) {
     console.error('Error fetching projects:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -120,7 +120,7 @@ export const getProjectById = async (req: AuthenticatedRequest, res: Response) =
     return res.json(project);
   } catch (error: any) {
     console.error('Error fetching project:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -177,7 +177,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response) =>
     return res.json(project);
   } catch (error: any) {
     console.error('Error updating project:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -209,7 +209,7 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response) =>
     return res.json({ message: 'Project deleted successfully' });
   } catch (error: any) {
     console.error('Error deleting project:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
