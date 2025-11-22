@@ -63,15 +63,6 @@ const initialState: AppState = {
   toasts: [],
   isAuthLoading: true,
   subscription: emptySubscription,
-  roles: {
-    currentUserRole: 'employee',
-    permissions: {
-      canCreateProject: false,
-      canManageEmployees: false,
-      canViewPayroll: false,
-      canExportReports: false
-    }
-  },
   modals: {
     createWorkspace: false,
     createProject: false,
@@ -117,7 +108,6 @@ type AppAction =
   | { type: 'SET_WORKSPACE'; payload: string }
   | { type: 'SET_PROJECT'; payload: string }
   | { type: 'SET_MODE'; payload: string }
-  | { type: 'SET_CURRENT_USER_ROLE'; payload: 'owner' | 'project-manager' | 'employee' }
   | { type: 'SET_CW_STEP'; payload: number }
   | { type: 'ADD_TOAST'; payload: Toast }
   | { type: 'REMOVE_TOAST'; payload: number }
@@ -161,39 +151,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, currentProject: action.payload };
     case 'SET_MODE':
       return { ...state, mode: action.payload };
-    case 'SET_CURRENT_USER_ROLE': {
-      let permissions = state.roles.permissions;
-      if (action.payload === 'owner') {
-        permissions = {
-          canCreateProject: true,
-          canManageEmployees: true,
-          canViewPayroll: true,
-          canExportReports: true
-        };
-      } else if (action.payload === 'project-manager') {
-        permissions = {
-          canCreateProject: true,
-          canManageEmployees: true,
-          canViewPayroll: false,
-          canExportReports: true
-        };
-      } else {
-        // employee
-        permissions = {
-          canCreateProject: false,
-          canManageEmployees: false,
-          canViewPayroll: false,
-          canExportReports: false
-        };
-      }
-      return {
-        ...state,
-        roles: {
-          currentUserRole: action.payload,
-          permissions
-        }
-      };
-    }
     case 'SET_CW_STEP':
       return { ...state, cwStep: action.payload };
     case 'ADD_TOAST':
@@ -361,12 +318,14 @@ export function AppProvider({ children }: AppProviderProps) {
         dispatch({ type: 'SET_USER', payload: userResponse });
 
         const workspaces = await apiService.getWorkspaces();
+        console.log('[AppProvider] Loaded workspaces:', workspaces.length, workspaces);
 
         if (workspaces.length > 0) {
           dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
           dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
           dispatch({ type: 'SET_MODE', payload: 'Workspace' });
         } else {
+          console.log('[AppProvider] No workspaces found for user');
           dispatch({ type: 'SET_WORKSPACES', payload: [] });
         }
       } catch (error) {

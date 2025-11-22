@@ -7,13 +7,9 @@ import {
   Settings, 
   Share2, 
   Plus,
-  Search,
-  Filter,
   MoreVertical,
   Edit,
   Trash2,
-  Eye,
-  EyeOff,
   CheckCircle,
   XCircle,
   Clock,
@@ -21,16 +17,18 @@ import {
   Phone,
   MapPin,
   Calendar,
-  TrendingUp,
   DollarSign,
+  TrendingUp,
   FileText,
   Download,
-  Bot
+  Bot,
+  UserCheck
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import CreateAIProjectModal from './CreateAIProjectModal';
 import ClientModal from './ClientModal';
 import InviteEmployeeModal from './InviteEmployeeModal';
+import WorkspaceJoinRequests from './WorkspaceJoinRequests';
 
 interface Client {
   _id: string;
@@ -675,6 +673,7 @@ const WorkspaceOwner: React.FC = () => {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'join-requests', label: 'Join Requests', icon: UserCheck },
     { id: 'clients', label: 'Manage Clients', icon: Users },
     { id: 'employees', label: 'Manage Employees', icon: UserPlus },
     { id: 'projects', label: 'Manage Projects', icon: Building2 },
@@ -732,6 +731,9 @@ const WorkspaceOwner: React.FC = () => {
         {/* Content */}
         <div className="p-6">
           {activeTab === 'dashboard' && renderDashboard()}
+          {activeTab === 'join-requests' && state.currentWorkspace && (
+            <WorkspaceJoinRequests workspaceId={state.currentWorkspace} />
+          )}
           {activeTab === 'clients' && renderClients()}
           {activeTab === 'employees' && renderEmployees()}
           {activeTab === 'projects' && renderProjects()}

@@ -536,15 +536,6 @@ export interface AppState {
   toasts: Toast[];
   isAuthLoading: boolean;
   subscription: UserSubscription;
-  roles: {
-    currentUserRole: 'owner' | 'project-manager' | 'employee';
-    permissions: {
-      canCreateProject: boolean;
-      canManageEmployees: boolean;
-      canViewPayroll: boolean;
-      canExportReports: boolean;
-    };
-  };
   modals: {
     createWorkspace: boolean;
     createProject: boolean;

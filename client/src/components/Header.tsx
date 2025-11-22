@@ -54,10 +54,6 @@ const Header: React.FC = () => {
     navigate('/login');
   };
 
-  const handleTestRoleChange = (role: 'owner' | 'project-manager' | 'employee') => {
-    dispatch({ type: 'SET_CURRENT_USER_ROLE', payload: role });
-  };
-
   return (
     <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6">
       <div className="flex items-center gap-3">
@@ -175,47 +171,6 @@ const Header: React.FC = () => {
                   <Settings className="w-4 h-4" />
                   Settings
                 </button>
-
-                <div className="mt-2 mb-2 rounded-lg bg-slate-50 dark:bg-gray-900/40 px-3 py-2">
-                  <div className="text-[11px] font-semibold text-slate-500 dark:text-gray-300 mb-1 uppercase">
-                    Test User Role
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <button
-                      className={`flex-1 min-w-[60px] px-2 py-1 text-[11px] rounded-full border ${
-                        state.roles.currentUserRole === 'owner'
-                          ? 'bg-accent text-gray-900 border-accent-dark'
-                          : 'bg-white text-slate-600 border-slate-200'
-                      }`}
-                      onClick={() => handleTestRoleChange('owner')}
-                    >
-                      Workspace Owner
-                    </button>
-                    <button
-                      className={`flex-1 min-w-[60px] px-2 py-1 text-[11px] rounded-full border ${
-                        state.roles.currentUserRole === 'project-manager'
-                          ? 'bg-accent text-gray-900 border-accent-dark'
-                          : 'bg-white text-slate-600 border-slate-200'
-                      }`}
-                      onClick={() => handleTestRoleChange('project-manager')}
-                    >
-                      Project Manager
-                    </button>
-                    <button
-                      className={`flex-1 min-w-[60px] px-2 py-1 text-[11px] rounded-full border ${
-                        state.roles.currentUserRole === 'employee'
-                          ? 'bg-accent text-gray-900 border-accent-dark'
-                          : 'bg-white text-slate-600 border-slate-200'
-                      }`}
-                      onClick={() => handleTestRoleChange('employee')}
-                    >
-                      Employee
-                    </button>
-                  </div>
-                  <div className="mt-1 text-[10px] text-slate-400 dark:text-gray-300">
-                    Testing only  changes affect visible tabs and permissions.
-                  </div>
-                </div>
 
                 <hr className="my-2" />
 

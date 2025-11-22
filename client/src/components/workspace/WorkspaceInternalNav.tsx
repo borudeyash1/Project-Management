@@ -30,7 +30,7 @@ const WorkspaceInternalNav: React.FC = () => {
 
   const activeWorkspaceId = state.currentWorkspace || routeWorkspaceId || state.workspaces[0]?._id || '';
   const currentWorkspace = state.workspaces.find(w => w._id === activeWorkspaceId);
-  const isOwner = currentWorkspace?.owner === state.userProfile._id || state.roles.currentUserRole === 'owner';
+  const isOwner = currentWorkspace?.owner === state.userProfile._id;
 
   const handleQuickInvite = () => {
     if (!activeWorkspaceId) return;

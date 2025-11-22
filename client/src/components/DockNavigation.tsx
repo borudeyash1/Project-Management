@@ -36,11 +36,24 @@ const DockNavigation: React.FC = () => {
 
   // Check if user owns any workspace
   const isWorkspaceOwner = useMemo(() => {
-    if (state.roles.currentUserRole === 'owner') {
-      return true;
-    }
-    return state.workspaces.some(w => w.owner === state.userProfile._id);
-  }, [state.workspaces, state.userProfile._id, state.roles.currentUserRole]);
+    const ownsWorkspace = state.workspaces.some(w => {
+      // Handle both string ID and populated object
+      const ownerId = typeof w.owner === 'string' ? w.owner : (w.owner as any)?._id;
+      return ownerId === state.userProfile._id;
+    });
+    console.log('[DockNavigation] Checking workspace ownership:', {
+      workspacesCount: state.workspaces.length,
+      userId: state.userProfile._id,
+      ownsWorkspace,
+      workspaces: state.workspaces.map(w => ({
+        id: w._id,
+        name: w.name,
+        owner: w.owner,
+        ownerId: typeof w.owner === 'string' ? w.owner : (w.owner as any)?._id
+      }))
+    });
+    return ownsWorkspace;
+  }, [state.workspaces, state.userProfile._id]);
 
   // Build main nav items dynamically
   const mainNavItems: NavItem[] = useMemo(() => {

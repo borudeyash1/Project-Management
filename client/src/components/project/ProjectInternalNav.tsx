@@ -34,11 +34,7 @@ const ProjectInternalNav: React.FC = () => {
     (m: any) => m.user === state.userProfile._id && (m.role === 'project-manager' || m.permissions?.canManageProject)
   ) || false;
   const isOwner = state.workspaces.find(w => w._id === project?.workspace)?.owner === state.userProfile._id;
-  const canManage =
-    isProjectManager ||
-    isOwner ||
-    state.roles.currentUserRole === 'owner' ||
-    state.roles.currentUserRole === 'project-manager';
+  const canManage = isProjectManager || isOwner;
 
   const projectTabs: ProjectTab[] = [
     {
