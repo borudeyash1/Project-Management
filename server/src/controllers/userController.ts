@@ -162,7 +162,7 @@ export const updateSettings = async (req: AuthenticatedRequest, res: Response): 
 export const deleteAccount = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
-    
+
     // Soft delete - deactivate account
     user.isActive = false;
     await user.save();
@@ -185,7 +185,7 @@ export const uploadAvatar = async (req: AuthenticatedRequest, res: Response): Pr
   try {
     // TODO: Implement file upload logic
     const user = req.user!;
-    
+
     // For now, just return success
     res.status(200).json({
       success: true,
@@ -199,3 +199,68 @@ export const uploadAvatar = async (req: AuthenticatedRequest, res: Response): Pr
     });
   }
 };
+
+// Get user preferences
+export const getPreferences = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user!;
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Preferences retrieved successfully',
+      data: user.preferences || {
+        theme: 'system',
+        accentColor: '#FBBF24',
+        fontSize: 'medium',
+        density: 'comfortable',
+        animations: true,
+        reducedMotion: false
+      }
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Get preferences error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Update user preferences
+export const updatePreferences = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { theme, accentColor, fontSize, density, animations, reducedMotion } = req.body;
+    const user = req.user!;
+
+    // Update preferences
+    if (!user.preferences) {
+      user.preferences = {};
+    }
+
+    if (theme) user.preferences.theme = theme;
+    if (accentColor) user.preferences.accentColor = accentColor;
+    if (fontSize) user.preferences.fontSize = fontSize;
+    if (density) user.preferences.density = density;
+    if (animations !== undefined) user.preferences.animations = animations;
+    if (reducedMotion !== undefined) user.preferences.reducedMotion = reducedMotion;
+
+    await user.save();
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Preferences updated successfully',
+      data: user.preferences
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Update preferences error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+

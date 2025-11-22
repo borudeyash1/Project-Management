@@ -10,6 +10,14 @@ export interface IUser extends Document {
   isActive: boolean;
   lastLogin?: Date;
   teams: mongoose.Types.ObjectId[];
+  preferences?: {
+    theme?: 'light' | 'dark' | 'system';
+    accentColor?: string;
+    fontSize?: 'small' | 'medium' | 'large';
+    density?: 'compact' | 'comfortable' | 'spacious';
+    animations?: boolean;
+    reducedMotion?: boolean;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,23 +26,31 @@ const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { 
-    type: String, 
-    enum: ['admin', 'manager', 'member'], 
-    default: 'member' 
+  role: {
+    type: String,
+    enum: ['admin', 'manager', 'member'],
+    default: 'member'
   },
   avatar: { type: String },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },
-  teams: [{ type: Schema.Types.ObjectId, ref: 'Team' }]
+  teams: [{ type: Schema.Types.ObjectId, ref: 'Team' }],
+  preferences: {
+    theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+    accentColor: { type: String, default: '#FBBF24' },
+    fontSize: { type: String, enum: ['small', 'medium', 'large'], default: 'medium' },
+    density: { type: String, enum: ['compact', 'comfortable', 'spacious'], default: 'comfortable' },
+    animations: { type: Boolean, default: true },
+    reducedMotion: { type: Boolean, default: false }
+  }
 }, {
   timestamps: true
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -49,7 +65,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Method to compare password
-userSchema.methods.matchPassword = async function(enteredPassword: string) {
+userSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
