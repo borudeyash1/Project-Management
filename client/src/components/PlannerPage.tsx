@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useTranslation } from 'react-i18next';
 
 interface Task {
   _id: string;
@@ -50,6 +51,7 @@ interface CalendarEvent {
 
 const PlannerPage: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const { canUseAI } = useFeatureAccess();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
@@ -380,16 +382,16 @@ const PlannerPage: React.FC = () => {
       <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Planner</h1>
-            <p className="text-gray-600 mt-1">Plan and organize your tasks and schedule</p>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('planner.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('planner.description')}</p>
           </div>
           <div className="flex items-center gap-3">
             {/* View Mode Toggle */}
             <div className="flex items-center border border-gray-300 rounded-lg">
               {[
-                { id: 'day', label: 'Day' },
-                { id: 'week', label: 'Week' },
-                { id: 'month', label: 'Month' }
+                { id: 'day', label: t('planner.day') },
+                { id: 'week', label: t('planner.week') },
+                { id: 'month', label: t('planner.month') }
               ].map(mode => (
                 <button
                   key={mode.id}
@@ -419,7 +421,7 @@ const PlannerPage: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
-              Add Task
+              {t('planner.addTask')}
             </button>
           </div>
         </div>
@@ -455,7 +457,7 @@ const PlannerPage: React.FC = () => {
                   onClick={() => setCurrentDate(new Date())}
                   className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
-                  Today
+                  {t('planner.today')}
                 </button>
               </div>
 
@@ -603,20 +605,20 @@ const PlannerPage: React.FC = () => {
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
                 <div className="flex items-center gap-2 mb-2">
                   <Bot className="w-5 h-5" />
-                  <h3 className="font-semibold">AI Planner</h3>
+                  <h3 className="font-semibold">{t('planner.aiPlanner')}</h3>
                 </div>
                 <p className="text-sm text-purple-100 mb-3">
-                  Get smart suggestions for your schedule and task prioritization.
+                  {t('planner.aiSuggestion')}
                 </p>
                 <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
-                  Ask AI
+                  {t('planner.askAI')}
                 </button>
               </div>
             )}
 
             {/* Today's Tasks */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Today's Tasks</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('planner.todaysTasks')}</h3>
               <div className="space-y-2">
                 {getTasksForDate(new Date()).slice(0, 5).map(task => (
                   <div
@@ -649,14 +651,14 @@ const PlannerPage: React.FC = () => {
                   </div>
                 ))}
                 {getTasksForDate(new Date()).length === 0 && (
-                  <p className="text-sm text-gray-600 text-center py-4">No tasks for today</p>
+                  <p className="text-sm text-gray-600 text-center py-4">{t('planner.noTasksToday')}</p>
                 )}
               </div>
             </div>
 
             {/* Upcoming Events */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Upcoming Events</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('planner.upcomingEvents')}</h3>
               <div className="space-y-2">
                 {events.slice(0, 5).map(event => (
                   <div key={event._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50">
@@ -670,29 +672,29 @@ const PlannerPage: React.FC = () => {
                   </div>
                 ))}
                 {events.length === 0 && (
-                  <p className="text-sm text-gray-600 text-center py-4">No upcoming events</p>
+                  <p className="text-sm text-gray-600 text-center py-4">{t('planner.noUpcomingEvents')}</p>
                 )}
               </div>
             </div>
 
             {/* Quick Stats */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Quick Stats</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('planner.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Pending Tasks</span>
+                  <span className="text-sm text-gray-600">{t('planner.pendingTasks')}</span>
                   <span className="text-sm font-medium">{tasks.filter(t => t.status === 'pending').length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">In Progress</span>
+                  <span className="text-sm text-gray-600">{t('planner.inProgress')}</span>
                   <span className="text-sm font-medium">{tasks.filter(t => t.status === 'in-progress').length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Completed Today</span>
+                  <span className="text-sm text-gray-600">{t('planner.completedToday')}</span>
                   <span className="text-sm font-medium">{tasks.filter(t => t.status === 'completed').length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Overdue</span>
+                  <span className="text-sm text-gray-600">{t('planner.overdue')}</span>
                   <span className="text-sm font-medium text-red-600">
                     {tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'completed').length}
                   </span>
@@ -708,7 +710,7 @@ const PlannerPage: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Create New Task</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('planner.createNewTask')}</h2>
               <button
                 onClick={() => setShowTaskModal(false)}
                 className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
@@ -720,32 +722,32 @@ const PlannerPage: React.FC = () => {
             <div className="p-6 space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Task Title *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.taskTitle')}</label>
                 <input
                   type="text"
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                  placeholder="Enter task title"
+                  placeholder={t('planner.enterTaskTitle')}
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.taskDescription')}</label>
                 <textarea
                   value={newTask.description}
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   rows={3}
-                  placeholder="Add task description"
+                  placeholder={t('planner.addTaskDescription')}
                 />
               </div>
 
               {/* Date and Time */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Due Date *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.dueDate')}</label>
                   <input
                     type="date"
                     value={newTask.dueDate}
@@ -754,7 +756,7 @@ const PlannerPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Time *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.time')}</label>
                   <input
                     type="time"
                     value={newTask.dueTime}
@@ -767,7 +769,7 @@ const PlannerPage: React.FC = () => {
               {/* Priority and Duration */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.priority')}</label>
                   <select
                     value={newTask.priority}
                     onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as any })}
@@ -780,7 +782,7 @@ const PlannerPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Duration (hours)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.duration')}</label>
                   <input
                     type="number"
                     min="0.5"
@@ -796,7 +798,7 @@ const PlannerPage: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Bell className="w-4 h-4 inline mr-1" />
-                  Reminder
+                  {t('planner.reminder')}
                 </label>
                 <select
                   value={newTask.reminder}

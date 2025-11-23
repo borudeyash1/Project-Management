@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
 
@@ -12,6 +13,7 @@ type CalendarMode = 'month' | 'week' | 'day';
 
 const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick }) => {
   const { tasks, updateTask } = usePlanner();
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [mode, setMode] = useState<CalendarMode>('month');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -134,7 +136,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
               onClick={() => setCurrentDate(new Date())}
               className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
             >
-              Today
+              {t('planner.calendar.today')}
             </button>
             <button
               onClick={handleNext}
@@ -144,7 +146,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
             </button>
 
             <span className="text-lg font-semibold text-gray-900 dark:text-white">
-              {currentDate.toLocaleDateString('en-US', { 
+              {currentDate.toLocaleDateString(i18n.language, { 
                 month: 'long', 
                 year: 'numeric',
                 ...(mode === 'day' && { day: 'numeric' })
@@ -163,7 +165,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
-                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                  {t(`planner.calendar.${m}`)}
                 </button>
               ))}
             </div>
@@ -177,9 +179,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
         {mode === 'month' && (
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
             <div className="grid grid-cols-7 border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => (
                 <div key={day} className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-700">
-                  {day}
+                  {t(`planner.calendar.days.${day}`)}
                 </div>
               ))}
             </div>
@@ -215,7 +217,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                         </div>
                       ))}
                       {dayTasks.length > 3 && (
-                        <div className="text-xs text-gray-600 dark:text-gray-200">+{dayTasks.length - 3} more</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-200">{t('planner.calendar.more', { count: dayTasks.length - 3 })}</div>
                       )}
                     </div>
                   </div>
@@ -232,7 +234,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
               {weekDays.map((day, idx) => (
                 <div key={idx} className="px-4 py-3 text-center border-r border-gray-300 dark:border-gray-600">
                   <div className="text-xs text-gray-600 dark:text-gray-200">
-                    {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                    {day.toLocaleDateString(i18n.language, { weekday: 'short' })}
                   </div>
                   <div className={`text-lg font-semibold mt-1 ${
                     isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
@@ -267,7 +269,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ searchQuery, onDateClick })
                           {task.dueDate && (
                             <div className="text-xs mt-1 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              {new Date(task.dueDate).toLocaleTimeString('en-US', {
+                              {new Date(task.dueDate).toLocaleTimeString(i18n.language, {
                                 hour: 'numeric',
                                 minute: '2-digit'
                               })}

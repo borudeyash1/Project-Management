@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle, 
   Star, Flag, Tag, MessageSquare, FileText, Users,
@@ -61,6 +62,7 @@ interface CalendarEvent {
 const RemindersPage: React.FC = () => {
   const { state, dispatch } = useApp();
   const { canUseAI } = useFeatureAccess();
+  const { t, i18n } = useTranslation();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -417,8 +419,8 @@ const RemindersPage: React.FC = () => {
       <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Reminders & Calendar</h1>
-            <p className="text-gray-600 mt-1">Stay on top of your tasks and deadlines</p>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('reminders.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('reminders.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Notification Permission */}
@@ -428,13 +430,13 @@ const RemindersPage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-accent-dark text-accent-dark rounded-lg hover:bg-blue-50"
               >
                 <Bell className="w-4 h-4" />
-                Enable Notifications
+                {t('reminders.enableNotifications')}
               </button>
             )}
             {permission === 'granted' && (
               <span className="inline-flex items-center gap-2 px-3 py-2 text-sm text-green-600 bg-green-50 rounded-lg">
                 <Bell className="w-4 h-4" />
-                Notifications On
+                {t('reminders.notificationsOn')}
               </span>
             )}
             
@@ -445,7 +447,7 @@ const RemindersPage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 <Download className="w-4 h-4" />
-                Export
+                {t('buttons.export')}
               </button>
               {showExportMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-300 py-1 z-10">
@@ -453,19 +455,19 @@ const RemindersPage: React.FC = () => {
                     onClick={() => handleExport('all')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
-                    Export All
+                    {t('reminders.exportAll')}
                   </button>
                   <button
                     onClick={() => handleExport('pending')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
-                    Export Pending
+                    {t('reminders.exportPending')}
                   </button>
                   <button
                     onClick={() => handleExport('completed')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
-                    Export Completed
+                    {t('reminders.exportCompleted')}
                   </button>
                 </div>
               )}
@@ -479,7 +481,7 @@ const RemindersPage: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
-              Add Reminder
+              {t('reminders.addReminder')}
             </button>
           </div>
         </div>
@@ -498,7 +500,7 @@ const RemindersPage: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                     <input
                       type="text"
-                      placeholder="Search reminders..."
+                      placeholder={t('reminders.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => handleSearch(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -513,10 +515,10 @@ const RemindersPage: React.FC = () => {
                     onChange={(e) => setFilterStatus(e.target.value as any)}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                    <option value="overdue">Overdue</option>
+                    <option value="all">{t('common.allStatus')}</option>
+                    <option value="pending">{t('common.pending')}</option>
+                    <option value="completed">{t('common.completed')}</option>
+                    <option value="overdue">{t('reminders.overdue')}</option>
                   </select>
 
                   <select
@@ -524,20 +526,20 @@ const RemindersPage: React.FC = () => {
                     onChange={(e) => setFilterPriority(e.target.value as any)}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
-                    <option value="all">All Priority</option>
-                    <option value="urgent">Urgent</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
+                    <option value="all">{t('common.allPriority')}</option>
+                    <option value="urgent">{t('common.urgent')}</option>
+                    <option value="high">{t('common.high')}</option>
+                    <option value="medium">{t('common.medium')}</option>
+                    <option value="low">{t('common.low')}</option>
                   </select>
                 </div>
 
                 {/* View Toggle */}
                 <div className="flex items-center border border-gray-300 rounded-lg ml-auto">
                   {[
-                    { id: 'list', label: 'List', icon: List },
-                    { id: 'calendar', label: 'Calendar', icon: Calendar },
-                    { id: 'kanban', label: 'Kanban', icon: Target }
+                    { id: 'list', label: t('reminders.views.list'), icon: List },
+                    { id: 'calendar', label: t('reminders.views.calendar'), icon: Calendar },
+                    { id: 'kanban', label: t('reminders.views.kanban'), icon: Target }
                   ].map(mode => {
                     const Icon = mode.icon;
                     return (
@@ -563,7 +565,7 @@ const RemindersPage: React.FC = () => {
             {viewMode === 'list' && (
               <div className="bg-white rounded-lg border border-gray-200">
                 <div className="p-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">Reminders</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">{t('reminders.title')}</h2>
                 </div>
                 <div className="divide-y divide-gray-200">
                   {filteredReminders.map(reminder => (
@@ -593,7 +595,7 @@ const RemindersPage: React.FC = () => {
                             </span>
                             {isOverdue(reminder.dueDate, reminder.completed) && (
                               <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium text-red-600 bg-red-100">
-                                Overdue
+                                {t('reminders.overdue')}
                               </span>
                             )}
                           </div>
@@ -651,7 +653,7 @@ const RemindersPage: React.FC = () => {
                     onClick={() => setCurrentDate(new Date())}
                     className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
-                    Today
+                    {t('common.today')}
                   </button>
                 </div>
 
@@ -718,9 +720,9 @@ const RemindersPage: React.FC = () => {
             {viewMode === 'kanban' && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { status: 'pending', title: 'Pending', color: 'bg-yellow-50 border-yellow-200' },
-                  { status: 'completed', title: 'Completed', color: 'bg-green-50 border-green-200' },
-                  { status: 'overdue', title: 'Overdue', color: 'bg-red-50 border-red-200' }
+                  { status: 'pending', title: t('common.pending'), color: 'bg-yellow-50 border-yellow-200' },
+                  { status: 'completed', title: t('common.completed'), color: 'bg-green-50 border-green-200' },
+                  { status: 'overdue', title: t('reminders.overdue'), color: 'bg-red-50 border-red-200' }
                 ].map(column => {
                   const columnReminders = filteredReminders.filter(reminder => {
                     if (column.status === 'pending') return !reminder.completed && !isOverdue(reminder.dueDate, reminder.completed);
@@ -773,39 +775,39 @@ const RemindersPage: React.FC = () => {
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
                 <div className="flex items-center gap-2 mb-2">
                   <Bot className="w-5 h-5" />
-                  <h3 className="font-semibold">AI Reminder Assistant</h3>
+                  <h3 className="font-semibold">{t('dashboard.aiAssistant')}</h3>
                 </div>
                 <p className="text-sm text-purple-100 mb-3">
-                  Get smart suggestions for task prioritization and deadline management.
+                  {t('dashboard.aiDescription')}
                 </p>
                 <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
-                  Ask AI
+                  {t('dashboard.askAI')}
                 </button>
               </div>
             )}
 
             {/* Quick Stats */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Quick Stats</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('reminders.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Pending</span>
+                  <span className="text-sm text-gray-600">{t('common.pending')}</span>
                   <span className="text-sm font-medium">{reminders.filter(r => !r.completed).length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Completed Today</span>
+                  <span className="text-sm text-gray-600">{t('reminders.completedToday')}</span>
                   <span className="text-sm font-medium">
                     {reminders.filter(r => r.completed && r.completedAt && new Date(r.completedAt).toDateString() === new Date().toDateString()).length}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Overdue</span>
+                  <span className="text-sm text-gray-600">{t('reminders.overdue')}</span>
                   <span className="text-sm font-medium text-red-600">
                     {reminders.filter(r => isOverdue(r.dueDate, r.completed)).length}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">This Week</span>
+                  <span className="text-sm text-gray-600">{t('reminders.thisWeek')}</span>
                   <span className="text-sm font-medium">
                     {reminders.filter(r => {
                       const reminderDate = new Date(r.dueDate);
@@ -821,7 +823,7 @@ const RemindersPage: React.FC = () => {
 
             {/* Upcoming Deadlines */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Upcoming Deadlines</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('reminders.upcomingDeadlines')}</h3>
               <div className="space-y-2">
                 {reminders
                   .filter(r => !r.completed && new Date(r.dueDate) >= new Date())
@@ -842,7 +844,7 @@ const RemindersPage: React.FC = () => {
                     </div>
                   ))}
                 {reminders.filter(r => !r.completed && new Date(r.dueDate) >= new Date()).length === 0 && (
-                  <p className="text-sm text-gray-600 text-center py-4">No upcoming deadlines</p>
+                  <p className="text-sm text-gray-600 text-center py-4">{t('reminders.noUpcomingDeadlines')}</p>
                 )}
               </div>
             </div>

@@ -3,6 +3,7 @@ import {
   X, Calendar, Clock, Bell, Tag, Users, MapPin, Link as LinkIcon,
   Repeat, Paperclip, FileText, AlertCircle, Plus, Trash2
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Reminder {
   _id?: string;
@@ -57,6 +58,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
   projects = [],
   teamMembers = []
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<Partial<Reminder>>({
     title: reminder?.title || '',
     description: reminder?.description || '',
@@ -130,7 +132,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-2xl font-semibold text-gray-900">
-            {reminder ? 'Edit Reminder' : 'Create Reminder'}
+            {reminder ? t('reminders.editReminder') : t('reminders.createReminder')}
           </h2>
           <button
             onClick={onClose}
@@ -145,14 +147,14 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title *
+              {t('planner.taskModal.fields.title')} *
             </label>
             <input
               type="text"
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Enter reminder title"
+              placeholder={t('reminders.enterTitle')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
@@ -161,34 +163,34 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
+                {t('reminders.type')} *
               </label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="task">Task</option>
-                <option value="meeting">Meeting</option>
-                <option value="deadline">Deadline</option>
-                <option value="milestone">Milestone</option>
-                <option value="personal">Personal</option>
+                <option value="task">{t('planner.taskModal.types.task.label')}</option>
+                <option value="meeting">{t('calendar.meetings')}</option>
+                <option value="deadline">{t('projects.deadline')}</option>
+                <option value="milestone">{t('projects.milestones')}</option>
+                <option value="personal">{t('reminders.personal')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority *
+                {t('common.priority')} *
               </label>
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="low">{t('common.low')}</option>
+                <option value="medium">{t('common.medium')}</option>
+                <option value="high">{t('common.high')}</option>
+                <option value="urgent">{t('common.urgent')}</option>
               </select>
             </div>
           </div>
@@ -196,7 +198,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           {/* Due Date and Time */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Due Date & Time *
+              {t('reminders.dueDateTime')} *
             </label>
             <input
               type="datetime-local"
@@ -210,13 +212,13 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              {t('common.description')}
             </label>
             <textarea
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Add description..."
+              placeholder={t('reminders.addDescription')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
@@ -225,7 +227,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Project
+                {t('common.projects')}
               </label>
               <select
                 value={formData.project?._id || ''}
@@ -235,7 +237,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="">No Project</option>
+                <option value="">{t('tasks.noProject')}</option>
                 {projects.map(project => (
                   <option key={project._id} value={project._id}>
                     {project.name}
@@ -246,7 +248,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Assignee
+                {t('tasks.assignee')}
               </label>
               <select
                 value={formData.assignee?._id || ''}
@@ -256,7 +258,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="">No Assignee</option>
+                <option value="">{t('tasks.unassigned')}</option>
                 {teamMembers.map(member => (
                   <option key={member._id} value={member._id}>
                     {member.name}
@@ -269,7 +271,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           {/* Tags */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tags
+              {t('projects.tags')}
             </label>
             <div className="flex flex-wrap gap-2 mb-2">
               {formData.tags?.map(tag => (
@@ -295,7 +297,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                placeholder="Add tag..."
+                placeholder={t('reminders.addTag')}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               />
               <button
@@ -303,7 +305,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 onClick={addTag}
                 className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
-                Add
+                {t('common.add')}
               </button>
             </div>
           </div>
@@ -311,7 +313,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           {/* Notifications */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notifications
+              {t('common.notifications')}
             </label>
             <div className="space-y-2">
               {formData.notifications?.map((notif, index) => (
@@ -321,9 +323,9 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                     onChange={(e) => updateNotification(index, 'type', e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
-                    <option value="push">Push</option>
-                    <option value="email">Email</option>
-                    <option value="sms">SMS</option>
+                    <option value="push">{t('reminders.push')}</option>
+                    <option value="email">{t('common.email')}</option>
+                    <option value="sms">{t('reminders.sms')}</option>
                   </select>
                   <input
                     type="number"
@@ -332,7 +334,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                     min="0"
                   />
-                  <span className="flex items-center text-sm text-gray-600">minutes before</span>
+                  <span className="flex items-center text-sm text-gray-600">{t('reminders.minutesBefore')}</span>
                   <button
                     type="button"
                     onClick={() => removeNotification(index)}
@@ -348,7 +350,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 className="text-sm text-accent-dark hover:text-blue-700 flex items-center gap-1"
               >
                 <Plus className="w-4 h-4" />
-                Add Notification
+                {t('reminders.addNotification')}
               </button>
             </div>
           </div>
@@ -372,7 +374,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 }}
                 className="rounded border-gray-300"
               />
-              Recurring
+              {t('reminders.recurring')}
             </label>
             {showRecurring && (
               <div className="grid grid-cols-2 gap-4 mt-2">
@@ -384,10 +386,10 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                   })}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
+                  <option value="daily">{t('planner.taskModal.options.recurrence.daily')}</option>
+                  <option value="weekly">{t('planner.taskModal.options.recurrence.weekly')}</option>
+                  <option value="monthly">{t('planner.taskModal.options.recurrence.monthly')}</option>
+                  <option value="yearly">{t('planner.taskModal.options.recurrence.yearly')}</option>
                 </select>
                 <input
                   type="number"
@@ -397,7 +399,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                     ...formData,
                     recurring: { ...formData.recurring!, interval: parseInt(e.target.value) }
                   })}
-                  placeholder="Interval"
+                  placeholder={t('reminders.interval')}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 />
               </div>
@@ -411,7 +413,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
               onClick={() => setShowAdvanced(!showAdvanced)}
               className="text-sm text-accent-dark hover:text-blue-700 flex items-center gap-1"
             >
-              {showAdvanced ? 'Hide' : 'Show'} Advanced Options
+              {showAdvanced ? t('reminders.hideAdvancedOptions') : t('reminders.showAdvancedOptions')}
             </button>
             {showAdvanced && (
               <div className="mt-4 space-y-4">
@@ -419,13 +421,13 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <MapPin className="w-4 h-4 inline mr-1" />
-                    Location
+                    {t('calendar.location')}
                   </label>
                   <input
                     type="text"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder="Add location..."
+                    placeholder={t('reminders.addLocation')}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   />
                 </div>
@@ -434,13 +436,13 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <LinkIcon className="w-4 h-4 inline mr-1" />
-                    Meeting Link
+                    {t('reminders.meetingLink')}
                   </label>
                   <input
                     type="url"
                     value={formData.meetingLink}
                     onChange={(e) => setFormData({ ...formData, meetingLink: e.target.value })}
-                    placeholder="https://zoom.us/j/..."
+                    placeholder={t('reminders.enterMeetingLink')}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   />
                 </div>
@@ -449,13 +451,13 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <FileText className="w-4 h-4 inline mr-1" />
-                    Notes
+                    {t('reminders.notes')}
                   </label>
                   <textarea
                     rows={3}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Add notes..."
+                    placeholder={t('reminders.addNotes')}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   />
                 </div>
@@ -470,13 +472,13 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-300"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
-              {reminder ? 'Save Changes' : 'Create Reminder'}
+              {reminder ? t('buttons.saveChanges') : t('reminders.createReminder')}
             </button>
           </div>
         </form>

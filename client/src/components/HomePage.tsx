@@ -19,6 +19,7 @@ import CalendarWidget from './dashboard/CalendarWidget';
 import ReportsWidget from './dashboard/ReportsWidget';
 import ExpandedStatCard from './dashboard/ExpandedStatCard';
 import ContentBanner from './ContentBanner';
+import { useTranslation } from 'react-i18next';
 
 interface QuickTask {
   _id: string;
@@ -95,6 +96,7 @@ const HomePage: React.FC = () => {
   const { userPlan, canUseAI } = useFeatureAccess();
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [quickTasks, setQuickTasks] = useState<QuickTask[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -360,10 +362,10 @@ const HomePage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Welcome back, {state.userProfile?.fullName}!
+              {t('dashboard.welcomeBack', { name: state.userProfile?.fullName })}
             </h1>
             <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              Here's what's happening with your projects today
+              {t('dashboard.todayOverview')}
             </p>
           </div>
         </div>
@@ -379,7 +381,7 @@ const HomePage: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pending Tasks</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('dashboard.pendingTasks')}</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {quickTasks.filter(t => !t.completed).length}
                 </p>
@@ -395,7 +397,7 @@ const HomePage: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Active Projects</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.active')}</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {projects.length}
                 </p>
@@ -411,7 +413,7 @@ const HomePage: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Members</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('team.members')}</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {projects.reduce((acc, p) => acc + p.team, 0)}
                 </p>
@@ -427,7 +429,7 @@ const HomePage: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Avg Progress</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('dashboard.avgProgress')}</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
                   {Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))}%
                 </p>
@@ -449,13 +451,13 @@ const HomePage: React.FC = () => {
             {/* Quick Actions */}
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h2>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
                 <button
                   onClick={() => setShowQuickAdd(!showQuickAdd)}
                   className="inline-flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg hover:opacity-90 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  Add Task
+                  {t('tasks.newTask')}
                 </button>
               </div>
 
@@ -473,7 +475,7 @@ const HomePage: React.FC = () => {
                         }`}
                     >
                       <CheckSquare className="w-4 h-4" />
-                      Task
+                      {t('tasks.title')}
                     </button>
                     <button
                       onClick={() => setNewTaskType('note')}
@@ -485,7 +487,7 @@ const HomePage: React.FC = () => {
                         }`}
                     >
                       <Type className="w-4 h-4" />
-                      Note
+                      {t('common.note', { defaultValue: 'Note' })}
                     </button>
                     <button
                       onClick={() => setNewTaskType('checklist')}
@@ -497,7 +499,7 @@ const HomePage: React.FC = () => {
                         }`}
                     >
                       <List className="w-4 h-4" />
-                      Checklist
+                      {t('tasks.checklist')}
                     </button>
                   </div>
                   <div className="flex gap-2">
@@ -577,12 +579,12 @@ const HomePage: React.FC = () => {
             {/* Recent Activity */}
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Activity</h2>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.recentActivity')}</h2>
                 <button
                   onClick={() => navigate('/activity')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  View all
+                  {t('buttons.viewAll')}
                 </button>
               </div>
               <div className="space-y-4">
@@ -606,7 +608,7 @@ const HomePage: React.FC = () => {
             {/* Productivity Chart - Moved to Left */}
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Weekly Productivity</h2>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.productivity')}</h2>
                 <Flame className={`w-5 h-5 ${isDarkMode ? 'text-orange-400' : 'text-orange-500'}`} />
               </div>
               <div className="flex items-end justify-between h-32 gap-2">
@@ -626,10 +628,10 @@ const HomePage: React.FC = () => {
                 ))}
               </div>
               <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
-                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Average: {Math.round(productivityData.reduce((a, b) => a + b, 0) / productivityData.length)}%</span>
+                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('dashboard.average')} {Math.round(productivityData.reduce((a, b) => a + b, 0) / productivityData.length)}%</span>
                 <div className="flex items-center gap-2">
                   <ArrowUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-500 font-medium">+12% this week</span>
+                  <span className="text-sm text-green-500 font-medium">{t('dashboard.productivityIncrease')}</span>
                 </div>
               </div>
             </div>
@@ -637,7 +639,7 @@ const HomePage: React.FC = () => {
             {/* Team Activity Feed - Moved to Left */}
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team Activity</h2>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.teamActivity')}</h2>
                 <Activity className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
               </div>
               <div className="space-y-4">
@@ -661,101 +663,16 @@ const HomePage: React.FC = () => {
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Right Column */}
-          <div className="space-y-6 min-w-0">
-            {/* AI Assistant */}
-            {canUseAI() && (
-              <div className={`rounded-lg p-6 shadow-lg ${isDarkMode
-                ? 'bg-gradient-to-br from-purple-600 to-pink-600'
-                : 'bg-gradient-to-br from-purple-100 via-pink-50 to-purple-50'
-                }`}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-purple-200'
-                    }`}>
-                    <Bot className={`w-5 h-5 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>AI Assistant</h3>
-                    <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>Get smart suggestions</p>
-                  </div>
-                </div>
-                <p className={`text-sm mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                  I can help you prioritize tasks, suggest project improvements, and provide insights.
-                </p>
-                <button
-                  onClick={() => navigate('/ai-assistant')}
-                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium text-white drop-shadow-sm transition-colors border border-white border-opacity-20"
-                >
-                  Ask AI Assistant
-                </button>
-              </div>
-            )}
-
-            {/* Calendar Widget */}
-            <CalendarWidget />
-
-            {/* Reports Widget */}
-            <ReportsWidget />
-
-            {/* Projects Overview */}
+            {/* Upcoming Deadlines - Moved to Left */}
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Projects</h2>
-                <button
-                  onClick={() => navigate('/workspace')}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  View all
-                </button>
-              </div>
-              <div className="space-y-4">
-                {projects.map(project => (
-                  <div key={project._id} className={`p-4 border rounded-lg hover:shadow-sm transition-shadow ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                    }`}>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${project.color}`} />
-                        <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h3>
-                      </div>
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                        {project.status}
-                      </span>
-                    </div>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3`}>{project.description}</p>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Progress</span>
-                        <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.progress}%</span>
-                      </div>
-                      <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                        <div
-                          className="bg-accent h-2 rounded-full transition-all"
-                          style={{ width: `${project.progress}%` }}
-                        />
-                      </div>
-                      <div className={`flex items-center justify-between text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                        <span>{project.team} team members</span>
-                        {project.dueDate && (
-                          <span>Due {new Date(project.dueDate).toLocaleDateString()}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Upcoming Deadlines */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Upcoming Deadlines</h2>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.upcomingTasks')}</h2>
                 <button
                   onClick={() => navigate('/tasks')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  View all
+                  {t('buttons.viewAll')}
                 </button>
               </div>
               <div className="space-y-3">
@@ -773,11 +690,11 @@ const HomePage: React.FC = () => {
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(deadline.priority)}`}>
-                          {deadline.priority}
+                          {t('tasks.' + deadline.priority.toLowerCase())}
                         </span>
                         <span className={`text-xs ${deadline.daysLeft <= 2 ? 'text-red-500 font-medium' : isDarkMode ? 'text-gray-400' : 'text-gray-600'
                           }`}>
-                          {deadline.daysLeft} days left
+                          {t('tasks.daysLeft', { count: deadline.daysLeft })}
                         </span>
                       </div>
                     </div>
@@ -785,98 +702,93 @@ const HomePage: React.FC = () => {
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Recent Files */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Files</h2>
+          {/* Right Column */}
+          <div className="space-y-6 min-w-0">
+            {/* AI Assistant */}
+            {canUseAI() && (
+              <div className={`rounded-lg p-6 shadow-lg ${isDarkMode
+                ? 'bg-gradient-to-br from-purple-600 to-pink-600'
+                : 'bg-gradient-to-br from-purple-100 via-pink-50 to-purple-50'
+                }`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-purple-200'
+                    }`}>
+                    <Bot className={`w-5 h-5 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.aiAssistant')}</h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{t('dashboard.aiSuggestions')}</p>
+                  </div>
+                </div>
+                <p className={`text-sm mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
+                  {t('dashboard.aiDescription')}
+                </p>
                 <button
-                  onClick={() => navigate('/files')}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  onClick={() => navigate('/ai-assistant')}
+                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium text-white drop-shadow-sm transition-colors border border-white border-opacity-20"
                 >
-                  View all
+                  {t('dashboard.askAI')}
                 </button>
               </div>
-              <div className="space-y-3">
-                {recentFiles.map(file => (
-                  <div key={file._id} className={`flex items-center gap-3 p-3 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                    } transition-colors cursor-pointer`}>
-                    <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                      {getFileIcon(file.type)}
+            )}
+
+            {/* Calendar Widget */}
+            <CalendarWidget />
+
+            {/* Reports Widget */}
+            <ReportsWidget />
+
+            {/* Projects Overview */}
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h2>
+                <button
+                  onClick={() => navigate('/workspace')}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  {t('buttons.viewAll')}
+                </button>
+              </div>
+              <div className="space-y-4">
+                {projects.map(project => (
+                  <div key={project._id} className={`p-4 border rounded-lg hover:shadow-sm transition-shadow ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                    }`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${project.color}`} />
+                        <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h3>
+                      </div>
+                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                        {t('projects.' + project.status.toLowerCase().replace(' ', ''))}
+                      </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} truncate`}>
-                        {file.name}
-                      </p>
-                      <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {file.size} • {file.uploadedBy}
-                      </p>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3`}>{project.description}</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('projects.progress')}</span>
+                        <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.progress}%</span>
+                      </div>
+                      <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                        <div
+                          className="bg-accent h-2 rounded-full transition-all"
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
+                      <div className={`flex items-center justify-between text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        <span>{t('projects.teamMembers', { count: project.team })}</span>
+                        {project.dueDate && (
+                          <span>{t('projects.due', { date: new Date(project.dueDate).toLocaleDateString() })}</span>
+                        )}
+                      </div>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Simulate file download
-                        const link = document.createElement('a');
-                        link.href = '#';
-                        link.download = file.name;
-                        dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: `Downloading ${file.name}...` } });
-                      }}
-                      className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
-                        } transition-colors`}
-                    >
-                      <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
-                    </button>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-              <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Quick Links</h2>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => navigate('/calendar')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
-                    ? 'border-gray-700 hover:bg-gray-700'
-                    : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                >
-                  <Calendar className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Calendar</span>
-                </button>
-                <button
-                  onClick={() => navigate('/workspace')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
-                    ? 'border-gray-700 hover:bg-gray-700'
-                    : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                >
-                  <Users className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team</span>
-                </button>
-                <button
-                  onClick={() => navigate('/analytics')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
-                    ? 'border-gray-700 hover:bg-gray-700'
-                    : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                >
-                  <BarChart3 className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Reports</span>
-                </button>
-                <button
-                  onClick={() => navigate('/settings')}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode
-                    ? 'border-gray-700 hover:bg-gray-700'
-                    : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                >
-                  <Settings className={`w-5 h-5 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Settings</span>
-                </button>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>

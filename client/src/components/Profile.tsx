@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import apiService from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 interface ProfileData {
   fullName: string;
@@ -158,6 +159,7 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -402,7 +404,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Profile updated successfully!',
+          message: t('messages.profileUpdated'),
           duration: 3000
         }
       });
@@ -413,7 +415,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to update profile. Please try again.',
+          message: t('messages.profileUpdateFailed'),
           duration: 3000
         }
       });
@@ -438,7 +440,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Preferences updated successfully!',
+          message: t('messages.preferencesUpdated'),
           duration: 3000
         }
       });
@@ -449,7 +451,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to update preferences. Please try again.',
+          message: t('messages.preferencesUpdateFailed'),
           duration: 3000
         }
       });
@@ -465,7 +467,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Passwords do not match!',
+          message: t('messages.passwordsMismatch'),
           duration: 3000
         }
       });
@@ -485,7 +487,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Password changed successfully!',
+          message: t('messages.passwordChanged'),
           duration: 3000
         }
       });
@@ -496,7 +498,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to change password. Please check your current password.',
+          message: t('messages.passwordChangeFailed'),
           duration: 3000
         }
       });
@@ -525,7 +527,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Address added successfully!',
+          message: t('messages.addressAdded'),
           duration: 3000
         }
       });
@@ -536,7 +538,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to add address. Please try again.',
+          message: t('messages.addressAddFailed'),
           duration: 3000
         }
       });
@@ -565,7 +567,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Payment method added successfully!',
+          message: t('messages.paymentAdded'),
           duration: 3000
         }
       });
@@ -576,7 +578,7 @@ const Profile: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to add payment method. Please try again.',
+          message: t('messages.paymentAddFailed'),
           duration: 3000
         }
       });
@@ -586,12 +588,12 @@ const Profile: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'preferences', label: 'Preferences', icon: Settings },
-    { id: 'addresses', label: 'Addresses', icon: MapPin },
-    { id: 'payments', label: 'Payment Methods', icon: CreditCard },
-    { id: 'achievements', label: 'Achievements', icon: Award },
-    { id: 'activity', label: 'Activity', icon: BarChart3 }
+    { id: 'personal', label: t('profile.personalInfo'), icon: User },
+    { id: 'preferences', label: t('profile.preferences'), icon: Settings },
+    { id: 'addresses', label: t('profile.addresses'), icon: MapPin },
+    { id: 'payments', label: t('profile.payments'), icon: CreditCard },
+    { id: 'achievements', label: t('profile.achievements'), icon: Award },
+    { id: 'activity', label: t('profile.activity'), icon: BarChart3 }
   ];
 
   const renderPersonalInfo = () => (
@@ -611,7 +613,7 @@ const Profile: React.FC = () => {
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{profileData?.fullName}</h2>
           <p className="text-gray-600 dark:text-gray-300">{profileData?.designation} • {profileData?.department}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-200">Member since {new Date(profileData?.joinDate || '').toLocaleDateString()}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-200">{t('profile.memberSince', { date: new Date(profileData?.joinDate || '').toLocaleDateString() })}</p>
         </div>
       </div>
 
@@ -622,7 +624,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3">
               <User className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Full Name</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('profile.fullName')}</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.fullName}</p>
               </div>
             </div>
@@ -641,7 +643,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Email</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('common.email')}</p>
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.email}</p>
                   {profileData?.isEmailVerified && (
@@ -652,7 +654,7 @@ const Profile: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <Lock className="w-4 h-4" />
-              <span className="text-xs">Non-editable</span>
+              <span className="text-xs">{t('profile.nonEditable')}</span>
             </div>
           </div>
 
@@ -660,7 +662,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Phone</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('profile.contactNumber')}</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.contactNumber}</p>
               </div>
             </div>
@@ -681,7 +683,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3">
               <Building className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Department</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('profile.department')}</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.department}</p>
               </div>
             </div>
@@ -700,7 +702,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Location</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('profile.location')}</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.location}</p>
               </div>
             </div>
@@ -719,7 +721,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3">
               <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Date of Birth</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('profile.dateOfBirth')}</p>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{new Date(profileData?.dateOfBirth || '').toLocaleDateString()}</p>
               </div>
             </div>
@@ -739,7 +741,7 @@ const Profile: React.FC = () => {
       {/* About Section */}
       <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100">About</h3>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('profile.about')}</h3>
           <button
             onClick={() => {
               setEditingField('about');
@@ -755,13 +757,13 @@ const Profile: React.FC = () => {
 
       {/* Security Section */}
       <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Security</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">{t('settings.security')}</h3>
         <button
           onClick={() => setShowPasswordForm(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Key className="w-4 h-4" />
-          Change Password
+          {t('profile.changePassword')}
         </button>
       </div>
     </div>
@@ -781,7 +783,7 @@ const Profile: React.FC = () => {
       <div className="space-y-6">
         {/* Theme Preferences */}
         <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Theme</h3>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.theme')}</h3>
           <div className="flex gap-3">
             {['light', 'dark', 'system'].map((theme) => (
               <button
@@ -815,7 +817,7 @@ const Profile: React.FC = () => {
 
         {/* Notification Preferences */}
         <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Notifications</h3>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.notifications')}</h3>
           <div className="space-y-3">
             {Object.entries(notifications).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between">
@@ -860,10 +862,10 @@ const Profile: React.FC = () => {
 
         {/* Privacy Preferences */}
         <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Privacy</h3>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.privacy')}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profile Visibility</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('profile.visibility')}</label>
               <select
                 value={privacy.profileVisibility}
                 onChange={(e) => {
@@ -894,7 +896,7 @@ const Profile: React.FC = () => {
             <div className="space-y-3">
               {Object.entries(privacy).filter(([key]) => key !== 'profileVisibility').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="font-medium text-gray-900 dark:text-gray-100">Show {key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t('profile.' + key)}</span>
                 <button
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     value ? 'bg-accent' : 'bg-gray-300'
@@ -937,13 +939,13 @@ const Profile: React.FC = () => {
   const renderAddresses = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Addresses</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.addresses')}</h3>
         <button
           onClick={() => setShowAddAddress(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Address
+          {t('profile.addAddress')}
         </button>
       </div>
 
@@ -953,9 +955,9 @@ const Profile: React.FC = () => {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-                <span className="font-medium capitalize text-gray-900 dark:text-gray-100">{address.type} Address</span>
+                <span className="font-medium capitalize text-gray-900 dark:text-gray-100">{t('profile.' + address.type)}</span>
                 {address.isDefault && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Default</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{t('profile.default')}</span>
                 )}
               </div>
               <button className="text-red-600 hover:text-red-700">
@@ -976,13 +978,13 @@ const Profile: React.FC = () => {
   const renderPaymentMethods = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Payment Methods</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.payments')}</h3>
         <button
           onClick={() => setShowAddPayment(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Payment Method
+          {t('profile.addPaymentMethod')}
         </button>
       </div>
 
@@ -994,7 +996,7 @@ const Profile: React.FC = () => {
                 <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-200" />
                 <span className="font-medium text-gray-900 dark:text-gray-100">{payment.brand} •••• {payment.last4}</span>
                 {payment.isDefault && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Default</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{t('profile.default')}</span>
                 )}
               </div>
               <button className="text-red-600 hover:text-red-700">
@@ -1002,7 +1004,7 @@ const Profile: React.FC = () => {
               </button>
             </div>
             <div className="text-sm text-gray-700 dark:text-gray-300">
-              <p>Expires {payment.expiryMonth}/{payment.expiryYear}</p>
+              <p>{t('profile.expiryDate')} {payment.expiryMonth}/{payment.expiryYear}</p>
             </div>
           </div>
         ))}
@@ -1012,7 +1014,7 @@ const Profile: React.FC = () => {
 
   const renderAchievements = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Achievements</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.achievements')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {profileData?.achievements?.map((achievement) => (
           <div key={achievement.id} className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
@@ -1039,7 +1041,7 @@ const Profile: React.FC = () => {
 
   const renderActivity = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Activity Statistics</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.activity')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(profileData?.activityStats || {}).map(([key, value]) => (
           <div key={key} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -1053,7 +1055,7 @@ const Profile: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 capitalize">{t('profile.' + key)}</p>
               </div>
             </div>
           </div>
@@ -1084,8 +1086,8 @@ const Profile: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-border dark:border-gray-600">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Manage your personal information and preferences</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('profile.title')}</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{t('descriptions.profile')}</p>
         </div>
 
         {/* Tabs */}
@@ -1126,7 +1128,7 @@ const Profile: React.FC = () => {
       {editingField && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Edit {editingField}</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('common.edit')} {t('profile.' + editingField)}</h3>
             <input
               type={editingField === 'email' ? 'email' : editingField === 'contactNumber' ? 'tel' : editingField === 'dateOfBirth' ? 'date' : 'text'}
               value={editValue}
@@ -1140,7 +1142,7 @@ const Profile: React.FC = () => {
                 disabled={saving}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
               <button
                 onClick={() => {
@@ -1160,10 +1162,10 @@ const Profile: React.FC = () => {
       {showPasswordForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Change Password</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('profile.changePassword')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('forms.currentPassword')}</label>
                 <input
                   type="password"
                   value={passwordData.currentPassword}
@@ -1172,7 +1174,7 @@ const Profile: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('forms.newPassword')}</label>
                 <input
                   type="password"
                   value={passwordData.newPassword}
@@ -1181,7 +1183,7 @@ const Profile: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('forms.confirmNewPassword')}</label>
                 <input
                   type="password"
                   value={passwordData.confirmPassword}
@@ -1196,7 +1198,7 @@ const Profile: React.FC = () => {
                 disabled={saving}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {saving ? 'Changing...' : 'Change Password'}
+                {saving ? t('common.changing') : t('profile.changePassword')}
               </button>
               <button
                 onClick={() => {
@@ -1216,10 +1218,10 @@ const Profile: React.FC = () => {
       {showAddAddress && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Add Address</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('profile.addAddress')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.type')}</label>
                 <select
                   value={newAddress.type}
                   onChange={(e) => setNewAddress(prev => ({ ...prev, type: e.target.value as 'home' | 'work' | 'billing' }))}
@@ -1231,7 +1233,7 @@ const Profile: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.street')}</label>
                 <input
                   type="text"
                   value={newAddress.street}
@@ -1241,7 +1243,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.city')}</label>
                   <input
                     type="text"
                     value={newAddress.city}
@@ -1250,7 +1252,7 @@ const Profile: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.state')}</label>
                   <input
                     type="text"
                     value={newAddress.state}
@@ -1261,7 +1263,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.zipCode')}</label>
                   <input
                     type="text"
                     value={newAddress.zipCode}
@@ -1270,7 +1272,7 @@ const Profile: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.country')}</label>
                   <input
                     type="text"
                     value={newAddress.country}
@@ -1286,7 +1288,7 @@ const Profile: React.FC = () => {
                   onChange={(e) => setNewAddress(prev => ({ ...prev, isDefault: e.target.checked }))}
                   className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
                 />
-                <label className="ml-2 text-sm text-gray-700">Set as default address</label>
+                <label className="ml-2 text-sm text-gray-700">{t('profile.setAsDefault')}</label>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
@@ -1295,7 +1297,7 @@ const Profile: React.FC = () => {
                 disabled={saving}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {saving ? 'Adding...' : 'Add Address'}
+                {saving ? t('common.adding') : t('profile.addAddress')}
               </button>
               <button
                 onClick={() => {
@@ -1323,10 +1325,10 @@ const Profile: React.FC = () => {
       {showAddPayment && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Add Payment Method</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('profile.addPaymentMethod')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.cardNumber')}</label>
                 <input
                   type="text"
                   value={newPayment.cardNumber}
@@ -1337,7 +1339,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Month</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.expiryMonth')}</label>
                   <input
                     type="text"
                     value={newPayment.expiryMonth}
@@ -1347,7 +1349,7 @@ const Profile: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Year</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.expiryYear')}</label>
                   <input
                     type="text"
                     value={newPayment.expiryYear}
@@ -1358,7 +1360,7 @@ const Profile: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.cardHolderName')}</label>
                 <input
                   type="text"
                   value={newPayment.name}
@@ -1373,7 +1375,7 @@ const Profile: React.FC = () => {
                   onChange={(e) => setNewPayment(prev => ({ ...prev, isDefault: e.target.checked }))}
                   className="h-4 w-4 text-accent-dark focus:ring-accent border-gray-300 rounded"
                 />
-                <label className="ml-2 text-sm text-gray-700">Set as default payment method</label>
+                <label className="ml-2 text-sm text-gray-700">{t('profile.setAsDefault')}</label>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
@@ -1382,7 +1384,7 @@ const Profile: React.FC = () => {
                 disabled={saving}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {saving ? 'Adding...' : 'Add Payment Method'}
+                {saving ? t('common.adding') : t('profile.addPaymentMethod')}
               </button>
               <button
                 onClick={() => {

@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import api from '../services/api';
 import { SubscriptionPlanData, CustomBillingResponse } from '../services/api';
 import { WorkspaceSettings } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface CreateWorkspaceModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface CreateWorkspaceModalProps {
 
 const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onClose }) => {
   const { dispatch } = useApp();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -50,17 +52,17 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     const newErrors: Record<string, string> = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Workspace name is required';
+      newErrors.name = t('forms.required');
     }
     
     if (!formData.contactEmail.trim()) {
-      newErrors.contactEmail = 'Contact email is required';
+      newErrors.contactEmail = t('forms.required');
     } else if (!/\S+@\S+\.\S+/.test(formData.contactEmail)) {
-      newErrors.contactEmail = 'Please enter a valid email address';
+      newErrors.contactEmail = t('forms.invalidEmail');
     }
     
     if (!formData.organizationName.trim()) {
-      newErrors.organizationName = 'Organization name is required';
+      newErrors.organizationName = t('forms.required');
     }
 
     setErrors(newErrors);
@@ -87,7 +89,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
 
   const handleVerifyOTP = async () => {
     if (!formData.otp.trim()) {
-      setErrors({ otp: 'Please enter the OTP' });
+      setErrors({ otp: t('forms.required') });
       return;
     }
     setLoading(true);
@@ -178,15 +180,15 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
             <p className="text-sm text-gray-600 mt-2 line-clamp-3">{plan.summary}</p>
             <div className="mt-3 text-sm">
               <div className="flex justify-between">
-                <span>Workspaces</span>
-                <span>{plan.limits.maxWorkspaces === -1 ? 'Unlimited' : plan.limits.maxWorkspaces}</span>
+                <span>{t('workspace.title')}</span>
+                <span>{plan.limits.maxWorkspaces === -1 ? t('projects.unlimited') : plan.limits.maxWorkspaces}</span>
               </div>
               <div className="flex justify-between">
-                <span>Team Members</span>
+                <span>{t('team.members')}</span>
                 <span>{plan.limits.maxTeamMembers}</span>
               </div>
               <div className="flex justify-between">
-                <span>Projects</span>
+                <span>{t('workspace.projects')}</span>
                 <span>{plan.limits.maxProjects}</span>
               </div>
             </div>
@@ -203,12 +205,12 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     <div className="space-y-6">
       {plans.length > 0 && renderPlans()}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Workspace Details</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('workspace.details')}</h3>
         
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Workspace Name *
+              {t('workspace.name')} *
             </label>
             <input
               type="text"
@@ -217,42 +219,42 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 errors.name ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Enter workspace name"
+              placeholder={t('workspace.enterName')}
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              {t('workspace.description')}
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              placeholder="Describe your workspace"
+              placeholder={t('workspace.describe')}
               rows={3}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Workspace Type
+              {t('workspace.type')}
             </label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             >
-              <option value="personal">Personal</option>
-              <option value="team">Team</option>
-              <option value="enterprise">Enterprise</option>
+              <option value="personal">{t('workspace.personal')}</option>
+              <option value="team">{t('workspace.team')}</option>
+              <option value="enterprise">{t('workspace.enterprise')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Organization Name *
+              {t('workspace.organizationName')} *
             </label>
             <input
               type="text"
@@ -261,14 +263,14 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 errors.organizationName ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Enter organization name"
+              placeholder={t('workspace.enterOrgName')}
             />
             {errors.organizationName && <p className="text-red-500 text-sm mt-1">{errors.organizationName}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Contact Email *
+              {t('workspace.contactEmail')} *
             </label>
             <input
               type="email"
@@ -277,14 +279,14 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 errors.contactEmail ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Enter contact email"
+              placeholder={t('workspace.enterEmail')}
             />
             {errors.contactEmail && <p className="text-red-500 text-sm mt-1">{errors.contactEmail}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Region
+              {t('workspace.region')}
             </label>
             <select
               value={formData.region}
@@ -302,7 +304,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Workspace Visibility
+              {t('workspace.visibility')}
             </label>
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -312,11 +314,11 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                   onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
                   className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent"
                 />
-                <span className="text-sm text-gray-700">Make this workspace publicly discoverable</span>
+                <span className="text-sm text-gray-700">{t('workspace.makePublic')}</span>
               </label>
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              Public workspaces can be found and joined by other users. Private workspaces are invite-only.
+              {t('workspace.publicDesc')}
             </p>
           </div>
         </div>
@@ -330,15 +332,15 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
           <Mail className="w-6 h-6 text-accent-dark" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Verify Your Email</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('workspace.verifyEmail')}</h3>
         <p className="text-gray-600">
-          We've sent a verification code to <strong>{formData.contactEmail}</strong>
+          {t('workspace.sentCode')} <strong>{formData.contactEmail}</strong>
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Enter Verification Code
+          {t('workspace.enterCode')}
         </label>
         <input
           type="text"
@@ -347,7 +349,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-center text-lg tracking-widest ${
             errors.otp ? 'border-red-300' : 'border-gray-300'
           }`}
-          placeholder="Enter 6-digit code"
+          placeholder={t('workspace.enter6Digit')}
           maxLength={6}
         />
         {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp}</p>}
@@ -358,7 +360,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
           onClick={handleResendOTP}
           className="text-accent-dark hover:text-blue-700 text-sm"
         >
-          Didn't receive the code? Resend
+          {t('workspace.resend')}
         </button>
       </div>
     </div>
@@ -370,9 +372,9 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
           <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Verified!</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('workspace.emailVerified')}</h3>
         <p className="text-gray-600">
-          Your email has been verified. Now let's complete the workspace setup.
+          {t('workspace.verifiedDesc')}
         </p>
       </div>
 
@@ -380,34 +382,34 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="flex items-start gap-3">
           <Shield className="w-5 h-5 text-yellow-600 mt-0.5" />
           <div>
-            <h4 className="font-medium text-gray-900">Billing overview</h4>
+            <h4 className="font-medium text-gray-900">{t('workspace.billingOverview')}</h4>
             <p className="text-sm text-gray-700 mt-1">
-              Our billing system is pending a gateway, so once a plan limit triggers a custom fee we show the shortcut below.
+              {t('workspace.billingDesc')}
             </p>
           </div>
         </div>
         {customBilling ? (
           <div className="rounded-lg border border-yellow-200 bg-white p-3 text-sm text-gray-800 space-y-1">
             <div className="flex items-center justify-between">
-              <span>Base fee</span>
+              <span>{t('workspace.baseFee')}</span>
               <strong>${customBilling.baseFee.toFixed(2)}</strong>
             </div>
             <div className="flex items-center justify-between">
-              <span>Per head</span>
+              <span>{t('workspace.perHead')}</span>
               <strong>${customBilling.perHeadPrice.toFixed(2)}</strong>
             </div>
             <div className="flex items-center justify-between">
-              <span>Employees</span>
+              <span>{t('workspace.employees')}</span>
               <strong>{customBilling.estimatedMembers}</strong>
             </div>
             <div className="flex items-center justify-between text-lg font-semibold">
-              <span>Total</span>
+              <span>{t('workspace.total')}</span>
               <strong>${customBilling.total.toFixed(2)}</strong>
             </div>
           </div>
         ) : (
           <div className="flex items-center gap-2 text-xs text-gray-800">
-            <span>Default template pricing applies: modify the plan in admin if you need custom limits.</span>
+            <span>{t('workspace.defaultPricing')}</span>
           </div>
         )}
         {customBilling && (
@@ -415,7 +417,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
             onClick={handleCreateWorkspace}
             className="w-full px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold"
           >
-            Bypass gateway & accept charge
+            {t('workspace.bypassGateway')}
           </button>
         )}
       </div>
@@ -428,9 +430,9 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
           <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Workspace Created!</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('workspace.createdTitle')}</h3>
         <p className="text-gray-600">
-          Your workspace "{formData.name}" has been created successfully.
+          {t('workspace.createdDesc', { name: formData.name })}
         </p>
       </div>
 
@@ -438,9 +440,9 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="flex items-center gap-3">
           <Building2 className="w-5 h-5 text-green-600" />
           <div>
-            <h4 className="font-medium text-green-800">Next Steps</h4>
+            <h4 className="font-medium text-green-800">{t('workspace.nextSteps')}</h4>
             <p className="text-sm text-green-700 mt-1">
-              You can now invite team members, create projects, and start collaborating!
+              {t('workspace.nextStepsDesc')}
             </p>
           </div>
         </div>
@@ -466,20 +468,20 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
   const stepMeta = {
     title:
       step === 1
-        ? 'Workspace details'
+        ? t('workspace.details')
         : step === 2
-        ? 'Verify ownership'
+        ? t('workspace.verifyOwnership')
         : step === 3
-        ? 'Billing confirmation'
-        : 'Workspace created',
+        ? t('workspace.billingConfirmation')
+        : t('workspace.createdTitle'),
     subtitle:
       step === 1
-        ? 'Provide workspace information so we can prepare the upgrade options.'
+        ? t('workspace.detailsDesc')
         : step === 2
-        ? 'Enter the verification code sent to your contact email.'
+        ? t('workspace.verifyOwnershipDesc')
         : step === 3
-        ? 'Review billing details and create your workspace.'
-        : 'You can now start inviting your team.',
+        ? t('workspace.billingConfirmationDesc')
+        : t('workspace.createdStepDesc'),
   };
 
   return (
@@ -489,7 +491,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         <div className="flex items-start justify-between p-6 border-b border-gray-200">
           <div>
             <p className="text-xs uppercase tracking-widest text-gray-600">
-              {step < 4 ? `Step ${step} of 3` : 'Completed'}
+              {step < 4 ? t('workspace.step', { current: step, total: 3 }) : t('workspace.completed')}
             </p>
             <h2 className="text-xl font-semibold text-gray-900 mt-1">{stepMeta.title}</h2>
             <p className="text-sm text-gray-600 mt-1">{stepMeta.subtitle}</p>
@@ -512,14 +514,14 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                 onClick={handleClose}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSendOTP}
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {loading ? 'Sending...' : 'Verify user'}
+                {loading ? t('workspace.sending') : t('workspace.verifyUser')}
               </button>
             </>
           )}
@@ -530,14 +532,14 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                 onClick={() => setStep(1)}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Back
+                {t('common.back')}
               </button>
               <button
                 onClick={handleVerifyOTP}
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {loading ? 'Verifying...' : 'Verify Code'}
+                {loading ? t('workspace.verifying') : t('workspace.verifyCode')}
               </button>
             </>
           )}
@@ -548,14 +550,14 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                 onClick={() => setStep(2)}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Back
+                {t('common.back')}
               </button>
               <button
                 onClick={handleCreateWorkspace}
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
               >
-                {loading ? 'Processing...' : 'Create Workspace'}
+                {loading ? t('workspace.processing') : t('workspace.create')}
               </button>
             </>
           )}
@@ -565,7 +567,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               onClick={handleClose}
               className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
-              Get Started
+              {t('workspace.getStarted')}
           </button>
           )}
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
 import {
@@ -28,6 +29,7 @@ interface Activity {
 }
 
 const ActivityPage: React.FC = () => {
+  const { t } = useTranslation();
   const { isDarkMode } = useTheme();
   const { addToast } = useApp();
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -108,10 +110,10 @@ const ActivityPage: React.FC = () => {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    if (diffMins < 1) return t('activity.time.justNow');
+    if (diffMins < 60) return t('activity.time.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('activity.time.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return t('activity.time.daysAgo', { count: diffDays });
     return activityDate.toLocaleDateString();
   };
 
@@ -123,12 +125,12 @@ const ActivityPage: React.FC = () => {
   });
 
   const filterOptions = [
-    { value: 'all', label: 'All Activities' },
-    { value: 'task', label: 'Tasks' },
-    { value: 'project', label: 'Projects' },
-    { value: 'team', label: 'Team' },
-    { value: 'goal', label: 'Goals' },
-    { value: 'file', label: 'Files' },
+    { value: 'all', label: t('activity.filters.all') },
+    { value: 'task', label: t('activity.filters.task') },
+    { value: 'project', label: t('activity.filters.project') },
+    { value: 'team', label: t('activity.filters.team') },
+    { value: 'goal', label: t('activity.filters.goal') },
+    { value: 'file', label: t('activity.filters.file') },
   ];
 
   return (
@@ -143,10 +145,10 @@ const ActivityPage: React.FC = () => {
               </div>
               <div>
                 <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Activity Feed
+                  {t('activity.title')}
                 </h1>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Track all your recent activities and updates
+                  {t('activity.subtitle')}
                 </p>
               </div>
             </div>
@@ -162,7 +164,7 @@ const ActivityPage: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search activities..."
+                placeholder={t('activity.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
@@ -197,19 +199,17 @@ const ActivityPage: React.FC = () => {
           <div className="flex items-center justify-center py-20">
             <div className="flex flex-col items-center space-y-3">
               <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-              <p className="text-sm text-gray-500">Loading activities...</p>
+              <p className="text-sm text-gray-500">{t('activity.loading')}</p>
             </div>
           </div>
         ) : filteredActivities.length === 0 ? (
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-12 text-center border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <ActivityIcon className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
             <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              No Activities Found
+              {t('activity.empty.title')}
             </h3>
             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-              {searchQuery || filter !== 'all'
-                ? 'Try adjusting your filters or search query'
-                : 'Start working on tasks and projects to see your activity here'}
+              {t('activity.empty.description')}
             </p>
           </div>
         ) : (

@@ -27,9 +27,11 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { WorkspaceCreationRestriction } from './FeatureRestriction';
+import { useTranslation } from 'react-i18next';
 
 const Dashboard: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
@@ -89,44 +91,44 @@ const Dashboard: React.FC = () => {
     switch (page) {
       case 'home':
         return [
-          { id: 'overview', label: 'Overview', icon: Home },
-          { id: 'recent', label: 'Recent', icon: Timer },
-          { id: 'favorites', label: 'Favorites', icon: Target }
+          { id: 'overview', label: t('tabs.overview'), icon: Home },
+          { id: 'recent', label: t('tabs.recent'), icon: Timer },
+          { id: 'favorites', label: t('tabs.favorites'), icon: Target }
         ];
       case 'dashboard':
         return [
-          { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-          { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-          { id: 'activity', label: 'Activity', icon: Bell }
+          { id: 'overview', label: t('tabs.overview'), icon: LayoutDashboard },
+          { id: 'analytics', label: t('tabs.analytics'), icon: BarChart3 },
+          { id: 'activity', label: t('tabs.activity'), icon: Bell }
         ];
       case 'projects':
         return [
-          { id: 'list', label: 'List', icon: FileText },
-          { id: 'kanban', label: 'Kanban', icon: Kanban },
-          { id: 'calendar', label: 'Calendar', icon: Calendar },
-          { id: 'gantt', label: 'Gantt', icon: GanttChart }
+          { id: 'list', label: t('tabs.list'), icon: FileText },
+          { id: 'kanban', label: t('tabs.kanban'), icon: Kanban },
+          { id: 'calendar', label: t('tabs.calendar'), icon: Calendar },
+          { id: 'gantt', label: t('tabs.gantt'), icon: GanttChart }
         ];
       case 'reports':
         return [
-          { id: 'overview', label: 'Overview', icon: BarChart3 },
-          { id: 'productivity', label: 'Productivity', icon: TrendingUp },
-          { id: 'time', label: 'Time Tracking', icon: Timer },
-          { id: 'team', label: 'Team', icon: Users }
+          { id: 'overview', label: t('tabs.overview'), icon: BarChart3 },
+          { id: 'productivity', label: t('tabs.productivity'), icon: TrendingUp },
+          { id: 'time', label: t('tabs.time'), icon: Timer },
+          { id: 'team', label: t('tabs.team'), icon: Users }
         ];
       case 'team':
         return [
-          { id: 'members', label: 'Members', icon: Users },
-          { id: 'roles', label: 'Roles', icon: Target },
-          { id: 'performance', label: 'Performance', icon: BarChart3 }
+          { id: 'members', label: t('tabs.members'), icon: Users },
+          { id: 'roles', label: t('tabs.roles'), icon: Target },
+          { id: 'performance', label: t('tabs.performance'), icon: BarChart3 }
         ];
       case 'goals':
         return [
-          { id: 'personal', label: 'Personal', icon: Target },
-          { id: 'team', label: 'Team', icon: Users },
-          { id: 'company', label: 'Company', icon: Building }
+          { id: 'personal', label: t('tabs.personal'), icon: Target },
+          { id: 'team', label: t('tabs.team'), icon: Users },
+          { id: 'company', label: t('tabs.company'), icon: Building }
         ];
       default:
-        return [{ id: 'overview', label: 'Overview', icon: Home }];
+        return [{ id: 'overview', label: t('tabs.overview'), icon: Home }];
     }
   };
 
@@ -140,28 +142,10 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-slate-900 capitalize">
-                {currentPage === 'home' ? 'Home' : 
-                 currentPage === 'dashboard' ? 'Dashboard' :
-                 currentPage === 'projects' ? 'Projects' :
-                 currentPage === 'planner' ? 'Planner' :
-                 currentPage === 'tracker' ? 'Tracker' :
-                 currentPage === 'reminders' ? 'Reminders' :
-                 currentPage === 'workspace' ? 'Workspace' :
-                 currentPage === 'reports' ? 'Reports' :
-                 currentPage === 'team' ? 'Team' :
-                 currentPage === 'goals' ? 'Goals' : 'Dashboard'}
+                {t(`headers.${currentPage}`)}
               </h1>
               <p className="text-sm text-slate-600 mt-1">
-                {currentPage === 'home' ? 'Welcome back! Here\'s your overview' :
-                 currentPage === 'dashboard' ? 'Monitor your productivity and progress' :
-                 currentPage === 'projects' ? 'Manage and track your projects' :
-                 currentPage === 'planner' ? 'Plan your tasks and schedule' :
-                 currentPage === 'tracker' ? 'Track your time and habits' :
-                 currentPage === 'reminders' ? 'Stay on top of important deadlines' :
-                 currentPage === 'workspace' ? 'Collaborate with your team' :
-                 currentPage === 'reports' ? 'Analyze your performance and insights' :
-                 currentPage === 'team' ? 'Manage your team and collaboration' :
-                 currentPage === 'goals' ? 'Set and track your goals' : 'Dashboard overview'}
+                {t(`descriptions.${currentPage}`)}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -171,7 +155,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => navigate('/workspace')}
                 >
                   <Building className="w-4 h-4 mr-1 inline-block" />
-                  Create workspace
+                  {t('workspace.create')}
                 </button>
               </WorkspaceCreationRestriction>
               <button 
@@ -179,7 +163,7 @@ const Dashboard: React.FC = () => {
                 onClick={() => showToast('Quick add', 'info')}
               >
                 <Plus className="w-4 h-4 mr-1 inline-block" />
-                New
+                {t('common.add')}
               </button>
             </div>
           </div>
@@ -245,6 +229,7 @@ const Dashboard: React.FC = () => {
 // Home Content Component
 const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const { state } = useApp();
+  const { t } = useTranslation();
 
   if (activeTab === 'overview') {
     return (
@@ -254,38 +239,38 @@ const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
           <div className="bg-white border border-border rounded-xl p-5">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-[22px] tracking-tight font-semibold">Good afternoon, {state.userProfile.fullName.split(' ')[0]}</h2>
-                <p className="text-sm text-slate-600 mt-1">Here's what's happening with your work today</p>
+                <h2 className="text-[22px] tracking-tight font-semibold">{t('dashboard.goodAfternoon', { name: state.userProfile.fullName.split(' ')[0] })}</h2>
+                <p className="text-sm text-slate-600 mt-1">{t('dashboard.workOverview')}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
               <div className="rounded-lg border border-border p-4">
-                <div className="text-xs text-slate-500">Active projects</div>
+                <div className="text-xs text-slate-500">{t('dashboard.activeProjects')}</div>
                 <div className="text-xl font-semibold tracking-tight mt-1">12</div>
                 <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
                   <TrendingUp className="w-3.5 h-3.5" />
-                  +2 this week
+                  {t('dashboard.productivityIncrease')}
                 </div>
               </div>
               <div className="rounded-lg border border-border p-4">
-                <div className="text-xs text-slate-500">Tasks due</div>
+                <div className="text-xs text-slate-500">{t('dashboard.tasksDue')}</div>
                 <div className="text-xl font-semibold tracking-tight mt-1">26</div>
                 <div className="text-xs text-orange-600 mt-1 flex items-center gap-1">
                   <Timer className="w-3.5 h-3.5" />
-                  5 overdue
+                  5 {t('dashboard.overdue')}
                 </div>
               </div>
               <div className="rounded-lg border border-border p-4">
-                <div className="text-xs text-slate-500">This week's hours</div>
+                <div className="text-xs text-slate-500">{t('dashboard.weeksHours')}</div>
                 <div className="text-xl font-semibold tracking-tight mt-1">38.5</div>
-                <div className="text-xs text-slate-500 mt-1">Timesheet synced</div>
+                <div className="text-xs text-slate-500 mt-1">{t('dashboard.timesheetSynced')}</div>
               </div>
               <div className="rounded-lg border border-border p-4">
-                <div className="text-xs text-slate-500">Payroll status</div>
+                <div className="text-xs text-slate-500">{t('dashboard.payrollStatus')}</div>
                 <div className="text-xl font-semibold tracking-tight mt-1">$24,380</div>
                 <div className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
                   <BadgeCheck className="w-3.5 h-3.5" />
-                  Ready
+                  {t('dashboard.ready')}
                 </div>
               </div>
             </div>
@@ -294,8 +279,8 @@ const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
         <div className="lg:col-span-4">
           <div className="bg-white border border-border rounded-xl p-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-[18px] tracking-tight font-semibold">Upcoming deadlines</h3>
-              <button className="text-sm text-slate-600 hover:text-slate-900">View all</button>
+              <h3 className="text-[18px] tracking-tight font-semibold">{t('dashboard.upcomingTasks')}</h3>
+              <button className="text-sm text-slate-600 hover:text-slate-900">{t('buttons.viewAll')}</button>
             </div>
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
@@ -303,14 +288,14 @@ const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
                   <div className="text-sm font-medium">Marketing site launch</div>
                   <div className="text-xs text-slate-500">Due today • 5:00 PM</div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200">High</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200">{t('tasks.high')}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-medium">Payroll approval</div>
                   <div className="text-xs text-slate-500">Due tomorrow • 11:00 AM</div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">On track</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">{t('projects.onTrack')}</span>
               </div>
             </div>
           </div>
@@ -322,7 +307,7 @@ const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'recent') {
     return (
       <div className="bg-white border border-border rounded-xl p-5">
-        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentActivity')}</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -349,27 +334,28 @@ const HomeContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
 
   return (
     <div className="bg-white border border-border rounded-xl p-5">
-      <h3 className="text-lg font-semibold mb-4">Favorites</h3>
-      <div className="text-slate-500">No favorites yet. Star items to add them here.</div>
+      <h3 className="text-lg font-semibold mb-4">{t('tabs.favorites')}</h3>
+      <div className="text-slate-500">{t('common.none')}</div>
     </div>
   );
 };
 
 // Dashboard Content Component
 const DashboardContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { t } = useTranslation();
   if (activeTab === 'overview') {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-8">
           <div className="bg-white border border-border rounded-xl p-5">
-            <h3 className="text-lg font-semibold mb-4">Project Overview</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('projects.title')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg border border-border">
-                <div className="text-sm text-slate-500">Total Projects</div>
+                <div className="text-sm text-slate-500">{t('projects.allProjects')}</div>
                 <div className="text-2xl font-semibold">12</div>
               </div>
               <div className="p-4 rounded-lg border border-border">
-                <div className="text-sm text-slate-500">Active Tasks</div>
+                <div className="text-sm text-slate-500">{t('projects.active')}</div>
                 <div className="text-2xl font-semibold">47</div>
               </div>
             </div>
@@ -377,15 +363,15 @@ const DashboardContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
         </div>
         <div className="lg:col-span-4">
           <div className="bg-white border border-border rounded-xl p-5">
-            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.quickActions')}</h3>
             <div className="space-y-2">
               <button className="w-full text-left p-3 rounded-lg border border-border hover:bg-slate-50">
-                <div className="font-medium">Create new project</div>
-                <div className="text-sm text-slate-500">Start a new project</div>
+                <div className="font-medium">{t('projects.newProject')}</div>
+                <div className="text-sm text-slate-500">{t('projects.newProject')}</div>
               </button>
               <button className="w-full text-left p-3 rounded-lg border border-border hover:bg-slate-50">
-                <div className="font-medium">Add task</div>
-                <div className="text-sm text-slate-500">Create a new task</div>
+                <div className="font-medium">{t('tasks.newTask')}</div>
+                <div className="text-sm text-slate-500">{t('tasks.newTask')}</div>
               </button>
             </div>
           </div>
@@ -397,16 +383,16 @@ const DashboardContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'analytics') {
     return (
       <div className="bg-white border border-border rounded-xl p-5">
-        <h3 className="text-lg font-semibold mb-4">Analytics</h3>
-        <div className="text-slate-500">Analytics dashboard coming soon...</div>
+        <h3 className="text-lg font-semibold mb-4">{t('tabs.analytics')}</h3>
+        <div className="text-slate-500">{t('common.loading')}</div>
       </div>
     );
   }
 
   return (
     <div className="bg-white border border-border rounded-xl p-5">
-      <h3 className="text-lg font-semibold mb-4">Activity Feed</h3>
-      <div className="text-slate-500">Recent activity will appear here...</div>
+      <h3 className="text-lg font-semibold mb-4">{t('tabs.activity')}</h3>
+      <div className="text-slate-500">{t('common.loading')}</div>
     </div>
   );
 };
@@ -414,14 +400,15 @@ const DashboardContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
 // Projects Content Component
 const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const { state } = useApp();
+  const { t } = useTranslation();
 
   if (activeTab === 'list') {
     return (
       <div className="bg-white border border-border rounded-xl">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div>
-            <h3 className="text-[18px] tracking-tight font-semibold">Projects</h3>
-            <p className="text-xs text-slate-500">Manage and track your work</p>
+            <h3 className="text-[18px] tracking-tight font-semibold">{t('projects.title')}</h3>
+            <p className="text-xs text-slate-500">{t('projects.projectDescription')}</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden md:flex items-center gap-2">
@@ -430,21 +417,21 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
                 <input 
                   type="text" 
                   className="w-48 rounded-lg border border-border bg-white pl-8 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500" 
-                  placeholder="Search projects..."
+                  placeholder={t('common.search')}
                 />
               </div>
               <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">
                 <SlidersHorizontal className="w-4 h-4 mr-1 inline-block" />
-                Filters
+                {t('common.filter')}
               </button>
               <button className="px-3 py-2 rounded-lg border border-border hover:bg-slate-50 text-sm">
                 <ArrowUpDown className="w-4 h-4 mr-1 inline-block" />
-                Sort
+                {t('reports.sortBy')}
               </button>
             </div>
             <button className="px-3 py-2 rounded-lg text-white text-sm hover:opacity-95 bg-accent">
               <FolderPlus className="w-4 h-4 mr-1 inline-block" />
-              Add Project
+              {t('projects.newProject')}
             </button>
           </div>
         </div>
@@ -454,12 +441,12 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
             <table className="min-w-full text-sm">
               <thead className="text-slate-600">
                 <tr className="border-b border-border">
-                  <th className="text-left font-medium py-2 pr-3">Project</th>
-                  <th className="text-left font-medium py-2 pr-3">Client</th>
-                  <th className="text-left font-medium py-2 pr-3">Status</th>
-                  <th className="text-left font-medium py-2 pr-3">Due</th>
-                  <th className="text-left font-medium py-2 pr-3">Assignees</th>
-                  <th className="text-right font-medium py-2 pl-3">Actions</th>
+                  <th className="text-left font-medium py-2 pr-3">{t('projects.projectName')}</th>
+                  <th className="text-left font-medium py-2 pr-3">{t('projects.client')}</th>
+                  <th className="text-left font-medium py-2 pr-3">{t('common.status')}</th>
+                  <th className="text-left font-medium py-2 pr-3">{t('tasks.dueDate')}</th>
+                  <th className="text-left font-medium py-2 pr-3">{t('projects.members')}</th>
+                  <th className="text-right font-medium py-2 pl-3">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -467,7 +454,7 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
                   <tr key={project._id} className="hover:bg-slate-50">
                     <td className="py-3 pr-3">
                       <div className="font-medium">{project.name}</div>
-                      <div className="text-xs text-slate-500">Marketing • {project.priority} priority</div>
+                      <div className="text-xs text-slate-500">Marketing • {t('tasks.' + project.priority.toLowerCase())} {t('tasks.priority')}</div>
                     </td>
                     <td className="py-3 pr-3">{project.client}</td>
                     <td className="py-3 pr-3">
@@ -476,10 +463,10 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
                         project.status === 'on-hold' ? 'bg-slate-100 text-slate-700 border-border' :
                         'bg-emerald-50 text-emerald-600 border-emerald-200'
                       }`}>
-                        {project.status}
+                        {t('projects.' + project.status.toLowerCase().replace(' ', ''))}
                       </span>
                     </td>
-                    <td className="py-3 pr-3">{project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'N/A'}</td>
+                    <td className="py-3 pr-3">{project.dueDate ? new Date(project.dueDate).toLocaleDateString() : t('common.none')}</td>
                     <td className="py-3 pr-3">
                       <div className="flex -space-x-2">
                         {project.teamMembers.slice(0, 2).map((member, index) => (
@@ -499,7 +486,7 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
                     </td>
                     <td className="py-3 pl-3 text-right">
                       <button className="px-2 py-1 rounded-md border border-border hover:bg-slate-50">
-                        Visit
+                        {t('common.view')}
                       </button>
                     </td>
                   </tr>
@@ -540,55 +527,59 @@ const ProjectsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
 
 // Reports Content Component
 const ReportsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white border border-border rounded-xl p-5">
       <h3 className="text-lg font-semibold mb-4">
-        {activeTab === 'overview' ? 'Reports Overview' :
-         activeTab === 'productivity' ? 'Productivity Reports' :
-         activeTab === 'time' ? 'Time Tracking Reports' :
-         activeTab === 'team' ? 'Team Reports' : 'Reports'}
+        {activeTab === 'overview' ? t('reports.title') + ' ' + t('dashboard.overview') :
+         activeTab === 'productivity' ? t('reports.productivity') :
+         activeTab === 'time' ? t('reports.timeTracking') :
+         activeTab === 'team' ? t('reports.teamPerformance') : t('reports.title')}
       </h3>
-      <div className="text-slate-500">Reports dashboard coming soon...</div>
+      <div className="text-slate-500">{t('common.comingSoon')}</div>
     </div>
   );
 };
 
 // Team Content Component
 const TeamContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white border border-border rounded-xl p-5">
       <h3 className="text-lg font-semibold mb-4">
-        {activeTab === 'members' ? 'Team Members' :
-         activeTab === 'roles' ? 'Roles & Permissions' :
-         activeTab === 'performance' ? 'Team Performance' : 'Team'}
+        {activeTab === 'members' ? t('team.members') :
+         activeTab === 'roles' ? t('tabs.roles') :
+         activeTab === 'performance' ? t('reports.teamPerformance') : t('team.title')}
       </h3>
-      <div className="text-slate-500">Team management coming soon...</div>
+      <div className="text-slate-500">{t('common.comingSoon')}</div>
     </div>
   );
 };
 
 // Goals Content Component
 const GoalsContent: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white border border-border rounded-xl p-5">
       <h3 className="text-lg font-semibold mb-4">
-        {activeTab === 'personal' ? 'Personal Goals' :
-         activeTab === 'team' ? 'Team Goals' :
-         activeTab === 'company' ? 'Company Goals' : 'Goals'}
+        {activeTab === 'personal' ? t('tabs.personal') + ' ' + t('headers.goals') :
+         activeTab === 'team' ? t('tabs.team') + ' ' + t('headers.goals') :
+         activeTab === 'company' ? t('tabs.company') + ' ' + t('headers.goals') : t('headers.goals')}
       </h3>
-      <div className="text-slate-500">Goals tracking coming soon...</div>
+      <div className="text-slate-500">{t('common.comingSoon')}</div>
     </div>
   );
 };
 
 // Default Content Component
 const DefaultContent: React.FC<{ currentPage: string; activeTab: string }> = ({ currentPage, activeTab }) => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white border border-border rounded-xl p-5">
       <h3 className="text-lg font-semibold mb-4 capitalize">
-        {currentPage} - {activeTab}
+        {t(`headers.${currentPage}`)} - {activeTab}
       </h3>
-      <div className="text-slate-500">Content for {currentPage} page coming soon...</div>
+      <div className="text-slate-500">{t('common.contentComingSoon', { page: t('headers.' + currentPage) })}</div>
     </div>
   );
 };

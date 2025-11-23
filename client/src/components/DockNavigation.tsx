@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import {
   Home,
@@ -24,6 +25,7 @@ import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/des
 interface NavItem {
   id: string;
   label: string;
+  translationKey: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
 }
@@ -32,6 +34,7 @@ const DockNavigation: React.FC = () => {
   const { state, dispatch } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [showWorkspaces, setShowWorkspaces] = useState(false);
 
   // Check if user owns any workspace
@@ -58,16 +61,16 @@ const DockNavigation: React.FC = () => {
   // Build main nav items dynamically
   const mainNavItems: NavItem[] = useMemo(() => {
     const items: NavItem[] = [
-      { id: 'home', label: 'Home', icon: Home, path: '/home' },
-      { id: 'projects', label: 'Projects', icon: FolderOpen, path: '/projects' },
-      { id: 'planner', label: 'Planner', icon: Calendar, path: '/planner' },
-      { id: 'tracker', label: 'Tracker', icon: Clock, path: '/tracker' },
-      { id: 'tasks', label: 'Tasks', icon: FileText, path: '/tasks' },
-      { id: 'reminders', label: 'Reminders', icon: Bell, path: '/reminders' },
-      { id: 'workspace', label: 'Workspace', icon: Building, path: '/workspace' },
-      { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports' },
-      { id: 'team', label: 'Team', icon: Users, path: '/team' },
-      { id: 'goals', label: 'Goals', icon: Target, path: '/goals' }
+      { id: 'home', label: 'Home', translationKey: 'navigation.home', icon: Home, path: '/home' },
+      { id: 'projects', label: 'Projects', translationKey: 'navigation.projects', icon: FolderOpen, path: '/projects' },
+      { id: 'planner', label: 'Planner', translationKey: 'planner.title', icon: Calendar, path: '/planner' },
+      { id: 'tracker', label: 'Tracker', translationKey: 'tracker.title', icon: Clock, path: '/tracker' },
+      { id: 'tasks', label: 'Tasks', translationKey: 'navigation.tasks', icon: FileText, path: '/tasks' },
+      { id: 'reminders', label: 'Reminders', translationKey: 'navigation.notifications', icon: Bell, path: '/reminders' },
+      { id: 'workspace', label: 'Workspace', translationKey: 'workspace.title', icon: Building, path: '/workspace' },
+      { id: 'reports', label: 'Reports', translationKey: 'navigation.reports', icon: BarChart3, path: '/reports' },
+      { id: 'team', label: 'Team', translationKey: 'navigation.team', icon: Users, path: '/team' },
+      { id: 'goals', label: 'Goals', translationKey: 'dashboard.insights', icon: Target, path: '/goals' }
     ];
 
     // Add Manage Workspace tab if user owns any workspace
@@ -75,6 +78,7 @@ const DockNavigation: React.FC = () => {
       items.push({
         id: 'manage-workspace',
         label: 'Manage Workspace',
+        translationKey: 'workspace.settings',
         icon: Shield,
         path: '/manage-workspace'
       });
@@ -120,13 +124,14 @@ const DockNavigation: React.FC = () => {
         {mainNavItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
+          const isEnglish = i18n.language === 'en';
           
           return (
             <DockIcon
               key={item.id}
               onClick={() => handleItemClick(item)}
               active={active}
-              tooltip={item.label}
+              tooltip={isEnglish ? t(item.translationKey) : `${t(item.translationKey)} (${item.label})`}
             >
               <Icon className="w-5 h-5" />
             </DockIcon>

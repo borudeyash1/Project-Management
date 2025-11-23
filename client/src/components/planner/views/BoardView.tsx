@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, MoreVertical } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import TaskCard from '../TaskCard';
 import TaskDetailModal from '../TaskDetailModal';
 import { usePlanner } from '../../../context/PlannerContext';
@@ -11,6 +12,7 @@ interface BoardViewProps {
 
 const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   const { tasks, columns, addTask, moveTask } = usePlanner();
+  const { t } = useTranslation();
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
@@ -55,7 +57,7 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${column.color}`} />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{column.name}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white" title={column.name}>{t(column.name)}</h3>
                   <span className="text-sm text-gray-600 dark:text-gray-200">
                     {filteredTasks(column.id).length}
                   </span>
@@ -66,7 +68,7 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
               </div>
               {column.wip && (
                 <div className="text-xs text-gray-600 dark:text-gray-200">
-                  WIP Limit: {filteredTasks(column.id).length}/{column.wip}
+                  {t('planner.wipLimit')}: {filteredTasks(column.id).length}/{column.wip}
                 </div>
               )}
             </div>
@@ -89,7 +91,7 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
                 className="w-full p-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Add Task
+                {t('planner.addTask')}
               </button>
             </div>
           </div>

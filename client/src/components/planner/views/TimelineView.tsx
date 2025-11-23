@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
 
@@ -11,6 +12,7 @@ type ZoomLevel = 'day' | 'week' | 'month';
 
 const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
   const { tasks } = usePlanner();
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [zoomLevel, setZoomLevel] = useState<ZoomLevel>('week');
 
@@ -137,9 +139,9 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Timeline View</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('planner.timeline.title')}</h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              {filteredTasks.length} tasks • Gantt chart view
+              {t('planner.timeline.subtitle', { count: filteredTasks.length })}
             </p>
           </div>
           
@@ -147,19 +149,19 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded bg-red-500"></div>
-              <span className="text-gray-600 dark:text-gray-200">Urgent</span>
+              <span className="text-gray-600 dark:text-gray-200">{t('planner.timeline.legend.urgent')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded bg-orange-500"></div>
-              <span className="text-gray-600 dark:text-gray-200">High</span>
+              <span className="text-gray-600 dark:text-gray-200">{t('planner.timeline.legend.high')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded bg-yellow-500"></div>
-              <span className="text-gray-600 dark:text-gray-200">Medium</span>
+              <span className="text-gray-600 dark:text-gray-200">{t('planner.timeline.legend.medium')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded bg-gray-400"></div>
-              <span className="text-gray-600 dark:text-gray-200">Low</span>
+              <span className="text-gray-600 dark:text-gray-200">{t('planner.timeline.legend.low')}</span>
             </div>
           </div>
         </div>
@@ -180,7 +182,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
               onClick={() => setCurrentDate(new Date())}
               className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg"
             >
-              Today
+              {t('planner.timeline.controls.today')}
             </button>
             <button
               onClick={handleNext}
@@ -201,7 +203,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                  {t(`planner.timeline.controls.${level}`)}
                 </button>
               ))}
             </div>
@@ -216,7 +218,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
           <div className="border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
             <div className="flex">
               <div className="w-48 flex-shrink-0 px-4 py-3 border-r border-gray-300 dark:border-gray-600">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-700">Task</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-700">{t('planner.timeline.task.title')}</span>
               </div>
               <div className="flex-1 relative">
                 <div className="flex h-full">
@@ -293,7 +295,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
                         left: position.left,
                         width: position.width
                       }}
-                      title={`${task.title}\nStart: ${position.startDate.toLocaleDateString()}\nEnd: ${position.endDate.toLocaleDateString()}\nDuration: ${position.duration} days`}
+                      title={`${task.title}\n${t('planner.timeline.task.start')}: ${position.startDate.toLocaleDateString()}\n${t('planner.timeline.task.end')}: ${position.endDate.toLocaleDateString()}\n${t('planner.timeline.task.duration')}: ${position.duration} ${t('planner.timeline.task.days')}`}
                     >
                       {/* Progress Bar */}
                       <div 
@@ -324,13 +326,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
                       <div className="absolute -top-16 left-0 hidden group-hover:block bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl z-20 min-w-64">
                         <div className="font-semibold mb-2">{task.title}</div>
                         <div className="space-y-1 text-gray-700">
-                          <div>Start: {position.startDate.toLocaleDateString()}</div>
-                          <div>End: {position.endDate.toLocaleDateString()}</div>
-                          <div>Duration: {position.duration} days</div>
-                          <div>Status: {task.status}</div>
-                          <div>Priority: {task.priority}</div>
+                          <div>{t('planner.timeline.task.start')}: {position.startDate.toLocaleDateString()}</div>
+                          <div>{t('planner.timeline.task.end')}: {position.endDate.toLocaleDateString()}</div>
+                          <div>{t('planner.timeline.task.duration')}: {position.duration} {t('planner.timeline.task.days')}</div>
+                          <div>{t('planner.list.columns.status')}: {task.status}</div>
+                          <div>{t('planner.list.columns.priority')}: {task.priority}</div>
                           {task.assignees.length > 0 && (
-                            <div>Assignee: {task.assignees[0]}</div>
+                            <div>{t('planner.list.columns.assignee')}: {task.assignees[0]}</div>
                           )}
                         </div>
                       </div>
@@ -343,7 +345,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
             {filteredTasks.length === 0 && (
               <div className="p-12 text-center">
                 <Calendar className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-200">No tasks with due dates</p>
+                <p className="text-gray-600 dark:text-gray-200">{t('planner.timeline.task.noTasks')}</p>
               </div>
             )}
           </div>

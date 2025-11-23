@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, DollarSign } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface CreateProjectModalProps {
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting = false }) => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -77,7 +79,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
         {/* Header */}
         <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            Create New Project
+            {t('projects.newProject')}
           </h2>
           <button
             onClick={onClose}
@@ -92,13 +94,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           {/* Project Name */}
           <div>
             <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-              Project Name *
+              {t('projects.projectName')} *
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Enter project name"
+              placeholder={t('projects.enterProjectName')}
               required
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 isDarkMode
@@ -111,12 +113,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           {/* Description */}
           <div>
             <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-              Description
+              {t('projects.projectDescription')}
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Describe your project"
+              placeholder={t('projects.describeProject')}
               rows={3}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                 isDarkMode
@@ -130,7 +132,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Status
+                {t('projects.status')}
               </label>
               <select
                 value={formData.status}
@@ -141,15 +143,15 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
               >
-                <option value="planning">Planning</option>
-                <option value="active">Active</option>
-                <option value="on-hold">On Hold</option>
+                <option value="planning">{t('projects.planning')}</option>
+                <option value="active">{t('projects.active')}</option>
+                <option value="on-hold">{t('projects.onHold')}</option>
               </select>
             </div>
 
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Priority
+                {t('projects.priority')}
               </label>
               <select
                 value={formData.priority}
@@ -160,10 +162,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="low">{t('projects.low')}</option>
+                <option value="medium">{t('projects.medium')}</option>
+                <option value="high">{t('projects.high')}</option>
+                <option value="urgent">{t('projects.urgent')}</option>
               </select>
             </div>
           </div>
@@ -172,7 +174,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Start Date *
+                {t('projects.startDate')} *
               </label>
               <input
                 type="date"
@@ -189,7 +191,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
 
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                End Date *
+                {t('projects.endDate')} *
               </label>
               <input
                 type="date"
@@ -209,7 +211,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Estimated Budget
+                {t('projects.estimatedBudget')}
               </label>
               <input
                 type="number"
@@ -229,7 +231,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
 
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Currency
+                {t('projects.currency')}
               </label>
               <select
                 value={formData.budget.currency}
@@ -254,7 +256,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           {/* Tags */}
           <div>
             <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-              Tags
+              {t('projects.tags')}
             </label>
             <div className="flex gap-2 mb-2">
               <input
@@ -262,7 +264,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                 value={currentTag}
                 onChange={(e) => setCurrentTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                placeholder="Add a tag"
+                placeholder={t('projects.addTag')}
                 className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
                   isDarkMode
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
@@ -274,7 +276,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                 onClick={addTag}
                 className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
-                Add
+                {t('common.add')}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -307,14 +309,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className={`px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {isSubmitting ? 'Creating...' : 'Create Project'}
+              {isSubmitting ? t('projects.creating') : t('projects.createProject')}
             </button>
           </div>
         </form>

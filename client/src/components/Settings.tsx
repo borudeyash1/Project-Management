@@ -6,11 +6,13 @@ import {
   Monitor, Smartphone, Tablet, Wifi, Cloud, Server, HardDrive,
   Zap, Moon, Sun, Volume2, VolumeX, Mic, MicOff, Camera, CameraOff,
   MapPin, Clock, Calendar, Mail, MessageSquare, Phone, Users,
-  BarChart3, PieChart, TrendingUp, Activity, Target, Award
+  BarChart3, PieChart, TrendingUp, Activity, Target, Award, Languages
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
+import LanguageSelector from './LanguageSelector';
 
 interface SettingsData {
   account: {
@@ -162,6 +164,7 @@ interface SettingsData {
 const Settings: React.FC = () => {
   const { state, dispatch } = useApp();
   const { preferences, updatePreferences: updateThemePreferences } = useTheme();
+  const { t, i18n } = useTranslation();
   const [settingsData, setSettingsData] = useState<SettingsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -451,9 +454,9 @@ const Settings: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'account', label: t('settings.account'), icon: User },
+    { id: 'notifications', label: t('settings.notifications'), icon: Bell },
+    { id: 'appearance', label: t('settings.appearance'), icon: Palette },
     { id: 'billing', label: 'Billing', icon: CreditCard },
     { id: 'data', label: 'Data & Export', icon: Database }
   ];
@@ -809,7 +812,7 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       {/* Theme */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Theme</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.theme')}</h3>
         <div className="flex gap-3">
           {['light', 'dark', 'system'].map((theme) => (
             <button
@@ -855,7 +858,7 @@ const Settings: React.FC = () => {
 
       {/* Accent Color */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Accent Color</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accentColor')}</h3>
         <div className="flex gap-3 flex-wrap">
           {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].map((color) => (
             <button
@@ -896,9 +899,12 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
+      {/* Language Selector */}
+      <LanguageSelector />
+
       {/* Font Size */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Font Size</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.fontSize')}</h3>
         <div className="flex gap-3">
           {['small', 'medium', 'large'].map((size) => (
             <button
@@ -941,7 +947,7 @@ const Settings: React.FC = () => {
 
       {/* Density */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Density</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.density')}</h3>
         <div className="flex gap-3">
           {['compact', 'comfortable', 'spacious'].map((density) => (
             <button

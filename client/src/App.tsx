@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { PlannerProvider } from './context/PlannerContext';
 import { TrackerProvider } from './context/TrackerContext';
 import { HelmetProvider } from 'react-helmet-async';
+import './i18n'; // Initialize i18n
 import Auth from './components/Auth';
 import DesktopHandshake from './components/DesktopHandshake';
 import DesktopShell from './components/DesktopShell';

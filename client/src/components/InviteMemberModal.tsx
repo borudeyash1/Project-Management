@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, UserPlus, Copy, Check } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface InviteMemberModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
   onInvite
 }) => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('member');
   const [customRole, setCustomRole] = useState('');
@@ -24,12 +26,12 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
 
   // Predefined roles
   const roles = [
-    { value: 'owner', label: 'Owner', description: 'Full access to workspace' },
-    { value: 'admin', label: 'Admin', description: 'Manage workspace and members' },
-    { value: 'manager', label: 'Manager', description: 'Manage projects and tasks' },
-    { value: 'member', label: 'Member', description: 'Work on assigned tasks' },
-    { value: 'viewer', label: 'Viewer', description: 'Read-only access' },
-    { value: 'custom', label: 'Custom Role', description: 'Define a custom role' }
+    { value: 'owner', label: t('team.roleOwner'), description: t('team.roleOwnerDesc') },
+    { value: 'admin', label: t('team.roleAdmin'), description: t('team.roleAdminDesc') },
+    { value: 'manager', label: t('team.roleManager'), description: t('team.roleManagerDesc') },
+    { value: 'member', label: t('team.roleMember'), description: t('team.roleMemberDesc') },
+    { value: 'viewer', label: t('team.roleViewer'), description: t('team.roleViewerDesc') },
+    { value: 'custom', label: t('team.roleCustom'), description: t('team.roleCustomDesc') }
   ];
 
   const handleGenerateLink = () => {
@@ -46,14 +48,14 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
 
   const handleInvite = () => {
     if (inviteMethod === 'email' && !email.trim()) {
-      alert('Please enter an email address');
+      alert(t('team.pleaseEnterEmail'));
       return;
     }
 
     const finalRole = role === 'custom' ? customRole : role;
     
     if (!finalRole.trim()) {
-      alert('Please select or enter a role');
+      alert(t('team.pleaseSelectRole'));
       return;
     }
 
@@ -86,10 +88,10 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
         <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div>
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Invite Team Member
+              {t('team.inviteTitle')}
             </h2>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-              Invite someone to join your workspace
+              {t('team.inviteDesc')}
             </p>
           </div>
           <button
@@ -106,7 +108,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
             {/* Invite Method Selection */}
             <div>
               <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Invite Method
+                {t('team.inviteMethod')}
               </label>
               <div className="flex gap-4">
                 <button
@@ -122,8 +124,8 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                   }`}
                 >
                   <Mail className={`w-6 h-6 mx-auto mb-2 ${inviteMethod === 'email' ? 'text-accent-dark' : isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
-                  <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Email Invite</div>
-                  <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Send invitation via email</div>
+                  <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('team.emailInvite')}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>{t('team.emailInviteDesc')}</div>
                 </button>
                 <button
                   onClick={() => setInviteMethod('link')}
@@ -138,8 +140,8 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                   }`}
                 >
                   <Copy className={`w-6 h-6 mx-auto mb-2 ${inviteMethod === 'link' ? 'text-accent-dark' : isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
-                  <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Invite Link</div>
-                  <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>Generate shareable link</div>
+                  <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('team.linkInvite')}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>{t('team.linkInviteDesc')}</div>
                 </button>
               </div>
             </div>
@@ -150,7 +152,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                 {/* Email Input */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                    Email Address *
+                    {t('team.emailAddress')} *
                   </label>
                   <input
                     type="email"
@@ -168,12 +170,12 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                 {/* Personal Message */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                    Personal Message (Optional)
+                    {t('team.personalMessage')}
                   </label>
                   <textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Add a personal message to the invitation..."
+                    placeholder={t('team.personalMessagePlaceholder')}
                     rows={3}
                     className={`w-full px-4 py-3 rounded-lg border ${
                       isDarkMode
@@ -194,12 +196,12 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                   >
                     <Copy className="w-5 h-5" />
-                    Generate Invite Link
+                    {t('team.generateLink')}
                   </button>
                 ) : (
                   <div className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-300 bg-gray-50'}`}>
                     <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                      Invite Link
+                      {t('team.linkInvite')}
                     </label>
                     <div className="flex gap-2">
                       <input
@@ -223,18 +225,18 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                         {linkCopied ? (
                           <>
                             <Check className="w-4 h-4" />
-                            Copied!
+                            {t('team.copied')}
                           </>
                         ) : (
                           <>
                             <Copy className="w-4 h-4" />
-                            Copy
+                            {t('team.copy')}
                           </>
                         )}
                       </button>
                     </div>
                     <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                      Share this link with anyone you want to invite. The link expires in 7 days.
+                      {t('team.linkDesc')}
                     </p>
                   </div>
                 )}
@@ -244,7 +246,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
             {/* Role Selection */}
             <div>
               <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Assign Role *
+                {t('team.assignRole')} *
               </label>
               <div className="space-y-2">
                 {roles.map((roleOption) => (
@@ -284,13 +286,13 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               {role === 'custom' && (
                 <div className="mt-4">
                   <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                    Enter Custom Role
+                    {t('team.enterCustomRole')}
                   </label>
                   <input
                     type="text"
                     value={customRole}
                     onChange={(e) => setCustomRole(e.target.value)}
-                    placeholder="e.g., Consultant, Contractor, Advisor..."
+                    placeholder={t('team.customRolePlaceholder')}
                     className={`w-full px-4 py-2 rounded-lg border ${
                       isDarkMode
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
@@ -313,7 +315,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           {inviteMethod === 'email' && (
             <button
@@ -326,7 +328,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               }`}
             >
               <UserPlus className="w-4 h-4" />
-              Send Invitation
+              {t('team.sendInvitation')}
             </button>
           )}
         </div>

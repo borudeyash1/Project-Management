@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { 
   LayoutGrid, List, Calendar, Clock, Inbox, BarChart3, 
   Settings, Plus, Search, Filter, Command, Bell
@@ -18,6 +19,7 @@ type ViewType = 'board' | 'list' | 'timeline' | 'calendar' | 'mywork';
 
 const PlannerLayout: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('board');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -32,11 +34,11 @@ const PlannerLayout: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const views = [
-    { id: 'board', label: 'Board', icon: LayoutGrid },
-    { id: 'list', label: 'List', icon: List },
-    { id: 'timeline', label: 'Timeline', icon: BarChart3 },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
-    { id: 'mywork', label: 'My Work', icon: Inbox }
+    { id: 'board', label: t('planner.views.board'), icon: LayoutGrid },
+    { id: 'list', label: t('planner.views.list'), icon: List },
+    { id: 'timeline', label: t('planner.views.timeline'), icon: BarChart3 },
+    { id: 'calendar', label: t('planner.views.calendar'), icon: Calendar },
+    { id: 'mywork', label: t('planner.views.myWork'), icon: Inbox }
   ];
 
   // Keyboard shortcuts
@@ -91,7 +93,7 @@ const PlannerLayout: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Planner</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('planner.title')}</h1>
             
             {/* View Switcher */}
             <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
@@ -124,7 +126,7 @@ const PlannerLayout: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tasks, projects..."
+                placeholder={t('planner.searchPlaceholder')}
                 className="w-64 pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
@@ -163,7 +165,7 @@ const PlannerLayout: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
-              <span>New Task</span>
+              <span>{t('planner.addTask')}</span>
             </button>
           </div>
         </div>

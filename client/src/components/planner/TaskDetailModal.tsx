@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Calendar, Clock, Flag, User, Tag, CheckSquare, MessageSquare, Paperclip, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../context/PlannerContext';
 import { Task } from '../../context/PlannerContext';
 
@@ -10,6 +11,7 @@ interface TaskDetailModalProps {
 
 const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
   const { updateTask, deleteTask, addSubtask, toggleSubtask, addComment } = usePlanner();
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [newSubtask, setNewSubtask] = useState('');
@@ -21,7 +23,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
+    if (window.confirm(t('planner.taskDetail.deleteConfirm'))) {
       deleteTask(task._id);
       onClose();
     }
@@ -80,13 +82,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   onClick={handleSave}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  Save
+                  {t('planner.taskDetail.save')}
                 </button>
                 <button
                   onClick={() => setIsEditing(false)}
                   className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  Cancel
+                  {t('planner.taskDetail.cancel')}
                 </button>
               </>
             ) : (
@@ -94,7 +96,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                 onClick={() => setIsEditing(true)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Edit
+                {t('planner.taskDetail.edit')}
               </button>
             )}
             <button
@@ -120,7 +122,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Description
+                  {t('planner.taskModal.fields.description')}
                 </label>
                 {isEditing ? (
                   <textarea
@@ -128,11 +130,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
                     rows={4}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    placeholder="Add description..."
+                    placeholder={t('planner.taskModal.fields.addDescription')}
                   />
                 ) : (
                   <p className="text-gray-600 dark:text-gray-200">
-                    {task.description || 'No description'}
+                    {task.description || t('planner.taskDetail.noDescription')}
                   </p>
                 )}
               </div>
@@ -141,7 +143,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <CheckSquare className="w-4 h-4 inline mr-1" />
-                  Subtasks ({task.subtasks.filter(st => st.completed).length}/{task.subtasks.length})
+                  {t('planner.taskDetail.subtasks')} ({task.subtasks.filter(st => st.completed).length}/{task.subtasks.length})
                 </label>
                 <div className="space-y-2">
                   {task.subtasks.map(subtask => (
@@ -163,14 +165,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                       value={newSubtask}
                       onChange={(e) => setNewSubtask(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
-                      placeholder="Add subtask..."
+                      placeholder={t('planner.taskDetail.addSubtask')}
                       className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                     <button
                       onClick={handleAddSubtask}
                       className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                     >
-                      Add
+                      {t('planner.taskModal.fields.add')}
                     </button>
                   </div>
                 </div>
@@ -180,7 +182,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <MessageSquare className="w-4 h-4 inline mr-1" />
-                  Comments ({task.comments.length})
+                  {t('planner.taskDetail.comments')} ({task.comments.length})
                 </label>
                 <div className="space-y-3 mb-3">
                   {task.comments.map(comment => (
@@ -201,14 +203,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                    placeholder="Add comment..."
+                    placeholder={t('planner.taskDetail.addComment')}
                     className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   <button
                     onClick={handleAddComment}
                     className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                   >
-                    Comment
+                    {t('planner.taskDetail.commentBtn')}
                   </button>
                 </div>
               </div>
@@ -219,7 +221,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               {/* Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Status
+                  {t('planner.taskModal.fields.status')}
                 </label>
                 {isEditing ? (
                   <select
@@ -227,10 +229,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
-                    <option value="todo">To Do</option>
-                    <option value="in-progress">In Progress</option>
+                    <option value="todo">{t('planner.bulkActions.moveToTodo')}</option>
+                    <option value="in-progress">{t('planner.bulkActions.moveToInProgress')}</option>
                     <option value="review">Review</option>
-                    <option value="done">Done</option>
+                    <option value="done">{t('planner.bulkActions.moveToDone')}</option>
                   </select>
                 ) : (
                   <span className="inline-block px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg">
@@ -243,7 +245,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Flag className="w-4 h-4 inline mr-1" />
-                  Priority
+                  {t('planner.taskModal.fields.priority')}
                 </label>
                 {isEditing ? (
                   <select
@@ -251,9 +253,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     onChange={(e) => setEditedTask({ ...editedTask, priority: e.target.value as any })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="low">{t('planner.bulkActions.setLowPriority')}</option>
+                    <option value="medium">{t('planner.bulkActions.setMediumPriority')}</option>
+                    <option value="high">{t('planner.bulkActions.setHighPriority')}</option>
                     <option value="urgent">Urgent</option>
                   </select>
                 ) : (
@@ -267,7 +269,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Due Date
+                  {t('planner.taskModal.fields.dueDate')}
                 </label>
                 {isEditing ? (
                   <input
@@ -278,7 +280,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   />
                 ) : (
                   <span className="text-sm text-gray-600 dark:text-gray-200">
-                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
+                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : t('planner.taskDetail.noDueDate')}
                   </span>
                 )}
               </div>
@@ -287,7 +289,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Clock className="w-4 h-4 inline mr-1" />
-                  Estimated Time
+                  {t('planner.taskModal.fields.estimatedTime')}
                 </label>
                 {isEditing ? (
                   <input
@@ -300,7 +302,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   />
                 ) : (
                   <span className="text-sm text-gray-600 dark:text-gray-200">
-                    {task.estimatedTime ? `${task.estimatedTime} hours` : 'Not set'}
+                    {task.estimatedTime ? `${task.estimatedTime} ${t('planner.taskDetail.hours')}` : t('planner.taskDetail.notSet')}
                   </span>
                 )}
               </div>
@@ -309,7 +311,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <User className="w-4 h-4 inline mr-1" />
-                  Assignees
+                  {t('planner.taskModal.fields.assignees')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {task.assignees.map(assignee => (
@@ -321,7 +323,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     </span>
                   ))}
                   {task.assignees.length === 0 && (
-                    <span className="text-sm text-gray-600">No assignees</span>
+                    <span className="text-sm text-gray-600">{t('planner.taskDetail.noAssignees')}</span>
                   )}
                 </div>
               </div>
@@ -330,7 +332,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Tag className="w-4 h-4 inline mr-1" />
-                  Tags
+                  {t('planner.taskModal.fields.tags')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {task.tags.map(tag => (
@@ -342,7 +344,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     </span>
                   ))}
                   {task.tags.length === 0 && (
-                    <span className="text-sm text-gray-600">No tags</span>
+                    <span className="text-sm text-gray-600">{t('planner.taskDetail.noTags')}</span>
                   )}
                 </div>
               </div>
@@ -351,10 +353,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Paperclip className="w-4 h-4 inline mr-1" />
-                  Attachments
+                  {t('planner.taskDetail.attachments')}
                 </label>
                 <span className="text-sm text-gray-600 dark:text-gray-200">
-                  {task.attachments.length} file(s)
+                  {task.attachments.length} {t('planner.taskDetail.files')}
                 </span>
               </div>
             </div>

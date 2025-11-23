@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Calendar, Clock, Flag, User, Tag, Repeat, Bell, FileText, Target, CheckSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../context/PlannerContext';
 
 interface TaskCreateModalProps {
@@ -18,6 +19,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   defaultTime 
 }) => {
   const { createTask } = usePlanner();
+  const { t } = useTranslation();
   
   const [taskType, setTaskType] = useState<TaskType>('task');
   const [formData, setFormData] = useState({
@@ -41,10 +43,10 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   const [tagInput, setTagInput] = useState('');
 
   const taskTypes = [
-    { id: 'task', label: 'Task', icon: CheckSquare, description: 'Regular task with due date' },
-    { id: 'reminder', label: 'Reminder', icon: Bell, description: 'Quick reminder with notification' },
-    { id: 'milestone', label: 'Milestone', icon: Target, description: 'Project milestone or checkpoint' },
-    { id: 'subtask', label: 'Subtask', icon: FileText, description: 'Part of a larger task' }
+    { id: 'task', label: t('planner.taskModal.types.task.label'), icon: CheckSquare, description: t('planner.taskModal.types.task.desc') },
+    { id: 'reminder', label: t('planner.taskModal.types.reminder.label'), icon: Bell, description: t('planner.taskModal.types.reminder.desc') },
+    { id: 'milestone', label: t('planner.taskModal.types.milestone.label'), icon: Target, description: t('planner.taskModal.types.milestone.desc') },
+    { id: 'subtask', label: t('planner.taskModal.types.subtask.label'), icon: FileText, description: t('planner.taskModal.types.subtask.desc') }
   ];
 
   const handleAddAssignee = () => {
@@ -118,7 +120,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Create New Task</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('planner.taskModal.title')}</h2>
           <button
             onClick={onClose}
             className="p-2 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -132,7 +134,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Task Type Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-3">
-                Task Type
+                {t('planner.taskModal.taskType')}
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {taskTypes.map(type => {
@@ -167,21 +169,21 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {taskType === 'reminder' && (
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <p className="text-sm text-blue-800 dark:text-blue-700">
-                  <strong>Reminder:</strong> Quick notification for important events. Set the date/time and notification timing.
+                  {t('planner.taskModal.typeInfo.reminder')}
                 </p>
               </div>
             )}
             {taskType === 'milestone' && (
               <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                 <p className="text-sm text-purple-800 dark:text-purple-200">
-                  <strong>Milestone:</strong> Important project checkpoint or deliverable. Can be made visible to clients.
+                  {t('planner.taskModal.typeInfo.milestone')}
                 </p>
               </div>
             )}
             {taskType === 'subtask' && (
               <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  <strong>Subtask:</strong> Smaller work item that's part of a larger task. Track time and assign to team members.
+                  {t('planner.taskModal.typeInfo.subtask')}
                 </p>
               </div>
             )}
@@ -189,7 +191,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Title *
+                {t('planner.taskModal.fields.title')}
               </label>
               <input
                 type="text"
@@ -197,10 +199,10 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder={
-                  taskType === 'reminder' ? 'e.g., Team standup meeting' :
-                  taskType === 'milestone' ? 'e.g., Launch v2.0' :
-                  taskType === 'subtask' ? 'e.g., Write unit tests' :
-                  'Enter task title'
+                  taskType === 'reminder' ? t('planner.taskModal.fields.placeholders.reminder') :
+                  taskType === 'milestone' ? t('planner.taskModal.fields.placeholders.milestone') :
+                  taskType === 'subtask' ? t('planner.taskModal.fields.placeholders.subtask') :
+                  t('planner.taskModal.fields.placeholders.default')
                 }
                 required
               />
@@ -210,14 +212,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             {(taskType === 'task' || taskType === 'milestone') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Description
+                  {t('planner.taskModal.fields.description')}
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-                  placeholder="Add description..."
+                  placeholder={t('planner.taskModal.fields.addDescription')}
                 />
               </div>
             )}
@@ -227,7 +229,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Due Date
+                  {t('planner.taskModal.fields.dueDate')}
                 </label>
                 <input
                   type="date"
@@ -239,7 +241,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Clock className="w-4 h-4 inline mr-1" />
-                  Time
+                  {t('planner.taskModal.fields.time')}
                 </label>
                 <input
                   type="time"
@@ -255,32 +257,32 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Flag className="w-4 h-4 inline mr-1" />
-                  Priority
+                  {t('planner.taskModal.fields.priority')}
                 </label>
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low">{t('planner.bulkActions.setLowPriority')}</option>
+                  <option value="medium">{t('planner.bulkActions.setMediumPriority')}</option>
+                  <option value="high">{t('planner.bulkActions.setHighPriority')}</option>
                   <option value="urgent">Urgent</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Status
+                  {t('planner.taskModal.fields.status')}
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 >
-                  <option value="todo">To Do</option>
-                  <option value="in-progress">In Progress</option>
+                  <option value="todo">{t('planner.bulkActions.moveToTodo')}</option>
+                  <option value="in-progress">{t('planner.bulkActions.moveToInProgress')}</option>
                   <option value="review">Review</option>
-                  <option value="done">Done</option>
+                  <option value="done">{t('planner.bulkActions.moveToDone')}</option>
                 </select>
               </div>
             </div>
@@ -290,7 +292,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Clock className="w-4 h-4 inline mr-1" />
-                  Estimated Time (hours)
+                  {t('planner.taskModal.fields.estimatedTime')}
                 </label>
                 <input
                   type="number"
@@ -308,7 +310,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
-                Assignees
+                {t('planner.taskModal.fields.assignees')}
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -317,14 +319,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   onChange={(e) => setAssigneeInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAssignee())}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-                  placeholder="Enter assignee name"
+                  placeholder={t('planner.taskModal.fields.enterAssignee')}
                 />
                 <button
                   type="button"
                   onClick={handleAddAssignee}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  Add
+                  {t('planner.taskModal.fields.add')}
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -351,7 +353,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                 <Tag className="w-4 h-4 inline mr-1" />
-                Tags
+                {t('planner.taskModal.fields.tags')}
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -360,14 +362,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-                  placeholder="Enter tag"
+                  placeholder={t('planner.taskModal.fields.enterTag')}
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  Add
+                  {t('planner.taskModal.fields.add')}
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -394,17 +396,17 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Repeat className="w-4 h-4 inline mr-1" />
-                  Recurrence
+                  {t('planner.taskModal.fields.recurrence')}
                 </label>
                 <select
                   value={formData.recurrence}
                   onChange={(e) => setFormData({ ...formData, recurrence: e.target.value as any })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 >
-                  <option value="none">None</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
+                  <option value="none">{t('planner.taskModal.options.recurrence.none')}</option>
+                  <option value="daily">{t('planner.taskModal.options.recurrence.daily')}</option>
+                  <option value="weekly">{t('planner.taskModal.options.recurrence.weekly')}</option>
+                  <option value="monthly">{t('planner.taskModal.options.recurrence.monthly')}</option>
                 </select>
               </div>
             )}
@@ -414,7 +416,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
                   <Bell className="w-4 h-4 inline mr-1" />
-                  {taskType === 'reminder' ? 'Notification Timing *' : 'Reminder'}
+                  {taskType === 'reminder' ? t('planner.taskModal.fields.notificationTiming') : t('planner.taskModal.fields.reminderLabel')}
                 </label>
                 <select
                   value={formData.reminder}
@@ -422,15 +424,15 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                   required={taskType === 'reminder'}
                 >
-                  <option value="none">No reminder</option>
-                  <option value="15min">15 minutes before</option>
-                  <option value="30min">30 minutes before</option>
-                  <option value="1hour">1 hour before</option>
-                  <option value="1day">1 day before</option>
+                  <option value="none">{t('planner.taskModal.options.reminder.none')}</option>
+                  <option value="15min">{t('planner.taskModal.options.reminder.15min')}</option>
+                  <option value="30min">{t('planner.taskModal.options.reminder.30min')}</option>
+                  <option value="1hour">{t('planner.taskModal.options.reminder.1hour')}</option>
+                  <option value="1day">{t('planner.taskModal.options.reminder.1day')}</option>
                 </select>
                 {taskType === 'reminder' && (
                   <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
-                    You'll receive a notification at this time
+                    {t('planner.taskModal.options.notificationHint')}
                   </p>
                 )}
               </div>
@@ -447,7 +449,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                   className="w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent"
                 />
                 <label htmlFor="clientVisible" className="text-sm text-gray-700 dark:text-gray-700">
-                  Make visible to client
+                  {t('planner.taskModal.fields.clientVisible')}
                 </label>
               </div>
             )}
@@ -460,14 +462,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              Cancel
+              {t('planner.taskModal.fields.cancel')}
             </button>
             <button
               type="submit"
               disabled={!formData.title.trim()}
               className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create {taskType.charAt(0).toUpperCase() + taskType.slice(1)}
+              {t('planner.taskModal.fields.create')} {taskType.charAt(0).toUpperCase() + taskType.slice(1)}
             </button>
           </div>
         </form>

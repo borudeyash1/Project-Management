@@ -6,6 +6,7 @@ import {
   Bot, Plus, CheckCircle, AlertCircle, XCircle, UserCheck,
   Settings, Shield, Key, Bell, Globe, Lock, Unlock
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import UserDisplay from './UserDisplay';
@@ -117,6 +118,7 @@ const normalizeMember = (member: TeamMemberResponse): TeamMember => {
 };
 
 const TeamPage: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { canAddTeamMember, canManageTeam, canUseAI } = useFeatureAccess();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -274,8 +276,8 @@ const TeamPage: React.FC = () => {
       <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Team Management</h1>
-            <p className="text-gray-600 mt-1">Manage your team members and their permissions</p>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('team.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('team.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             {canAddTeamMember() && (
@@ -284,7 +286,7 @@ const TeamPage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 <UserPlus className="w-4 h-4" />
-                Invite Member
+                {t('team.inviteMember')}
               </button>
             )}
             {canManageTeam() && (
@@ -293,7 +295,7 @@ const TeamPage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Plus className="w-4 h-4" />
-                Add Member
+                {t('team.addMember')}
               </button>
             )}
           </div>
@@ -310,7 +312,7 @@ const TeamPage: React.FC = () => {
                 <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">Total Members</p>
+                      <p className="text-sm text-gray-600">{t('team.totalMembers')}</p>
                       <p className="text-2xl font-bold text-gray-900">{teamStats.totalMembers}</p>
                     </div>
                     <Users className="w-8 h-8 text-accent" />
@@ -320,7 +322,7 @@ const TeamPage: React.FC = () => {
                 <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">Active Members</p>
+                      <p className="text-sm text-gray-600">{t('team.activeMembers')}</p>
                       <p className="text-2xl font-bold text-gray-900">{teamStats.activeMembers}</p>
                     </div>
                     <UserCheck className="w-8 h-8 text-green-500" />
@@ -330,7 +332,7 @@ const TeamPage: React.FC = () => {
                 <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">Pending Invites</p>
+                      <p className="text-sm text-gray-600">{t('team.pendingInvites')}</p>
                       <p className="text-2xl font-bold text-gray-900">{teamStats.pendingInvites}</p>
                     </div>
                     <Clock className="w-8 h-8 text-yellow-500" />
@@ -340,7 +342,7 @@ const TeamPage: React.FC = () => {
                 <div className="bg-white rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">Avg Productivity</p>
+                      <p className="text-sm text-gray-600">{t('team.avgProductivity')}</p>
                       <p className="text-2xl font-bold text-gray-900">{teamStats.averageProductivity}%</p>
                     </div>
                     <TrendingUp className="w-8 h-8 text-purple-500" />
@@ -353,11 +355,11 @@ const TeamPage: React.FC = () => {
             <div className="bg-white rounded-lg border border-gray-300 p-1">
               <div className="flex items-center gap-2">
                 {[
-                  { id: 'members', label: 'Team Members', icon: Users },
-                  { id: 'orgchart', label: 'Org Chart', icon: Target },
-                  { id: 'capacity', label: 'Capacity', icon: BarChart3 },
-                  { id: 'skills', label: 'Skills Matrix', icon: Award },
-                  { id: 'health', label: 'Team Health', icon: TrendingUp }
+                  { id: 'members', label: t('team.tabs.members'), icon: Users },
+                  { id: 'orgchart', label: t('team.tabs.orgChart'), icon: Target },
+                  { id: 'capacity', label: t('team.tabs.capacity'), icon: BarChart3 },
+                  { id: 'skills', label: t('team.tabs.skills'), icon: Award },
+                  { id: 'health', label: t('team.tabs.health'), icon: TrendingUp }
                 ].map(tab => {
                   const Icon = tab.icon;
                   return (
@@ -386,7 +388,7 @@ const TeamPage: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
                     <input
                       type="text"
-                      placeholder="Search team members..."
+                      placeholder={t('team.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -400,8 +402,8 @@ const TeamPage: React.FC = () => {
                     onChange={(e) => setFilterRole(e.target.value as any)}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
-                    <option value="all">All Roles</option>
-                    <option value="admin">Admin</option>
+                    <option value="all">{t('team.allRoles')}</option>
+                    <option value="admin">{t('team.roleAdmin')}</option>
                     <option value="manager">Manager</option>
                     <option value="member">Member</option>
                     <option value="viewer">Viewer</option>
@@ -412,8 +414,8 @@ const TeamPage: React.FC = () => {
                     onChange={(e) => setFilterStatus(e.target.value as any)}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
+                    <option value="all">{t('team.allStatus')}</option>
+                    <option value="active">{t('team.online')}</option>
                     <option value="inactive">Inactive</option>
                     <option value="pending">Pending</option>
                     <option value="away">Away</option>
@@ -445,7 +447,7 @@ const TeamPage: React.FC = () => {
             {activeTab === 'members' && (
             <div className="bg-white rounded-lg border border-gray-200">
               <div className="p-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Team Members ({filteredMembers.length})</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('team.members')} ({filteredMembers.length})</h2>
               </div>
               
               {viewMode === 'grid' && (
@@ -482,13 +484,13 @@ const TeamPage: React.FC = () => {
                       
                       <div className="space-y-2">
                         <div className="text-sm text-gray-600">
-                          <span className="font-medium">Department:</span> {member.department}
+                          <span className="font-medium">{t('team.department')}:</span> {member.department}
                         </div>
                         <div className="text-sm text-gray-600">
-                          <span className="font-medium">Last active:</span> {formatLastActive(member.lastActive)}
+                          <span className="font-medium">{t('team.lastActive')}:</span> {formatLastActive(member.lastActive)}
                         </div>
                         <div className="text-sm text-gray-600">
-                          <span className="font-medium">Productivity:</span> {member.performance.productivityScore}%
+                          <span className="font-medium">{t('team.productivity')}:</span> {member.performance.productivityScore}%
                         </div>
                       </div>
                       
@@ -498,7 +500,7 @@ const TeamPage: React.FC = () => {
                           className="flex-1 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
                         >
                           <Eye className="w-4 h-4 inline mr-1" />
-                          View
+                          {t('team.view')}
                         </button>
                         <button className="px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
                           <MessageSquare className="w-4 h-4" />
@@ -543,8 +545,8 @@ const TeamPage: React.FC = () => {
                         </div>
                         
                         <div className="text-right text-sm text-gray-600">
-                          <div>Last active: {formatLastActive(member.lastActive)}</div>
-                          <div>Productivity: {member.performance.productivityScore}%</div>
+                          <div>{t('team.lastActive')}: {formatLastActive(member.lastActive)}</div>
+                          <div>{t('team.productivity')}: {member.performance.productivityScore}%</div>
                         </div>
                         
                         <div className="flex items-center gap-2">
@@ -572,13 +574,13 @@ const TeamPage: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Member</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Role</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Department</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Productivity</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Last Active</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.members')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.role')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.status')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.department')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.productivity')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.lastActive')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -657,12 +659,12 @@ const TeamPage: React.FC = () => {
             {/* Organization Chart View */}
             {activeTab === 'orgchart' && (
               <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Organization Chart</h2>
-                <p className="text-gray-600 mb-6">Visual representation of team hierarchy and reporting structure</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.orgChart.title')}</h2>
+                <p className="text-gray-600 mb-6">{t('team.orgChart.subtitle')}</p>
                 <div className="text-center py-12 text-gray-600">
                   <Target className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-                  <p className="text-lg font-medium">Organization Chart Coming Soon</p>
-                  <p className="text-sm mt-2">Visual hierarchy with drag-drop, reporting lines, and role-based coloring</p>
+                  <p className="text-lg font-medium">{t('team.orgChart.comingSoon')}</p>
+                  <p className="text-sm mt-2">{t('team.orgChart.description')}</p>
                 </div>
               </div>
             )}
@@ -670,8 +672,8 @@ const TeamPage: React.FC = () => {
             {/* Capacity Planning View */}
             {activeTab === 'capacity' && (
               <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Capacity Planning</h2>
-                <p className="text-gray-600 mb-6">Workload distribution and resource allocation across team</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.capacity.title')}</h2>
+                <p className="text-gray-600 mb-6">{t('team.capacity.subtitle')}</p>
                 <div className="space-y-4">
                   {filteredMembers.map(member => (
                     <div key={member._id} className="border border-gray-300 rounded-lg p-4">
@@ -686,17 +688,17 @@ const TeamPage: React.FC = () => {
                           )}
                           <div>
                             <h3 className="font-medium text-gray-900">{member.name}</h3>
-                            <p className="text-sm text-gray-600">{member.role}</p>
+                            <p className="text-sm text-gray-600">{t(`team.role${member.role}`)}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-gray-900">85%</div>
-                          <div className="text-xs text-gray-600">Utilization</div>
+                          <div className="text-xs text-gray-600">{t('team.capacity.utilization')}</div>
                         </div>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Weekly Capacity</span>
+                          <span className="text-gray-600">{t('team.capacity.weeklyCapacity')}</span>
                           <span className="font-medium">34h / 40h</span>
                         </div>
                         <div className="w-full bg-gray-300 rounded-full h-2">
@@ -720,15 +722,22 @@ const TeamPage: React.FC = () => {
             {/* Skills Matrix View */}
             {activeTab === 'skills' && (
               <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Skills Matrix</h2>
-                <p className="text-gray-600 mb-6">Team capabilities and expertise levels</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.skills.title')}</h2>
+                <p className="text-gray-600 mb-6">{t('team.skills.subtitle')}</p>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="text-left p-3 font-medium text-gray-900">Team Member</th>
-                        {['React', 'Node.js', 'Python', 'Design', 'DevOps', 'Testing'].map(skill => (
-                          <th key={skill} className="text-center p-3 font-medium text-gray-900">{skill}</th>
+                        <th className="text-left p-3 font-medium text-gray-900">{t('team.skills.teamMember')}</th>
+                        {[
+                          { key: 'react', label: 'React' },
+                          { key: 'node', label: 'Node.js' },
+                          { key: 'python', label: 'Python' },
+                          { key: 'design', label: 'Design' },
+                          { key: 'devops', label: 'DevOps' },
+                          { key: 'testing', label: 'Testing' }
+                        ].map(skill => (
+                          <th key={skill.key} className="text-center p-3 font-medium text-gray-900">{t(`team.skills.${skill.key}`)}</th>
                         ))}
                       </tr>
                     </thead>
@@ -747,11 +756,18 @@ const TeamPage: React.FC = () => {
                               <span className="font-medium text-gray-900">{member.name}</span>
                             </div>
                           </td>
-                          {['React', 'Node.js', 'Python', 'Design', 'DevOps', 'Testing'].map(skill => {
-                            const hasSkill = member.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
+                          {[
+                            { key: 'react', label: 'React' },
+                            { key: 'node', label: 'Node.js' },
+                            { key: 'python', label: 'Python' },
+                            { key: 'design', label: 'Design' },
+                            { key: 'devops', label: 'DevOps' },
+                            { key: 'testing', label: 'Testing' }
+                          ].map(skill => {
+                            const hasSkill = member.skills.some(s => s.toLowerCase().includes(skill.label.toLowerCase()));
                             const level = hasSkill ? Math.floor(Math.random() * 3) + 2 : Math.floor(Math.random() * 2);
                             return (
-                              <td key={skill} className="p-3 text-center">
+                              <td key={skill.key} className="p-3 text-center">
                                 <div className="flex justify-center gap-1">
                                   {[1, 2, 3, 4].map(star => (
                                     <Star
@@ -774,13 +790,13 @@ const TeamPage: React.FC = () => {
             {/* Team Health View */}
             {activeTab === 'health' && (
               <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Team Health Dashboard</h2>
-                <p className="text-gray-600 mb-6">Monitor team well-being and identify potential issues</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.health.title')}</h2>
+                <p className="text-gray-600 mb-6">{t('team.health.subtitle')}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">Burnout Risk</h3>
+                      <h3 className="font-medium text-gray-900">{t('team.health.burnoutRisk')}</h3>
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                         <span className="text-lg font-bold text-green-600">25</span>
                       </div>
@@ -788,12 +804,12 @@ const TeamPage: React.FC = () => {
                     <div className="w-full bg-gray-300 rounded-full h-2">
                       <div className="bg-green-500 h-2 rounded-full" style={{ width: '25%' }} />
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">Low risk - Team is well-balanced</p>
+                    <p className="text-xs text-gray-600 mt-2">{t('team.health.lowRisk')}</p>
                   </div>
 
                   <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">Satisfaction</h3>
+                      <h3 className="font-medium text-gray-900">{t('team.health.satisfaction')}</h3>
                       <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                         <span className="text-lg font-bold text-accent-dark">4.2</span>
                       </div>
@@ -803,23 +819,23 @@ const TeamPage: React.FC = () => {
                         <Star key={star} className={`w-5 h-5 ${star <= 4 ? 'text-yellow-500 fill-current' : 'text-gray-700'}`} />
                       ))}
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">High satisfaction score</p>
+                    <p className="text-xs text-gray-600 mt-2">{t('team.health.highSatisfaction')}</p>
                   </div>
 
                   <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">Retention Risk</h3>
+                      <h3 className="font-medium text-gray-900">{t('team.health.retentionRisk')}</h3>
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                         <CheckCircle className="w-6 h-6 text-green-600" />
                       </div>
                     </div>
                     <div className="text-2xl font-bold text-gray-900">95%</div>
-                    <p className="text-xs text-gray-600 mt-2">Stable - Low flight risk</p>
+                    <p className="text-xs text-gray-600 mt-2">{t('team.health.stable')}</p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="font-medium text-gray-900">Individual Health Scores</h3>
+                  <h3 className="font-medium text-gray-900">{t('team.health.individualScores')}</h3>
                   {filteredMembers.map(member => {
                     const healthScore = Math.floor(Math.random() * 30) + 70;
                     const riskLevel = healthScore >= 80 ? 'low' : healthScore >= 60 ? 'medium' : 'high';
@@ -837,13 +853,13 @@ const TeamPage: React.FC = () => {
                           )}
                           <div className="flex-1">
                             <h4 className="font-medium text-gray-900">{member.name}</h4>
-                            <p className="text-sm text-gray-600">{member.role}</p>
+                            <p className="text-sm text-gray-600">{t(`team.role${member.role}`)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="text-right">
                             <div className="text-lg font-bold text-gray-900">{healthScore}</div>
-                            <div className="text-xs text-gray-600">Health Score</div>
+                            <div className="text-xs text-gray-600">{t('team.health.healthScore')}</div>
                           </div>
                           <div className="w-24 bg-gray-300 rounded-full h-2">
                             <div className={`${colorClass} h-2 rounded-full`} style={{ width: `${healthScore}%` }} />
@@ -864,13 +880,13 @@ const TeamPage: React.FC = () => {
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
                 <div className="flex items-center gap-2 mb-2">
                   <Bot className="w-5 h-5" />
-                  <h3 className="font-semibold">AI Team Assistant</h3>
+                  <h3 className="font-semibold">{t('team.aiAssistant.title')}</h3>
                 </div>
                 <p className="text-sm text-purple-100 mb-3">
-                  Get AI-powered insights on team performance and optimization suggestions.
+                  {t('team.aiAssistant.description')}
                 </p>
                 <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
-                  Ask AI
+                  {t('team.aiAssistant.ask')}
                 </button>
               </div>
             )}
@@ -878,7 +894,7 @@ const TeamPage: React.FC = () => {
             {/* Recent Activity */}
             {teamStats && (
               <div className="bg-white rounded-lg border border-gray-300 p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Recent Activity</h3>
+                <h3 className="font-semibold text-gray-900 mb-3">{t('team.recentActivity')}</h3>
                 <div className="space-y-3">
                   {teamStats.recentActivity.map(activity => (
                     <div key={activity._id} className="flex items-start gap-3">
@@ -895,7 +911,7 @@ const TeamPage: React.FC = () => {
 
             {/* Top Performers */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Top Performers</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('team.topPerformers')}</h3>
               <div className="space-y-3">
                 {teamMembers
                   .sort((a, b) => b.performance.productivityScore - a.performance.productivityScore)
@@ -921,7 +937,7 @@ const TeamPage: React.FC = () => {
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-600">{member.role}</p>
+                          <p className="text-xs text-gray-600">{t(`team.role${member.role}`)}</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -964,11 +980,11 @@ const TeamPage: React.FC = () => {
                     <p className="text-gray-600">{selectedMember.email}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(selectedMember.role)}`}>
-                        {selectedMember.role}
+                        {t(`team.role${selectedMember.role}`)}
                       </span>
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedMember.status)}`}>
                         {getStatusIcon(selectedMember.status)}
-                        {selectedMember.status}
+                        {t(`team.${selectedMember.status.toLowerCase()}`)}
                       </span>
                     </div>
                   </div>
@@ -985,14 +1001,14 @@ const TeamPage: React.FC = () => {
             <div className="p-6 space-y-6">
               {/* Basic Info */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h4>
+                <h4 className="text-lg font-medium text-gray-900 mb-3">{t('profile.personalInfo')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Department</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('team.department')}</label>
                     <p className="text-sm text-gray-900">{selectedMember.department}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Location</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('profile.location')}</label>
                     <p className="text-sm text-gray-900">{selectedMember.location}</p>
                   </div>
                   <div>

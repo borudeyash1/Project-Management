@@ -3,6 +3,7 @@ import {
   CheckCircle, Circle, Clock, Flag, Play, Pause, Plus,
   ChevronDown, ChevronRight, Calendar, User, AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
 
@@ -12,6 +13,7 @@ interface MyWorkViewProps {
 
 const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
   const { tasks, updateTask } = usePlanner();
+  const { t, i18n } = useTranslation();
   const [expandedSections, setExpandedSections] = useState({
     overdue: true,
     today: true,
@@ -130,7 +132,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
           {task.dueDate && (
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              {new Date(task.dueDate).toLocaleDateString('en-US', {
+              {new Date(task.dueDate).toLocaleDateString(i18n.language, {
                 month: 'short',
                 day: 'numeric'
               })}
@@ -159,7 +161,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
               ? 'bg-blue-100 border-blue-300 text-blue-700'
               : 'border-gray-300 text-gray-600 hover:bg-gray-50'
           }`}
-          title={activeTimer === task._id ? 'Stop timer' : 'Start timer'}
+          title={activeTimer === task._id ? t('planner.myWork.stopTimer') : t('planner.myWork.startTimer')}
         >
           {activeTimer === task._id ? (
             <Pause className="w-4 h-4" />
@@ -211,7 +213,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
             tasks.map(task => <TaskItem key={task._id} task={task} />)
           ) : (
             <div className="p-8 text-center text-gray-600 dark:text-gray-200">
-              No tasks in this section
+              {t('planner.myWork.noTasksInSection')}
             </div>
           )}
         </div>
@@ -225,9 +227,9 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">My Work</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('planner.myWork.title')}</h1>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              {myTasks.length} active tasks
+              {t('planner.myWork.activeTasks', { count: myTasks.length })}
             </p>
           </div>
         </div>
@@ -239,7 +241,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
           {/* Overdue */}
           {overdueTasks.length > 0 && (
             <Section
-              title="Overdue"
+              title={t('planner.myWork.sections.overdue')}
               count={overdueTasks.length}
               tasks={overdueTasks}
               sectionKey="overdue"
@@ -250,7 +252,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
 
           {/* Today */}
           <Section
-            title="Today"
+            title={t('planner.myWork.sections.today')}
             count={todayTasks.length}
             tasks={todayTasks}
             sectionKey="today"
@@ -260,7 +262,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
 
           {/* This Week */}
           <Section
-            title="This Week"
+            title={t('planner.myWork.sections.thisWeek')}
             count={thisWeekTasks.length}
             tasks={thisWeekTasks}
             sectionKey="thisWeek"
@@ -270,7 +272,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
 
           {/* Later */}
           <Section
-            title="Later"
+            title={t('planner.myWork.sections.later')}
             count={laterTasks.length}
             tasks={laterTasks}
             sectionKey="later"
@@ -282,10 +284,10 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-12 text-center">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                All caught up!
+                {t('planner.myWork.allCaughtUp')}
               </h3>
               <p className="text-gray-600 dark:text-gray-200">
-                You have no active tasks. Great job!
+                {t('planner.myWork.noActiveTasks')}
               </p>
             </div>
           )}

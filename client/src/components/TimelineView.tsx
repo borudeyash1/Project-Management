@@ -23,6 +23,7 @@ import {
   Target as TargetIcon, Building as BuildingIcon, LayoutGrid, List,
   GripVertical
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Task {
   _id: string;
@@ -115,6 +116,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   onTaskCreate,
   onTaskDelete
 }) => {
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'quarter'>('month');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -130,11 +132,11 @@ const TimelineView: React.FC<TimelineViewProps> = ({
 
   // Status categories (swimlanes)
   const statusCategories = [
-    { id: 'pending', name: 'New Ideas and Requests', color: '#F3F4F6' },
-    { id: 'assigned', name: 'Assigned', color: '#DBEAFE' },
-    { id: 'in-progress', name: 'In Progress/Active', color: '#FEF3C7' },
-    { id: 'qa', name: 'QA/QC', color: '#E0E7FF' },
-    { id: 'completed', name: 'Recently Completed', color: '#D1FAE5' }
+    { id: 'pending', name: t('tasks.newIdeasRequests'), color: '#F3F4F6' },
+    { id: 'assigned', name: t('tasks.assigned'), color: '#DBEAFE' },
+    { id: 'in-progress', name: t('tasks.inProgressActive'), color: '#FEF3C7' },
+    { id: 'qa', name: t('tasks.qaQc'), color: '#E0E7FF' },
+    { id: 'completed', name: t('tasks.recentlyCompleted'), color: '#D1FAE5' }
   ];
 
   // Generate date range based on view mode
@@ -300,31 +302,31 @@ const TimelineView: React.FC<TimelineViewProps> = ({
       <div className="border-b border-gray-300 p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <h2 className="text-xl font-semibold text-gray-900">Timeline View</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t('tasks.views.timeline')}</h2>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigateTimeline('prev')}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Previous"
+                title={t('buttons.previous')}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <div className="px-4 py-2 bg-gray-100 rounded-lg min-w-[200px] text-center">
                 <span className="text-sm font-semibold text-gray-900">
-                  {dates[0]?.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  {viewMode === 'quarter' && ` - ${dates[dates.length - 1]?.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+                  {dates[0]?.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}
+                  {viewMode === 'quarter' && ` - ${dates[dates.length - 1]?.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}`}
                 </span>
               </div>
               <button
                 onClick={goToToday}
                 className="px-3 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
-                Today
+                {t('common.today')}
               </button>
               <button
                 onClick={() => navigateTimeline('next')}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Next"
+                title={t('buttons.next')}
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -333,30 +335,30 @@ const TimelineView: React.FC<TimelineViewProps> = ({
           
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">View:</span>
+              <span className="text-sm text-gray-600">{t('common.view')}:</span>
               <select
                 value={viewMode}
                 onChange={(e) => setViewMode(e.target.value as 'week' | 'month' | 'quarter')}
                 className="px-3 py-1 border border-gray-300 rounded text-sm"
               >
-                <option value="week">Week</option>
-                <option value="month">Month</option>
-                <option value="quarter">Quarter</option>
+                <option value="week">{t('calendar.week')}</option>
+                <option value="month">{t('calendar.month')}</option>
+                <option value="quarter">{t('calendar.quarter') || 'Quarter'}</option>
               </select>
             </div>
             
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Status:</span>
+              <span className="text-sm text-gray-600">{t('common.status')}:</span>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="px-3 py-1 border border-gray-300 rounded text-sm"
               >
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="blocked">Blocked</option>
+                <option value="all">{t('common.all')}</option>
+                <option value="pending">{t('common.pending')}</option>
+                <option value="in-progress">{t('common.inProgress')}</option>
+                <option value="completed">{t('common.completed')}</option>
+                <option value="blocked">{t('common.blocked')}</option>
               </select>
             </div>
             
@@ -365,7 +367,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
               className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
-              New Task
+              {t('tasks.newTask')}
             </button>
           </div>
         </div>
@@ -383,9 +385,9 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                     : 'text-gray-700'
                 }`}
               >
-                <div>{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                <div>{date.toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })}</div>
                 <div className="text-xs text-gray-600">
-                  {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                  {date.toLocaleDateString(i18n.language, { weekday: 'short' })}
                 </div>
               </div>
             ))}
@@ -426,7 +428,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                       }
                     }}
                   >
-                    Drop tasks here
+                    {t('tasks.dropTasksHere')}
                   </div>
                 </div>
               );
@@ -528,13 +530,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.description')}</label>
                 <p className="text-gray-600">{selectedTask.description}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.status')}</label>
                   <select
                     value={selectedTask.status}
                     onChange={(e) => onTaskUpdate(selectedTask._id, { 
@@ -542,15 +544,15 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="blocked">Blocked</option>
+                    <option value="pending">{t('common.pending')}</option>
+                    <option value="in-progress">{t('common.inProgress')}</option>
+                    <option value="completed">{t('common.completed')}</option>
+                    <option value="blocked">{t('common.blocked')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.priority')}</label>
                   <select
                     value={selectedTask.priority}
                     onChange={(e) => onTaskUpdate(selectedTask._id, { 
@@ -558,15 +560,15 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                    <option value="low">{t('common.low')}</option>
+                    <option value="medium">{t('common.medium')}</option>
+                    <option value="high">{t('common.high')}</option>
+                    <option value="critical">{t('tracker.dashboard.critical')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.startDate')}</label>
                   <input
                     type="date"
                     value={selectedTask.startDate.toISOString().split('T')[0]}
@@ -578,7 +580,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.dueDate')}</label>
                   <input
                     type="date"
                     value={selectedTask.dueDate.toISOString().split('T')[0]}
@@ -598,13 +600,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
                   }}
                   className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
                 >
-                  Delete Task
+                  {t('tasks.deleteTask')}
                 </button>
                 <button
                   onClick={() => setShowTaskModal(false)}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  Save Changes
+                  {t('buttons.saveChanges')}
                 </button>
               </div>
             </div>

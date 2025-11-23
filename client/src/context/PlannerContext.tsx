@@ -149,11 +149,12 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
   ]);
 
   const [columns] = useState<Column[]>([
-    { id: 'todo', name: 'To Do', color: 'bg-gray-400', order: 1 },
-    { id: 'in-progress', name: 'In Progress', color: 'bg-accent', wip: 3, order: 2 },
-    { id: 'review', name: 'Review', color: 'bg-yellow-500', order: 3 },
-    { id: 'done', name: 'Done', color: 'bg-green-500', order: 4 }
+    { id: 'todo', name: 'planner.board.toDo', color: 'bg-gray-400', order: 1 },
+    { id: 'in-progress', name: 'planner.board.inProgress', color: 'bg-accent', wip: 3, order: 2 },
+    { id: 'review', name: 'planner.board.review', color: 'bg-yellow-500', order: 3 },
+    { id: 'done', name: 'planner.board.done', color: 'bg-green-500', order: 4 }
   ]);
+
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [polls, setPolls] = useState<Poll[]>([]);

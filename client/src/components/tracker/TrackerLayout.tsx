@@ -3,6 +3,7 @@ import {
   Activity, Clock, FileText, Users, AlertTriangle, BarChart3, 
   Settings, Play, Pause, StopCircle, Search, Bell, Filter
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTracker } from '../../context/TrackerContext';
 import ActivityFeed from './views/ActivityFeed';
 import TimesheetView from './views/TimesheetView';
@@ -16,6 +17,7 @@ type ViewType = 'activity' | 'timesheet' | 'dashboard' | 'issues' | 'worklog' | 
 
 const TrackerLayout: React.FC = () => {
   const { activeTimer, startTimer, stopTimer, teamMetrics, alerts } = useTracker();
+  const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -44,13 +46,13 @@ const TrackerLayout: React.FC = () => {
   };
 
   const navItems = [
-    { id: 'dashboard' as ViewType, label: 'Dashboard', icon: BarChart3, badge: null },
-    { id: 'activity' as ViewType, label: 'Activity Feed', icon: Activity, badge: null },
-    { id: 'timesheet' as ViewType, label: 'Timesheet', icon: FileText, badge: null },
-    { id: 'issues' as ViewType, label: 'Issues', icon: AlertTriangle, badge: teamMetrics.idleAlerts },
-    { id: 'worklog' as ViewType, label: 'Task Worklog', icon: Clock, badge: null },
-    { id: 'reports' as ViewType, label: 'Reports', icon: BarChart3, badge: null },
-    { id: 'sla' as ViewType, label: 'SLA Monitor', icon: Bell, badge: alerts.filter(a => !a.acknowledged).length }
+    { id: 'dashboard' as ViewType, label: t('navigation.dashboard'), icon: BarChart3, badge: null },
+    { id: 'activity' as ViewType, label: t('tracker.recentActivity'), icon: Activity, badge: null },
+    { id: 'timesheet' as ViewType, label: t('tracker.entries'), icon: FileText, badge: null },
+    { id: 'issues' as ViewType, label: t('tracker.running'), icon: AlertTriangle, badge: teamMetrics.idleAlerts },
+    { id: 'worklog' as ViewType, label: t('tracker.task'), icon: Clock, badge: null },
+    { id: 'reports' as ViewType, label: t('tracker.reports'), icon: BarChart3, badge: null },
+    { id: 'sla' as ViewType, label: t('tracker.slaMonitor'), icon: Bell, badge: alerts.filter(a => !a.acknowledged).length }
   ];
 
   const unacknowledgedAlerts = alerts.filter(a => !a.acknowledged).length;
@@ -61,9 +63,9 @@ const TrackerLayout: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tracker</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('tracker.title')}</h1>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              Time tracking, activity monitoring & analytics
+              {t('tracker.subtitle')}
             </p>
           </div>
 
@@ -160,7 +162,7 @@ const TrackerLayout: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
+                placeholder={t('forms.searchPlaceholder')}
                 className="pl-10 pr-4 py-2 w-64 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>

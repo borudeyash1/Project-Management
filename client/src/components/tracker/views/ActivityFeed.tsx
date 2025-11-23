@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Activity, Clock, FileUp, MessageSquare, CheckCircle, AlertTriangle, GitCommit, Calendar, Filter } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
+import { useTranslation } from 'react-i18next';
 
 interface ActivityFeedProps {
   searchQuery: string;
@@ -8,6 +9,7 @@ interface ActivityFeedProps {
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
   const { activityEvents, logActivity } = useTracker();
+  const { t } = useTranslation();
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
 
@@ -80,14 +82,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
         <div className="flex items-center gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-700 mb-1">
-              Event Type
+              {t('tracker.eventType')}
             </label>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="all">All Types</option>
+              <option value="all">{t('tracker.allTypes')}</option>
               <option value="timer_start">Timer Start</option>
               <option value="timer_stop">Timer Stop</option>
               <option value="task_status_change">Task Status</option>
@@ -97,14 +99,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-700 mb-1">
-              Severity
+              {t('tracker.severity')}
             </label>
             <select
               value={filterSeverity}
               onChange={(e) => setFilterSeverity(e.target.value)}
               className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="all">All Severities</option>
+              <option value="all">{t('tracker.allSeverities')}</option>
               <option value="info">Info</option>
               <option value="warning">Warning</option>
               <option value="critical">Critical</option>
@@ -175,7 +177,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ searchQuery }) => {
           {filteredEvents.length === 0 && (
             <div className="text-center py-12">
               <Activity className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-200">No activity events found</p>
+              <p className="text-gray-600 dark:text-gray-200">{t('tracker.noEvents')}</p>
             </div>
           )}
         </div>

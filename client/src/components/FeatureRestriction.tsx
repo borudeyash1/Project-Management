@@ -6,6 +6,7 @@ import {
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import PricingModal from './PricingModal';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface FeatureRestrictionProps {
   feature: string;
@@ -28,6 +29,7 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
     getUpgradeMessage, 
     getRequiredPlanForFeature 
   } = useFeatureAccess();
+  const { t } = useTranslation();
   
   const [showPricingModal, setShowPricingModal] = React.useState(false);
   
@@ -74,7 +76,7 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
         } ${className}`}
       >
         {getPlanIcon(requiredPlan)}
-        <span>Upgrade to {requiredPlan === 'pro' ? 'Pro' : 'Ultra'}</span>
+        <span>{t('plans.upgradeTo', { plan: requiredPlan === 'pro' ? 'Pro' : 'Ultra' })}</span>
       </button>
       
       {showPricingModal && (
@@ -122,6 +124,7 @@ export const WhiteLabelingRestriction: React.FC<{ children: React.ReactNode }> =
 export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { userPlan, getPlanComparison } = useFeatureAccess();
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [showPricingModal, setShowPricingModal] = React.useState(false);
   
   const planInfo = getPlanComparison();
@@ -165,13 +168,13 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
           <div className="flex items-center justify-between">
             <h4 className={`font-medium capitalize ${
               isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>{userPlan} Plan</h4>
+            }`}>{t('plans.plan', { plan: userPlan })}</h4>
             {userPlan !== 'ultra' && (
               <button
                 onClick={() => setShowPricingModal(true)}
                 className="text-sm text-accent-dark hover:text-blue-700 font-medium"
               >
-                Upgrade
+                {t('plans.upgrade')}
               </button>
             )}
           </div>
@@ -179,9 +182,9 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
           <div className={`text-xs mt-1 ${
             isDarkMode ? 'text-gray-600' : 'text-gray-600'
           }`}>
-            {planInfo.limits.workspaces === -1 ? 'Unlimited' : planInfo.limits.workspaces} workspaces • 
-            {planInfo.limits.projects === -1 ? 'Unlimited' : planInfo.limits.projects} projects • 
-            {planInfo.limits.teamMembers === -1 ? 'Unlimited' : planInfo.limits.teamMembers} members
+            {planInfo.limits.workspaces === -1 ? t('plans.unlimited') : planInfo.limits.workspaces} {t('plans.workspaces')} • 
+            {planInfo.limits.projects === -1 ? t('plans.unlimited') : planInfo.limits.projects} {t('plans.projects')} • 
+            {planInfo.limits.teamMembers === -1 ? t('plans.unlimited') : planInfo.limits.teamMembers} {t('plans.members')}
           </div>
         </div>
       </div>

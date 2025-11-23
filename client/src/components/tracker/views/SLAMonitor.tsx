@@ -1,12 +1,14 @@
 import React from 'react';
 import { Bell, AlertTriangle, Clock, CheckCircle, X } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
+import { useTranslation } from 'react-i18next';
 
 interface SLAMonitorProps {
   searchQuery: string;
 }
 
 const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
+  const { t } = useTranslation();
   const { alerts, slaRules, acknowledgeAlert, resolveAlert, issues } = useTracker();
 
   const getSeverityColor = (severity: string) => {
@@ -36,7 +38,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Active Alerts</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.sla.stats.activeAlerts')}</div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {unacknowledgedAlerts.length}
                 </div>
@@ -47,7 +49,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">SLA Breached</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.sla.stats.slaBreached')}</div>
                 <div className="text-3xl font-bold text-red-600">
                   {breachedIssues.length}
                 </div>
@@ -58,7 +60,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">At Risk</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.sla.stats.atRisk')}</div>
                 <div className="text-3xl font-bold text-yellow-600">
                   {atRiskIssues.length}
                 </div>
@@ -69,7 +71,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Active Rules</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.sla.stats.activeRules')}</div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {slaRules.filter(r => r.enabled).length}
                 </div>
@@ -83,7 +85,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
         {unacknowledgedAlerts.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Unacknowledged Alerts
+              {t('tracker.sla.unacknowledged')}
             </h3>
             <div className="space-y-3">
               {unacknowledgedAlerts.map(alert => (
@@ -113,13 +115,13 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                         onClick={() => acknowledgeAlert(alert._id, 'current-user')}
                         className="px-3 py-1 bg-accent text-gray-900 rounded text-sm hover:bg-accent-hover"
                       >
-                        Acknowledge
+                        {t('tracker.sla.actions.acknowledge')}
                       </button>
                       <button
                         onClick={() => resolveAlert(alert._id)}
                         className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
                       >
-                        Resolve
+                        {t('tracker.sla.actions.resolve')}
                       </button>
                     </div>
                   </div>
@@ -132,7 +134,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
         {/* SLA Rules */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            SLA Rules
+            {t('tracker.sla.rules.title')}
           </h3>
           <div className="space-y-3">
             {slaRules.map(rule => (
@@ -146,7 +148,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                       {rule.name}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-200">
-                      Threshold: {rule.threshold} {rule.unit}
+                      {t('tracker.sla.rules.threshold')} {rule.threshold} {rule.unit}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -155,7 +157,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-600'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
                     }`}>
-                      {rule.enabled ? 'Enabled' : 'Disabled'}
+                      {rule.enabled ? t('tracker.sla.rules.enabled') : t('tracker.sla.rules.disabled')}
                     </span>
                   </div>
                 </div>
@@ -168,7 +170,7 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
         {(breachedIssues.length > 0 || atRiskIssues.length > 0) && (
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              SLA Status
+              {t('tracker.sla.status.title')}
             </h3>
             <div className="space-y-3">
               {breachedIssues.map(issue => (
@@ -179,11 +181,11 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                         {issue.title}
                       </div>
                       <div className="text-sm text-red-600 dark:text-red-600">
-                        SLA Breached - Deadline: {issue.slaDeadline?.toLocaleString()}
+                        {t('tracker.sla.status.breachedDeadline')} {issue.slaDeadline?.toLocaleString()}
                       </div>
                     </div>
                     <span className="px-3 py-1 bg-red-600 text-white rounded-full text-sm font-medium">
-                      Breached
+                      {t('tracker.sla.status.breachedTag')}
                     </span>
                   </div>
                 </div>
@@ -196,11 +198,11 @@ const SLAMonitor: React.FC<SLAMonitorProps> = ({ searchQuery }) => {
                         {issue.title}
                       </div>
                       <div className="text-sm text-yellow-600 dark:text-yellow-600">
-                        At Risk - Deadline: {issue.slaDeadline?.toLocaleString()}
+                        {t('tracker.sla.status.atRiskDeadline')} {issue.slaDeadline?.toLocaleString()}
                       </div>
                     </div>
                     <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-sm font-medium">
-                      At Risk
+                      {t('tracker.sla.status.atRiskTag')}
                     </span>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Clock, Play, Pause, Square, CheckCircle, Circle, 
   Plus, Edit, Trash2, Bot, Sparkles, FileText, 
@@ -99,6 +100,7 @@ const TaskTimeline: React.FC<TaskTimelineProps> = ({
   onNoteUpdate,
   onNoteDelete
 }) => {
+  const { t } = useTranslation();
   const [activeTasks, setActiveTasks] = useState<Task[]>([]);
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -321,23 +323,23 @@ Generated at ${new Date().toLocaleString()}`;
     <div className="bg-gray-50 border-b border-gray-300 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-gray-900">Task Timeline</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('tasks.taskTimeline')}</h2>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Scale:</span>
+            <span className="text-sm text-gray-600">{t('tasks.scale')}:</span>
             <select
               value={timeScale}
               onChange={(e) => setTimeScale(e.target.value as 'hour' | 'day' | 'week')}
               className="px-3 py-1 border border-gray-300 rounded text-sm"
             >
-              <option value="hour">Hour</option>
-              <option value="day">Day</option>
-              <option value="week">Week</option>
+              <option value="hour">{t('common.hour')}</option>
+              <option value="day">{t('tasks.day')}</option>
+              <option value="week">{t('common.week')}</option>
             </select>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="text-sm text-gray-600">
-            Current Time: {formatTime(currentTime)}
+            {t('tasks.currentTime')}: {formatTime(currentTime)}
           </div>
           <button
             onClick={() => setCurrentTime(new Date())}
@@ -509,18 +511,18 @@ Generated at ${new Date().toLocaleString()}`;
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-900">Active Tasks</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('tasks.activeTasks')}</h3>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                   {activeTasks.length}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-sm text-gray-600">
-                  {activeTasks.filter(t => t.status === 'in-progress').length} in progress
+                  {activeTasks.filter(t => t.status === 'in-progress').length} {t('common.inProgress')}
                 </div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                 <div className="text-sm text-gray-600">
-                  {activeTasks.filter(t => t.status === 'pending').length} pending
+                  {activeTasks.filter(t => t.status === 'pending').length} {t('common.pending')}
                 </div>
               </div>
             </div>
@@ -535,7 +537,7 @@ Generated at ${new Date().toLocaleString()}`;
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-900">Completed Tasks</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('tasks.completedTasks')}</h3>
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                   {completedTasks.length}
                 </span>
@@ -544,7 +546,7 @@ Generated at ${new Date().toLocaleString()}`;
                 <div className="text-sm text-gray-600">
                   {completedTasks.length > 0 && (
                     <span>
-                      Last completed: {formatDate(completedTasks[0].updatedAt)}
+                      {t('tasks.lastCompleted')}: {formatDate(completedTasks[0].updatedAt)}
                     </span>
                   )}
                 </div>
@@ -558,7 +560,7 @@ Generated at ${new Date().toLocaleString()}`;
 
           {/* Quick Actions */}
           <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('tasks.quickActions')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => {
@@ -569,8 +571,8 @@ Generated at ${new Date().toLocaleString()}`;
               >
                 <MessageSquare className="w-5 h-5 text-accent-dark" />
                 <div className="text-left">
-                  <div className="font-medium text-gray-900">Add Manual Note</div>
-                  <div className="text-sm text-gray-600">Create a custom note</div>
+                  <div className="font-medium text-gray-900">{t('tasks.addManualNote')}</div>
+                  <div className="text-sm text-gray-600">{t('tasks.createCustomNote')}</div>
                 </div>
               </button>
               
@@ -583,16 +585,16 @@ Generated at ${new Date().toLocaleString()}`;
               >
                 <Bot className="w-5 h-5 text-purple-600" />
                 <div className="text-left">
-                  <div className="font-medium text-gray-900">Generate AI Note</div>
-                  <div className="text-sm text-gray-600">AI-powered analysis</div>
+                  <div className="font-medium text-gray-900">{t('tasks.generateAINote')}</div>
+                  <div className="text-sm text-gray-600">{t('tasks.aiPoweredAnalysis')}</div>
                 </div>
               </button>
               
               <button className="flex items-center gap-3 p-4 bg-white border border-gray-300 rounded-lg hover:shadow-md transition-shadow">
                 <BarChart3 className="w-5 h-5 text-green-600" />
                 <div className="text-left">
-                  <div className="font-medium text-gray-900">View Analytics</div>
-                  <div className="text-sm text-gray-600">Task performance insights</div>
+                  <div className="font-medium text-gray-900">{t('tasks.viewAnalytics')}</div>
+                  <div className="text-sm text-gray-600">{t('tasks.taskPerformanceInsights')}</div>
                 </div>
               </button>
             </div>

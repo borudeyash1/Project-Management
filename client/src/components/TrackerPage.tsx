@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Play, Pause, Square, Clock, Target, Users, TrendingUp, 
   BarChart3, Calendar, Filter, Search, MoreVertical,
@@ -39,6 +40,7 @@ interface Project {
 }
 
 const TrackerPage: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics } = useFeatureAccess();
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
@@ -300,8 +302,8 @@ const TrackerPage: React.FC = () => {
       <div className="bg-white border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Time Tracker</h1>
-            <p className="text-gray-600 mt-1">Track your time and productivity</p>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('tracker.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('tracker.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -309,7 +311,7 @@ const TrackerPage: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Clock className="w-4 h-4" />
-              Add Entry
+              {t('tracker.addEntry')}
             </button>
           </div>
         </div>
@@ -322,7 +324,7 @@ const TrackerPage: React.FC = () => {
             {/* Timer Section */}
             <div className="bg-white rounded-lg border border-gray-300 p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Timer</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('tracker.timer')}</h2>
                 <div className="flex items-center gap-2">
                   {['timer', 'entries', 'reports'].map(tab => (
                     <button
@@ -334,7 +336,7 @@ const TrackerPage: React.FC = () => {
                           : 'text-gray-600 hover:text-gray-900'
                       }`}
                     >
-                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      {t(`tracker.${tab}`)}
                     </button>
                   ))}
                 </div>
@@ -354,7 +356,7 @@ const TrackerPage: React.FC = () => {
                       </div>
                       {isPaused && (
                         <div className="text-lg text-yellow-700 mb-2 font-medium">
-                          ⏸️ Timer Paused
+                          ⏸️ {t('tracker.timerPaused')}
                         </div>
                       )}
                       <div className="text-lg text-gray-700 mb-4">
@@ -384,14 +386,14 @@ const TrackerPage: React.FC = () => {
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Clock className="w-8 h-8 text-gray-600" />
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No active timer</h3>
-                      <p className="text-gray-600 mb-4">Start tracking time for your tasks</p>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tracker.noActiveTimer')}</h3>
+                      <p className="text-gray-600 mb-4">{t('tracker.startTrackingTime')}</p>
                       <button
                         onClick={() => setShowAddEntry(true)}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                       >
                         <Play className="w-4 h-4" />
-                        Start Timer
+                        {t('tracker.startTimer')}
                       </button>
                     </div>
                   )}
@@ -400,15 +402,15 @@ const TrackerPage: React.FC = () => {
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-gray-900">{formatDuration(getTotalTimeToday())}</div>
-                      <div className="text-sm text-gray-600">Today</div>
+                      <div className="text-sm text-gray-600">{t('tracker.today')}</div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-gray-900">{formatDuration(getTotalTimeThisWeek())}</div>
-                      <div className="text-sm text-gray-600">This Week</div>
+                      <div className="text-sm text-gray-600">{t('tracker.thisWeek')}</div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-gray-900">${getBillableAmount().toFixed(0)}</div>
-                      <div className="text-sm text-gray-600">Billable</div>
+                      <div className="text-sm text-gray-600">{t('tracker.billable')}</div>
                     </div>
                   </div>
                 </div>
@@ -440,7 +442,7 @@ const TrackerPage: React.FC = () => {
                         {entry.isRunning && (
                           <div className="flex items-center gap-1 text-green-600">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                            <span className="text-sm">Running</span>
+                            <span className="text-sm">{t('tracker.running')}</span>
                           </div>
                         )}
                         <button className="p-2 text-gray-600 hover:text-gray-600">
@@ -457,14 +459,14 @@ const TrackerPage: React.FC = () => {
                   {canUseAdvancedAnalytics() ? (
                     <div className="text-center py-8">
                       <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Advanced Reports</h3>
-                      <p className="text-gray-600">Detailed time tracking reports and analytics</p>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tracker.advancedReports')}</h3>
+                      <p className="text-gray-600">{t('tracker.detailedReports')}</p>
                     </div>
                   ) : (
                     <div className="text-center py-8">
                       <Crown className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Upgrade Required</h3>
-                      <p className="text-gray-600">Advanced reports are available in Pro and Ultra plans</p>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tracker.upgradeRequired')}</h3>
+                      <p className="text-gray-600">{t('tracker.upgradeMessage')}</p>
                     </div>
                   )}
                 </div>
@@ -478,19 +480,19 @@ const TrackerPage: React.FC = () => {
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
               <div className="flex items-center gap-2 mb-2">
                 <Bot className="w-5 h-5" />
-                <h3 className="font-semibold">AI Time Assistant</h3>
+                <h3 className="font-semibold">{t('tracker.aiTimeAssistant')}</h3>
               </div>
               <p className="text-sm text-purple-100 mb-3">
-                Get insights on your productivity patterns and time optimization suggestions.
+                {t('tracker.aiInsights')}
               </p>
               <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
-                Ask AI
+                {t('tracker.askAI')}
               </button>
             </div>
 
             {/* Projects */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Projects</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('tracker.projects')}</h3>
               <div className="space-y-3">
                 {projects.map(project => (
                   <div key={project._id} className="flex items-center justify-between">
@@ -508,7 +510,7 @@ const TrackerPage: React.FC = () => {
 
             {/* Recent Activity */}
             <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Recent Activity</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('tracker.recentActivity')}</h3>
               <div className="space-y-2">
                 {timeEntries.slice(0, 5).map(entry => (
                   <div key={entry._id} className="flex items-center gap-2 text-sm">
@@ -528,7 +530,7 @@ const TrackerPage: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Start Timer</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('tracker.startTimer')}</h3>
               <button
                 onClick={() => setShowAddEntry(false)}
                 className="text-gray-600 hover:text-gray-600"
@@ -539,13 +541,13 @@ const TrackerPage: React.FC = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('tracker.project')}</label>
                 <select
                   value={selectedProject}
                   onChange={(e) => setSelectedProject(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
-                  <option value="">Select project</option>
+                  <option value="">{t('tracker.selectProject')}</option>
                   {projects.map(project => (
                     <option key={project._id} value={project._id}>{project.name}</option>
                   ))}
@@ -553,13 +555,13 @@ const TrackerPage: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Task</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('tracker.task')}</label>
                 <select
                   value={selectedTask}
                   onChange={(e) => setSelectedTask(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
-                  <option value="">Select task</option>
+                  <option value="">{t('tracker.selectTask')}</option>
                   {selectedProject && projects.find(p => p._id === selectedProject)?.tasks.map(task => (
                     <option key={task._id} value={task._id}>{task.title}</option>
                   ))}
@@ -567,13 +569,13 @@ const TrackerPage: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('tracker.descriptionOptional')}</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="What are you working on?"
+                  placeholder={t('tracker.whatAreYouWorkingOn')}
                 />
               </div>
               
@@ -582,14 +584,14 @@ const TrackerPage: React.FC = () => {
                   onClick={() => setShowAddEntry(false)}
                   className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={startTracking}
                   disabled={!selectedProject || !selectedTask}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Start Timer
+                  {t('tracker.startTimer')}
                 </button>
               </div>
             </div>

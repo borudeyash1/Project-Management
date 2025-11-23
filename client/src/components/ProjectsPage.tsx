@@ -11,6 +11,7 @@ import { WorkspaceCreationRestriction } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import CreateProjectModal from './CreateProjectModal';
 import {
   getProjects,
@@ -51,6 +52,7 @@ interface Project {
 }
 
 const ProjectsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { canCreateProject } = useFeatureAccess();
   const { isDarkMode } = useTheme();
@@ -81,7 +83,7 @@ const ProjectsPage: React.FC = () => {
   const loadProjects = useCallback(async () => {
     try {
       if (!activeWorkspaceId) {
-        setError('No active workspace selected. Please create or select a workspace.');
+        setError(t('messages.noWorkspace'));
         setProjects([]);
         setFilteredProjects([]);
         setLoading(false);
@@ -242,7 +244,7 @@ const ProjectsPage: React.FC = () => {
     if (!activeWorkspaceId) {
       dispatch({
         type: 'ADD_TOAST',
-        payload: { type: 'error', message: 'No active workspace selected.' },
+        payload: { type: 'error', message: t('messages.noWorkspace') },
       });
       return;
     }
@@ -260,11 +262,11 @@ const ProjectsPage: React.FC = () => {
         tags: projectData.tags,
         workspaceId: activeWorkspaceId,
       } as any);
-      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project created successfully!' } });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: t('messages.projectCreated') } });
       setShowCreateModal(false);
       await loadProjects();
     } catch (err: any) {
-      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to create project' } });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || t('messages.createFailed') } });
     } finally {
       setCreatingProject(false);
     }
@@ -274,26 +276,26 @@ const ProjectsPage: React.FC = () => {
     try {
       setProcessingProjectId(projectId);
       await updateProjectApi(projectId, { status });
-      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: `Project marked as ${status}` } });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: t('messages.projectStatusUpdated') } });
       await loadProjects();
     } catch (err: any) {
-      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to update project' } });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || t('messages.updateFailed') } });
     } finally {
       setProcessingProjectId(null);
     }
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this project?');
+    const confirmDelete = window.confirm(t('messages.confirmDeleteProject'));
     if (!confirmDelete) return;
 
     try {
       setProcessingProjectId(projectId);
       await deleteProjectApi(projectId);
-      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project deleted successfully' } });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: t('messages.projectDeleted') } });
       await loadProjects();
     } catch (err: any) {
-      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to delete project' } });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || t('messages.deleteFailed') } });
     } finally {
       setProcessingProjectId(null);
     }
@@ -313,8 +315,8 @@ const ProjectsPage: React.FC = () => {
       <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Projects</h1>
-            <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage and track your projects</p>
+            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h1>
+            <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>{t('descriptions.projects')}</p>
           </div>
           <div className="flex items-center gap-3">
             {canCreateProject() ? (
@@ -323,7 +325,7 @@ const ProjectsPage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                New Project
+                {t('projects.newProject')}
               </button>
             ) : (
               <WorkspaceCreationRestriction>
@@ -343,7 +345,7 @@ const ProjectsPage: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search projects..."
+                placeholder={t('projects.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
@@ -365,12 +367,12 @@ const ProjectsPage: React.FC = () => {
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
               >
-                <option value="all">All Status</option>
-                <option value="planning">Planning</option>
-                <option value="active">Active</option>
-                <option value="on-hold">On Hold</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{t('projects.allStatus')}</option>
+                <option value="planning">{t('projects.planning')}</option>
+                <option value="active">{t('projects.active')}</option>
+                <option value="on-hold">{t('projects.onHold')}</option>
+                <option value="completed">{t('projects.completed')}</option>
+                <option value="cancelled">{t('projects.cancelled')}</option>
               </select>
 
               <select
@@ -382,11 +384,11 @@ const ProjectsPage: React.FC = () => {
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
               >
-                <option value="all">All Priority</option>
-                <option value="urgent">Urgent</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
+                <option value="all">{t('projects.allPriority')}</option>
+                <option value="urgent">{t('projects.urgent')}</option>
+                <option value="high">{t('projects.high')}</option>
+                <option value="medium">{t('projects.medium')}</option>
+                <option value="low">{t('projects.low')}</option>
               </select>
 
               <select
@@ -402,14 +404,14 @@ const ProjectsPage: React.FC = () => {
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
               >
-                <option value="name-asc">Name A-Z</option>
-                <option value="name-desc">Name Z-A</option>
-                <option value="progress-desc">Progress High-Low</option>
-                <option value="progress-asc">Progress Low-High</option>
-                <option value="dueDate-asc">Due Date Soon</option>
-                <option value="dueDate-desc">Due Date Later</option>
-                <option value="created-desc">Recently Created</option>
-                <option value="created-asc">Oldest Created</option>
+                <option value="name-asc">{t('sort.nameAsc')}</option>
+                <option value="name-desc">{t('sort.nameDesc')}</option>
+                <option value="progress-desc">{t('sort.progressDesc')}</option>
+                <option value="progress-asc">{t('sort.progressAsc')}</option>
+                <option value="dueDate-asc">{t('sort.dueDateAsc')}</option>
+                <option value="dueDate-desc">{t('sort.dueDateDesc')}</option>
+                <option value="created-desc">{t('sort.createdDesc')}</option>
+                <option value="created-asc">{t('sort.createdAsc')}</option>
               </select>
 
               <div className="flex items-center border border-gray-300 rounded-lg">
@@ -436,13 +438,13 @@ const ProjectsPage: React.FC = () => {
         ) : error ? (
           <div className={`max-w-lg mx-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6 text-center`}>
             <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-2" />
-            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Unable to load projects</h3>
+            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.loadError')}</h3>
             <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-4`}>{error}</p>
             <button
               onClick={loadProjects}
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
-              Retry
+              {t('messages.tryAgain')}
             </button>
           </div>
         ) : viewMode === 'grid' ? (
@@ -478,7 +480,7 @@ const ProjectsPage: React.FC = () => {
                 {/* Progress */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-600">Progress</span>
+                    <span className="text-gray-600">{t('projects.progress')}</span>
                     <span className="font-medium">{project.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-2">
@@ -492,10 +494,10 @@ const ProjectsPage: React.FC = () => {
                 {/* Status and Priority */}
                 <div className="flex items-center justify-between mb-4">
                   <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                    {project.status}
+                    {t('projects.' + (project.status === 'on-hold' ? 'onHold' : project.status))}
                   </span>
                   <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
-                    {project.priority}
+                    {t('projects.' + project.priority)}
                   </span>
                 </div>
 
@@ -516,19 +518,19 @@ const ProjectsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <span className="text-sm text-gray-600">{project.team.length} members</span>
+                  <span className="text-sm text-gray-600">{project.team.length} {t('common.members')}</span>
                 </div>
 
                 {/* Budget and Due Date */}
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Budget</span>
+                    <span className="text-gray-600">{t('projects.budget')}</span>
                     <span className="font-medium">
                       {formatCurrency(project.budget.actual, project.budget.currency)} / {formatCurrency(project.budget.estimated, project.budget.currency)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Due Date</span>
+                    <span className="text-gray-600">{t('projects.dueDate')}</span>
                     <span className="font-medium">
                       {new Date(project.endDate).toLocaleDateString()}
                     </span>
@@ -546,7 +548,7 @@ const ProjectsPage: React.FC = () => {
                     }`}
                   >
                     <Eye className="w-4 h-4" />
-                    View
+                    {t('common.view')}
                   </button>
                   <button 
                     onClick={() => handleEditProject(project._id)}
@@ -557,7 +559,7 @@ const ProjectsPage: React.FC = () => {
                     }`}
                   >
                     <Edit className="w-4 h-4" />
-                    Edit
+                    {t('common.edit')}
                   </button>
                   {project.status !== 'completed' && (
                     <button
@@ -570,7 +572,7 @@ const ProjectsPage: React.FC = () => {
                       } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <CheckCircle className="w-4 h-4" />
-                      Complete
+                      {t('common.complete')}
                     </button>
                   )}
                   <button
@@ -583,7 +585,7 @@ const ProjectsPage: React.FC = () => {
                     } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <Trash2 className="w-4 h-4" />
-                    Delete
+                    {t('common.delete')}
                   </button>
                 </div>
               </div>
@@ -595,13 +597,13 @@ const ProjectsPage: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Project</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Progress</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Team</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Due Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Budget</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.title')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.status')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.progress')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.team')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.dueDate')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.budget')}</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -629,10 +631,10 @@ const ProjectsPage: React.FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                            {project.status}
+                            {t('projects.' + (project.status === 'on-hold' ? 'onHold' : project.status))}
                           </span>
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
-                            {project.priority}
+                            {t('projects.' + project.priority)}
                           </span>
                         </div>
                       </td>
@@ -710,11 +712,11 @@ const ProjectsPage: React.FC = () => {
             }`}>
               <Target className={`w-8 h-8 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
             </div>
-            <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>No projects found</h3>
+            <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.noProjects')}</h3>
             <p className={`mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
               {searchTerm || selectedStatus !== 'all' || selectedPriority !== 'all'
-                ? 'Try adjusting your filters to see more projects.'
-                : 'Get started by creating your first project.'}
+                ? t('projects.adjustFilters')
+                : t('projects.createFirst')}
             </p>
             {canCreateProject() && (
               <button 
@@ -722,7 +724,7 @@ const ProjectsPage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Plus className="w-4 h-4" />
-                Create Project
+                {t('projects.createProject')}
               </button>
             )}
           </div>

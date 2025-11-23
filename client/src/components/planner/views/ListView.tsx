@@ -3,6 +3,7 @@ import {
   ChevronDown, ChevronUp, Edit2, Trash2, CheckSquare, Square,
   User, Calendar, Flag, Tag, MoreVertical, Filter, Download, Plus
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
 
@@ -16,6 +17,7 @@ type GroupBy = 'none' | 'status' | 'priority' | 'assignee' | 'project';
 
 const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   const { tasks, updateTask, deleteTask, bulkUpdateTasks } = usePlanner();
+  const { t } = useTranslation();
   const [sortField, setSortField] = useState<SortField>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [groupBy, setGroupBy] = useState<GroupBy>('none');
@@ -160,18 +162,18 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
               onChange={(e) => setGroupBy(e.target.value as GroupBy)}
               className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="none">No Grouping</option>
-              <option value="status">Group by Status</option>
-              <option value="priority">Group by Priority</option>
-              <option value="assignee">Group by Assignee</option>
-              <option value="project">Group by Project</option>
+              <option value="none">{t('planner.list.groupBy.none')}</option>
+              <option value="status">{t('planner.list.groupBy.status')}</option>
+              <option value="priority">{t('planner.list.groupBy.priority')}</option>
+              <option value="assignee">{t('planner.list.groupBy.assignee')}</option>
+              <option value="project">{t('planner.list.groupBy.project')}</option>
             </select>
 
             {/* Bulk Actions */}
             {selectedTasks.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-200">
-                  {selectedTasks.length} selected
+                  {selectedTasks.length} {t('planner.list.selected')}
                 </span>
                 <select
                   onChange={(e) => {
@@ -181,14 +183,14 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                   }}
                   className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="">Bulk Actions</option>
-                  <option value="status:todo">Move to To Do</option>
-                  <option value="status:in-progress">Move to In Progress</option>
-                  <option value="status:done">Move to Done</option>
-                  <option value="priority:high">Set High Priority</option>
-                  <option value="priority:medium">Set Medium Priority</option>
-                  <option value="priority:low">Set Low Priority</option>
-                  <option value="delete">Delete Selected</option>
+                  <option value="">{t('planner.bulkActions.label')}</option>
+                  <option value="status:todo">{t('planner.bulkActions.moveToTodo')}</option>
+                  <option value="status:in-progress">{t('planner.bulkActions.moveToInProgress')}</option>
+                  <option value="status:done">{t('planner.bulkActions.moveToDone')}</option>
+                  <option value="priority:high">{t('planner.bulkActions.setHighPriority')}</option>
+                  <option value="priority:medium">{t('planner.bulkActions.setMediumPriority')}</option>
+                  <option value="priority:low">{t('planner.bulkActions.setLowPriority')}</option>
+                  <option value="delete">{t('planner.bulkActions.deleteSelected')}</option>
                 </select>
               </div>
             )}
@@ -196,7 +198,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
 
           <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg">
             <Download className="w-4 h-4" />
-            Export
+            {t('planner.export')}
           </button>
         </div>
       </div>
@@ -228,7 +230,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       onClick={() => handleSort('title')}
                     >
                       <div className="flex items-center gap-2">
-                        Task
+                        {t('planner.list.columns.task')}
                         <SortIcon field="title" />
                       </div>
                     </th>
@@ -237,7 +239,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       onClick={() => handleSort('status')}
                     >
                       <div className="flex items-center gap-2">
-                        Status
+                        {t('planner.list.columns.status')}
                         <SortIcon field="status" />
                       </div>
                     </th>
@@ -246,7 +248,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       onClick={() => handleSort('priority')}
                     >
                       <div className="flex items-center gap-2">
-                        Priority
+                        {t('planner.list.columns.priority')}
                         <SortIcon field="priority" />
                       </div>
                     </th>
@@ -255,7 +257,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       onClick={() => handleSort('assignees')}
                     >
                       <div className="flex items-center gap-2">
-                        Assignee
+                        {t('planner.list.columns.assignee')}
                         <SortIcon field="assignees" />
                       </div>
                     </th>
@@ -264,12 +266,12 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       onClick={() => handleSort('dueDate')}
                     >
                       <div className="flex items-center gap-2">
-                        Due Date
+                        {t('planner.list.columns.dueDate')}
                         <SortIcon field="dueDate" />
                       </div>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                      Tags
+                      {t('planner.list.columns.tags')}
                     </th>
                     <th className="w-12 px-4 py-3"></th>
                   </tr>
@@ -390,7 +392,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
 
         {sortedTasks.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-12 text-center">
-            <p className="text-gray-600 dark:text-gray-200">No tasks found</p>
+            <p className="text-gray-600 dark:text-gray-200">{t('planner.list.noTasksFound')}</p>
           </div>
         )}
       </div>

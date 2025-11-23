@@ -26,6 +26,7 @@ import { useApp } from '../context/AppContext';
 import TaskTimeline from './TaskTimeline';
 import TimelineView from './TimelineView';
 import KanbanBoard from './KanbanBoard';
+import { useTranslation } from 'react-i18next';
 
 interface Task {
   _id: string;
@@ -180,6 +181,7 @@ interface TeamMember {
 
 const TaskManagement: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { t, i18n } = useTranslation();
   const [activeView, setActiveView] = useState('taskboard');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -220,7 +222,7 @@ const TaskManagement: React.FC = () => {
   const handleColumnCreate = (columnData: Partial<Column>) => {
     const newColumn: Column = {
       _id: `column_${Date.now()}`,
-      name: columnData.name || 'New Column',
+      name: columnData.name || t('common.newColumn'),
       color: columnData.color || '#3B82F6',
       position: columnData.position || columns.length,
       taskLimit: columnData.taskLimit
@@ -294,11 +296,11 @@ const TaskManagement: React.FC = () => {
   const handleTaskCreate = (taskData: Partial<Task>) => {
     const newTask: Task = {
       _id: `task_${Date.now()}`,
-      title: taskData.title || 'New Task',
+      title: taskData.title || t('tasks.newTask'),
       description: taskData.description || '',
       status: taskData.status || 'pending',
       priority: taskData.priority || 'medium',
-      assignee: taskData.assignee || { _id: 'unassigned', name: 'Unassigned', email: '', avatarUrl: '' },
+      assignee: taskData.assignee || { _id: 'unassigned', name: t('tasks.unassigned'), email: '', avatarUrl: '' },
       startDate: taskData.startDate || new Date(),
       dueDate: taskData.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       createdAt: new Date(),
@@ -312,7 +314,7 @@ const TaskManagement: React.FC = () => {
       estimatedHours: 0,
       actualHours: 0,
       projectId: taskData.projectId || '1',
-      project: taskData.project || { _id: '1', name: 'Default Project', color: '#3B82F6' },
+      project: taskData.project || { _id: '1', name: t('projects.defaultProject'), color: '#3B82F6' },
       subtasks: [],
       dependencies: [],
       timeTracking: [],
@@ -629,13 +631,13 @@ const mockColumns: Column[] = [
   const renderTaskBoard = () => (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Task Board</h2>
+        <h2 className="text-xl font-semibold text-gray-900">{t('tasks.views.board')}</h2>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search tasks..."
+              placeholder={t('tasks.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
@@ -646,18 +648,18 @@ const mockColumns: Column[] = [
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="blocked">Blocked</option>
+            <option value="all">{t('common.allStatus')}</option>
+            <option value="pending">{t('common.pending')}</option>
+            <option value="in-progress">{t('common.inProgress')}</option>
+            <option value="completed">{t('common.completed')}</option>
+            <option value="blocked">{t('tasks.blocked')}</option>
           </select>
           <select
             value={filterProject}
             onChange={(e) => setFilterProject(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
-            <option value="all">All Projects</option>
+            <option value="all">{t('projects.allProjects')}</option>
             {projects.map(project => (
               <option key={project._id} value={project._id}>{project.name}</option>
             ))}
@@ -667,7 +669,7 @@ const mockColumns: Column[] = [
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
-            New Task
+            {t('tasks.newTask')}
           </button>
         </div>
       </div>
@@ -687,7 +689,7 @@ const mockColumns: Column[] = [
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900 capitalize">
-                {status.replace('-', ' ')}
+                {t(`common.${status.replace('-', '')}`)}
               </h3>
               <span className="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">
                 {tasks.filter((t: Task) => t.status === status).length}
@@ -697,7 +699,7 @@ const mockColumns: Column[] = [
             <div className="space-y-3">
               {draggedOverColumn === status && draggedTask && draggedTask.status !== status && (
                 <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-accent-dark text-sm font-medium">
-                  Drop "{draggedTask.title}" here
+                  {t('tasks.dropHere', { title: draggedTask.title })}
                 </div>
               )}
               {tasks
@@ -748,7 +750,7 @@ const mockColumns: Column[] = [
                     {task.milestones.length > 0 && (
                       <div className="mt-2">
                         <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                          <span>Milestones</span>
+                          <span>{t('projects.milestones')}</span>
                           <span>
                             {task.milestones.filter((m: Milestone) => m.status === 'completed').length}/
                             {task.milestones.length}
@@ -786,8 +788,8 @@ const mockColumns: Column[] = [
                   <div className="w-12 h-12 mx-auto mb-2 bg-gray-300 rounded-full flex items-center justify-center">
                     <Plus className="w-6 h-6" />
                   </div>
-                  <p>No {status.replace('-', ' ')} tasks</p>
-                  <p className="text-xs">Drag tasks here or create new ones</p>
+                  <p>{t('tasks.noTasksInStatus', { status: t(`common.${status.replace('-', '')}`) })}</p>
+                  <p className="text-xs mt-1">{t('tasks.dragOrCreate')}</p>
                 </div>
               )}
             </div>
@@ -797,367 +799,13 @@ const mockColumns: Column[] = [
     </div>
   );
 
-  const renderTaskList = () => (
-    <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Task List</h2>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search tasks..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-                    />
-                  </div>
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="blocked">Blocked</option>
-                  </select>
-                  <select
-                    value={filterPriority}
-                    onChange={(e) => setFilterPriority(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-                  >
-                    <option value="all">All Priority</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                  </select>
-                  <select
-                    value={filterAssignee}
-                    onChange={(e) => setFilterAssignee(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-                  >
-                    <option value="all">All Assignees</option>
-                    {teamMembers.map(member => (
-                      <option key={member._id} value={member._id}>{member.name}</option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={() => setShowCreateTask(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Task
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Task</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Project</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Assignee</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Priority</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Due Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Progress</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {tasks.map((task: Task) => (
-                        <tr key={task._id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                  <CheckSquare className="h-5 w-5 text-gray-600" />
-                                </div>
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{task.title}</div>
-                                <div className="text-sm text-gray-600">{task.description}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div
-                                className="w-3 h-3 rounded-full mr-2"
-                                style={{ backgroundColor: task.project.color }}
-                              />
-                              <span className="text-sm text-gray-900">{task.project.name}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <img
-                                src={task.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${task.assignee.name}&background=random`}
-                                alt={task.assignee.name}
-                                className="h-8 w-8 rounded-full mr-3"
-                              />
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">{task.assignee.name}</div>
-                                <div className="text-sm text-gray-600">{task.assignee.email}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                              {task.status.replace('-', ' ')}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="w-16 bg-gray-300 rounded-full h-2 mr-2">
-                                <div
-                                  className="bg-accent h-2 rounded-full"
-                                  style={{
-                                    width: `${(task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100}%`
-                                  }}
-                                />
-                              </div>
-                              <span className="text-sm text-gray-600">
-                                {task.milestones.length > 0 
-                                  ? `${Math.round((task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100)}%`
-                                  : '0%'
-                                }
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => {
-                                  setSelectedTask(task);
-                                  setShowTaskModal(true);
-                                }}
-                                className="text-accent-dark hover:text-blue-900"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => startTimeTracking(task._id)}
-                                className="text-green-600 hover:text-green-900"
-                              >
-                                <Timer className="w-4 h-4" />
-                              </button>
-                              <button className="text-gray-600 hover:text-gray-900">
-                                <MoreVertical className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          );
-
-  const renderTaskCalendar = () => {
-    const today = new Date();
-    
-    // Get first day of month and total days
-    const firstDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
-    const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
-    const startingDayOfWeek = firstDayOfMonth.getDay();
-    const daysInMonth = lastDayOfMonth.getDate();
-    
-    // Generate calendar days (including previous/next month days)
-    const calendarDays = [];
-    
-    // Previous month days
-    const prevMonthLastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 0).getDate();
-    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-      calendarDays.push({
-        date: new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, prevMonthLastDay - i),
-        isCurrentMonth: false
-      });
-    }
-    
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      calendarDays.push({
-        date: new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i),
-        isCurrentMonth: true
-      });
-    }
-    
-    // Next month days to fill the grid
-    const remainingDays = 35 - calendarDays.length;
-    for (let i = 1; i <= remainingDays; i++) {
-      calendarDays.push({
-        date: new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, i),
-        isCurrentMonth: false
-      });
-    }
-    
-    const navigateMonth = (direction: 'prev' | 'next') => {
-      const newDate = new Date(calendarDate);
-      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
-      setCalendarDate(newDate);
-    };
-    
-    const goToToday = () => {
-      setCalendarDate(new Date());
-    };
-    
-    const isToday = (date: Date) => {
-      return date.toDateString() === today.toDateString();
-    };
-    
-    const getTasksForDate = (date: Date) => {
-      return tasks.filter(task => {
-        const taskDueDate = task.dueDate ? new Date(task.dueDate) : null;
-        const taskStartDate = task.startDate ? new Date(task.startDate) : null;
-        const dateStr = date.toDateString();
-        
-        return (
-          (taskDueDate && taskDueDate.toDateString() === dateStr) ||
-          (taskStartDate && taskStartDate.toDateString() === dateStr)
-        );
-      });
-    };
-    
-    const handleDateClick = (date: Date) => {
-      // Open create task modal with pre-filled date
-      setShowCreateTask(true);
-      // You can add logic here to pre-fill the date in the modal
-    };
-    
-    return (
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Task Calendar</h2>
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => navigateMonth('prev')}
-              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              title="Previous Month"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-medium text-gray-900 min-w-[150px] text-center">
-                {calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </span>
-              <button
-                onClick={goToToday}
-                className="px-3 py-1 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-              >
-                Today
-              </button>
-            </div>
-            <button 
-              onClick={() => navigateMonth('next')}
-              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              title="Next Month"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setShowCreateTask(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Task
-            </button>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-          <div className="grid grid-cols-7 gap-px bg-gray-300">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="bg-gray-50 p-3 text-center text-sm font-medium text-gray-700">
-                {day}
-              </div>
-            ))}
-          </div>
-          
-          <div className="grid grid-cols-7 gap-px bg-gray-300">
-            {calendarDays.map((day, i) => {
-              const dayTasks = getTasksForDate(day.date);
-              const isTodayDate = isToday(day.date);
-              
-              return (
-                <div 
-                  key={i} 
-                  onClick={() => handleDateClick(day.date)}
-                  className={`bg-white min-h-[100px] p-2 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    !day.isCurrentMonth ? 'opacity-40' : ''
-                  } ${
-                    isTodayDate ? 'ring-2 ring-blue-500 ring-inset' : ''
-                  }`}
-                >
-                  <div className={`text-sm mb-1 ${
-                    isTodayDate 
-                      ? 'bg-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center font-semibold' 
-                      : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-600'
-                  }`}>
-                    {day.date.getDate()}
-                  </div>
-                  <div className="space-y-1">
-                    {dayTasks.slice(0, 3).map(task => {
-                      const isDueDate = task.dueDate && new Date(task.dueDate).toDateString() === day.date.toDateString();
-                      return (
-                        <div
-                          key={task._id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedTask(task);
-                            setShowTaskModal(true);
-                          }}
-                          className="p-1 rounded text-xs cursor-pointer hover:shadow-md transition-shadow"
-                          style={{ 
-                            backgroundColor: task.project.color + '30',
-                            borderLeft: `3px solid ${task.project.color}`
-                          }}
-                        >
-                          <div className="font-medium truncate flex items-center gap-1">
-                            {isDueDate && <Flag className="w-3 h-3" />}
-                            {task.title}
-                          </div>
-                          <div className="text-gray-600 truncate text-[10px]">{task.assignee.name}</div>
-                        </div>
-                      );
-                    })}
-                    {dayTasks.length > 3 && (
-                      <div className="text-xs text-gray-600 text-center py-1">
-                        +{dayTasks.length - 3} more
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const renderTaskAnalytics = () => (
     <div className="p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Tasks</p>
+              <p className="text-sm font-medium text-gray-600">{t('reports.totalTasks')}</p>
               <p className="text-2xl font-semibold text-gray-900">{tasks.length}</p>
             </div>
             <CheckSquare className="w-8 h-8 text-accent-dark" />
@@ -1167,7 +815,7 @@ const mockColumns: Column[] = [
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Completed</p>
+              <p className="text-sm font-medium text-gray-600">{t('common.completed')}</p>
               <p className="text-2xl font-semibold text-gray-900">
                 {tasks.filter(t => t.status === 'completed').length}
               </p>
@@ -1179,7 +827,7 @@ const mockColumns: Column[] = [
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">In Progress</p>
+              <p className="text-sm font-medium text-gray-600">{t('common.inProgress')}</p>
               <p className="text-2xl font-semibold text-gray-900">
                 {tasks.filter(t => t.status === 'in-progress').length}
               </p>
@@ -1191,7 +839,7 @@ const mockColumns: Column[] = [
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Overdue</p>
+              <p className="text-sm font-medium text-gray-600">{t('tasks.overdue')}</p>
               <p className="text-2xl font-semibold text-gray-900">
                 {tasks.filter(t => (t.dueDate ? new Date(t.dueDate) : new Date(8640000000000000)) < new Date() && t.status !== 'completed').length}
               </p>
@@ -1203,7 +851,7 @@ const mockColumns: Column[] = [
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Tasks by Status</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('reports.taskCompletion')}</h3>
           <div className="space-y-3">
             {['pending', 'in-progress', 'completed', 'blocked'].map(status => {
               const count = tasks.filter(t => t.status === status).length;
@@ -1218,7 +866,7 @@ const mockColumns: Column[] = [
                       status === 'completed' ? 'bg-green-400' : 'bg-red-400'
                     }`} />
                     <span className="text-sm font-medium text-gray-900 capitalize">
-                      {status.replace('-', ' ')}
+                      {t(`common.${status.replace('-', '')}`)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1241,7 +889,7 @@ const mockColumns: Column[] = [
         </div>
 
         <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Tasks by Project</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('reports.projectMetrics')}</h3>
           <div className="space-y-3">
             {projects.map(project => {
               const count = tasks.filter(t => t.projectId === project._id).length;
@@ -1277,35 +925,149 @@ const mockColumns: Column[] = [
     </div>
   );
 
+  const renderTaskList = () => (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">{t('tasks.views.list')}</h2>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
+            <input
+              type="text"
+              placeholder={t('tasks.search')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+            />
+          </div>
+          <button
+            onClick={() => setShowCreateTask(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            {t('tasks.newTask')}
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('planner.list.columns.task')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('planner.list.columns.status')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('planner.list.columns.priority')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('planner.list.columns.assignee')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('planner.list.columns.dueDate')}</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.actions')}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {tasks.map(task => (
+              <tr key={task._id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: task.project.color }} />
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{task.title}</div>
+                      <div className="text-xs text-gray-500">{task.project.name}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <span className={`px-2 py-1 text-xs rounded-full capitalize ${getStatusColor(task.status)}`}>
+                    {t(`common.${task.status.replace('-', '')}`)}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2 capitalize text-sm text-gray-700">
+                    {getPriorityIcon(task.priority)}
+                    {task.priority === 'critical' ? t('tracker.dashboard.critical') : t(`common.${task.priority}`)}
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={task.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${task.assignee.name}&background=random`}
+                      alt={task.assignee.name}
+                      className="w-6 h-6 rounded-full"
+                    />
+                    <span className="text-sm text-gray-700">{task.assignee.name}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700">
+                  {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}
+                </td>
+                <td className="px-6 py-4 text-right">
+                  <button
+                    onClick={() => {
+                      setSelectedTask(task);
+                      setShowTaskModal(true);
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderTaskCalendar = () => (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">{t('tasks.views.calendar')}</h2>
+        <div className="flex items-center gap-2">
+          <button className="p-2 hover:bg-gray-100 rounded-lg">
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          <span className="text-lg font-medium text-gray-900">
+            {new Date().toLocaleString(i18n.language, { month: 'long', year: 'numeric' })}
+          </span>
+          <button className="p-2 hover:bg-gray-100 rounded-lg">
+            <ChevronRight className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+      </div>
+      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center text-gray-500">
+        {t('widgets.calendar')} {t('common.view')}
+      </div>
+    </div>
+  );
+
   const renderTemplates = () => (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Task Templates</h2>
+        <h2 className="text-xl font-semibold text-gray-900">{t('tasks.templates')}</h2>
         <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
           <Plus className="w-4 h-4" />
-          Create Template
+          {t('tasks.createTemplate')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { name: 'Bug Report', description: 'Template for reporting and tracking bugs', category: 'Development' },
-          { name: 'Feature Request', description: 'Template for requesting new features', category: 'Product' },
-          { name: 'Code Review', description: 'Template for code review tasks', category: 'Development' },
-          { name: 'Design Review', description: 'Template for design review tasks', category: 'Design' },
-          { name: 'Testing Task', description: 'Template for testing tasks', category: 'QA' },
-          { name: 'Documentation', description: 'Template for documentation tasks', category: 'General' }
+          { name: 'bugReport', category: 'development' },
+          { name: 'featureRequest', category: 'product' },
+          { name: 'codeReview', category: 'development' },
+          { name: 'designReview', category: 'design' },
+          { name: 'testingTask', category: 'qa' },
+          { name: 'documentation', category: 'general' }
         ].map((template, index) => (
           <div key={index} className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900">{template.name}</h3>
+              <h3 className="font-semibold text-gray-900">{t(`tasks.templateList.${template.name}.name`)}</h3>
               <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                {template.category}
+                {t(`tasks.categories.${template.category}`)}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-4">{template.description}</p>
+            <p className="text-sm text-gray-600 mb-4">{t(`tasks.templateList.${template.name}.description`)}</p>
             <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-              Use Template
+              {t('tasks.useTemplate')}
             </button>
           </div>
         ))}
@@ -1346,209 +1108,233 @@ const mockColumns: Column[] = [
             </div>
           </div>
 
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
-                  <p className="text-gray-600">{selectedTask.description}</p>
-                </div>
+          <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Description */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">{t('tasks.sections.description')}</h4>
+                <p className="text-gray-600 whitespace-pre-wrap">{selectedTask.description}</p>
+              </div>
 
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Milestones</h3>
-                  <div className="space-y-2">
-                    {selectedTask.milestones.map(milestone => (
-                      <div key={milestone._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input
-                          type="checkbox"
-                          checked={milestone.status === 'completed'}
-                          className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
-                        />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{milestone.title}</p>
-                          <p className="text-xs text-gray-600">{milestone.description}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(milestone.status)}`}>
-                          {milestone.status}
-                        </span>
-                      </div>
-                    ))}
+              {/* Milestones */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold text-gray-900">{t('tasks.sections.milestones')}</h4>
+                  <div className="text-xs text-gray-600">
+                    {selectedTask.milestones.filter(m => m.status === 'completed').length}/{selectedTask.milestones.length}
                   </div>
                 </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Subtasks</h3>
-                  <div className="space-y-2">
-                    {selectedTask.subtasks.map(subtask => (
-                      <div key={subtask._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input
-                          type="checkbox"
-                          checked={subtask.status === 'completed'}
-                          className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
-                        />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{subtask.title}</p>
-                          <p className="text-xs text-gray-600">{subtask.description}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(subtask.status)}`}>
-                          {subtask.status}
-                        </span>
+                <div className="space-y-2">
+                  {selectedTask.milestones.map(milestone => (
+                    <div key={milestone._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <input
+                        type="checkbox"
+                        checked={milestone.status === 'completed'}
+                        className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{milestone.title}</p>
+                        <p className="text-xs text-gray-600">{milestone.description}</p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Attachments</h3>
-                  <div className="space-y-2">
-                    {selectedTask.attachments.map(attachment => (
-                      <div key={attachment._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        {attachment.type === 'file' ? (
-                          <FileText className="w-5 h-5 text-gray-600" />
-                        ) : (
-                          <Link className="w-5 h-5 text-gray-600" />
-                        )}
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{attachment.name}</p>
-                          <p className="text-xs text-gray-600">
-                            {attachment.type === 'file' && attachment.size 
-                              ? `${(attachment.size / 1024 / 1024).toFixed(2)} MB`
-                              : 'Link'
-                            }
-                          </p>
-                        </div>
-                        <button className="text-accent-dark hover:text-blue-800">
-                          <Download className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Comments</h3>
-                  <div className="space-y-3">
-                    {selectedTask.comments.map(comment => (
-                      <div key={comment._id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
-                        <img
-                          src={comment.author.avatarUrl || `https://ui-avatars.com/api/?name=${comment.author.name}&background=random`}
-                          alt={comment.author.name}
-                          className="w-8 h-8 rounded-full"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-gray-900">{comment.author.name}</span>
-                            <span className="text-xs text-gray-600">
-                              {new Date(comment.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-700">{comment.content}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-4">
-                    <textarea
-                      placeholder="Add a comment..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-                      rows={3}
-                    />
-                    <button className="mt-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
-                      Add Comment
-                    </button>
-                  </div>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(milestone.status)}`}>
+                        {milestone.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="space-y-6">
+              {/* Subtasks */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold text-gray-900">{t('tasks.sections.subtasks')}</h4>
+                  <div className="text-xs text-gray-600">
+                    {selectedTask.subtasks.filter(s => s.status === 'completed').length}/{selectedTask.subtasks.length}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {selectedTask.subtasks.map(subtask => (
+                    <div key={subtask._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <input
+                        type="checkbox"
+                        checked={subtask.status === 'completed'}
+                        className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{subtask.title}</p>
+                        <p className="text-xs text-gray-600">{subtask.description}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(subtask.status)}`}>
+                        {subtask.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Attachments */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">{t('tasks.sections.attachments')}</h4>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600">{t('forms.dragDropFile')}</p>
+                </div>
+                <div className="space-y-2 mt-4">
+                  {selectedTask.attachments.map(attachment => (
+                    <div key={attachment._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      {attachment.type === 'file' ? (
+                        <FileText className="w-5 h-5 text-gray-600" />
+                      ) : (
+                        <Link className="w-5 h-5 text-gray-600" />
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{attachment.name}</p>
+                        <p className="text-xs text-gray-600">
+                          {attachment.type === 'file' && attachment.size 
+                            ? `${(attachment.size / 1024 / 1024).toFixed(2)} MB`
+                            : 'Link'
+                          }
+                        </p>
+                      </div>
+                      <button className="text-accent-dark hover:text-blue-800">
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comments */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-4">{t('tasks.sections.comments')}</h4>
+                <div className="space-y-4 mb-4">
+                  {selectedTask.comments.map(comment => (
+                    <div key={comment._id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
+                      <img
+                        src={comment.author.avatarUrl || `https://ui-avatars.com/api/?name=${comment.author.name}&background=random`}
+                        alt={comment.author.name}
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-gray-900">{comment.author.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {new Date(comment.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-700">{comment.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder={t('tasks.actions.addComment') + "..."}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                  />
+                  <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
+                    {t('tasks.actions.addComment')}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Sidebar Info */}
+              <div className="bg-gray-50 p-4 rounded-lg space-y-4">
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Task Details</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Status:</span>
-                      <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(selectedTask.status)}`}>
-                        {selectedTask.status.replace('-', ' ')}
-                      </span>
+                  <span className="text-sm font-medium text-gray-700">{t('common.status')}:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(selectedTask.status)}`}>
+                    {t(`common.${selectedTask.status.replace('-', '')}`)}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium text-gray-700">{t('tasks.priority')}:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getPriorityColor(selectedTask.priority)}`}>
+                    {selectedTask.priority}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium text-gray-700">{t('tasks.assignee')}:</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <img
+                      src={selectedTask.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${selectedTask.assignee.name}&background=random`}
+                      alt={selectedTask.assignee.name}
+                      className="w-6 h-6 rounded-full"
+                    />
+                    <span className="text-sm text-gray-600">{selectedTask.assignee.name}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium text-gray-700">{t('tasks.dueDate')}:</span>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
+                    <CalendarIcon className="w-4 h-4" />
+                    {selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString(i18n.language) : '-'}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium text-gray-700">{t('tasks.timeTracking')}:</span>
+                  <div className="mt-1 space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('tasks.estimatedTime')}:</span>
+                      <span className="font-medium">{selectedTask.estimatedHours}h</span>
                     </div>
-                    
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Priority:</span>
-                      <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getPriorityColor(selectedTask.priority)}`}>
-                        {selectedTask.priority}
-                      </span>
-                    </div>
-                    
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Assignee:</span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <img
-                          src={selectedTask.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${selectedTask.assignee.name}&background=random`}
-                          alt={selectedTask.assignee.name}
-                          className="w-6 h-6 rounded-full"
-                        />
-                        <span className="text-sm text-gray-600">{selectedTask.assignee.name}</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Due Date:</span>
-                      <span className="ml-2 text-sm text-gray-600">
-                        {selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString() : ''}
-                      </span>
-                    </div>
-                    
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Time Tracking:</span>
-                      <div className="mt-1 text-sm text-gray-600">
-                        <div>Estimated: {selectedTask.estimatedHours}h</div>
-                        <div>Actual: {selectedTask.actualHours}h</div>
-                      </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('tasks.actualTime')}:</span>
+                      <span className="font-medium">{selectedTask.actualHours}h</span>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTask.tags.map(tag => (
-                      <span key={tag} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  <span className="text-sm font-medium text-gray-700">{t('tasks.sections.tags')}</span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {selectedTask.tags.map((tag, index) => (
+                      <span key={index} className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Actions</h3>
-                  <div className="space-y-2">
-                    <button 
-                      onClick={() => {
+              {/* Actions */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">{t('tasks.sections.actions')}</h4>
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => {
+                      setShowTaskModal(false);
+                      setShowEditTask(true);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+                  >
+                    <Edit className="w-4 h-4" />
+                    {t('tasks.actions.editTask')}
+                  </button>
+                  <button className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700">
+                    <Copy className="w-4 h-4" />
+                    {t('tasks.actions.duplicateTask')}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (window.confirm(t('planner.taskDetail.deleteConfirm'))) {
+                        handleTaskDelete(selectedTask._id);
                         setShowTaskModal(false);
-                        setShowEditTask(true);
-                      }}
-                      className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-                    >
-                      Edit Task
-                    </button>
-                    <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                      Duplicate Task
-                    </button>
-                    <button 
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this task?')) {
-                          handleTaskDelete(selectedTask._id);
-                          setShowTaskModal(false);
-                          setToastMessage('Task deleted successfully!');
-                          setShowToast(true);
-                          setTimeout(() => setShowToast(false), 3000);
-                        }
-                      }}
-                      className="w-full px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-                    >
-                      Delete Task
-                    </button>
-                  </div>
+                        setToastMessage(t('tasks.deleteSuccess'));
+                        setShowToast(true);
+                        setTimeout(() => setShowToast(false), 3000);
+                      }
+                    }}
+                    className="w-full px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    {t('tasks.deleteTask')}
+                  </button>
                 </div>
               </div>
             </div>
@@ -1564,7 +1350,7 @@ const mockColumns: Column[] = [
         <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-800 z-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Create New Task</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('planner.taskModal.title')}</h2>
             <button
               onClick={() => setShowCreateTask(false)}
               className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
@@ -1597,7 +1383,7 @@ const mockColumns: Column[] = [
               };
               handleTaskCreate(taskData);
               setShowCreateTask(false);
-              setToastMessage('Task created successfully!');
+              setToastMessage(t('tasks.createSuccess'));
               setShowToast(true);
               setTimeout(() => setShowToast(false), 3000);
             }}
@@ -1606,13 +1392,13 @@ const mockColumns: Column[] = [
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Task Title *
+                {t('planner.taskModal.fields.title')}
               </label>
               <input
                 type="text"
                 name="title"
                 required
-                placeholder="Enter task title"
+                placeholder={t('tasks.enterTitle')}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -1620,12 +1406,12 @@ const mockColumns: Column[] = [
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Description
+                {t('planner.taskModal.fields.description')}
               </label>
               <textarea
                 name="description"
                 rows={4}
-                placeholder="Enter task description"
+                placeholder={t('tasks.enterDescription')}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -1634,32 +1420,32 @@ const mockColumns: Column[] = [
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Priority *
+                  {t('planner.taskModal.fields.priority')}
                 </label>
                 <select
                   name="priority"
                   required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
+                  <option value="low">{t('common.low')}</option>
+                  <option value="medium">{t('common.medium')}</option>
+                  <option value="high">{t('common.high')}</option>
+                  <option value="critical">{t('tracker.dashboard.critical')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Status *
+                  {t('planner.taskModal.fields.status')}
                 </label>
                 <select
                   name="status"
                   required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="blocked">Blocked</option>
+                  <option value="pending">{t('common.pending')}</option>
+                  <option value="in-progress">{t('common.inProgress')}</option>
+                  <option value="completed">{t('common.completed')}</option>
+                  <option value="blocked">{t('tasks.blocked')}</option>
                 </select>
               </div>
             </div>
@@ -1667,14 +1453,14 @@ const mockColumns: Column[] = [
             {/* Assignee */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Assignee *
+                {t('planner.taskModal.fields.assignees')}
               </label>
               <select
                 name="assignee"
                 required
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="">Select Assignee</option>
+                <option value="">{t('tasks.selectAssignee')}</option>
                 {teamMembers.map(member => (
                   <option key={member._id} value={member._id}>
                     {member.name} - {member.role}
@@ -1687,13 +1473,13 @@ const mockColumns: Column[] = [
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Project
+                  {t('tracker.project')}
                 </label>
                 <select
                   name="project"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="">No Project</option>
+                  <option value="">{t('tasks.noProject')}</option>
                   {state.projects.map(project => (
                     <option key={project._id} value={project._id}>{project.name}</option>
                   ))}
@@ -1701,7 +1487,7 @@ const mockColumns: Column[] = [
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Due Date
+                  {t('planner.taskModal.fields.dueDate')}
                 </label>
                 <input
                   type="date"
@@ -1715,7 +1501,7 @@ const mockColumns: Column[] = [
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Start Date
+                  {t('tasks.startDate')}
                 </label>
                 <input
                   type="date"
@@ -1726,7 +1512,7 @@ const mockColumns: Column[] = [
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Estimated Hours
+                  {t('planner.taskModal.fields.estimatedTime')}
                 </label>
                 <input
                   type="number"
@@ -1742,12 +1528,12 @@ const mockColumns: Column[] = [
             {/* Tags */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Tags (comma separated)
+                {t('planner.taskModal.fields.tags')}
               </label>
               <input
                 type="text"
                 name="tags"
-                placeholder="e.g., frontend, urgent, bug-fix"
+                placeholder={t('tasks.tagsPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -1759,13 +1545,13 @@ const mockColumns: Column[] = [
                 onClick={() => setShowCreateTask(false)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-700 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
-                Create Task
+                {t('planner.taskModal.fields.create')}
               </button>
             </div>
           </form>
@@ -1782,7 +1568,7 @@ const mockColumns: Column[] = [
         <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-800 z-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit Task</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('tasks.editTask')}</h2>
             <button
               onClick={() => setShowEditTask(false)}
               className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
@@ -1815,7 +1601,7 @@ const mockColumns: Column[] = [
               };
               handleTaskUpdate(selectedTask._id, updates);
               setShowEditTask(false);
-              setToastMessage('Task updated successfully!');
+              setToastMessage(t('tasks.updateSuccess'));
               setShowToast(true);
               setTimeout(() => setShowToast(false), 3000);
             }}
@@ -1824,14 +1610,14 @@ const mockColumns: Column[] = [
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Task Title *
+                {t('planner.taskModal.fields.title')}
               </label>
               <input
                 type="text"
                 name="title"
                 required
                 defaultValue={selectedTask.title}
-                placeholder="Enter task title"
+                placeholder={t('tasks.enterTitle')}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -1839,13 +1625,13 @@ const mockColumns: Column[] = [
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Description
+                {t('planner.taskModal.fields.description')}
               </label>
               <textarea
                 name="description"
                 rows={4}
                 defaultValue={selectedTask.description}
-                placeholder="Enter task description"
+                placeholder={t('tasks.enterDescription')}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -1854,7 +1640,7 @@ const mockColumns: Column[] = [
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Priority *
+                  {t('planner.taskModal.fields.priority')}
                 </label>
                 <select
                   name="priority"
@@ -1862,15 +1648,15 @@ const mockColumns: Column[] = [
                   defaultValue={selectedTask.priority}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
+                  <option value="low">{t('common.low')}</option>
+                  <option value="medium">{t('common.medium')}</option>
+                  <option value="high">{t('common.high')}</option>
+                  <option value="critical">{t('tracker.dashboard.critical')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Status *
+                  {t('planner.taskModal.fields.status')}
                 </label>
                 <select
                   name="status"
@@ -1878,10 +1664,10 @@ const mockColumns: Column[] = [
                   defaultValue={selectedTask.status}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="blocked">Blocked</option>
+                  <option value="pending">{t('common.pending')}</option>
+                  <option value="in-progress">{t('common.inProgress')}</option>
+                  <option value="completed">{t('common.completed')}</option>
+                  <option value="blocked">{t('tasks.blocked')}</option>
                 </select>
               </div>
             </div>
@@ -1889,7 +1675,7 @@ const mockColumns: Column[] = [
             {/* Assignee */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Assignee *
+                {t('planner.taskModal.fields.assignees')}
               </label>
               <select
                 name="assignee"
@@ -1909,14 +1695,14 @@ const mockColumns: Column[] = [
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Project
+                  {t('tracker.project')}
                 </label>
                 <select
                   name="project"
                   defaultValue={selectedTask.projectId}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="">No Project</option>
+                  <option value="">{t('tasks.noProject')}</option>
                   {state.projects.map(project => (
                     <option key={project._id} value={project._id}>{project.name}</option>
                   ))}
@@ -1924,7 +1710,7 @@ const mockColumns: Column[] = [
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Due Date
+                  {t('planner.taskModal.fields.dueDate')}
                 </label>
                 <input
                   type="date"
@@ -1939,7 +1725,7 @@ const mockColumns: Column[] = [
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Start Date
+                  {t('tasks.startDate')}
                 </label>
                 <input
                   type="date"
@@ -1950,7 +1736,7 @@ const mockColumns: Column[] = [
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  Estimated Hours
+                  {t('planner.taskModal.fields.estimatedTime')}
                 </label>
                 <input
                   type="number"
@@ -1966,13 +1752,13 @@ const mockColumns: Column[] = [
             {/* Tags */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                Tags (comma separated)
+                {t('planner.taskModal.fields.tags')}
               </label>
               <input
                 type="text"
                 name="tags"
                 defaultValue={selectedTask.tags.join(', ')}
-                placeholder="e.g., frontend, urgent, bug-fix"
+                placeholder={t('tasks.tagsPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -1984,13 +1770,13 @@ const mockColumns: Column[] = [
                 onClick={() => setShowEditTask(false)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-700 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
-                Save Changes
+                {t('buttons.saveChanges')}
               </button>
             </div>
           </form>
@@ -2006,7 +1792,7 @@ const mockColumns: Column[] = [
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] overflow-y-auto py-8">
         <div className="bg-white rounded-xl max-w-md w-full p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Time Tracking</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('tasks.timeTracking')}</h3>
             <button
               onClick={() => setShowTimeTracking(false)}
               className="text-gray-600 hover:text-gray-600"
@@ -2020,13 +1806,13 @@ const mockColumns: Column[] = [
               <div className="text-2xl font-bold text-gray-900 mb-2">
                 {currentTimeEntry ? '00:00:00' : '00:00:00'}
               </div>
-              <p className="text-sm text-gray-600">Time spent on task</p>
+              <p className="text-sm text-gray-600">{t('tracker.timeSpent')}</p>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.description')}</label>
               <textarea
-                placeholder="What did you work on?"
+                placeholder={t('tracker.whatAreYouWorkingOn')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                 rows={3}
               />
@@ -2037,13 +1823,13 @@ const mockColumns: Column[] = [
                 onClick={stopTimeTracking}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                Stop Timer
+                {t('planner.stopTimer')}
               </button>
               <button
                 onClick={() => setShowTimeTracking(false)}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -2053,14 +1839,14 @@ const mockColumns: Column[] = [
   };
 
   const views = [
-    { id: 'taskboard', label: 'TaskBoard', icon: LayoutGrid, description: 'Interactive Kanban-style task management' },
-    { id: 'tasklist', label: 'TaskList', icon: List, description: 'Detailed list view with advanced filtering' },
-    { id: 'timeline', label: 'Timeline', icon: CalendarIcon, description: 'Gantt-style timeline with horizontal bars and swimlanes' },
-    { id: 'tasktimeline', label: 'TaskTimeline', icon: Clock, description: 'Real-time timeline with active/completed tasks and AI notes' },
-    { id: 'taskcalendar', label: 'TaskCalendar', icon: CalendarIcon, description: 'Calendar view for scheduling and deadlines' },
-    { id: 'taskanalytics', label: 'TaskAnalytics', icon: BarChart3, description: 'Analytics and performance insights' },
-    { id: 'kanban', label: 'Kanban', icon: LayoutGrid, description: 'Asana-style Kanban board with advanced features' },
-    { id: 'templates', label: 'Templates', icon: FileText, description: 'Pre-built task templates' }
+    { id: 'taskboard', label: t('tasks.views.board'), icon: LayoutGrid, description: t('tasks.views.descriptions.board') },
+    { id: 'tasklist', label: t('tasks.views.list'), icon: List, description: t('tasks.views.descriptions.list') },
+    { id: 'timeline', label: t('tasks.views.timeline'), icon: CalendarIcon, description: t('tasks.views.descriptions.timeline') },
+    { id: 'tasktimeline', label: t('tasks.views.taskTimeline'), icon: Clock, description: t('tasks.views.descriptions.taskTimeline') },
+    { id: 'taskcalendar', label: t('tasks.views.calendar'), icon: CalendarIcon, description: t('tasks.views.descriptions.calendar') },
+    { id: 'taskanalytics', label: t('reports.analytics'), icon: BarChart3, description: t('tasks.views.descriptions.analytics') },
+    { id: 'kanban', label: t('tasks.views.kanban'), icon: LayoutGrid, description: t('tasks.views.descriptions.kanban') },
+    { id: 'templates', label: t('tasks.templates'), icon: FileText, description: t('tasks.views.descriptions.templates') }
   ];
 
   const renderContent = () => {
@@ -2119,8 +1905,8 @@ const mockColumns: Column[] = [
         <div className="p-6 border-b border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Task Management</h1>
-              <p className="text-sm text-gray-600 mt-1">Manage all your tasks across projects and workspaces.</p>
+              <h1 className="text-2xl font-semibold text-gray-900">{t('tasks.title')}</h1>
+              <p className="text-sm text-gray-600 mt-1">{t('tasks.subtitle')}</p>
             </div>
             <div className="flex items-center gap-3">
               <button 
@@ -2128,7 +1914,7 @@ const mockColumns: Column[] = [
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                New Task
+                {t('tasks.newTask')}
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { getCalendarEvents } from '../../services/calendarService';
+import { useTranslation } from 'react-i18next';
 
 interface CalendarEvent {
     date: string;
@@ -11,6 +12,7 @@ interface CalendarEvent {
 
 const CalendarWidget: React.FC = () => {
     const { isDarkMode } = useTheme();
+    const { t, i18n } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -28,10 +30,16 @@ const CalendarWidget: React.FC = () => {
         1
     ).getDay();
 
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+    // Generate localized week days starting from Sunday
+    const weekDays = React.useMemo(() => {
+        const days = [];
+        // Jan 5, 2025 is a Sunday
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(2025, 0, 5 + i);
+            days.push(d.toLocaleString(i18n.language, { weekday: 'short' }));
+        }
+        return days;
+    }, [i18n.language]);
 
     useEffect(() => {
         loadEvents();
@@ -126,7 +134,7 @@ const CalendarWidget: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Calendar
+                    {t('widgets.calendar')}
                 </h2>
                 <CalendarIcon className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
             </div>
@@ -140,7 +148,7 @@ const CalendarWidget: React.FC = () => {
                     <ChevronLeft className="w-5 h-5" />
                 </button>
                 <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                    {currentDate.toLocaleString(i18n.language, { month: 'long', year: 'numeric' })}
                 </span>
                 <button
                     onClick={nextMonth}
@@ -152,9 +160,9 @@ const CalendarWidget: React.FC = () => {
 
             {/* Day Headers */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                {weekDays.map((day, index) => (
                     <div
-                        key={day}
+                        key={index}
                         className={`text-center text-xs font-medium ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`}
                     >
                         {day}
@@ -171,7 +179,7 @@ const CalendarWidget: React.FC = () => {
             {selectedDate && (
                 <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                     <h3 className={`text-sm font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                        {selectedDate.toLocaleDateString(i18n.language, { month: 'long', day: 'numeric' })}
                     </h3>
                     <div className="space-y-2">
                         {getEventsForDate(selectedDate.getDate()).length > 0 ? (
@@ -191,7 +199,7 @@ const CalendarWidget: React.FC = () => {
                             ))
                         ) : (
                             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                No events for this date
+                                {t('widgets.noEvents')}
                             </p>
                         )}
                     </div>

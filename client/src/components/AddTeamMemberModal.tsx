@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, UserPlus, ChevronDown } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
 
 interface AddTeamMemberModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
 }) => {
   const { isDarkMode } = useTheme();
   const { state } = useApp();
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMember, setSelectedMember] = useState<WorkspaceMember | null>(null);
   const [selectedRole, setSelectedRole] = useState('member');
@@ -37,11 +39,11 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
 
   // Predefined roles
   const predefinedRoles = [
-    { value: 'owner', label: 'Owner', description: 'Full access to project' },
-    { value: 'manager', label: 'Manager', description: 'Can manage tasks and team' },
-    { value: 'member', label: 'Member', description: 'Can work on assigned tasks' },
-    { value: 'viewer', label: 'Viewer', description: 'Read-only access' },
-    { value: 'custom', label: 'Custom Role', description: 'Define a custom role' }
+    { value: 'owner', label: t('team.roleOwner'), description: t('team.roleProjectOwnerDesc') },
+    { value: 'manager', label: t('team.roleManager'), description: t('team.roleProjectManagerDesc') },
+    { value: 'member', label: t('team.roleMember'), description: t('team.roleProjectMemberDesc') },
+    { value: 'viewer', label: t('team.roleViewer'), description: t('team.roleViewerDesc') },
+    { value: 'custom', label: t('team.roleCustom'), description: t('team.roleCustomDesc') }
   ];
 
   // Load workspace members
@@ -172,7 +174,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
     const finalRole = selectedRole === 'custom' ? customRole : selectedRole;
     
     if (!finalRole.trim()) {
-      alert('Please enter a custom role');
+      alert(t('team.pleaseEnterCustomRole'));
       return;
     }
 
@@ -202,10 +204,10 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
         <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div>
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Add Team Member
+              {t('team.addMemberTitle')}
             </h2>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-              Select a member from your workspace and assign a role
+              {t('team.addMemberDesc')}
             </p>
           </div>
           <button
@@ -222,7 +224,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             {/* Search Members */}
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Search Workspace Members
+                {t('team.searchMembers')}
               </label>
               <div className="relative">
                 <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
@@ -230,7 +232,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by name, email, or role..."
+                  placeholder={t('team.searchPlaceholder')}
                   className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
@@ -243,12 +245,12 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             {/* Member List */}
             <div>
               <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                Available Members ({filteredMembers.length})
+                {t('team.availableMembers')} ({filteredMembers.length})
               </label>
               <div className={`border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} max-h-64 overflow-y-auto`}>
                 {filteredMembers.length === 0 ? (
                   <div className={`p-8 text-center ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                    {searchTerm ? 'No members found matching your search' : 'All workspace members are already in this project'}
+                    {searchTerm ? t('team.noMembersFound') : t('team.allMembersAdded')}
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -304,7 +306,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             {selectedMember && (
               <div className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-300 bg-gray-50'}`}>
                 <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                  Select Role for {selectedMember.name}
+                  {t('team.selectRoleFor', { name: selectedMember.name })}
                 </label>
                 <div className="space-y-2">
                   {predefinedRoles.map((role) => (
@@ -344,13 +346,13 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                 {selectedRole === 'custom' && (
                   <div className="mt-4">
                     <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                      Enter Custom Role
+                      {t('team.enterCustomRole')}
                     </label>
                     <input
                       type="text"
                       value={customRole}
                       onChange={(e) => setCustomRole(e.target.value)}
-                      placeholder="e.g., Technical Lead, Consultant, Advisor..."
+                      placeholder={t('team.customRolePlaceholder')}
                       className={`w-full px-4 py-2 rounded-lg border ${
                         isDarkMode
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
@@ -374,7 +376,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleAddMember}
@@ -386,7 +388,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             }`}
           >
             <UserPlus className="w-4 h-4" />
-            Add to Project
+            {t('team.addToProject')}
           </button>
         </div>
       </div>

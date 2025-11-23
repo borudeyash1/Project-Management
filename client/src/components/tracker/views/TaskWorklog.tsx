@@ -1,12 +1,14 @@
 import React from 'react';
 import { Clock, Play } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
+import { useTranslation } from 'react-i18next';
 
 interface TaskWorklogProps {
   searchQuery: string;
 }
 
 const TaskWorklog: React.FC<TaskWorklogProps> = ({ searchQuery }) => {
+  const { t } = useTranslation();
   const { timeEntries, startTimer } = useTracker();
 
   // Group entries by task
@@ -15,7 +17,7 @@ const TaskWorklog: React.FC<TaskWorklogProps> = ({ searchQuery }) => {
     if (!acc[key]) {
       acc[key] = {
         taskId: entry.taskId,
-        taskTitle: entry.taskTitle || 'No Task',
+        taskTitle: entry.taskTitle || t('tracker.worklog.noTask'),
         projectName: entry.projectName,
         entries: []
       };
@@ -49,7 +51,7 @@ const TaskWorklog: React.FC<TaskWorklogProps> = ({ searchQuery }) => {
                     className="mt-2 flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
                   >
                     <Play className="w-3 h-3" />
-                    Start Timer
+                    {t('tracker.worklog.startTimer')}
                   </button>
                 </div>
               </div>

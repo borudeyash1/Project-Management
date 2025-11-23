@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Plus, MoreVertical, Filter, Search, SortAsc, Settings, 
   MessageSquare, Paperclip, CheckSquare, Clock, AlertCircle,
@@ -106,6 +107,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onColumnCreate,
   onColumnDelete
 }) => {
+  const { t } = useTranslation();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [draggedOverColumn, setDraggedOverColumn] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -273,18 +275,32 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     }
   };
 
+  // Translate column name
+  const getColumnName = (name: string) => {
+    const columnMap: { [key: string]: string } = {
+      'Backlog': 'tasks.backlog',
+      'In Progress': 'common.inProgress',
+      'Common.inprogress': 'common.inProgress',
+      'Review (internal)': 'tasks.reviewInternal',
+      'Check comments, make edits': 'tasks.checkComments',
+      'QA (client)': 'tasks.qaClient',
+      'Publication': 'tasks.publication'
+    };
+    return columnMap[name] ? t(columnMap[name]) : name;
+  };
+
   return (
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-300 p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Content Production</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('projects.projectName')}</h1>
             <div className="flex items-center gap-4 mt-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Last task completed on</span>
+                <span className="text-sm text-gray-600">{t('tasks.lastTaskCompleted')}</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {lastCompletedDate ? formatDate(lastCompletedDate) : 'No completed tasks'}
+                  {lastCompletedDate ? formatDate(lastCompletedDate) : t('tasks.completedTasks')}
                 </span>
               </div>
             </div>
@@ -292,7 +308,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Set status</span>
+              <span className="text-sm text-gray-600">{t('tasks.setStatus')}</span>
               <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
             
@@ -317,14 +333,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             
             <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <Share2 className="w-4 h-4" />
-              Share
+              {t('common.share')}
             </button>
             
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search tasks..."
+                placeholder={t('tasks.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent w-64"
@@ -341,7 +357,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">All tasks</span>
+              <span className="text-sm text-gray-600">{t('tasks.allTasks')}</span>
               <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
             
@@ -350,7 +366,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <Filter className="w-4 h-4" />
-              Filter
+              {t('common.filter')}
             </button>
             
             <div className="flex items-center gap-2">
@@ -360,21 +376,21 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
               >
-                <option value="created">Created</option>
-                <option value="updated">Updated</option>
-                <option value="due">Due Date</option>
-                <option value="priority">Priority</option>
+                <option value="created">{t('tasks.created')}</option>
+                <option value="updated">{t('common.update')}</option>
+                <option value="due">{t('tasks.dueDate')}</option>
+                <option value="priority">{t('tasks.priority')}</option>
               </select>
             </div>
             
             <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <Settings className="w-4 h-4" />
-              Rules
+              {t('tasks.rules')}
             </button>
             
             <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <BarChart3 className="w-4 h-4" />
-              Fields
+              {t('tasks.fields')}
             </button>
           </div>
         </div>
@@ -390,7 +406,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   onChange={(e) => setFilterAssignee(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="all">All Assignees</option>
+                  <option value="all">{t('common.all')} {t('tasks.assignee')}</option>
                   {getUniqueAssignees().map(assignee => (
                     <option key={assignee._id} value={assignee._id}>{assignee.name}</option>
                   ))}
@@ -398,13 +414,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.labels')}</label>
                 <select
                   value={filterLabel}
                   onChange={(e) => setFilterLabel(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="all">All Labels</option>
+                  <option value="all">{t('common.all')} {t('tasks.labels')}</option>
                   {getUniqueLabels().map(label => (
                     <option key={label._id} value={label._id}>{label.name}</option>
                   ))}
@@ -436,7 +452,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 <div className="p-4 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">{column.name}</h3>
+                      <h3 className="font-semibold text-gray-900">{getColumnName(column.name)}</h3>
                       <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
                         {columnTasks.length}
                         {column.taskLimit && `/${column.taskLimit}`}
@@ -471,19 +487,19 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <div className="absolute z-10 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                     <div className="py-1">
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Edit Column
+                      {t('common.edit')} {t('tasks.status')}
                       </button>
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Set Task Limit
+                        {t('tasks.setStatus')}
                       </button>
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Archive Column
+                        {t('common.archive')}
                       </button>
                       <button 
                         onClick={() => onColumnDelete(column._id)}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                       >
-                        Delete Column
+                        {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -593,8 +609,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       <div className="w-12 h-12 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center">
                         <Plus className="w-6 h-6" />
                       </div>
-                      <p className="text-sm">No tasks in {column.name}</p>
-                      <p className="text-xs">Drag tasks here or create new ones</p>
+                      <p className="text-sm">{t('tasks.noTasksIn', { column: getColumnName(column.name) })}</p>
+                      <p className="text-xs">{t('tasks.dragTasksHere')}</p>
                     </div>
                   )}
                 </div>
@@ -622,7 +638,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.description')}</label>
                 <textarea
                   value={selectedTask.description}
                   onChange={(e) => onTaskUpdate(selectedTask._id, { description: e.target.value })}
@@ -633,20 +649,20 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.status')}</label>
                   <select
                     value={selectedTask.status}
                     onChange={(e) => onTaskUpdate(selectedTask._id, { status: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
                     {columns.map(column => (
-                      <option key={column._id} value={column._id}>{column.name}</option>
+                      <option key={column._id} value={column._id}>{getColumnName(column.name)}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.priority')}</label>
                   <select
                     value={selectedTask.priority}
                     onChange={(e) => onTaskUpdate(selectedTask._id, { 
@@ -654,15 +670,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                    <option value="low">{t('tasks.low')}</option>
+                    <option value="medium">{t('tasks.medium')}</option>
+                    <option value="high">{t('tasks.high')}</option>
+                    <option value="critical">{t('tasks.urgent')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Assignee</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.assignee')}</label>
                   <select
                     value={selectedTask.assignee._id}
                     onChange={(e) => {
@@ -680,7 +696,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.dueDate')}</label>
                   <input
                     type="date"
                     value={selectedTask.dueDate ? selectedTask.dueDate.toISOString().split('T')[0] : ''}
@@ -700,13 +716,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   }}
                   className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
                 >
-                  Delete Task
+                  {t('common.delete')} {t('tasks.title')}
                 </button>
                 <button
                   onClick={() => setShowTaskModal(false)}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  Save Changes
+                  {t('buttons.saveChanges')}
                 </button>
               </div>
             </div>

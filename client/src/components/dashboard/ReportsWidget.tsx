@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, CheckCircle, AlertTriangle, Target } from 'lucid
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { getReportsSummary } from '../../services/reportsService';
+import { useTranslation } from 'react-i18next';
 
 interface ReportMetric {
     label: string;
@@ -15,12 +16,13 @@ interface ReportMetric {
 const ReportsWidget: React.FC = () => {
     const { isDarkMode } = useTheme();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [metrics, setMetrics] = useState<ReportMetric[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadReports();
-    }, []);
+    }, [t]);
 
     const loadReports = async () => {
         try {
@@ -29,26 +31,26 @@ const ReportsWidget: React.FC = () => {
 
             setMetrics([
                 {
-                    label: 'Tasks Completed',
+                    label: t('widgets.tasksCompleted'),
                     value: data.tasksCompletedThisWeek || 0,
                     change: data.tasksCompletedChange || 0,
                     icon: CheckCircle,
                     color: 'text-green-600'
                 },
                 {
-                    label: 'Projects On Track',
+                    label: t('widgets.projectsOnTrack'),
                     value: `${data.projectsOnTrack || 0}/${data.totalProjects || 0}`,
                     icon: Target,
                     color: 'text-blue-600'
                 },
                 {
-                    label: 'At Risk',
+                    label: t('widgets.atRisk'),
                     value: data.projectsAtRisk || 0,
                     icon: AlertTriangle,
                     color: 'text-red-600'
                 },
                 {
-                    label: 'Productivity',
+                    label: t('widgets.productivity'),
                     value: `${data.productivityScore || 0}%`,
                     change: data.productivityChange || 0,
                     icon: TrendingUp,
@@ -59,10 +61,10 @@ const ReportsWidget: React.FC = () => {
             console.error('Failed to load reports:', error);
             // Set default metrics on error
             setMetrics([
-                { label: 'Tasks Completed', value: 0, icon: CheckCircle, color: 'text-green-600' },
-                { label: 'Projects On Track', value: '0/0', icon: Target, color: 'text-blue-600' },
-                { label: 'At Risk', value: 0, icon: AlertTriangle, color: 'text-red-600' },
-                { label: 'Productivity', value: '0%', icon: TrendingUp, color: 'text-purple-600' }
+                { label: t('widgets.tasksCompleted'), value: 0, icon: CheckCircle, color: 'text-green-600' },
+                { label: t('widgets.projectsOnTrack'), value: '0/0', icon: Target, color: 'text-blue-600' },
+                { label: t('widgets.atRisk'), value: 0, icon: AlertTriangle, color: 'text-red-600' },
+                { label: t('widgets.productivity'), value: '0%', icon: TrendingUp, color: 'text-purple-600' }
             ]);
         } finally {
             setLoading(false);
@@ -84,7 +86,7 @@ const ReportsWidget: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Weekly Reports
+                    {t('widgets.weeklyReports')}
                 </h2>
                 <BarChart3 className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
             </div>
@@ -126,7 +128,7 @@ const ReportsWidget: React.FC = () => {
                 onClick={() => navigate('/analytics')}
                 className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
             >
-                View Full Report
+                {t('widgets.viewFullReport')}
             </button>
         </div>
     );

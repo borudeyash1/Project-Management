@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, Check, X, Edit2, Trash2, Plus, Download } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
+import { useTranslation } from 'react-i18next';
 
 interface TimesheetViewProps {
   searchQuery: string;
@@ -10,6 +11,7 @@ const TimesheetView: React.FC<TimesheetViewProps> = ({ searchQuery }) => {
   const { timeEntries, addManualEntry, updateTimeEntry, deleteTimeEntry, submitWorklog, generateWorklog } = useTracker();
   const [selectedWeek, setSelectedWeek] = useState(new Date());
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
 
   const getWeekDates = (date: Date) => {
     const start = new Date(date);
@@ -63,10 +65,10 @@ const TimesheetView: React.FC<TimesheetViewProps> = ({ searchQuery }) => {
             </button>
             <div className="text-center">
               <div className="font-semibold text-gray-900 dark:text-white">
-                {weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {weekStart.toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })} - {weekEnd.toLocaleDateString(i18n.language, { month: 'short', day: 'numeric', year: 'numeric' })}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-200">
-                Total: {weekTotal.toFixed(1)} hours
+                {t('tracker.timesheet.totalHours')}: {weekTotal.toFixed(1)}
               </div>
             </div>
             <button
@@ -86,11 +88,11 @@ const TimesheetView: React.FC<TimesheetViewProps> = ({ searchQuery }) => {
               className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Check className="w-4 h-4" />
-              Submit for Approval
+              {t('tracker.timesheet.submitApproval')}
             </button>
             <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
               <Download className="w-4 h-4" />
-              Export
+              {t('tracker.timesheet.export')}
             </button>
           </div>
         </div>
@@ -103,19 +105,19 @@ const TimesheetView: React.FC<TimesheetViewProps> = ({ searchQuery }) => {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700 w-48">
-                  Task / Project
+                  {t('tracker.timesheet.taskProject')}
                 </th>
                 {weekDates.map(date => (
                   <th key={date.toISOString()} className="text-center py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    <div>{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                    <div>{date.toLocaleDateString(i18n.language, { weekday: 'short' })}</div>
                     <div className="text-xs text-gray-600">{date.getDate()}</div>
                   </th>
                 ))}
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                  Total
+                  {t('tracker.timesheet.total')}
                 </th>
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                  Actions
+                  {t('tracker.timesheet.actions')}
                 </th>
               </tr>
             </thead>
@@ -124,10 +126,10 @@ const TimesheetView: React.FC<TimesheetViewProps> = ({ searchQuery }) => {
                 <tr key={entry._id} className="border-t border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="py-3 px-4">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {entry.taskTitle || 'No task'}
+                      {entry.taskTitle || t('tracker.timesheet.noTask')}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-200">
-                      {entry.projectName || 'No project'}
+                      {entry.projectName || t('tracker.timesheet.noProject')}
                     </div>
                   </td>
                   {weekDates.map(date => {
@@ -167,7 +169,7 @@ const TimesheetView: React.FC<TimesheetViewProps> = ({ searchQuery }) => {
               ))}
               <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 font-bold">
                 <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                  Daily Total
+                  {t('tracker.timesheet.dailyTotal')}
                 </td>
                 {weekDates.map(date => (
                   <td key={date.toISOString()} className="text-center py-3 px-4 text-sm text-gray-900 dark:text-white">

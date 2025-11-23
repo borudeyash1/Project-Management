@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Clock, TrendingUp, DollarSign, AlertCircle, Users, Activity, BarChart2, Timer } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
 
@@ -7,64 +8,65 @@ interface TeamDashboardProps {
 }
 
 const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
+  const { t } = useTranslation();
   const { teamMetrics, timeEntries, issues, activeTimer } = useTracker();
 
   const stats = [
     {
-      label: 'Hours Today',
+      label: t('tracker.dashboard.hoursToday'),
       value: teamMetrics.totalHoursToday.toFixed(1),
       icon: Clock,
       color: 'blue',
       trend: '+12%'
     },
     {
-      label: 'Hours This Week',
+      label: t('tracker.dashboard.hoursThisWeek'),
       value: teamMetrics.totalHoursWeek.toFixed(1),
       icon: BarChart2,
       color: 'green',
       trend: '+8%'
     },
     {
-      label: 'Utilization',
+      label: t('tracker.dashboard.utilization'),
       value: `${teamMetrics.utilizationPercent.toFixed(0)}%`,
       icon: TrendingUp,
       color: 'purple',
-      trend: teamMetrics.utilizationPercent > 80 ? 'High' : 'Normal'
+      trend: teamMetrics.utilizationPercent > 80 ? t('tracker.dashboard.high') : t('tracker.dashboard.normal')
     },
     {
-      label: 'Billable %',
+      label: t('tracker.dashboard.billablePercent'),
       value: `${teamMetrics.billablePercent.toFixed(0)}%`,
       icon: DollarSign,
       color: 'yellow',
-      trend: teamMetrics.billablePercent > 70 ? 'Good' : 'Low'
+      trend: teamMetrics.billablePercent > 70 ? t('tracker.dashboard.good') : t('tracker.dashboard.low')
     },
     {
-      label: 'Active Timers',
+      label: t('tracker.dashboard.activeTimers'),
       value: teamMetrics.activeTimers.toString(),
       icon: Timer,
       color: 'green',
-      trend: activeTimer ? 'Running' : 'Idle'
+      trend: activeTimer ? t('tracker.dashboard.running') : t('tracker.dashboard.idle')
     },
     {
-      label: 'Open Issues',
+      label: t('tracker.dashboard.openIssues'),
       value: issues.filter(i => i.status !== 'resolved' && i.status !== 'closed').length.toString(),
       icon: AlertCircle,
       color: 'red',
-      trend: issues.filter(i => i.severity === 'critical').length + ' Critical'
+      trend: issues.filter(i => i.severity === 'critical').length + ' ' + t('tracker.dashboard.critical')
     },
     {
-      label: 'Overtime Hours',
+      label: t('tracker.dashboard.overtimeHours'),
       value: teamMetrics.overtimeHours.toFixed(1),
       icon: Clock,
       color: 'orange',
-      trend: teamMetrics.overtimeHours > 5 ? 'High' : 'Normal'
+      trend: teamMetrics.overtimeHours > 5 ? t('tracker.dashboard.high') : t('tracker.dashboard.normal')
     },
     {
-      label: 'Avg Cycle Time',
+      label: t('tracker.dashboard.avgCycleTime'),
       value: `${teamMetrics.avgCycleTime}h`,
       icon: Activity,
       color: 'indigo',
-      trend: 'Target: 20h'
+      trend: t('tracker.dashboard.target') + ': 20h'
     }
   ];
 
@@ -122,7 +124,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
           {/* Utilization Chart */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Weekly Utilization
+              {t('tracker.dashboard.weeklyUtilization')}
             </h3>
             <div className="space-y-4">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, idx) => {
@@ -155,7 +157,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
           {/* Billable vs Non-Billable */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Billable Breakdown
+              {t('tracker.dashboard.billableBreakdown')}
             </h3>
             <div className="flex items-center justify-center h-48">
               <div className="relative w-48 h-48">
@@ -185,7 +187,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                     {teamMetrics.billablePercent.toFixed(0)}%
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-200">
-                    Billable
+                    {t('tracker.billable')}
                   </div>
                 </div>
               </div>
@@ -195,13 +197,13 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                 <div className="text-2xl font-bold text-green-600 dark:text-green-600">
                   {((teamMetrics.totalHoursWeek * teamMetrics.billablePercent) / 100).toFixed(1)}h
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-200">Billable</div>
+                <div className="text-xs text-gray-600 dark:text-gray-200">{t('tracker.billable')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-600 dark:text-gray-200">
                   {(teamMetrics.totalHoursWeek * (1 - teamMetrics.billablePercent / 100)).toFixed(1)}h
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-200">Non-Billable</div>
+                <div className="text-xs text-gray-600 dark:text-gray-200">{t('tracker.dashboard.nonBillable')}</div>
               </div>
             </div>
           </div>
@@ -210,29 +212,29 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
         {/* Recent Activity */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Time Entries
+            {t('tracker.dashboard.recentTimeEntries')}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-300 dark:border-gray-600">
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    User
+                    {t('tracker.dashboard.user')}
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    Task
+                    {t('tracker.task')}
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    Project
+                    {t('tracker.project')}
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    Duration
+                    {t('tracker.dashboard.duration')}
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    Status
+                    {t('common.status')}
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                    Billable
+                    {t('tracker.billable')}
                   </th>
                 </tr>
               </thead>
@@ -246,10 +248,10 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                       {entry.userName}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-200">
-                      {entry.taskTitle || 'No task'}
+                      {entry.taskTitle || t('tracker.worklog.noTask')}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-200">
-                      {entry.projectName || 'No project'}
+                      {entry.projectName || t('tracker.timesheet.noProject')}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white font-medium">
                       {(entry.duration / 60).toFixed(1)}h

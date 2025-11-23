@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, Trash2, Upload, Link as LinkIcon, Calendar, Clock, Flag, User, Tag, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TeamMember {
   _id: string;
@@ -29,6 +30,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   projectTeam,
   projectId
 }) => {
+  const { t } = useTranslation();
   const [taskData, setTaskData] = useState({
     title: '',
     description: '',
@@ -121,15 +123,15 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   const handleSubmit = () => {
     // Validation
     if (!taskData.title.trim()) {
-      alert('Please enter a task title');
+      alert(t('projects.pleaseEnterTitle'));
       return;
     }
     if (!taskData.assigneeId) {
-      alert('Please assign the task to a team member');
+      alert(t('projects.pleaseSelectAssignee'));
       return;
     }
     if (!taskData.dueDate) {
-      alert('Please set a due date');
+      alert(t('projects.pleaseSelectDueDate'));
       return;
     }
 
@@ -204,7 +206,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">Create New Task</h2>
+          <h2 className="text-xl font-semibold text-gray-900">{t('projects.createTask')}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -218,28 +220,28 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           {/* Task Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Task Title <span className="text-red-500">*</span>
+              {t('projects.taskName')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={taskData.title}
               onChange={(e) => setTaskData({ ...taskData, title: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              placeholder="Enter task title"
+              placeholder={t('projects.enterTaskTitle')}
             />
           </div>
 
           {/* Task Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              {t('projects.taskDescription')}
             </label>
             <textarea
               value={taskData.description}
               onChange={(e) => setTaskData({ ...taskData, description: e.target.value })}
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              placeholder="Describe the task in detail..."
+              placeholder={t('projects.describeTask')}
             />
           </div>
 
@@ -248,39 +250,39 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Tag className="w-4 h-4 inline mr-1" />
-                Task Type
+                {t('projects.taskType')}
               </label>
               <select
                 value={taskData.taskType}
                 onChange={(e) => setTaskData({ ...taskData, taskType: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="task">📋 Task</option>
-                <option value="bug">🐛 Bug</option>
-                <option value="feature">✨ Feature</option>
-                <option value="improvement">🔧 Improvement</option>
-                <option value="research">🔍 Research</option>
-                <option value="documentation">📝 Documentation</option>
+                <option value="task">📋 {t('projects.typeTask')}</option>
+                <option value="bug">🐛 {t('projects.typeBug')}</option>
+                <option value="feature">✨ {t('projects.typeFeature')}</option>
+                <option value="improvement">🔧 {t('projects.typeImprovement')}</option>
+                <option value="research">🔍 {t('projects.typeResearch')}</option>
+                <option value="documentation">📝 {t('projects.typeDocumentation')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-1" />
-                Category
+                {t('projects.category')}
               </label>
               <select
                 value={taskData.category}
                 onChange={(e) => setTaskData({ ...taskData, category: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="development">💻 Development</option>
-                <option value="design">🎨 Design</option>
-                <option value="testing">🧪 Testing</option>
-                <option value="deployment">🚀 Deployment</option>
-                <option value="meeting">👥 Meeting</option>
-                <option value="review">👀 Review</option>
-                <option value="other">📦 Other</option>
+                <option value="development">💻 {t('projects.catDevelopment')}</option>
+                <option value="design">🎨 {t('projects.catDesign')}</option>
+                <option value="testing">🧪 {t('projects.catTesting')}</option>
+                <option value="deployment">🚀 {t('projects.catDeployment')}</option>
+                <option value="meeting">👥 {t('projects.catMeeting')}</option>
+                <option value="review">👀 {t('projects.catReview')}</option>
+                <option value="other">📦 {t('projects.catOther')}</option>
               </select>
             </div>
           </div>
@@ -290,14 +292,14 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
-                Assign To <span className="text-red-500">*</span>
+                {t('projects.assignTo')} <span className="text-red-500">*</span>
               </label>
               <select
                 value={taskData.assigneeId}
                 onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="">Select team member</option>
+                <option value="">{t('projects.selectMember')}</option>
                 {projectTeam.map((member) => (
                   <option key={member._id} value={member._id}>
                     {member.name} ({member.role})
@@ -309,17 +311,17 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Flag className="w-4 h-4 inline mr-1" />
-                Priority
+                {t('projects.priority')}
               </label>
               <select
                 value={taskData.priority}
                 onChange={(e) => setTaskData({ ...taskData, priority: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
+                <option value="low">{t('projects.low')}</option>
+                <option value="medium">{t('projects.medium')}</option>
+                <option value="high">{t('projects.high')}</option>
+                <option value="critical">{t('projects.critical')}</option>
               </select>
             </div>
           </div>
@@ -329,7 +331,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
-                Due Date <span className="text-red-500">*</span>
+                {t('projects.dueDate')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -342,7 +344,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Clock className="w-4 h-4 inline mr-1" />
-                Estimated Hours
+                {t('projects.estimatedTime')}
               </label>
               <input
                 type="number"
@@ -359,16 +361,16 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Initial Status
+              {t('projects.initialStatus')}
             </label>
             <select
               value={taskData.status}
               onChange={(e) => setTaskData({ ...taskData, status: e.target.value as any })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             >
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="blocked">Blocked</option>
+              <option value="pending">{t('projects.todo')}</option>
+              <option value="in-progress">{t('projects.inProgress')}</option>
+              <option value="blocked">{t('projects.blocked')}</option>
             </select>
           </div>
 
@@ -376,7 +378,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <FileText className="w-4 h-4 inline mr-1" />
-              Subtasks / Milestones
+              {t('projects.subtasks')}
             </label>
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -386,14 +388,14 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   onChange={(e) => setNewSubtask(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="Add a subtask..."
+                  placeholder={t('projects.addSubtask')}
                 />
                 <button
                   onClick={handleAddSubtask}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  Add
+                  {t('common.add')}
                 </button>
               </div>
 
@@ -419,7 +421,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Tag className="w-4 h-4 inline mr-1" />
-              Tags
+              {t('projects.tags')}
             </label>
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -429,14 +431,14 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="Add a tag..."
+                  placeholder={t('projects.addTag')}
                 />
                 <button
                   onClick={handleAddTag}
                   className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  Add
+                  {t('common.add')}
                 </button>
               </div>
 
@@ -465,7 +467,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Upload className="w-4 h-4 inline mr-1" />
-              Attachments
+              {t('projects.attachments')}
             </label>
             <div className="space-y-2">
               <input
@@ -499,7 +501,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <LinkIcon className="w-4 h-4 inline mr-1" />
-              Links
+              {t('projects.links')}
             </label>
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -509,14 +511,14 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   onChange={(e) => setNewLink(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddLink()}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="https://example.com"
+                  placeholder={t('projects.enterLink')}
                 />
                 <button
                   onClick={handleAddLink}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  Add
+                  {t('common.add')}
                 </button>
               </div>
 
@@ -552,13 +554,13 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             onClick={onClose}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleSubmit}
             className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
-            Create Task
+            {t('projects.createTask')}
           </button>
         </div>
       </div>

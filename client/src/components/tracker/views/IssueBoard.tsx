@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Plus, Clock, User } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
+import { useTranslation } from 'react-i18next';
 
 interface IssueBoardProps {
   searchQuery: string;
 }
 
 const IssueBoard: React.FC<IssueBoardProps> = ({ searchQuery }) => {
+  const { t } = useTranslation();
   const { issues, createIssue, updateIssue, resolveIssue } = useTracker();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const columns = [
-    { id: 'reported', label: 'Reported', color: 'bg-gray-300' },
-    { id: 'investigating', label: 'Investigating', color: 'bg-yellow-200' },
-    { id: 'in_progress', label: 'In Progress', color: 'bg-blue-200' },
-    { id: 'resolved', label: 'Resolved', color: 'bg-green-200' }
+    { id: 'reported', label: t('tracker.issueBoard.columns.reported'), color: 'bg-gray-300' },
+    { id: 'investigating', label: t('tracker.issueBoard.columns.investigating'), color: 'bg-yellow-200' },
+    { id: 'in_progress', label: t('tracker.issueBoard.columns.inProgress'), color: 'bg-blue-200' },
+    { id: 'resolved', label: t('tracker.issueBoard.columns.resolved'), color: 'bg-green-200' }
   ];
 
   const getSeverityColor = (severity: string) => {
@@ -81,13 +83,13 @@ const IssueBoard: React.FC<IssueBoardProps> = ({ searchQuery }) => {
                   </p>
                   {issue.linkedTaskTitle && (
                     <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-                      Task: {issue.linkedTaskTitle}
+                      {t('tracker.issueBoard.taskLabel')} {issue.linkedTaskTitle}
                     </div>
                   )}
                   <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-200">
                     <div className="flex items-center gap-1">
                       <User className="w-3 h-3" />
-                      {issue.assigneeName || 'Unassigned'}
+                      {issue.assigneeName || t('tracker.issueBoard.unassigned')}
                     </div>
                     {issue.slaDeadline && (
                       <div className={`flex items-center gap-1 ${issue.slaBreached ? 'text-red-600' : ''}`}>

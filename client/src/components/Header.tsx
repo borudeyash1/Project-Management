@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
@@ -14,13 +14,17 @@ import {
   LogOut,
   ChevronDown,
   Menu,
-  X
+  X,
+  Globe
 } from 'lucide-react';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC = () => {
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   const toggleUserMenu = () => {
     dispatch({ type: 'TOGGLE_USER_MENU' });
@@ -32,6 +36,11 @@ const Header: React.FC = () => {
 
   const toggleNotifications = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: 'notifications' });
+  };
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setShowLanguageMenu(false);
   };
 
   const handleLogout = async () => {
@@ -84,7 +93,7 @@ const Header: React.FC = () => {
             <input
               type="text"
               className="w-64 rounded-lg border border-border dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
-              placeholder="Search projects, tasks, people..."
+              placeholder={t('forms.searchPlaceholder')}
             />
           </div>
         </div>
@@ -107,6 +116,41 @@ const Header: React.FC = () => {
         >
           <Settings className="w-4 h-4" />
         </button>
+
+        {/* Language Switcher */}
+        <div className="relative">
+          <button
+            className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700"
+            onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+          >
+            <Globe className="w-4 h-4" />
+          </button>
+
+          {showLanguageMenu && (
+            <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50">
+              <div className="p-2">
+                <button
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
+                    i18n.language === 'en' ? 'bg-slate-100 dark:bg-gray-700' : ''
+                  }`}
+                  onClick={() => changeLanguage('en')}
+                >
+                  <span className="text-lg">🇺🇸</span>
+                  <span className="dark:text-gray-200">English</span>
+                </button>
+                <button
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
+                    i18n.language === 'ja' ? 'bg-slate-100 dark:bg-gray-700' : ''
+                  }`}
+                  onClick={() => changeLanguage('ja')}
+                >
+                  <span className="text-lg">🇯🇵</span>
+                  <span className="dark:text-gray-200">日本語</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* User Menu */}
         <div className="relative">
@@ -151,7 +195,7 @@ const Header: React.FC = () => {
                   }}
                 >
                   <User className="w-4 h-4" />
-                  Profile
+                  {t('common.profile')}
                 </button>
 
                 <button
@@ -162,7 +206,7 @@ const Header: React.FC = () => {
                   }}
                 >
                   <Settings className="w-4 h-4" />
-                  Settings
+                  {t('common.settings')}
                 </button>
 
                 <hr className="my-2" />
@@ -172,7 +216,7 @@ const Header: React.FC = () => {
                   onClick={handleLogout}
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign out
+                  {t('buttons.logOut')}
                 </button>
               </div>
             </div>

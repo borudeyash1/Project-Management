@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { BarChart3, Download, Calendar, Users, DollarSign } from 'lucide-react';
 import { useTracker } from '../../../context/TrackerContext';
+import { useTranslation } from 'react-i18next';
 
 interface ReportsBuilderProps {
   searchQuery: string;
 }
 
 const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
+  const { t } = useTranslation();
   const { timeEntries, issues, teamMetrics } = useTracker();
   const [reportType, setReportType] = useState('time-by-project');
 
   const reports = [
-    { id: 'time-by-project', label: 'Time by Project', icon: BarChart3 },
-    { id: 'time-by-user', label: 'Time by User', icon: Users },
-    { id: 'billable-summary', label: 'Billable Summary', icon: DollarSign },
-    { id: 'overtime-trends', label: 'Overtime Trends', icon: Calendar }
+    { id: 'time-by-project', label: t('tracker.reportsBuilder.types.timeByProject'), icon: BarChart3 },
+    { id: 'time-by-user', label: t('tracker.reportsBuilder.types.timeByUser'), icon: Users },
+    { id: 'billable-summary', label: t('tracker.reportsBuilder.types.billableSummary'), icon: DollarSign },
+    { id: 'overtime-trends', label: t('tracker.reportsBuilder.types.overtimeTrends'), icon: Calendar }
   ];
 
   return (
@@ -49,7 +51,7 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
             </h2>
             <button className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
               <Download className="w-4 h-4" />
-              Export CSV
+              {t('tracker.reportsBuilder.exportCSV')}
             </button>
           </div>
 
@@ -57,19 +59,19 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Hours</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.reportsBuilder.metrics.totalHours')}</div>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
                   {teamMetrics.totalHoursWeek.toFixed(1)}
                 </div>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Billable %</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.reportsBuilder.metrics.billablePercent')}</div>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-600">
                   {teamMetrics.billablePercent.toFixed(0)}%
                 </div>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Overtime</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('tracker.reportsBuilder.metrics.overtime')}</div>
                 <div className="text-2xl font-bold text-orange-600 dark:text-orange-500">
                   {teamMetrics.overtimeHours.toFixed(1)}h
                 </div>
@@ -81,16 +83,16 @@ const ReportsBuilder: React.FC<ReportsBuilderProps> = ({ searchQuery }) => {
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                      Project
+                      {t('tracker.reportsBuilder.table.project')}
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                      Hours
+                      {t('tracker.reportsBuilder.table.hours')}
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                      Billable
+                      {t('tracker.reportsBuilder.table.billable')}
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-700">
-                      Non-Billable
+                      {t('tracker.reportsBuilder.table.nonBillable')}
                     </th>
                   </tr>
                 </thead>
