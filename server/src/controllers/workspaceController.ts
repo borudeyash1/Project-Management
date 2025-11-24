@@ -459,6 +459,8 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     const { id, memberId } = req.params;
     const currentUserId = req.user!._id;
 
+    console.log('🔍 [REMOVE MEMBER] Workspace:', id, 'Member to remove:', memberId, 'Requested by:', currentUserId);
+
     const workspace = await Workspace.findOne({
       _id: id,
       $or: [
@@ -468,6 +470,7 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     });
 
     if (!workspace) {
+      console.log('❌ [REMOVE MEMBER] Workspace not found or access denied');
       res.status(404).json({
         success: false,
         message: 'Workspace not found or access denied'
@@ -475,20 +478,69 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
       return;
     }
 
-    // Remove member
+    // Prevent removing the workspace owner
+    if (workspace.owner.toString() === memberId) {
+      console.log('❌ [REMOVE MEMBER] Cannot remove workspace owner');
+      res.status(400).json({
+        success: false,
+        message: 'Cannot remove the workspace owner'
+      });
+      return;
+    }
+
+    // Check if member exists in workspace
+    const memberExists = workspace.members.some((member: any) => 
+      member.user.toString() === memberId
+    );
+
+    if (!memberExists) {
+      console.log('❌ [REMOVE MEMBER] Member not found in workspace');
+      res.status(404).json({
+        success: false,
+        message: 'Member not found in this workspace'
+      });
+      return;
+    }
+
+    console.log('🔄 [REMOVE MEMBER] Removing member from workspace...');
+    
+    // IMPORTANT: Clean up any pending join requests first
+    // This prevents duplicate key errors if the user tries to rejoin later
+    const deletedRequests = await JoinRequest.deleteMany({
+      workspace: id,
+      user: memberId
+    });
+    
+    if (deletedRequests.deletedCount > 0) {
+      console.log(`🗑️ [REMOVE MEMBER] Deleted ${deletedRequests.deletedCount} pending join request(s)`);
+    }
+    
+    // Remove member from workspace
+    // Their historical data (tasks, activities, project contributions) is preserved
+    // This only filters the members array
     await workspace.removeMember(memberId as string);
+
+    console.log('✅ [REMOVE MEMBER] Member removed from workspace');
+    console.log('📝 [REMOVE MEMBER] Historical data preserved (tasks, activities, contributions)');
+
+    // Note: We do NOT delete:
+    // - Tasks created/assigned to this user
+    // - Activities logged by this user
+    // - Project contributions
+    // - Comments or other content
+    // These remain for audit trail and historical accuracy
 
     await workspace.populate('members.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IWorkspace> = {
       success: true,
-      message: 'Member removed successfully',
+      message: 'Member removed successfully. Their historical data has been preserved.',
       data: workspace
     };
 
     res.status(200).json(response);
   } catch (error: any) {
-    console.error('Remove member error:', error);
+    console.error('❌ [REMOVE MEMBER] Error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'
