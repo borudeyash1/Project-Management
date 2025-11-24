@@ -17,7 +17,12 @@ import {
   rejectWorkspaceInvite,
   getSentInvitations,
   getReceivedInvitations,
-  cancelWorkspaceInvite
+  cancelWorkspaceInvite,
+  sendJoinRequest,
+  getJoinRequests,
+  approveJoinRequest,
+  rejectJoinRequest,
+  cancelJoinRequest
 } from '../controllers/workspaceController';
 import { sendMemberRemovalOtp, validateMemberRemovalOtp } from '../controllers/memberRemovalOtp';
 
@@ -48,5 +53,12 @@ router.post('/:id/reject-invite', rejectWorkspaceInvite);
 router.get('/invitations/received', getReceivedInvitations);
 router.get('/:id/invitations', getSentInvitations);
 router.delete('/:id/invitations/:invitationId', cancelWorkspaceInvite);
+
+// Join request routes
+router.post('/:id/join-request', sendJoinRequest);
+router.delete('/:id/join-request', cancelJoinRequest);
+router.get('/:id/join-requests', getJoinRequests);
+router.post('/:id/join-requests/:requestId/approve', approveJoinRequest);
+router.post('/:id/join-requests/:requestId/reject', rejectJoinRequest);
 
 export default router;

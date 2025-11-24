@@ -27,10 +27,12 @@ export default function WorkspaceJoinRequests({ workspaceId }: Props) {
   const loadRequests = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('🔍 [FRONTEND] Fetching join requests for workspace:', workspaceId);
       const data = await api.getJoinRequests(workspaceId);
+      console.log('✅ [FRONTEND] Received join requests:', data);
       setRequests(data);
     } catch (error) {
-      console.error('Failed to load join requests:', error);
+      console.error('❌ [FRONTEND] Failed to load join requests:', error);
       dispatch({
         type: 'ADD_TOAST',
         payload: {

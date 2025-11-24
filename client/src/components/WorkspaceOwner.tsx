@@ -732,7 +732,10 @@ const WorkspaceOwner: React.FC = () => {
         <div className="p-6">
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'join-requests' && state.currentWorkspace && (
-            <WorkspaceJoinRequests workspaceId={state.currentWorkspace} />
+            <>
+              {console.log('🔍 [WORKSPACE OWNER] Rendering Join Requests tab for workspace:', state.currentWorkspace)}
+              <WorkspaceJoinRequests workspaceId={state.currentWorkspace} />
+            </>
           )}
           {activeTab === 'clients' && renderClients()}
           {activeTab === 'employees' && renderEmployees()}

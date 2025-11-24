@@ -18,3 +18,8 @@
   async cancelWorkspaceInvite(workspaceId: string, invitationId: string): Promise<void> {
     await this.delete(`/workspaces/${workspaceId}/invitations/${invitationId}`);
   }
+
+  // Join request management
+  async cancelJoinRequest(workspaceId: string): Promise<void> {
+    await this.delete(`/workspaces/${workspaceId}/join-request`);
+  }

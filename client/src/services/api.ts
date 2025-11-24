@@ -488,6 +488,10 @@ class ApiService {
     await this.post(`/workspaces/${workspaceId}/join-requests/${requestId}/reject`, {});
   }
 
+
+  async cancelJoinRequest(workspaceId: string): Promise<void> {
+    await this.delete(`/workspaces/${workspaceId}/join-request`);
+  }
   // Workspace settings
   async updateWorkspaceSettings(workspaceId: string, settings: any): Promise<Workspace> {
     const response = await this.put<Workspace>(`/workspaces/${workspaceId}/settings`, { settings });

@@ -4,6 +4,7 @@ import User from '../models/User';
 import Notification from '../models/Notification';
 import SubscriptionPlan from '../models/SubscriptionPlan';
 import WorkspaceInvitation from '../models/WorkspaceInvitation';
+import JoinRequest from '../models/JoinRequest';
 import { sendEmail } from '../services/emailService';
 import { generateOTP, OTP_VALIDITY_MS } from '../utils/otp';
 import { AuthenticatedRequest, ApiResponse, IWorkspace } from '../types';
@@ -126,8 +127,8 @@ export const discoverWorkspaces: RequestHandler = async (req, res) => {
       .populate('owner', 'fullName email avatarUrl')
       .sort({ createdAt: -1 });
 
-    // For each workspace, check if current user has pending invitation
-    const workspacesWithInviteStatus = await Promise.all(
+    // For each workspace, check if current user has pending invitation or join request
+    const workspacesWithStatus = await Promise.all(
       workspaces.map(async (workspace) => {
         const pendingInvite = await WorkspaceInvitation.findOne({
           workspace: workspace._id,
@@ -135,9 +136,16 @@ export const discoverWorkspaces: RequestHandler = async (req, res) => {
           status: 'pending'
         });
 
+        const pendingJoinRequest = await JoinRequest.findOne({
+          workspace: workspace._id,
+          user: currentUserId,
+          status: 'pending'
+        });
+
         return {
           ...workspace.toJSON(),
-          hasPendingInvite: !!pendingInvite
+          hasPendingInvite: !!pendingInvite,
+          hasPendingJoinRequest: !!pendingJoinRequest
         };
       })
     );
@@ -145,7 +153,7 @@ export const discoverWorkspaces: RequestHandler = async (req, res) => {
     const response: ApiResponse<any[]> = {
       success: true,
       message: 'Workspaces retrieved successfully',
-      data: workspacesWithInviteStatus
+      data: workspacesWithStatus
     };
 
     res.status(200).json(response);
@@ -843,6 +851,280 @@ export const cancelWorkspaceInvite: RequestHandler = async (req, res) => {
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Cancel workspace invite error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Send join request to workspace
+export const sendJoinRequest: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+    const authReq = req as AuthenticatedRequest;
+    const currentUserId = authReq.user!._id.toString();
+
+    const workspace = await Workspace.findById(id);
+    if (!workspace || workspace.isActive === false) {
+      res.status(404).json({ success: false, message: 'Workspace not found' });
+      return;
+    }
+
+    // Check if user is already a member
+    if (workspace.isMember(currentUserId)) {
+      res.status(400).json({ success: false, message: 'You are already a member of this workspace' });
+      return;
+    }
+
+    // Check if there's already a pending join request
+    const existingRequest = await JoinRequest.findOne({
+      workspace: id,
+      user: currentUserId,
+      status: 'pending'
+    });
+
+    if (existingRequest) {
+      res.status(400).json({ success: false, message: 'You already have a pending join request for this workspace' });
+      return;
+    }
+
+    // Create join request
+    console.log('🔍 [JOIN REQUEST] Creating join request for workspace:', id, 'user:', currentUserId);
+    const joinRequest = await JoinRequest.create({
+      workspace: id,
+      user: currentUserId,
+      message: message || '',
+      status: 'pending'
+    });
+    console.log('✅ [JOIN REQUEST] Join request created:', joinRequest._id);
+
+    // Create notification for workspace owner
+    await Notification.create({
+      type: 'workspace',
+      title: `New join request for ${workspace.name}`,
+      message: `${authReq.user!.fullName || 'A user'} has requested to join your workspace "${workspace.name}"`,
+      userId: workspace.owner,
+      relatedId: workspace._id.toString()
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Join request sent successfully',
+      data: joinRequest
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Send join request error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Get join requests for a workspace (for workspace owner/admin)
+export const getJoinRequests: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthenticatedRequest;
+    const currentUserId = authReq.user!._id;
+
+    // Verify user has access to this workspace
+    const workspace = await Workspace.findOne({
+      _id: id,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    console.log('🔍 [GET JOIN REQUESTS] Fetching join requests for workspace:', id);
+
+    const joinRequests = await JoinRequest.find({
+      workspace: id,
+      status: 'pending'  // Only get pending requests
+    })
+      .populate('user', 'fullName email avatarUrl')
+      .sort({ createdAt: -1 });
+
+    console.log('✅ [GET JOIN REQUESTS] Found', joinRequests.length, 'pending join requests');
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Join requests retrieved successfully',
+      data: joinRequests
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('❌ [GET JOIN REQUESTS] Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Approve join request
+export const approveJoinRequest: RequestHandler = async (req, res) => {
+  try {
+    const { id, requestId } = req.params;
+    const authReq = req as AuthenticatedRequest;
+    const currentUserId = authReq.user!._id;
+
+    // Verify user has access to this workspace
+    const workspace = await Workspace.findOne({
+      _id: id,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    const joinRequest = await JoinRequest.findOne({
+      _id: requestId,
+      workspace: id,
+      status: 'pending'
+    });
+
+    if (!joinRequest) {
+      res.status(404).json({ success: false, message: 'Join request not found or already processed' });
+      return;
+    }
+
+    // Update join request status
+    joinRequest.status = 'approved';
+    await joinRequest.save();
+
+    // Add user to workspace
+    await workspace.addMember(joinRequest.user, 'member');
+
+    // Create notification for the user
+    await Notification.create({
+      type: 'workspace',
+      title: `Join request approved`,
+      message: `Your request to join "${workspace.name}" has been approved`,
+      userId: joinRequest.user,
+      relatedId: workspace._id.toString()
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Join request approved successfully'
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Approve join request error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Reject join request
+export const rejectJoinRequest: RequestHandler = async (req, res) => {
+  try {
+    const { id, requestId } = req.params;
+    const authReq = req as AuthenticatedRequest;
+    const currentUserId = authReq.user!._id;
+
+    // Verify user has access to this workspace
+    const workspace = await Workspace.findOne({
+      _id: id,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    const joinRequest = await JoinRequest.findOne({
+      _id: requestId,
+      workspace: id,
+      status: 'pending'
+    });
+
+    if (!joinRequest) {
+      res.status(404).json({ success: false, message: 'Join request not found or already processed' });
+      return;
+    }
+
+    // Update join request status
+    joinRequest.status = 'rejected';
+    await joinRequest.save();
+
+    // Create notification for the user
+    await Notification.create({
+      type: 'workspace',
+      title: `Join request rejected`,
+      message: `Your request to join "${workspace.name}" has been rejected`,
+      userId: joinRequest.user,
+      relatedId: workspace._id.toString()
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Join request rejected successfully'
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Reject join request error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Cancel own join request (for users who sent the request)
+export const cancelJoinRequest: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params; // workspace id
+    const authReq = req as AuthenticatedRequest;
+    const currentUserId = authReq.user!._id.toString();
+
+    console.log('🔍 [CANCEL JOIN REQUEST] Looking for join request - workspace:', id, 'user:', currentUserId);
+
+    // Find the user's pending join request
+    const joinRequest = await JoinRequest.findOne({
+      workspace: id,
+      user: currentUserId,
+      status: 'pending'
+    });
+
+    console.log('🔍 [CANCEL JOIN REQUEST] Found join request:', joinRequest ? joinRequest._id : 'NOT FOUND');
+
+    if (!joinRequest) {
+      res.status(404).json({ success: false, message: 'No pending join request found' });
+      return;
+    }
+
+    // Delete the join request
+    await JoinRequest.deleteOne({ _id: joinRequest._id });
+    console.log('✅ [CANCEL JOIN REQUEST] Join request cancelled successfully');
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Join request cancelled successfully'
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('❌ [CANCEL JOIN REQUEST] Error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
