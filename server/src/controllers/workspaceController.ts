@@ -504,9 +504,20 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
 
     console.log('🔄 [REMOVE MEMBER] Removing member from workspace...');
     
-    // IMPORTANT: We only remove them from the workspace members list
+    // IMPORTANT: Clean up any pending join requests first
+    // This prevents duplicate key errors if the user tries to rejoin later
+    const deletedRequests = await JoinRequest.deleteMany({
+      workspace: id,
+      user: memberId
+    });
+    
+    if (deletedRequests.deletedCount > 0) {
+      console.log(`🗑️ [REMOVE MEMBER] Deleted ${deletedRequests.deletedCount} pending join request(s)`);
+    }
+    
+    // Remove member from workspace
     // Their historical data (tasks, activities, project contributions) is preserved
-    // This is done by the removeMember method which only filters the members array
+    // This only filters the members array
     await workspace.removeMember(memberId as string);
 
     console.log('✅ [REMOVE MEMBER] Member removed from workspace');
