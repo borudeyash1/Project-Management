@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
-import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar, UserCheck, UserX, AlertCircle } from 'lucide-react';
+import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar, UserCheck, UserX, AlertCircle, Loader2 } from 'lucide-react';
 import api from '../../services/api';
+import RemoveMemberModal from '../RemoveMemberModal';
 
 interface Member {
   _id: string;
@@ -37,6 +38,9 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
   const [inviteEmail, setInviteEmail] = useState('');
   const [userSearch, setUserSearch] = useState('');
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
+  const [processingRequestId, setProcessingRequestId] = useState<string | null>(null);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
   const [directoryUsers, setDirectoryUsers] = useState<{
     _id: string;
     fullName: string;
@@ -241,8 +245,14 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
   };
 
   const handleAcceptRequest = async (request: JoinRequest) => {
+    if (processingRequestId) return; // Prevent double-clicks
+    
     try {
+      setProcessingRequestId(request.id);
+      console.log('🔍 [APPROVE] Approving join request:', request.id, 'for workspace:', workspaceId);
+      
       await api.approveJoinRequest(workspaceId, request.id);
+      console.log('✅ [APPROVE] Join request approved successfully');
       
       // Remove from local state
       setJoinRequests((prev) => prev.filter((req) => req.id !== request.id));
@@ -252,31 +262,41 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: t('workspace.members.toast.accepted', { name: request.name }),
+          message: `${request.name} has been added to the workspace`,
           duration: 3000
         }
       });
       
       // Refresh workspace data to show new member
+      console.log('🔄 [APPROVE] Refreshing workspaces...');
       const workspaces = await api.getWorkspaces();
       dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
+      console.log('✅ [APPROVE] Workspaces refreshed');
     } catch (error: any) {
-      console.error('Failed to approve join request:', error);
+      console.error('❌ [APPROVE] Failed to approve join request:', error);
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: error?.message || t('workspace.members.toast.acceptError'),
+          message: error?.message || 'Failed to approve request',
           duration: 3000
         }
       });
+    } finally {
+      setProcessingRequestId(null);
     }
   };
 
   const handleDeclineRequest = async (requestId: string) => {
+    if (processingRequestId) return; // Prevent double-clicks
+    
     try {
+      setProcessingRequestId(requestId);
+      console.log('🔍 [DECLINE] Declining join request:', requestId, 'for workspace:', workspaceId);
+      
       await api.rejectJoinRequest(workspaceId, requestId);
+      console.log('✅ [DECLINE] Join request declined successfully');
       
       // Remove from local state
       setJoinRequests((prev) => prev.filter((req) => req.id !== requestId));
@@ -286,33 +306,65 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         payload: {
           id: Date.now().toString(),
           type: 'info',
-          message: t('workspace.members.toast.declined'),
+          message: 'Request declined',
           duration: 2500
         }
       });
     } catch (error: any) {
-      console.error('Failed to reject join request:', error);
+      console.error('❌ [DECLINE] Failed to reject join request:', error);
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: error?.message || t('workspace.members.toast.declineError'),
+          message: error?.message || 'Failed to decline request',
           duration: 3000
         }
       });
+    } finally {
+      setProcessingRequestId(null);
     }
   };
 
-  const handleRemoveMember = (memberId: string) => {
-    if (window.confirm(t('workspace.members.confirmRemove'))) {
-      setMembers(members.filter((m) => m._id !== memberId));
+  const handleRemoveMember = (member: Member) => {
+    setMemberToRemove(member);
+    setShowRemoveModal(true);
+  };
+
+  const confirmRemoveMember = async () => {
+    if (!memberToRemove) return;
+
+    try {
+      console.log('🔍 [FRONTEND] Removing member:', memberToRemove._id);
+      
+      await api.removeMember(workspaceId, memberToRemove.userId);
+      
+      console.log('✅ [FRONTEND] Member removed successfully');
+      
+      // Remove from local state
+      setMembers(members.filter((m) => m._id !== memberToRemove._id));
+      
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: t('workspace.members.toast.removed'),
+          message: `${memberToRemove.name} has been removed from the workspace`,
+          duration: 3000
+        }
+      });
+
+      // Refresh workspace data
+      const workspaces = await api.getWorkspaces();
+      dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
+    } catch (error: any) {
+      console.error('❌ [FRONTEND] Failed to remove member:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to remove member',
           duration: 3000
         }
       });
@@ -398,17 +450,11 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                     {member.status}
                   </span>
                   {canManageMembers && member.userId !== workspace?.owner && (
-
                     <button
-
-                      onClick={() => handleRemoveMember(member._id)}
-
+                      onClick={() => handleRemoveMember(member)}
                       className="text-red-600 hover:text-red-700 p-1"
-
                       title="Remove member"
-
                     >
-
                       <Trash2 className="w-4 h-4" />
 
                     </button>
@@ -554,17 +600,27 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                     <>
                       <button
                         onClick={() => handleAcceptRequest(request)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                        disabled={processingRequestId === request.id}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <UserCheck className="w-4 h-4" />
-                        {t('workspace.members.accept')}
+                        {processingRequestId === request.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <UserCheck className="w-4 h-4" />
+                        )}
+                        {processingRequestId === request.id ? 'Accepting...' : 'Accept'}
                       </button>
                       <button
                         onClick={() => handleDeclineRequest(request.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
+                        disabled={processingRequestId === request.id}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <UserX className="w-4 h-4" />
-                        {t('workspace.members.decline')}
+                        {processingRequestId === request.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <UserX className="w-4 h-4" />
+                        )}
+                        {processingRequestId === request.id ? 'Declining...' : 'Decline'}
                       </button>
                     </>
                   )}
@@ -655,6 +711,18 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
           </div>
         </div>
       )}
+
+      {/* Remove Member Modal */}
+      <RemoveMemberModal
+        isOpen={showRemoveModal}
+        memberName={memberToRemove?.name || ''}
+        memberEmail={memberToRemove?.email || ''}
+        onConfirm={confirmRemoveMember}
+        onCancel={() => {
+          setShowRemoveModal(false);
+          setMemberToRemove(null);
+        }}
+      />
     </div>
   );
 };

@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle } from 'lucide-react';
+import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle, Loader2, Clock, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
-=======
-import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle, Loader2, Clock, X } from 'lucide-react';
->>>>>>> 5fa803fe14cbdda8c34bc2fdc3563695f8d0d6a8
 import { useApp } from '../context/AppContext';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';

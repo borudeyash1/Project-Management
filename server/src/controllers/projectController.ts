@@ -210,12 +210,36 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    const projects = await Project.find({
+    // Check if user is workspace owner or admin
+    const isWorkspaceOwner = workspace.owner.toString() === userId.toString();
+    const isWorkspaceAdmin = workspace.members.some(
+      (member: any) => 
+        member.user.toString() === userId.toString() && 
+        (member.role === 'admin' || member.role === 'owner')
+    );
+
+    console.log('🔍 [GET PROJECTS] User:', userId, 'Workspace:', resolvedWorkspaceId);
+    console.log('🔍 [GET PROJECTS] Is owner:', isWorkspaceOwner, 'Is admin:', isWorkspaceAdmin);
+
+    // Build query based on user role
+    let projectQuery: any = {
       workspace: resolvedWorkspaceId,
       isActive: true
-    })
+    };
+
+    // If user is not workspace owner/admin, only show projects they're assigned to
+    if (!isWorkspaceOwner && !isWorkspaceAdmin) {
+      projectQuery['teamMembers.user'] = userId;
+      console.log('🔍 [GET PROJECTS] Regular member - filtering by team membership');
+    } else {
+      console.log('🔍 [GET PROJECTS] Owner/Admin - showing all workspace projects');
+    }
+
+    const projects = await Project.find(projectQuery)
       .populate('teamMembers.user', 'fullName email avatarUrl')
       .sort({ createdAt: -1 });
+
+    console.log('✅ [GET PROJECTS] Found', projects.length, 'projects');
 
     const response: ApiResponse<IProject[]> = {
       success: true,

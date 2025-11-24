@@ -498,9 +498,9 @@ class ApiService {
     return response.data!;
   }
 
-  // Member management with OTP
-  async removeMember(workspaceId: string, memberId: string, reason: string, otp: string): Promise<void> {
-    await this.delete(`/workspaces/${workspaceId}/members/${memberId}?reason=${encodeURIComponent(reason)}&otp=${otp}`);
+  // Member management
+  async removeMember(workspaceId: string, memberId: string): Promise<void> {
+    await this.delete(`/workspaces/${workspaceId}/members/${memberId}`);
   }
 
   async sendMemberRemovalOtp(workspaceId: string): Promise<void> {
