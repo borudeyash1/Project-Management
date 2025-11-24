@@ -5,6 +5,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
+import passport from 'passport';
+import path from 'path';
 
 // Routes
 import authRoutes from "./routes/auth";
@@ -32,6 +34,10 @@ import attendanceRoutes from "./routes/attendance";
 import documentationRoutes from "./routes/documentation";
 import activityRoutes from "./routes/activity";
 import contentRoutes from "./routes/content";
+import sartthiAuthRoutes from "./routes/sartthi-auth";
+import sartthiMailRoutes from "./routes/sartthi-mail";
+import sartthiCalendarRoutes from "./routes/sartthi-calendar";
+import sartthiVaultRoutes from "./routes/sartthi-vault";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 
 // Load environment variables
@@ -43,9 +49,31 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [
+    'https://sartthi.com',
+    'https://www.sartthi.com',
+    'https://mail.sartthi.com',
+    'https://calendar.sartthi.com',
+    'https://drive.sartthi.com',
+  ]
+  : [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+  ];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "https://sartthi.com",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -54,8 +82,8 @@ app.use(
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: "Too many requests from this IP, please try again later.",
   skip: (req) => req.path.startsWith("/admin/subscriptions"),
 });
@@ -68,16 +96,21 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Serve uploaded files (fallback for local storage)
-import path from 'path';
+// Initialize Passport
+app.use(passport.initialize());
+
+// Serve uploaded files
 const uploadsPath = path.join(process.cwd(), 'uploads');
 console.log('📁 [SERVER] Serving uploads from:', uploadsPath);
-// Serve at both root and /api to handle different client configurations
 app.use('/uploads', express.static(uploadsPath));
 app.use('/api/uploads', express.static(uploadsPath));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/auth/sartthi", sartthiAuthRoutes);
+app.use("/api/mail", sartthiMailRoutes);
+app.use("/api/calendar", sartthiCalendarRoutes);
+app.use("/api/vault", sartthiVaultRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/projects", projectRoutes);
@@ -99,7 +132,6 @@ app.use("/api/releases", desktopReleaseRoutes);
 app.use("/api/home", homeRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
-app.use("/api/inbox", inboxRoutes);
 app.use("/api/docs", documentationRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/content", contentRoutes);

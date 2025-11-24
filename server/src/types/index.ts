@@ -95,6 +95,28 @@ export interface IUser extends Document {
       twoFactorAuth: boolean;
     };
   };
+  // Sartthi Ecosystem Modules
+  modules?: {
+    mail?: {
+      isEnabled: boolean;
+      refreshToken?: string | null;
+      connectedAt?: Date;
+      lastSyncedAt?: Date;
+    };
+    calendar?: {
+      isEnabled: boolean;
+      refreshToken?: string | null;
+      connectedAt?: Date;
+      lastSyncedAt?: Date;
+    };
+    vault?: {
+      isEnabled: boolean;
+      rootFolderId?: string;
+      refreshToken?: string | null;
+      connectedAt?: Date;
+      lastSyncedAt?: Date;
+    };
+  };
   // Enhanced profile information for AI-powered insights
   profile?: {
     // Professional Information

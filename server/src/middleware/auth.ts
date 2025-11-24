@@ -8,18 +8,16 @@ import { AuthenticatedRequest, JWTPayload } from '../types';
 // Verify JWT token
 export const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization; 
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        success: false,
-        message: 'Access denied. No token provided.'
-      });
-      return;
+    const authHeader = req.headers.authorization;
+    let token;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (req.query.token) {
+      // Fallback to query parameter for OAuth redirects
+      token = req.query.token as string;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    
     if (!token) {
       res.status(401).json({
         success: false,
@@ -30,9 +28,9 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    
-    console.log('🔍 [AUTH] Token decoded:', { id: decoded.id, type: decoded.type, role: decoded.role });
-    
+
+    // console.log('🔍 [AUTH] Token decoded:', { id: decoded.id, type: decoded.type, role: decoded.role });
+
     // Check if this is an admin token
     if (decoded.type === 'admin') {
       const admin = await Admin.findById(decoded.id).select('-password');
@@ -54,14 +52,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         return;
       }
 
-      console.log('✅ [AUTH] Admin authenticated:', admin.email);
+      // console.log('✅ [AUTH] Admin authenticated:', admin.email);
       const authReq = req as AuthenticatedRequest;
       authReq.user = admin as any;
       authReq.isAdmin = true;
       next();
       return;
     }
-    
+
     // Regular user authentication
     const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
@@ -83,7 +81,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    console.log('✅ [AUTH] User authenticated:', user.email);
+    // console.log('✅ [AUTH] User authenticated:', user.email);
     (req as AuthenticatedRequest).user = user;
     next();
   } catch (error: any) {
@@ -94,7 +92,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       });
       return;
     }
-    
+
     if (error.name === 'TokenExpiredError') {
       res.status(401).json({
         success: false,
@@ -111,11 +109,57 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
+// Verify JWT token from Query Parameter (for OAuth redirects)
+export const authenticateQuery = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const token = req.query.token as string;
+
+    if (!token) {
+      res.status(401).json({
+        success: false,
+        message: 'Access denied. No token provided in query.'
+      });
+      return;
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    // Regular user authentication
+    const user = await User.findById(decoded.userId).select('-password');
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: 'Token is valid but user no longer exists.'
+      });
+      return;
+    }
+
+    if (!user.isActive) {
+      res.status(401).json({
+        success: false,
+        message: 'Account has been deactivated.'
+      });
+      return;
+    }
+
+    console.log('✅ [AUTH QUERY] User authenticated:', user.email);
+    (req as AuthenticatedRequest).user = user;
+    next();
+  } catch (error: any) {
+    console.error('Auth query middleware error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token.'
+    });
+  }
+};
+
 // Verify refresh token
 export const authenticateRefresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { refreshToken } = req.body;
-    
+
     if (!refreshToken) {
       res.status(401).json({
         success: false,
@@ -126,7 +170,7 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
 
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as JWTPayload;
-    
+
     // Check if user exists
     const user = await User.findById(decoded.userId);
     if (!user) {
@@ -159,7 +203,7 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
       });
       return;
     }
-    
+
     if (error.name === 'TokenExpiredError') {
       res.status(401).json({
         success: false,
@@ -180,26 +224,26 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
 export const optionalAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return next();
     }
 
     const token = authHeader.substring(7);
-    
+
     if (!token) {
       return next();
     }
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
-    
+
     // Check if user still exists
     const user = await User.findById(decoded.userId).select('-password');
     if (user && user.isActive) {
       req.user = user;
     }
-    
+
     next();
   } catch (error) {
     // If token is invalid, just continue without setting req.user
@@ -216,7 +260,7 @@ export const checkWorkspaceRole = (requiredRoles: string[] = []) => {
 
       // Import here to avoid circular dependency
       const Workspace = require('../models/Workspace').default;
-      
+
       const workspace = await Workspace.findById(workspaceId);
       if (!workspace) {
         res.status(404).json({
@@ -226,7 +270,7 @@ export const checkWorkspaceRole = (requiredRoles: string[] = []) => {
         return;
       }
 
-      const member = workspace.members.find((m: any) => 
+      const member = workspace.members.find((m: any) =>
         m.user.toString() === userId.toString() && m.status === 'active'
       );
 
@@ -268,7 +312,7 @@ export const checkProjectRole = (requiredRoles: string[] = []) => {
 
       // Import here to avoid circular dependency
       const Project = require('../models/Project').default;
-      
+
       const project = await Project.findById(projectId);
       if (!project) {
         res.status(404).json({
@@ -278,7 +322,7 @@ export const checkProjectRole = (requiredRoles: string[] = []) => {
         return;
       }
 
-      const member = project.teamMembers.find((m: any) => 
+      const member = project.teamMembers.find((m: any) =>
         m.user.toString() === userId.toString()
       );
 

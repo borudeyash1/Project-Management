@@ -222,7 +222,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.log('🔍 [DEBUG] Registration endpoint called');
     console.log('🔍 [DEBUG] Request body:', JSON.stringify(req.body, null, 2));
     console.log('🔍 [DEBUG] Request headers:', req.headers);
-    
+
     const {
       fullName,
       username,
@@ -255,7 +255,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         existingEmail: existingUser.email === email,
         existingUsername: existingUser.username === username
       });
-      
+
       if (existingUser.isEmailVerified) {
         console.log('❌ [DEBUG] User is already verified');
         res.status(400).json({
@@ -291,7 +291,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.log('🔍 [DEBUG] Generating OTP...');
     const otp = generateOTP();
     console.log('🔍 [DEBUG] Generated OTP:', otp);
-    
+
     user.emailVerificationOTP = otp;
     user.emailVerificationOTPExpires = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
 
@@ -310,13 +310,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       <p>Best regards,</p>
       <p>The Sartthi Team</p>
     `;
-    
+
     console.log('🔍 [DEBUG] Email details:', {
       to: email,
       subject: emailSubject,
       otp: otp
     });
-    
+
     let emailSent = false;
     try {
       await sendEmail({
@@ -334,7 +334,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const response: ApiResponse = {
       success: true,
-      message: emailSent 
+      message: emailSent
         ? "Registration successful! Please check your email to verify your account with the OTP."
         : "Registration successful! Email service is not configured. Your account has been created but email verification is skipped.",
       data: {
@@ -372,44 +372,55 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
     // Check if this is a registration OTP verification (user not verified yet)
     if (!user.isEmailVerified) {
 
-    if (!user.emailVerificationOTP || !user.emailVerificationOTPExpires) {
-      res.status(400).json({ success: false, message: "No OTP sent for this email or OTP expired." });
+      if (!user.emailVerificationOTP || !user.emailVerificationOTPExpires) {
+        res.status(400).json({ success: false, message: "No OTP sent for this email or OTP expired." });
+        return;
+      }
+
+      if (user.emailVerificationOTP !== otp) {
+        res.status(400).json({ success: false, message: "Invalid OTP." });
+        return;
+      }
+
+      if (user.emailVerificationOTPExpires < new Date()) {
+        res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
+        return;
+      }
+
+      user.isEmailVerified = true;
+      user.emailVerificationOTP = undefined;
+      user.emailVerificationOTPExpires = undefined;
+
+      // Generate tokens for the newly verified user
+      const accessToken = generateToken(user._id);
+      const refreshToken = generateRefreshToken(user._id);
+      user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
+      appendLoginHistoryEntry(user, req, 'browser');
+      await user.save();
+
+      // Set HTTP-only cookie for SSO across subdomains
+      const isProduction = process.env.NODE_ENV === 'production';
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+        ...(isProduction && { domain: '.sartthi.com' }), // Enable subdomain sharing in production
+      });
+
+      const response: ApiResponse<AuthResponse> = {
+        success: true,
+        message: "Email verified successfully! Welcome to Sartthi!",
+        data: {
+          user: user.toJSON() as any,
+          accessToken,
+          refreshToken,
+        },
+      };
+
+      res.status(200).json(response);
       return;
-    }
-
-    if (user.emailVerificationOTP !== otp) {
-      res.status(400).json({ success: false, message: "Invalid OTP." });
-      return;
-    }
-
-    if (user.emailVerificationOTPExpires < new Date()) {
-      res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
-      return;
-    }
-
-    user.isEmailVerified = true;
-    user.emailVerificationOTP = undefined;
-    user.emailVerificationOTPExpires = undefined;
-
-    // Generate tokens for the newly verified user
-    const accessToken = generateToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
-    user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
-    appendLoginHistoryEntry(user, req, 'browser');
-    await user.save();
-
-    const response: ApiResponse<AuthResponse> = {
-      success: true,
-      message: "Email verified successfully! Welcome to Sartthi!",
-      data: {
-        user: user.toJSON() as any,
-        accessToken,
-        refreshToken,
-      },
-    };
-
-    res.status(200).json(response);
-    return;
     }
 
     // Check if this is a login OTP verification (user already verified)
@@ -427,7 +438,7 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
       // Login OTP verification successful
       user.loginOtp = undefined;
       user.loginOtpExpiry = undefined;
-      
+
       // Update last login and track login information
       user.lastLogin = new Date();
       appendLoginHistoryEntry(user, req, 'browser');
@@ -440,6 +451,17 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
       // Save refresh token
       user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
       await user.save();
+
+      // Set HTTP-only cookie for SSO across subdomains
+      const isProduction = process.env.NODE_ENV === 'production';
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+        ...(isProduction && { domain: '.sartthi.com' }), // Enable subdomain sharing in production
+      });
 
       const response: ApiResponse<AuthResponse> = {
         success: true,
@@ -804,7 +826,7 @@ export const googleAuth = async (
         throw new Error(`Failed to verify access token: ${response.statusText}`);
       }
       userInfo = await response.json();
-      
+
       // Verify the email matches
       if (userInfo.email !== email) {
         res.status(400).json({

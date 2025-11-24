@@ -419,6 +419,49 @@ const userSchema = new Schema<IUser>({
     },
     trialEndsAt: Date
   },
+  // Sartthi Ecosystem Modules (Mail, Calendar, etc.)
+  modules: {
+    mail: {
+      isEnabled: {
+        type: Boolean,
+        default: false
+      },
+      refreshToken: {
+        type: String,
+        default: null
+      },
+      connectedAt: Date,
+      lastSyncedAt: Date
+    },
+    calendar: {
+      isEnabled: {
+        type: Boolean,
+        default: false
+      },
+      refreshToken: {
+        type: String,
+        default: null
+      },
+      connectedAt: Date,
+      lastSyncedAt: Date
+    },
+    vault: {
+      isEnabled: {
+        type: Boolean,
+        default: false
+      },
+      rootFolderId: {
+        type: String,
+        default: null
+      },
+      refreshToken: {
+        type: String,
+        default: null
+      },
+      connectedAt: Date,
+      lastSyncedAt: Date
+    }
+  },
   settings: {
     themeColor: {
       type: String,

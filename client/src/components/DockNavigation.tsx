@@ -16,11 +16,13 @@ import {
   LogOut,
   Settings,
   User,
-  Shield
+  Shield,
+  Mail
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
+import { getAppUrl } from '../utils/appUrls';
 
 interface NavItem {
   id: string;
@@ -112,6 +114,23 @@ const DockNavigation: React.FC = () => {
     navigate('/login', { replace: true });
   };
 
+  const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
+    const url = getAppUrl(appName);
+    
+    // In development, pass the token via URL parameter for seamless auth
+    if (process.env.NODE_ENV === 'development') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const separator = url.includes('?') ? '&' : '?';
+        const authUrl = `${url}${separator}token=${token}`;
+        window.open(authUrl, '_blank');
+        return;
+      }
+    }
+    
+    window.open(url, '_blank');
+  };
+
   const isActive = (path: string) => {
     return location.pathname === path || 
            (path !== '/home' && location.pathname.startsWith(path));
@@ -167,11 +186,39 @@ const DockNavigation: React.FC = () => {
           </DockIcon>
         )}
 
+        {/* Sartthi Mail */}
+        <DockIcon
+          onClick={() => handleAppClick('mail')}
+          tooltip={t('navigation.sartthiMail')}
+        >
+          <Mail className="w-5 h-5" />
+        </DockIcon>
+
+        {/* Sartthi Calendar */}
+        <DockIcon
+          onClick={() => handleAppClick('calendar')}
+          tooltip={t('navigation.sartthiCalendar')}
+        >
+          <Calendar className="w-5 h-5" />
+        </DockIcon>
+
+        {/* Sartthi Vault */}
+        <DockIcon
+          onClick={() => handleAppClick('vault')}
+          tooltip={t('navigation.sartthiVault')}
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+          </svg>
+        </DockIcon>
+
         {/* Settings */}
         <DockIcon
           onClick={() => navigate('/settings')}
           active={location.pathname === '/settings'}
-          tooltip="Settings"
+          tooltip={t('navigation.settings')}
         >
           <Settings className="w-5 h-5" />
         </DockIcon>
@@ -180,7 +227,7 @@ const DockNavigation: React.FC = () => {
         <DockIcon
           onClick={() => navigate('/profile')}
           active={location.pathname === '/profile'}
-          tooltip="Profile"
+          tooltip={t('navigation.profile')}
         >
           <User className="w-5 h-5" />
         </DockIcon>
@@ -188,7 +235,7 @@ const DockNavigation: React.FC = () => {
         {/* Logout */}
         <DockIcon
           onClick={handleLogout}
-          tooltip="Logout"
+          tooltip={t('common.logout')}
           className="!bg-red-100 dark:!bg-red-900/30 !text-red-600 dark:!text-red-600 hover:!bg-red-200 dark:hover:!bg-red-900/50"
         >
           <LogOut className="w-5 h-5" />
