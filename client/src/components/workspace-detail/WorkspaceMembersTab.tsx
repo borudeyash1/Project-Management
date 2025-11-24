@@ -163,6 +163,35 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
     }
   };
 
+  // Load join requests from API
+  useEffect(() => {
+    if (!canManageMembers || !workspaceId) return;
+
+    const loadJoinRequests = async () => {
+      try {
+        console.log('🔍 [MEMBERS TAB] Fetching join requests for workspace:', workspaceId);
+        const requests = await api.getJoinRequests(workspaceId);
+        console.log('✅ [MEMBERS TAB] Received join requests:', requests);
+        
+        // Transform API response to match component interface
+        const transformedRequests: JoinRequest[] = requests.map((req: any) => ({
+          id: req._id,
+          name: req.user?.fullName || req.user?.email || 'Unknown User',
+          email: req.user?.email || '',
+          message: req.message,
+          requestedAt: new Date(req.createdAt),
+          status: 'pending'
+        }));
+        
+        setJoinRequests(transformedRequests);
+      } catch (error) {
+        console.error('❌ [MEMBERS TAB] Failed to load join requests:', error);
+      }
+    };
+
+    loadJoinRequests();
+  }, [workspaceId, canManageMembers]);
+
   const handleInviteMember = async (overrideEmail?: string, overrideName?: string, targetUserId?: string) => {
     const inviteTarget = overrideEmail || inviteEmail;
     if (!inviteTarget.trim() && !targetUserId) {
@@ -211,35 +240,68 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
     }
   };
 
-  const handleAcceptRequest = (request: JoinRequest) => {
-    setJoinRequests((prev) =>
-      prev.map((req) => (req.id === request.id ? { ...req, status: 'accepted' } : req))
-    );
-    handleInviteMember(request.email, request.name);
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: t('workspace.members.toast.accepted', { name: request.name }),
-        duration: 3000
-      }
-    });
+  const handleAcceptRequest = async (request: JoinRequest) => {
+    try {
+      await api.approveJoinRequest(workspaceId, request.id);
+      
+      // Remove from local state
+      setJoinRequests((prev) => prev.filter((req) => req.id !== request.id));
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: t('workspace.members.toast.accepted', { name: request.name }),
+          duration: 3000
+        }
+      });
+      
+      // Refresh workspace data to show new member
+      const workspaces = await api.getWorkspaces();
+      dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
+    } catch (error: any) {
+      console.error('Failed to approve join request:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || t('workspace.members.toast.acceptError'),
+          duration: 3000
+        }
+      });
+    }
   };
 
-  const handleDeclineRequest = (requestId: string) => {
-    setJoinRequests((prev) =>
-      prev.map((req) => (req.id === requestId ? { ...req, status: 'declined' } : req))
-    );
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'info',
-        message: t('workspace.members.toast.declined'),
-        duration: 2500
-      }
-    });
+  const handleDeclineRequest = async (requestId: string) => {
+    try {
+      await api.rejectJoinRequest(workspaceId, requestId);
+      
+      // Remove from local state
+      setJoinRequests((prev) => prev.filter((req) => req.id !== requestId));
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'info',
+          message: t('workspace.members.toast.declined'),
+          duration: 2500
+        }
+      });
+    } catch (error: any) {
+      console.error('Failed to reject join request:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || t('workspace.members.toast.declineError'),
+          duration: 3000
+        }
+      });
+    }
   };
 
   const handleRemoveMember = (memberId: string) => {

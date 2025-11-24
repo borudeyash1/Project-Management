@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
+=======
+import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle, Loader2, Clock, X } from 'lucide-react';
+>>>>>>> 5fa803fe14cbdda8c34bc2fdc3563695f8d0d6a8
 import { useApp } from '../context/AppContext';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';
@@ -29,6 +33,7 @@ interface Workspace {
     requireApprovalForJoining: boolean;
   };
   createdAt: Date;
+  hasPendingJoinRequest?: boolean;
 }
 
 const WorkspaceDiscover: React.FC = () => {
@@ -46,6 +51,8 @@ const WorkspaceDiscover: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAICreateModal, setShowAICreateModal] = useState(false);
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlanData[]>([]);
+  const [requestingWorkspaceId, setRequestingWorkspaceId] = useState<string | null>(null);
+  const [cancellingWorkspaceId, setCancellingWorkspaceId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -74,7 +81,8 @@ const WorkspaceDiscover: React.FC = () => {
             allowMemberInvites: true,
             requireApprovalForJoining: true
           },
-          createdAt: ws.createdAt ? new Date(ws.createdAt) : new Date()
+          createdAt: ws.createdAt ? new Date(ws.createdAt) : new Date(),
+          hasPendingJoinRequest: ws.hasPendingJoinRequest || false
         }));
 
         setWorkspaces(normalized);
@@ -135,12 +143,34 @@ const WorkspaceDiscover: React.FC = () => {
   };
 
   const handleJoinRequest = async (workspaceId: string) => {
+    setRequestingWorkspaceId(workspaceId);
     try {
       await api.sendJoinRequest(workspaceId);
       
       // Refresh workspaces to update membership status
       const userWorkspaces = await api.getWorkspaces();
       dispatch({ type: 'SET_WORKSPACES', payload: userWorkspaces });
+      
+      // Reload discover workspaces to get updated join request status
+      const apiWorkspaces = await api.getDiscoverWorkspaces();
+      const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
+        _id: ws._id,
+        name: ws.name,
+        description: ws.description,
+        type: ws.type,
+        region: ws.region,
+        memberCount: ws.memberCount ?? 0,
+        owner: ws.owner,
+        settings: ws.settings || {
+          isPublic: false,
+          allowMemberInvites: true,
+          requireApprovalForJoining: true
+        },
+        createdAt: ws.createdAt ? new Date(ws.createdAt) : new Date(),
+        hasPendingJoinRequest: ws.hasPendingJoinRequest || false
+      }));
+      setWorkspaces(normalized);
+      setFilteredWorkspaces(normalized);
       
       // Show success message
       dispatch({
@@ -163,6 +193,60 @@ const WorkspaceDiscover: React.FC = () => {
           duration: 3000
         }
       });
+    } finally {
+      setRequestingWorkspaceId(null);
+    }
+  };
+
+  const handleCancelJoinRequest = async (workspaceId: string) => {
+    setCancellingWorkspaceId(workspaceId);
+    try {
+      await api.cancelJoinRequest(workspaceId);
+      
+      // Reload discover workspaces to get updated join request status
+      const apiWorkspaces = await api.getDiscoverWorkspaces();
+      const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
+        _id: ws._id,
+        name: ws.name,
+        description: ws.description,
+        type: ws.type,
+        region: ws.region,
+        memberCount: ws.memberCount ?? 0,
+        owner: ws.owner,
+        settings: ws.settings || {
+          isPublic: false,
+          allowMemberInvites: true,
+          requireApprovalForJoining: true
+        },
+        createdAt: ws.createdAt ? new Date(ws.createdAt) : new Date(),
+        hasPendingJoinRequest: ws.hasPendingJoinRequest || false
+      }));
+      setWorkspaces(normalized);
+      setFilteredWorkspaces(normalized);
+      
+      // Show success message
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Join request cancelled successfully!',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('Error cancelling join request:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to cancel join request. Please try again.',
+          duration: 3000
+        }
+      });
+    } finally {
+      setCancellingWorkspaceId(null);
     }
   };
 
@@ -369,12 +453,47 @@ const WorkspaceDiscover: React.FC = () => {
                       <CheckCircle className="w-4 h-4" />
                       Visit Workspace
                     </button>
+                  ) : workspace.hasPendingJoinRequest ? (
+                    <button
+                      onClick={() => handleCancelJoinRequest(workspace._id)}
+                      disabled={cancellingWorkspaceId === workspace._id}
+                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                        cancellingWorkspaceId === workspace._id
+                          ? 'bg-red-500 text-white cursor-not-allowed'
+                          : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-md active:scale-95'
+                      }`}
+                    >
+                      {cancellingWorkspaceId === workspace._id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Cancelling...
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="w-4 h-4" />
+                          Pending
+                          <X className="w-4 h-4 ml-auto" />
+                        </>
+                      )}
+                    </button>
                   ) : (
                     <button
                       onClick={() => handleJoinRequest(workspace._id)}
-                      className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+                      disabled={requestingWorkspaceId === workspace._id}
+                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                        requestingWorkspaceId === workspace._id
+                          ? 'bg-blue-500 text-white cursor-not-allowed'
+                          : 'bg-accent text-gray-900 hover:bg-accent-hover hover:shadow-md active:scale-95'
+                      }`}
                     >
-                      Send Join Request
+                      {requestingWorkspaceId === workspace._id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Sending Request...
+                        </>
+                      ) : (
+                        'Send Join Request'
+                      )}
                     </button>
                   )}
                 </div>
