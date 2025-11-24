@@ -188,7 +188,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
                 <span>{plan.limits.maxTeamMembers}</span>
               </div>
               <div className="flex justify-between">
-                <span>{t('workspace.projects')}</span>
+                <span>{t('workspace.projectsLabel')}</span>
                 <span>{plan.limits.maxProjects}</span>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -14,6 +15,7 @@ import WorkspaceClientsTab from './workspace-detail/WorkspaceClientsTab';
 import WorkspaceProjectsTab from './workspace-detail/WorkspaceProjectsTab';
 
 const WorkspaceDetailView: React.FC = () => {
+  const { t } = useTranslation();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const { state } = useApp();
   const navigate = useNavigate();
@@ -47,12 +49,12 @@ const WorkspaceDetailView: React.FC = () => {
       <div className="h-full bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Building className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Workspace Not Found</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('workspace.detail.notFoundTitle')}</h2>
           <button
             onClick={() => navigate('/manage-workspace')}
             className="text-accent-dark hover:text-blue-700"
           >
-            Back to Workspaces
+            {t('workspace.detail.backToWorkspaces')}
           </button>
         </div>
       </div>
@@ -60,11 +62,11 @@ const WorkspaceDetailView: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'edit', label: 'Edit Workspace', icon: Edit },
-    { id: 'collaborate', label: 'Collaborate', icon: Users },
-    { id: 'members', label: 'Members', icon: UserPlus },
-    { id: 'clients', label: 'Clients', icon: Briefcase },
-    { id: 'projects', label: 'Projects', icon: FolderOpen }
+    { id: 'edit', label: t('workspace.detail.tabs.edit'), icon: Edit },
+    { id: 'collaborate', label: t('workspace.detail.tabs.collaborate'), icon: Users },
+    { id: 'members', label: t('workspace.detail.tabs.members'), icon: UserPlus },
+    { id: 'clients', label: t('workspace.detail.tabs.clients'), icon: Briefcase },
+    { id: 'projects', label: t('workspace.detail.tabs.projects'), icon: FolderOpen }
   ];
 
   return (
@@ -84,7 +86,7 @@ const WorkspaceDetailView: React.FC = () => {
                 <Building className="w-6 h-6 text-accent-dark" />
                 {workspace.name}
               </h1>
-              <p className="text-gray-600 mt-1">{workspace.description || 'No description'}</p>
+              <p className="text-gray-600 mt-1">{workspace.description || t('workspace.detail.noDescription')}</p>
             </div>
           </div>
         </div>

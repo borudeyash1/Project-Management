@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { Plus, Briefcase, Edit, Trash2, X, Mail, Phone, Globe, MapPin, Building } from 'lucide-react';
 import { Client } from '../../types';
@@ -14,6 +15,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
   isWorkspaceOwner = false 
 }) => {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const allClients = (state.clients || []) as Client[];
   const clients = allClients.filter((client) => client.workspaceId === workspaceId);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,7 +73,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Please fill in required fields (Name and Email)',
+          message: t('workspace.clients.toast.required'),
           duration: 3000
         }
       });
@@ -93,7 +95,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
           payload: {
             id: Date.now().toString(),
             type: 'success',
-            message: 'Client updated successfully!',
+            message: t('workspace.clients.toast.updated'),
             duration: 3000,
           },
         });
@@ -111,7 +113,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
           payload: {
             id: Date.now().toString(),
             type: 'success',
-            message: 'Client created successfully!',
+            message: t('workspace.clients.toast.created'),
             duration: 3000,
           },
         });
@@ -149,7 +151,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
   };
 
   const handleDeleteClient = async (clientId: string) => {
-    if (!window.confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
+    if (!window.confirm(t('workspace.clients.confirmDelete'))) {
       return;
     }
 
@@ -164,7 +166,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Client deleted successfully',
+          message: t('workspace.clients.toast.deleted'),
           duration: 3000,
         },
       });
@@ -192,9 +194,9 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Clients</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('workspace.clients.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Manage client profiles and associate them with projects
+              {t('workspace.clients.subtitle')}
             </p>
           </div>
           {isWorkspaceOwner && (
@@ -203,7 +205,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Add Client
+              {t('workspace.clients.add')}
             </button>
           )}
         </div>
@@ -212,8 +214,8 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
         {clients.length === 0 ? (
           <div className="text-center py-12 text-gray-600">
             <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-            <p className="font-medium">No clients yet</p>
-            <p className="text-sm mt-1">Add a client to start creating projects for them</p>
+            <p className="font-medium">{t('workspace.clients.noClients')}</p>
+            <p className="text-sm mt-1">{t('workspace.clients.noClientsDesc')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -241,7 +243,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                       </p>
                     )}
                     <p className="text-xs text-accent-dark mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Click to view projects →
+                      {t('workspace.clients.viewProjects')}
                     </p>
                   </div>
                   {isWorkspaceOwner && (
@@ -308,7 +310,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 my-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {editingClient ? 'Edit Client' : 'Add Client'}
+                {editingClient ? t('workspace.clients.modal.editTitle') : t('workspace.clients.modal.addTitle')}
               </h3>
               <button onClick={handleCloseModal}>
                 <X className="w-5 h-5 text-gray-600 hover:text-gray-600" />
@@ -319,27 +321,27 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Client Name *
+                    {t('workspace.clients.modal.nameLabel')}
                   </label>
                   <input
                     type="text"
                     value={clientForm.name}
                     onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                    placeholder="John Doe"
+                    placeholder={t('workspace.clients.modal.namePlaceholder')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Company
+                    {t('workspace.clients.modal.companyLabel')}
                   </label>
                   <input
                     type="text"
                     value={clientForm.company}
                     onChange={(e) => setClientForm({ ...clientForm, company: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                    placeholder="Acme Corp"
+                    placeholder={t('workspace.clients.modal.companyPlaceholder')}
                   />
                 </div>
               </div>
@@ -347,67 +349,67 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email *
+                    {t('workspace.clients.modal.emailLabel')}
                   </label>
                   <input
                     type="email"
                     value={clientForm.email}
                     onChange={(e) => setClientForm({ ...clientForm, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                    placeholder="john@example.com"
+                    placeholder={t('workspace.clients.modal.emailPlaceholder')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone
+                    {t('workspace.clients.modal.phoneLabel')}
                   </label>
                   <input
                     type="tel"
                     value={clientForm.phone}
                     onChange={(e) => setClientForm({ ...clientForm, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                    placeholder="+1 (555) 000-0000"
+                    placeholder={t('workspace.clients.modal.phonePlaceholder')}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Website
+                  {t('workspace.clients.modal.websiteLabel')}
                 </label>
                 <input
                   type="url"
                   value={clientForm.website}
                   onChange={(e) => setClientForm({ ...clientForm, website: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="https://example.com"
+                  placeholder={t('workspace.clients.modal.websitePlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address
+                  {t('workspace.clients.modal.addressLabel')}
                 </label>
                 <input
                   type="text"
                   value={clientForm.address}
                   onChange={(e) => setClientForm({ ...clientForm, address: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="123 Main St, City, State, ZIP"
+                  placeholder={t('workspace.clients.modal.addressPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Notes
+                  {t('workspace.clients.modal.notesLabel')}
                 </label>
                 <textarea
                   value={clientForm.notes}
                   onChange={(e) => setClientForm({ ...clientForm, notes: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="Additional notes about the client..."
+                  placeholder={t('workspace.clients.modal.notesPlaceholder')}
                 />
               </div>
               
@@ -416,13 +418,13 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
                   onClick={handleCloseModal}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('workspace.clients.modal.cancel')}
                 </button>
                 <button
                   onClick={handleAddClient}
                   className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                 >
-                  {editingClient ? 'Update Client' : 'Add Client'}
+                  {editingClient ? t('workspace.clients.modal.updateBtn') : t('workspace.clients.modal.addBtn')}
                 </button>
               </div>
             </div>

@@ -143,15 +143,15 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
       switch (plan) {
         case 'free': return 'text-gray-600 bg-gray-700';
         case 'pro': return 'text-accent-light bg-blue-900/50';
-        case 'ultra': return 'text-purple-600 bg-purple-900/50';
+        case 'ultra': return 'text-purple-400 bg-purple-900/50';
         default: return 'text-gray-600 bg-gray-700';
       }
     }
     switch (plan) {
-      case 'free': return 'text-gray-600 bg-gray-100';
-      case 'pro': return 'text-accent-dark bg-blue-100';
-      case 'ultra': return 'text-purple-600 bg-purple-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'free': return 'text-gray-700 bg-gray-100';
+      case 'pro': return 'text-blue-700 bg-blue-100';
+      case 'ultra': return 'text-purple-800 bg-purple-100';
+      default: return 'text-gray-700 bg-gray-100';
     }
   };
   

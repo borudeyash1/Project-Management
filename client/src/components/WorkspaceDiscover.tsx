@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';
@@ -30,6 +32,8 @@ interface Workspace {
 }
 
 const WorkspaceDiscover: React.FC = () => {
+  const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -191,9 +195,9 @@ const WorkspaceDiscover: React.FC = () => {
         <div className="p-6 border-b border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Discover Workspaces</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">{t('workspace.discoverWorkspaces')}</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Find and join workspaces that match your interests
+                {t('workspace.findWorkspaces')}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -202,14 +206,18 @@ const WorkspaceDiscover: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Custom Workspace
+                {t('workspace.customWorkspace')}
               </button>
               <button
                 onClick={() => setShowAICreateModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-colors"
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700' 
+                    : 'bg-white text-gray-900 border border-purple-200 hover:bg-purple-50'
+                }`}
               >
-                <Bot className="w-4 h-4" />
-                AI-Powered Workspace
+                <Bot className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
+                <span>{t('workspace.aiPoweredWorkspace')}</span>
               </button>
             </div>
           </div>
@@ -228,7 +236,7 @@ const WorkspaceDiscover: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search workspaces..."
+                placeholder={t('workspace.searchWorkspaces')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -241,7 +249,7 @@ const WorkspaceDiscover: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Filter className="w-4 h-4" />
-              Filters
+              {t('workspace.filters')}
             </button>
           </div>
 
@@ -377,9 +385,9 @@ const WorkspaceDiscover: React.FC = () => {
               <div className="text-gray-600 mb-4">
                 <Building2 className="w-12 h-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('workspace.noWorkspacesFound')}</h3>
               <p className="text-gray-600 mb-4">
-                Try adjusting your search terms or filters to find more workspaces.
+                {t('workspace.tryAdjustingFilters')}
               </p>
               <button
                 onClick={() => {
@@ -389,7 +397,7 @@ const WorkspaceDiscover: React.FC = () => {
                 }}
                 className="text-accent-dark hover:text-blue-700 font-medium"
               >
-                Clear all filters
+                {t('workspace.clearAllFilters')}
               </button>
             </div>
           )}

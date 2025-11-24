@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { getProjects as getWorkspaceProjects } from '../../services/projectService';
 import { 
@@ -16,6 +17,7 @@ import {
 const WorkspaceOverview: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const workspaceProjects = state.projects.filter(
@@ -57,7 +59,8 @@ const WorkspaceOverview: React.FC = () => {
 
   const stats = [
     {
-      label: 'Active Projects',
+      key: 'activeProjects',
+      label: t('workspace.overview.activeProjects'),
       value: activeProjects,
       icon: FolderKanban,
       color: 'text-accent-dark',
@@ -65,7 +68,8 @@ const WorkspaceOverview: React.FC = () => {
       change: '+4% MoM'
     },
     {
-      label: 'Utilization',
+      key: 'utilization',
+      label: t('workspace.overview.utilization'),
       value: `${avgProgress}%`,
       icon: TrendingUp,
       color: 'text-green-600',
@@ -73,7 +77,8 @@ const WorkspaceOverview: React.FC = () => {
       change: '+2% MoM'
     },
     {
-      label: 'Burn Rate',
+      key: 'burnRate',
+      label: t('workspace.overview.burnRate'),
       value: '$18.4k',
       icon: DollarSign,
       color: 'text-orange-600',
@@ -81,7 +86,8 @@ const WorkspaceOverview: React.FC = () => {
       change: '+4% MoM'
     },
     {
-      label: 'Revenue (MTD)',
+      key: 'revenue',
+      label: t('workspace.overview.revenue'),
       value: '$42.7k',
       icon: DollarSign,
       color: 'text-purple-600',
@@ -109,7 +115,7 @@ const WorkspaceOverview: React.FC = () => {
                 {currentWorkspace?.name}
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-200">
-                You are viewing the workspace area
+                {t('workspace.overview.viewingWorkspace')}
               </p>
             </div>
           </div>
@@ -120,14 +126,14 @@ const WorkspaceOverview: React.FC = () => {
             className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
-            New Project
+            {t('workspace.overview.newProject')}
           </button>
         )}
       </div>
 
       {/* Analytics Cards */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Analytics</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('workspace.overview.analytics')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
@@ -145,12 +151,12 @@ const WorkspaceOverview: React.FC = () => {
                     <div className="text-xs text-green-600 mt-1">{stat.change}</div>
                   </div>
                   {/* Progress bar for some stats */}
-                  {stat.label === 'Active Projects' && (
+                  {stat.key === 'activeProjects' && (
                     <div className="w-16 h-2 bg-gray-300 rounded-full overflow-hidden">
                       <div className="h-full bg-accent" style={{ width: '72%' }} />
                     </div>
                   )}
-                  {stat.label === 'Utilization' && (
+                  {stat.key === 'utilization' && (
                     <div className="w-16 h-2 bg-gray-300 rounded-full overflow-hidden">
                       <div className="h-full bg-green-600" style={{ width: avgProgress + '%' }} />
                     </div>
@@ -166,10 +172,10 @@ const WorkspaceOverview: React.FC = () => {
         {/* Chart Placeholder */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Project Progress
+            {t('workspace.overview.projectProgress')}
           </h3>
           <div className="h-64 flex items-center justify-center text-gray-600">
-            Chart placeholder - Project timeline and progress visualization
+            {t('workspace.overview.chartPlaceholder')}
           </div>
         </div>
 
@@ -177,9 +183,9 @@ const WorkspaceOverview: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Upcoming Milestones
+              {t('workspace.overview.upcomingMilestones')}
             </h3>
-            <button className="text-sm text-accent-dark hover:text-blue-700">View</button>
+            <button className="text-sm text-accent-dark hover:text-blue-700">{t('workspace.overview.view')}</button>
           </div>
           <div className="space-y-3">
             {upcomingMilestones.map((milestone, index) => (
@@ -201,12 +207,12 @@ const WorkspaceOverview: React.FC = () => {
       {/* Projects Grid */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('navigation.projects')}</h2>
           <button
             onClick={() => navigate(`/workspace/${state.currentWorkspace}/projects`)}
             className="text-sm text-accent-dark hover:text-blue-700"
           >
-            View all
+            {t('workspace.overview.viewAll')}
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -237,7 +243,7 @@ const WorkspaceOverview: React.FC = () => {
               {/* Progress Bar */}
               <div className="mb-3">
                 <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
-                  <span>Progress</span>
+                  <span>{t('common.progress')}</span>
                   <span>{project.progress}%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -261,7 +267,7 @@ const WorkspaceOverview: React.FC = () => {
                 {project.priority === 'critical' && (
                   <div className="flex items-center gap-1 text-red-600">
                     <AlertCircle className="w-3 h-3" />
-                    <span>Critical</span>
+                    <span>{t('common.critical')}</span>
                   </div>
                 )}
               </div>

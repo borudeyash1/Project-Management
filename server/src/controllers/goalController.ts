@@ -59,8 +59,8 @@ export const getGoals = async (req: Request, res: Response) => {
     }
 
     const goals = await Goal.find(query)
-      .populate('createdBy', 'name email avatar')
-      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'fullName email avatarUrl')
+      .populate('assignedTo', 'fullName email avatarUrl')
       .populate('project', 'name color')
       .sort({ createdAt: -1 });
 
@@ -86,8 +86,8 @@ export const getGoal = async (req: Request, res: Response): Promise<void> => {
     const userId = (req as any).user.id;
 
     const goal = await Goal.findOne({ _id: id, createdBy: userId })
-      .populate('createdBy', 'name email avatar')
-      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'fullName email avatarUrl')
+      .populate('assignedTo', 'fullName email avatarUrl')
       .populate('project', 'name color');
 
     if (!goal) {
@@ -123,8 +123,8 @@ export const updateGoal = async (req: Request, res: Response): Promise<void> => 
       { ...req.body, updatedAt: new Date() },
       { new: true }
     ).populate('createdBy', 'name email avatar')
-     .populate('assignedTo', 'name email avatar')
-     .populate('project', 'name color');
+      .populate('assignedTo', 'name email avatar')
+      .populate('project', 'name color');
 
     if (!goal) {
       res.status(404).json({
@@ -185,13 +185,13 @@ export const getGoalStats = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
 
     const totalGoals = await Goal.countDocuments({ createdBy: userId });
-    const completedGoals = await Goal.countDocuments({ 
-      createdBy: userId, 
-      status: 'completed' 
+    const completedGoals = await Goal.countDocuments({
+      createdBy: userId,
+      status: 'completed'
     });
-    const inProgressGoals = await Goal.countDocuments({ 
-      createdBy: userId, 
-      status: 'in_progress' 
+    const inProgressGoals = await Goal.countDocuments({
+      createdBy: userId,
+      status: 'in_progress'
     });
     const overdueGoals = await Goal.countDocuments({
       createdBy: userId,
@@ -206,15 +206,30 @@ export const getGoalStats = async (req: Request, res: Response) => {
 
     const categoryStats = await Goal.aggregate([
       { $match: { createdBy: userId } },
-      { $group: { 
-        _id: '$category', 
-        count: { $sum: 1 },
-        completed: { 
-          $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 },
+          completed: {
+            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+          }
         }
-      }},
+      },
       { $sort: { count: -1 } }
     ]);
+
+    const recentGoals = await Goal.find({ createdBy: userId })
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .populate('createdBy', 'fullName');
+
+    const recentActivity = recentGoals.map(goal => ({
+      _id: goal._id,
+      type: goal.status === 'completed' ? 'completed' : 'updated',
+      goal: goal.title,
+      user: (goal.createdBy as any).fullName,
+      timestamp: goal.updatedAt
+    }));
 
     res.status(200).json({
       success: true,
@@ -225,7 +240,12 @@ export const getGoalStats = async (req: Request, res: Response) => {
         overdueGoals,
         averageProgress: averageProgress[0]?.avgProgress || 0,
         completionRate: totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0,
-        topCategories: categoryStats
+        topCategories: categoryStats.map(cat => ({
+          category: cat._id,
+          count: cat.count,
+          completed: cat.completed
+        })),
+        recentActivity
       }
     });
   } catch (error) {
@@ -386,7 +406,7 @@ export const toggleMilestoneCompletion = async (req: Request, res: Response): Pr
 
     // Update goal progress based on completed milestones
     const completedMilestones = (goal.milestones as any).filter((m: any) => m.completed).length;
-    goal.progress = goal.milestones.length > 0 ? 
+    goal.progress = goal.milestones.length > 0 ?
       Math.round((completedMilestones / goal.milestones.length) * 100) : 0;
 
     // Update goal status if all milestones are completed

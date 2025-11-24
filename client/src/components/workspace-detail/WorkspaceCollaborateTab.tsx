@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { UserPlus, Users, User, Trash2, X, Mail, Shield } from 'lucide-react';
 import api from '../../services/api';
@@ -30,6 +31,7 @@ interface WorkspaceCollaborateTabProps {
 
 const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ workspaceId }) => {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState('');
@@ -105,7 +107,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Please select a member to promote',
+          message: t('workspace.collaborate.toast.selectMember'),
           duration: 3000
         }
       });
@@ -131,7 +133,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Member promoted to collaborator successfully!',
+          message: t('workspace.collaborate.toast.success'),
           duration: 3000
         }
       });
@@ -150,7 +152,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
   };
 
   const handleDemoteCollaborator = async (memberId: string, memberName: string) => {
-    if (!window.confirm(`Remove ${memberName}'s collaborator role? They will become a regular member.`)) {
+    if (!window.confirm(t('workspace.collaborate.confirmDemote', { name: memberName }))) {
       return;
     }
 
@@ -167,7 +169,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Collaborator demoted to member',
+          message: t('workspace.collaborate.toast.demoteSuccess'),
           duration: 3000
         }
       });
@@ -199,9 +201,9 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Workspace Collaborators</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('workspace.collaborate.title')}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              Promote workspace members to collaborators with admin or manager permissions.
+              {t('workspace.collaborate.subtitle')}
             </p>
           </div>
           <button
@@ -210,7 +212,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <UserPlus className="w-4 h-4" />
-            Add Collaborator
+            {t('workspace.collaborate.add')}
           </button>
         </div>
 
@@ -218,13 +220,13 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
         <div className="space-y-3">
           {isLoading ? (
             <div className="text-center py-12 text-gray-600 dark:text-gray-300">
-              Loading collaborators...
+              {t('workspace.collaborate.loading')}
             </div>
           ) : collaborators.length === 0 ? (
             <div className="text-center py-12 text-gray-600 dark:text-gray-300">
               <Users className="w-12 h-12 mx-auto mb-3" />
-              <p className="font-medium">No collaborators yet</p>
-              <p className="text-sm mt-1">Promote workspace members to help manage this workspace</p>
+              <p className="font-medium">{t('workspace.collaborate.noCollaborators')}</p>
+              <p className="text-sm mt-1">{t('workspace.collaborate.noCollaboratorsDesc')}</p>
             </div>
           ) : (
             collaborators.map((collab) => {
@@ -255,7 +257,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
                         ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                         : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                     }`}>
-                      {collab.role === 'admin' ? 'Administrator' : 'Manager'}
+                      {collab.role === 'admin' ? t('workspace.collaborate.roles.admin') : t('workspace.collaborate.roles.manager')}
                     </span>
                     {!isOwner && (
                       <button
@@ -277,14 +279,14 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
             <Shield className="w-4 h-4" />
-            Collaborator Roles
+            {t('workspace.collaborate.roles.title')}
           </h4>
           <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
             <div>
-              <span className="font-medium">Administrator:</span> Full workspace management permissions
+              {t('workspace.collaborate.roles.adminDesc')}
             </div>
             <div>
-              <span className="font-medium">Manager:</span> Can create projects with limited administrative access
+              {t('workspace.collaborate.roles.managerDesc')}
             </div>
           </div>
         </div>
@@ -295,7 +297,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Promote to Collaborator</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('workspace.collaborate.modal.title')}</h3>
               <button onClick={() => {
                 setShowAddModal(false);
                 setSelectedMemberId('');
@@ -308,14 +310,14 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
               {/* Member Selection Dropdown */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Select Workspace Member
+                  {t('workspace.collaborate.modal.selectMember')}
                 </label>
                 <select
                   value={selectedMemberId}
                   onChange={(e) => setSelectedMemberId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
-                  <option value="">Choose a member to promote...</option>
+                  <option value="">{t('workspace.collaborate.modal.chooseMember')}</option>
                   {promotableMembers.map((member) => {
                     const { name, email } = getUserDisplay(member);
                     return (
@@ -327,7 +329,7 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
                 </select>
                 {promotableMembers.length === 0 && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    No members available to promote
+                    {t('workspace.collaborate.modal.noMembers')}
                   </p>
                 )}
               </div>
@@ -335,21 +337,21 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
               {/* Role Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Collaborator Role
+                  {t('workspace.collaborate.modal.roleLabel')}
                 </label>
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as 'admin' | 'manager')}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
-                  <option value="manager">Manager - Limited permissions</option>
-                  <option value="admin">Administrator - Full permissions</option>
+                  <option value="manager">{t('workspace.collaborate.modal.managerOption')}</option>
+                  <option value="admin">{t('workspace.collaborate.modal.adminOption')}</option>
                 </select>
               </div>
 
               {/* Permissions Preview */}
               <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Permissions:</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('workspace.collaborate.modal.permissions')}</p>
                 <div className="space-y-1 text-xs text-gray-600 dark:text-gray-300">
                   {Object.entries(permissions).map(([key, value]) => (
                     <div key={key} className="flex items-center gap-2">
@@ -372,14 +374,14 @@ const WorkspaceCollaborateTab: React.FC<WorkspaceCollaborateTabProps> = ({ works
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Cancel
+                  {t('workspace.collaborate.modal.cancel')}
                 </button>
                 <button
                   onClick={handlePromoteToCollaborator}
                   disabled={!selectedMemberId}
                   className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Promote Member
+                  {t('workspace.collaborate.modal.promote')}
                 </button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -19,6 +20,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   onClearClientFilter 
 }) => {
   const { state, dispatch } = useApp();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedProjectForStatus, setSelectedProjectForStatus] = useState<any | null>(null);
@@ -59,7 +61,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Please enter a project name',
+          message: t('workspace.projects.toast.nameRequired'),
           duration: 3000
         }
       });
@@ -112,7 +114,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
       payload: {
         id: Date.now().toString(),
         type: 'success',
-        message: 'Project created successfully!',
+        message: t('workspace.projects.toast.created'),
         duration: 3000
       }
     });
@@ -145,7 +147,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
       payload: {
         id: Date.now().toString(),
         type: 'success',
-        message: `Project status updated to ${newStatus}`,
+        message: t('workspace.projects.toast.updated'),
         duration: 3000
       }
     });
@@ -154,7 +156,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   };
 
   const handleDeleteProject = (projectId: string) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
+    if (window.confirm(t('workspace.projects.confirmDelete'))) {
       dispatch({
         type: 'DELETE_PROJECT',
         payload: projectId
@@ -164,7 +166,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Project deleted successfully',
+          message: t('workspace.projects.toast.deleted'),
           duration: 3000
         }
       });
@@ -230,9 +232,9 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Workspace Projects</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('workspace.projects.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Manage projects associated with clients in this workspace ({filteredProjects.length} projects)
+              {t('workspace.projects.subtitle')} ({filteredProjects.length})
             </p>
           </div>
           {isWorkspaceOwner && (
@@ -241,7 +243,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Create Project
+              {t('workspace.projects.create')}
             </button>
           )}
         </div>
@@ -251,7 +253,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
           <div className="mb-4 flex items-center gap-2">
             <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
               <Briefcase className="w-3 h-3" />
-              Showing projects for: {selectedClientName}
+              {t('workspace.projects.filterClient')}: {selectedClientName}
               <button
                 onClick={onClearClientFilter}
                 className="hover:text-blue-900"
@@ -267,8 +269,8 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         {filteredProjects.length === 0 ? (
           <div className="text-center py-12 text-gray-600">
             <FolderOpen className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-            <p className="font-medium">No projects yet</p>
-            <p className="text-sm mt-1">Projects will appear here</p>
+            <p className="font-medium">{t('workspace.projects.noProjects')}</p>
+            <p className="text-sm mt-1">{t('workspace.projects.noProjectsDesc')}</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -311,7 +313,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" />
                             <span>
-                              {new Date(project.startDate).toLocaleDateString()} - {new Date(project.dueDate).toLocaleDateString()}
+                              {new Date(project.startDate).toLocaleDateString(i18n.language)} - {new Date(project.dueDate).toLocaleDateString(i18n.language)}
                             </span>
                           </div>
                         )}
@@ -362,7 +364,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                           className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                         >
                           <Edit className="w-3 h-3" />
-                          Status
+                          {t('workspace.projects.statusLabel')}
                         </button>
                         <button
                           onClick={() => handleDeleteProject(project._id)}
@@ -408,7 +410,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               >
                 <Clock className="w-5 h-5 text-gray-600" />
                 <div>
-                  <div className="font-medium text-gray-900">Planning</div>
+                  <div className="font-medium text-gray-900">{t('workspace.projects.status.planning')}</div>
                   <div className="text-xs text-gray-600">Project is in planning phase</div>
                 </div>
               </button>
@@ -419,7 +421,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               >
                 <Play className="w-5 h-5 text-green-600" />
                 <div>
-                  <div className="font-medium text-gray-900">Active</div>
+                  <div className="font-medium text-gray-900">{t('workspace.projects.status.active')}</div>
                   <div className="text-xs text-gray-600">Project is actively being worked on</div>
                 </div>
               </button>
@@ -430,7 +432,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               >
                 <Pause className="w-5 h-5 text-yellow-600" />
                 <div>
-                  <div className="font-medium text-gray-900">On Hold</div>
+                  <div className="font-medium text-gray-900">{t('workspace.projects.status.on-hold')}</div>
                   <div className="text-xs text-gray-600">Project is temporarily paused</div>
                 </div>
               </button>
@@ -441,7 +443,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               >
                 <CheckCircle className="w-5 h-5 text-accent-dark" />
                 <div>
-                  <div className="font-medium text-gray-900">Completed</div>
+                  <div className="font-medium text-gray-900">{t('workspace.projects.status.completed')}</div>
                   <div className="text-xs text-gray-600">Project is successfully completed</div>
                 </div>
               </button>
@@ -452,7 +454,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               >
                 <XCircle className="w-5 h-5 text-red-600" />
                 <div>
-                  <div className="font-medium text-gray-900">Cancelled</div>
+                  <div className="font-medium text-gray-900">{t('workspace.projects.status.cancelled')}</div>
                   <div className="text-xs text-gray-600">Project was cancelled</div>
                 </div>
               </button>
@@ -477,7 +479,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Create New Project</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('workspace.projects.modal.createTitle')}</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="text-gray-600 hover:text-gray-600"
@@ -490,42 +492,42 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               {/* Project Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Name *
+                  {t('workspace.projects.modal.nameLabel')}
                 </label>
                 <input
                   type="text"
                   value={projectForm.name}
                   onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
-                  placeholder="Enter project name"
+                  placeholder={t('workspace.projects.modal.namePlaceholder')}
                 />
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  {t('workspace.projects.modal.descriptionLabel')}
                 </label>
                 <textarea
                   value={projectForm.description}
                   onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
-                  placeholder="Enter project description"
+                  placeholder={t('workspace.projects.modal.descriptionPlaceholder')}
                 />
               </div>
 
               {/* Client */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Client
+                  {t('workspace.projects.modal.clientLabel')}
                 </label>
                 <select
                   value={projectForm.client}
                   onChange={(e) => setProjectForm({ ...projectForm, client: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
-                  <option value="">Select a client...</option>
+                  <option value="">{t('workspace.projects.modal.clientPlaceholder')}</option>
                   {workspaceClients.map((client) => (
                     <option key={client._id} value={client.name}>
                       {client.name}
@@ -538,33 +540,33 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    {t('workspace.projects.modal.statusLabel')}
                   </label>
                   <select
                     value={projectForm.status}
                     onChange={(e) => setProjectForm({ ...projectForm, status: e.target.value as any })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
-                    <option value="planning">Planning</option>
-                    <option value="active">Active</option>
-                    <option value="on-hold">On Hold</option>
-                    <option value="completed">Completed</option>
+                    <option value="planning">{t('workspace.projects.status.planning')}</option>
+                    <option value="active">{t('workspace.projects.status.active')}</option>
+                    <option value="on-hold">{t('workspace.projects.status.on-hold')}</option>
+                    <option value="completed">{t('workspace.projects.status.completed')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Priority
+                    {t('workspace.projects.modal.priorityLabel')}
                   </label>
                   <select
                     value={projectForm.priority}
                     onChange={(e) => setProjectForm({ ...projectForm, priority: e.target.value as any })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                    <option value="low">{t('workspace.projects.priority.low')}</option>
+                    <option value="medium">{t('workspace.projects.priority.medium')}</option>
+                    <option value="high">{t('workspace.projects.priority.high')}</option>
+                    <option value="critical">{t('workspace.projects.priority.urgent')}</option>
                   </select>
                 </div>
               </div>
@@ -573,7 +575,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
+                    {t('workspace.projects.modal.startDateLabel')}
                   </label>
                   <input
                     type="date"
@@ -585,7 +587,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Due Date
+                    {t('workspace.projects.modal.dueDateLabel')}
                   </label>
                   <input
                     type="date"
@@ -600,7 +602,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Estimated Budget ($)
+                    {t('workspace.projects.modal.budgetLabel')}
                   </label>
                   <input
                     type="number"
@@ -645,13 +647,13 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   onClick={handleCreateProject}
                   className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  Create Project
+                  {t('workspace.projects.modal.createBtn')}
                 </button>
                 <button
                   onClick={() => setShowCreateModal(false)}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('workspace.projects.modal.cancel')}
                 </button>
               </div>
             </div>

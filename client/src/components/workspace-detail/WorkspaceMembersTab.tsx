@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar, UserCheck, UserX, AlertCircle } from 'lucide-react';
 import api from '../../services/api';
@@ -29,6 +30,7 @@ interface WorkspaceMembersTabProps {
 
 const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }) => {
   const { state, dispatch } = useApp();
+  const { t, i18n } = useTranslation();
   const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -169,7 +171,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Please enter an email or username',
+          message: t('workspace.members.toast.enterEmail'),
           duration: 3000
         }
       });
@@ -191,7 +193,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Member invitation sent successfully!',
+          message: t('workspace.members.toast.sent'),
           duration: 3000
         }
       });
@@ -219,7 +221,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
       payload: {
         id: Date.now().toString(),
         type: 'success',
-        message: `${request.name} has been added to the workspace`,
+        message: t('workspace.members.toast.accepted', { name: request.name }),
         duration: 3000
       }
     });
@@ -234,21 +236,21 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
       payload: {
         id: Date.now().toString(),
         type: 'info',
-        message: 'Request declined',
+        message: t('workspace.members.toast.declined'),
         duration: 2500
       }
     });
   };
 
   const handleRemoveMember = (memberId: string) => {
-    if (window.confirm('Are you sure you want to remove this member from the workspace?')) {
+    if (window.confirm(t('workspace.members.confirmRemove'))) {
       setMembers(members.filter((m) => m._id !== memberId));
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Member removed from workspace',
+          message: t('workspace.members.toast.removed'),
           duration: 3000
         }
       });
@@ -265,9 +267,9 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Workspace Members</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('workspace.members.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Invite members to join projects in this workspace. Members will appear in project teammate lists.
+              {t('workspace.members.subtitle')}
             </p>
           </div>
           {canManageMembers && (
@@ -276,7 +278,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <UserPlus className="w-4 h-4" />
-              Invite Member
+              {t('workspace.members.invite')}
             </button>
           )}
         </div>
@@ -286,7 +288,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search members by username or email..."
+            placeholder={t('workspace.members.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -298,13 +300,13 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
           {filteredMembers.length === 0 && !searchQuery ? (
             <div className="text-center py-12 text-gray-600">
               <Users className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="font-medium">No members yet</p>
-              <p className="text-sm mt-1">Invite team members to collaborate on projects</p>
+              <p className="font-medium">{t('workspace.members.noMembers')}</p>
+              <p className="text-sm mt-1">{t('workspace.members.noMembersDesc')}</p>
             </div>
           ) : filteredMembers.length === 0 ? (
             <div className="text-center py-12 text-gray-600">
               <Search className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p>No members found matching "{searchQuery}"</p>
+              <p>{t('workspace.members.noResults')} "{searchQuery}"</p>
             </div>
           ) : (
             filteredMembers.map((member) => (
@@ -324,7 +326,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-gray-600 flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {new Date(member.joinedAt).toLocaleDateString()}
+                    {new Date(member.joinedAt).toLocaleDateString(i18n.language)}
                   </div>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     member.status === 'active' 
@@ -360,8 +362,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         {members.length > 0 && (
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>{members.length}</strong> member{members.length !== 1 ? 's' : ''} in this workspace. 
-              Members can be assigned to projects and will receive notifications about project updates.
+              {t('workspace.members.info', { count: members.length, s: members.length !== 1 ? 's' : '' })}
             </p>
           </div>
         )}
@@ -370,9 +371,9 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
       {/* Contact Admin / Owner info for regular members */}
       {!canManageMembers && workspace && (
         <div className="bg-white rounded-lg border border-gray-300 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Contact workspace admin</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('workspace.members.contactAdminTitle')}</h3>
           <p className="text-sm text-gray-600 mb-4">
-            For changes to workspace members or settings, please reach out to an owner or admin.
+            {t('workspace.members.contactAdminDesc')}
           </p>
           <div className="space-y-3">
             {/* Owner */}
@@ -381,8 +382,8 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                 <div>
                   <p className="text-sm font-medium text-gray-900">
                     {typeof workspace.owner === 'string'
-                      ? 'Workspace owner'
-                      : workspace.owner.fullName || workspace.owner.email || workspace.owner.username || 'Workspace owner'}
+                      ? t('workspace.members.owner')
+                      : workspace.owner.fullName || workspace.owner.email || workspace.owner.username || t('workspace.members.owner')}
                   </p>
                   {typeof workspace.owner !== 'string' && workspace.owner.email && (
                     <p className="text-xs text-gray-600 flex items-center gap-1">
@@ -405,7 +406,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                 const displayName =
                   typeof user === 'string'
                     ? user
-                    : user.fullName || user.username || user.email || 'Collaborator';
+                    : user.fullName || user.username || user.email || t('workspace.members.collaborator');
                 const email = typeof user === 'string' ? undefined : user.email;
                 return (
                   <div
@@ -436,21 +437,21 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Join Requests</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('workspace.members.joinRequestsTitle')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Approve or decline join requests submitted from the Discover Workspace page.
+              {t('workspace.members.joinRequestsDesc')}
             </p>
           </div>
           <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700">
-            {joinRequests.filter((req) => req.status === 'pending').length} pending
+            {joinRequests.filter((req) => req.status === 'pending').length} {t('workspace.members.pending')}
           </span>
         </div>
 
         {joinRequests.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-gray-600">
             <AlertCircle className="w-10 h-10 mb-2 text-gray-700" />
-            <p className="font-medium">No requests yet</p>
-            <p className="text-sm">Requests from Discover Workspace will appear here.</p>
+            <p className="font-medium">{t('workspace.members.noRequests')}</p>
+            <p className="text-sm">{t('workspace.members.noRequestsDesc')}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -494,14 +495,14 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
                       >
                         <UserCheck className="w-4 h-4" />
-                        Accept
+                        {t('workspace.members.accept')}
                       </button>
                       <button
                         onClick={() => handleDeclineRequest(request.id)}
                         className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
                       >
                         <UserX className="w-4 h-4" />
-                        Decline
+                        {t('workspace.members.decline')}
                       </button>
                     </>
                   )}
@@ -518,7 +519,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Invite Member</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('workspace.members.modal.title')}</h3>
               <button onClick={() => setShowInviteModal(false)}>
                 <X className="w-5 h-5 text-gray-600 hover:text-gray-600" />
               </button>
@@ -527,23 +528,23 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username or Email
+                  {t('workspace.members.modal.emailLabel')}
                 </label>
                 <input
                   type="text"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="Enter username or email"
+                  placeholder={t('workspace.members.modal.emailPlaceholder')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 />
                 <p className="text-xs text-gray-600 mt-1">
-                  The user will receive an invitation to join this workspace
+                  {t('workspace.members.modal.emailDesc')}
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Search platform directory
+                  {t('workspace.members.modal.searchLabel')}
                 </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
@@ -551,7 +552,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                     type="text"
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
-                    placeholder="Search by name or email"
+                    placeholder={t('workspace.members.modal.searchPlaceholder')}
                     className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                   {filteredDirectoryUsers.length > 0 && (
@@ -570,7 +571,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   )}
                 </div>
                 <p className="text-xs text-gray-600 mt-1">
-                  Pull users who are already on the platform without re-typing their email.
+                  {t('workspace.members.modal.searchDesc')}
                 </p>
               </div>
               
@@ -579,13 +580,13 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                   onClick={() => setShowInviteModal(false)}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('workspace.members.modal.cancel')}
                 </button>
                 <button
                   onClick={() => handleInviteMember()}
                   className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
                 >
-                  Send Invite
+                  {t('workspace.members.modal.send')}
                 </button>
               </div>
             </div>

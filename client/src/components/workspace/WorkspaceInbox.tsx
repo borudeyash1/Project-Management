@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { Send, Search, Plus, Users, User, Paperclip, Smile, MoreVertical } from 'lucide-react';
 import apiService from '../../services/api';
@@ -21,6 +22,7 @@ interface InboxMessage {
 }
 
 const WorkspaceInbox: React.FC = () => {
+  const { t } = useTranslation();
   const { state } = useApp();
   const [threads, setThreads] = useState<InboxThread[]>([]);
   const [messages, setMessages] = useState<InboxMessage[]>([]);
@@ -154,7 +156,7 @@ const WorkspaceInbox: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
             <input
               type="text"
-              placeholder="Search chats..."
+              placeholder={t('workspace.inbox.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-accent"
@@ -162,17 +164,17 @@ const WorkspaceInbox: React.FC = () => {
           </div>
           <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors text-sm">
             <Plus className="w-4 h-4" />
-            New Chat
+            {t('workspace.inbox.newChat')}
           </button>
         </div>
 
         {/* Chat List */}
         <div className="flex-1 overflow-y-auto">
           {isLoadingThreads && (
-            <div className="p-4 text-sm text-gray-600">Loading conversations...</div>
+            <div className="p-4 text-sm text-gray-600">{t('workspace.inbox.loadingConversations')}</div>
           )}
           {!isLoadingThreads && filteredThreads.length === 0 && (
-            <div className="p-4 text-sm text-gray-600">No other members in this workspace yet.</div>
+            <div className="p-4 text-sm text-gray-600">{t('workspace.inbox.noMembers')}</div>
           )}
           {filteredThreads.map((thread) => (
             <button
@@ -224,10 +226,10 @@ const WorkspaceInbox: React.FC = () => {
               </div>
               <div>
                 <h2 className="font-semibold text-gray-900 dark:text-gray-100">
-                  {threads.find((t) => t.userId === selectedUserId)?.name || 'Conversation'}
+                  {threads.find((t) => t.userId === selectedUserId)?.name || t('workspace.inbox.conversationDefault')}
                 </h2>
                 <p className="text-xs text-gray-600 dark:text-gray-200">
-                  Direct Message
+                  {t('workspace.inbox.directMessage')}
                 </p>
               </div>
             </div>
@@ -239,10 +241,10 @@ const WorkspaceInbox: React.FC = () => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {isLoadingMessages && (
-              <div className="text-sm text-gray-600">Loading messages...</div>
+              <div className="text-sm text-gray-600">{t('workspace.inbox.loadingMessages')}</div>
             )}
             {!isLoadingMessages && messages.length === 0 && (
-              <div className="text-sm text-gray-600">No messages yet. Say hello!</div>
+              <div className="text-sm text-gray-600">{t('workspace.inbox.noMessages')}</div>
             )}
             {messages.map((message) => {
               const isOwn = message.sender === currentUserId;
@@ -294,7 +296,7 @@ const WorkspaceInbox: React.FC = () => {
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Type a message..."
+                  placeholder={t('workspace.inbox.typeMessage')}
                   rows={1}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none focus:ring-2 focus:ring-accent"
                 />
@@ -315,7 +317,7 @@ const WorkspaceInbox: React.FC = () => {
         <div className="flex-1 flex items-center justify-center text-gray-600">
           <div className="text-center">
             <Users className="w-16 h-16 mx-auto mb-4" />
-            <p className="text-lg font-medium">Select a chat to start messaging</p>
+            <p className="text-lg font-medium">{t('workspace.inbox.selectChat')}</p>
           </div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import AddClientModal from '../AddClientModal';
@@ -35,6 +36,7 @@ interface ClientView {
 }
 
 const WorkspaceClients: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const { workspaceId: routeWorkspaceId } = useParams<{ workspaceId: string }>();
@@ -60,7 +62,7 @@ const WorkspaceClients: React.FC = () => {
           type: 'ADD_TOAST',
           payload: {
             type: 'error',
-            message: error?.message || 'Failed to load clients',
+            message: error?.message || t('workspace.clients.toast.loadError'),
           },
         });
       }
@@ -104,10 +106,10 @@ const WorkspaceClients: React.FC = () => {
   );
 
   const stats = [
-    { label: 'Total Clients', value: clients.length, color: 'text-accent-dark' },
-    { label: 'Active', value: clients.filter(c => c.status === 'active').length, color: 'text-green-600' },
-    { label: 'Total Projects', value: clients.reduce((sum, c) => sum + c.projectCount, 0), color: 'text-purple-600' },
-    { label: 'Total Revenue', value: `$${(clients.reduce((sum, c) => sum + c.totalRevenue, 0) / 1000).toFixed(0)}k`, color: 'text-orange-600' }
+    { label: t('workspace.clients.stats.totalClients'), value: clients.length, color: 'text-accent-dark' },
+    { label: t('workspace.clients.stats.active'), value: clients.filter(c => c.status === 'active').length, color: 'text-green-600' },
+    { label: t('workspace.clients.stats.totalProjects'), value: clients.reduce((sum, c) => sum + c.projectCount, 0), color: 'text-purple-600' },
+    { label: t('workspace.clients.stats.totalRevenue'), value: `$${(clients.reduce((sum, c) => sum + c.totalRevenue, 0) / 1000).toFixed(0)}k`, color: 'text-orange-600' }
   ];
 
   return (
@@ -115,9 +117,9 @@ const WorkspaceClients: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Clients</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('workspace.clients.title')}</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            Manage your workspace clients
+            {t('workspace.clients.subtitle')}
           </p>
         </div>
         {isOwner && (
@@ -126,7 +128,7 @@ const WorkspaceClients: React.FC = () => {
             className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Client
+            {t('workspace.clients.addClient')}
           </button>
         )}
       </div>
@@ -146,7 +148,7 @@ const WorkspaceClients: React.FC = () => {
         <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
         <input
           type="text"
-          placeholder="Search clients..."
+          placeholder={t('workspace.clients.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -218,7 +220,7 @@ const WorkspaceClients: React.FC = () => {
                   className="flex items-center gap-1 text-accent-dark hover:text-blue-700 dark:text-accent-light dark:hover:text-blue-700"
                 >
                   <FolderKanban className="w-4 h-4" />
-                  <span>{client.projectCount} Projects</span>
+                  <span>{t('workspace.clients.projectsButton', { count: client.projectCount })}</span>
                 </button>
                 <div className="font-semibold text-green-600">
                   ${(client.totalRevenue / 1000).toFixed(0)}k
@@ -230,7 +232,7 @@ const WorkspaceClients: React.FC = () => {
               <div className="flex items-center gap-2 mt-4">
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   <Edit className="w-3 h-3" />
-                  Edit
+                  {t('workspace.clients.edit')}
                 </button>
                 <button className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
                   <Trash2 className="w-3 h-3" />
@@ -248,10 +250,10 @@ const WorkspaceClients: React.FC = () => {
             <Briefcase className="w-16 h-16 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-            No clients found
+            {t('workspace.clients.empty.title')}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            {searchQuery ? 'Try adjusting your search' : 'Get started by adding your first client'}
+            {searchQuery ? t('workspace.clients.empty.searchMessage') : t('workspace.clients.empty.startMessage')}
           </p>
           {isOwner && !searchQuery && (
             <button
@@ -259,7 +261,7 @@ const WorkspaceClients: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Add Client
+              {t('workspace.clients.addClient')}
             </button>
           )}
         </div>
@@ -273,7 +275,7 @@ const WorkspaceClients: React.FC = () => {
           if (!workspaceId) {
             dispatch({
               type: 'ADD_TOAST',
-              payload: { type: 'error', message: 'No active workspace selected.' },
+              payload: { type: 'error', message: t('workspace.clients.toast.noWorkspace') },
             });
             return;
           }
@@ -297,7 +299,7 @@ const WorkspaceClients: React.FC = () => {
               type: 'ADD_TOAST',
               payload: {
                 type: 'success',
-                message: `Client "${clientData.name}" added successfully!`,
+                message: t('workspace.clients.toast.createSuccess', { name: clientData.name }),
               },
             });
           } catch (error: any) {
@@ -306,7 +308,7 @@ const WorkspaceClients: React.FC = () => {
               type: 'ADD_TOAST',
               payload: {
                 type: 'error',
-                message: error?.message || 'Failed to create client',
+                message: error?.message || t('workspace.clients.toast.createError'),
               },
             });
           }
@@ -321,7 +323,7 @@ const WorkspaceClients: React.FC = () => {
             <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-600">
               <div>
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                  {selectedClient.name} - Projects
+                  {t('workspace.clients.modal.projectsTitle', { name: selectedClient.name })}
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   {selectedClient.company}
@@ -346,10 +348,10 @@ const WorkspaceClients: React.FC = () => {
                   <div className="text-center py-12">
                     <FolderKanban className="w-16 h-16 mx-auto text-gray-600 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                      No projects yet
+                      {t('workspace.clients.modal.noProjectsTitle')}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-200">
-                      This client doesn't have any projects assigned
+                      {t('workspace.clients.modal.noProjectsMessage')}
                     </p>
                   </div>
                 ) : (

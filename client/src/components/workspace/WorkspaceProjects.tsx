@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react';
 
 const WorkspaceProjects: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -81,10 +83,10 @@ const WorkspaceProjects: React.FC = () => {
   };
 
   const stats = [
-    { label: 'Total Projects', value: workspaceProjects.length, color: 'text-accent-dark' },
-    { label: 'Active', value: workspaceProjects.filter(p => p.status === 'active').length, color: 'text-green-600' },
-    { label: 'Completed', value: workspaceProjects.filter(p => p.status === 'completed').length, color: 'text-purple-600' },
-    { label: 'On Hold', value: workspaceProjects.filter(p => p.status === 'on-hold').length, color: 'text-yellow-600' }
+    { label: t('workspace.projects.stats.totalProjects'), value: workspaceProjects.length, color: 'text-accent-dark' },
+    { label: t('workspace.projects.stats.active'), value: workspaceProjects.filter(p => p.status === 'active').length, color: 'text-green-600' },
+    { label: t('workspace.projects.stats.completed'), value: workspaceProjects.filter(p => p.status === 'completed').length, color: 'text-purple-600' },
+    { label: t('workspace.projects.stats.onHold'), value: workspaceProjects.filter(p => p.status === 'on-hold').length, color: 'text-yellow-600' }
   ];
 
   return (
@@ -92,9 +94,9 @@ const WorkspaceProjects: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Projects</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('workspace.projects.title')}</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            Manage all workspace projects
+            {t('workspace.projects.subtitle')}
           </p>
         </div>
         {isOwner && (
@@ -103,7 +105,7 @@ const WorkspaceProjects: React.FC = () => {
             className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Create Project
+            {t('workspace.projects.createProject')}
           </button>
         )}
       </div>
@@ -124,7 +126,7 @@ const WorkspaceProjects: React.FC = () => {
           <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
           <input
             type="text"
-            placeholder="Search projects..."
+            placeholder={t('workspace.projects.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -137,11 +139,11 @@ const WorkspaceProjects: React.FC = () => {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent"
           >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="planning">Planning</option>
-            <option value="on-hold">On Hold</option>
-            <option value="completed">Completed</option>
+            <option value="all">{t('workspace.projects.filter.allStatus')}</option>
+            <option value="active">{t('workspace.projects.status.active')}</option>
+            <option value="planning">{t('workspace.projects.status.planning')}</option>
+            <option value="on-hold">{t('workspace.projects.status.onHold')}</option>
+            <option value="completed">{t('workspace.projects.status.completed')}</option>
           </select>
 
           <select
@@ -149,11 +151,11 @@ const WorkspaceProjects: React.FC = () => {
             onChange={(e) => setFilterPriority(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent"
           >
-            <option value="all">All Priority</option>
-            <option value="critical">Critical</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
+            <option value="all">{t('workspace.projects.filter.allPriority')}</option>
+            <option value="critical">{t('common.critical')}</option>
+            <option value="high">{t('common.high')}</option>
+            <option value="medium">{t('common.medium')}</option>
+            <option value="low">{t('common.low')}</option>
           </select>
 
           <div className="flex items-center gap-1 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
@@ -215,7 +217,7 @@ const WorkspaceProjects: React.FC = () => {
               {/* Progress Bar */}
               <div className="mb-3">
                 <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
-                  <span>Progress</span>
+                  <span>{t('workspace.projects.table.progress')}</span>
                   <span>{project.progress}%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -241,7 +243,7 @@ const WorkspaceProjects: React.FC = () => {
                 {project.dueDate && (
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    <span>{new Date(project.dueDate).toLocaleDateString()}</span>
+                    <span>{new Date(project.dueDate).toLocaleDateString(i18n.language)}</span>
                   </div>
                 )}
               </div>
@@ -268,25 +270,25 @@ const WorkspaceProjects: React.FC = () => {
             <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-600">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Project
+                  {t('workspace.projects.table.project')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Status
+                  {t('workspace.projects.table.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Priority
+                  {t('workspace.projects.table.priority')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Progress
+                  {t('workspace.projects.table.progress')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Team
+                  {t('workspace.projects.table.team')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Due Date
+                  {t('workspace.projects.table.dueDate')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
+                  {t('workspace.projects.table.actions')}
                 </th>
               </tr>
             </thead>
@@ -332,7 +334,7 @@ const WorkspaceProjects: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm text-gray-600 dark:text-gray-200">
-                      {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : '-'}
+                      {project.dueDate ? new Date(project.dueDate).toLocaleDateString(i18n.language) : '-'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -361,12 +363,12 @@ const WorkspaceProjects: React.FC = () => {
             <Grid className="w-16 h-16 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-            No projects found
+            {t('workspace.projects.empty.title')}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
             {searchQuery || filterStatus !== 'all' || filterPriority !== 'all'
-              ? 'Try adjusting your filters'
-              : 'Get started by creating your first project'}
+              ? t('workspace.projects.empty.filterMessage')
+              : t('workspace.projects.empty.startMessage')}
           </p>
           {isOwner && !searchQuery && filterStatus === 'all' && filterPriority === 'all' && (
             <button
@@ -374,7 +376,7 @@ const WorkspaceProjects: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Create Project
+              {t('workspace.projects.createProject')}
             </button>
           )}
         </div>
@@ -390,7 +392,7 @@ const WorkspaceProjects: React.FC = () => {
               type: 'ADD_TOAST',
               payload: {
                 type: 'error',
-                message: 'No active workspace selected. Please select a workspace first.',
+                message: t('workspace.projects.toastExtended.noWorkspace'),
               },
             });
             return;
@@ -418,7 +420,7 @@ const WorkspaceProjects: React.FC = () => {
               type: 'ADD_TOAST',
               payload: {
                 type: 'success',
-                message: `Project "${projectData.name}" created successfully!`,
+                message: t('workspace.projects.toastExtended.createSuccess', { name: projectData.name }),
               },
             });
           } catch (error: any) {
@@ -427,7 +429,7 @@ const WorkspaceProjects: React.FC = () => {
               type: 'ADD_TOAST',
               payload: {
                 type: 'error',
-                message: error?.message || 'Failed to create project',
+                message: error?.message || t('workspace.projects.toastExtended.createError'),
               },
             });
           }

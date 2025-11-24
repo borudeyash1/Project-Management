@@ -4,6 +4,7 @@ import {
   CheckCircle, ArrowRight, ArrowLeft, Loader, Bot, Lightbulb,
   Briefcase, Code, Palette, BarChart3, Globe, Shield, Zap
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import apiService from '../services/api';
 
@@ -33,6 +34,7 @@ interface CreateAIWorkspaceModalProps {
 }
 
 const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const { dispatch } = useApp();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -208,13 +210,13 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
           <Bot className="w-8 h-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">AI-Powered Workspace Creation</h3>
-        <p className="text-gray-600">Tell us about your organization and let AI create the perfect workspace for you</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('workspace.aiWorkspaceCreation')}</h3>
+        <p className="text-gray-600">{t('workspace.aiWorkspaceDesc')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Organization Type</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.organizationType')}</label>
           <select
             value={workspaceData.type}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, type: e.target.value as any }))}
@@ -230,13 +232,13 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.industry')}</label>
           <select
             value={workspaceData.industry}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, industry: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
-            <option value="">Select Industry</option>
+            <option value="">{t('workspace.selectIndustry')}</option>
             {industryOptions.map(industry => (
               <option key={industry} value={industry}>{industry}</option>
             ))}
@@ -244,7 +246,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Team Size</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.teamSize')}</label>
           <select
             value={workspaceData.teamSize}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, teamSize: e.target.value as any }))}
@@ -259,7 +261,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Budget</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.budget')}</label>
           <select
             value={workspaceData.budget}
             onChange={(e) => setWorkspaceData(prev => ({ ...prev, budget: e.target.value as any }))}
@@ -274,7 +276,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Primary Goals</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.primaryGoals')}</label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {goalOptions.map(goal => (
             <label key={goal} className="flex items-center">
@@ -304,12 +306,12 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mb-4">
           <Lightbulb className="w-8 h-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Customize Your Workspace</h3>
-        <p className="text-gray-600">Select features and integrations that match your workflow</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('workspace.customizeWorkspace')}</h3>
+        <p className="text-gray-600">{t('workspace.selectFeatures')}</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Essential Features</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.essentialFeatures')}</label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {featureOptions.map(feature => (
             <label key={feature} className="flex items-center">
@@ -332,7 +334,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Integrations</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.integrations')}</label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {integrationOptions.map(integration => (
             <label key={integration} className="flex items-center">
@@ -355,13 +357,13 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('workspace.timeline')}</label>
         <select
           value={workspaceData.timeline}
           onChange={(e) => setWorkspaceData(prev => ({ ...prev, timeline: e.target.value as any }))}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
         >
-          <option value="immediate">Immediate</option>
+          <option value="immediate">{t('workspace.immediate')}</option>
           <option value="1-month">Within 1 month</option>
           <option value="3-months">Within 3 months</option>
           <option value="6-months">Within 6 months</option>
@@ -376,8 +378,8 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mb-4">
           <CheckCircle className="w-8 h-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">AI-Generated Workspace</h3>
-        <p className="text-gray-600">Review and customize your AI-created workspace</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('workspace.aiGeneratedWorkspace')}</h3>
+        <p className="text-gray-600">{t('workspace.reviewCustomize')}</p>
       </div>
 
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
@@ -391,25 +393,25 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium text-gray-700">Type:</span>
+            <span className="font-medium text-gray-700">{t('workspace.type')}:</span>
             <span className="ml-2 text-gray-600 capitalize">{workspaceData.type}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Industry:</span>
+            <span className="font-medium text-gray-700">{t('workspace.industry')}:</span>
             <span className="ml-2 text-gray-600">{workspaceData.industry}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Team Size:</span>
+            <span className="font-medium text-gray-700">{t('workspace.teamSize')}:</span>
             <span className="ml-2 text-gray-600">{workspaceData.teamSize} people</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Budget:</span>
+            <span className="font-medium text-gray-700">{t('workspace.budget')}:</span>
             <span className="ml-2 text-gray-600 capitalize">{workspaceData.budget}</span>
           </div>
         </div>
 
         <div>
-          <span className="font-medium text-gray-700 text-sm">Goals:</span>
+          <span className="font-medium text-gray-700 text-sm">{t('workspace.goals')}:</span>
           <div className="flex flex-wrap gap-1 mt-1">
             {workspaceData.goals.map(goal => (
               <span key={goal} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
@@ -420,7 +422,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         </div>
 
         <div>
-          <span className="font-medium text-gray-700 text-sm">Features:</span>
+          <span className="font-medium text-gray-700 text-sm">{t('workspace.features')}:</span>
           <div className="flex flex-wrap gap-1 mt-1">
             {workspaceData.features.map(feature => (
               <span key={feature} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
@@ -431,7 +433,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         </div>
 
         <div>
-          <span className="font-medium text-gray-700 text-sm">Integrations:</span>
+          <span className="font-medium text-gray-700 text-sm">{t('workspace.integrations')}:</span>
           <div className="flex flex-wrap gap-1 mt-1">
             {workspaceData.integrations.map(integration => (
               <span key={integration} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
@@ -446,9 +448,9 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
         <div className="flex items-start gap-3">
           <Zap className="w-5 h-5 text-accent-dark mt-0.5" />
           <div>
-            <h4 className="font-medium text-blue-900">AI Recommendations</h4>
+            <h4 className="font-medium text-blue-900">{t('workspace.aiRecommendations')}</h4>
             <p className="text-sm text-blue-700 mt-1">
-              Based on your selections, AI has optimized your workspace for maximum productivity and team collaboration.
+              {t('workspace.aiOptimized')}
             </p>
           </div>
         </div>
@@ -463,9 +465,9 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {step === 1 && 'AI Workspace Setup'}
-            {step === 2 && 'Customize Features'}
-            {step === 3 && 'Review & Create'}
+            {step === 1 && t('workspace.aiWorkspaceSetup')}
+            {step === 2 && t('workspace.customizeFeatures')}
+            {step === 3 && t('workspace.reviewCreate')}
           </h2>
           <button onClick={onClose} className="text-gray-600 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -476,8 +478,8 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
           {/* Progress Bar */}
           <div className="mb-6">
             <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-              <span>Step {step} of 3</span>
-              <span>{Math.round((step / 3) * 100)}% Complete</span>
+              <span>{t('workspace.stepOf', { current: step, total: 3 })}</span>
+              <span>{t('workspace.percentComplete', { percent: Math.round((step / 3) * 100) })}</span>
             </div>
             <div className="w-full bg-gray-300 rounded-full h-2">
               <div
@@ -499,7 +501,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 inline mr-2" />
-              Back
+              {t('workspace.back')}
             </button>
           )}
           
@@ -508,7 +510,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
               onClick={() => setStep(step + 1)}
               className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
             >
-              Next
+              {t('workspace.next')}
               <ArrowRight className="w-4 h-4 inline ml-2" />
             </button>
           ) : step === 2 ? (
@@ -543,7 +545,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
               ) : (
                 <>
                   <CheckCircle className="w-4 h-4 inline mr-2" />
-                  Create Workspace
+                  {t('workspace.createWorkspace')}
                 </>
               )}
             </button>
