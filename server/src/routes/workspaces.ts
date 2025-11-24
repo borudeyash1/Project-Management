@@ -13,7 +13,11 @@ import {
   verifyWorkspaceCreationOtp,
   discoverWorkspaces,
   sendWorkspaceInvite,
-  acceptWorkspaceInvite
+  acceptWorkspaceInvite,
+  rejectWorkspaceInvite,
+  getSentInvitations,
+  getReceivedInvitations,
+  cancelWorkspaceInvite
 } from '../controllers/workspaceController';
 import { sendMemberRemovalOtp, validateMemberRemovalOtp } from '../controllers/memberRemovalOtp';
 
@@ -40,5 +44,9 @@ router.delete('/:id/members/:memberId', removeMember);
 router.put('/:id/members/:memberId/role', updateMemberRole);
 router.post('/:id/invite', sendWorkspaceInvite);
 router.post('/:id/accept-invite', acceptWorkspaceInvite);
+router.post('/:id/reject-invite', rejectWorkspaceInvite);
+router.get('/invitations/received', getReceivedInvitations);
+router.get('/:id/invitations', getSentInvitations);
+router.delete('/:id/invitations/:invitationId', cancelWorkspaceInvite);
 
 export default router;
