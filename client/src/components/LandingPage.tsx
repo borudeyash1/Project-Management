@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Users, BarChart3, Zap, Play, TrendingUp, Clock, Shield } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import ContentBanner from './ContentBanner';
 
 const LandingPage: React.FC = () => {
+  const { t } = useTranslation();
   const { isDarkMode } = useTheme();
   const [scrollY, setScrollY] = useState(0);
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -55,30 +57,30 @@ const LandingPage: React.FC = () => {
           <div className="text-center">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 shadow-lg animate-fade-in ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
               <Zap className="w-4 h-4" />
-              <span className="text-sm font-medium">Trusted by 10,000+ teams worldwide</span>
+              <span className="text-sm font-medium">{t('landing.trustedBy')}</span>
             </div>
             <h1 className={`text-4xl md:text-7xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6 animate-fade-in-up`}>
-              Project Management
+              {t('landing.hero.title')}
               <span className="block text-accent mt-2">
-                Made Simple
+                {t('landing.hero.subtitle')}
               </span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200`}>
-              Streamline your projects, collaborate with your team, and achieve your goals with our intuitive project management platform.
+              {t('landing.hero.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
               <Link
                 to="/register"
                 className="group bg-accent hover:bg-accent-hover text-gray-900 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl hover:shadow-accent/50 hover:scale-105 transform"
               >
-                Get Started Free
+                {t('landing.hero.getStarted')}
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/user-guide"
                 className={`border-2 ${isDarkMode ? 'border-gray-300 text-gray-100 hover:border-accent hover:text-accent hover:bg-accent/10' : 'border-gray-300 text-gray-800 hover:border-accent hover:text-accent hover:bg-amber-50'} px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 transform shadow-lg`}
               >
-                Learn More
+                {t('landing.hero.learnMore')}
               </Link>
             </div>
 
@@ -98,7 +100,7 @@ const LandingPage: React.FC = () => {
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     </div>
                     <div className={`flex-1 text-center text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
-                      Sartthi Dashboard
+                      {t('landing.dashboard.title')}
                     </div>
                   </div>
 
@@ -112,7 +114,7 @@ const LandingPage: React.FC = () => {
                             <TrendingUp className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>Active Projects</div>
+                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.activeProjects')}</div>
                             <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>24</div>
                           </div>
                         </div>
@@ -123,7 +125,7 @@ const LandingPage: React.FC = () => {
                             <CheckCircle className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>Completed</div>
+                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.completed')}</div>
                             <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>156</div>
                           </div>
                         </div>
@@ -134,7 +136,7 @@ const LandingPage: React.FC = () => {
                             <Clock className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>In Progress</div>
+                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.inProgress')}</div>
                             <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>12</div>
                           </div>
                         </div>
@@ -144,8 +146,8 @@ const LandingPage: React.FC = () => {
                     {/* Simulated Chart/Graph */}
                     <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                       <div className="flex items-center justify-between mb-4">
-                        <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Progress</div>
-                        <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>Last 7 days</div>
+                        <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('landing.dashboard.projectProgress')}</div>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.last7Days')}</div>
                       </div>
                       <div className="flex items-end gap-2 h-32">
                         {[40, 65, 45, 80, 60, 90, 75].map((height, i) => (
@@ -173,15 +175,15 @@ const LandingPage: React.FC = () => {
             <div className="mt-12 flex flex-wrap justify-center items-center gap-8 opacity-70 animate-fade-in-up animation-delay-800">
               <div className="flex items-center gap-2">
                 <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>No credit card required</span>
+                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{t('landing.trust.noCreditCard')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>14-day free trial</span>
+                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{t('landing.trust.freeTrial')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>Cancel anytime</span>
+                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{t('landing.trust.cancelAnytime')}</span>
               </div>
             </div>
           </div>
@@ -191,13 +193,13 @@ const LandingPage: React.FC = () => {
         <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className={`text-center mb-16 ${featuresVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
             <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-accent/20 text-accent' : 'bg-amber-100 text-amber-700'} text-sm font-semibold mb-4`}>
-              FEATURES
+              {t('landing.features.badge')}
             </span>
             <h2 className={`text-3xl md:text-5xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              Everything you need to manage projects
+              {t('landing.features.title')}
             </h2>
             <p className={`text-xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} max-w-2xl mx-auto`}>
-              Powerful features designed to help you and your team succeed
+              {t('landing.features.subtitle')}
             </p>
           </div>
 
@@ -209,9 +211,9 @@ const LandingPage: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>Task Management</h3>
+              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>{t('landing.features.taskManagement.title')}</h3>
               <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
-                Create, assign, and track tasks with ease. Keep your team organized and on track with powerful task management tools.
+                {t('landing.features.taskManagement.description')}
               </p>
             </div>
 
@@ -220,9 +222,9 @@ const LandingPage: React.FC = () => {
               <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>Team Collaboration</h3>
+              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>{t('landing.features.teamCollaboration.title')}</h3>
               <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
-                Work together seamlessly with real-time updates and communication tools that keep everyone in sync.
+                {t('landing.features.teamCollaboration.description')}
               </p>
             </div>
 
@@ -231,9 +233,9 @@ const LandingPage: React.FC = () => {
               <div className={`w-16 h-16 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                 <BarChart3 className="w-8 h-8 text-white" />
               </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-purple-500 transition-colors`}>Analytics & Reports</h3>
+              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-purple-500 transition-colors`}>{t('landing.features.analytics.title')}</h3>
               <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
-                Get insights into your project performance with detailed analytics and comprehensive reports.
+                {t('landing.features.analytics.description')}
               </p>
             </div>
           </div>
@@ -250,27 +252,27 @@ const LandingPage: React.FC = () => {
 
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                  Ready to get started?
+                  {t('landing.cta.title')}
                 </h2>
                 <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
-                  Join thousands of teams already using Sartthi to manage their projects efficiently.
+                  {t('landing.cta.description')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     to="/register"
                     className="group bg-white text-orange-600 px-10 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-2xl hover:scale-105 transform"
                   >
-                    Start Your Free Trial
+                    {t('landing.cta.startTrial')}
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
                     to="/about"
                     className="border-2 border-white text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-xl hover:scale-105 transform"
                   >
-                    Learn More About Us
+                    {t('landing.cta.learnMore')}
                   </Link>
                 </div>
-                <p className="text-white/80 text-sm mt-6">No credit card required • 14-day free trial • Cancel anytime</p>
+                <p className="text-white/80 text-sm mt-6">{t('landing.cta.footer')}</p>
               </div>
             </div>
           </div>

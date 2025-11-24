@@ -114,7 +114,9 @@
         "aiAssistant": "AIアシスタント",
         "aiSuggestions": "AI提案",
         "aiDescription": "AIによる分析と提案",
-        "askAI": "AIに聞く"
+        "askAI": "AIに聞く",
+        "average": "平均",
+        "productivityIncrease": "生産性向上"
     },
     "plans": {
         "plan": "プラン: {{plan}}",
@@ -177,6 +179,9 @@
         "dueDate": "期限",
         "noProjects": "まだプロジェクトがありません",
         "createFirst": "最初のプロジェクトを作成",
+        "teamMembers": "{{count}}人のメンバー",
+        "due": "期限: {{date}}",
+        "planning": "計画中",
         "createProject": "プロジェクトを作成"
     },
     "tasks": {
@@ -222,6 +227,7 @@
         "endTime": "終了時間",
         "filter": "フィルター",
         "search": "タスクを検索...",
+        "daysLeft": "残り{{count}}日",
         "description": "プロジェクトやワークスペース全体のタスクを管理します。",
         "allAssignees": "すべての担当者",
         "templates": "タスクテンプレート",
@@ -314,6 +320,7 @@
     },
     "settings": {
         "title": "設定",
+        "subtitle": "アカウント設定と環境設定を管理",
         "general": "一般",
         "appearance": "外観",
         "language": "言語",
@@ -326,9 +333,9 @@
         "integrations": "統合",
         "advanced": "詳細設定",
         "theme": "テーマ",
-        "lightMode": "ライトモード",
-        "darkMode": "ダークモード",
-        "systemMode": "システム",
+        "light": "ライトモード",
+        "dark": "ダークモード",
+        "system": "システム",
         "accentColor": "アクセントカラー",
         "fontSize": "フォントサイズ",
         "density": "密度",
@@ -338,20 +345,635 @@
         "small": "小",
         "medium": "中",
         "large": "大",
-        "subtitle": "アカウント設定と環境設定を管理",
         "dataExport": "データとエクスポート",
-        "accountInformation": "アカウント情報",
+        "accountInfo": "アカウント情報",
         "username": "ユーザー名",
         "email": "メール",
-        "twoFactorAuth": "二要素認証",
-        "twoFactorAuthDescription": "セキュリティの追加レイヤーを追加",
+        "twoFactor": "二要素認証",
+        "twoFactorDesc": "セキュリティの追加レイヤーを追加",
         "loginNotifications": "ログイン通知",
-        "loginNotificationsDescription": "新しいログインの通知を受け取る",
+        "loginNotificationsDesc": "新しいログインの通知を受け取る",
         "sessionManagement": "セッション管理",
         "sessionTimeout": "セッションタイムアウト（分）",
         "dangerZone": "危険ゾーン",
         "deleteAccount": "アカウントを削除",
-        "deleteAccountDescription": "アカウントとすべてのデータを完全に削除"
+        "deleteAccountDesc": "アカウントとすべてのデータを完全に削除",
+        "emailNotifications": "メール通知",
+        "pushNotifications": "プッシュ通知",
+        "desktopNotifications": "デスクトップ通知",
+        "taskUpdates": "タスクの更新",
+        "projectUpdates": "プロジェクトの更新",
+        "mentions": "メンション",
+        "deadlines": "期限",
+        "weeklyDigest": "週間ダイジェスト",
+        "sound": "サウンド",
+        "badges": "バッジ",
+        "accessibility": "アクセシビリティ",
+        "animations": "アニメーション",
+        "animationsDesc": "スムーズな遷移とアニメーションを有効にする",
+        "reducedMotion": "視差効果を減らす",
+        "reducedMotionDesc": "アクセシビリティのためにアニメーションを最小限に抑える",
+        "currentPlan": "現在のプラン",
+        "nextBilling": "次回の請求: {{date}}",
+        "upgradePlan": "プランをアップグレード",
+        "usage": "使用状況",
+        "projects": "プロジェクト",
+        "storage": "ストレージ",
+        "paymentMethod": "支払い方法",
+        "expires": "有効期限 {{date}}",
+        "recentInvoices": "最近の請求書",
+        "exportData": "データのエクスポート",
+        "exportDataDesc": "さまざまな形式でデータのコピーをダウンロード",
+        "autoBackup": "自動バックアップ",
+        "autoBackupDesc": "データを自動的にバックアップ",
+        "backupFrequency": "バックアップ頻度",
+        "dataLocation": "データの場所",
+        "primaryDataCenter": "プライマリデータセンター",
+        "deleteAccountWarning": "この操作は取り消せません。すべてのデータが完全に削除されます。",
+        "deleteReason": "削除の理由",
+        "deleteReasonPlaceholder": "アカウントを削除する理由をお聞かせください...",
+        "deleting": "削除中...",
+        "exportWarning": "これにより、すべてのデータのコピーが{{format}}形式でダウンロードされます。",
+        "exporting": "エクスポート中...",
+        "updateSuccess": "設定が正常に更新されました！",
+        "updateError": "設定の更新に失敗しました。もう一度お試しください。",
+        "deleteReasonRequired": "アカウント削除の理由を入力してください。",
+        "deleteScheduled": "アカウントの削除がスケジュールされました。確認メールが送信されます。",
+        "deleteError": "アカウント削除のスケジュールに失敗しました。もう一度お試しください。",
+        "exportSuccess": "データが正常にエクスポートされました！",
+        "exportError": "データのエクスポートに失敗しました。もう一度お試しください。",
+        "themeUpdated": "テーマが{{theme}}に変更されました",
+        "themeError": "テーマの更新に失敗しました",
+        "accentColorUpdated": "アクセントカラーが更新されました",
+        "accentColorError": "アクセントカラーの更新に失敗しました",
+        "fontSizeUpdated": "フォントサイズが{{size}}に変更されました",
+        "fontSizeError": "フォントサイズの更新に失敗しました",
+        "densityUpdated": "密度が{{density}}に変更されました",
+        "densityError": "密度の更新に失敗しました"
+    },
+    "landing": {
+        "trustedBy": "世界中の10,000以上のチームに信頼されています",
+        "hero": {
+            "title": "プロジェクト管理を",
+            "subtitle": "もっとシンプルに",
+            "description": "直感的なプロジェクト管理プラットフォームで、プロジェクトを効率化し、チームと協力して目標を達成しましょう。",
+            "getStarted": "無料で始める",
+            "learnMore": "詳細を見る"
+        },
+        "dashboard": {
+            "title": "Sartthi ダッシュボード",
+            "activeProjects": "アクティブなプロジェクト",
+            "completed": "完了",
+            "inProgress": "進行中",
+            "projectProgress": "プロジェクトの進捗",
+            "last7Days": "過去7日間"
+        },
+        "trust": {
+            "noCreditCard": "クレジットカード不要",
+            "freeTrial": "14日間無料トライアル",
+            "cancelAnytime": "いつでもキャンセル可能"
+        },
+        "features": {
+            "badge": "機能",
+            "title": "プロジェクト管理に必要なすべて",
+            "subtitle": "あなたとチームの成功を支援する強力な機能",
+            "taskManagement": {
+                "title": "タスク管理",
+                "description": "タスクの作成、割り当て、追跡が簡単に行えます。強力なタスク管理ツールでチームを整理し、順調に進めましょう。"
+            },
+            "teamCollaboration": {
+                "title": "チームコラボレーション",
+                "description": "リアルタイムの更新とコミュニケーションツールで、全員が同期を取りながらシームレスに協力できます。"
+            },
+            "analytics": {
+                "title": "分析とレポート",
+                "description": "詳細な分析と包括的なレポートで、プロジェクトのパフォーマンスに関する洞察を得られます。"
+            }
+        },
+        "cta": {
+            "title": "始める準備はできましたか？",
+            "description": "すでにSartthiを使用してプロジェクトを効率的に管理している数千のチームに参加しましょう。",
+            "startTrial": "無料トライアルを開始",
+            "learnMore": "私たちについてもっと知る",
+            "footer": "クレジットカード不要 • 14日間無料トライアル • いつでもキャンセル可能"
+        }
+    },
+    "about": {
+        "backToHome": "ホームに戻る",
+        "badge": "私たちについて",
+        "title": "Sartthiについて",
+        "subtitle": "私たちは、一度に一つの機能でプロジェクト管理の未来を築いています。",
+        "mission": {
+            "title": "私たちのミッション",
+            "description": "Sartthiでは、素晴らしいプロジェクトは素晴らしいツールから始まると信じています。私たちのミッションは、プロジェクト管理を簡素化し、あらゆる規模のチームが利用できるようにすることです。チームが効果的に協力し、目標を達成するのに役立つ、直感的で強力かつ信頼性の高いソリューションを提供することに取り組んでいます。"
+        },
+        "offer": {
+            "title": "私たちが提供するもの",
+            "items": {
+                "tracking": "包括的なプロジェクト追跡と管理",
+                "collaboration": "リアルタイムコラボレーションツール",
+                "analytics": "高度な分析とレポート",
+                "communication": "シームレスなチームコミュニケーション",
+                "workflows": "カスタマイズ可能なワークフロー"
+            }
+        },
+        "choose": {
+            "title": "Sartthiを選ぶ理由",
+            "items": {
+                "interface": "生産性のために設計されたユーザーフレンドリーなインターフェース",
+                "scalable": "あらゆる規模のチームに対応するスケーラブルなソリューション",
+                "support": "24時間365日のカスタマーサポート",
+                "updates": "定期的なアップデートと新機能",
+                "security": "安全で信頼性の高いインフラストラクチャ"
+            }
+        },
+        "team": {
+            "title": "私たちのチーム",
+            "description": "Sartthiは、現代のチームコラボレーションの課題を理解している開発者、デザイナー、プロジェクト管理の専門家からなる情熱的なチームによって構築されています。私たちは常にプラットフォームを改善し、ユーザーのフィードバックに基づいて新機能を追加することに取り組んでいます。",
+            "development": {
+                "title": "開発チーム",
+                "subtitle": "未来を築く"
+            },
+            "design": {
+                "title": "デザインチーム",
+                "subtitle": "美しい体験を創造する"
+            },
+            "support": {
+                "title": "サポートチーム",
+                "subtitle": "いつでもお手伝いします"
+            }
+        },
+        "office": {
+            "title": "オフィスを訪問",
+            "headquarters": "The Tech Factory 本社",
+            "address": {
+                "label": "住所:",
+                "line1": "カウシャリヤナガル、アーメドナガル - アウランガバードロード",
+                "line2": "スーリヤナガル、リライアンスガソリンスタンド近く",
+                "line3": "マハラシュトラ州 アヒリヤナガル 414003"
+            },
+            "hours": {
+                "label": "営業時間:",
+                "weekdays": "月曜日 - 金曜日: 午前9:00 - 午後6:00",
+                "saturday": "土曜日: 午前10:00 - 午後4:00",
+                "sunday": "日曜日: 休業"
+            },
+            "contact": {
+                "label": "連絡先:",
+                "phone": "電話: +91 12345 67890",
+                "email": "メール: contact@thetechfactory.com"
+            },
+            "viewMaps": "Googleマップで見る",
+            "openMaps": "マップで開く"
+        },
+        "contact": {
+            "title": "お問い合わせ",
+            "description": "ご質問やご意見はありますか？ご連絡をお待ちしております。",
+            "startTrial": "無料トライアルを開始",
+            "support": "サポートに連絡"
+        }
+    },
+    "userGuide": {
+        "backToHome": "ホームに戻る",
+        "badge": "完全なドキュメント",
+        "title": "ユーザーガイド",
+        "subtitle": "Sartthiを最大限に活用するために知っておくべきことすべて。",
+        "quickStart": {
+            "title": "クイックスタート",
+            "steps": {
+                "signUp": {
+                    "title": "サインアップ",
+                    "description": "数秒で無料アカウントを作成"
+                },
+                "createWorkspace": {
+                    "title": "ワークスペースを作成",
+                    "description": "チームのワークスペースを設定"
+                },
+                "startManaging": {
+                    "title": "管理を開始",
+                    "description": "プロジェクトとタスクを作成"
+                }
+            }
+        },
+        "sections": {
+            "gettingStarted": {
+                "title": "はじめに",
+                "createAccount": {
+                    "title": "1. アカウントを作成",
+                    "description": "Sartthiを始めるために無料アカウントに登録してください。"
+                },
+                "setupWorkspace": {
+                    "title": "2. ワークスペースを設定",
+                    "description": "最初のワークスペースを作成し、チームメンバーを招待します。"
+                },
+                "createProject": {
+                    "title": "3. 最初のプロジェクトを作成",
+                    "description": "プロジェクトを作成し、タスクを追加することから始めましょう。"
+                }
+            },
+            "managingProjects": {
+                "title": "プロジェクトの管理",
+                "creating": {
+                    "title": "プロジェクトの作成",
+                    "description": "「プロジェクトを作成」ボタンをクリックして、新しいプロジェクトを開始します。名前、説明、タイムラインなどのプロジェクト詳細を入力します。"
+                },
+                "settings": {
+                    "title": "プロジェクト設定",
+                    "description": "プロジェクト設定、チーム権限、通知設定を構成します。"
+                },
+                "analytics": {
+                    "title": "プロジェクト分析",
+                    "description": "組み込みの分析およびレポートツールでプロジェクトの進捗を追跡します。"
+                }
+            },
+            "taskManagement": {
+                "title": "タスク管理",
+                "creating": {
+                    "title": "タスクの作成",
+                    "description": "詳細な説明、期日、担当者を指定して、プロジェクトにタスクを追加します。"
+                },
+                "status": {
+                    "title": "タスクステータス",
+                    "description": "タスクステータスを更新します：Todo、進行中、完了、または保留。"
+                },
+                "dependencies": {
+                    "title": "タスクの依存関係",
+                    "description": "適切なワークフロー順序を確保するために、タスクの依存関係を設定します。"
+                }
+            },
+            "collaboration": {
+                "title": "チームコラボレーション",
+                "inviting": {
+                    "title": "チームメンバーの招待",
+                    "description": "ワークスペースにチームメンバーを招待し、プロジェクトに割り当てます。"
+                },
+                "roles": {
+                    "title": "役割管理",
+                    "description": "チームメンバーに異なる役割と権限を割り当てます。"
+                },
+                "communication": {
+                    "title": "コミュニケーション",
+                    "description": "タスクやプロジェクト内でコミュニケーションをとるために、コメントやメンションを使用します。"
+                }
+            },
+            "analytics": {
+                "title": "分析とレポート",
+                "projectAnalytics": {
+                    "title": "プロジェクト分析",
+                    "description": "プロジェクトの進捗、チームのパフォーマンス、時間追跡に関する詳細な分析を表示します。"
+                },
+                "customReports": {
+                    "title": "カスタムレポート",
+                    "description": "利害関係者やチームメンバー向けのカスタムレポートを生成します。"
+                },
+                "exportData": {
+                    "title": "データのエクスポート",
+                    "description": "外部分析のために、さまざまな形式でプロジェクトデータをエクスポートします。"
+                }
+            },
+            "troubleshooting": {
+                "title": "トラブルシューティング",
+                "commonIssues": {
+                    "title": "一般的な問題",
+                    "description": "一般的な問題やよくある質問の解決策を見つけます。"
+                },
+                "performance": {
+                    "title": "パフォーマンスのヒント",
+                    "description": "これらのパフォーマンスのヒントで、Sartthiのエクスペリエンスを最適化します。"
+                },
+                "contact": {
+                    "title": "サポートに連絡",
+                    "description": "必要なときにサポートチームから助けを得られます。"
+                }
+            }
+        },
+        "support": {
+            "badge": "24/7サポート利用可能",
+            "title": "さらに助けが必要ですか？",
+            "description": "私たちのサポートチームがあなたの成功を支援します。",
+            "contact": "サポートに連絡",
+            "getStarted": "始める"
+        }
+    },
+    "pricing": {
+        "badge": "すべてのワークスペースに柔軟な価格設定",
+        "title": "Sartthiの完全なプロジェクトと給与スイートを解放",
+        "subtitle": "管理者が設定したプランを選択してください。チェックアウト時にクーポンやアフィリエイトリンクを適用し、支払いゲートウェイなしで即座にアップグレードできます。",
+        "highlights": {
+            "aiCollaboration": "AIコパイロットとの無制限のコラボレーション",
+            "coupons": "管理者定義のクーポンとアフィリエイト収益",
+            "analytics": "高度な分析、給与、自動化",
+            "security": "エンタープライズグレードのセキュリティとコンプライアンス"
+        },
+        "authPrompt": {
+            "title": "認証が必要です",
+            "message": "{{planName}}プランを選択するには、ログインまたはアカウントを作成してください。",
+            "description": "すでにアカウントをお持ちですか？ログインを続行してください。Sartthiは初めてですか？まずサインアップしてから、アップグレードを完了してください。",
+            "login": "ログイン",
+            "signup": "サインアップ"
+        },
+        "loading": "プランを読み込んでいます...",
+        "mostPopular": "最も人気",
+        "free": "無料",
+        "perMonth": "月あたり",
+        "limits": {
+            "workspaces": "ワークスペース",
+            "projects": "プロジェクト",
+            "teamMembers": "チームメンバー",
+            "unlimited": "無制限"
+        },
+        "buttons": {
+            "getStartedFree": "無料で始める",
+            "choosePro": "プロユーザーを選択",
+            "chooseUltra": "ウルトラを選択"
+        },
+        "features": {
+            "security": {
+                "title": "セキュリティ第一のアーキテクチャ",
+                "description": "ロールベースのアクセス、監査ログ、SSO対応。",
+                "items": {
+                    "planLimits": "管理者が設定可能なプラン制限",
+                    "otpGated": "OTPゲート付きワークスペース作成",
+                    "customBilling": "承認付きカスタム請求バイパス"
+                }
+            },
+            "affiliate": {
+                "title": "アフィリエイトとクーポンエンジン",
+                "description": "エバンジェリストに報酬を与え、チームに即座の節約を提供します。",
+                "items": {
+                    "couponCatalog": "管理者管理のクーポンカタログ",
+                    "affiliateCodes": "コミッション追跡付きアフィリエイトコード",
+                    "instantValidation": "チェックアウト時の即時検証"
+                }
+            }
+        }
+    },
+    "footer": {
+        "companyName": "The Tech Factory",
+        "description": "革新的なプロジェクト管理ソリューションでチームを強化します。組織がワークフローを合理化し、目標を効率的に達成するためのツールを構築しています。",
+        "location": "アヒリヤナガル、マハラシュトラ、インド",
+        "email": "contact@thetechfactory.com",
+        "phone": "+91 12345 67890",
+        "quickLinks": "クイックリンク",
+        "home": "ホーム",
+        "aboutUs": "私たちについて",
+        "userGuide": "ユーザーガイド",
+        "login": "ログイン",
+        "register": "登録",
+        "services": "サービス",
+        "projectManagement": "プロジェクト管理",
+        "teamCollaboration": "チームコラボレーション",
+        "taskTracking": "タスク追跡",
+        "payrollManagement": "給与管理",
+        "analyticsReports": "分析とレポート",
+        "customSolutions": "カスタムソリューション",
+        "copyright": "© {{year}} The Tech Factory. 全著作権所有。",
+        "privacyPolicy": "プライバシーポリシー",
+        "termsOfService": "利用規約",
+        "cookiePolicy": "クッキーポリシー"
+    },
+    "docs": {
+        "title": "ドキュメント",
+        "searchPlaceholder": "ドキュメントを検索...",
+        "noArticleTitle": "記事が選択されていません",
+        "noArticleDescription": "サイドバーから記事を選択して開始してください",
+        "breadcrumbDocs": "ドキュメント"
+    },
+    "auth": {
+        "login": {
+            "title": "ログイン",
+            "emailLabel": "メールアドレスまたはユーザー名",
+            "emailPlaceholder": "you@company.com",
+            "passwordLabel": "パスワード",
+            "passwordPlaceholder": "••••••••",
+            "forgotPassword": "お忘れですか？",
+            "rememberMe": "ログイン状態を保持",
+            "ssoEnabled": "SSO有効",
+            "continueButton": "続ける",
+            "signingIn": "サインイン中...",
+            "orDivider": "または",
+            "googleButton": "Googleで続ける",
+            "welcomeBack": "おかえりなさい！",
+            "loginFailed": "ログインに失敗しました",
+            "desktopSignIn": "Sartthiデスクトップサインイン",
+            "desktopMessage": "デスクトップアプリからログインを開始しました。ここでサインインすると、デスクトップアプリが自動的に再度開きます。",
+            "switchToRegister": "登録"
+        },
+        "otp": {
+            "title": "ログインを確認",
+            "description": "6桁の確認コードを送信しました",
+            "verifyButton": "OTPを確認",
+            "verifying": "確認中...",
+            "resendOtp": "OTPを再送信",
+            "resendIn": "OTPを再送信",
+            "seconds": "秒",
+            "otpSent": "OTPが正常に再送信されました",
+            "otpFailed": "OTPの再送信に失敗しました",
+            "enterComplete": "完全な6桁のOTPを入力してください",
+            "verificationFailed": "OTP確認に失敗しました",
+            "loginSuccess": "ログイン成功！おかえりなさい！",
+            "checkEmail": "ログインを確認するためにメールをご確認ください"
+        },
+        "hero": {
+            "badge": "プロジェクト、給与、プランナー — 統合",
+            "title": "計画、追跡、支払い — すべて一箇所で",
+            "subtitle": "あらゆる規模のチームのためのワークスペース、役割、分析、自動化。"
+        },
+        "register": {
+            "title": "登録",
+            "switchToLogin": "ログイン",
+            "steps": {
+                "personalInfo": "個人情報",
+                "professional": "職業情報",
+                "skillsGoals": "スキルと目標",
+                "preferences": "設定",
+                "aiSetup": "AI設定"
+            },
+            "step1": {
+                "heading": "あなたのことを教えてください",
+                "subheading": "体験をパーソナライズするために、あなた自身について教えてください",
+                "fullName": "フルネーム",
+                "fullNamePlaceholder": "山田 太郎",
+                "username": "ユーザー名",
+                "usernamePlaceholder": "yamadataro",
+                "email": "メールアドレス",
+                "emailPlaceholder": "name@company.com",
+                "contactNumber": "電話番号",
+                "contactNumberPlaceholder": "+81 90 1234 5678",
+                "password": "パスワード",
+                "passwordPlaceholder": "••••••••",
+                "confirmPassword": "パスワード確認",
+                "orDivider": "または",
+                "googleButton": "Googleで続ける",
+                "signedInAs": "サインイン済み",
+                "required": "*"
+            },
+            "step2": {
+                "heading": "職業情報",
+                "subheading": "あなたの職業的背景を理解するのに役立ちます",
+                "jobTitle": "役職",
+                "jobTitlePlaceholder": "プロダクトマネージャー",
+                "company": "会社名",
+                "companyPlaceholder": "株式会社サンプル",
+                "industry": "業界",
+                "industryPlaceholder": "テクノロジー",
+                "experience": "経験レベル",
+                "experienceLevels": {
+                    "entry": "エントリーレベル（0-1年）",
+                    "junior": "ジュニア（1-3年）",
+                    "mid": "ミッドレベル（3-5年）",
+                    "senior": "シニア（5-8年）",
+                    "lead": "リード（8-12年）",
+                    "executive": "エグゼクティブ（12年以上）"
+                }
+            },
+            "step3": {
+                "heading": "スキルと目標",
+                "subheading": "あなたのスキルと達成したいことを教えてください",
+                "skillsSection": "あなたのスキル",
+                "addSkill": "スキルを追加",
+                "skillName": "スキル名",
+                "skillNamePlaceholder": "例：プロジェクト管理",
+                "skillLevel": "レベル",
+                "skillCategory": "カテゴリー",
+                "skillLevels": {
+                    "beginner": "初心者",
+                    "intermediate": "中級",
+                    "advanced": "上級",
+                    "expert": "エキスパート"
+                },
+                "skillCategories": {
+                    "technical": "技術的",
+                    "soft": "ソフトスキル",
+                    "management": "マネジメント",
+                    "creative": "クリエイティブ",
+                    "analytical": "分析的"
+                },
+                "goalsSection": "あなたの目標",
+                "shortTermGoals": "短期目標（3-6ヶ月）",
+                "longTermGoals": "長期目標（1-3年）",
+                "addGoal": "目標を追加",
+                "goalDescription": "目標の説明",
+                "goalDescriptionPlaceholder": "例：認定資格を取得する",
+                "goalPriority": "優先度",
+                "priorities": {
+                    "low": "低",
+                    "medium": "中",
+                    "high": "高"
+                },
+                "careerAspirations": "キャリアの抱負",
+                "careerAspirationsPlaceholder": "5年後のあなたはどこにいますか？"
+            },
+            "step4": {
+                "heading": "仕事の好み",
+                "subheading": "あなたが最も効果的に働く方法を理解するのに役立ちます",
+                "workStyle": "仕事のスタイル",
+                "workStyles": {
+                    "collaborative": "協力的",
+                    "independent": "独立的",
+                    "mixed": "混合"
+                },
+                "communicationStyle": "コミュニケーションスタイル",
+                "communicationStyles": {
+                    "direct": "直接的",
+                    "diplomatic": "外交的",
+                    "analytical": "分析的",
+                    "creative": "創造的"
+                },
+                "timeManagement": "時間管理",
+                "timeManagementStyles": {
+                    "structured": "構造化",
+                    "flexible": "柔軟",
+                    "deadlineDriven": "締切重視",
+                    "spontaneous": "自発的"
+                },
+                "workingStyle": "作業スタイル",
+                "workingStyles": {
+                    "detailOriented": "細部重視",
+                    "bigPicture": "全体像重視",
+                    "processFocused": "プロセス重視",
+                    "resultsDriven": "結果重視"
+                },
+                "stressLevel": "ストレス耐性",
+                "stressLevels": {
+                    "low": "低",
+                    "medium": "中",
+                    "high": "高"
+                },
+                "preferredEnvironment": "好みの作業環境",
+                "environments": {
+                    "quiet": "静か",
+                    "moderate": "適度",
+                    "busy": "活発",
+                    "flexible": "柔軟"
+                },
+                "learningInterests": "学習の興味",
+                "addInterest": "興味を追加",
+                "interestPlaceholder": "例：機械学習"
+            },
+            "step5": {
+                "heading": "AIアシスタント設定",
+                "subheading": "あなたの働き方に合わせてAIアシスタントをカスタマイズ",
+                "assistanceLevel": "支援レベル",
+                "assistanceLevels": {
+                    "minimal": "最小限 - 尋ねたときのみ",
+                    "moderate": "適度 - 役立つ提案",
+                    "comprehensive": "包括的 - 積極的なガイダンス"
+                },
+                "aiCommunicationStyle": "AIコミュニケーションスタイル",
+                "aiCommunicationStyles": {
+                    "formal": "フォーマル＆プロフェッショナル",
+                    "casual": "カジュアル＆フレンドリー",
+                    "technical": "技術的＆詳細",
+                    "friendly": "温かい＆サポート的"
+                },
+                "notificationPreferences": "通知設定",
+                "taskReminders": "タスクリマインダー",
+                "deadlineAlerts": "締切アラート",
+                "productivityInsights": "生産性の洞察",
+                "skillRecommendations": "スキル推奨"
+            },
+            "otp": {
+                "heading": "メールアドレスを確認",
+                "description": "6桁のOTPが送信されました",
+                "enterOtp": "アカウントを確認するために以下に入力してください。",
+                "resendIn": "OTPを再送信",
+                "seconds": "秒",
+                "resendButton": "OTPを再送信",
+                "verifyButton": "メールを確認",
+                "verifying": "確認中..."
+            },
+            "navigation": {
+                "next": "次へ",
+                "previous": "前へ",
+                "skip": "スキップ",
+                "finish": "登録を完了",
+                "submitting": "アカウント作成中..."
+            },
+            "validation": {
+                "fullNameRequired": "フルネームは必須です",
+                "usernameRequired": "ユーザー名は必須です",
+                "emailRequired": "メールアドレスは必須です",
+                "passwordRequired": "パスワードは必須です",
+                "passwordMismatch": "パスワードが一致しません",
+                "passwordLength": "パスワードは6文字以上である必要があります",
+                "otpIncomplete": "完全な6桁のOTPを入力してください"
+            },
+            "messages": {
+                "checkEmail": "アカウントを確認するためにメールをご確認ください",
+                "registrationSuccess": "登録成功！Sartthiへようこそ！",
+                "emailVerified": "メールが確認され、ログインに成功しました！",
+                "otpSent": "新しいOTPがメールに送信されました！",
+                "otpFailed": "OTPの再送信に失敗しました。もう一度お試しください。",
+                "googleSignInSuccess": "Googleでのサインインに成功しました！",
+                "googleContinueRegistration": "登録を完了してください",
+                "googleAuthFailed": "Google認証に失敗しました",
+                "serverError": "サーバーに接続できません。サーバーが実行中か確認してください。",
+                "userExists": "このメールアドレスまたはユーザー名のユーザーは既に存在します",
+                "validationError": "入力内容を確認して再度お試しください",
+                "unexpectedError": "登録に失敗しました。もう一度お試しください。"
+            }
+        }
     },
     "profile": {
         "title": "プロフィール",
@@ -407,7 +1029,6 @@
         "enterprise": "エンタープライズ",
         "membersLabel": "メンバー",
         "projectsLabel": "プロジェクト",
-        "settings": "ワークスペース設定",
         "invite": "メンバーを招待",
         "leave": "ワークスペースを退出",
         "archive": "アーカイブ",
@@ -419,6 +1040,20 @@
         "roles": "役割",
         "owner": "オーナー",
         "admin": "管理者",
+        "switcher": {
+            "personalMode": "個人モード",
+            "individualWorkspace": "個人のワークスペース",
+            "teamWorkspace": "チームワークスペース",
+            "workspaces": "ワークスペース",
+            "quickActions": "クイックアクション",
+            "createWorkspace": "ワークスペースを作成",
+            "createWorkspaceDesc": "新しいチームワークスペースを開始",
+            "discoverWorkspaces": "ワークスペースを探索",
+            "discoverWorkspacesDesc": "チームを見つけて参加",
+            "switchedTo": "{{name}}に切り替えました",
+            "switchedToPersonal": "個人モードに切り替えました",
+            "members": "{{count}}人のメンバー"
+        },
         "member": "メンバー",
         "guest": "ゲスト",
         "management": "ワークスペース管理",
@@ -443,7 +1078,6 @@
         "projectReport": "プロジェクトレポート",
         "analyticsReport": "分析レポート",
         "financialReport": "財務レポート",
-        "overview": "概要",
         "addMember": "メンバーを追加",
         "viewingWorkspace": "ワークスペースエリアを表示しています",
         "newProject": "新しいプロジェクト",
@@ -459,8 +1093,6 @@
         "view": "表示",
         "viewAll": "すべて表示",
         "collaborateLabel": "コラボレーション",
-        "inbox": "受信トレイ",
-        "profile": "プロフィール",
         "inviteMember": "メンバーを招待",
         "searchMembers": "メンバーを検索...",
         "email": "メール",
@@ -702,7 +1334,9 @@
                 "enterEmail": "メールアドレスまたはユーザー名を入力してください",
                 "sent": "メンバーの招待が正常に送信されました！",
                 "accepted": "{{name}} がワークスペースに追加されました",
+                "acceptError": "リクエストの承認に失敗しました",
                 "declined": "リクエストが拒否されました",
+                "declineError": "リクエストの拒否に失敗しました",
                 "removed": "メンバーがワークスペースから削除されました"
             },
             "confirmDemote": "{{name}} のコラボレーター権限を削除しますか？通常のメンバーに戻ります。"
@@ -711,9 +1345,24 @@
             "title": "クライアント",
             "subtitle": "クライアントプロファイルを管理し、プロジェクトに関連付けます",
             "add": "クライアントを追加",
+            "addClient": "クライアントを追加",
             "noClients": "クライアントはまだいません",
             "noClientsDesc": "クライアントを追加して、プロジェクトの作成を開始してください",
             "viewProjects": "クリックしてプロジェクトを表示 →",
+            "searchPlaceholder": "クライアントを検索...",
+            "projectsButton": "{{count}} プロジェクト",
+            "edit": "編集",
+            "stats": {
+                "totalClients": "総クライアント数",
+                "active": "アクティブ",
+                "totalProjects": "総プロジェクト数",
+                "totalRevenue": "総収益"
+            },
+            "empty": {
+                "title": "クライアントが見つかりません",
+                "searchMessage": "検索条件を調整してみてください",
+                "startMessage": "最初のクライアントを追加して始めましょう"
+            },
             "modal": {
                 "addTitle": "クライアントを追加",
                 "editTitle": "クライアントを編集",
@@ -733,13 +1382,20 @@
                 "notesPlaceholder": "クライアントに関する追加のメモ...",
                 "cancel": "キャンセル",
                 "addBtn": "クライアントを追加",
-                "updateBtn": "クライアントを更新"
+                "updateBtn": "クライアントを更新",
+                "projectsTitle": "{{name}} - プロジェクト",
+                "noProjectsTitle": "プロジェクトはまだありません",
+                "noProjectsMessage": "このクライアントにはプロジェクトが割り当てられていません"
             },
             "toast": {
                 "required": "必須項目（名前とメールアドレス）を入力してください",
                 "created": "クライアントが正常に作成されました！",
                 "updated": "クライアントが正常に更新されました！",
-                "deleted": "クライアントが正常に削除されました"
+                "deleted": "クライアントが正常に削除されました",
+                "noWorkspace": "アクティブなワークスペースが選択されていません。",
+                "createSuccess": "クライアント「{{name}}」が正常に追加されました！",
+                "createError": "クライアントの作成に失敗しました",
+                "loadError": "クライアントの読み込みに失敗しました"
             },
             "confirmDelete": "このクライアントを削除してもよろしいですか？この操作は元に戻せません。"
         },
@@ -822,31 +1478,6 @@
                 "noWorkspace": "アクティブなワークスペースが選択されていません。最初にワークスペースを選択してください。",
                 "createSuccess": "プロジェクト「{{name}}」が正常に作成されました！",
                 "createError": "プロジェクトの作成に失敗しました"
-            }
-        },
-        "clients": {
-            "title": "クライアント",
-            "subtitle": "ワークスペースのクライアントを管理します",
-            "addClient": "クライアントを追加",
-            "searchPlaceholder": "クライアントを検索...",
-            "stats": {
-                "totalClients": "総クライアント数",
-                "active": "アクティブ",
-                "totalProjects": "総プロジェクト数",
-                "totalRevenue": "総収益"
-            },
-            "projectsButton": "{{count}} プロジェクト",
-            "edit": "編集",
-            "empty": {
-                "title": "クライアントが見つかりません",
-                "searchMessage": "検索条件を調整してみてください",
-                "startMessage": "最初のクライアントを追加して始めましょう"
-            },
-            "toast": {
-                "noWorkspace": "アクティブなワークスペースが選択されていません。",
-                "createSuccess": "クライアント「{{name}}」が正常に追加されました！",
-                "createError": "クライアントの作成に失敗しました",
-                "loadError": "クライアントの読み込みに失敗しました"
             }
         },
         "inbox": {
@@ -1005,52 +1636,361 @@
             "upcomingMilestones": "今後のマイルストーン",
             "view": "表示",
             "viewAll": "すべて表示"
+        }
+    },
+    "project": {
+        "tabs": {
+            "overview": "概要",
+            "info": "プロジェクト情報",
+            "team": "チーム",
+            "tasks": "タスク＆ボード",
+            "timeline": "タイムライン",
+            "progress": "進捗トラッカー",
+            "workload": "作業負荷",
+            "attendance": "出席",
+            "reports": "レポート",
+            "documents": "ドキュメント",
+            "inbox": "受信トレイ",
+            "settings": "設定"
         },
-        "members": {
-            "title": "メンバー",
-            "subtitle": "ワークスペースのメンバーとその役割を管理します",
-            "inviteMembers": "メンバーを招待",
-            "searchPlaceholder": "メンバーを検索...",
+        "header": {
+            "share": "共有",
+            "settings": "設定",
+            "addTask": "タスクを追加"
+        },
+        "sidebar": {
+            "projectInfo": "プロジェクト情報",
+            "status": "ステータス",
+            "priority": "優先度",
+            "progress": "進捗",
+            "budget": "予算",
+            "spent": "支出",
+            "teamMembers": "チームメンバー",
+            "quickStats": "クイック統計",
+            "totalTasks": "総タスク数",
+            "completed": "完了",
+            "inProgress": "進行中",
+            "overdue": "期限超過",
+            "moreMembers": "+{{count}}人のメンバー"
+        },
+        "overview": {
+            "totalTasks": "総タスク数",
+            "completed": "完了",
+            "inProgress": "進行中",
+            "teamMembers": "チームメンバー",
+            "projectProgress": "プロジェクト進捗",
+            "startDate": "開始日",
+            "dueDate": "期限",
+            "daysRemaining": "残り日数",
+            "milestones": "マイルストーン",
+            "recentActivity": "最近のアクティビティ",
+            "quickActions": "クイックアクション",
+            "addTask": "タスクを追加",
+            "addMember": "メンバーを追加",
+            "schedule": "スケジュール",
+            "viewReports": "レポートを表示",
+            "notSet": "未設定"
+        },
+        "info": {
+            "title": "プロジェクト情報",
+            "edit": "編集",
+            "save": "保存",
+            "cancel": "キャンセル",
+            "projectName": "プロジェクト名",
+            "client": "クライアント",
+            "noClient": "クライアントなし",
+            "description": "説明",
+            "noDescription": "説明なし",
+            "status": "ステータス",
+            "priority": "優先度",
+            "startDate": "開始日",
+            "dueDate": "期限",
+            "notSet": "未設定",
+            "estimatedBudget": "推定予算",
+            "actualSpent": "実績費用",
+            "progress": "進捗",
+            "tags": "タグ",
+            "tagsPlaceholder": "タグをカンマ区切りで入力",
+            "noTags": "タグなし",
+            "teamSize": "チームサイズ",
+            "membersCount": "{{count}} メンバー",
+            "notAvailable": "プロジェクト情報は利用できません"
+        },
+        "status": {
+            "planning": "計画中",
+            "active": "アクティブ",
+            "onHold": "保留中",
+            "completed": "完了",
+            "cancelled": "キャンセル",
+            "abandoned": "放棄"
+        },
+        "priority": {
+            "low": "低",
+            "medium": "中",
+            "high": "高",
+            "critical": "緊急"
+        },
+        "team": {
+            "title": "プロジェクトチーム",
+            "subtitle": "このプロジェクトのチームメンバーを管理 ({{count}} メンバー)",
+            "addMember": "メンバーを追加",
+            "projectManager": "プロジェクトマネージャー",
+            "noMembers": "チームメンバーはまだいません",
+            "noMembersSubtitle": "ワークスペースからメンバーを追加して開始してください",
+            "added": "追加日 {{date}}",
+            "manager": "マネージャー",
+            "member": "メンバー",
+            "removeMember": "メンバーを削除",
+            "makePM": "PMにする",
+            "modal": {
+                "title": "チームメンバーを追加",
+                "selectMember": "ワークスペースからメンバーを選択",
+                "allMembersAdded": "すべてのワークスペースメンバーはすでにこのプロジェクトに参加しています",
+                "chooseMember": "メンバーを選択...",
+                "role": "役割",
+                "ownerOnly": "プロジェクトマネージャーを任命できるのはワークスペース所有者のみです",
+                "pmExists": "このプロジェクトにはすでにプロジェクトマネージャーがいます",
+                "add": "メンバーを追加",
+                "cancel": "キャンセル"
+            }
+        },
+        "tasks": {
+            "title": "タスク割り当て",
+            "subtitle": "チームのタスクを割り当てて管理 ({{count}} タスク)",
+            "assignNew": "新しいタスクを割り当て",
+            "noTasks": "タスクはまだ割り当てられていません",
+            "noTasksSubtitle": "最初のタスクを作成して開始してください",
+            "startDate": "開始日",
+            "dueDate": "期限",
+            "subtasksCompleted": "{{completed}} / {{total}} サブタスク完了",
+            "addSubtask": "サブタスクを追加...",
+            "links": "リンク",
+            "addLink": "リンクを追加 (https://...)",
+            "progress": "進捗",
+            "verifyTask": "タスクを確認",
+            "rateAndFinish": "評価して完了",
+            "taskFinished": "タスク完了",
+            "accessRestricted": "アクセス制限",
+            "accessRestrictedSubtitle": "タスクの割り当てと管理はプロジェクトマネージャーのみが行えます。",
+            "types": {
+                "statusUpdate": "ステータス更新",
+                "fileSubmission": "ファイル提出必須",
+                "linkSubmission": "リンク提出必須",
+                "review": "レビュー",
+                "general": "一般"
+            },
+            "rating": {
+                "title": "タスクパフォーマンス評価",
+                "evaluate": "評価: {{title}}",
+                "assignedTo": "担当者: {{name}}",
+                "timeliness": "適時性",
+                "timelinessDesc": "タスクは時間通りに完了しましたか？期限を守りましたか？",
+                "quality": "作業の質",
+                "qualityDesc": "タスクはどの程度うまく実行されましたか？要件を満たしていますか？",
+                "communication": "コミュニケーション",
+                "communicationDesc": "更新情報を提供しましたか？フィードバックに対応しましたか？",
+                "completeness": "完全性",
+                "completenessDesc": "すべてのサブタスクが完了しましたか？不足している成果物はありますか？",
+                "overall": "総合評価",
+                "average": "すべての基準の平均",
+                "comments": "追加コメント (任意)",
+                "commentsPlaceholder": "タスクのパフォーマンスに関する具体的なフィードバックを提供してください...",
+                "submit": "評価を送信",
+                "cancel": "キャンセル"
+            },
+            "modal": {
+                "title": {
+                    "edit": "タスクを編集",
+                    "create": "新しいタスクを割り当て"
+                },
+                "taskTitle": "タスク名 *",
+                "taskTitlePlaceholder": "タスク名を入力",
+                "description": "説明",
+                "descriptionPlaceholder": "タスクの説明を入力",
+                "taskType": "タスクタイプ *",
+                "taskTypeDesc": {
+                    "general": "サブタスクと進捗管理を含む通常のタスク",
+                    "statusUpdate": "従業員はステータス更新のみを提供",
+                    "fileSubmission": "従業員は完了するためにファイルをアップロードする必要があります",
+                    "linkSubmission": "従業員は完了するためにリンクを提供する必要があります",
+                    "review": "PMによるレビューと承認が必要"
+                },
+                "assignTo": "担当者 *",
+                "selectMember": "チームメンバーを選択...",
+                "priority": "優先度",
+                "startDate": "開始日",
+                "dueDate": "期限 *",
+                "progress": "進捗 ({{percent}}%)",
+                "progressDesc": "進捗は完了したサブタスクに基づいて自動的に計算されます",
+                "update": "タスクを更新",
+                "assign": "タスクを割り当て",
+                "cancel": "キャンセル"
+            },
+            "alert": {
+                "fillRequired": "すべての必須項目を入力してください",
+                "deleteConfirm": "このタスクを削除してもよろしいですか？"
+            }
+        },
+        "employeeTasks": {
+            "title": "マイタスク",
+            "subtitle": "あなたに割り当てられたタスク ({{count}} タスク)",
             "filter": {
-                "all": "すべての役割",
-                "owner": "オーナー",
-                "admin": "管理者",
-                "manager": "マネージャー",
-                "member": "メンバー"
-            },
-            "role": {
-                "owner": "オーナー",
-                "admin": "管理者",
-                "manager": "マネージャー",
-                "member": "メンバー"
-            },
-            "joined": "参加日",
-            "editRole": "役割を編集",
-            "joinRequests": {
-                "title": "参加リクエスト",
-                "subtitle": "ワークスペースの検索から送信されたリクエストがここに表示されます。",
+                "label": "フィルター:",
+                "all": "すべてのタスク",
                 "pending": "保留中",
-                "noRequests": "現在リクエストはありません",
-                "noRequestsSubtitle": "検索から応募した学習者がここに表示されます。",
-                "requested": "リクエスト日時",
-                "accept": "承認",
-                "decline": "拒否"
+                "inProgress": "進行中",
+                "completed": "完了",
+                "verified": "確認済み",
+                "blocked": "ブロック中"
             },
-            "inviteModal": {
-                "title": "メンバーを招待",
-                "emailLabel": "メールアドレスまたはユーザー名",
-                "emailPlaceholder": "someone@example.com",
-                "directoryLabel": "プラットフォームディレクトリを検索",
-                "directoryPlaceholder": "名前またはメールアドレスを入力",
-                "directoryHelp": "詳細を再入力せずに既存のプラットフォームメンバーをすばやく招待します。",
-                "cancel": "キャンセル",
-                "sendInvite": "招待を送信"
+            "views": {
+                "list": "リスト",
+                "kanban": "カンバン",
+                "calendar": "カレンダー",
+                "gantt": "ガント",
+                "table": "テーブル",
+                "dashboard": "ダッシュボード",
+                "workload": "ワークロード"
             },
             "stats": {
-                "totalMembers": "総メンバー数",
-                "active": "アクティブ",
-                "admins": "管理者",
-                "pendingRequests": "保留中のリクエスト"
+                "total": "合計",
+                "inProgress": "進行中",
+                "completed": "完了",
+                "overdue": "期限切れ"
+            },
+            "noTasks": "タスクが見つかりません",
+            "noTasksSubtitle": {
+                "all": "割り当てられたタスクはまだありません",
+                "filtered": "{{status}}のタスクはありません"
+            },
+            "finished": "終了",
+            "overdue": "⚠️ 期限切れ",
+            "subtasks": "サブタスク ({{completed}}/{{total}})",
+            "uploadRequired": "必須ファイルをアップロード",
+            "uploadDesc": "このタスクに必要なファイルをアップロードしてください",
+            "uploadedFiles": "アップロードされたファイル:",
+            "remove": "削除",
+            "markCompleted": "完了としてマーク",
+            "submitLinks": "必須リンクを提出",
+            "add": "追加",
+            "submittedLinks": "提出されたリンク:",
+            "provideStatus": "📝 ステータス更新を提供",
+            "statusPlaceholder": "ステータス更新をここに入力...",
+            "submitUpdate": "更新を送信",
+            "referenceLinks": "参考リンク",
+            "attachedFiles": "添付ファイル",
+            "taskRating": "タスク評価",
+            "kanban": {
+                "pending": "保留中",
+                "inProgress": "進行中",
+                "completed": "完了",
+                "verified": "確認済み"
+            },
+            "dashboard": {
+                "totalTasks": "総タスク数",
+                "totalTasksDesc": "割り当てられたすべてのタスク",
+                "completed": "完了",
+                "completedDesc": "完了率 {{percent}}%",
+                "inProgress": "進行中",
+                "inProgressDesc": "アクティブなタスク",
+                "overdue": "期限切れ",
+                "overdueDesc": "要注意",
+                "distribution": "タスク分布",
+                "priorityBreakdown": "優先度内訳",
+                "recentTasks": "最近のタスク"
+            },
+            "workload": {
+                "title": "マイワークロード概要",
+                "total": "総ワークロード",
+                "capacity": "使用容量",
+                "avgProgress": "平均進捗",
+                "tasksByWeek": "週別タスク",
+                "weeks": {
+                    "thisWeek": "今週",
+                    "nextWeek": "来週",
+                    "later": "以降"
+                },
+                "moreTasks": "+他 {{count}} 件のタスク"
+            },
+            "modal": {
+                "description": "説明",
+                "progress": "進捗",
+                "subtasks": "サブタスク ({{completed}}/{{total}})",
+                "files": "ファイル ({{count}})",
+                "links": "リンク ({{count}})",
+                "rating": "タスク評価",
+                "close": "閉じる"
+            }
+        },
+        "view": {
+            "timeline": {
+                "title": "プロジェクトタイムライン",
+                "day": "日",
+                "week": "週",
+                "month": "月",
+                "addEvent": "イベントを追加",
+                "noActivity": "アクティビティはまだありません",
+                "noActivityDesc": "作業が進むにつれて、ここにアクティビティが表示されます",
+                "milestones": "マイルストーン",
+                "noMilestones": "マイルストーンが定義されていません",
+                "due": "期限: {{date}}",
+                "complete": "{{percent}}% 完了"
+            },
+            "documents": {
+                "title": "ドキュメント",
+                "upload": "アップロード",
+                "newFolder": "新しいフォルダ",
+                "totalFiles": "総ファイル数",
+                "storageUsed": "使用ストレージ",
+                "recentUploads": "最近のアップロード",
+                "allFiles": "すべてのファイル",
+                "images": "画像",
+                "docs": "ドキュメント",
+                "recent": "最近",
+                "noDocuments": "ドキュメントはまだありません",
+                "noDocumentsDesc": "チームと共有するファイルをアップロードしてください",
+                "uploadedBy": "{{name}} によってアップロード",
+                "download": "ダウンロード",
+                "share": "共有",
+                "folder": "フォルダ"
+            },
+            "analytics": {
+                "title": "プロジェクト分析",
+                "last7Days": "過去7日間",
+                "last30Days": "過去30日間",
+                "allTime": "全期間",
+                "completionRate": "完了率",
+                "vsLastMonth": "先月比 +5%",
+                "teamVelocity": "チームベロシティ",
+                "tasksCompleted": "完了したタスク",
+                "budgetUsage": "予算使用状況",
+                "budgetDesc": "{{total}} 中 {{spent}}",
+                "teamWorkload": "チームワークロード",
+                "avgWorkload": "平均ワークロード",
+                "taskDist": "タスクステータス分布",
+                "teamPerf": "チームパフォーマンス",
+                "tasksStat": "{{completed}}/{{assigned}} タスク",
+                "budgetBreakdown": "予算内訳",
+                "totalBudget": "総予算",
+                "spent": "支出",
+                "remaining": "残り",
+                "activitySummary": "アクティビティ概要",
+                "tasksCreated": "作成されたタスク",
+                "teamMembers": "チームメンバー"
+            },
+            "settings": {
+                "title": "プロジェクト設定",
+                "comingSoon": "プロジェクト構成および管理設定は近日公開予定です！",
+                "attendanceLocation": "勤怠オフィス所在地",
+                "attendanceDesc": "主要なオフィス所在地を設定します。これは、このプロジェクトの自動勤怠確認の参照として使用されます。",
+                "latitude": "緯度",
+                "longitude": "経度",
+                "useCurrentLocation": "現在の位置情報を使用",
+                "uiOnly": "（現在はUIのみ）後でこれをバックエンドの勤怠設定に接続できます。"
+            },
+            "overview": {
+                "progress": "進捗",
+                "recentActivity": "最近のアクティビティ"
             }
         }
     },
@@ -1782,10 +2722,6 @@
         "start": "開始: {{date}}",
         "aiSuggestion": "目標設定と達成戦略のためのAIによる提案を取得します。",
         "askAi": "AIに尋ねる",
-        "createPersonalGoal": "個人の目標を作成",
-        "createTeamGoal": "チームの目標を作成",
-        "viewAnalytics": "分析を表示",
-        "exportGoals": "目標をエクスポート",
         "targetDate": "目標日",
         "createdByLabel": "作成者",
         "categoryLabel": "カテゴリ",
@@ -1822,7 +2758,6 @@
         },
         "noGoalsYet": "まだ目標がありません",
         "noMatchingGoals": "一致する目標がありません",
-        "createFirstGoal": "最初の目標を作成して始めましょう",
         "tryDifferentFilters": "フィルターを調整してより多くの目標を表示してください"
     }
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Building, Home, ChevronDown, Users, Settings, Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface WorkspaceModeSwitcherProps {
   className?: string;
@@ -11,6 +12,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleModeChange = (mode: string, workspaceId?: string) => {
     dispatch({ type: 'SET_MODE', payload: mode });
@@ -27,7 +29,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
         dispatch({ 
           type: 'ADD_TOAST', 
           payload: { 
-            message: `Switched to ${workspace.name}`, 
+            message: t('switcher.switchedTo', { name: workspace.name }), 
             type: 'success' 
           } 
         });
@@ -39,7 +41,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
       dispatch({ 
         type: 'ADD_TOAST', 
         payload: { 
-          message: 'Switched to Personal Mode', 
+          message: t('switcher.switchedToPersonal'), 
           type: 'success' 
         } 
       });
@@ -51,15 +53,15 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
     if (state.mode === 'Personal') {
       return {
         icon: Home,
-        label: 'Personal Mode',
-        description: 'Individual workspace'
+        label: t('switcher.personalMode'),
+        description: t('switcher.individualWorkspace')
       };
     } else {
       const workspace = state.workspaces.find(w => w._id === state.currentWorkspace);
       return {
         icon: Building,
-        label: workspace?.name || 'Workspace',
-        description: 'Team workspace'
+        label: workspace?.name || t('workspace.title'),
+        description: t('switcher.teamWorkspace')
       };
     }
   };
@@ -92,8 +94,8 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
             >
               <Home className="w-4 h-4" />
               <div>
-                <div className="font-medium">Personal Mode</div>
-                <div className="text-xs text-gray-600">Individual workspace</div>
+                <div className="font-medium">{t('switcher.personalMode')}</div>
+                <div className="text-xs text-gray-600">{t('switcher.individualWorkspace')}</div>
               </div>
               {state.mode === 'Personal' && (
                 <div className="ml-auto w-2 h-2 bg-accent rounded-full" />
@@ -106,7 +108,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
             {/* Workspace Modes */}
             <div className="space-y-1">
               <div className="px-3 py-1 text-xs font-medium text-gray-600 uppercase tracking-wide">
-                Workspaces
+                {t('switcher.workspaces')}
               </div>
               {state.workspaces.map(workspace => (
                 <button
@@ -127,7 +129,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                       )}
                     </div>
                     <div className="text-xs text-gray-600">
-                      {workspace.memberCount} members • {workspace.type}
+                      {t('switcher.members', { count: workspace.memberCount })} • {workspace.type}
                     </div>
                   </div>
                   {state.mode === 'Workspace' && state.currentWorkspace === workspace._id && (
@@ -140,7 +142,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
             {/* Quick Actions */}
             <div className="mt-3 pt-3 border-t border-gray-200">
               <div className="px-3 py-1 text-xs font-medium text-gray-600 uppercase tracking-wide">
-                Quick Actions
+                {t('switcher.quickActions')}
               </div>
               <div className="space-y-1">
                 <button
@@ -152,8 +154,8 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                 >
                   <Building className="w-4 h-4" />
                   <div>
-                    <div className="font-medium">Create Workspace</div>
-                    <div className="text-xs text-gray-600">Start a new team workspace</div>
+                    <div className="font-medium">{t('switcher.createWorkspace')}</div>
+                    <div className="text-xs text-gray-600">{t('switcher.createWorkspaceDesc')}</div>
                   </div>
                 </button>
                 <button
@@ -166,8 +168,8 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                 >
                   <Users className="w-4 h-4" />
                   <div>
-                    <div className="font-medium">Discover Workspaces</div>
-                    <div className="text-xs text-gray-600">Find and join teams</div>
+                    <div className="font-medium">{t('switcher.discoverWorkspaces')}</div>
+                    <div className="text-xs text-gray-600">{t('switcher.discoverWorkspacesDesc')}</div>
                   </div>
                 </button>
               </div>

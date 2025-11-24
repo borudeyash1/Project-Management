@@ -260,7 +260,7 @@ const HomePage: React.FC = () => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
       case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'medium': return 'text-yellow-800 bg-yellow-200';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
@@ -594,7 +594,9 @@ const HomePage: React.FC = () => {
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activity.title}</p>
+                      <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {t(`activity.types.${activity.type}`, { defaultValue: activity.title })}
+                      </p>
                       <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{activity.description}</p>
                       <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>
                         {new Date(activity.timestamp).toLocaleString()}
@@ -710,12 +712,12 @@ const HomePage: React.FC = () => {
             {canUseAI() && (
               <div className={`rounded-lg p-6 shadow-lg ${isDarkMode
                 ? 'bg-gradient-to-br from-purple-600 to-pink-600'
-                : 'bg-gradient-to-br from-purple-100 via-pink-50 to-purple-50'
+                : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-50'
                 }`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-purple-200'
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-accent/20'
                     }`}>
-                    <Bot className={`w-5 h-5 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
+                    <Bot className={`w-5 h-5 ${isDarkMode ? 'text-white' : 'text-yellow-700'}`} />
                   </div>
                   <div>
                     <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.aiAssistant')}</h3>
@@ -727,7 +729,9 @@ const HomePage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => navigate('/ai-assistant')}
-                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium text-white drop-shadow-sm transition-colors border border-white border-opacity-20"
+                  className={`w-full rounded-lg px-4 py-2 text-sm font-medium drop-shadow-sm transition-colors border ${isDarkMode 
+                    ? 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-white border-opacity-20' 
+                    : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200'}`}
                 >
                   {t('dashboard.askAI')}
                 </button>

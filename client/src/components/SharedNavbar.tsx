@@ -15,9 +15,11 @@ import {
   HardDrive,
   ChevronDown,
   Menu,
-  X
+  X,
+  Languages
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 
 interface Release {
@@ -35,12 +37,32 @@ interface Release {
 
 const SharedNavbar: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
+  const { i18n } = useTranslation();
   const location = useLocation();
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const languageDropdownRef = useRef<HTMLDivElement>(null);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    { code: 'ko', name: '한국어', flag: '🇰🇷' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'pt', name: 'Português', flag: '🇵🇹' },
+    { code: 'da', name: 'Dansk', flag: '🇩🇰' },
+    { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+    { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
+    { code: 'no', name: 'Norsk', flag: '🇳🇴' },
+    { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
+  ];
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -59,6 +81,9 @@ const SharedNavbar: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDownloadMenu(false);
+      }
+      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+        setShowLanguageMenu(false);
       }
     };
 
@@ -96,6 +121,13 @@ const SharedNavbar: React.FC = () => {
       window.open(`${baseUrl}${release.downloadUrl}`, '_blank');
     }
     setShowDownloadMenu(false);
+  };
+
+  const handleLanguageChange = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+    localStorage.setItem('i18nextLng', langCode);
+    setShowLanguageMenu(false);
+    setIsMobileMenuOpen(false);
   };
 
   const getPlatformIcon = (platform: string) => {
@@ -326,6 +358,40 @@ const SharedNavbar: React.FC = () => {
             >
               <Palette size={20} />
             </button>
+
+            {/* Language Dropdown */}
+            <div className="relative inline-block" ref={languageDropdownRef}>
+              <button
+                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                className={`text-accent hover:text-accent-dark p-2 rounded-lg transition-colors duration-200`}
+                title="Change Language"
+              >
+                <Languages size={20} />
+              </button>
+
+              {showLanguageMenu && (
+                <div className={`absolute right-0 mt-2 w-48 rounded-xl shadow-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} overflow-hidden z-50`}>
+                  <div className="py-1 max-h-96 overflow-y-auto">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang.code)}
+                        className={`w-full px-4 py-2 text-left flex items-center gap-3 ${
+                          i18n.language === lang.code
+                            ? 'bg-accent/10 text-accent'
+                            : isDarkMode
+                              ? 'text-gray-200 hover:bg-gray-700'
+                              : 'text-gray-800 hover:bg-gray-50'
+                        } transition-colors`}
+                      >
+                        <span className="text-lg">{lang.flag}</span>
+                        <span className="text-sm font-medium">{lang.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -385,6 +451,31 @@ const SharedNavbar: React.FC = () => {
           </Link>
 
           <div className={`pt-4 pb-2 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} mt-2`}>
+            {/* Language Selection for Mobile */}
+            <div className="px-3 py-2">
+              <p className={`text-xs font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider mb-2`}>
+                Language
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
+                      i18n.language === lang.code
+                        ? 'bg-accent/10 text-accent'
+                        : isDarkMode
+                          ? 'text-gray-200 hover:bg-gray-800'
+                          : 'text-gray-800 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <Link
               to="/login"
               onClick={() => setIsMobileMenuOpen(false)}

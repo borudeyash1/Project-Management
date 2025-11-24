@@ -12,7 +12,10 @@ import {
   Activity
 } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 const ProjectOverview: React.FC = () => {
+  const { t } = useTranslation();
   const { state } = useApp();
   const { projectId } = useParams();
   
@@ -22,28 +25,28 @@ const ProjectOverview: React.FC = () => {
 
   const stats = [
     {
-      label: 'Total Tasks',
+      label: t('project.overview.totalTasks'),
       value: project.totalTasksCount,
       icon: CheckCircle,
       color: 'text-accent-dark',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30'
     },
     {
-      label: 'Completed',
+      label: t('project.overview.completed'),
       value: project.completedTasksCount,
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100 dark:bg-green-900/30'
     },
     {
-      label: 'In Progress',
+      label: t('project.overview.inProgress'),
       value: project.totalTasksCount - project.completedTasksCount,
       icon: Activity,
       color: 'text-orange-600',
       bgColor: 'bg-orange-200 dark:bg-orange-900/30'
     },
     {
-      label: 'Team Members',
+      label: t('project.overview.teamMembers'),
       value: project.teamMemberCount,
       icon: Users,
       color: 'text-purple-600',
@@ -92,7 +95,7 @@ const ProjectOverview: React.FC = () => {
       {/* Progress Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Progress</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('project.overview.projectProgress')}</h2>
           <span className="text-2xl font-bold text-accent-dark">{project.progress}%</span>
         </div>
         <div className="w-full h-4 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -103,19 +106,19 @@ const ProjectOverview: React.FC = () => {
         </div>
         <div className="grid grid-cols-3 gap-4 mt-4">
           <div className="text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-200">Start Date</div>
+            <div className="text-sm text-gray-600 dark:text-gray-200">{t('project.overview.startDate')}</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
-              {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not set'}
+              {project.startDate ? new Date(project.startDate).toLocaleDateString() : t('project.overview.notSet')}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-200">Due Date</div>
+            <div className="text-sm text-gray-600 dark:text-gray-200">{t('project.overview.dueDate')}</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
-              {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'Not set'}
+              {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : t('project.overview.notSet')}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-200">Days Remaining</div>
+            <div className="text-sm text-gray-600 dark:text-gray-200">{t('project.overview.daysRemaining')}</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
               {project.dueDate ? Math.ceil((new Date(project.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : '-'}
             </div>
@@ -129,7 +132,7 @@ const ProjectOverview: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Target className="w-5 h-5" />
-              Milestones
+              {t('project.overview.milestones')}
             </h2>
           </div>
           <div className="space-y-3">
@@ -161,7 +164,7 @@ const ProjectOverview: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Activity className="w-5 h-5" />
-              Recent Activity
+              {t('project.overview.recentActivity')}
             </h2>
           </div>
           <div className="space-y-3">
@@ -186,23 +189,23 @@ const ProjectOverview: React.FC = () => {
 
       {/* Quick Actions */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('project.overview.quickActions')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <CheckCircle className="w-6 h-6 text-accent-dark" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Add Task</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.addTask')}</span>
           </button>
           <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <Users className="w-6 h-6 text-purple-600" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Add Member</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.addMember')}</span>
           </button>
           <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <Calendar className="w-6 h-6 text-green-600" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Schedule</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.schedule')}</span>
           </button>
           <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <TrendingUp className="w-6 h-6 text-orange-600" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">View Reports</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.viewReports')}</span>
           </button>
         </div>
       </div>

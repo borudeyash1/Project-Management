@@ -351,7 +351,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Settings updated successfully!',
+          message: t('settings.updateSuccess'),
           duration: 3000
         }
       });
@@ -362,7 +362,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to update settings. Please try again.',
+          message: t('settings.updateError'),
           duration: 3000
         }
       });
@@ -378,7 +378,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Please provide a reason for account deletion.',
+          message: t('settings.deleteReasonRequired'),
           duration: 3000
         }
       });
@@ -393,7 +393,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Account deletion scheduled. You will receive an email confirmation.',
+          message: t('settings.deleteScheduled'),
           duration: 5000
         }
       });
@@ -405,7 +405,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to schedule account deletion. Please try again.',
+          message: t('settings.deleteError'),
           duration: 3000
         }
       });
@@ -433,7 +433,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Data exported successfully!',
+          message: t('settings.exportSuccess'),
           duration: 3000
         }
       });
@@ -444,7 +444,7 @@ const Settings: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: 'Failed to export data. Please try again.',
+          message: t('settings.exportError'),
           duration: 3000
         }
       });
@@ -457,19 +457,19 @@ const Settings: React.FC = () => {
     { id: 'account', label: t('settings.account'), icon: User },
     { id: 'notifications', label: t('settings.notifications'), icon: Bell },
     { id: 'appearance', label: t('settings.appearance'), icon: Palette },
-    { id: 'billing', label: 'Billing', icon: CreditCard },
-    { id: 'data', label: 'Data & Export', icon: Database }
+    { id: 'billing', label: t('settings.billing'), icon: CreditCard },
+    { id: 'data', label: t('settings.dataExport'), icon: Database }
   ];
 
   const renderAccount = () => (
     <div className="space-y-6">
       {/* Account Information */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Account Information</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accountInfo')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Username</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.username')}</p>
               <p className="text-sm text-gray-600 dark:text-gray-200">{settingsData?.account.username}</p>
             </div>
             <button className="text-accent-dark hover:text-blue-700">
@@ -478,7 +478,7 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Email</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.email')}</p>
               <p className="text-sm text-gray-600 dark:text-gray-200">{settingsData?.account.email}</p>
             </div>
             <button className="text-accent-dark hover:text-blue-700">
@@ -490,14 +490,14 @@ const Settings: React.FC = () => {
 
       {/* Security Settings */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Security</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.security')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-gray-100">Two-Factor Authentication</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Add an extra layer of security</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.twoFactor')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.twoFactorDesc')}</p>
               </div>
             </div>
             <button
@@ -524,8 +524,8 @@ const Settings: React.FC = () => {
             <div className="flex items-center gap-3">
               <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-gray-100">Login Notifications</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">Get notified of new logins</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.loginNotifications')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.loginNotificationsDesc')}</p>
               </div>
             </div>
             <button
@@ -553,10 +553,10 @@ const Settings: React.FC = () => {
 
       {/* Session Management */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Session Management</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.sessionManagement')}</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Session Timeout (minutes)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.sessionTimeout')}</label>
             <input
               type="number"
               value={settingsData?.account.sessionTimeout}
@@ -578,18 +578,18 @@ const Settings: React.FC = () => {
 
       {/* Danger Zone */}
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="font-medium text-red-900 mb-4">Danger Zone</h3>
+        <h3 className="font-medium text-red-900 mb-4">{t('settings.dangerZone')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-red-900">Delete Account</p>
-              <p className="text-sm text-red-700">Permanently delete your account and all data</p>
+              <p className="font-medium text-red-900">{t('settings.deleteAccount')}</p>
+              <p className="text-sm text-red-700">{t('settings.deleteAccountDesc')}</p>
             </div>
             <button
               onClick={() => setShowDeleteAccount(true)}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
-              Delete Account
+              {t('settings.deleteAccount')}
             </button>
           </div>
         </div>
@@ -604,7 +604,7 @@ const Settings: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Mail className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">Email Notifications</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.emailNotifications')}</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -636,7 +636,7 @@ const Settings: React.FC = () => {
           <div className="space-y-3">
             {Object.entries(settingsData.notifications.email).filter(([key]) => key !== 'enabled').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     value ? 'bg-accent' : 'bg-gray-300'
@@ -673,7 +673,7 @@ const Settings: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">Push Notifications</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.pushNotifications')}</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -705,7 +705,7 @@ const Settings: React.FC = () => {
           <div className="space-y-3">
             {Object.entries(settingsData.notifications.push).filter(([key]) => key !== 'enabled').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     value ? 'bg-accent' : 'bg-gray-300'
@@ -742,7 +742,7 @@ const Settings: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">Desktop Notifications</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.desktopNotifications')}</h3>
           </div>
           <button
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -774,7 +774,7 @@ const Settings: React.FC = () => {
           <div className="space-y-3">
             {Object.entries(settingsData.notifications.desktop).filter(([key]) => key !== 'enabled').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
                 <button
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     value ? 'bg-accent' : 'bg-gray-300'
@@ -830,7 +830,7 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'success',
-                      message: `Theme changed to ${theme}`,
+                      message: t('settings.themeUpdated', { theme }),
                       duration: 2000
                     }
                   });
@@ -840,7 +840,7 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'error',
-                      message: 'Failed to update theme',
+                      message: t('settings.themeError'),
                       duration: 3000
                     }
                   });
@@ -850,7 +850,7 @@ const Settings: React.FC = () => {
               {theme === 'light' && <Sun className="w-4 h-4 inline mr-2" />}
               {theme === 'dark' && <Moon className="w-4 h-4 inline mr-2" />}
               {theme === 'system' && <Monitor className="w-4 h-4 inline mr-2" />}
-              {theme.charAt(0).toUpperCase() + theme.slice(1)}
+              {t(`settings.${theme}`)}
             </button>
           ))}
         </div>
@@ -877,7 +877,7 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'success',
-                      message: 'Accent color updated',
+                      message: t('settings.accentColorUpdated'),
                       duration: 2000
                     }
                   });
@@ -887,7 +887,7 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'error',
-                      message: 'Failed to update accent color',
+                      message: t('settings.accentColorError'),
                       duration: 3000
                     }
                   });
@@ -922,7 +922,7 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'success',
-                      message: `Font size changed to ${size}`,
+                      message: t('settings.fontSizeUpdated', { size }),
                       duration: 2000
                     }
                   });
@@ -932,14 +932,14 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'error',
-                      message: 'Failed to update font size',
+                      message: t('settings.fontSizeError'),
                       duration: 3000
                     }
                   });
                 }
               }}
             >
-              {size.charAt(0).toUpperCase() + size.slice(1)}
+              {t(`settings.${size}`)}
             </button>
           ))}
         </div>
@@ -965,7 +965,7 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'success',
-                      message: `Density changed to ${density}`,
+                      message: t('settings.densityUpdated', { density }),
                       duration: 2000
                     }
                   });
@@ -975,14 +975,14 @@ const Settings: React.FC = () => {
                     payload: {
                       id: Date.now().toString(),
                       type: 'error',
-                      message: 'Failed to update density',
+                      message: t('settings.densityError'),
                       duration: 3000
                     }
                   });
                 }
               }}
             >
-              {density.charAt(0).toUpperCase() + density.slice(1)}
+              {t(`settings.${density}`)}
             </button>
           ))}
         </div>
@@ -990,12 +990,12 @@ const Settings: React.FC = () => {
 
       {/* Accessibility */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Accessibility</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accessibility')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Animations</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">Enable smooth transitions and animations</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.animations')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.animationsDesc')}</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -1018,8 +1018,8 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Reduced Motion</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">Minimize animations for accessibility</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.reducedMotion')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.reducedMotionDesc')}</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -1049,25 +1049,25 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       {/* Current Plan */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Current Plan</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.currentPlan')}</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} Plan</p>
-            <p className="text-sm text-gray-600 dark:text-gray-200">Next billing: {new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.nextBilling', { date: new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString() })}</p>
           </div>
           <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
-            Upgrade Plan
+            {t('settings.upgradePlan')}
           </button>
         </div>
       </div>
 
       {/* Usage */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Usage</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.usage')}</h3>
         <div className="space-y-4">
           <div>
             <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
-              <span>Projects</span>
+              <span>{t('settings.projects')}</span>
               <span>{settingsData?.billing.usage.projects} / {settingsData?.billing.usage.maxProjects}</span>
             </div>
             <div className="w-full bg-gray-300 rounded-full h-2">
@@ -1079,7 +1079,7 @@ const Settings: React.FC = () => {
           </div>
           <div>
             <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
-              <span>Storage</span>
+              <span>{t('settings.storage')}</span>
               <span>{settingsData?.billing.usage.storage} GB / {settingsData?.billing.usage.maxStorage} GB</span>
             </div>
             <div className="w-full bg-gray-300 rounded-full h-2">
@@ -1091,7 +1091,7 @@ const Settings: React.FC = () => {
           </div>
           <div>
             <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
-              <span>Team Members</span>
+              <span>{t('workspace.teamMembers')}</span>
               <span>{settingsData?.billing.usage.teamMembers} / {settingsData?.billing.usage.maxTeamMembers}</span>
             </div>
             <div className="w-full bg-gray-300 rounded-full h-2">
@@ -1106,13 +1106,13 @@ const Settings: React.FC = () => {
 
       {/* Payment Method */}
       <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Payment Method</h3>
+        <h3 className="font-medium text-gray-900 mb-4">{t('settings.paymentMethod')}</h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CreditCard className="w-5 h-5 text-gray-600" />
             <div>
               <p className="font-medium">{settingsData?.billing.paymentMethod.brand} •••• {settingsData?.billing.paymentMethod.last4}</p>
-              <p className="text-sm text-gray-600">Expires 12/25</p>
+              <p className="text-sm text-gray-600">{t('settings.expires', { date: '12/25' })}</p>
             </div>
           </div>
           <button className="text-accent-dark hover:text-blue-700">
@@ -1123,7 +1123,7 @@ const Settings: React.FC = () => {
 
       {/* Invoices */}
       <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">Recent Invoices</h3>
+        <h3 className="font-medium text-gray-900 mb-4">{t('settings.recentInvoices')}</h3>
         <div className="space-y-3">
           {settingsData?.billing.invoices.map((invoice) => (
             <div key={invoice.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
@@ -1152,8 +1152,8 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       {/* Data Export */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Export Data</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Download a copy of your data in various formats</p>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.exportData')}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{t('settings.exportDataDesc')}</p>
         <div className="flex gap-3">
           <select
             value={exportFormat}
@@ -1169,19 +1169,19 @@ const Settings: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
             <Download className="w-4 h-4" />
-            Export Data
+            {t('settings.exportData')}
           </button>
         </div>
       </div>
 
       {/* Auto Backup */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Auto Backup</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.autoBackup')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Enable Auto Backup</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">Automatically backup your data</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.autoBackup')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.autoBackupDesc')}</p>
             </div>
             <button
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -1205,7 +1205,7 @@ const Settings: React.FC = () => {
           </div>
           {settingsData?.data.autoBackup && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Backup Frequency</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.backupFrequency')}</label>
               <select
                 value={settingsData.data.backupFrequency}
                 onChange={(e) => {
@@ -1228,9 +1228,9 @@ const Settings: React.FC = () => {
 
       {/* Data Location */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Data Location</h3>
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.dataLocation')}</h3>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Primary Data Center</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.primaryDataCenter')}</label>
           <select
             value={settingsData?.data.dataLocation}
             onChange={(e) => {
@@ -1273,8 +1273,8 @@ const Settings: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-border dark:border-gray-600">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Settings</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Manage your account settings and preferences</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('settings.title')}</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{t('settings.subtitle')}</p>
         </div>
 
         {/* Tabs */}
@@ -1316,19 +1316,19 @@ const Settings: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="w-6 h-6 text-red-600" />
-              <h3 className="text-lg font-semibold text-red-900">Delete Account</h3>
+              <h3 className="text-lg font-semibold text-red-900">{t('settings.deleteAccount')}</h3>
             </div>
             <p className="text-gray-700 dark:text-gray-700 mb-4">
-              This action cannot be undone. All your data will be permanently deleted.
+              {t('settings.deleteAccountWarning')}
             </p>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">Reason for deletion</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.deleteReason')}</label>
               <textarea
                 value={deleteReason}
                 onChange={(e) => setDeleteReason(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 rows={3}
-                placeholder="Please tell us why you're deleting your account..."
+                placeholder={t('settings.deleteReasonPlaceholder')}
               />
             </div>
             <div className="flex gap-3">
@@ -1337,7 +1337,7 @@ const Settings: React.FC = () => {
                 disabled={saving || !deleteReason.trim()}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
               >
-                {saving ? 'Deleting...' : 'Delete Account'}
+                {saving ? t('settings.deleting') : t('settings.deleteAccount')}
               </button>
               <button
                 onClick={() => {
@@ -1346,7 +1346,7 @@ const Settings: React.FC = () => {
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -1357,9 +1357,9 @@ const Settings: React.FC = () => {
       {showExportData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Export Data</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('settings.exportData')}</h3>
             <p className="text-gray-700 dark:text-gray-700 mb-4">
-              This will download a copy of all your data in {exportFormat.toUpperCase()} format.
+              {t('settings.exportWarning', { format: exportFormat.toUpperCase() })}
             </p>
             <div className="flex gap-3">
               <button
@@ -1367,13 +1367,13 @@ const Settings: React.FC = () => {
                 disabled={saving}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {saving ? 'Exporting...' : 'Export Data'}
+                {saving ? t('settings.exporting') : t('settings.exportData')}
               </button>
               <button
                 onClick={() => setShowExportData(false)}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>

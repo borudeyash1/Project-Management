@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle, Clock, Flag, User, Calendar, Upload, Link as LinkIcon, ChevronDown, ChevronUp, List, LayoutGrid, CalendarDays, BarChart3, Table2, Activity, Users2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TaskFile {
   _id: string;
@@ -49,6 +50,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   currentUserId,
   onUpdateTask
 }) => {
+  const { t } = useTranslation();
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [newLink, setNewLink] = useState<{[taskId: string]: string}>({});
@@ -165,7 +167,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
     // In a real app, you'd save this to a comments/updates array
     // For now, we'll add it to the description or a custom field
-    alert(`Status update added: ${update}`);
+    alert(t('project.employeeTasks.submitUpdate') + `: ${update}`);
     
     // Clear input
     setStatusUpdate({ ...statusUpdate, [taskId]: '' });
@@ -184,15 +186,15 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   const getTaskTypeInfo = (taskType: Task['taskType']) => {
     switch (taskType) {
       case 'status-update':
-        return { label: 'Status Update', color: 'bg-blue-100 text-blue-700', icon: '📝' };
+        return { label: t('project.tasks.types.statusUpdate'), color: 'bg-blue-100 text-blue-700', icon: '📝' };
       case 'file-submission':
-        return { label: 'File Required', color: 'bg-purple-100 text-purple-700', icon: '📎' };
+        return { label: t('project.tasks.types.fileSubmission'), color: 'bg-purple-100 text-purple-700', icon: '📎' };
       case 'link-submission':
-        return { label: 'Link Required', color: 'bg-indigo-100 text-indigo-700', icon: '🔗' };
+        return { label: t('project.tasks.types.linkSubmission'), color: 'bg-indigo-100 text-indigo-700', icon: '🔗' };
       case 'review':
-        return { label: 'Review', color: 'bg-yellow-100 text-yellow-700', icon: '👁️' };
+        return { label: t('project.tasks.types.review'), color: 'bg-yellow-100 text-yellow-700', icon: '👁️' };
       default:
-        return { label: 'General', color: 'bg-gray-100 text-gray-700', icon: '📋' };
+        return { label: t('project.tasks.types.general'), color: 'bg-gray-100 text-gray-700', icon: '📋' };
     }
   };
 
@@ -217,26 +219,26 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">My Tasks</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('project.employeeTasks.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Tasks assigned to you ({filteredTasks.length} tasks)
+              {t('project.employeeTasks.subtitle', { count: filteredTasks.length })}
             </p>
           </div>
 
           {/* Status Filter */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Filter:</span>
+            <span className="text-sm text-gray-600">{t('project.employeeTasks.filter.label')}</span>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent"
             >
-              <option value="all">All Tasks</option>
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="verified">Verified</option>
-              <option value="blocked">Blocked</option>
+              <option value="all">{t('project.employeeTasks.filter.all')}</option>
+              <option value="pending">{t('project.employeeTasks.filter.pending')}</option>
+              <option value="in-progress">{t('project.employeeTasks.filter.inProgress')}</option>
+              <option value="completed">{t('project.employeeTasks.filter.completed')}</option>
+              <option value="verified">{t('project.employeeTasks.filter.verified')}</option>
+              <option value="blocked">{t('project.employeeTasks.filter.blocked')}</option>
             </select>
           </div>
 
@@ -249,10 +251,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="List View"
+              title={t('project.employeeTasks.views.list')}
             >
               <List className="w-4 h-4" />
-              <span className="text-xs font-medium">List</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.list')}</span>
             </button>
             <button
               onClick={() => setViewMode('kanban')}
@@ -261,10 +263,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="Kanban Board"
+              title={t('project.employeeTasks.views.kanban')}
             >
               <LayoutGrid className="w-4 h-4" />
-              <span className="text-xs font-medium">Kanban</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.kanban')}</span>
             </button>
             <button
               onClick={() => setViewMode('calendar')}
@@ -273,10 +275,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="Calendar View"
+              title={t('project.employeeTasks.views.calendar')}
             >
               <CalendarDays className="w-4 h-4" />
-              <span className="text-xs font-medium">Calendar</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.calendar')}</span>
             </button>
             <button
               onClick={() => setViewMode('gantt')}
@@ -285,10 +287,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="Gantt Chart"
+              title={t('project.employeeTasks.views.gantt')}
             >
               <BarChart3 className="w-4 h-4" />
-              <span className="text-xs font-medium">Gantt</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.gantt')}</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
@@ -297,10 +299,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="Table View"
+              title={t('project.employeeTasks.views.table')}
             >
               <Table2 className="w-4 h-4" />
-              <span className="text-xs font-medium">Table</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.table')}</span>
             </button>
             <button
               onClick={() => setViewMode('dashboard')}
@@ -309,10 +311,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="Dashboard View"
+              title={t('project.employeeTasks.views.dashboard')}
             >
               <Activity className="w-4 h-4" />
-              <span className="text-xs font-medium">Dashboard</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.dashboard')}</span>
             </button>
             <button
               onClick={() => setViewMode('workload')}
@@ -321,10 +323,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   ? 'bg-white text-accent-dark shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              title="Workload View"
+              title={t('project.employeeTasks.views.workload')}
             >
               <Users2 className="w-4 h-4" />
-              <span className="text-xs font-medium">Workload</span>
+              <span className="text-xs font-medium">{t('project.employeeTasks.views.workload')}</span>
             </button>
           </div>
         </div>
@@ -332,23 +334,23 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {/* Task Statistics */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-xs text-gray-600 mb-1">Total</p>
+            <p className="text-xs text-gray-600 mb-1">{t('project.employeeTasks.stats.total')}</p>
             <p className="text-2xl font-bold text-gray-900">{myTasks.length}</p>
           </div>
           <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-xs text-accent-dark mb-1">In Progress</p>
+            <p className="text-xs text-accent-dark mb-1">{t('project.employeeTasks.stats.inProgress')}</p>
             <p className="text-2xl font-bold text-blue-700">
               {myTasks.filter(t => t.status === 'in-progress').length}
             </p>
           </div>
           <div className="bg-green-50 rounded-lg p-4">
-            <p className="text-xs text-green-600 mb-1">Completed</p>
+            <p className="text-xs text-green-600 mb-1">{t('project.employeeTasks.stats.completed')}</p>
             <p className="text-2xl font-bold text-green-700">
               {myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length}
             </p>
           </div>
           <div className="bg-red-50 rounded-lg p-4">
-            <p className="text-xs text-red-600 mb-1">Overdue</p>
+            <p className="text-xs text-red-600 mb-1">{t('project.employeeTasks.stats.overdue')}</p>
             <p className="text-2xl font-bold text-red-700">
               {myTasks.filter(t => isOverdue(t.dueDate) && t.status !== 'completed' && t.status !== 'verified').length}
             </p>
@@ -361,11 +363,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             {filteredTasks.length === 0 ? (
               <div className="text-center py-12 text-gray-600">
                 <User className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p className="font-medium">No tasks found</p>
+                <p className="font-medium">{t('project.employeeTasks.noTasks')}</p>
                 <p className="text-sm mt-1">
                   {filterStatus === 'all' 
-                    ? 'You have no tasks assigned yet' 
-                    : `No ${filterStatus} tasks`}
+                    ? t('project.employeeTasks.noTasksSubtitle.all')
+                    : t('project.employeeTasks.noTasksSubtitle.filtered', { status: filterStatus })}
                 </p>
               </div>
             ) : (
@@ -386,7 +388,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       {task.isFinished && (
                         <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center gap-1">
                           <CheckCircle className="w-3 h-3" />
-                          Finished
+                          {t('project.employeeTasks.finished')}
                         </span>
                       )}
                     </div>
@@ -416,11 +418,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           className={`px-2 py-1 text-xs rounded-full border-0 cursor-pointer ${getStatusColor(task.status)}`}
                           disabled={task.status === 'verified'}
                         >
-                          <option value="pending">Pending</option>
-                          <option value="in-progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                          <option value="blocked">Blocked</option>
-                          {task.status === 'verified' && <option value="verified">Verified</option>}
+                          <option value="pending">{t('project.employeeTasks.filter.pending')}</option>
+                          <option value="in-progress">{t('project.employeeTasks.filter.inProgress')}</option>
+                          <option value="completed">{t('project.employeeTasks.filter.completed')}</option>
+                          <option value="blocked">{t('project.employeeTasks.filter.blocked')}</option>
+                          {task.status === 'verified' && <option value="verified">{t('project.employeeTasks.filter.verified')}</option>}
                         </select>
                       ) : (
                         <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(task.status)}`}>
@@ -430,7 +432,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
                       {isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified' && (
                         <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
-                          ⚠️ Overdue
+                          {t('project.employeeTasks.overdue')}
                         </span>
                       )}
                     </div>
@@ -451,14 +453,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4 mb-3 pb-3 border-b border-gray-200">
                   <div>
-                    <p className="text-xs text-gray-600 mb-1">Start Date</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('project.tasks.startDate')}</p>
                     <p className="text-sm text-gray-900 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {new Date(task.startDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 mb-1">Due Date</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('project.tasks.dueDate')}</p>
                     <p className={`text-sm flex items-center gap-1 ${
                       isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
                         ? 'text-red-600 font-semibold' 
@@ -473,7 +475,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {/* Progress Bar */}
                 <div className="mb-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-600">Progress</span>
+                    <span className="text-xs text-gray-600">{t('project.tasks.progress')}</span>
                     <span className="text-xs font-medium text-gray-900">{task.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-2">
@@ -492,7 +494,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       <div>
                         <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <CheckCircle className="w-4 h-4" />
-                          Subtasks ({task.subtasks.filter(st => st.completed).length}/{task.subtasks.length})
+                          {t('project.employeeTasks.subtasks', { completed: task.subtasks.filter(st => st.completed).length, total: task.subtasks.length })}
                         </h5>
                         <div className="space-y-2 pl-4">
                           {task.subtasks.map((subtask) => (
@@ -520,7 +522,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                         <h5 className="text-sm font-medium text-purple-900 mb-2 flex items-center gap-2">
                           <Upload className="w-4 h-4" />
-                          Upload Required Files
+                          {t('project.employeeTasks.uploadRequired')}
                         </h5>
                         
                         {/* File Upload Input */}
@@ -534,14 +536,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             />
                           </label>
                           <p className="text-xs text-gray-600 mt-1">
-                            Upload files required for this task
+                            {t('project.employeeTasks.uploadDesc')}
                           </p>
                         </div>
 
                         {/* Uploaded Files */}
                         {task.files && task.files.length > 0 && (
                           <div className="space-y-2">
-                            <p className="text-xs font-medium text-gray-700">Uploaded Files:</p>
+                            <p className="text-xs font-medium text-gray-700">{t('project.employeeTasks.uploadedFiles')}</p>
                             {task.files.map((file) => (
                               <div key={file._id} className="flex items-center justify-between bg-white rounded p-2">
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -552,7 +554,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                                   onClick={() => handleRemoveFile(task._id, file._id)}
                                   className="text-red-600 hover:text-red-700 text-xs ml-2"
                                 >
-                                  Remove
+                                  {t('project.employeeTasks.remove')}
                                 </button>
                               </div>
                             ))}
@@ -565,7 +567,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             onClick={() => handleStatusChange(task._id, 'completed')}
                             className="w-full mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
                           >
-                            Mark as Completed
+                            {t('project.employeeTasks.markCompleted')}
                           </button>
                         )}
                       </div>
@@ -576,7 +578,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
                         <h5 className="text-sm font-medium text-indigo-900 mb-2 flex items-center gap-2">
                           <LinkIcon className="w-4 h-4" />
-                          Submit Required Links
+                          {t('project.employeeTasks.submitLinks')}
                         </h5>
                         
                         {/* Link Input */}
@@ -592,14 +594,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             onClick={() => handleAddLink(task._id)}
                             className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
                           >
-                            Add
+                            {t('project.employeeTasks.add')}
                           </button>
                         </div>
 
                         {/* Submitted Links */}
                         {task.links && task.links.length > 0 && (
                           <div className="space-y-2">
-                            <p className="text-xs font-medium text-gray-700">Submitted Links:</p>
+                            <p className="text-xs font-medium text-gray-700">{t('project.employeeTasks.submittedLinks')}</p>
                             {task.links.map((link, index) => (
                               <div key={index} className="flex items-center justify-between bg-white rounded p-2">
                                 <a 
@@ -614,7 +616,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                                   onClick={() => handleRemoveLink(task._id, index)}
                                   className="text-red-600 hover:text-red-700 text-xs ml-2"
                                 >
-                                  Remove
+                                  {t('project.employeeTasks.remove')}
                                 </button>
                               </div>
                             ))}
@@ -627,7 +629,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             onClick={() => handleStatusChange(task._id, 'completed')}
                             className="w-full mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
                           >
-                            Mark as Completed
+                            {t('project.employeeTasks.markCompleted')}
                           </button>
                         )}
                       </div>
@@ -637,14 +639,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     {task.taskType === 'status-update' && !task.isFinished && (
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <h5 className="text-sm font-medium text-blue-900 mb-2 flex items-center gap-2">
-                          📝 Provide Status Update
+                          {t('project.employeeTasks.provideStatus')}
                         </h5>
                         
                         <div className="space-y-2">
                           <textarea
                             value={statusUpdate[task._id] || ''}
                             onChange={(e) => setStatusUpdate({ ...statusUpdate, [task._id]: e.target.value })}
-                            placeholder="Enter your status update here..."
+                            placeholder={t('project.employeeTasks.statusPlaceholder')}
                             rows={3}
                             className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent resize-none"
                           />
@@ -652,7 +654,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             onClick={() => handleAddStatusUpdate(task._id)}
                             className="px-4 py-2 bg-accent text-gray-900 text-sm rounded-lg hover:bg-accent-hover"
                           >
-                            Submit Update
+                            {t('project.employeeTasks.submitUpdate')}
                           </button>
                         </div>
                       </div>
@@ -663,7 +665,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       <div>
                         <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <LinkIcon className="w-4 h-4" />
-                          Reference Links
+                          {t('project.employeeTasks.referenceLinks')}
                         </h5>
                         <div className="space-y-1 pl-4">
                           {task.links.map((link, index) => (
@@ -686,7 +688,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       <div>
                         <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <Upload className="w-4 h-4" />
-                          Attached Files
+                          {t('project.employeeTasks.attachedFiles')}
                         </h5>
                         <div className="space-y-1 pl-4">
                           {task.files.map((file) => (
@@ -702,7 +704,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     {/* Rating Display */}
                     {task.isFinished && task.rating && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <p className="text-sm font-medium text-gray-700 mb-1">Task Rating</p>
+                        <p className="text-sm font-medium text-gray-700 mb-1">{t('project.employeeTasks.taskRating')}</p>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <span key={star} className={star <= task.rating! ? 'text-yellow-600 text-lg' : 'text-gray-700 text-lg'}>
@@ -733,7 +735,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onDrop={() => handleDrop('pending')}
             >
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center justify-between">
-                <span>Pending</span>
+                <span>{t('project.employeeTasks.kanban.pending')}</span>
                 <span className="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">
                   {filteredTasks.filter(t => t.status === 'pending').length}
                 </span>
@@ -779,7 +781,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onDrop={() => handleDrop('in-progress')}
             >
               <h3 className="font-semibold text-blue-900 mb-3 flex items-center justify-between">
-                <span>In Progress</span>
+                <span>{t('project.employeeTasks.kanban.inProgress')}</span>
                 <span className="bg-blue-200 text-blue-700 text-xs px-2 py-1 rounded-full">
                   {filteredTasks.filter(t => t.status === 'in-progress').length}
                 </span>
@@ -828,7 +830,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onDrop={() => handleDrop('completed')}
             >
               <h3 className="font-semibold text-green-900 mb-3 flex items-center justify-between">
-                <span>Completed</span>
+                <span>{t('project.employeeTasks.kanban.completed')}</span>
                 <span className="bg-green-200 text-green-700 text-xs px-2 py-1 rounded-full">
                   {filteredTasks.filter(t => t.status === 'completed').length}
                 </span>
@@ -860,7 +862,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                       <CheckCircle className="w-3 h-3 text-green-600" />
-                      Completed
+                      {t('project.employeeTasks.kanban.completed')}
                     </div>
                   </div>
                 ))}
@@ -874,7 +876,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               onDrop={() => handleDrop('verified')}
             >
               <h3 className="font-semibold text-purple-900 mb-3 flex items-center justify-between">
-                <span>Verified</span>
+                <span>{t('project.employeeTasks.kanban.verified')}</span>
                 <span className="bg-purple-200 text-purple-700 text-xs px-2 py-1 rounded-full">
                   {filteredTasks.filter(t => t.status === 'verified' || t.status === 'blocked').length}
                 </span>
@@ -1010,7 +1012,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {/* Gantt Chart View */}
         {viewMode === 'gantt' && (
           <div className="bg-white rounded-lg border border-gray-300 p-6 overflow-x-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Gantt Chart Timeline</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.views.gantt')}</h3>
             
             <div className="min-w-[800px]">
               {/* Timeline Header */}
@@ -1082,14 +1084,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Task</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Priority</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Progress</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Start Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Due Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Rating</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.task')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.type')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.status')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.priority')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.progress')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.startDate')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.tasks.dueDate')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">{t('project.employeeTasks.taskRating')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -1164,46 +1166,46 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <div className="grid grid-cols-4 gap-4">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium opacity-90">Total Tasks</h3>
+                  <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.totalTasks')}</h3>
                   <List className="w-5 h-5 opacity-75" />
                 </div>
                 <p className="text-3xl font-bold">{myTasks.length}</p>
-                <p className="text-xs opacity-75 mt-1">All assigned tasks</p>
+                <p className="text-xs opacity-75 mt-1">{t('project.employeeTasks.dashboard.totalTasksDesc')}</p>
               </div>
               
               <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium opacity-90">Completed</h3>
+                  <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.completed')}</h3>
                   <CheckCircle className="w-5 h-5 opacity-75" />
                 </div>
                 <p className="text-3xl font-bold">
                   {myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length}
                 </p>
                 <p className="text-xs opacity-75 mt-1">
-                  {Math.round((myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length / myTasks.length) * 100)}% completion rate
+                  {t('project.employeeTasks.dashboard.completedDesc', { percent: Math.round((myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length / myTasks.length) * 100) })}
                 </p>
               </div>
               
               <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium opacity-90">In Progress</h3>
+                  <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.inProgress')}</h3>
                   <Activity className="w-5 h-5 opacity-75" />
                 </div>
                 <p className="text-3xl font-bold">
                   {myTasks.filter(t => t.status === 'in-progress').length}
                 </p>
-                <p className="text-xs opacity-75 mt-1">Active tasks</p>
+                <p className="text-xs opacity-75 mt-1">{t('project.employeeTasks.dashboard.inProgressDesc')}</p>
               </div>
               
               <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium opacity-90">Overdue</h3>
+                  <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.overdue')}</h3>
                   <Clock className="w-5 h-5 opacity-75" />
                 </div>
                 <p className="text-3xl font-bold">
                   {myTasks.filter(t => isOverdue(t.dueDate) && t.status !== 'completed' && t.status !== 'verified').length}
                 </p>
-                <p className="text-xs opacity-75 mt-1">Need attention</p>
+                <p className="text-xs opacity-75 mt-1">{t('project.employeeTasks.dashboard.overdueDesc')}</p>
               </div>
             </div>
 
@@ -1211,7 +1213,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <div className="grid grid-cols-2 gap-6">
               {/* Task Distribution by Status */}
               <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Distribution</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.dashboard.distribution')}</h3>
                 <div className="space-y-3">
                   {['pending', 'in-progress', 'completed', 'verified', 'blocked'].map(status => {
                     const count = myTasks.filter(t => t.status === status).length;
@@ -1236,7 +1238,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
               {/* Priority Breakdown */}
               <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Priority Breakdown</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.dashboard.priorityBreakdown')}</h3>
                 <div className="space-y-3">
                   {['critical', 'high', 'medium', 'low'].map(priority => {
                     const count = myTasks.filter(t => t.priority === priority).length;
@@ -1262,7 +1264,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
             {/* Recent Tasks */}
             <div className="bg-white rounded-lg border border-gray-300 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Tasks</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.dashboard.recentTasks')}</h3>
               <div className="space-y-2">
                 {filteredTasks.slice(0, 5).map(task => (
                   <div 
@@ -1298,22 +1300,22 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {/* Workload View */}
         {viewMode === 'workload' && (
           <div className="bg-white rounded-lg border border-gray-300 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">My Workload Overview</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('project.employeeTasks.workload.title')}</h3>
             
             {/* Workload Summary */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-accent-dark mb-1">Total Workload</p>
+                <p className="text-sm text-accent-dark mb-1">{t('project.employeeTasks.workload.total')}</p>
                 <p className="text-2xl font-bold text-blue-700">{myTasks.length} tasks</p>
               </div>
               <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-sm text-green-600 mb-1">Capacity Used</p>
+                <p className="text-sm text-green-600 mb-1">{t('project.employeeTasks.workload.capacity')}</p>
                 <p className="text-2xl font-bold text-green-700">
                   {Math.round((myTasks.filter(t => t.status === 'in-progress').length / Math.max(myTasks.length, 1)) * 100)}%
                 </p>
               </div>
               <div className="bg-orange-50 rounded-lg p-4">
-                <p className="text-sm text-orange-600 mb-1">Avg. Progress</p>
+                <p className="text-sm text-orange-600 mb-1">{t('project.employeeTasks.workload.avgProgress')}</p>
                 <p className="text-2xl font-bold text-orange-700">
                   {Math.round(myTasks.reduce((sum, t) => sum + t.progress, 0) / Math.max(myTasks.length, 1))}%
                 </p>
@@ -1322,17 +1324,21 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
             {/* Task Timeline */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-gray-900">Tasks by Week</h4>
+              <h4 className="font-semibold text-gray-900">{t('project.employeeTasks.workload.tasksByWeek')}</h4>
               {(() => {
-                const weeks = ['This Week', 'Next Week', 'Later'];
+                const weeks = [
+                  t('project.employeeTasks.workload.weeks.thisWeek'), 
+                  t('project.employeeTasks.workload.weeks.nextWeek'), 
+                  t('project.employeeTasks.workload.weeks.later')
+                ];
                 const today = new Date();
                 const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
                 
                 return weeks.map(week => {
                   let weekTasks;
-                  if (week === 'This Week') {
+                  if (week === t('project.employeeTasks.workload.weeks.thisWeek')) {
                     weekTasks = myTasks.filter(t => new Date(t.dueDate) <= nextWeek);
-                  } else if (week === 'Next Week') {
+                  } else if (week === t('project.employeeTasks.workload.weeks.nextWeek')) {
                     const twoWeeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
                     weekTasks = myTasks.filter(t => new Date(t.dueDate) > nextWeek && new Date(t.dueDate) <= twoWeeks);
                   } else {
@@ -1364,7 +1370,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           </div>
                         ))}
                         {weekTasks.length > 3 && (
-                          <p className="text-xs text-gray-600 pl-4">+{weekTasks.length - 3} more tasks</p>
+                          <p className="text-xs text-gray-600 pl-4">{t('project.employeeTasks.workload.moreTasks', { count: weekTasks.length - 3 })}</p>
                         )}
                       </div>
                     </div>
@@ -1419,21 +1425,21 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               <div className="px-6 py-4 space-y-4">
                 {/* Description */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Description</h3>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">{t('project.employeeTasks.modal.description')}</h3>
                   <p className="text-sm text-gray-600">{selectedTaskForModal.description}</p>
                 </div>
 
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-1">Start Date</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">{t('project.tasks.startDate')}</h3>
                     <p className="text-sm text-gray-600 flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       {new Date(selectedTaskForModal.startDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-1">Due Date</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">{t('project.tasks.dueDate')}</h3>
                     <p className={`text-sm flex items-center gap-1 ${
                       isOverdue(selectedTaskForModal.dueDate) && selectedTaskForModal.status !== 'completed' 
                         ? 'text-red-600 font-semibold' 
@@ -1448,7 +1454,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {/* Progress */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-gray-700">Progress</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">{t('project.employeeTasks.modal.progress')}</h3>
                     <span className="text-sm font-medium text-gray-900">{selectedTaskForModal.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-3">
@@ -1464,7 +1470,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
-                      Subtasks ({selectedTaskForModal.subtasks.filter(st => st.completed).length}/{selectedTaskForModal.subtasks.length})
+                      {t('project.employeeTasks.modal.subtasks', { completed: selectedTaskForModal.subtasks.filter(st => st.completed).length, total: selectedTaskForModal.subtasks.length })}
                     </h3>
                     <div className="space-y-2">
                       {selectedTaskForModal.subtasks.map((subtask) => (
@@ -1490,7 +1496,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       <Upload className="w-4 h-4" />
-                      Files ({selectedTaskForModal.files.length})
+                      {t('project.employeeTasks.modal.files', { count: selectedTaskForModal.files.length })}
                     </h3>
                     <div className="space-y-2">
                       {selectedTaskForModal.files.map((file) => (
@@ -1508,7 +1514,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       <LinkIcon className="w-4 h-4" />
-                      Links ({selectedTaskForModal.links.length})
+                      {t('project.employeeTasks.modal.links', { count: selectedTaskForModal.links.length })}
                     </h3>
                     <div className="space-y-2">
                       {selectedTaskForModal.links.map((link, index) => (
@@ -1529,7 +1535,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {/* Rating */}
                 {selectedTaskForModal.isFinished && selectedTaskForModal.rating && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Task Rating</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2">{t('project.employeeTasks.modal.rating')}</h3>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= selectedTaskForModal.rating! ? 'text-yellow-600 text-2xl' : 'text-gray-700 text-2xl'}>
@@ -1550,7 +1556,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   onClick={() => setSelectedTaskForModal(null)}
                   className="px-4 py-2 text-gray-700 hover:bg-gray-300 rounded-lg transition-colors"
                 >
-                  Close
+                  {t('project.employeeTasks.modal.close')}
                 </button>
                 {!selectedTaskForModal.isFinished && selectedTaskForModal.taskType !== 'file-submission' && selectedTaskForModal.taskType !== 'link-submission' && (
                   <select
@@ -1561,10 +1567,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="blocked">Blocked</option>
+                    <option value="pending">{t('project.employeeTasks.filter.pending')}</option>
+                    <option value="in-progress">{t('project.employeeTasks.filter.inProgress')}</option>
+                    <option value="completed">{t('project.employeeTasks.filter.completed')}</option>
+                    <option value="blocked">{t('project.employeeTasks.filter.blocked')}</option>
                   </select>
                 )}
               </div>

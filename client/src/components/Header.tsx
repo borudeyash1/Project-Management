@@ -127,26 +127,35 @@ const Header: React.FC = () => {
           </button>
 
           {showLanguageMenu && (
-            <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
               <div className="p-2">
-                <button
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
-                    i18n.language === 'en' ? 'bg-slate-100 dark:bg-gray-700' : ''
-                  }`}
-                  onClick={() => changeLanguage('en')}
-                >
-                  <span className="text-lg">🇺🇸</span>
-                  <span className="dark:text-gray-200">English</span>
-                </button>
-                <button
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
-                    i18n.language === 'ja' ? 'bg-slate-100 dark:bg-gray-700' : ''
-                  }`}
-                  onClick={() => changeLanguage('ja')}
-                >
-                  <span className="text-lg">🇯🇵</span>
-                  <span className="dark:text-gray-200">日本語</span>
-                </button>
+                {[
+                  { code: 'en', name: 'English', flag: '🇬🇧' },
+                  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+                  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+                  { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+                  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+                  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+                  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+                  { code: 'es', name: 'Español', flag: '🇪🇸' },
+                  { code: 'pt', name: 'Português', flag: '🇵🇹' },
+                  { code: 'da', name: 'Dansk', flag: '🇩🇰' },
+                  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+                  { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
+                  { code: 'no', name: 'Norsk', flag: '🇳🇴' },
+                  { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
+                ].map((lang) => (
+                  <button
+                    key={lang.code}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
+                      i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
+                    }`}
+                    onClick={() => changeLanguage(lang.code)}
+                  >
+                    <span className="text-lg">{lang.flag}</span>
+                    <span className="dark:text-gray-200">{lang.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
           )}

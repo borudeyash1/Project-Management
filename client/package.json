@@ -9,6 +9,7 @@
     "@types/date-fns": "^2.5.3",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@vitalets/google-translate-api": "^9.2.1",
     "axios": "^1.12.2",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.0.0",

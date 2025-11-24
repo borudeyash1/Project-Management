@@ -6,6 +6,7 @@ import SharedFooter from './SharedFooter';
 import PricingModal from './PricingModal';
 import api, { SubscriptionPlanData } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import ContentBanner from './ContentBanner';
 
 const planIconMap: Record<'free' | 'pro' | 'ultra', React.ReactNode> = {
@@ -14,15 +15,11 @@ const planIconMap: Record<'free' | 'pro' | 'ultra', React.ReactNode> = {
   ultra: <Crown className="w-8 h-8 text-purple-500" />
 };
 
-const highlightBullets = [
-  'Unlimited collaboration with AI copilots',
-  'Admin-defined coupons & affiliate earnings',
-  'Advanced analytics, payroll, and automation',
-  'Enterprise-grade security & compliance'
-];
+
 
 const PricingPage: React.FC = () => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,30 +71,40 @@ const PricingPage: React.FC = () => {
         <section className={`px-4 ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'}`}>
           <div className="max-w-6xl mx-auto text-center py-16">
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
-              <Sparkles className="w-4 h-4" /> Flexible pricing for every workspace
+              <Sparkles className="w-4 h-4" /> {t('pricing.badge')}
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold mt-6 tracking-tight">
-              Unlock Sartthi&apos;s full Project & Payroll suite
+              {t('pricing.title')}
             </h1>
             <p className="mt-4 text-lg text-gray-600 dark:text-gray-700 max-w-3xl mx-auto">
-              Choose a plan configured by your admins. Apply coupons or affiliate links at checkout, and upgrade instantly without a payment gateway.
+              {t('pricing.subtitle')}
             </p>
             <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-              {highlightBullets.map((bullet) => (
-                <div key={bullet} className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white shadow-sm'}`}>
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  <span className="text-base font-medium">{bullet}</span>
-                </div>
-              ))}
+              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white shadow-sm'}`}>
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span className="text-base font-medium">{t('pricing.highlights.aiCollaboration')}</span>
+              </div>
+              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white shadow-sm'}`}>
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span className="text-base font-medium">{t('pricing.highlights.coupons')}</span>
+              </div>
+              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white shadow-sm'}`}>
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span className="text-base font-medium">{t('pricing.highlights.analytics')}</span>
+              </div>
+              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white shadow-sm'}`}>
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span className="text-base font-medium">{t('pricing.highlights.security')}</span>
+              </div>
             </div>
 
             {authPrompt && (
               <div className={`mt-8 max-w-3xl mx-auto rounded-3xl border px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white shadow-lg'}`}>
                 <div>
-                  <p className="text-sm uppercase tracking-wider text-amber-500 font-semibold">Authentication required</p>
-                  <h2 className="text-xl font-bold mt-1">Login or create an account to select the {authPrompt.planName} plan.</h2>
+                  <p className="text-sm uppercase tracking-wider text-amber-500 font-semibold">{t('pricing.authPrompt.title')}</p>
+                  <h2 className="text-xl font-bold mt-1">{t('pricing.authPrompt.message', { planName: authPrompt.planName })}</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-700 mt-1">
-                    Already have an account? Continue to login. New to Sartthi? Sign up first, then complete the upgrade.
+                    {t('pricing.authPrompt.description')}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -105,13 +112,13 @@ const PricingPage: React.FC = () => {
                     onClick={() => handleLoginRedirect('/login')}
                     className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-semibold border border-accent text-accent-dark hover:bg-blue-50"
                   >
-                    Login
+                    {t('pricing.authPrompt.login')}
                   </button>
                   <button
                     onClick={() => handleLoginRedirect('/register')}
                     className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-semibold bg-accent text-gray-900 hover:bg-accent-hover"
                   >
-                    Sign up
+                    {t('pricing.authPrompt.signup')}
                   </button>
                 </div>
               </div>
@@ -122,7 +129,7 @@ const PricingPage: React.FC = () => {
         <section className="px-4">
           <div className="max-w-6xl mx-auto">
             {loading && (
-              <div className="text-center py-16 text-gray-600">Loading plans...</div>
+              <div className="text-center py-16 text-gray-600">{t('pricing.loading')}</div>
             )}
             {!loading && (
               <div className="grid gap-8 md:grid-cols-3">
@@ -138,7 +145,7 @@ const PricingPage: React.FC = () => {
                   >
                     {plan.planKey === 'pro' && (
                       <span className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-accent text-gray-900 text-xs font-semibold shadow-md">
-                        Most popular
+                        {t('pricing.mostPopular')}
                       </span>
                     )}
                     <div className="flex flex-col items-center text-center">
@@ -149,24 +156,24 @@ const PricingPage: React.FC = () => {
                       <p className="text-gray-600 dark:text-gray-700 mt-2">{plan.summary}</p>
                       <div className="mt-6">
                         <div className="text-4xl font-extrabold">
-                          {plan.monthlyPrice === 0 ? 'Free' : `$${plan.monthlyPrice}`}
+                          {plan.monthlyPrice === 0 ? t('pricing.free') : `$${plan.monthlyPrice}`}
                         </div>
-                        <p className="text-sm text-gray-600">per month</p>
+                        <p className="text-sm text-gray-600">{t('pricing.perMonth')}</p>
                       </div>
                     </div>
 
                     <div className="mt-8 space-y-3 text-sm">
                       <div className="flex justify-between border-b pb-2 border-gray-300 dark:border-gray-600">
-                        <span className="text-gray-600">Workspaces</span>
-                        <span className="font-semibold">{plan.limits.maxWorkspaces === -1 ? 'Unlimited' : plan.limits.maxWorkspaces}</span>
+                        <span className="text-gray-600">{t('pricing.limits.workspaces')}</span>
+                        <span className="font-semibold">{plan.limits.maxWorkspaces === -1 ? t('pricing.limits.unlimited') : plan.limits.maxWorkspaces}</span>
                       </div>
                       <div className="flex justify-between border-b pb-2 border-gray-300 dark:border-gray-600">
-                        <span className="text-gray-600">Projects</span>
-                        <span className="font-semibold">{plan.limits.maxProjects === -1 ? 'Unlimited' : plan.limits.maxProjects}</span>
+                        <span className="text-gray-600">{t('pricing.limits.projects')}</span>
+                        <span className="font-semibold">{plan.limits.maxProjects === -1 ? t('pricing.limits.unlimited') : plan.limits.maxProjects}</span>
                       </div>
                       <div className="flex justify-between border-b pb-2 border-gray-300 dark:border-gray-600">
-                        <span className="text-gray-600">Team members</span>
-                        <span className="font-semibold">{plan.limits.maxTeamMembers === -1 ? 'Unlimited' : plan.limits.maxTeamMembers}</span>
+                        <span className="text-gray-600">{t('pricing.limits.teamMembers')}</span>
+                        <span className="font-semibold">{plan.limits.maxTeamMembers === -1 ? t('pricing.limits.unlimited') : plan.limits.maxTeamMembers}</span>
                       </div>
 
                     </div>
@@ -181,10 +188,10 @@ const PricingPage: React.FC = () => {
                         } ${isDarkMode && plan.planKey === 'free' ? 'bg-gray-700 text-white hover:bg-gray-600' : ''}`}
                     >
                       {plan.planKey === 'free'
-                        ? 'Get Started Free'
+                        ? t('pricing.buttons.getStartedFree')
                         : plan.planKey === 'pro'
-                          ? 'Choose Pro User'
-                          : 'Choose Ultra'}
+                          ? t('pricing.buttons.choosePro')
+                          : t('pricing.buttons.chooseUltra')}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -200,28 +207,28 @@ const PricingPage: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Shield className="w-10 h-10 text-emerald-500" />
                 <div>
-                  <h3 className="text-xl font-semibold">Security-first architecture</h3>
-                  <p className="text-gray-600 dark:text-gray-700 text-sm">Role-based access, audit logs, SSO-ready.</p>
+                  <h3 className="text-xl font-semibold">{t('pricing.features.security.title')}</h3>
+                  <p className="text-gray-600 dark:text-gray-700 text-sm">{t('pricing.features.security.description')}</p>
                 </div>
               </div>
               <ul className="mt-6 space-y-3 text-sm text-gray-600 dark:text-gray-700">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Admin-configurable plan limits</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> OTP-gated workspace creation</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Custom billing bypass with approvals</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.security.items.planLimits')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.security.items.otpGated')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.security.items.customBilling')}</li>
               </ul>
             </div>
             <div className={`rounded-3xl p-8 border ${isDarkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-white shadow-lg'}`}>
               <div className="flex items-center gap-3">
                 <Award className="w-10 h-10 text-amber-500" />
                 <div>
-                  <h3 className="text-xl font-semibold">Affiliate & coupon engine</h3>
-                  <p className="text-gray-600 dark:text-gray-700 text-sm">Reward evangelists, delight teams with instant savings.</p>
+                  <h3 className="text-xl font-semibold">{t('pricing.features.affiliate.title')}</h3>
+                  <p className="text-gray-600 dark:text-gray-700 text-sm">{t('pricing.features.affiliate.description')}</p>
                 </div>
               </div>
               <ul className="mt-6 space-y-3 text-sm text-gray-600 dark:text-gray-700">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Admin-managed coupon catalog</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Affiliate codes with commission tracking</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Instant validation during checkout</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.affiliate.items.couponCatalog')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.affiliate.items.affiliateCodes')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.affiliate.items.instantValidation')}</li>
               </ul>
             </div>
           </div>

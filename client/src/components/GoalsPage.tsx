@@ -69,7 +69,7 @@ const GoalsPage: React.FC = () => {
     switch (priority) {
       case 'urgent': return 'text-red-600 bg-red-100';
       case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'medium': return 'text-yellow-800 bg-yellow-200';
       case 'low': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
@@ -180,10 +180,10 @@ const GoalsPage: React.FC = () => {
             {canCreateGoals() && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-3 py-2 border text-gray-600 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gradient-to-r dark:from-purple-600 dark:to-pink-600 dark:border-transparent hover:bg-gray-50 dark:hover:opacity-90 transition-all"
+                className="flex items-center gap-2 px-3 py-2 border border-transparent rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-accent text-gray-900 hover:bg-accent/90 transition-all"
               >
-                <Plus className="w-4 h-4 text-purple-600 dark:text-white" />
-                <span className="text-gray-700 dark:text-white font-medium">{t('goals.newGoal')}</span>
+                <Plus className="w-4 h-4 text-gray-900" />
+                <span className="text-gray-900 font-medium">{t('goals.newGoal')}</span>
               </button>
             )}
           </div>
@@ -334,10 +334,10 @@ const GoalsPage: React.FC = () => {
               {goals.length === 0 && canCreateGoals() && (
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gradient-to-r dark:from-purple-600 dark:to-pink-600 dark:border-transparent hover:bg-gray-50 dark:hover:opacity-90 transition-all"
+                  className="inline-flex items-center gap-2 px-3 py-2 border border-transparent rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-accent text-gray-900 hover:bg-accent/90 transition-all"
                 >
-                  <Plus className="w-4 h-4 text-purple-600 dark:text-white" />
-                  <span className="text-gray-700 dark:text-white font-medium">{t('goals.newGoal')}</span>
+                  <Plus className="w-4 h-4 text-gray-900" />
+                  <span className="text-gray-900 font-medium">{t('goals.newGoal')}</span>
                 </button>
               )}
             </div>

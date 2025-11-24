@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import {
   LayoutDashboard,
@@ -23,6 +24,7 @@ interface WorkspaceTab {
 }
 
 const WorkspaceInternalNav: React.FC = () => {
+  const { t } = useTranslation();
   const { state } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,45 +44,45 @@ const WorkspaceInternalNav: React.FC = () => {
   const workspaceTabs: WorkspaceTab[] = [
     {
       id: 'overview',
-      label: 'Overview',
+      label: t('workspace.tabs.overview'),
       icon: LayoutDashboard,
       path: `/workspace/${activeWorkspaceId}/overview`
     },
     {
       id: 'members',
-      label: 'Members',
+      label: t('workspace.tabs.members'),
       icon: Users,
       path: `/workspace/${activeWorkspaceId}/members`
     },
     {
       id: 'projects',
-      label: 'Projects',
+      label: t('workspace.tabs.projects'),
       icon: FolderKanban,
       path: `/workspace/${activeWorkspaceId}/projects`
     },
     {
       id: 'clients',
-      label: 'Clients',
+      label: t('workspace.tabs.clients'),
       icon: Briefcase,
       path: `/workspace/${activeWorkspaceId}/clients`,
       ownerOnly: true
     },
     {
       id: 'profile',
-      label: 'Profile',
+      label: t('workspace.tabs.profile'),
       icon: UserCircle,
       path: `/workspace/${activeWorkspaceId}/profile`
     },
     {
       id: 'collaborate',
-      label: 'Collaborate',
+      label: t('workspace.tabs.collaborate'),
       icon: UserPlus,
       path: `/workspace/${activeWorkspaceId}/collaborate`,
       ownerOnly: true
     },
     {
       id: 'inbox',
-      label: 'Inbox',
+      label: t('workspace.tabs.inbox'),
       icon: MessageSquare,
       path: `/workspace/${activeWorkspaceId}/inbox`
     }
@@ -123,7 +125,7 @@ const WorkspaceInternalNav: React.FC = () => {
             className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-accent text-gray-900 hover:bg-accent-hover transition-colors"
           >
             <UserPlus className="w-4 h-4" />
-            Add member
+            {t('workspace.nav.addMember')}
           </button>
         )}
       </div>

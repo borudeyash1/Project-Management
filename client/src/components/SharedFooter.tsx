@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Info, BookOpen, Mail, MapPin, Phone, ExternalLink } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const SharedFooter: React.FC = () => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <footer className={`${isDarkMode ? 'bg-gray-900/80 backdrop-blur-md border-t border-gray-700/30' : 'bg-white/80 backdrop-blur-md border-t border-gray-200/50'} mt-auto shadow-2xl`}>
@@ -14,31 +16,30 @@ const SharedFooter: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-6">
               <div className="text-3xl font-bold text-accent">
-                The Tech Factory
+                {t('footer.companyName')}
               </div>
             </div>
             <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-6 max-w-md text-base leading-relaxed`}>
-              Empowering teams with innovative project management solutions. We build tools that help organizations 
-              streamline their workflows and achieve their goals efficiently.
+              {t('footer.description')}
             </p>
             <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} space-y-3`}>
               <div className="flex items-center gap-3 hover:text-yellow-500 transition-colors duration-200">
                 <div className={`w-8 h-8 ${isDarkMode ? 'bg-yellow-500/20' : 'bg-yellow-100'} rounded-lg flex items-center justify-center`}>
                   <MapPin size={16} className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} />
                 </div>
-                <span className="text-sm">Ahilyanagar, Maharashtra, India</span>
+                <span className="text-sm">{t('footer.location')}</span>
               </div>
               <div className="flex items-center gap-3 hover:text-yellow-500 transition-colors duration-200">
                 <div className={`w-8 h-8 ${isDarkMode ? 'bg-yellow-500/20' : 'bg-yellow-100'} rounded-lg flex items-center justify-center`}>
                   <Mail size={16} className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} />
                 </div>
-                <a href="mailto:contact@thetechfactory.com" className="text-sm">contact@thetechfactory.com</a>
+                <a href={`mailto:${t('footer.email')}`} className="text-sm">{t('footer.email')}</a>
               </div>
               <div className="flex items-center gap-3 hover:text-yellow-500 transition-colors duration-200">
                 <div className={`w-8 h-8 ${isDarkMode ? 'bg-yellow-500/20' : 'bg-yellow-100'} rounded-lg flex items-center justify-center`}>
                   <Phone size={16} className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'}`} />
                 </div>
-                <span className="text-sm">+91 12345 67890</span>
+                <span className="text-sm">{t('footer.phone')}</span>
               </div>
             </div>
           </div>
@@ -46,7 +47,7 @@ const SharedFooter: React.FC = () => {
           {/* Quick Links */}
           <div>
             <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              Quick Links
+              {t('footer.quickLinks')}
             </h3>
             <ul className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               <li>
@@ -55,7 +56,7 @@ const SharedFooter: React.FC = () => {
                   className={`${isDarkMode ? 'hover:text-yellow-400' : 'hover:text-yellow-600'} transition-colors duration-200 flex items-center gap-2 text-sm font-medium`}
                 >
                   <Home size={16} />
-                  Home
+                  {t('footer.home')}
                 </Link>
               </li>
               <li>
@@ -64,7 +65,7 @@ const SharedFooter: React.FC = () => {
                   className={`${isDarkMode ? 'hover:text-yellow-400' : 'hover:text-yellow-600'} transition-colors duration-200 flex items-center gap-2 text-sm font-medium`}
                 >
                   <Info size={16} />
-                  About Us
+                  {t('footer.aboutUs')}
                 </Link>
               </li>
               <li>
@@ -73,7 +74,7 @@ const SharedFooter: React.FC = () => {
                   className={`${isDarkMode ? 'hover:text-yellow-400' : 'hover:text-yellow-600'} transition-colors duration-200 flex items-center gap-2 text-sm font-medium`}
                 >
                   <BookOpen size={16} />
-                  User Guide
+                  {t('footer.userGuide')}
                 </Link>
               </li>
               <li>
@@ -81,7 +82,7 @@ const SharedFooter: React.FC = () => {
                   to="/login" 
                   className={`${isDarkMode ? 'hover:text-yellow-400' : 'hover:text-yellow-600'} transition-colors duration-200 flex items-center gap-2 text-sm font-medium`}
                 >
-                  Login
+                  {t('footer.login')}
                 </Link>
               </li>
               <li>
@@ -89,7 +90,7 @@ const SharedFooter: React.FC = () => {
                   to="/register" 
                   className={`${isDarkMode ? 'hover:text-yellow-400' : 'hover:text-yellow-600'} transition-colors duration-200 flex items-center gap-2 text-sm font-medium`}
                 >
-                  Register
+                  {t('footer.register')}
                 </Link>
               </li>
             </ul>
@@ -98,32 +99,32 @@ const SharedFooter: React.FC = () => {
           {/* Services */}
           <div>
             <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              Our Services
+              {t('footer.services')}
             </h3>
             <ul className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-sm`}>
               <li className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 ${isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'} rounded-full`}></div>
-                Project Management
+                {t('footer.projectManagement')}
               </li>
               <li className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 ${isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'} rounded-full`}></div>
-                Team Collaboration
+                {t('footer.teamCollaboration')}
               </li>
               <li className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 ${isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'} rounded-full`}></div>
-                Task Tracking
+                {t('footer.taskTracking')}
               </li>
               <li className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 ${isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'} rounded-full`}></div>
-                Payroll Management
+                {t('footer.payrollManagement')}
               </li>
               <li className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 ${isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'} rounded-full`}></div>
-                Analytics & Reports
+                {t('footer.analyticsReports')}
               </li>
               <li className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 ${isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'} rounded-full`}></div>
-                Custom Solutions
+                {t('footer.customSolutions')}
               </li>
             </ul>
           </div>
@@ -133,28 +134,28 @@ const SharedFooter: React.FC = () => {
         <div className={`border-t ${isDarkMode ? 'border-gray-700/30' : 'border-gray-200/50'} mt-12 pt-8`}>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-sm font-medium`}>
-              © {new Date().getFullYear()} The Tech Factory. All rights reserved.
+              {t('footer.copyright', { year: new Date().getFullYear() })}
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <a 
                 href="#" 
                 className={`${isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-600 hover:text-yellow-600'} transition-colors duration-200 font-medium`}
               >
-                Privacy Policy
+                {t('footer.privacyPolicy')}
               </a>
               <span className={`${isDarkMode ? 'text-gray-600' : 'text-gray-700'}`}>•</span>
               <a 
                 href="#" 
                 className={`${isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-600 hover:text-yellow-600'} transition-colors duration-200 font-medium`}
               >
-                Terms of Service
+                {t('footer.termsOfService')}
               </a>
               <span className={`${isDarkMode ? 'text-gray-600' : 'text-gray-700'}`}>•</span>
               <a 
                 href="#" 
                 className={`${isDarkMode ? 'text-gray-300 hover:text-yellow-400' : 'text-gray-600 hover:text-yellow-600'} transition-colors duration-200 font-medium`}
               >
-                Cookie Policy
+                {t('footer.cookiePolicy')}
               </a>
             </div>
           </div>

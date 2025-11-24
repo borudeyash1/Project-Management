@@ -25,6 +25,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
 
 import AddTeamMemberModal from './AddTeamMemberModal';
@@ -202,7 +203,7 @@ const ProjectViewDetailed: React.FC = () => {
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
   const { isDarkMode } = useTheme();
-  
+  const { t } = useTranslation();  // ← ADD THIS LINE
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeView, setActiveView] = useState<
@@ -752,11 +753,11 @@ const ProjectViewDetailed: React.FC = () => {
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
             <Share2 className="w-4 h-4" />
-            Share
+            {t('project.header.share')}
           </button>
           <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
             <Settings className="w-4 h-4" />
-            Settings
+            {t('project.header.settings')}
           </button>
           {(currentUserRole === 'owner' || currentUserRole === 'manager') && (
             <button
@@ -1181,30 +1182,30 @@ const ProjectViewDetailed: React.FC = () => {
         <div className="space-y-6">
           {/* Project Information */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.sidebar.projectInfo')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Status</span>
+                <span className="text-gray-600">{t('project.sidebar.status')}</span>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(activeProject?.status || '')}`}>
                   {activeProject?.status}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Priority</span>
+                <span className="text-gray-600">{t('project.sidebar.priority')}</span>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(activeProject?.priority || '')}`}>
                   {activeProject?.priority}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Progress</span>
+                <span className="text-gray-600">{t('project.sidebar.progress')}</span>
                 <span className="font-medium text-gray-900">{activeProject?.progress}%</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Budget</span>
+                <span className="text-gray-600">{t('project.sidebar.budget')}</span>
                 <span className="font-medium text-gray-900">{formatCurrency(activeProject?.budget || 0)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Spent</span>
+                <span className="text-gray-600">{t('project.sidebar.spent')}</span>
                 <span className="font-medium text-gray-900">{formatCurrency(activeProject?.spent || 0)}</span>
               </div>
             </div>
@@ -1212,7 +1213,7 @@ const ProjectViewDetailed: React.FC = () => {
 
           {/* Team Members */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Team Members</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.sidebar.teamMembers')}</h3>
             <div className="space-y-3">
               {activeProject?.team?.slice(0, 5).map((member) => (
                 <div key={member._id} className="flex items-center gap-3">
@@ -1230,7 +1231,7 @@ const ProjectViewDetailed: React.FC = () => {
               ))}
               {activeProject && activeProject.team && activeProject.team.length > 5 && (
                 <p className="text-sm text-gray-600 text-center">
-                  +{activeProject.team.length - 5} more members
+                  {t('project.sidebar.moreMembers', { count: activeProject.team.length - 5 })}
                 </p>
               )}
             </div>
@@ -1238,26 +1239,26 @@ const ProjectViewDetailed: React.FC = () => {
 
           {/* Quick Stats */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.sidebar.quickStats')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Total Tasks</span>
+                <span className="text-gray-600">{t('project.sidebar.totalTasks')}</span>
                 <span className="font-medium text-gray-900">{activeProject?.tasks?.length || 0}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Completed</span>
+                <span className="text-gray-600">{t('project.sidebar.completed')}</span>
                 <span className="font-medium text-gray-900">
                   {activeProject?.tasks?.filter(t => t.status === 'completed').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">In Progress</span>
+                <span className="text-gray-600">{t('project.sidebar.inProgress')}</span>
                 <span className="font-medium text-gray-900">
                   {activeProject?.tasks?.filter(t => t.status === 'in-progress').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Overdue</span>
+                <span className="text-gray-600">{t('project.sidebar.overdue')}</span>
                 <span className="font-medium text-red-600">
                   {activeProject?.tasks?.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed').length || 0}
                 </span>

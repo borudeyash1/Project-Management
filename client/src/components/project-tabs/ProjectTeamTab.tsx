@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Users, UserPlus, Trash2, Crown, Shield, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 
 interface WorkspaceMember {
@@ -40,6 +41,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   onRemoveMember,
   onChangeProjectManager
 }) => {
+  const { t } = useTranslation();
   const { state } = useApp();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState('');
@@ -77,9 +79,9 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Project Team</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('project.team.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Manage team members for this project ({projectTeam.length} members)
+              {t('project.team.subtitle', { count: projectTeam.length })}
             </p>
           </div>
           {(isOwner || isProjectManager) && (
@@ -88,7 +90,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <UserPlus className="w-4 h-4" />
-              Add Member
+              {t('project.team.addMember')}
             </button>
           )}
         </div>
@@ -104,7 +106,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                 <div className="flex items-center gap-2">
                   <h4 className="font-semibold text-gray-900">{currentPM.name}</h4>
                   <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
-                    Project Manager
+                    {t('project.team.projectManager')}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">{currentPM.email}</p>
@@ -118,8 +120,8 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
           {projectTeam.length === 0 ? (
             <div className="text-center py-12 text-gray-600">
               <Users className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="font-medium">No team members yet</p>
-              <p className="text-sm mt-1">Add members from your workspace to get started</p>
+              <p className="font-medium">{t('project.team.noMembers')}</p>
+              <p className="text-sm mt-1">{t('project.team.noMembersSubtitle')}</p>
             </div>
           ) : (
             projectTeam.map((member) => (
@@ -140,7 +142,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                     </div>
                     <p className="text-sm text-gray-600">{member.email}</p>
                     <p className="text-xs text-gray-600">
-                      Added {new Date(member.addedAt).toLocaleDateString()}
+                      {t('project.team.added', { date: new Date(member.addedAt).toLocaleDateString() })}
                     </p>
                   </div>
                 </div>
@@ -151,14 +153,14 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                       ? 'bg-purple-100 text-purple-700'
                       : 'bg-gray-100 text-gray-700'
                   }`}>
-                    {member.role === 'project-manager' ? 'Manager' : 'Member'}
+                    {member.role === 'project-manager' ? t('project.team.manager') : t('project.team.member')}
                   </span>
 
                   {(isOwner || isProjectManager) && member._id !== projectManager && (
                     <button
                       onClick={() => onRemoveMember(member._id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                      title="Remove member"
+                      title={t('project.team.removeMember')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -168,10 +170,10 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                     <button
                       onClick={() => onChangeProjectManager(member._id)}
                       className="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
-                      title="Make Project Manager"
+                      title={t('project.team.makePM')}
                     >
                       <Crown className="w-3 h-3 inline mr-1" />
-                      Make PM
+                      {t('project.team.makePM')}
                     </button>
                   )}
                 </div>
@@ -186,7 +188,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Add Team Member</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('project.team.modal.title')}</h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="text-gray-600 hover:text-gray-600"
@@ -199,11 +201,11 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               {/* Member Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Member from Workspace
+                  {t('project.team.modal.selectMember')}
                 </label>
                 {availableMembers.length === 0 ? (
                   <p className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
-                    All workspace members are already in this project
+                    {t('project.team.modal.allMembersAdded')}
                   </p>
                 ) : (
                   <select
@@ -211,7 +213,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                     onChange={(e) => setSelectedMemberId(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   >
-                    <option value="">Choose a member...</option>
+                    <option value="">{t('project.team.modal.chooseMember')}</option>
                     {availableMembers.map((member: any) => (
                       <option key={member._id} value={member._id}>
                         {member.name} ({member.email})
@@ -224,7 +226,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               {/* Role Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Role
+                  {t('project.team.modal.role')}
                 </label>
                 <select
                   value={selectedRole}
@@ -232,19 +234,19 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                   disabled={!isOwner && selectedRole === 'project-manager'}
                 >
-                  <option value="member">Member</option>
+                  <option value="member">{t('project.team.member')}</option>
                   {isOwner && !currentPM && (
-                    <option value="project-manager">Project Manager</option>
+                    <option value="project-manager">{t('project.team.projectManager')}</option>
                   )}
                 </select>
                 {!isOwner && (
                   <p className="text-xs text-gray-600 mt-1">
-                    Only workspace owner can assign project manager
+                    {t('project.team.modal.ownerOnly')}
                   </p>
                 )}
                 {currentPM && selectedRole === 'project-manager' && (
                   <p className="text-xs text-orange-600 mt-1">
-                    This project already has a project manager
+                    {t('project.team.modal.pmExists')}
                   </p>
                 )}
               </div>
@@ -256,13 +258,13 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                   disabled={!selectedMemberId || availableMembers.length === 0}
                   className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  Add Member
+                  {t('project.team.modal.add')}
                 </button>
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('project.team.modal.cancel')}
                 </button>
               </div>
             </div>

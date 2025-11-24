@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Rocket, CheckCircle2 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import ContentBanner from './ContentBanner';
 
 const UserGuide: React.FC = () => {
+  const { t } = useTranslation();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const { isDarkMode } = useTheme();
 
@@ -17,97 +19,97 @@ const UserGuide: React.FC = () => {
   const sections = [
     {
       id: 'getting-started',
-      title: 'Getting Started',
+      title: t('userGuide.sections.gettingStarted.title'),
       content: (
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">1. Create Your Account</h4>
-          <p className="text-gray-600">Sign up for a free account to get started with Sartthi.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.gettingStarted.createAccount.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.gettingStarted.createAccount.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">2. Set Up Your Workspace</h4>
-          <p className="text-gray-600">Create your first workspace and invite team members.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.gettingStarted.setupWorkspace.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.gettingStarted.setupWorkspace.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">3. Create Your First Project</h4>
-          <p className="text-gray-600">Start by creating a project and adding tasks.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.gettingStarted.createProject.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.gettingStarted.createProject.description')}</p>
         </div>
       )
     },
     {
       id: 'projects',
-      title: 'Managing Projects',
+      title: t('userGuide.sections.managingProjects.title'),
       content: (
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Creating Projects</h4>
-          <p className="text-gray-600">Click the "Create Project" button to start a new project. Fill in the project details including name, description, and timeline.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.managingProjects.creating.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.managingProjects.creating.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Project Settings</h4>
-          <p className="text-gray-600">Configure project settings, team permissions, and notification preferences.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.managingProjects.settings.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.managingProjects.settings.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Project Analytics</h4>
-          <p className="text-gray-600">Track project progress with built-in analytics and reporting tools.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.managingProjects.analytics.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.managingProjects.analytics.description')}</p>
         </div>
       )
     },
     {
       id: 'tasks',
-      title: 'Task Management',
+      title: t('userGuide.sections.taskManagement.title'),
       content: (
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Creating Tasks</h4>
-          <p className="text-gray-600">Add tasks to your projects with detailed descriptions, due dates, and assignees.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.taskManagement.creating.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.taskManagement.creating.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Task Status</h4>
-          <p className="text-gray-600">Update task status: Todo, In Progress, Completed, or On Hold.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.taskManagement.status.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.taskManagement.status.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Task Dependencies</h4>
-          <p className="text-gray-600">Set up task dependencies to ensure proper workflow order.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.taskManagement.dependencies.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.taskManagement.dependencies.description')}</p>
         </div>
       )
     },
     {
       id: 'team-collaboration',
-      title: 'Team Collaboration',
+      title: t('userGuide.sections.collaboration.title'),
       content: (
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Inviting Team Members</h4>
-          <p className="text-gray-600">Invite team members to your workspace and assign them to projects.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.collaboration.inviting.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.collaboration.inviting.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Role Management</h4>
-          <p className="text-gray-600">Assign different roles and permissions to team members.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.collaboration.roles.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.collaboration.roles.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Communication</h4>
-          <p className="text-gray-600">Use comments and mentions to communicate within tasks and projects.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.collaboration.communication.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.collaboration.communication.description')}</p>
         </div>
       )
     },
     {
       id: 'analytics',
-      title: 'Analytics & Reports',
+      title: t('userGuide.sections.analytics.title'),
       content: (
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Project Analytics</h4>
-          <p className="text-gray-600">View detailed analytics on project progress, team performance, and time tracking.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.analytics.projectAnalytics.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.analytics.projectAnalytics.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Custom Reports</h4>
-          <p className="text-gray-600">Generate custom reports for stakeholders and team members.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.analytics.customReports.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.analytics.customReports.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Export Data</h4>
-          <p className="text-gray-600">Export project data in various formats for external analysis.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.analytics.exportData.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.analytics.exportData.description')}</p>
         </div>
       )
     },
     {
       id: 'troubleshooting',
-      title: 'Troubleshooting',
+      title: t('userGuide.sections.troubleshooting.title'),
       content: (
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Common Issues</h4>
-          <p className="text-gray-600">Find solutions to common problems and frequently asked questions.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.troubleshooting.commonIssues.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.troubleshooting.commonIssues.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Performance Tips</h4>
-          <p className="text-gray-600">Optimize your Sartthi experience with these performance tips.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.troubleshooting.performance.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.troubleshooting.performance.description')}</p>
 
-          <h4 className="font-semibold text-gray-900">Contact Support</h4>
-          <p className="text-gray-600">Get help from our support team when you need it.</p>
+          <h4 className="font-semibold text-gray-900">{t('userGuide.sections.troubleshooting.contact.title')}</h4>
+          <p className="text-gray-600">{t('userGuide.sections.troubleshooting.contact.description')}</p>
         </div>
       )
     }
@@ -132,20 +134,20 @@ const UserGuide: React.FC = () => {
             className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-600 hover:text-yellow-700' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
           >
             <ArrowLeft size={18} />
-            Back to Home
+            {t('userGuide.backToHome')}
           </Link>
 
           {/* Header */}
           <div className="text-center mb-20">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 shadow-lg ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
               <BookOpen className="w-4 h-4" />
-              <span className="text-sm font-medium">Complete Documentation</span>
+              <span className="text-sm font-medium">{t('userGuide.badge')}</span>
             </div>
             <h1 className={`text-4xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              User <span className="text-accent">Guide</span>
+              {t('userGuide.title')}
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
-              Everything you need to know to get the most out of Sartthi.
+              {t('userGuide.subtitle')}
             </p>
           </div>
 
@@ -155,29 +157,29 @@ const UserGuide: React.FC = () => {
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shadow-lg">
                 <Rocket className="w-6 h-6 text-white" />
               </div>
-              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Start</h2>
+              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('userGuide.quickStart.title')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center group">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">1</span>
                 </div>
-                <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Sign Up</h3>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>Create your free account in seconds</p>
+                <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('userGuide.quickStart.steps.signUp.title')}</h3>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>{t('userGuide.quickStart.steps.signUp.description')}</p>
               </div>
               <div className="text-center group">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">2</span>
                 </div>
-                <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Create Workspace</h3>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>Set up your team workspace</p>
+                <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('userGuide.quickStart.steps.createWorkspace.title')}</h3>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>{t('userGuide.quickStart.steps.createWorkspace.description')}</p>
               </div>
               <div className="text-center group">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">3</span>
                 </div>
-                <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Start Managing</h3>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>Create projects and tasks</p>
+                <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('userGuide.quickStart.steps.startManaging.title')}</h3>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm leading-relaxed`}>{t('userGuide.quickStart.steps.startManaging.description')}</p>
               </div>
             </div>
           </div>
@@ -219,25 +221,25 @@ const UserGuide: React.FC = () => {
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
                 <CheckCircle2 className="text-white" size={18} />
-                <span className="text-white text-sm font-semibold">24/7 Support Available</span>
+                <span className="text-white text-sm font-semibold">{t('userGuide.support.badge')}</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Need More Help?</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('userGuide.support.title')}</h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Our support team is here to help you succeed.
+                {t('userGuide.support.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="mailto:support@sartthi.com"
                   className="group bg-white text-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-xl hover:scale-105 transform inline-flex items-center justify-center gap-2"
                 >
-                  Contact Support
+                  {t('userGuide.support.contact')}
                   <ArrowLeft size={18} className="rotate-180 group-hover:translate-x-1 transition-transform" />
                 </a>
                 <Link
                   to="/register"
                   className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 shadow-xl hover:scale-105 transform"
                 >
-                  Get Started
+                  {t('userGuide.support.getStarted')}
                 </Link>
               </div>
             </div>

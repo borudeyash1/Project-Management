@@ -4,6 +4,8 @@ import {
   Clock, TrendingUp, Users, FileText, AlertCircle
 } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 interface ProjectInfoTabProps {
   project: any;
   canEdit: boolean;
@@ -11,6 +13,7 @@ interface ProjectInfoTabProps {
 }
 
 const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpdate }) => {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: project?.name || '',
@@ -88,7 +91,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
     return (
       <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
         <AlertCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-        <p className="text-gray-600">Project information not available</p>
+        <p className="text-gray-600">{t('project.info.notAvailable')}</p>
       </div>
     );
   }
@@ -98,14 +101,14 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Project Information</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('project.info.title')}</h3>
           {canEdit && !isEditing && (
             <button
               onClick={() => setIsEditing(true)}
               className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               <Edit className="w-4 h-4" />
-              Edit
+              {t('project.info.edit')}
             </button>
           )}
           {isEditing && (
@@ -115,14 +118,14 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >
                 <Save className="w-4 h-4" />
-                Save
+                {t('project.info.save')}
               </button>
               <button
                 onClick={handleCancel}
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 <X className="w-4 h-4" />
-                Cancel
+                {t('project.info.cancel')}
               </button>
             </div>
           )}
@@ -135,7 +138,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-1" />
-                Project Name
+                {t('project.info.projectName')}
               </label>
               {isEditing ? (
                 <input
@@ -152,7 +155,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Briefcase className="w-4 h-4 inline mr-1" />
-                Client
+                {t('project.info.client')}
               </label>
               {isEditing ? (
                 <input
@@ -162,7 +165,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 />
               ) : (
-                <p className="text-gray-900">{project.client || 'No client'}</p>
+                <p className="text-gray-900">{project.client || t('project.info.noClient')}</p>
               )}
             </div>
           </div>
@@ -170,7 +173,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              {t('project.info.description')}
             </label>
             {isEditing ? (
               <textarea
@@ -180,7 +183,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
               />
             ) : (
-              <p className="text-gray-700">{project.description || 'No description'}</p>
+              <p className="text-gray-700">{project.description || t('project.info.noDescription')}</p>
             )}
           </div>
 
@@ -188,7 +191,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
+                {t('project.info.status')}
               </label>
               {isEditing ? (
                 <select
@@ -196,23 +199,23 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
-                  <option value="planning">Planning</option>
-                  <option value="active">Active</option>
-                  <option value="on-hold">On Hold</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="abandoned">Abandoned</option>
+                  <option value="planning">{t('project.status.planning')}</option>
+                  <option value="active">{t('project.status.active')}</option>
+                  <option value="on-hold">{t('project.status.onHold')}</option>
+                  <option value="completed">{t('project.status.completed')}</option>
+                  <option value="cancelled">{t('project.status.cancelled')}</option>
+                  <option value="abandoned">{t('project.status.abandoned')}</option>
                 </select>
               ) : (
                 <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(project.status)}`}>
-                  {project.status}
+                  {t(`project.status.${project.status}`)}
                 </span>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
+                {t('project.info.priority')}
               </label>
               {isEditing ? (
                 <select
@@ -220,14 +223,14 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
+                  <option value="low">{t('project.priority.low')}</option>
+                  <option value="medium">{t('project.priority.medium')}</option>
+                  <option value="high">{t('project.priority.high')}</option>
+                  <option value="critical">{t('project.priority.critical')}</option>
                 </select>
               ) : (
                 <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getPriorityColor(project.priority)}`}>
-                  {project.priority}
+                  {t(`project.priority.${project.priority}`)}
                 </span>
               )}
             </div>
@@ -238,7 +241,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
-                Start Date
+                {t('project.info.startDate')}
               </label>
               {isEditing ? (
                 <input
@@ -249,7 +252,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 />
               ) : (
                 <p className="text-gray-900">
-                  {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not set'}
+                  {project.startDate ? new Date(project.startDate).toLocaleDateString() : t('project.info.notSet')}
                 </p>
               )}
             </div>
@@ -257,7 +260,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Clock className="w-4 h-4 inline mr-1" />
-                Due Date
+                {t('project.info.dueDate')}
               </label>
               {isEditing ? (
                 <input
@@ -268,7 +271,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 />
               ) : (
                 <p className="text-gray-900">
-                  {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'Not set'}
+                  {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : t('project.info.notSet')}
                 </p>
               )}
             </div>
@@ -279,7 +282,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <DollarSign className="w-4 h-4 inline mr-1" />
-                Estimated Budget
+                {t('project.info.estimatedBudget')}
               </label>
               {isEditing ? (
                 <input
@@ -299,7 +302,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <TrendingUp className="w-4 h-4 inline mr-1" />
-                Actual Spent
+                {t('project.info.actualSpent')}
               </label>
               {isEditing ? (
                 <input
@@ -321,7 +324,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <TrendingUp className="w-4 h-4 inline mr-1" />
-              Progress
+              {t('project.info.progress')}
             </label>
             <div className="flex items-center gap-4">
               <div className="flex-1 bg-gray-300 rounded-full h-3">
@@ -338,7 +341,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Tag className="w-4 h-4 inline mr-1" />
-              Tags
+              {t('project.info.tags')}
             </label>
             {isEditing ? (
               <input
@@ -346,7 +349,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
-                placeholder="Enter tags separated by commas"
+                placeholder={t('project.info.tagsPlaceholder')}
               />
             ) : (
               <div className="flex flex-wrap gap-2">
@@ -360,7 +363,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                     </span>
                   ))
                 ) : (
-                  <p className="text-gray-600 text-sm">No tags</p>
+                  <p className="text-gray-600 text-sm">{t('project.info.noTags')}</p>
                 )}
               </div>
             )}
@@ -370,10 +373,10 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Users className="w-4 h-4 inline mr-1" />
-              Team Size
+              {t('project.info.teamSize')}
             </label>
             <p className="text-gray-900 font-medium">
-              {project.team?.length || project.teamMemberCount || 0} members
+              {t('project.info.membersCount', { count: project.team?.length || project.teamMemberCount || 0 })}
             </p>
           </div>
         </div>

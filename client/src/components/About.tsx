@@ -2,11 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, ExternalLink, Award, Users, Zap, Shield } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import ContentBanner from './ContentBanner';
 
 const About: React.FC = () => {
+  const { t } = useTranslation();
   const { isDarkMode } = useTheme();
 
   return (
@@ -28,19 +30,19 @@ const About: React.FC = () => {
             className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-600 hover:text-yellow-700' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
           >
             <ArrowLeft size={18} />
-            Back to Home
+            {t('about.backToHome')}
           </Link>
 
           {/* Header */}
           <div className="text-center mb-20">
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
-              ABOUT US
+              {t('about.badge')}
             </span>
             <h1 className={`text-4xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              About <span className="text-accent">Sartthi</span>
+              {t('about.title')} <span className="text-accent">Sartthi</span>
             </h1>
             <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
-              We're building the future of project management, one feature at a time.
+              {t('about.subtitle')}
             </p>
           </div>
 
@@ -50,12 +52,10 @@ const About: React.FC = () => {
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shadow-lg">
                 <Award className="w-6 h-6 text-white" />
               </div>
-              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Mission</h2>
+              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.mission.title')}</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed`}>
-              At Sartthi, we believe that great projects start with great tools. Our mission is to simplify project management
-              and make it accessible to teams of all sizes. We're committed to providing intuitive, powerful, and reliable
-              solutions that help teams collaborate effectively and achieve their goals.
+              {t('about.mission.description')}
             </p>
           </div>
 
@@ -66,38 +66,38 @@ const About: React.FC = () => {
                 <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-blue-500 to-purple-500' : 'bg-gradient-to-br from-blue-400 to-purple-400'} rounded-lg flex items-center justify-center shadow-lg`}>
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>What We Offer</h3>
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.offer.title')}</h3>
               </div>
               <ul className={`space-y-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Comprehensive project tracking and management</span>
+                  <span className="leading-relaxed">{t('about.offer.items.tracking')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Real-time collaboration tools</span>
+                  <span className="leading-relaxed">{t('about.offer.items.collaboration')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Advanced analytics and reporting</span>
+                  <span className="leading-relaxed">{t('about.offer.items.analytics')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Seamless team communication</span>
+                  <span className="leading-relaxed">{t('about.offer.items.communication')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Customizable workflows</span>
+                  <span className="leading-relaxed">{t('about.offer.items.workflows')}</span>
                 </li>
               </ul>
             </div>
@@ -107,38 +107,38 @@ const About: React.FC = () => {
                 <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-lg flex items-center justify-center shadow-lg`}>
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Choose Sartthi</h3>
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.choose.title')}</h3>
               </div>
               <ul className={`space-y-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">User-friendly interface designed for productivity</span>
+                  <span className="leading-relaxed">{t('about.choose.items.interface')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Scalable solutions for teams of any size</span>
+                  <span className="leading-relaxed">{t('about.choose.items.scalable')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">24/7 customer support</span>
+                  <span className="leading-relaxed">{t('about.choose.items.support')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Regular updates and new features</span>
+                  <span className="leading-relaxed">{t('about.choose.items.updates')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
                   </div>
-                  <span className="leading-relaxed">Secure and reliable infrastructure</span>
+                  <span className="leading-relaxed">{t('about.choose.items.security')}</span>
                 </li>
               </ul>
             </div>
@@ -150,95 +150,33 @@ const About: React.FC = () => {
               <div className={`w-12 h-12 ${isDarkMode ? 'bg-gradient-to-br from-green-500 to-blue-500' : 'bg-gradient-to-br from-green-400 to-blue-400'} rounded-xl flex items-center justify-center shadow-lg`}>
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Our Team</h2>
+              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.team.title')}</h2>
             </div>
             <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
-              Sartthi is built by a passionate team of developers, designers, and project management experts
-              who understand the challenges of modern team collaboration. We're constantly working to improve
-              our platform and add new features based on user feedback.
+              {t('about.team.description')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">D</span>
                 </div>
-                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Development Team</h4>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>Building the future</p>
+                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('about.team.development.title')}</h4>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>{t('about.team.development.subtitle')}</p>
               </div>
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">D</span>
                 </div>
-                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Design Team</h4>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>Creating beautiful experiences</p>
+                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('about.team.design.title')}</h4>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>{t('about.team.design.subtitle')}</p>
               </div>
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">S</span>
                 </div>
-                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Support Team</h4>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>Always here to help</p>
+                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('about.team.support.title')}</h4>
+                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>{t('about.team.support.subtitle')}</p>
               </div>
-            </div>
-          </div>
-
-          {/* Office Location Section */}
-          <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16`}>
-            <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-8 text-center`}>
-              Visit Our Office
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Office Info */}
-              <div>
-                <h3 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
-                  The Tech Factory Headquarters
-                </h3>
-                <div className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} space-y-4`}>
-                  <div className="flex items-start gap-3">
-                    <MapPin size={20} className={`${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'} mt-1 flex-shrink-0`} />
-                    <div>
-                      <p className="font-medium">Address:</p>
-                      <p>Kaushalya Nagar, Ahmednagar - Aurangabad Rd</p>
-                      <p>Near Reliance Petrol Pump, Surya Nagar</p>
-                      <p>Ahilyanagar, Maharashtra 414003</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 ${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'} mt-1 flex-shrink-0`}>
-                      🕒
-                    </div>
-                    <div>
-                      <p className="font-medium">Business Hours:</p>
-                      <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                      <p>Saturday: 10:00 AM - 4:00 PM</p>
-                      <p>Sunday: Closed</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 ${isDarkMode ? 'text-yellow-600' : 'text-yellow-600'} mt-1 flex-shrink-0`}>
-                      📞
-                    </div>
-                    <div>
-                      <p className="font-medium">Contact:</p>
-                      <p>Phone: +91 12345 67890</p>
-                      <p>Email: contact@thetechfactory.com</p>
-                    </div>
-                  </div>
-                  <div className="pt-4">
-                    <a
-                      href="https://maps.app.goo.gl/Tp1gahGcSXTAR1sz9"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 ${isDarkMode ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-yellow-600 hover:bg-yellow-700'} text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg`}
-                    >
-                      <MapPin size={18} />
-                      View on Google Maps
-                      <ExternalLink size={16} />
-                    </a>
-                  </div>
-                </div>
-              </div>
-
               {/* Map Embed */}
               <div className="relative">
                 <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
@@ -262,7 +200,7 @@ const About: React.FC = () => {
                     className={`${isDarkMode ? 'bg-gray-800/80 hover:bg-gray-800' : 'bg-white/80 hover:bg-white'} backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
                   >
                     <ExternalLink size={14} />
-                    Open in Maps
+                    {t('about.office.openMaps')}
                   </a>
                 </div>
               </div>
@@ -277,23 +215,23 @@ const About: React.FC = () => {
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
 
             <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Get in Touch</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('about.contact.title')}</h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Have questions or feedback? We'd love to hear from you.
+                {t('about.contact.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/register"
                   className="group bg-white text-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-xl hover:scale-105 transform inline-flex items-center justify-center gap-2"
                 >
-                  Start Free Trial
+                  {t('about.contact.startTrial')}
                   <ArrowLeft size={18} className="rotate-180 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <a
                   href="mailto:contact@thetechfactory.com"
                   className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 shadow-xl hover:scale-105 transform"
                 >
-                  Contact Support
+                  {t('about.contact.support')}
                 </a>
               </div>
             </div>

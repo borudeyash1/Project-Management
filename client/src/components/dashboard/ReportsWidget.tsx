@@ -126,7 +126,7 @@ const ReportsWidget: React.FC = () => {
             {/* View Full Report Button */}
             <button
                 onClick={() => navigate('/analytics')}
-                className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                className="w-full py-2 px-4 bg-accent text-gray-900 rounded-lg hover:bg-accent/90 transition-colors text-sm font-medium"
             >
                 {t('widgets.viewFullReport')}
             </button>

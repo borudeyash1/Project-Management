@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import {
   LayoutDashboard,
@@ -24,6 +25,7 @@ interface ProjectTab {
 }
 
 const ProjectInternalNav: React.FC = () => {
+  const { t } = useTranslation();
   const { state } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,74 +41,74 @@ const ProjectInternalNav: React.FC = () => {
   const projectTabs: ProjectTab[] = [
     {
       id: 'overview',
-      label: 'Overview',
+      label: t('project.tabs.overview'),
       icon: LayoutDashboard,
       path: `/project/${projectId}/overview`
     },
     {
       id: 'info',
-      label: 'Project Info',
+      label: t('project.tabs.info'),
       icon: Info,
       path: `/project/${projectId}/info`
     },
     {
       id: 'team',
-      label: 'Team',
+      label: t('project.tabs.team'),
       icon: Users,
       path: `/project/${projectId}/team`
     },
     {
       id: 'tasks',
-      label: 'Tasks & Board',
+      label: t('project.tabs.tasks'),
       icon: CheckSquare,
       path: `/project/${projectId}/tasks`
     },
     {
       id: 'timeline',
-      label: 'Timeline',
+      label: t('project.tabs.timeline'),
       icon: Calendar,
       path: `/project/${projectId}/timeline`
     },
     {
       id: 'progress',
-      label: 'Progress Tracker',
+      label: t('project.tabs.progress'),
       icon: Target,
       path: `/project/${projectId}/progress`
     },
     {
       id: 'workload',
-      label: 'Workload',
+      label: t('project.tabs.workload'),
       icon: Clock,
       path: `/project/${projectId}/workload`,
       managerOnly: true
     },
     {
       id: 'attendance',
-      label: 'Attendance',
+      label: t('project.tabs.attendance'),
       icon: Clock,
       path: `/project/${projectId}/attendance`,
     },
     {
       id: 'reports',
-      label: 'Reports',
+      label: t('project.tabs.reports'),
       icon: BarChart3,
       path: `/project/${projectId}/reports`
     },
     {
       id: 'documents',
-      label: 'Documents',
+      label: t('project.tabs.documents'),
       icon: FileText,
       path: `/project/${projectId}/documents`
     },
     {
       id: 'inbox',
-      label: 'Inbox',
+      label: t('project.tabs.inbox'),
       icon: MessageSquare,
       path: `/project/${projectId}/inbox`
     },
     {
       id: 'settings',
-      label: 'Settings',
+      label: t('project.tabs.settings'),
       icon: Settings,
       path: `/project/${projectId}/settings`,
       managerOnly: true

@@ -15,6 +15,7 @@ import {
   PlayCircle
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import SEO from './SEO';
@@ -46,6 +47,7 @@ const Docs: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<DocCategory[]>([]);
   const [currentArticle, setCurrentArticle] = useState<DocArticle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -168,7 +170,7 @@ const Docs: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search documentation..."
+            placeholder={t('docs.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-4 py-2 rounded-lg border ${isDarkMode
@@ -249,7 +251,7 @@ const Docs: React.FC = () => {
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <h1 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Documentation
+              {t('docs.title')}
             </h1>
           </div>
 
@@ -281,7 +283,7 @@ const Docs: React.FC = () => {
                   <div className="flex items-center gap-2 text-sm mb-6">
                     <Home className="w-4 h-4 text-gray-400" />
                     <ChevronRight className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-400">Docs</span>
+                    <span className="text-gray-400">{t('docs.breadcrumbDocs')}</span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                     <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>
                       {currentArticle.title}
@@ -340,10 +342,10 @@ const Docs: React.FC = () => {
                 <div className={`${isDarkMode ? 'bg-gray-800/60' : 'bg-white'} rounded-2xl p-12 text-center`}>
                   <BookOpen className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                   <h2 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    No Article Selected
+                    {t('docs.noArticleTitle')}
                   </h2>
                   <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                    Select an article from the sidebar to get started
+                    {t('docs.noArticleDescription')}
                   </p>
                 </div>
               )}

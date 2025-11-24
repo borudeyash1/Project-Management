@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, User, Calendar, Clock, Flag, CheckCircle, Upload, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TaskFile {
   _id: string;
@@ -71,6 +72,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   onDeleteTask,
   onReassignTask
 }) => {
+  const { t } = useTranslation();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
@@ -105,7 +107,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
   const handleCreateTask = () => {
     if (!taskForm.title.trim() || !taskForm.assignedTo) {
-      alert('Please fill in all required fields');
+      alert(t('project.tasks.alert.fillRequired'));
       return;
     }
 
@@ -316,15 +318,15 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   const getTaskTypeInfo = (taskType: Task['taskType']) => {
     switch (taskType) {
       case 'status-update':
-        return { label: 'Status Update', color: 'bg-blue-100 text-blue-700', icon: '📝' };
+        return { label: t('project.tasks.types.statusUpdate'), color: 'bg-blue-100 text-blue-700', icon: '📝' };
       case 'file-submission':
-        return { label: 'File Required', color: 'bg-purple-100 text-purple-700', icon: '📎' };
+        return { label: t('project.tasks.types.fileSubmission'), color: 'bg-purple-100 text-purple-700', icon: '📎' };
       case 'link-submission':
-        return { label: 'Link Required', color: 'bg-indigo-100 text-indigo-700', icon: '🔗' };
+        return { label: t('project.tasks.types.linkSubmission'), color: 'bg-indigo-100 text-indigo-700', icon: '🔗' };
       case 'review':
-        return { label: 'Review', color: 'bg-yellow-100 text-yellow-700', icon: '👁️' };
+        return { label: t('project.tasks.types.review'), color: 'bg-yellow-100 text-yellow-700', icon: '👁️' };
       default:
-        return { label: 'General', color: 'bg-gray-100 text-gray-700', icon: '📋' };
+        return { label: t('project.tasks.types.general'), color: 'bg-gray-100 text-gray-700', icon: '📋' };
     }
   };
 
@@ -342,8 +344,8 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
     return (
       <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
         <User className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
-        <p className="text-gray-600">Only the Project Manager can assign and manage tasks.</p>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('project.tasks.accessRestricted')}</h3>
+        <p className="text-gray-600">{t('project.tasks.accessRestrictedSubtitle')}</p>
       </div>
     );
   }
@@ -353,9 +355,9 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Task Assignment</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('project.tasks.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Assign and manage tasks for your team ({tasks.length} tasks)
+              {t('project.tasks.subtitle', { count: tasks.length })}
             </p>
           </div>
           <button
@@ -363,7 +365,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
             className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Assign New Task
+            {t('project.tasks.assignNew')}
           </button>
         </div>
 
@@ -372,8 +374,8 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
           {tasks.length === 0 ? (
             <div className="text-center py-12 text-gray-600">
               <FileText className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="font-medium">No tasks assigned yet</p>
-              <p className="text-sm mt-1">Create your first task to get started</p>
+              <p className="font-medium">{t('project.tasks.noTasks')}</p>
+              <p className="text-sm mt-1">{t('project.tasks.noTasksSubtitle')}</p>
             </div>
           ) : (
             tasks.map((task) => (
@@ -416,7 +418,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     </button>
                     <button
                       onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this task?')) {
+                        if (window.confirm(t('project.tasks.alert.deleteConfirm'))) {
                           onDeleteTask(task._id);
                         }
                       }}
@@ -430,14 +432,14 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-gray-200">
                   <div>
-                    <p className="text-xs text-gray-600 mb-1">Start Date</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('project.tasks.startDate')}</p>
                     <p className="text-sm text-gray-900 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {new Date(task.startDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 mb-1">Due Date</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('project.tasks.dueDate')}</p>
                     <p className="text-sm text-gray-900 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {new Date(task.dueDate).toLocaleDateString()}
@@ -453,7 +455,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       className="text-sm font-medium text-accent-dark hover:text-blue-700 flex items-center gap-1"
                     >
                       <CheckCircle className="w-4 h-4" />
-                      {task.subtasks.filter(st => st.completed).length} / {task.subtasks.length} Subtasks Completed
+                      {t('project.tasks.subtasksCompleted', { completed: task.subtasks.filter(st => st.completed).length, total: task.subtasks.length })}
                       <span className="text-xs ml-1">{expandedTaskId === task._id ? '▼' : '▶'}</span>
                     </button>
                     
@@ -486,7 +488,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                             value={expandedTaskId === task._id ? newSubtaskTitle : ''}
                             onChange={(e) => setNewSubtaskTitle(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask(task._id)}
-                            placeholder="Add subtask..."
+                            placeholder={t('project.tasks.addSubtask')}
                             className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
                           />
                           <button
@@ -504,7 +506,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                 {/* Links Section */}
                 {expandedTaskId === task._id && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <h5 className="text-sm font-medium text-gray-700 mb-2">Links</h5>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">{t('project.tasks.links')}</h5>
                     {task.links && task.links.length > 0 && (
                       <div className="space-y-1 mb-2">
                         {task.links.map((link, index) => (
@@ -528,7 +530,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                         value={expandedTaskId === task._id ? newLink : ''}
                         onChange={(e) => setNewLink(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleAddLink(task._id)}
-                        placeholder="Add link (https://...)"
+                        placeholder={t('project.tasks.addLink')}
                         className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
                       />
                       <button
@@ -543,7 +545,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-600">Progress</span>
+                    <span className="text-xs text-gray-600">{t('project.tasks.progress')}</span>
                     <span className="text-xs font-medium text-gray-900">{task.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-2">
@@ -562,14 +564,14 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                       className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
                     >
                       <CheckCircle className="w-4 h-4" />
-                      Verify Task
+                      {t('project.tasks.verifyTask')}
                     </button>
                     <button
                       onClick={() => openRatingModal(task)}
                       className="flex-1 px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
                     >
                       <Flag className="w-4 h-4" />
-                      Rate & Finish
+                      {t('project.tasks.rateAndFinish')}
                     </button>
                   </div>
                 )}
@@ -579,7 +581,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-green-600 font-medium flex items-center gap-1">
                         <CheckCircle className="w-4 h-4" />
-                        Task Finished
+                        {t('project.tasks.taskFinished')}
                       </span>
                       {task.rating && (
                         <div className="flex items-center gap-1">
@@ -603,11 +605,11 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
       {showRatingModal && ratingTask && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Task Performance Evaluation</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('project.tasks.rating.title')}</h3>
             <p className="text-sm text-gray-600 mb-6">
-              Evaluate: <strong className="text-gray-900">{ratingTask.title}</strong>
+              {t('project.tasks.rating.evaluate', { title: ratingTask.title })}
               <br />
-              <span className="text-xs">Assigned to: {ratingTask.assignedToName}</span>
+              <span className="text-xs">{t('project.tasks.rating.assignedTo', { name: ratingTask.assignedToName })}</span>
             </p>
             
             {/* Rating Criteria */}
@@ -618,10 +620,10 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                       <Clock className="w-4 h-4 text-accent-dark" />
-                      Timeliness
+                      {t('project.tasks.rating.timeliness')}
                     </h4>
                     <p className="text-xs text-gray-600 mt-1">
-                      Was the task completed on time? Did they meet the deadline?
+                      {t('project.tasks.rating.timelinessDesc')}
                     </p>
                   </div>
                   <span className="text-sm font-medium text-gray-700">
@@ -649,10 +651,10 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-600" />
-                      Quality of Work
+                      {t('project.tasks.rating.quality')}
                     </h4>
                     <p className="text-xs text-gray-600 mt-1">
-                      How well was the task executed? Does it meet requirements?
+                      {t('project.tasks.rating.qualityDesc')}
                     </p>
                   </div>
                   <span className="text-sm font-medium text-gray-700">
@@ -680,10 +682,10 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                       <User className="w-4 h-4 text-purple-600" />
-                      Communication
+                      {t('project.tasks.rating.communication')}
                     </h4>
                     <p className="text-xs text-gray-600 mt-1">
-                      Did they provide updates? Were they responsive to feedback?
+                      {t('project.tasks.rating.communicationDesc')}
                     </p>
                   </div>
                   <span className="text-sm font-medium text-gray-700">
@@ -711,10 +713,10 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                       <Flag className="w-4 h-4 text-orange-600" />
-                      Completeness
+                      {t('project.tasks.rating.completeness')}
                     </h4>
                     <p className="text-xs text-gray-600 mt-1">
-                      Were all subtasks completed? Any missing deliverables?
+                      {t('project.tasks.rating.completenessDesc')}
                     </p>
                   </div>
                   <span className="text-sm font-medium text-gray-700">
@@ -740,9 +742,9 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-gray-900">Overall Rating</h4>
+                    <h4 className="font-semibold text-gray-900">{t('project.tasks.rating.overall')}</h4>
                     <p className="text-xs text-gray-600 mt-1">
-                      Average of all criteria
+                      {t('project.tasks.rating.average')}
                     </p>
                   </div>
                   <div className="text-right">
@@ -761,12 +763,12 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               {/* Comments */}
               <div>
                 <label className="block font-semibold text-gray-900 mb-2">
-                  Additional Comments (Optional)
+                  {t('project.tasks.rating.comments')}
                 </label>
                 <textarea
                   value={ratingDetails.comments}
                   onChange={(e) => setRatingDetails({...ratingDetails, comments: e.target.value})}
-                  placeholder="Provide specific feedback about the task performance..."
+                  placeholder={t('project.tasks.rating.commentsPlaceholder')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent resize-none"
                   rows={3}
                 />
@@ -781,7 +783,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                          !ratingDetails.communication || !ratingDetails.completeness}
                 className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
               >
-                Submit Evaluation
+                {t('project.tasks.rating.submit')}
               </button>
               <button
                 onClick={() => {
@@ -798,7 +800,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
               >
-                Cancel
+                {t('project.tasks.rating.cancel')}
               </button>
             </div>
           </div>
@@ -810,42 +812,42 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {editingTask ? 'Edit Task' : 'Assign New Task'}
+              {editingTask ? t('project.tasks.modal.title.edit') : t('project.tasks.modal.title.create')}
             </h3>
 
             <div className="space-y-4">
               {/* Task Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Task Title *
+                  {t('project.tasks.modal.taskTitle')}
                 </label>
                 <input
                   type="text"
                   value={taskForm.title}
                   onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Enter task title"
+                  placeholder={t('project.tasks.modal.taskTitlePlaceholder')}
                 />
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  {t('project.tasks.modal.description')}
                 </label>
                 <textarea
                   value={taskForm.description}
                   onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Enter task description"
+                  placeholder={t('project.tasks.modal.descriptionPlaceholder')}
                 />
               </div>
 
               {/* Task Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Task Type *
+                  {t('project.tasks.modal.taskType')}
                 </label>
                 <select
                   value={taskForm.taskType}
@@ -860,32 +862,32 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="general">General Task</option>
-                  <option value="status-update">Status Update</option>
-                  <option value="file-submission">File Submission</option>
-                  <option value="link-submission">Link Submission</option>
-                  <option value="review">Review/Approval</option>
+                  <option value="general">{t('project.tasks.types.general')}</option>
+                  <option value="status-update">{t('project.tasks.types.statusUpdate')}</option>
+                  <option value="file-submission">{t('project.tasks.types.fileSubmission')}</option>
+                  <option value="link-submission">{t('project.tasks.types.linkSubmission')}</option>
+                  <option value="review">{t('project.tasks.types.review')}</option>
                 </select>
                 <p className="text-xs text-gray-600 mt-1">
-                  {taskForm.taskType === 'general' && 'Regular task with subtasks and progress tracking'}
-                  {taskForm.taskType === 'status-update' && 'Employee provides status updates only'}
-                  {taskForm.taskType === 'file-submission' && 'Employee must upload file(s) to complete'}
-                  {taskForm.taskType === 'link-submission' && 'Employee must provide link(s) to complete'}
-                  {taskForm.taskType === 'review' && 'Requires review and approval from PM'}
+                  {taskForm.taskType === 'general' && t('project.tasks.modal.taskTypeDesc.general')}
+                  {taskForm.taskType === 'status-update' && t('project.tasks.modal.taskTypeDesc.statusUpdate')}
+                  {taskForm.taskType === 'file-submission' && t('project.tasks.modal.taskTypeDesc.fileSubmission')}
+                  {taskForm.taskType === 'link-submission' && t('project.tasks.modal.taskTypeDesc.linkSubmission')}
+                  {taskForm.taskType === 'review' && t('project.tasks.modal.taskTypeDesc.review')}
                 </p>
               </div>
 
               {/* Assign To */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Assign To *
+                  {t('project.tasks.modal.assignTo')}
                 </label>
                 <select
                   value={taskForm.assignedTo}
                   onChange={(e) => setTaskForm({ ...taskForm, assignedTo: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="">Select team member...</option>
+                  <option value="">{t('project.tasks.modal.selectMember')}</option>
                   {projectTeam.filter(m => m.role !== 'project-manager').map((member) => (
                     <option key={member._id} value={member._id}>
                       {member.name} - {member.role}
@@ -898,17 +900,17 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               <div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Priority
+                    {t('project.tasks.modal.priority')}
                   </label>
                   <select
                     value={taskForm.priority}
                     onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value as any })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                    <option value="low">{t('project.priority.low')}</option>
+                    <option value="medium">{t('project.priority.medium')}</option>
+                    <option value="high">{t('project.priority.high')}</option>
+                    <option value="critical">{t('project.priority.critical')}</option>
                   </select>
                 </div>
               </div>
@@ -917,7 +919,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
+                    {t('project.tasks.modal.startDate')}
                   </label>
                   <input
                     type="date"
@@ -929,7 +931,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Due Date *
+                    {t('project.tasks.modal.dueDate')}
                   </label>
                   <input
                     type="date"
@@ -944,7 +946,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               {editingTask && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Progress ({taskForm.progress}%)
+                    {t('project.tasks.modal.progress', { percent: taskForm.progress })}
                   </label>
                   <input
                     type="range"
@@ -955,7 +957,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     className="w-full"
                   />
                   <p className="text-xs text-gray-600 mt-1">
-                    Progress is automatically calculated based on completed subtasks
+                    {t('project.tasks.modal.progressDesc')}
                   </p>
                 </div>
               )}
@@ -966,7 +968,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   onClick={editingTask ? handleUpdateTask : handleCreateTask}
                   className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                 >
-                  {editingTask ? 'Update Task' : 'Assign Task'}
+                  {editingTask ? t('project.tasks.modal.update') : t('project.tasks.modal.assign')}
                 </button>
                 <button
                   onClick={() => {
@@ -976,7 +978,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('project.tasks.modal.cancel')}
                 </button>
               </div>
             </div>

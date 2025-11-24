@@ -5,6 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { LoginRequest, RegisterRequest, User, Workspace } from '../types';
 import { apiService } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import EnhancedRegistration from './EnhancedRegistration';
 import { googleAuthService } from '../config/googleAuth';
@@ -15,6 +16,7 @@ const Auth: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -183,7 +185,7 @@ const Auth: React.FC = () => {
         setShowOtpVerification(true);
         setLoginEmail(formData.email);
         startOtpTimer(60); // 60 seconds for OTP timer
-        showToast("Please check your email to verify your login", "info");
+        showToast(t('auth.otp.checkEmail'), "info");
       } else {
         // Store tokens in localStorage
         localStorage.setItem("accessToken", response.accessToken);
@@ -193,7 +195,7 @@ const Auth: React.FC = () => {
         dispatch({ type: "SET_USER", payload: response.user });
         await ensureWorkspaceAccess(response.user);
 
-        showToast("Welcome back!", "success");
+        showToast(t('auth.login.welcomeBack'), "success");
 
         if (isDesktopFlow) {
           navigate("/desktop-handshake", { replace: true });
@@ -202,7 +204,7 @@ const Auth: React.FC = () => {
         }
       }
     } catch (error: any) {
-      showToast(error.message || "Login failed", "error");
+      showToast(error.message || t('auth.login.loginFailed'), "error");
     } finally {
       setLoading(false);
     }
@@ -235,7 +237,7 @@ const Auth: React.FC = () => {
   const handleOtpVerification = async () => {
     const otpCode = otp.join("");
     if (otpCode.length !== 6) {
-      showToast("Please enter the complete 6-digit OTP", "error");
+      showToast(t('auth.otp.enterComplete'), "error");
       return;
     }
 
@@ -253,7 +255,7 @@ const Auth: React.FC = () => {
       // Load workspaces to ensure dock navigation shows correctly
       await ensureWorkspaceAccess(response.user);
 
-      showToast("Login successful! Welcome back!", "success");
+      showToast(t('auth.otp.loginSuccess'), "success");
 
       if (isDesktopFlow) {
         navigate("/desktop-handshake", { replace: true });
@@ -261,7 +263,7 @@ const Auth: React.FC = () => {
         navigate("/home");
       }
     } catch (error: any) {
-      showToast(error.message || "OTP verification failed", "error");
+      showToast(error.message || t('auth.otp.verificationFailed'), "error");
     } finally {
       setLoading(false);
     }
@@ -271,10 +273,10 @@ const Auth: React.FC = () => {
     setLoading(true);
     try {
       await apiService.resendEmailOTP(loginEmail);
-      showToast("OTP resent successfully", "success");
+      showToast(t('auth.otp.otpSent'), "success");
       startOtpTimer(60);
     } catch (error: any) {
-      showToast(error.message || "Failed to resend OTP", "error");
+      showToast(error.message || t('auth.otp.otpFailed'), "error");
     } finally {
       setLoading(false);
     }
@@ -310,7 +312,7 @@ const Auth: React.FC = () => {
         dispatch({ type: "SET_USER", payload: response.user });
         await ensureWorkspaceAccess(response.user);
 
-        showToast("Successfully signed in with Google!", "success");
+        showToast(t('auth.login.welcomeBack'), "success");
 
         if (isDesktopFlow) {
           navigate("/desktop-handshake", { replace: true });
@@ -322,7 +324,7 @@ const Auth: React.FC = () => {
         if (authError.message === "USER_NOT_REGISTERED") {
           // Store Google data in sessionStorage to pass to registration
           sessionStorage.setItem("googleAuthData", JSON.stringify(googleUser));
-          showToast("Please complete your registration", "info");
+          showToast(t('auth.register.title'), "info");
           navigate("/register");
         } else {
           throw authError;
@@ -330,7 +332,7 @@ const Auth: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Google authentication error:", error);
-      showToast(error.message || "Google authentication failed", "error");
+      showToast(error.message || t('auth.login.loginFailed'), "error");
     } finally {
       setLoading(false);
     }
@@ -381,15 +383,14 @@ const Auth: React.FC = () => {
             <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2.5 border border-white/20 mb-6 shadow-xl">
               <div className="w-5 h-5 text-yellow-600">🚀</div>
               <span className="text-sm font-semibold text-slate-700">
-                Projects, Payroll, Planner — unified
+                {t('auth.hero.badge')}
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl tracking-tight font-bold text-white mb-4 leading-tight">
-              Plan, track, and pay — all in one place
+              {t('auth.hero.title')}
             </h1>
             <p className="text-white/90 text-lg mt-4 max-w-lg leading-relaxed">
-              Workspaces, roles, analytics, and automations for teams of any
-              size.
+              {t('auth.hero.subtitle')}
             </p>
           </div>
         </div>
@@ -411,7 +412,7 @@ const Auth: React.FC = () => {
                 }`}
                 onClick={switchToLogin}
               >
-                Login
+                {t('auth.login.title')}
               </button>
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
@@ -421,19 +422,20 @@ const Auth: React.FC = () => {
                 }`}
                 onClick={switchToRegister}
               >
-                Register
+                {t('auth.login.switchToRegister')}
               </button>
             </div>
+
 
             {isDesktopFlow && (
               <div
                 className={`mb-8 rounded-2xl border ${isDarkMode ? "border-yellow-500/40 bg-yellow-500/10" : "border-yellow-200 bg-yellow-50"} p-4 text-sm leading-relaxed`}
               >
                 <p className={`font-semibold ${isDarkMode ? "text-yellow-200" : "text-yellow-800"}`}>
-                  Sartthi Desktop sign-in
+                  {t('auth.login.desktopSignIn')}
                 </p>
                 <p className={isDarkMode ? "text-gray-200" : "text-slate-600"}>
-                  You started login from the desktop app. After signing in here, we’ll reopen the desktop app automatically.
+                  {t('auth.login.desktopMessage')}
                 </p>
               </div>
             )}
@@ -448,7 +450,7 @@ const Auth: React.FC = () => {
                   <label
                     className={`text-sm font-semibold block mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}
                   >
-                    Email or Username
+                    {t('auth.login.emailLabel')}
                   </label>
                   <input
                     type="text"
@@ -456,7 +458,7 @@ const Auth: React.FC = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-600" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
-                    placeholder="you@company.com"
+                    placeholder={t('auth.login.emailPlaceholder')}
                     required
                   />
                 </div>
@@ -465,13 +467,13 @@ const Auth: React.FC = () => {
                     <label
                       className={`text-sm font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}
                     >
-                      Password
+                      {t('auth.login.passwordLabel')}
                     </label>
                     <button
                       type="button"
                       className={`text-xs font-medium ${isDarkMode ? "text-yellow-600 hover:text-yellow-700" : "text-yellow-600 hover:text-yellow-700"} transition-colors`}
                     >
-                      Forgot?
+                      {t('auth.login.forgotPassword')}
                     </button>
                   </div>
                   <div className="relative">
@@ -481,7 +483,7 @@ const Auth: React.FC = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-600" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
-                      placeholder="••••••••"
+                      placeholder={t('auth.login.passwordPlaceholder')}
                       required
                     />
                     <button
@@ -512,12 +514,12 @@ const Auth: React.FC = () => {
                     >
                       <span className={`absolute top-1 ${rememberMe ? "left-6" : "left-1"} h-4 w-4 rounded-full bg-white shadow-md transition-all`}></span>
                     </span>
-                    Remember me
+                    {t('auth.login.rememberMe')}
                   </label>
                   <div
                     className={`text-xs ${isDarkMode ? "text-gray-600" : "text-slate-500"} font-medium`}
                   >
-                    SSO enabled
+                    {t('auth.login.ssoEnabled')}
                   </div>
                 </div>
 
@@ -526,7 +528,7 @@ const Auth: React.FC = () => {
                   disabled={loading}
                   className="w-full px-4 py-3.5 rounded-xl text-gray-900 text-base font-bold bg-accent hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
-                  {loading ? "Signing in..." : "Continue"}
+                  {loading ? t('auth.login.signingIn') : t('auth.login.continueButton')}
                 </button>
 
                 <div className="relative">
@@ -539,7 +541,7 @@ const Auth: React.FC = () => {
                     <span
                       className={`${isDarkMode ? "bg-gray-800" : "bg-white"} px-4 text-sm font-medium ${isDarkMode ? "text-gray-600" : "text-slate-500"}`}
                     >
-                      or
+                      {t('auth.login.orDivider')}
                     </span>
                   </div>
                 </div>
@@ -554,7 +556,7 @@ const Auth: React.FC = () => {
                     className="h-5 w-5"
                     alt="Google"
                   />
-                  Continue with Google
+                  {t('auth.login.googleButton')}
                 </button>
               </form>
             )}
@@ -571,12 +573,12 @@ const Auth: React.FC = () => {
                   <h3
                     className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-900"} mb-3`}
                   >
-                    Verify Your Login
+                    {t('auth.otp.title')}
                   </h3>
                   <p
                     className={`text-sm ${isDarkMode ? "text-gray-700" : "text-slate-600"} mb-6`}
                   >
-                    We've sent a 6-digit verification code to{" "}
+                    {t('auth.otp.description')}{" "}
                     <strong
                       className={
                         isDarkMode ? "text-yellow-600" : "text-yellow-600"
@@ -608,7 +610,7 @@ const Auth: React.FC = () => {
                   disabled={loading || otp.join("").length !== 6}
                   className="w-full px-4 py-3.5 rounded-xl text-gray-900 text-base font-bold bg-accent hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
-                  {loading ? "Verifying..." : "Verify OTP"}
+                  {loading ? t('auth.otp.verifying') : t('auth.otp.verifyButton')}
                 </button>
 
                 <div className="text-center">
@@ -616,13 +618,13 @@ const Auth: React.FC = () => {
                     <p
                       className={`text-sm ${isDarkMode ? "text-gray-600" : "text-slate-500"} font-medium`}
                     >
-                      Resend OTP in{" "}
+                      {t('auth.otp.resendIn')}{" "}
                       <span
                         className={
                           isDarkMode ? "text-yellow-600" : "text-yellow-600"
                         }
                       >
-                        {otpTimer}s
+                        {otpTimer}{t('auth.otp.seconds')}
                       </span>
                     </p>
                   ) : (
@@ -632,7 +634,7 @@ const Auth: React.FC = () => {
                       disabled={loading}
                       className={`text-sm ${isDarkMode ? "text-yellow-600 hover:text-yellow-700" : "text-yellow-600 hover:text-yellow-700"} font-bold disabled:opacity-50 transition-colors`}
                     >
-                      Resend OTP
+                      {t('auth.otp.resendOtp')}
                     </button>
                   )}
                 </div>

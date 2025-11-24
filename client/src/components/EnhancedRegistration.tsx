@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { apiService } from '../services/api';
 import SharedNavbar from './SharedNavbar';
 
@@ -87,6 +88,7 @@ const EnhancedRegistration: React.FC = () => {
   const navigate = useNavigate();
   const { dispatch } = useApp();
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -308,16 +310,16 @@ const EnhancedRegistration: React.FC = () => {
         localStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken);
         dispatch({ type: "SET_USER", payload: response.user });
-        showToast("Successfully signed in with Google!", "success");
+        showToast(t('auth.register.messages.googleSignInSuccess'), "success");
         navigate("/home");
       } catch (error: any) {
         // User doesn't exist yet - they can continue registration with pre-filled data
         console.log('User not found, continuing with registration...');
-        showToast('Please complete your registration', 'info');
+        showToast(t('auth.register.messages.googleContinueRegistration'), 'info');
       }
     } catch (error: any) {
       console.error('Google auth error:', error);
-      showToast(error.message || 'Google authentication failed', 'error');
+      showToast(error.message || t('auth.register.messages.googleAuthFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -408,27 +410,27 @@ const EnhancedRegistration: React.FC = () => {
     switch (currentStep) {
       case 1:
         if (!formData.fullName.trim()) {
-          showToast('Full name is required', 'error');
+          showToast(t('auth.register.validation.fullNameRequired'), 'error');
           return false;
         }
         if (!formData.username.trim()) {
-          showToast('Username is required', 'error');
+          showToast(t('auth.register.validation.usernameRequired'), 'error');
           return false;
         }
         if (!formData.email.trim()) {
-          showToast('Email is required', 'error');
+          showToast(t('auth.register.validation.emailRequired'), 'error');
           return false;
         }
         if (!formData.password.trim()) {
-          showToast('Password is required', 'error');
+          showToast(t('auth.register.validation.passwordRequired'), 'error');
           return false;
         }
         if (formData.password !== formData.confirmPassword) {
-          showToast('Passwords do not match', 'error');
+          showToast(t('auth.register.validation.passwordMismatch'), 'error');
           return false;
         }
         if (formData.password.length < 6) {
-          showToast('Password must be at least 6 characters', 'error');
+          showToast(t('auth.register.validation.passwordLength'), 'error');
           return false;
         }
         return true;
@@ -476,7 +478,7 @@ const EnhancedRegistration: React.FC = () => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         dispatch({ type: 'SET_USER', payload: response.user });
-        showToast('Registration successful! Welcome to Sartthi!', 'success');
+        showToast(t('auth.register.messages.registrationSuccess'), 'success');
         navigate('/home');
 
       } else {
@@ -492,7 +494,7 @@ const EnhancedRegistration: React.FC = () => {
           setRegistrationEmail(formData.email);
           setRegistrationUserId(registerResponse.userId || ''); 
           startOtpTimer(60); // 60 seconds for OTP timer
-          showToast('Please check your email to verify your account', 'info');
+          showToast(t('auth.register.messages.checkEmail'), 'info');
         } else {
           // This case should ideally not be reached if backend logic is consistent
           showToast('Registration successful, but unexpected flow.', 'success');
@@ -505,15 +507,15 @@ const EnhancedRegistration: React.FC = () => {
       console.error('🔍 [DEBUG] Frontend - Error stack:', error.stack);
 
       if (error.message?.includes('fetch')) {
-        showToast('Unable to connect to server. Please check if the server is running.', 'error');
+        showToast(t('auth.register.messages.serverError'), 'error');
       } else if (error.message?.includes('already exists')) {
-        showToast('User with this email or username already exists', 'error');
+        showToast(t('auth.register.messages.userExists'), 'error');
       } else if (error.message?.includes('validation')) {
-        showToast('Please check your input and try again', 'error');
+        showToast(t('auth.register.messages.validationError'), 'error');
       } else if (error.message?.includes('Invalid response from server')) {
         showToast('Server response format error. Please try again.', 'error');
       } else {
-        showToast(error.message || 'Registration failed. Please try again.', 'error');
+        showToast(error.message || t('auth.register.messages.unexpectedError'), 'error');
       }
     } finally {
       setLoading(false);
@@ -549,7 +551,7 @@ const EnhancedRegistration: React.FC = () => {
     try {
       const fullOtp = otp.join('');
       if (fullOtp.length !== 6) {
-        showToast('Please enter a complete 6-digit OTP', 'error');
+        showToast(t('auth.register.validation.otpIncomplete'), 'error');
         return;
       }
       const response = await apiService.verifyEmailOTP(registrationEmail, fullOtp);
@@ -557,12 +559,12 @@ const EnhancedRegistration: React.FC = () => {
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       dispatch({ type: 'SET_USER', payload: response.user });
-      showToast('Email verified and logged in successfully!', 'success');
+      showToast(t('auth.register.messages.emailVerified'), 'success');
       sessionStorage.removeItem('googleAuthData'); // Clear any pending google data
       navigate('/home');
     } catch (error: any) {
       console.error('OTP verification error:', error);
-      showToast(error.message || 'OTP verification failed. Please try again.', 'error');
+      showToast(error.message || t('auth.register.messages.otpFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -572,13 +574,13 @@ const EnhancedRegistration: React.FC = () => {
     setLoading(true);
     try {
       const response = await apiService.resendEmailOTP(registrationEmail);
-      showToast('New OTP sent to your email!', 'success');
+      showToast(t('auth.register.messages.otpSent'), 'success');
       startOtpTimer(60); // Restart timer for 60 seconds
       setOtp(new Array(6).fill('')); // Clear OTP input fields
       otpInputRefs.current[0]?.focus(); // Focus the first OTP input
     } catch (error: any) {
       console.error('Resend OTP error:', error);
-      showToast(error.message || 'Failed to resend OTP. Please try again.', 'error');
+      showToast(error.message || t('auth.register.messages.otpFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -589,8 +591,8 @@ const EnhancedRegistration: React.FC = () => {
       return (
         <div className="space-y-6">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Email</h2>
-            <p className="text-gray-600">A 6-digit OTP has been sent to <strong>{registrationEmail}</strong>. Please enter it below to verify your account.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth.register.otp.heading')}</h2>
+            <p className="text-gray-600">{t('auth.register.otp.description')} <strong>{registrationEmail}</strong>. {t('auth.register.otp.enterOtp')}</p>
           </div>
 
           <div className="flex justify-center space-x-2">
@@ -611,7 +613,7 @@ const EnhancedRegistration: React.FC = () => {
           </div>
 
           {otpTimer > 0 ? (
-            <p className="text-center text-sm text-gray-600">Resend OTP in {otpTimer} seconds</p>
+            <p className="text-center text-sm text-gray-600">{t('auth.register.otp.resendIn')} {otpTimer} {t('auth.register.otp.seconds')}</p>
           ) : (
             <button
               type="button"
@@ -619,7 +621,7 @@ const EnhancedRegistration: React.FC = () => {
               disabled={loading}
               className="w-full px-4 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
             >
-              Resend OTP
+              {t('auth.register.otp.resendButton')}
             </button>
           )}
 
@@ -629,7 +631,7 @@ const EnhancedRegistration: React.FC = () => {
             disabled={loading || otp.join('').length !== 6}
             className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
           >
-            {loading ? 'Verifying...' : 'Verify Email'}
+            {loading ? t('auth.register.otp.verifying') : t('auth.register.otp.verifyButton')}
           </button>
         </div>
       );
@@ -640,53 +642,53 @@ const EnhancedRegistration: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's get to know you</h2>
-              <p className="text-gray-600">Tell us about yourself to personalize your experience</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth.register.step1.heading')}</h2>
+              <p className="text-gray-600">{t('auth.register.step1.subheading')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.step1.fullName')} {t('auth.register.step1.required')}</label>
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder="Jane Cooper"
+                  placeholder={t('auth.register.step1.fullNamePlaceholder')}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.step1.username')} {t('auth.register.step1.required')}</label>
                 <input
                   type="text"
                   name="username"
                   value={formData.username}
                   onChange={handleInputChange}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder="janecooper"
+                  placeholder={t('auth.register.step1.usernamePlaceholder')}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.step1.email')} {t('auth.register.step1.required')}</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder="name@company.com"
+                  placeholder={t('auth.register.step1.emailPlaceholder')}
                   required
                   disabled={!!googleAuthData} // Disable if pre-filled by Google
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Contact Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.step1.contactNumber')}</label>
                 <div className="relative">
                   <input
                     key="contactNumber"
@@ -695,7 +697,7 @@ const EnhancedRegistration: React.FC = () => {
                     value={formData.contactNumber}
                     onChange={handleInputChange}
                     className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                    placeholder="+1 555 0100"
+                    placeholder={t('auth.register.step1.contactNumberPlaceholder')}
                     autoComplete="off"
                     data-lpignore="true"
                     data-form-type="other"
@@ -713,7 +715,7 @@ const EnhancedRegistration: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.step1.password')} {t('auth.register.step1.required')}</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -721,7 +723,7 @@ const EnhancedRegistration: React.FC = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                    placeholder="••••••••"
+                    placeholder={t('auth.register.step1.passwordPlaceholder')}
                     required
                   />
                   <button
@@ -735,14 +737,14 @@ const EnhancedRegistration: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.step1.confirmPassword')} {t('auth.register.step1.required')}</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder="••••••••"
+                  placeholder={t('auth.register.step1.passwordPlaceholder')}
                   required
                 />
               </div>
@@ -755,7 +757,7 @@ const EnhancedRegistration: React.FC = () => {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-sm text-gray-600">or</span>
+                  <span className="bg-white px-3 text-sm text-gray-600">{t('auth.register.step1.orDivider')}</span>
                 </div>
               </div>
             )}
@@ -768,7 +770,7 @@ const EnhancedRegistration: React.FC = () => {
                 disabled={loading}
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
-                Continue with Google
+                {t('auth.register.step1.googleButton')}
               </button>
             )}
 
@@ -777,7 +779,7 @@ const EnhancedRegistration: React.FC = () => {
                 <div className="flex items-center">
                   <img src={oauthData.imageUrl} alt="Profile" className="w-8 h-8 rounded-full mr-3" />
                   <div>
-                    <p className="text-sm font-medium text-green-800">Signed in as {oauthData.name}</p>
+                    <p className="text-sm font-medium text-green-800">{t('auth.register.step1.signedInAs')} {oauthData.name}</p>
                     <p className="text-xs text-green-600">{oauthData.email}</p>
                   </div>
                 </div>
@@ -789,8 +791,8 @@ const EnhancedRegistration: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Professional Information</h2>
-              <p className="text-gray-600">Help us understand your professional background</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth.register.step2.heading')}</h2>
+              <p className="text-gray-600">{t('auth.register.step2.subheading')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1350,7 +1352,7 @@ const EnhancedRegistration: React.FC = () => {
                       onClick={prevStep}
                       className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
                     >
-                      <ChevronLeft className="inline-block w-4 h-4 mr-2" /> Back
+                      <ChevronLeft className="inline-block w-4 h-4 mr-2" /> {t('auth.register.navigation.previous')}
                     </button>
                   )}
 
@@ -1361,7 +1363,7 @@ const EnhancedRegistration: React.FC = () => {
                       disabled={loading}
                       className={`px-6 py-2 ${currentStep === 1 ? 'w-full' : 'ml-auto'} bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium`}
                     >
-                      {loading ? 'Loading...' : 'Next'} 
+                      {loading ? t('auth.register.navigation.submitting') : t('auth.register.navigation.next')} 
                       {currentStep !== 1 && <ChevronRight className="inline-block w-4 h-4 ml-2" />}
                     </button>
                   )}
@@ -1373,7 +1375,7 @@ const EnhancedRegistration: React.FC = () => {
                       disabled={loading}
                       className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
-                      {loading ? 'Sending OTP...' : 'Send OTP & Complete Registration'}
+                      {loading ? t('auth.register.navigation.submitting') : t('auth.register.navigation.finish')}
                     </button>
                   )}
                 </div>
