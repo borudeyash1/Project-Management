@@ -117,15 +117,14 @@ const DockNavigation: React.FC = () => {
   const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
     const url = getAppUrl(appName);
     
-    // In development, pass the token via URL parameter for seamless auth
-    if (process.env.NODE_ENV === 'development') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        const separator = url.includes('?') ? '&' : '?';
-        const authUrl = `${url}${separator}token=${token}`;
-        window.open(authUrl, '_blank');
-        return;
-      }
+    // Pass the token via URL parameter for seamless SSO across subdomains
+    // Works for both localhost (dev) and sartthi.com (prod)
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const separator = url.includes('?') ? '&' : '?';
+      const authUrl = `${url}${separator}token=${token}`;
+      window.open(authUrl, '_blank');
+      return;
     }
     
     window.open(url, '_blank');
