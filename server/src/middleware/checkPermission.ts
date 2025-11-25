@@ -1,14 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import Workspace from '../models/Workspace';
-
-// Extend Request type to include user
-interface AuthenticatedRequest extends Request {
-  user?: {
-    _id: string;
-    email: string;
-    fullName: string;
-  };
-}
+import { AuthenticatedRequest } from '../types';
 
 /**
  * Middleware to check if user has specific permission in workspace
@@ -21,25 +13,25 @@ export const checkPermission = (permission: string) => {
       const userId = req.user?._id;
 
       if (!userId) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           success: false,
-          message: 'Authentication required' 
+          message: 'Authentication required'
         });
       }
 
       if (!workspaceId) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: 'Workspace ID required' 
+          message: 'Workspace ID required'
         });
       }
 
       const workspace = await Workspace.findById(workspaceId);
-      
+
       if (!workspace) {
-        return res.status(404).json({ 
+        return res.status(404).json({
           success: false,
-          message: 'Workspace not found' 
+          message: 'Workspace not found'
         });
       }
 
@@ -54,25 +46,25 @@ export const checkPermission = (permission: string) => {
       );
 
       if (!member) {
-        return res.status(403).json({ 
+        return res.status(403).json({
           success: false,
-          message: 'Not a workspace member' 
+          message: 'Not a workspace member'
         });
       }
 
       // Check if member is active
       if (member.status !== 'active') {
-        return res.status(403).json({ 
+        return res.status(403).json({
           success: false,
-          message: 'Workspace membership is not active' 
+          message: 'Workspace membership is not active'
         });
       }
 
       // Check specific permission
-      if (!member.permissions || !member.permissions[permission]) {
-        return res.status(403).json({ 
+      if (!member.permissions || !(member.permissions as any)[permission]) {
+        return res.status(403).json({
           success: false,
-          message: `Permission denied: ${permission.replace(/^can/, '').replace(/([A-Z])/g, ' $1').trim()}` 
+          message: `Permission denied: ${permission.replace(/^can/, '').replace(/([A-Z])/g, ' $1').trim()}`
         });
       }
 
@@ -80,9 +72,9 @@ export const checkPermission = (permission: string) => {
       next();
     } catch (error) {
       console.error('Permission check error:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
-        message: 'Server error while checking permissions' 
+        message: 'Server error while checking permissions'
       });
     }
   };
@@ -97,34 +89,34 @@ export const checkOwner = async (req: AuthenticatedRequest, res: Response, next:
     const userId = req.user?._id;
 
     if (!userId) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Authentication required' 
+        message: 'Authentication required'
       });
     }
 
     const workspace = await Workspace.findById(workspaceId);
-    
+
     if (!workspace) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Workspace not found' 
+        message: 'Workspace not found'
       });
     }
 
     if (workspace.owner !== userId) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
-        message: 'Only workspace owner can perform this action' 
+        message: 'Only workspace owner can perform this action'
       });
     }
 
-    next();
+    return next();
   } catch (error) {
     console.error('Owner check error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error while checking ownership' 
+      message: 'Server error while checking ownership'
     });
   }
 };
@@ -138,18 +130,18 @@ export const checkMember = async (req: AuthenticatedRequest, res: Response, next
     const userId = req.user?._id;
 
     if (!userId) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Authentication required' 
+        message: 'Authentication required'
       });
     }
 
     const workspace = await Workspace.findById(workspaceId);
-    
+
     if (!workspace) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Workspace not found' 
+        message: 'Workspace not found'
       });
     }
 
@@ -164,18 +156,18 @@ export const checkMember = async (req: AuthenticatedRequest, res: Response, next
     );
 
     if (!member) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
-        message: 'Not a workspace member' 
+        message: 'Not a workspace member'
       });
     }
 
     next();
   } catch (error) {
     console.error('Member check error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error while checking membership' 
+      message: 'Server error while checking membership'
     });
   }
 };
