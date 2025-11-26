@@ -56,6 +56,7 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
     'https://www.sartthi.com',
     'https://mail.sartthi.com',
     'https://calendar.sartthi.com',
+    'https://vault.sartthi.com',
     'https://drive.sartthi.com',
   ]
   : [
