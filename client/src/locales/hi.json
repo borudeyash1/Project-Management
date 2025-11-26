@@ -93,6 +93,19 @@
         "support": "समर्थन",
         "feedback": "प्रतिक्रिया"
     },
+    "switcher": {
+        "workspaces": "Workspaces",
+        "quickActions": "Quick Actions",
+        "createWorkspace": "Create Workspace",
+        "createWorkspaceDesc": "Create a new workspace",
+        "discoverWorkspaces": "Discover Workspaces",
+        "discoverWorkspacesDesc": "Browse available workspaces",
+        "personalMode": "Personal Mode"
+    },
+    "messages": {
+        "noWorkspace": "No workspace selected",
+        "tryAgain": "Try Again"
+    },
     "dashboard": {
         "title": "डैशबोर्ड",
         "overview": "अवलोकन",
@@ -180,7 +193,8 @@
         "teamMembers": "{{count}} members",
         "due": "Due {{date}}",
         "planning": "Planning",
-        "createProject": "प्रोजेक्ट बनाएं"
+        "createProject": "प्रोजेक्ट बनाएं",
+        "loadError": "Failed to load projects"
     },
     "tasks": {
         "title": "कार्य",
@@ -518,7 +532,7 @@
             },
             "contact": {
                 "label": "संपर्क:",
-                "phone": "फ़ोन: +91 12345 67890",
+                "phone": "फ़ोन: +91 70833 73681",
                 "email": "ईमेल: contact@thetechfactory.com"
             },
             "viewMaps": "Google मैप्स पर देखें",
@@ -711,7 +725,7 @@
         "description": "अभिनव प्रोजेक्ट प्रबंधन समाधानों के साथ टीमों को सशक्त बनाना। हम ऐसे उपकरण बनाते हैं जो संगठनों को वर्कफ़्लो को सुव्यवस्थित करने और कुशलतापूर्वक लक्ष्यों को प्राप्त करने में मदद करते हैं।",
         "location": "अहिल्या नगर, महाराष्ट्र, भारत",
         "email": "contact@thetechfactory.com",
-        "phone": "+91 12345 67890",
+        "phone": "+91 70833 73681",
         "quickLinks": "त्वरित लिंक",
         "home": "होम",
         "aboutUs": "हमारे बारे में",

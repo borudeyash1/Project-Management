@@ -6,6 +6,7 @@ import SharedFooter from './SharedFooter';
 import PricingModal from './PricingModal';
 import api, { SubscriptionPlanData } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { useApp } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import ContentBanner from './ContentBanner';
 
@@ -46,9 +47,11 @@ const PricingPage: React.FC = () => {
     return [...plans].sort((a, b) => a.order - b.order);
   }, [plans]);
 
+  const { state } = useApp();
+  
   const handleChoosePlan = (plan: SubscriptionPlanData) => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
+    const isAuthenticated = !!state.userProfile._id;
+    if (!isAuthenticated) {
       setAuthPrompt({ planKey: plan.planKey, planName: plan.displayName });
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;

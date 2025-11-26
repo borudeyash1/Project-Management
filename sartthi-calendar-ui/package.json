@@ -1,6 +1,8 @@
 {
     "name": "sartthi-calendar-ui",
+    "private": true,
     "version": "1.0.0",
+    "type": "module",
     "description": "Sartthi Calendar Application",
     "scripts": {
         "dev": "vite --port 3002",
@@ -8,15 +10,22 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/modifiers": "^9.0.0",
         "axios": "^1.6.0",
-        "lucide-react": "^0.294.0"
+        "date-fns": "^4.1.0",
+        "framer-motion": "^12.23.24",
+        "lucide-react": "^0.294.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     },
     "devDependencies": {
         "@types/react": "^18.2.0",
         "@types/react-dom": "^18.2.0",
         "@vitejs/plugin-react": "^4.2.0",
+        "autoprefixer": "^10.4.22",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^3.4.18",
         "typescript": "^5.3.0",
         "vite": "^5.0.0"
     }

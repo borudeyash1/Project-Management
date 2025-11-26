@@ -93,6 +93,19 @@
     "support": "Tuki",
     "feedback": "Palaute"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Hallintapaneeli",
     "overview": "Yleiskatsaus",
@@ -182,7 +195,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Create Project"
+    "createProject": "Create Project",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Tehtävät",
@@ -520,7 +534,7 @@
       },
       "contact": {
         "label": "Yhteystiedot:",
-        "phone": "Puhelin: +91 12345 67890",
+        "phone": "Puhelin: +91 70833 73681",
         "email": "Sähköposti: contact@thetechfactory.com"
       },
       "viewMaps": "Näytä Google Mapsissa",
@@ -713,7 +727,7 @@
     "description": "Tehostamme tiimejä innovatiivisilla projektinhallintaratkaisuilla. Rakennamme työkaluja, jotka auttavat organisaatioita virtaviivaistamaan työnkulkuja ja saavuttamaan tavoitteet tehokkaasti.",
     "location": "Ahilya Nagar, Maharashtra, Intia",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Pikalinkit",
     "home": "Koti",
     "aboutUs": "Meistä",

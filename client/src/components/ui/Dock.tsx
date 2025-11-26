@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   motion,
   useMotionValue,
@@ -330,6 +331,7 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const defaultMouseX = useMotionValue(Infinity);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
   const distance = useTransform(parentMouseX || defaultMouseX, (val: number) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
@@ -347,8 +349,26 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
   const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
 
+  const handleMouseEnter = () => {
+    if (ref.current && tooltip) {
+      const rect = ref.current.getBoundingClientRect();
+      setTooltipPos({
+        x: orientation === 'vertical' 
+           ? rect.right + 12 
+           : rect.left + rect.width / 2,
+        y: orientation === 'vertical'
+           ? rect.top + rect.height / 2
+           : rect.top - 12
+      });
+    }
+  };
+
   return (
-    <div className="group relative">
+    <div 
+      className="group relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setTooltipPos(null)}
+    >
       <motion.div
         ref={ref}
         style={{
@@ -358,15 +378,27 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
           scale
         }}
       >
-        {/* Tooltip - Shows on hover */}
-        {tooltip && (
-          <div className={`absolute ${orientation === 'vertical' ? 'left-full ml-3 top-1/2 -translate-y-1/2' : 'bottom-full mb-3 left-1/2 -translate-x-1/2'} px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-2xl z-[9999]`}>
+        {/* Tooltip Portal */}
+        {tooltip && tooltipPos && createPortal(
+          <div 
+            className="fixed px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg shadow-2xl z-[9999] pointer-events-none whitespace-nowrap animate-fadeIn"
+            style={{
+              left: tooltipPos.x,
+              top: tooltipPos.y,
+              transform: orientation === 'vertical' ? 'translateY(-50%)' : 'translateX(-50%) translateY(-100%)'
+            }}
+          >
             {tooltip}
-            {/* Tooltip arrow */}
-            <div className={`absolute ${orientation === 'vertical' ? 'right-full top-1/2 -translate-y-1/2 mr-[1px]' : 'top-full left-1/2 -translate-x-1/2 -mt-[1px]'}`}>
-              <div className={`${orientation === 'vertical' ? 'border-[7px] border-transparent border-r-black' : 'border-[7px] border-transparent border-t-black'}`} />
-            </div>
-          </div>
+            {/* Arrow */}
+            <div 
+               className={`absolute w-3 h-3 bg-black transform rotate-45 ${
+                 orientation === 'vertical' 
+                   ? 'left-[-4px] top-1/2 -translate-y-1/2' 
+                   : 'bottom-[-4px] left-1/2 -translate-x-1/2'
+               }`}
+             />
+          </div>,
+          document.body
         )}
 
         <button

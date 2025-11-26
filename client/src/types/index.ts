@@ -107,6 +107,30 @@ export interface User {
       };
     };
   };
+  modules?: {
+    mail?: {
+      isEnabled: boolean;
+      refreshToken?: string;
+      email?: string;
+      connectedAt?: string;
+      lastSyncedAt?: string;
+    };
+    calendar?: {
+      isEnabled: boolean;
+      refreshToken?: string;
+      email?: string;
+      connectedAt?: string;
+      lastSyncedAt?: string;
+    };
+    vault?: {
+      isEnabled: boolean;
+      refreshToken?: string;
+      email?: string;
+      connectedAt?: string;
+      lastSyncedAt?: string;
+      rootFolderId?: string;
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 }

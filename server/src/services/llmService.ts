@@ -245,13 +245,67 @@ Intent:`;
   async generateGeneralResponse(
     userMessage: string,
     context?: string,
+    language?: string,
   ): Promise<string> {
-    const prompt = `
-You are an AI assistant for a project management platform. Help users with their questions and provide helpful, professional, and concise responses.
+    // Map language codes to full language names
+    const languageMap: Record<string, string> = {
+      'en': 'English',
+      'ja': 'Japanese',
+      'es': 'Spanish',
+      'fr': 'French',
+      'de': 'German',
+      'hi': 'Hindi',
+      'ko': 'Korean',
+      'mr': 'Marathi',
+      'pt': 'Portuguese',
+      'da': 'Danish',
+      'nl': 'Dutch',
+      'fi': 'Finnish',
+      'no': 'Norwegian',
+      'sv': 'Swedish'
+    };
+
+    const languageName = language ? (languageMap[language] || language) : undefined;
+
+    console.log('[LLM Service] Input language code:', language);
+    console.log('[LLM Service] Mapped language name:', languageName);
+
+    const languageInstruction = languageName
+      ? `\nIMPORTANT: You MUST answer in ${languageName} language unless the user explicitly asks for a different language in their message. All your responses, explanations, and suggestions must be in ${languageName}.`
+      : "";
+
+    console.log('[LLM Service] Language instruction:', languageInstruction);
+
+    const prompt = languageName
+      ? `CRITICAL INSTRUCTION: You MUST respond ONLY in ${languageName} language. Do NOT use any English words in your response. Every single word must be in ${languageName}.
+
+You are "AI Studio", an advanced AI assistant for the Sartthi project management platform. You are available on the Annual plan and provide premium, smart capabilities.
+
+Your goal is to demonstrate these "Smart" features in your answers (in ${languageName} language):
+1. **Smart Answers**: Provide direct, context-aware, and actionable responses. Avoid fluff.
+2. **Smart Editor**: If the user asks for help with text, offer polished, professional versions.
+3. **Smart Summaries**: When discussing projects or tasks, provide structured, bulleted summaries.
+4. **Smart Fields**: Identify and highlight key data points (dates, priorities, assignees) in your responses.
+5. **Smart Status**: Analyze progress and suggest realistic statuses or risks.
 
 ${context ? `Context: ${context}\n` : ""}
-User: "${userMessage}"
-AI Assistant:`;
+User Query: "${userMessage}"
+
+Response in ${languageName} language:`
+      : `
+You are "AI Studio", an advanced AI assistant for the Sartthi project management platform. You are available on the Annual plan and provide premium, smart capabilities.
+
+Your goal is to demonstrate these "Smart" features in your answers:
+1. **Smart Answers**: Provide direct, context-aware, and actionable responses. Avoid fluff.
+2. **Smart Editor**: If the user asks for help with text, offer polished, professional versions.
+3. **Smart Summaries**: When discussing projects or tasks, provide structured, bulleted summaries.
+4. **Smart Fields**: Identify and highlight key data points (dates, priorities, assignees) in your responses.
+5. **Smart Status**: Analyze progress and suggest realistic statuses or risks.
+
+${context ? `Context: ${context}\n` : ""}
+User Query: "${userMessage}"
+
+Response (as AI Studio):`;
 
     try {
       const response = await this.callGeminiAPI(prompt);

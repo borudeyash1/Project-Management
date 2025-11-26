@@ -20,6 +20,7 @@ class AIService {
   async getAIResponse(
     userMessage: string,
     userContext: UserContext,
+    language?: string,
   ): Promise<AIResponse> {
     try {
       // Step 1: Recognize intent
@@ -47,7 +48,7 @@ class AIService {
           return await this.handleGetWorkingProjects(userContext);
 
         case "GENERAL_QUERY":
-          return await this.handleGeneralQuery(userMessage, userContext);
+          return await this.handleGeneralQuery(userMessage, userContext, language);
 
         default:
           // Try to handle common patterns even if intent recognition fails
@@ -66,10 +67,10 @@ class AIService {
       }
     } catch (error: any) {
       console.error("Error in AIService.getAIResponse:", error);
-      
+
       // Always provide helpful responses for project management queries
       const message = userMessage.toLowerCase();
-      
+
       if (message.includes('create') && (message.includes('project') || message.includes('new'))) {
         return {
           content: `I'd be happy to help you create a new project! 🚀
@@ -94,7 +95,7 @@ Here's how to get started:
 Just tell me: "Create a [project type] project" and I'll help you structure it!`,
           suggestions: [
             "Create a mobile app project",
-            "Create a website project", 
+            "Create a website project",
             "Create a marketing campaign",
             "Create a team training project"
           ]
@@ -132,8 +133,8 @@ What specific aspect of task management would you like help with?`,
             "Show me productivity techniques"
           ]
         };
-      } else if (message.includes('project') || message.includes('manage') || message.includes('organize') || 
-                 message.includes('plan') || message.includes('deadline') || message.includes('team')) {
+      } else if (message.includes('project') || message.includes('manage') || message.includes('organize') ||
+        message.includes('plan') || message.includes('deadline') || message.includes('team')) {
         return {
           content: `I'm your dedicated project management assistant! Here's how I can help you succeed:
 
@@ -512,35 +513,77 @@ Return only JSON: {"projectName": "string", "projectDescription": "string"} or "
   private async handleGeneralQuery(
     userMessage: string,
     userContext: UserContext,
+    language?: string,
   ): Promise<AIResponse> {
     try {
+      // Map language codes to full names
+      const languageMap: Record<string, string> = {
+        'en': 'English',
+        'ja': 'Japanese',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'hi': 'Hindi',
+        'ko': 'Korean',
+        'mr': 'Marathi',
+        'pt': 'Portuguese',
+        'da': 'Danish',
+        'nl': 'Dutch',
+        'fi': 'Finnish',
+        'no': 'Norwegian',
+        'sv': 'Swedish'
+      };
+
+      const languageName = language ? (languageMap[language] || language) : undefined;
+
       // Build context string
       const contextInfo = this.buildContextString(userContext);
       const response = await llmService.generateGeneralResponse(
         userMessage,
         contextInfo,
+        language
       );
+
+      // Get suggestions in the appropriate language
+      const suggestionPrompt = languageName
+        ? `Provide 4 short follow-up suggestions in ${languageName} language for a project management assistant. Return only a JSON array of strings, nothing else. Example: ["suggestion 1", "suggestion 2", "suggestion 3", "suggestion 4"]`
+        : `Provide 4 short follow-up suggestions for a project management assistant. Return only a JSON array of strings, nothing else.`;
+
+      let suggestions = [
+        "Create a new project",
+        "Show my tasks",
+        "Help me organize my work",
+        "Analyze my productivity"
+      ];
+
+      try {
+        const suggestionsResponse = await llmService.generateGeneralResponse(suggestionPrompt, "", language);
+        const parsedSuggestions = JSON.parse(suggestionsResponse.replace(/```json\n?|\n?```/g, '').trim());
+        if (Array.isArray(parsedSuggestions) && parsedSuggestions.length > 0) {
+          suggestions = parsedSuggestions.slice(0, 4);
+        }
+      } catch (e) {
+        // Use default suggestions if parsing fails
+        console.error("Failed to parse suggestions:", e);
+      }
 
       return {
         content: response,
-        suggestions: [
-          "What can you help me with?",
-          "Create a new project",
-          "Show my tasks",
-          "Analyze my productivity",
-        ],
+        suggestions
       };
     } catch (error: any) {
       console.error("Error in handleGeneralQuery:", error);
-      
+      console.error("Error stack:", error.stack);
+      console.error("Error message:", error.message);
+
       // Always provide helpful responses for project management queries
       const message = userMessage.toLowerCase();
-      
-      if (message.includes('project') || message.includes('task') || message.includes('work') || 
-          message.includes('manage') || message.includes('organize') || message.includes('plan') ||
-          message.includes('deadline') || message.includes('priority') || message.includes('team') ||
-          message.includes('productivity') || message.includes('schedule') || message.includes('timeline')) {
-        
+
+      if (message.includes('project') || message.includes('task') || message.includes('work') ||
+        message.includes('manage') || message.includes('organize') || message.includes('plan') ||
+        message.includes('deadline') || message.includes('priority') || message.includes('team') ||
+        message.includes('productivity') || message.includes('schedule') || message.includes('timeline')) {
+
         return {
           content: `I'm here to help with your project management needs! Based on your question about "${userMessage}", here are some ways I can assist you:
 
@@ -574,7 +617,7 @@ What specific aspect of project management would you like help with?`,
           ]
         };
       }
-      
+
       return {
         content: `I'm your AI project management assistant! I can help you with:
 
@@ -604,9 +647,9 @@ What specific aspect of project management would you like help with?`,
 
 What would you like help with today? I'm here to make your project management journey smoother and more successful!`,
         suggestions: [
-          "Create a new project",
-          "Help me organize my work",
-          "What are project management best practices?",
+          "Generate Smart Summary",
+          "Analyze Project Status",
+          "Extract Smart Fields",
           "Show me productivity tips",
           "How do I manage my team better?"
         ]

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import apiService from '../services/api';
+import { useApp } from './AppContext';
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
@@ -42,15 +43,11 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const { state } = useApp();
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Check if user is authenticated
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    setIsAuthenticated(!!token);
-  }, []);
+  
+  const isAuthenticated = !!state.userProfile._id;
 
   // Fetch preferences from API if authenticated
   useEffect(() => {

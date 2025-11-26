@@ -37,7 +37,7 @@ router.get('/connect-mail', authenticate, async (req: Request, res: Response) =>
         const url = client.generateAuthUrl({
             access_type: 'offline',
             scope: ['https://www.googleapis.com/auth/gmail.modify'],
-            prompt: 'consent',
+            prompt: 'select_account consent',
             state: state
         });
 
@@ -92,7 +92,7 @@ router.get('/connect-calendar', authenticate, async (req: Request, res: Response
         const url = client.generateAuthUrl({
             access_type: 'offline',
             scope: ['https://www.googleapis.com/auth/calendar'],
-            prompt: 'consent',
+            prompt: 'select_account consent',
             state: state
         });
 
@@ -147,7 +147,7 @@ router.get('/connect-vault', authenticate, async (req: Request, res: Response) =
         const url = client.generateAuthUrl({
             access_type: 'offline',
             scope: ['https://www.googleapis.com/auth/drive'],
-            prompt: 'consent',
+            prompt: 'select_account consent',
             state: state
         });
 

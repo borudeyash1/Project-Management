@@ -9,6 +9,7 @@ interface ChatRequest {
     tasks?: any[];
     workspaces?: any[];
   };
+  language?: string;
 }
 
 /**
@@ -16,7 +17,10 @@ interface ChatRequest {
  */
 export const handleChatRequest = async (req: Request, res: Response) => {
   try {
-    const { message, userContext }: ChatRequest = req.body;
+    const { message, userContext, language }: ChatRequest = req.body;
+
+    console.log('[AI Controller] Received language:', language);
+    console.log('[AI Controller] Message:', message);
 
     // Validate input
     if (
@@ -34,6 +38,7 @@ export const handleChatRequest = async (req: Request, res: Response) => {
     const aiResponse = await aiService.getAIResponse(
       message,
       userContext || {},
+      language
     );
 
     return res.status(200).json({

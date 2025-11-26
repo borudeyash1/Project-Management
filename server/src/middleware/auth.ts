@@ -8,13 +8,18 @@ import { AuthenticatedRequest, JWTPayload } from '../types';
 // Verify JWT token
 export const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
     let token;
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    } else if (req.query.token) {
-      // Fallback to query parameter for OAuth redirects
+    // Priority 1: Check cookie (secure, cross-subdomain)
+    if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
+    }
+    // Priority 2: Check Authorization header (backward compatibility)
+    else if (req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.substring(7);
+    }
+    // Priority 3: Check query parameter (OAuth redirects)
+    else if (req.query.token) {
       token = req.query.token as string;
     }
 

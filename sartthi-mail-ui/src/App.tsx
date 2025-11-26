@@ -23,19 +23,6 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for token in URL query params (SSO from main app)
-    const params = new URLSearchParams(window.location.search);
-    const tokenFromUrl = params.get('token');
-    
-    if (tokenFromUrl) {
-      console.log('[Mail App] Found token in URL, saving to localStorage');
-      localStorage.setItem('accessToken', tokenFromUrl);
-      
-      // Clean up URL
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-    }
-    
     checkAuth();
   }, []);
 
@@ -44,22 +31,11 @@ function App() {
       console.log('[Mail App] Checking authentication...');
       console.log('[Mail App] API URL:', API_URL);
       
-      // Try to get token from localStorage (set by main app)
-      const token = localStorage.getItem('accessToken');
-      console.log('[Mail App] Token from localStorage:', token ? 'Found' : 'Not found');
-      
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-      
-      // If token exists in localStorage, use Authorization header
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
       const response = await fetch(`${API_URL}/api/auth/me`, {
-        credentials: 'include', // Still try cookies as fallback
-        headers,
+        credentials: 'include', // Send cookies with request
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       console.log('[Mail App] Response status:', response.status);

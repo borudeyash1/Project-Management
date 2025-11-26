@@ -91,7 +91,25 @@
     "help": "मदत",
     "docs": "दस्तऐवज",
     "support": "सपोर्ट",
-    "feedback": "अभिप्राय"
+    "feedback": "Feedback"
+  },
+  "switcher": {
+    "workspaces": "वर्कस्पेसेस",
+    "quickActions": "त्वरित क्रिया",
+    "createWorkspace": "वर्कस्पेस तयार करा",
+    "createWorkspaceDesc": "नवीन वर्कस्पेस तयार करा",
+    "discoverWorkspaces": "वर्कस्पेसेस शोधा",
+    "discoverWorkspacesDesc": "उपलब्ध वर्कस्पेसेस ब्राउज करा",
+    "personalMode": "वैयक्तिक मोड",
+    "individualWorkspace": "वैयक्तिक वर्कस्पेस",
+    "teamWorkspace": "टीम वर्कस्पेस",
+    "switchedTo": "{{name}} वर स्विच केले",
+    "switchedToPersonal": "वैयक्तिक मोडवर स्विच केले",
+    "members": "{{count}} सदस्य"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
   },
   "dashboard": {
     "title": "डॅशबोर्ड",
@@ -180,7 +198,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "प्रकल्प तयार करा"
+    "createProject": "प्रकल्प तयार करा",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "कार्ये",
@@ -518,7 +537,7 @@
       },
       "contact": {
         "label": "संपर्क:",
-        "phone": "फोन: +९१ १२३४५ ६७८९०",
+        "phone": "फोन: +91 70833 73681",
         "email": "ईमेल: contact@thetechfactory.com"
       },
       "viewMaps": "Google Maps वर पहा",
@@ -711,7 +730,7 @@
     "description": "नाविन्यपूर्ण प्रकल्प व्यवस्थापन सोल्यूशन्ससह टीम्सना सक्षम करणे. आम्ही अशी साधने तयार करतो जी संस्थांना वर्कफ्लो सुव्यवस्थित करण्यास आणि कार्यक्षमतेने उद्दिष्टे साध्य करण्यास मदत करतात.",
     "location": "अहिल्यानगर, महाराष्ट्र, भारत",
     "email": "contact@thetechfactory.com",
-    "phone": "+९१ १२३४५ ६७८९०",
+    "phone": "+91 70833 73681",
     "quickLinks": "क्विक लिंक्स",
     "home": "होम",
     "aboutUs": "आमच्याबद्दल",

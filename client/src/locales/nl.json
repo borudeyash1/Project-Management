@@ -93,6 +93,19 @@
     "support": "Ondersteuning",
     "feedback": "Feedback"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Dashboard",
     "overview": "Overzicht",
@@ -182,7 +195,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Project maken"
+    "createProject": "Project maken",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Taken",
@@ -520,7 +534,7 @@
       },
       "contact": {
         "label": "Contact:",
-        "phone": "Telefoon: +91 12345 67890",
+        "phone": "Telefoon: +91 70833 73681",
         "email": "E-mail: contact@thetechfactory.com"
       },
       "viewMaps": "Bekijk op Google Maps",
@@ -713,7 +727,7 @@
     "description": "Teams versterken met innovatieve oplossingen voor projectbeheer. We bouwen tools die organisaties helpen workflows te stroomlijnen en doelen efficiënt te bereiken.",
     "location": "Ahilya Nagar, Maharashtra, India",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Snelle links",
     "home": "Home",
     "aboutUs": "Over ons",

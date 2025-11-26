@@ -20,6 +20,7 @@ import ReportsWidget from './dashboard/ReportsWidget';
 import ExpandedStatCard from './dashboard/ExpandedStatCard';
 import ContentBanner from './ContentBanner';
 import { useTranslation } from 'react-i18next';
+import AIChatbot from './AIChatbot';
 
 interface QuickTask {
   _id: string;
@@ -97,6 +98,7 @@ const HomePage: React.FC = () => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [quickTasks, setQuickTasks] = useState<QuickTask[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -728,7 +730,7 @@ const HomePage: React.FC = () => {
                   {t('dashboard.aiDescription')}
                 </p>
                 <button
-                  onClick={() => navigate('/ai-assistant')}
+                  onClick={() => setIsAIModalOpen(true)}
                   className={`w-full rounded-lg px-4 py-2 text-sm font-medium drop-shadow-sm transition-colors border ${isDarkMode 
                     ? 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-white border-opacity-20' 
                     : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200'}`}
@@ -737,6 +739,12 @@ const HomePage: React.FC = () => {
                 </button>
               </div>
             )}
+
+            {/* AI Chatbot Modal */}
+            <AIChatbot 
+              isOpen={isAIModalOpen} 
+              onClose={() => setIsAIModalOpen(false)} 
+            />
 
             {/* Calendar Widget */}
             <CalendarWidget />

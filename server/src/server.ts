@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import passport from 'passport';
 import path from 'path';
+import disconnectModulesRoutes from "./routes/disconnect-modules";
 
 // Routes
 import authRoutes from "./routes/auth";
@@ -112,6 +113,8 @@ app.use("/api/mail", sartthiMailRoutes);
 app.use("/api/calendar", sartthiCalendarRoutes);
 app.use("/api/vault", sartthiVaultRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/auth/sartthi", sartthiAuthRoutes);
+app.use("/api/auth/sartthi", disconnectModulesRoutes); // ADD THIS LINE
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/tasks", taskRoutes);

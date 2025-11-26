@@ -91,7 +91,25 @@
     "help": "도움말",
     "docs": "문서",
     "support": "지원",
-    "feedback": "피드백"
+    "feedback": "Feedback"
+  },
+  "switcher": {
+    "workspaces": "워크스페이스",
+    "quickActions": "빠른 작업",
+    "createWorkspace": "워크스페이스 생성",
+    "createWorkspaceDesc": "새 워크스페이스 생성",
+    "discoverWorkspaces": "워크스페이스 찾기",
+    "discoverWorkspacesDesc": "사용 가능한 워크스페이스 탐색",
+    "personalMode": "개인 모드",
+    "individualWorkspace": "개인 워크스페이스",
+    "teamWorkspace": "팀 워크스페이스",
+    "switchedTo": "{{name}}(으)로 전환됨",
+    "switchedToPersonal": "개인 모드로 전환됨",
+    "members": "{{count}}명의 멤버"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
   },
   "dashboard": {
     "title": "대시보드",
@@ -182,7 +200,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Create Project"
+    "createProject": "Create Project",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "작업",
@@ -520,7 +539,7 @@
       },
       "contact": {
         "label": "연락처:",
-        "phone": "전화: +91 12345 67890",
+        "phone": "전화: +91 70833 73681",
         "email": "이메일: contact@thetechfactory.com"
       },
       "viewMaps": "Google 지도에서 보기",
@@ -713,7 +732,7 @@
     "description": "혁신적인 프로젝트 관리 솔루션으로 팀의 역량을 강화합니다. 조직이 워크플로우를 간소화하고 목표를 효율적으로 달성할 수 있도록 돕는 도구를 만듭니다.",
     "location": "Ahilyanagar, Maharashtra, India",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "빠른 링크",
     "home": "홈",
     "aboutUs": "회사 소개",

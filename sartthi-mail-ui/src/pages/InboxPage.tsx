@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './InboxPage.css';
 import ComposeModal from '../components/ComposeModal';
+import { useToast } from '../context/ToastContext';
 
 interface InboxPageProps {
   user: {
@@ -29,6 +30,7 @@ type SortBy = 'date' | 'sender' | 'subject';
 type FilterBy = 'all' | 'unread' | 'read' | 'attachments';
 
 function InboxPage({ user }: InboxPageProps) {
+  const { toast } = useToast();
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,10 +41,15 @@ function InboxPage({ user }: InboxPageProps) {
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [replyTo, setReplyTo] = useState<any>(null);
 
+  // UI State for enhancements
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [listWidth, setListWidth] = useState(400);
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeRef = useRef<HTMLDivElement>(null);
+
   // Email action handlers
   const handleSendEmail = async (emailData: any) => {
     try {
-      const token = localStorage.getItem('accessToken');
       const endpoint = replyTo ? '/api/mail/reply' : '/api/mail/send';
       const body = replyTo
         ? { ...emailData, messageId: replyTo.messageId, threadId: replyTo.threadId }
@@ -50,8 +57,8 @@ function InboxPage({ user }: InboxPageProps) {
 
       const response = await fetch(endpoint, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -59,24 +66,24 @@ function InboxPage({ user }: InboxPageProps) {
 
       const data = await response.json();
       if (data.success) {
-        alert('Email sent successfully!');
+        toast.success('Email sent successfully!');
         setReplyTo(null);
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
       console.error('Send email error:', error);
+      toast.error('Failed to send email');
       throw error;
     }
   };
 
   const handleStarEmail = async (emailId: string, starred: boolean) => {
     try {
-      const token = localStorage.getItem('accessToken');
       await fetch('/api/mail/star', {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ messageId: emailId, starred })
@@ -85,6 +92,7 @@ function InboxPage({ user }: InboxPageProps) {
       setEmails(emails.map(e => e.id === emailId ? { ...e, isStarred: starred } : e));
     } catch (error) {
       console.error('Star email error:', error);
+      toast.error('Failed to star email');
     }
   };
 
@@ -92,11 +100,10 @@ function InboxPage({ user }: InboxPageProps) {
     if (!confirm('Move this email to trash?')) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
       await fetch('/api/mail/delete', {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ messageId: emailId })
@@ -106,8 +113,10 @@ function InboxPage({ user }: InboxPageProps) {
       if (selectedEmail?.id === emailId) {
         setSelectedEmail(null);
       }
+      toast.success('Email moved to trash');
     } catch (error) {
       console.error('Delete email error:', error);
+      toast.error('Failed to delete email');
     }
   };
 
@@ -153,11 +162,8 @@ function InboxPage({ user }: InboxPageProps) {
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
         const response = await fetch('/api/mail/messages', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include'
         });
         const data = await response.json();
         
@@ -180,6 +186,7 @@ function InboxPage({ user }: InboxPageProps) {
         }
       } catch (error) {
         console.error('Failed to fetch emails', error);
+        toast.error('Failed to fetch emails');
       } finally {
         setLoading(false);
       }
@@ -187,6 +194,39 @@ function InboxPage({ user }: InboxPageProps) {
 
     fetchEmails();
   }, []);
+
+  // Resize handler
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      // Calculate new width: mouse X position minus sidebar width
+      const sidebarWidth = isSidebarCollapsed ? 80 : 280;
+      const newWidth = e.clientX - sidebarWidth;
+      
+      // Min width 300px, Max width 800px
+      if (newWidth >= 300 && newWidth <= 800) {
+        setListWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+    } else {
+      document.body.style.cursor = 'default';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'default';
+    };
+  }, [isResizing, isSidebarCollapsed]);
 
   // Filter emails based on active view
   const getFilteredEmails = () => {
@@ -265,7 +305,7 @@ function InboxPage({ user }: InboxPageProps) {
   ];
 
   return (
-    <div className="inbox-page">
+    <div className="inbox-page" style={{ display: 'flex', gridTemplateColumns: 'none' }}>
       <ComposeModal
         isOpen={isComposeOpen}
         onClose={() => { setIsComposeOpen(false); setReplyTo(null); }}
@@ -274,31 +314,47 @@ function InboxPage({ user }: InboxPageProps) {
       />
 
       {/* Sidebar */}
-      <div className="inbox-sidebar">
-        <div className="sidebar-header">
-          <div className="logo">
+      <div 
+        className="inbox-sidebar" 
+        style={{ 
+          width: isSidebarCollapsed ? '80px' : '280px', 
+          transition: 'width 0.3s ease',
+          padding: isSidebarCollapsed ? '1rem 0.5rem' : '1.5rem',
+          flexShrink: 0
+        }}
+      >
+        <div className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', alignItems: isSidebarCollapsed ? 'center' : 'stretch' }}>
+          <div className="logo" style={{ justifyContent: isSidebarCollapsed ? 'center' : 'flex-start' }}>
             <div className="logo-icon">📧</div>
-            <h1>Sartthi Mail</h1>
+            {!isSidebarCollapsed && <h1>Sartthi Mail</h1>}
           </div>
-          <button className="btn-compose" onClick={() => { setReplyTo(null); setIsComposeOpen(true); }}>
+          
+          <button 
+            className="btn-compose" 
+            onClick={() => { setReplyTo(null); setIsComposeOpen(true); }}
+            title={isSidebarCollapsed ? "Compose" : ""}
+            style={{ padding: isSidebarCollapsed ? '0.875rem' : '0.875rem' }}
+          >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
-            Compose
+            {!isSidebarCollapsed && "Compose"}
           </button>
         </div>
 
         <div className="views-section">
-          <div className="section-label">Views</div>
+          {!isSidebarCollapsed && <div className="section-label">Views</div>}
           {views.slice(0, 5).map((view) => (
             <button
               key={view.id}
               className={`folder-item ${activeView === view.id ? 'active' : ''}`}
               onClick={() => setActiveView(view.id)}
+              style={{ justifyContent: isSidebarCollapsed ? 'center' : 'flex-start', padding: isSidebarCollapsed ? '0.75rem' : '0.75rem 1rem' }}
+              title={isSidebarCollapsed ? view.name : ""}
             >
               <span className="folder-icon">{view.icon}</span>
-              <span className="folder-name">{view.name}</span>
-              {view.count > 0 && (
+              {!isSidebarCollapsed && <span className="folder-name">{view.name}</span>}
+              {!isSidebarCollapsed && view.count > 0 && (
                 <span className="folder-count">{view.count}</span>
               )}
             </button>
@@ -306,16 +362,18 @@ function InboxPage({ user }: InboxPageProps) {
         </div>
 
         <div className="folders">
-          <div className="section-label">Mail</div>
+          {!isSidebarCollapsed && <div className="section-label">Mail</div>}
           {views.slice(5).map((view) => (
             <button
               key={view.id}
               className={`folder-item ${activeView === view.id ? 'active' : ''}`}
               onClick={() => setActiveView(view.id)}
+              style={{ justifyContent: isSidebarCollapsed ? 'center' : 'flex-start', padding: isSidebarCollapsed ? '0.75rem' : '0.75rem 1rem' }}
+              title={isSidebarCollapsed ? view.name : ""}
             >
               <span className="folder-icon">{view.icon}</span>
-              <span className="folder-name">{view.name}</span>
-              {view.count > 0 && (
+              {!isSidebarCollapsed && <span className="folder-name">{view.name}</span>}
+              {!isSidebarCollapsed && view.count > 0 && (
                 <span className="folder-count">{view.count}</span>
               )}
             </button>
@@ -323,20 +381,59 @@ function InboxPage({ user }: InboxPageProps) {
         </div>
 
         <div className="sidebar-footer">
-          <div className="user-profile">
+          {/* Collapse Toggle */}
+          <button 
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            style={{ 
+              width: '100%', 
+              background: 'transparent', 
+              border: 'none', 
+              color: '#a0a0a0', 
+              cursor: 'pointer', 
+              padding: '0.5rem',
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '1rem'
+            }}
+            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isSidebarCollapsed ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
+              </svg>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
+                </svg>
+                <span>Collapse Sidebar</span>
+              </div>
+            )}
+          </button>
+
+          <div className="user-profile" style={{ justifyContent: isSidebarCollapsed ? 'center' : 'flex-start' }}>
             <div className="user-avatar">
               {user.fullName.charAt(0).toUpperCase()}
             </div>
-            <div className="user-info">
-              <div className="user-name">{user.fullName}</div>
-              <div className="user-email">{user.email}</div>
-            </div>
+            {!isSidebarCollapsed && (
+              <div className="user-info">
+                <div className="user-name">{user.fullName}</div>
+                <div className="user-email">{user.email}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Email List */}
-      <div className="email-list">
+      <div 
+        className="email-list" 
+        style={{ 
+          width: `${listWidth}px`, 
+          flexShrink: 0,
+          position: 'relative'
+        }}
+      >
         <div className="list-header">
           <h2>{views.find(v => v.id === activeView)?.name || 'Inbox'}</h2>
           <div className="list-actions">
@@ -350,18 +447,18 @@ function InboxPage({ user }: InboxPageProps) {
 
         {/* Filter Bar */}
         <div className="filter-bar">
-          <div className="filter-group">
+          <div className="filter-group" style={{ flex: 1 }}>
             <input
               type="text"
               className="search-input"
-              placeholder="Search in this view..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: '100%', minWidth: '0' }}
             />
           </div>
           
           <div className="filter-group">
-            <label>Sort by:</label>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} className="filter-select">
               <option value="date">Date</option>
               <option value="sender">Sender</option>
@@ -370,17 +467,12 @@ function InboxPage({ user }: InboxPageProps) {
           </div>
 
           <div className="filter-group">
-            <label>Filter:</label>
             <select value={filterBy} onChange={(e) => setFilterBy(e.target.value as FilterBy)} className="filter-select">
               <option value="all">All</option>
               <option value="unread">Unread</option>
               <option value="read">Read</option>
-              <option value="attachments">Has Attachments</option>
+              <option value="attachments">Attachments</option>
             </select>
-          </div>
-
-          <div className="filter-stats">
-            {filteredEmails.length} emails
           </div>
         </div>
 
@@ -423,10 +515,28 @@ function InboxPage({ user }: InboxPageProps) {
               )}
             </div>
           )))}</div>
+
+          {/* Resize Handle */}
+          <div
+            ref={resizeRef}
+            onMouseDown={() => setIsResizing(true)}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: '4px',
+              height: '100%',
+              cursor: 'col-resize',
+              zIndex: 10,
+              background: isResizing ? '#6366f1' : 'transparent',
+              transition: 'background 0.2s'
+            }}
+            className="resize-handle hover:bg-indigo-500/50"
+          />
       </div>
 
       {/* Email Detail */}
-      <div className="email-detail">
+      <div className="email-detail" style={{ flex: 1, minWidth: 0 }}>
         {selectedEmail ? (
           <>
             <div className="detail-header">

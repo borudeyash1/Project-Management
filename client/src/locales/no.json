@@ -93,6 +93,19 @@
     "support": "Support",
     "feedback": "Feedback"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Dashboard",
     "overview": "Overview",
@@ -182,7 +195,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Create Project"
+    "createProject": "Create Project",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Tasks",
@@ -520,7 +534,7 @@
       },
       "contact": {
         "label": "Contact:",
-        "phone": "Phone: +91 12345 67890",
+        "phone": "Phone: +91 70833 73681",
         "email": "Email: contact@thetechfactory.com"
       },
       "viewMaps": "View on Google Maps",
@@ -713,7 +727,7 @@
     "description": "Empowering teams with innovative project management solutions. We build tools that help organizations streamline their workflows and achieve their goals efficiently.",
     "location": "Ahilyanagar, Maharashtra, India",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Quick Links",
     "home": "Home",
     "aboutUs": "About Us",

@@ -1,74 +1,248 @@
 import express, { Request, Response } from 'express';
+import multer from 'multer';
 import { authenticate } from '../middleware/auth';
-import { listAssets, createFolder, deleteAsset, renameAsset, getAssetDetails } from '../services/vaultService';
+import {
+    listFiles,
+    uploadFile,
+    downloadFile,
+    deleteFile,
+    renameFile,
+    createFolder,
+    getDriveClient
+} from '../services/driveService';
 
 const router = express.Router();
 
+// Configure multer for file uploads (memory storage)
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
+});
+
 /**
- * GET /api/vault/root
- * Get contents of the root Vault folder
+ * GET /api/vault/files
+ * List files in a folder
  */
-router.get('/root', authenticate, async (req: Request, res: Response) => {
+router.get('/files', authenticate, async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
+        const folderId = req.query.folderId as string | undefined;
 
-        const assets = await listAssets(userId);
+        const files = await listFiles(userId, folderId);
 
         res.json({
             success: true,
-            data: assets
+            data: files
         });
     } catch (error: any) {
-        console.error('Vault Root Error:', error);
+        console.error('List files error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to fetch vault contents',
+            message: 'Failed to list files',
             error: error.message
         });
     }
 });
 
 /**
- * GET /api/vault/folder/:folderId
- * Get contents of a specific folder
+ * POST /api/vault/upload
+ * Upload a file
  */
-router.get('/folder/:folderId', authenticate, async (req: Request, res: Response) => {
+router.post('/upload', authenticate, upload.single('file'), async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
-        const folderId = req.params.folderId;
+        const folderId = req.body.folderId as string | undefined;
+        const file = req.file;
 
-        if (!folderId) {
+        if (!file) {
             res.status(400).json({
                 success: false,
-                message: 'Folder ID is required'
+                message: 'No file provided'
             });
             return;
         }
 
-        const assets = await listAssets(userId, folderId);
+        const uploadedFile = await uploadFile(userId, file, folderId);
 
         res.json({
             success: true,
-            data: assets
+            message: 'File uploaded successfully',
+            data: uploadedFile
         });
     } catch (error: any) {
-        console.error('Vault Folder Error:', error);
+        console.error('Upload error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to fetch folder contents',
+            message: 'Failed to upload file',
             error: error.message
         });
     }
 });
 
 /**
- * POST /api/vault/folder
- * Create a new folder
+ * GET /api/vault/download/:fileId
+ * Download a file
  */
-router.post('/folder', authenticate, async (req: Request, res: Response) => {
+router.get('/download/:fileId', authenticate, async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
-        const { name, parentId } = req.body;
+        const { fileId } = req.params;
+
+        if (!fileId) {
+            res.status(400).json({
+                success: false,
+                message: 'File ID is required'
+            });
+            return;
+        }
+
+        // Get file metadata first
+        const drive = await getDriveClient(userId);
+        const metadata = await drive.files.get({
+            fileId,
+            fields: 'name, mimeType'
+        });
+
+        const fileStream = await downloadFile(userId, fileId);
+
+        res.setHeader('Content-Type', metadata.data.mimeType || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="${metadata.data.name}"`);
+
+        fileStream.pipe(res);
+    } catch (error: any) {
+        console.error('Download error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to download file',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/vault/view/:fileId
+ * View/stream a file (for preview)
+ */
+router.get('/view/:fileId', authenticate, async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const { fileId } = req.params;
+
+        if (!fileId) {
+            res.status(400).json({
+                success: false,
+                message: 'File ID is required'
+            });
+            return;
+        }
+
+        // Get file metadata first
+        const drive = await getDriveClient(userId);
+        const metadata = await drive.files.get({
+            fileId,
+            fields: 'name, mimeType'
+        });
+
+        const fileStream = await downloadFile(userId, fileId);
+
+        res.setHeader('Content-Type', metadata.data.mimeType || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `inline; filename="${metadata.data.name}"`);
+
+        fileStream.pipe(res);
+    } catch (error: any) {
+        console.error('View error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to view file',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * DELETE /api/vault/files/:fileId
+ * Delete a file
+ */
+router.delete('/files/:fileId', authenticate, async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const { fileId } = req.params;
+
+        if (!fileId) {
+            res.status(400).json({
+                success: false,
+                message: 'File ID is required'
+            });
+            return;
+        }
+
+        await deleteFile(userId, fileId);
+
+        res.json({
+            success: true,
+            message: 'File deleted successfully'
+        });
+    } catch (error: any) {
+        console.error('Delete error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete file',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * PATCH /api/vault/files/:fileId
+ * Rename a file
+ */
+router.patch('/files/:fileId', authenticate, async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const { fileId } = req.params;
+        const { name } = req.body;
+
+        if (!fileId) {
+            res.status(400).json({
+                success: false,
+                message: 'File ID is required'
+            });
+            return;
+        }
+
+        if (!name) {
+            res.status(400).json({
+                success: false,
+                message: 'New name is required'
+            });
+            return;
+        }
+
+        const updatedFile = await renameFile(userId, fileId, name);
+
+        res.json({
+            success: true,
+            message: 'File renamed successfully',
+            data: updatedFile
+        });
+    } catch (error: any) {
+        console.error('Rename error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to rename file',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/vault/folders
+ * Create a new folder
+ */
+router.post('/folders', authenticate, async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const { name, parentFolderId } = req.body;
 
         if (!name) {
             res.status(400).json({
@@ -78,117 +252,18 @@ router.post('/folder', authenticate, async (req: Request, res: Response) => {
             return;
         }
 
-        const folder = await createFolder(userId, name, parentId);
+        const folder = await createFolder(userId, name, parentFolderId);
 
         res.json({
             success: true,
+            message: 'Folder created successfully',
             data: folder
         });
     } catch (error: any) {
-        console.error('Create Folder Error:', error);
+        console.error('Create folder error:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to create folder',
-            error: error.message
-        });
-    }
-});
-
-/**
- * DELETE /api/vault/asset/:assetId
- * Delete a file or folder
- */
-router.delete('/asset/:assetId', authenticate, async (req: Request, res: Response) => {
-    try {
-        const userId = (req as any).user._id;
-        const assetId = req.params.assetId;
-
-        if (!assetId) {
-            res.status(400).json({
-                success: false,
-                message: 'Asset ID is required'
-            });
-            return;
-        }
-
-        await deleteAsset(userId, assetId);
-
-        res.json({
-            success: true,
-            message: 'Asset deleted successfully'
-        });
-    } catch (error: any) {
-        console.error('Delete Asset Error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to delete asset',
-            error: error.message
-        });
-    }
-});
-
-/**
- * PUT /api/vault/asset/:assetId/rename
- * Rename a file or folder
- */
-router.put('/asset/:assetId/rename', authenticate, async (req: Request, res: Response) => {
-    try {
-        const userId = (req as any).user._id;
-        const assetId = req.params.assetId;
-        const { name } = req.body;
-
-        if (!assetId || !name) {
-            res.status(400).json({
-                success: false,
-                message: 'Asset ID and new name are required'
-            });
-            return;
-        }
-
-        const asset = await renameAsset(userId, assetId, name);
-
-        res.json({
-            success: true,
-            data: asset
-        });
-    } catch (error: any) {
-        console.error('Rename Asset Error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to rename asset',
-            error: error.message
-        });
-    }
-});
-
-/**
- * GET /api/vault/asset/:assetId
- * Get details of a specific asset
- */
-router.get('/asset/:assetId', authenticate, async (req: Request, res: Response) => {
-    try {
-        const userId = (req as any).user._id;
-        const assetId = req.params.assetId;
-
-        if (!assetId) {
-            res.status(400).json({
-                success: false,
-                message: 'Asset ID is required'
-            });
-            return;
-        }
-
-        const asset = await getAssetDetails(userId, assetId);
-
-        res.json({
-            success: true,
-            data: asset
-        });
-    } catch (error: any) {
-        console.error('Get Asset Error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to get asset details',
             error: error.message
         });
     }

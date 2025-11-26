@@ -23,6 +23,7 @@ import { Dock, DockIcon } from './ui/Dock';
 import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { getAppUrl } from '../utils/appUrls';
+import AppInfoCard from './AppInfoCard';
 
 interface NavItem {
   id: string;
@@ -38,7 +39,7 @@ const DockNavigation: React.FC = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [showWorkspaces, setShowWorkspaces] = useState(false);
-
+  const [showInfoCard, setShowInfoCard] = useState<'mail' | 'calendar' | 'vault' | null>(null);
   // Check if user owns any workspace
   const isWorkspaceOwner = useMemo(() => {
     const ownsWorkspace = state.workspaces.some(w => {
@@ -114,21 +115,30 @@ const DockNavigation: React.FC = () => {
     navigate('/login', { replace: true });
   };
 
-  const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
-    const url = getAppUrl(appName);
-    
-    // Pass the token via URL parameter for seamless SSO across subdomains
-    // Works for both localhost (dev) and sartthi.com (prod)
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const separator = url.includes('?') ? '&' : '?';
-      const authUrl = `${url}${separator}token=${token}`;
-      window.open(authUrl, '_blank');
-      return;
-    }
-    
-    window.open(url, '_blank');
-  };
+const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
+  // Check if module is connected
+  const isConnected = state.userProfile.modules?.[appName]?.refreshToken;
+  
+  if (!isConnected) {
+    // Show info card
+    setShowInfoCard(appName);
+    return;
+  }
+  
+  // Module is connected, open the app
+  const url = getAppUrl(appName);
+  
+  // Pass the token via URL parameter for seamless SSO across subdomains
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    const separator = url.includes('?') ? '&' : '?';
+    const authUrl = `${url}${separator}token=${token}`;
+    window.open(authUrl, '_blank');
+    return;
+  }
+  
+  window.open(url, '_blank');
+};
 
   const isActive = (path: string) => {
     return location.pathname === path || 
@@ -326,6 +336,17 @@ const DockNavigation: React.FC = () => {
             )}
           </div>
         </div>
+      )}
+      {/* App Info Card */}
+      {showInfoCard && (
+        <AppInfoCard
+          app={showInfoCard}
+          onClose={() => setShowInfoCard(null)}
+          onConnect={() => {
+            const token = localStorage.getItem('accessToken');
+            window.location.href = `/api/auth/sartthi/connect-${showInfoCard}?token=${token}`;
+          }}
+        />
       )}
     </>
   );

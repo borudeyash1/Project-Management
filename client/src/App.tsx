@@ -51,7 +51,7 @@ import TaskDrawer from './components/TaskDrawer';
 import TaskManagement from './components/TaskManagement';
 import LandingPage from './components/LandingPage';
 import About from './components/About';
-import UserGuide from './components/UserGuide';
+import SartthiApps from './components/SartthiApps';
 import Docs from './components/Docs';
 import PricingPage from './components/PricingPage';
 import ActivityPage from './components/ActivityPage';
@@ -94,9 +94,16 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { state } = useApp();
 
-  // Check if user is authenticated - check for user token in localStorage
-  const token = localStorage.getItem('accessToken');
-  const isAuthenticated = !!token;
+  if (state.isAuthLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-bg dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  const isAuthenticated = !!state.userProfile._id;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -134,7 +141,7 @@ const AppContent: React.FC = () => {
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<About />} />
-        <Route path="/user-guide" element={<UserGuide />} />
+        <Route path="/apps" element={<SartthiApps />} />
         <Route path="/docs" element={<Docs />} />
         <Route path="/docs/:slug" element={<Docs />} />
         <Route path="/pricing" element={<PricingPage />} />
@@ -388,15 +395,15 @@ const App: React.FC = () => {
   return (
     <HelmetProvider>
       <Router>
-        <ThemeProvider>
-          <AppProvider>
+        <AppProvider>
+          <ThemeProvider>
             <PlannerProvider>
               <TrackerProvider>
                 <AppContent />
               </TrackerProvider>
             </PlannerProvider>
-          </AppProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AppProvider>
       </Router>
     </HelmetProvider>
   );

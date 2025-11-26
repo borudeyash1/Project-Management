@@ -93,6 +93,19 @@
     "support": "Suporte",
     "feedback": "Feedback"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Painel",
     "overview": "Visão geral",
@@ -180,7 +193,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Create Projecto"
+    "createProject": "Create Projecto",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Tarefas",
@@ -518,7 +532,7 @@
       },
       "contact": {
         "label": "Contato:",
-        "phone": "Telefone: +91 12345 67890",
+        "phone": "Telefone: +91 70833 73681",
         "email": "E-mail: contact@thetechfactory.com"
       },
       "viewMaps": "Ver no Google Maps",
@@ -711,7 +725,7 @@
     "description": "Capacitando equipes com soluções inovadoras de gerenciamento de projetos. Construindo ferramentas para ajudar organizações a otimizar fluxos de trabalho e atingir metas de forma eficiente.",
     "location": "Ahilyanagar, Maharashtra, Índia",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Links rápidos",
     "home": "Início",
     "aboutUs": "Sobre nós",

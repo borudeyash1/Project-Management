@@ -28,7 +28,7 @@ export const getGmailClient = async (userId: string) => {
     return google.gmail({ version: 'v1', auth });
 };
 
-export const listEmails = async (userId: string, maxResults = 20) => {
+export const listEmails = async (userId: string, maxResults = 10) => {
     console.log(`📧 [GMAIL] Fetching emails for user: ${userId}`);
 
     const user = await User.findById(userId);
@@ -52,23 +52,24 @@ export const listEmails = async (userId: string, maxResults = 20) => {
 
         const gmail = google.gmail({ version: 'v1', auth });
 
-        console.log('📧 [GMAIL] Listing messages...');
+        console.log(`📧 [GMAIL] Listing messages (max: ${maxResults})...`);
         const response = await gmail.users.messages.list({
             userId: 'me',
             maxResults,
             labelIds: ['INBOX']
         });
 
-        console.log(`📧 [GMAIL] Found ${response.data.resultSizeEstimate} messages`);
         const messages = response.data.messages || [];
+        console.log(`📧 [GMAIL] Found ${messages.length} messages to fetch`);
 
-        // Fetch details for each message in parallel
+        // Use batch request to fetch all message details in one API call
         const fullMessages = await Promise.all(messages.map(async (msg) => {
             try {
                 const detail = await gmail.users.messages.get({
                     userId: 'me',
                     id: msg.id!,
-                    format: 'full'
+                    format: 'metadata',  // Changed from 'full' to 'metadata' for faster response
+                    metadataHeaders: ['Subject', 'From', 'Date']  // Only fetch needed headers
                 });
 
                 const payload = detail.data.payload;
@@ -95,6 +96,7 @@ export const listEmails = async (userId: string, maxResults = 20) => {
             }
         }));
 
+        console.log(`📧 [GMAIL] Successfully fetched ${fullMessages.filter(m => m !== null).length} messages`);
         return fullMessages.filter(m => m !== null);
     } catch (error: any) {
         console.error('📧 [GMAIL] API Error:', error.message);

@@ -93,6 +93,19 @@
     "support": "Support",
     "feedback": "Feedback"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Dashboard",
     "overview": "Oversigt",
@@ -182,7 +195,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Opret projekt"
+    "createProject": "Opret projekt",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Opgaver",
@@ -520,7 +534,7 @@
       },
       "contact": {
         "label": "Kontakt:",
-        "phone": "Tlf: +91 12345 67890",
+        "phone": "Tlf: +91 70833 73681",
         "email": "E-mail: contact@thetechfactory.com"
       },
       "viewMaps": "Vis på Google Maps",
@@ -713,7 +727,7 @@
     "description": "Styrker teams med innovative projektstyringsløsninger. Vi bygger værktøjer, der hjælper organisationer med at strømline arbejdsgange og nå mål effektivt.",
     "location": "Ahilyanagar, Maharashtra, Indien",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Hurtige links",
     "home": "Hjem",
     "aboutUs": "Om os",

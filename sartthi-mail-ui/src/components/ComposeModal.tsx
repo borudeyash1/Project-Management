@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './ComposeModal.css';
+import { useToast } from '../context/ToastContext';
 
 interface ComposeModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface EmailData {
 }
 
 function ComposeModal({ isOpen, onClose, onSend, replyTo }: ComposeModalProps) {
+  const { toast } = useToast();
   const [to, setTo] = useState(replyTo?.to || '');
   const [cc, setCc] = useState('');
   const [bcc, setBcc] = useState('');
@@ -35,7 +37,7 @@ function ComposeModal({ isOpen, onClose, onSend, replyTo }: ComposeModalProps) {
 
   const handleSend = async () => {
     if (!to || !subject) {
-      alert('Please fill in recipient and subject');
+      toast.error('Please fill in recipient and subject');
       return;
     }
 
@@ -51,7 +53,7 @@ function ComposeModal({ isOpen, onClose, onSend, replyTo }: ComposeModalProps) {
       onClose();
     } catch (error) {
       console.error('Failed to send email:', error);
-      alert('Failed to send email');
+      toast.error('Failed to send email');
     } finally {
       setSending(false);
     }

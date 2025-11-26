@@ -67,7 +67,7 @@ const DocumentationSchema: Schema = new Schema(
 
 // Index for faster queries
 DocumentationSchema.index({ category: 1, order: 1 });
-DocumentationSchema.index({ slug: 1 });
+// Note: slug index is automatically created by unique: true
 DocumentationSchema.index({ isPublished: 1 });
 
 export default mongoose.model<IDocumentation>('Documentation', DocumentationSchema);

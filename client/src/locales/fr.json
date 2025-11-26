@@ -93,6 +93,19 @@
     "support": "Support",
     "feedback": "Retour d'info"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Tableau de bord",
     "overview": "Aperçu",
@@ -111,12 +124,38 @@
     "todayOverview": "Aperçu d'aujourd'hui",
     "pendingTasks": "Tâches en attente",
     "avgProgress": "Progrès moyen",
-    "aiAssistant": "Assistant IA",
-    "aiSuggestions": "Suggestions IA",
-    "aiDescription": "Analyse et suggestions par IA",
+    "aiAssistant": "AI Studio",
+    "aiSuggestions": "Suggestions Intelligentes",
+    "aiDescription": "Analyse intelligente et fonctionnalités premium",
     "askAI": "Demander à l'IA",
-    "average": "Average",
-    "productivityIncrease": "Productivity Increase"
+    "average": "Moyenne",
+    "productivityIncrease": "Augmentation de la productivité"
+  },
+  "aiStudio": {
+    "title": "AI Studio",
+    "badge": "Plan Annuel",
+    "poweredBy": "Propulsé par Gemini Pro",
+    "thinking": "Réflexion...",
+    "suggestions": "Suggestions rapides :",
+    "placeholder": "Posez-moi des questions sur votre travail...",
+    "welcome": {
+      "greeting": "Bonjour {{name}} ! Bienvenue dans **AI Studio**.",
+      "intro": "Je suis équipé de capacités avancées pour booster votre productivité :",
+      "question": "Que souhaitez-vous explorer aujourd'hui ?"
+    },
+    "features": {
+      "smartAnswers": "✨ **Réponses Intelligentes** - Réponses contextuelles à vos questions",
+      "smartEditor": "📝 **Éditeur Intelligent** - Création et raffinement de contenu assisté par IA",
+      "smartSummaries": "📊 **Résumés Intelligents** - Aperçus instantanés des projets et tâches",
+      "smartFields": "🏷️ **Champs Intelligents** - Extraction intelligente de données et remplissage automatique",
+      "smartStatus": "🚀 **Statut Intelligent** - Mises à jour prédictives de statut et insights"
+    },
+    "defaultSuggestions": {
+      "summary": "Générer un résumé intelligent",
+      "edit": "Aidez-moi à éditer ce texte",
+      "status": "Prédire le statut du projet",
+      "fields": "Extraire les champs de cette note"
+    }
   },
   "plans": {
     "plan": "Plan : {{plan}}",
@@ -182,7 +221,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Créer un projet"
+    "createProject": "Créer un projet",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Tâches",
@@ -520,7 +560,7 @@
       },
       "contact": {
         "label": "Contact :",
-        "phone": "Tél : +91 12345 67890",
+        "phone": "Tél : +91 70833 73681",
         "email": "E-mail : contact@thetechfactory.com"
       },
       "viewMaps": "Voir sur Google Maps",
@@ -713,7 +753,7 @@
     "description": "Autonomiser les équipes avec des solutions de gestion de projet innovantes. Nous construisons des outils qui aident les organisations à rationaliser les flux de travail et à atteindre leurs objectifs efficacement.",
     "location": "Ahilyanagar, Maharashtra, Inde",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Liens rapides",
     "home": "Accueil",
     "aboutUs": "À propos de nous",

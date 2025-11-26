@@ -12,8 +12,8 @@ interface ConnectMailPageProps {
 function ConnectMailPage({ user }: ConnectMailPageProps) {
   const handleConnect = () => {
     // Redirect to backend OAuth endpoint
-    const token = localStorage.getItem('accessToken');
-    const redirectUrl = `${API_URL}/api/auth/sartthi/connect-mail${token ? `?token=${token}` : ''}`;
+    // Cookies will be sent automatically
+    const redirectUrl = `${API_URL}/api/auth/sartthi/connect-mail`;
     window.location.href = redirectUrl;
   };
 

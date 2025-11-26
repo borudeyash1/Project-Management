@@ -13,16 +13,34 @@ import {
   JWTPayload,
   DesktopDeviceInfo,
 } from "../types";
-import { sendEmail } from '../services/emailService'; // Import the email service
+import { sendEmail } from '../services/emailService';
+import {
+  setCookieToken,
+  clearCookieToken
+} from '../utils/cookieUtils';
 
 // Initialize Google OAuth2 client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const DESKTOP_SESSION_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // Generate JWT token
 const generateToken = (userId: string): string => {
   return jwt.sign({ userId }, process.env.JWT_SECRET as string, {
     expiresIn: "7d",
   });
+};
+
+// Generate refresh token
+const generateRefreshToken = (userId: string): string => {
+  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET as string, {
+    expiresIn: "30d",
+  });
+};
+
+// Generate a 6-digit OTP
+const generateOTP = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
 };
 
 const extractClientMeta = (req: Request) => {
@@ -201,20 +219,6 @@ export const exchangeDesktopSessionToken: RequestHandler = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to exchange desktop session token' });
   }
 };
-
-// Generate refresh token
-const generateRefreshToken = (userId: string): string => {
-  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET as string, {
-    expiresIn: "30d",
-  });
-};
-
-// Generate a 6-digit OTP
-const generateOTP = (): string => {
-  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
-};
-
-const DESKTOP_SESSION_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // Register user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -399,15 +403,7 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
       await user.save();
 
       // Set HTTP-only cookie for SSO across subdomains
-      const isProduction = process.env.NODE_ENV === 'production';
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/',
-        ...(isProduction && { domain: '.sartthi.com' }), // Enable subdomain sharing in production
-      });
+      setCookieToken(res, 'accessToken', accessToken, 7 * 24 * 60 * 60 * 1000); // 7 days
 
       const response: ApiResponse<AuthResponse> = {
         success: true,
@@ -453,15 +449,7 @@ export const verifyEmailOTP = async (req: Request, res: Response): Promise<void>
       await user.save();
 
       // Set HTTP-only cookie for SSO across subdomains
-      const isProduction = process.env.NODE_ENV === 'production';
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/',
-        ...(isProduction && { domain: '.sartthi.com' }), // Enable subdomain sharing in production
-      });
+      setCookieToken(res, 'accessToken', accessToken, 7 * 24 * 60 * 60 * 1000); // 7 days
 
       const response: ApiResponse<AuthResponse> = {
         success: true,
@@ -647,6 +635,10 @@ export const logout = async (
       await req.user?.save();
     }
 
+    // Clear cookies
+    clearCookieToken(res, 'accessToken');
+    clearCookieToken(res, 'refreshToken');
+
     res.status(200).json({
       success: true,
       message: "Logout successful",
@@ -679,6 +671,10 @@ export const refreshToken = async (
     // Save new refresh token
     user.refreshTokens.push({ token: newRefreshToken, createdAt: new Date() });
     await user.save();
+
+    // Set HTTP-only cookies
+    setCookieToken(res, 'accessToken', newAccessToken, 7 * 24 * 60 * 60 * 1000); // 7 days
+    setCookieToken(res, 'refreshToken', newRefreshToken, 30 * 24 * 60 * 60 * 1000); // 30 days
 
     const response: ApiResponse<AuthResponse> = {
       success: true,
@@ -960,6 +956,10 @@ export const googleAuth = async (
     // Save refresh token
     user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
     await user.save();
+
+    // Set HTTP-only cookies
+    setCookieToken(res, 'accessToken', jwtAccessToken, 7 * 24 * 60 * 60 * 1000); // 7 days
+    setCookieToken(res, 'refreshToken', refreshToken, 30 * 24 * 60 * 60 * 1000); // 30 days
 
     const response: ApiResponse<AuthResponse> = {
       success: true,

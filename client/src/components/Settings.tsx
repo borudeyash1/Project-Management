@@ -13,6 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
 import LanguageSelector from './LanguageSelector';
+import ConnectedAccounts from './ConnectedAccounts';
 
 interface SettingsData {
   account: {
@@ -463,6 +464,11 @@ const Settings: React.FC = () => {
 
   const renderAccount = () => (
     <div className="space-y-6">
+      {/* Connected Accounts Section */}
+      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <ConnectedAccounts />
+      </div>
+
       {/* Account Information */}
       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accountInfo')}</h3>

@@ -25,11 +25,32 @@ module.exports = {
         success: '#16A34A',
         warning: '#F59E0B',
         error: '#DC2626',
-        info: '#0EA5E9'
+        info: '#0EA5E9',
+        // High-Density Dark Mode Theme
+        'app-bg': '#191919',
+        'sidebar-bg': '#202020',
+        'card-bg': '#202020',
+        'hover-bg': '#262626',
+        'border-subtle': '#2C2C2C',
+        'border-light': '#333333',
+        'text-primary': '#E3E3E3',
+        'text-muted': '#9CA3AF',
+        'text-light': '#D1D5DB',
+        'text-lighter': '#6B7280',
+        'accent-blue': '#2563EB',
+        'accent-red': '#EF4444',
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif']
-      }
+      },
+      fontSize: {
+        '2xs': '0.625rem', // 10px
+        'xs': '0.75rem',   // 12px
+        '13': '0.8125rem', // 13px
+      },
+      aspectRatio: {
+        '4/3': '4 / 3',
+      },
     },
   },
   plugins: [],

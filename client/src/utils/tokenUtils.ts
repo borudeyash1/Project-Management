@@ -99,9 +99,10 @@ export const clearExpiredTokens = (): void => {
     localStorage.removeItem('adminData');
   }
 
-  const accessToken = localStorage.getItem('accessToken');
-  if (accessToken && isTokenExpired(accessToken)) {
-    console.log('🧹 [TOKEN] Clearing expired access token');
-    localStorage.removeItem('accessToken');
-  }
+  // accessToken is now stored in HTTP-only cookie, so we don't need to clear it from localStorage
+  // const accessToken = localStorage.getItem('accessToken');
+  // if (accessToken && isTokenExpired(accessToken)) {
+  //   console.log('🧹 [TOKEN] Clearing expired access token');
+  //   localStorage.removeItem('accessToken');
+  // }
 };

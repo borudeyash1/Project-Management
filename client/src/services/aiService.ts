@@ -83,8 +83,9 @@ class AIService {
   async getAIResponse(
     message: string,
     userContext: UserContext,
+    language?: string,
   ): Promise<AIResponse> {
-    const payload = { message, userContext };
+    const payload = { message, userContext, language };
 
     const res = await this.request<{
       success: boolean;

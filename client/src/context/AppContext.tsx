@@ -304,15 +304,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     const bootstrapSession = async () => {
-      const token = localStorage.getItem('accessToken');
-
-      if (!token) {
-        dispatch({ type: 'SET_USER', payload: emptyUser });
-        dispatch({ type: 'SET_WORKSPACES', payload: [] });
-        dispatch({ type: 'SET_AUTH_LOADING', payload: false });
-        return;
-      }
-
+      // Try to get current user directly (cookies will be sent)
       try {
         const userResponse = await apiService.getCurrentUser();
         dispatch({ type: 'SET_USER', payload: userResponse });
@@ -330,37 +322,29 @@ export function AppProvider({ children }: AppProviderProps) {
         }
       } catch (error) {
         console.error('[AppProvider] Failed to bootstrap session', error);
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          try {
-            await apiService.refreshToken();
-            const refreshedUser = await apiService.getCurrentUser();
-            dispatch({ type: 'SET_USER', payload: refreshedUser });
-            const workspaces = await apiService.getWorkspaces();
+        // Try to refresh token
+        try {
+          await apiService.refreshToken();
+          const refreshedUser = await apiService.getCurrentUser();
+          dispatch({ type: 'SET_USER', payload: refreshedUser });
+          const workspaces = await apiService.getWorkspaces();
 
-            if (workspaces.length > 0) {
-              dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
-              dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
-              dispatch({ type: 'SET_MODE', payload: 'Workspace' });
-            } else {
-              dispatch({ type: 'SET_WORKSPACES', payload: [] });
-            }
-            return;
-          } catch (refreshError) {
-            console.error('[AppProvider] Refresh attempt failed', refreshError);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            dispatch({ type: 'SET_USER', payload: emptyUser });
+          if (workspaces.length > 0) {
+            dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
+            dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
+            dispatch({ type: 'SET_MODE', payload: 'Workspace' });
+          } else {
             dispatch({ type: 'SET_WORKSPACES', payload: [] });
-            dispatch({ type: 'SET_MODE', payload: 'Personal' });
-            return;
           }
+          return;
+        } catch (refreshError) {
+          console.error('[AppProvider] Refresh attempt failed', refreshError);
+          // No valid session
+          dispatch({ type: 'SET_USER', payload: emptyUser });
+          dispatch({ type: 'SET_WORKSPACES', payload: [] });
+          dispatch({ type: 'SET_MODE', payload: 'Personal' });
+          return;
         }
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        dispatch({ type: 'SET_USER', payload: emptyUser });
-        dispatch({ type: 'SET_WORKSPACES', payload: [] });
-        dispatch({ type: 'SET_MODE', payload: 'Personal' });
       } finally {
         dispatch({ type: 'SET_AUTH_LOADING', payload: false });
       }

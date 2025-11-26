@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import WeekGrid from './components/WeekGrid';
 // import ConnectCalendarPage from './pages/ConnectCalendarPage';
 // import CalendarPage from './pages/CalendarPage';
 
@@ -13,47 +14,37 @@ function App() {
 
   useEffect(() => {
     checkAuth();
+    
+    // Check if returning from OAuth callback
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') || urlParams.get('code')) {
+      // Wait a moment for backend to process, then re-fetch user data
+      setTimeout(() => {
+        checkAuth();
+      }, 1000);
+    }
   }, []);
 
   const checkAuth = async () => {
     try {
-      // 1. Check for token in URL (passed from main app)
-      const urlParams = new URLSearchParams(window.location.search);
-      const tokenFromUrl = urlParams.get('token');
-
-      if (tokenFromUrl) {
-        // Save token to localStorage
-        localStorage.setItem('accessToken', tokenFromUrl);
-        
-        // Clean URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
-      // 2. Get token from localStorage
-      const token = localStorage.getItem('accessToken');
-
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      // 3. Verify token with backend
+      // Verify token with backend using cookies
       const response = await fetch(`${API_URL}/api/auth/me`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        setUser(data.data);  // Changed from data.user to data.data
         setIsAuthenticated(true);
       } else {
-        // Token invalid
-        localStorage.removeItem('accessToken');
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }
@@ -86,20 +77,24 @@ function App() {
   return (
     <div className="app-container">
       {isCalendarConnected ? (
-        // <CalendarPage user={user} />
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <h1>Calendar Connected!</h1>
-          <p>Welcome back, {user.name}</p>
-        </div>
+        <WeekGrid user={user} />
       ) : (
-        // <ConnectCalendarPage user={user} />
         <div style={{ padding: '2rem', textAlign: 'center' }}>
            <h1>Connect Google Calendar</h1>
+           <p style={{ marginBottom: '1rem', color: '#999' }}>
+             {user?.modules?.calendar ? 'Checking connection status...' : 'Connect your Google Calendar to view events'}
+           </p>
            <button onClick={() => {
-             const token = localStorage.getItem('accessToken');
-             window.location.href = `${API_URL}/api/auth/sartthi/connect-calendar${token ? `?token=${token}` : ''}`;
-           }}>
+             // Cookies will be sent automatically
+             window.location.href = `${API_URL}/api/auth/sartthi/connect-calendar`;
+           }} style={{ marginRight: '1rem' }}>
              Connect with Google
+           </button>
+           <button onClick={() => {
+             setIsLoading(true);
+             checkAuth();
+           }} style={{ background: '#555', color: 'white', padding: '0.5rem 1rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+             Refresh Status
            </button>
         </div>
       )}

@@ -41,7 +41,7 @@ class ApiService {
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
-    this.token = localStorage.getItem('accessToken');
+    // this.token = localStorage.getItem('accessToken'); // No longer needed with cookies
   }
 
   private async request<T>(
@@ -51,9 +51,11 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
 
     const config: RequestInit = {
+      credentials: 'include', // Send cookies with request
       headers: {
         'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+        // Authorization header is no longer needed as we use cookies
+        // ...(this.token && { Authorization: `Bearer ${this.token}` }),
         ...options.headers,
       },
       ...options,
@@ -103,9 +105,10 @@ class ApiService {
       body: JSON.stringify(credentials),
     });
 
-    if (response.data && response.data.accessToken) {
-      this.setToken(response.data.accessToken);
-    }
+    // Token management is now handled by cookies
+    // if (response.data && response.data.accessToken) {
+    //   this.setToken(response.data.accessToken);
+    // }
 
     return response.data!;
   }
@@ -119,11 +122,6 @@ class ApiService {
     });
 
     console.log('🔍 [DEBUG] API Service - request completed, response:', response);
-
-    // For manual registration, we don't set token immediately, as OTP verification is pending
-    // if (response.data && !response.data.requiresOtpVerification) {
-    //   this.setToken(response.data.accessToken);
-    // }
 
     // Extract the data from the response
     console.log('🔍 [DEBUG] API Service - Full response:', response);
@@ -163,22 +161,11 @@ class ApiService {
   }
 
   async refreshToken(): Promise<AuthResponse> {
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
+    // Refresh token is now sent via cookie
     const response = await this.request<AuthResponse>('/auth/refresh', {
       method: 'POST',
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({}), // Empty body, token is in cookie
     });
-
-    if (response.data) {
-      this.setToken(response.data.accessToken);
-      if (response.data.refreshToken) {
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-      }
-    }
 
     return response.data!;
   }
@@ -193,10 +180,6 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(googleUserData),
     });
-
-    if (response.data) {
-      this.setToken(response.data.accessToken);
-    }
 
     return response.data!;
   }
@@ -223,9 +206,6 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ email, otp }),
     });
-    if (response.data) {
-      this.setToken(response.data.accessToken);
-    }
     return response.data!;
   }
 
@@ -239,9 +219,9 @@ class ApiService {
 
   async getSubscriptionPlans(): Promise<SubscriptionPlanData[]> {
     const response = await fetch(`${this.baseURL}/subscriptions`, {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
     });
     if (!response.ok) {
@@ -263,9 +243,9 @@ class ApiService {
     const url = `${this.baseURL}/workspaces/otp`; // endpoint to add
     const response = await fetch(url, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
     });
     if (!response.ok) {
@@ -277,9 +257,9 @@ class ApiService {
     const url = `${this.baseURL}/workspaces/otp/verify`; // endpoint to add
     const response = await fetch(url, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
       body: JSON.stringify({ otp: code })
     });
@@ -293,9 +273,9 @@ class ApiService {
     const url = `${this.baseURL}/workspaces`;
     const response = await fetch(url, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
       body: JSON.stringify(workspaceData)
     });
@@ -412,13 +392,13 @@ class ApiService {
   // Token management methods
   private setToken(token: string): void {
     this.token = token;
-    localStorage.setItem('accessToken', token);
+    // localStorage.setItem('accessToken', token);
   }
 
   private clearToken(): void {
     this.token = null;
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    // localStorage.removeItem('accessToken');
+    // localStorage.removeItem('refreshToken');
   }
 
   // Workspace endpoints
@@ -601,8 +581,9 @@ class ApiService {
   async uploadRelease(formData: FormData) {
     const response = await fetch(`${this.baseURL}/releases`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        ...(this.token && { Authorization: `Bearer ${this.token}` })
+        // ...(this.token && { Authorization: `Bearer ${this.token}` })
       },
       body: formData
     });
@@ -618,8 +599,9 @@ class ApiService {
   async upload<T = any>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        ...(this.token && { Authorization: `Bearer ${this.token}` })
+        // ...(this.token && { Authorization: `Bearer ${this.token}` })
       },
       body: formData
     });

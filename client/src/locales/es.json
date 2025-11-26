@@ -93,6 +93,19 @@
     "support": "Soporte",
     "feedback": "Comentarios"
   },
+  "switcher": {
+    "workspaces": "Workspaces",
+    "quickActions": "Quick Actions",
+    "createWorkspace": "Create Workspace",
+    "createWorkspaceDesc": "Create a new workspace",
+    "discoverWorkspaces": "Discover Workspaces",
+    "discoverWorkspacesDesc": "Browse available workspaces",
+    "personalMode": "Personal Mode"
+  },
+  "messages": {
+    "noWorkspace": "No workspace selected",
+    "tryAgain": "Try Again"
+  },
   "dashboard": {
     "title": "Panel",
     "overview": "Resumen",
@@ -111,10 +124,38 @@
     "todayOverview": "Resumen de hoy",
     "pendingTasks": "Tareas pendientes",
     "avgProgress": "Progreso medio",
-    "aiAssistant": "Asistente IA",
-    "aiSuggestions": "Sugerencias de IA",
-    "aiDescription": "Análisis y sugerencias por IA",
-    "askAI": "Preguntar a IA"
+    "aiAssistant": "AI Studio",
+    "aiSuggestions": "Sugerencias Inteligentes",
+    "aiDescription": "Análisis inteligente y funciones premium",
+    "askAI": "Preguntar a IA",
+    "average": "Promedio",
+    "productivityIncrease": "Aumento de productividad"
+  },
+  "aiStudio": {
+    "title": "AI Studio",
+    "badge": "Plan Anual",
+    "poweredBy": "Impulsado por Gemini Pro",
+    "thinking": "Pensando...",
+    "suggestions": "Sugerencias rápidas:",
+    "placeholder": "Pregúntame cualquier cosa sobre tu trabajo...",
+    "welcome": {
+      "greeting": "¡Hola {{name}}! Bienvenido a **AI Studio**.",
+      "intro": "Estoy equipado con capacidades avanzadas para potenciar tu productividad:",
+      "question": "¿Qué te gustaría explorar hoy?"
+    },
+    "features": {
+      "smartAnswers": "✨ **Respuestas Inteligentes** - Respuestas contextuales a tus consultas",
+      "smartEditor": "📝 **Editor Inteligente** - Creación y refinamiento de contenido asistido por IA",
+      "smartSummaries": "📊 **Resúmenes Inteligentes** - Resúmenes instantáneos de proyectos y tareas",
+      "smartFields": "🏷️ **Campos Inteligentes** - Extracción inteligente de datos y autocompletado",
+      "smartStatus": "🚀 **Estado Inteligente** - Actualizaciones predictivas de estado e insights"
+    },
+    "defaultSuggestions": {
+      "summary": "Generar resumen inteligente",
+      "edit": "Ayúdame a editar este texto",
+      "status": "Predecir estado del proyecto",
+      "fields": "Extraer campos de esta nota"
+    }
   },
   "plans": {
     "plan": "Plan: {{plan}}",
@@ -180,7 +221,8 @@
     "teamMembers": "{{count}} members",
     "due": "Due {{date}}",
     "planning": "Planning",
-    "createProject": "Create Project"
+    "createProject": "Create Project",
+    "loadError": "Failed to load projects"
   },
   "tasks": {
     "title": "Tareas",
@@ -518,7 +560,7 @@
       },
       "contact": {
         "label": "Contacto:",
-        "phone": "Teléfono: +91 12345 67890",
+        "phone": "Teléfono: +91 70833 73681",
         "email": "Correo: contact@thetechfactory.com"
       },
       "viewMaps": "Ver en Google Maps",
@@ -711,7 +753,7 @@
     "description": "Empoderando equipos con soluciones innovadoras de gestión de proyectos. Construimos herramientas que ayudan a las organizaciones a optimizar flujos de trabajo y alcanzar objetivos de manera eficiente.",
     "location": "Ahilyanagar, Maharashtra, India",
     "email": "contact@thetechfactory.com",
-    "phone": "+91 12345 67890",
+    "phone": "+91 70833 73681",
     "quickLinks": "Enlaces rápidos",
     "home": "Inicio",
     "aboutUs": "Sobre nosotros",

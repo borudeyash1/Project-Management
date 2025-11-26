@@ -91,7 +91,23 @@
         "help": "ヘルプ",
         "docs": "ドキュメント",
         "support": "サポート",
-        "feedback": "フィードバック"
+        "feedback": "フィードバック",
+        "sartthiMail": "Sartthi Mail",
+        "sartthiCalendar": "Sartthi Calendar",
+        "sartthiVault": "Sartthi Vault"
+    },
+    "switcher": {
+        "workspaces": "ワークスペース",
+        "quickActions": "クイックアクション",
+        "createWorkspace": "ワークスペースを作成",
+        "createWorkspaceDesc": "新しいワークスペースを作成",
+        "discoverWorkspaces": "ワークスペースを探す",
+        "discoverWorkspacesDesc": "利用可能なワークスペースを閲覧",
+        "personalMode": "個人モード"
+    },
+    "messages": {
+        "noWorkspace": "ワークスペースが選択されていません",
+        "tryAgain": "再試行"
     },
     "dashboard": {
         "title": "ダッシュボード",
@@ -111,12 +127,38 @@
         "todayOverview": "今日の概要",
         "pendingTasks": "保留中のタスク",
         "avgProgress": "平均進捗",
-        "aiAssistant": "AIアシスタント",
-        "aiSuggestions": "AI提案",
-        "aiDescription": "AIによる分析と提案",
+        "aiAssistant": "AIスタジオ",
+        "aiSuggestions": "スマート提案",
+        "aiDescription": "スマート分析とプレミアム機能",
         "askAI": "AIに聞く",
         "average": "平均",
         "productivityIncrease": "生産性向上"
+    },
+    "aiStudio": {
+        "title": "AIスタジオ",
+        "badge": "年間プラン",
+        "poweredBy": "Gemini Pro 搭載",
+        "thinking": "考え中...",
+        "suggestions": "クイック提案:",
+        "placeholder": "仕事について何でも聞いてください...",
+        "welcome": {
+            "greeting": "こんにちは {{name}}! **AIスタジオ**へようこそ。",
+            "intro": "あなたの生産性を向上させる高度な機能を備えています:",
+            "question": "今日は何をしますか？"
+        },
+        "features": {
+            "smartAnswers": "✨ **スマート回答** - 文脈を理解した回答",
+            "smartEditor": "📝 **スマートエディタ** - AIによるコンテンツ作成と推敲",
+            "smartSummaries": "📊 **スマート要約** - プロジェクトとタスクの即時概要",
+            "smartFields": "🏷️ **スマートフィールド** - インテリジェントなデータ抽出と自動入力",
+            "smartStatus": "🚀 **スマートステータス** - ステータスの予測とインサイト"
+        },
+        "defaultSuggestions": {
+            "summary": "スマート要約を生成",
+            "edit": "テキストの編集を手伝って",
+            "status": "プロジェクトステータスを予測",
+            "fields": "メモからフィールドを抽出"
+        }
     },
     "plans": {
         "plan": "プラン: {{plan}}",
@@ -182,7 +224,8 @@
         "teamMembers": "{{count}}人のメンバー",
         "due": "期限: {{date}}",
         "planning": "計画中",
-        "createProject": "プロジェクトを作成"
+        "createProject": "プロジェクトを作成",
+        "loadError": "プロジェクトの読み込みに失敗しました"
     },
     "tasks": {
         "title": "タスク",
@@ -227,8 +270,9 @@
         "endTime": "終了時間",
         "filter": "フィルター",
         "search": "タスクを検索...",
-        "daysLeft": "残り{{count}}日",
-        "description": "プロジェクトやワークスペース全体のタスクを管理します。",
+        "daysLeft": "{{count}} days left",
+        "description": "プロジェクトやワークスペース全体でタスクを管理します。",
+        "newIdeasRequests": "新しいアイデア/リクエスト",
         "allAssignees": "すべての担当者",
         "templates": "タスクテンプレート",
         "createTemplate": "テンプレートを作成",
@@ -520,7 +564,7 @@
             },
             "contact": {
                 "label": "連絡先:",
-                "phone": "電話: +91 12345 67890",
+                "phone": "電話: +91 70833 73681",
                 "email": "メール: contact@thetechfactory.com"
             },
             "viewMaps": "Googleマップで見る",
@@ -713,7 +757,7 @@
         "description": "革新的なプロジェクト管理ソリューションでチームを強化します。組織がワークフローを合理化し、目標を効率的に達成するためのツールを構築しています。",
         "location": "アヒリヤナガル、マハラシュトラ、インド",
         "email": "contact@thetechfactory.com",
-        "phone": "+91 12345 67890",
+        "phone": "+91 70833 73681",
         "quickLinks": "クイックリンク",
         "home": "ホーム",
         "aboutUs": "私たちについて",
