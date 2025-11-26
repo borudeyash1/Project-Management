@@ -95,7 +95,7 @@ router.get('/download/:fileId', authenticate, async (req: Request, res: Response
             fields: 'name, mimeType'
         });
 
-        const fileStream = await downloadFile(userId, fileId);
+        const fileStream = await downloadFile(userId, fileId as string);
 
         res.setHeader('Content-Type', metadata.data.mimeType || 'application/octet-stream');
         res.setHeader('Content-Disposition', `attachment; filename="${metadata.data.name}"`);
@@ -127,7 +127,7 @@ router.get('/view/:fileId', authenticate, async (req: Request, res: Response) =>
             fields: 'name, mimeType'
         });
 
-        const fileStream = await downloadFile(userId, fileId);
+        const fileStream = await downloadFile(userId, fileId as string);
 
         res.setHeader('Content-Type', metadata.data.mimeType || 'application/octet-stream');
         res.setHeader('Content-Disposition', `inline; filename="${metadata.data.name}"`);
@@ -152,7 +152,7 @@ router.delete('/files/:fileId', authenticate, async (req: Request, res: Response
         const userId = (req as any).user._id;
         const { fileId } = req.params;
 
-        await deleteFile(userId, fileId);
+        await deleteFile(userId, fileId as string);
 
         res.json({
             success: true,
@@ -186,7 +186,7 @@ router.patch('/files/:fileId', authenticate, async (req: Request, res: Response)
             return;
         }
 
-        const updatedFile = await renameFile(userId, fileId, name);
+        const updatedFile = await renameFile(userId, fileId as string, name);
 
         res.json({
             success: true,

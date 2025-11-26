@@ -1,8 +1,7 @@
 import { RequestHandler } from 'express';
 import Message from '../models/Message';
 import Workspace from '../models/Workspace';
-import { AuthenticatedRequest } from '../middleware/auth';
-import { ApiResponse } from '../types';
+import { AuthenticatedRequest, ApiResponse } from '../types';
 
 // Get messages for current user in workspace
 export const getWorkspaceMessages: RequestHandler = async (req, res) => {
@@ -47,6 +46,7 @@ export const getWorkspaceMessages: RequestHandler = async (req, res) => {
 
     const response: ApiResponse = {
       success: true,
+      message: 'Messages retrieved successfully',
       data: messages
     };
 
@@ -88,8 +88,8 @@ export const getWorkspaceMembers: RequestHandler = async (req, res) => {
 
     // Filter active members and exclude current user
     const members = workspace.members
-      .filter((m: any) => 
-        m.status === 'active' && 
+      .filter((m: any) =>
+        m.status === 'active' &&
         m.user._id.toString() !== currentUserId.toString()
       )
       .map((m: any) => ({
@@ -105,6 +105,7 @@ export const getWorkspaceMembers: RequestHandler = async (req, res) => {
 
     const response: ApiResponse = {
       success: true,
+      message: 'Members retrieved successfully',
       data: members
     };
 
@@ -151,16 +152,15 @@ export const sendWorkspaceMessage: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Create message with encryption
+    // Create message
     const message = new Message({
       workspace: workspaceId,
       sender: currentUserId,
       recipient: recipientId,
+      content: content.trim(),
       readBy: [currentUserId] // Sender has read it
     });
 
-    // Encrypt the content
-    message.encryptedContent = message.encrypt(content.trim());
     await message.save();
 
     // Populate user details
@@ -215,6 +215,7 @@ export const markMessageAsRead: RequestHandler = async (req, res) => {
 
     const response: ApiResponse = {
       success: true,
+      message: 'Message marked as read',
       data: message
     };
 
@@ -254,6 +255,7 @@ export const getConversation: RequestHandler = async (req, res) => {
 
     const response: ApiResponse = {
       success: true,
+      message: 'Conversation retrieved successfully',
       data: messages
     };
 
