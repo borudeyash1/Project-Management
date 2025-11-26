@@ -472,6 +472,17 @@ class ApiService {
   async cancelJoinRequest(workspaceId: string): Promise<void> {
     await this.delete(`/workspaces/${workspaceId}/join-request`);
   }
+
+  async getWorkspaceInvitations(workspaceId: string): Promise<any[]> {
+    const response = await this.get(`/workspaces/${workspaceId}/invitations`);
+    return response.data || [];
+  }
+
+  async cancelWorkspaceInvitation(workspaceId: string, invitationId: string): Promise<void> {
+    await this.delete(`/workspaces/${workspaceId}/invitations/${invitationId}`);
+  }
+
+
   // Workspace settings
   async updateWorkspaceSettings(workspaceId: string, settings: any): Promise<Workspace> {
     const response = await this.put<Workspace>(`/workspaces/${workspaceId}/settings`, { settings });

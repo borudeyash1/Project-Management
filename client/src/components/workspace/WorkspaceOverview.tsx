@@ -7,7 +7,6 @@ import {
   FolderKanban, 
   Users, 
   TrendingUp, 
-  DollarSign,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -77,29 +76,36 @@ const WorkspaceOverview: React.FC = () => {
       change: '+2% MoM'
     },
     {
-      key: 'burnRate',
-      label: t('workspace.overview.burnRate'),
-      value: '$18.4k',
-      icon: DollarSign,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-200',
-      change: '+4% MoM'
+      key: 'completedProjects',
+      label: t('workspace.overview.completedProjects'),
+      value: completedProjects,
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+      change: `${workspaceProjects.length} total`
     },
     {
-      key: 'revenue',
-      label: t('workspace.overview.revenue'),
-      value: '$42.7k',
-      icon: DollarSign,
+      key: 'totalTasks',
+      label: t('workspace.overview.totalTasks'),
+      value: totalTasks,
+      icon: Clock,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
-      change: '+9% MoM'
+      change: `${completedTasks} completed`
     }
   ];
 
-  const upcomingMilestones = [
-    { name: 'Site handoff', date: 'Oct 23', project: 'NovaTech', type: 'internal' },
-    { name: 'Payroll cycle close', date: 'Dec 30', project: 'Internal', type: 'internal' }
-  ];
+  // Get upcoming project deadlines as milestones
+  const upcomingMilestones = workspaceProjects
+    .filter(p => p.dueDate && new Date(p.dueDate) > new Date())
+    .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
+    .slice(0, 5)
+    .map(p => ({
+      name: p.name,
+      date: new Date(p.dueDate!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      project: p.name,
+      type: p.status
+    }));
 
   return (
     <div className="p-6 space-y-6">

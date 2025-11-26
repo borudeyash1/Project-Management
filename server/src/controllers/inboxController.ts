@@ -11,6 +11,8 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
     const { user } = req as AuthenticatedRequest;
     const currentUserId = user!._id.toString();
 
+    console.log('🔍 [INBOX] Getting threads for workspace:', workspaceId, 'User:', currentUserId);
+
     const workspace = await Workspace.findById(workspaceId).populate('members.user', 'fullName email username avatarUrl');
     if (!workspace || workspace.isActive === false) {
       res.status(404).json({ success: false, message: 'Workspace not found' });
@@ -18,15 +20,23 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
     }
 
     // Ensure current user is an active member of this workspace
-    const isMember = workspace.members.some((m: any) => m.user.toString() === currentUserId && m.status === 'active');
+    const isMember = workspace.members.some((m: any) => {
+      const userId = typeof m.user === 'string' ? m.user : m.user._id.toString();
+      return userId === currentUserId && m.status === 'active';
+    });
+    
     if (!isMember) {
+      console.log('❌ [INBOX] Access denied - user not an active member');
       res.status(403).json({ success: false, message: 'Access denied' });
       return;
     }
 
     const threads: any[] = [];
 
+    // Get all active members except current user
     for (const m of workspace.members as any[]) {
+      if (m.status !== 'active') continue; // Only active members
+      
       const otherUser = m.user;
       const otherUserId = typeof otherUser === 'string' ? otherUser : otherUser._id.toString();
       if (otherUserId === currentUserId) continue;
@@ -66,6 +76,8 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
       });
     }
 
+    console.log('✅ [INBOX] Found', threads.length, 'threads');
+
     const response: ApiResponse = {
       success: true,
       message: 'Threads retrieved successfully',
@@ -74,7 +86,7 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error: any) {
-    console.error('Get workspace threads error:', error);
+    console.error('❌ [INBOX] Get threads error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

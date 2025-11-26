@@ -6,10 +6,7 @@ import {
   LayoutDashboard,
   Users,
   FolderKanban,
-  UserCheck,
-  Settings,
   MessageSquare,
-  Megaphone,
   UserPlus,
   Briefcase,
   UserCircle
@@ -33,13 +30,6 @@ const WorkspaceInternalNav: React.FC = () => {
   const activeWorkspaceId = state.currentWorkspace || routeWorkspaceId || state.workspaces[0]?._id || '';
   const currentWorkspace = state.workspaces.find(w => w._id === activeWorkspaceId);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
-
-  const handleQuickInvite = () => {
-    if (!activeWorkspaceId) return;
-    sessionStorage.setItem('workspaceMembersOpenInvite', 'true');
-    window.dispatchEvent(new Event('workspace:open-invite'));
-    navigate(`/workspace/${activeWorkspaceId}/members`);
-  };
 
   const workspaceTabs: WorkspaceTab[] = [
     {
@@ -119,15 +109,6 @@ const WorkspaceInternalNav: React.FC = () => {
             );
           })}
         </div>
-        {isOwner && (
-          <button
-            onClick={handleQuickInvite}
-            className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-accent text-gray-900 hover:bg-accent-hover transition-colors"
-          >
-            <UserPlus className="w-4 h-4" />
-            {t('workspace.nav.addMember')}
-          </button>
-        )}
       </div>
     </div>
   );
