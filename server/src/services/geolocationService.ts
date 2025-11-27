@@ -61,6 +61,8 @@ export const batchGeocodeIPs = async (
 
     for (let i = 0; i < ips.length; i++) {
         const ip = ips[i];
+        if (!ip) continue;
+
 
         try {
             const location = await getLocationFromIP(ip);
