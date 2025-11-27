@@ -24,9 +24,30 @@ function App() {
 
   const checkAuth = async () => {
     try {
+      // 1. Check for token in URL (SSO)
+      const params = new URLSearchParams(window.location.search);
+      let token = params.get('token');
+      
+      if (token) {
+        localStorage.setItem('accessToken', token);
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        // 2. Check storage
+        token = localStorage.getItem('accessToken');
+      }
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/api/auth/me`, {
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
+        headers
       });
 
       if (response.ok) {
@@ -35,6 +56,9 @@ function App() {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
+        if (response.status === 401) {
+          localStorage.removeItem('accessToken');
+        }
       }
     } catch (error) {
       console.error('Auth check failed:', error);

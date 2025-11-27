@@ -31,11 +31,31 @@ function App() {
       console.log('[Mail App] Checking authentication...');
       console.log('[Mail App] API URL:', API_URL);
       
+      // 1. Check for token in URL (SSO)
+      const params = new URLSearchParams(window.location.search);
+      let token = params.get('token');
+      
+      if (token) {
+        console.log('[Mail App] Found token in URL, saving to storage');
+        localStorage.setItem('accessToken', token);
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        // 2. Check storage
+        token = localStorage.getItem('accessToken');
+      }
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/api/auth/me`, {
-        credentials: 'include', // Send cookies with request
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        credentials: 'include',
+        headers,
       });
 
       console.log('[Mail App] Response status:', response.status);
@@ -49,6 +69,11 @@ function App() {
         const errorData = await response.text();
         console.error('[Mail App] Auth failed:', errorData);
         setError('Not authenticated. Please login to the main Sartthi app first.');
+        
+        // If 401, maybe clear invalid token
+        if (response.status === 401) {
+          localStorage.removeItem('accessToken');
+        }
       }
     } catch (err) {
       console.error('[Mail App] Auth check failed:', err);
