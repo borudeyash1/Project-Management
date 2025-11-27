@@ -37,6 +37,16 @@ const SAMPLE_LOCATIONS = [
   { lat: 52.5200, lng: 13.4050, city: 'Berlin', country: 'Germany', count: 8 }
 ];
 
+// Unified interface for rendering
+interface MapPoint {
+  lat: number;
+  lng: number;
+  city: string;
+  country: string;
+  count: number;
+  users?: any[];
+}
+
 const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
   const [locations, setLocations] = useState<UserLocation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +74,6 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
           console.log('📍 Using sample data for development');
           setUseMockData(true);
         } else {
-          // TODO: In production, fetch real coordinates from IP geolocation API
           setLocations(locs);
         }
       }
@@ -85,7 +94,26 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
     return { x, y };
   };
 
-  const renderLocations = useMockData ? SAMPLE_LOCATIONS : locations.filter(loc => loc.coordinates);
+  // Normalize data to MapPoint interface
+  const renderLocations: MapPoint[] = useMockData 
+    ? SAMPLE_LOCATIONS.map(loc => ({
+        lat: loc.lat,
+        lng: loc.lng,
+        city: loc.city,
+        country: loc.country,
+        count: loc.count,
+        users: []
+      }))
+    : locations
+        .filter(loc => loc.coordinates)
+        .map(loc => ({
+          lat: loc.coordinates!.lat,
+          lng: loc.coordinates!.lng,
+          city: loc.coordinates!.city || 'Unknown',
+          country: loc.coordinates!.country || 'Unknown',
+          count: loc.count,
+          users: loc.users
+        }));
 
   if (loading) {
     return (
@@ -145,13 +173,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
             </span>
           </div>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            {useMockData 
-              ? 111 
-              : renderLocations.reduce((sum, loc) => {
-                  const count = 'count' in loc ? loc.count : ('users' in loc && loc.users ? loc.users.length : 0);
-                  return sum + count;
-                }, 0)
-            }
+            {renderLocations.reduce((sum, loc) => sum + loc.count, 0)}
           </p>
         </div>
 
@@ -163,7 +185,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
             </span>
           </div>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            {useMockData ? 10 : new Set(renderLocations.map(loc => loc.coordinates?.country)).size}
+            {new Set(renderLocations.map(loc => loc.country)).size}
           </p>
         </div>
       </div>
@@ -212,24 +234,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
 
           {/* Location Markers */}
           {renderLocations.map((location, index) => {
-            const coords = useMockData 
-              ? projectToSVG(location.lat, location.lng)
-              : location.coordinates 
-                ? projectToSVG(location.coordinates.lat, location.coordinates.lng)
-                : null;
-
-            if (!coords) return null;
-
-            // Type guard to safely get count
-            const getLocationCount = (loc: typeof location): number => {
-              if (useMockData) {
-                return (loc as any).count || 0;
-              }
-              return (loc as any).count || (loc as any).users?.length || 0;
-            };
-
-            const count = getLocationCount(location);
-            const size = Math.min(30, Math.max(10, count * 1.5));
+            const coords = projectToSVG(location.lat, location.lng);
+            const size = Math.min(30, Math.max(10, location.count * 1.5));
             const isHovered = hoveredLocation === index;
 
             return (
@@ -270,7 +276,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
                   fontSize="10"
                   fontWeight="bold"
                 >
-                  {location.count || location.users?.length || 0}
+                  {location.count}
                 </text>
 
                 {/* Tooltip on hover */}
@@ -293,7 +299,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
                       fontSize="12"
                       fontWeight="bold"
                     >
-                      {useMockData ? location.city : location.coordinates?.city || 'Unknown'}
+                      {location.city}
                     </text>
                     <text
                       x={coords.x + 30}
@@ -301,7 +307,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
                       fill={isDarkMode ? '#9ca3af' : '#6b7280'}
                       fontSize="10"
                     >
-                      {useMockData ? location.country : location.coordinates?.country || ''}
+                      {location.country}
                     </text>
                     <text
                       x={coords.x + 30}
@@ -309,10 +315,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isDarkMode }) => {
                       fill={isDarkMode ? '#9ca3af' : '#6b7280'}
                       fontSize="10"
                     >
-                      {(() => {
-                        const count = 'count' in location ? location.count : ('users' in location && location.users ? location.users.length : 0);
-                        return `${count} users`;
-                      })()}
+                      {location.count} users
                     </text>
                   </g>
                 )}
