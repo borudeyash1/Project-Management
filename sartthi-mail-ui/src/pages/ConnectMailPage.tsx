@@ -11,9 +11,10 @@ interface ConnectMailPageProps {
 
 function ConnectMailPage({ user }: ConnectMailPageProps) {
   const handleConnect = () => {
-    // Redirect to backend OAuth endpoint
-    // Cookies will be sent automatically
-    const redirectUrl = `${API_URL}/api/auth/sartthi/connect-mail`;
+    const token = localStorage.getItem('accessToken');
+    const redirectUrl = token
+      ? `${API_URL}/api/auth/sartthi/connect-mail?token=${encodeURIComponent(token)}`
+      : `${API_URL}/api/auth/sartthi/connect-mail`;
     window.location.href = redirectUrl;
   };
 
@@ -37,7 +38,7 @@ function ConnectMailPage({ user }: ConnectMailPageProps) {
         {/* User Info */}
         <div className="user-info">
           <div className="user-avatar">
-            {user.fullName.charAt(0).toUpperCase()}
+            {user.fullName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
           </div>
           <div className="user-details">
             <h3>{user.fullName}</h3>

@@ -19,8 +19,18 @@ const VaultLayout: React.FC<VaultLayoutProps> = ({ children, activeView, onViewC
     // Fetch user data
     const fetchUserData = async () => {
       try {
+        const token = localStorage.getItem('accessToken');
+        const headers: any = {
+          'Content-Type': 'application/json',
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch('/api/auth/me', {
-          credentials: 'include'
+          credentials: 'include',
+          headers
         });
         if (response.ok) {
           const data = await response.json();

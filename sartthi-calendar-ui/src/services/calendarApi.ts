@@ -18,10 +18,18 @@ export interface CalendarEvent {
 class CalendarApiService {
     private async request(method: string, endpoint: string, data?: any) {
         try {
+            const token = localStorage.getItem('accessToken');
+            const headers: any = {};
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const response = await axios({
                 method,
                 url: `${API_URL}${endpoint}`,
                 data,
+                headers,
                 withCredentials: true,
             });
             return response.data;

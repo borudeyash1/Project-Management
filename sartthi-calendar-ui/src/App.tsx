@@ -107,8 +107,11 @@ function App() {
              {user?.modules?.calendar ? 'Checking connection status...' : 'Connect your Google Calendar to view events'}
            </p>
            <button onClick={() => {
-             // Cookies will be sent automatically
-             window.location.href = `${API_URL}/api/auth/sartthi/connect-calendar`;
+             const token = localStorage.getItem('accessToken');
+             const url = token 
+               ? `${API_URL}/api/auth/sartthi/connect-calendar?token=${encodeURIComponent(token)}`
+               : `${API_URL}/api/auth/sartthi/connect-calendar`;
+             window.location.href = url;
            }} style={{ marginRight: '1rem' }}>
              Connect with Google
            </button>

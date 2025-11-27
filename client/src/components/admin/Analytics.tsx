@@ -8,6 +8,7 @@ import AdminDockNavigation from './AdminDockNavigation';
 import AdminChatbotButton from './AdminChatbotButton';
 import AnalyticsCharts from './AnalyticsCharts';
 import AnalyticsDetailModal from './AnalyticsDetailModal';
+import WorldMap from './WorldMap';
 import api from '../../services/api';
 import {
   UserGrowthDetail,
@@ -263,6 +264,11 @@ const Analytics: React.FC = () => {
           devicesByRisk={analytics.devices.byRisk}
           onChartClick={handleChartClick}
         />
+
+        {/* World Map */}
+        <div className="mt-6">
+          <WorldMap isDarkMode={isDarkMode} />
+        </div>
 
         {/* Additional Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">

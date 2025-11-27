@@ -2,6 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import './InboxPage.css';
 import ComposeModal from '../components/ComposeModal';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
+import { detectEmailSource } from '../services/emailDetector';
+import { parseLinkedInEmail } from '../services/emailParsers/linkedinParser';
+import { parseGitHubEmail } from '../services/emailParsers/githubParser';
+import LinkedInPreview from '../components/EmailPreviews/LinkedInPreview';
+import GitHubPreview from '../components/EmailPreviews/GitHubPreview';
+import GenericPreview from '../components/EmailPreviews/GenericPreview';
+import EmailSkeleton from '../components/EmailPreviews/EmailSkeleton';
+import ProfileSettings from '../components/ProfileSettings/ProfileSettings';
 
 interface InboxPageProps {
   user: {
@@ -40,12 +49,29 @@ function InboxPage({ user }: InboxPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [replyTo, setReplyTo] = useState<any>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // UI State for enhancements
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [listWidth, setListWidth] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
   const resizeRef = useRef<HTMLDivElement>(null);
+
+  // Rich preview state
+  const [emailContent, setEmailContent] = useState<any>(null);
+  const [loadingContent, setLoadingContent] = useState(false);
+
+  // Helper to get fetch options with auth header
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('accessToken');
+    const headers: any = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  };
 
   // Email action handlers
   const handleSendEmail = async (emailData: any) => {
@@ -58,9 +84,7 @@ function InboxPage({ user }: InboxPageProps) {
       const response = await fetch(endpoint, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(body)
       });
 
@@ -83,9 +107,7 @@ function InboxPage({ user }: InboxPageProps) {
       await fetch('/api/mail/star', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ messageId: emailId, starred })
       });
 
@@ -103,9 +125,7 @@ function InboxPage({ user }: InboxPageProps) {
       await fetch('/api/mail/delete', {
         method: 'DELETE',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ messageId: emailId })
       });
 
@@ -159,11 +179,43 @@ function InboxPage({ user }: InboxPageProps) {
     return 'primary';
   };
 
+  // Map view to Gmail labels
+  const getLabelsForView = (view: ViewType): string[] => {
+    switch (view) {
+      case 'starred':
+        return ['STARRED'];
+      case 'sent':
+        return ['SENT'];
+      case 'drafts':
+        return ['DRAFT'];
+      case 'spam':
+        return ['SPAM'];
+      case 'trash':
+        return ['TRASH'];
+      case 'snoozed':
+        return ['SNOOZED'];
+      case 'all':
+        return []; // No label filter = all mail
+      case 'primary':
+      case 'social':
+      case 'promotions':
+      case 'updates':
+      case 'forums':
+      default:
+        return ['INBOX']; // Categories are client-side filtered from INBOX
+    }
+  };
+
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const response = await fetch('/api/mail/messages', {
-          credentials: 'include'
+        setLoading(true);
+        const labels = getLabelsForView(activeView);
+        const labelsParam = labels.length > 0 ? `?labels=${labels.join(',')}` : '';
+        
+        const response = await fetch(`/api/mail/messages${labelsParam}`, {
+          credentials: 'include',
+          headers: getAuthHeaders()
         });
         const data = await response.json();
         
@@ -193,7 +245,55 @@ function InboxPage({ user }: InboxPageProps) {
     };
 
     fetchEmails();
-  }, []);
+  }, [activeView]); // Re-fetch when activeView changes
+
+  // Fetch full email content when an email is selected
+  useEffect(() => {
+    const fetchEmailContent = async () => {
+      if (!selectedEmail) {
+        setEmailContent(null);
+        return;
+      }
+
+      try {
+        setLoadingContent(true);
+        const response = await fetch(`/api/mail/messages/${selectedEmail.id}`, {
+          credentials: 'include',
+          headers: getAuthHeaders()
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setEmailContent(data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch email content:', error);
+        toast.error('Failed to load email content');
+      } finally {
+        setLoadingContent(false);
+      }
+    };
+
+    fetchEmailContent();
+  }, [selectedEmail?.id]); // Re-fetch when selected email changes
+
+  // Persist selected email to localStorage
+  useEffect(() => {
+    if (selectedEmail) {
+      localStorage.setItem('selectedEmailId', selectedEmail.id);
+    }
+  }, [selectedEmail]);
+
+  // Restore selected email from localStorage on mount
+  useEffect(() => {
+    const savedEmailId = localStorage.getItem('selectedEmailId');
+    if (savedEmailId && emails.length > 0) {
+      const email = emails.find(e => e.id === savedEmailId);
+      if (email) {
+        setSelectedEmail(email);
+      }
+    }
+  }, [emails]); // Run when emails are loaded
 
   // Resize handler
   useEffect(() => {
@@ -411,9 +511,17 @@ function InboxPage({ user }: InboxPageProps) {
             )}
           </button>
 
-          <div className="user-profile" style={{ justifyContent: isSidebarCollapsed ? 'center' : 'flex-start' }}>
+          <div 
+            className="user-profile" 
+            style={{ 
+              justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+              cursor: 'pointer'
+            }}
+            onClick={() => setIsProfileOpen(true)}
+            title="Profile Settings"
+          >
             <div className="user-avatar">
-              {user.fullName.charAt(0).toUpperCase()}
+              {user.fullName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             {!isSidebarCollapsed && (
               <div className="user-info">
@@ -555,19 +663,68 @@ function InboxPage({ user }: InboxPageProps) {
               </div>
             </div>
 
-            <div className="detail-from">
-              <div className="from-avatar">
-                {selectedEmail.from.charAt(0).toUpperCase()}
-              </div>
-              <div className="from-info">
-                <div className="from-name">{selectedEmail.from}</div>
-                <div className="from-email">to me</div>
-              </div>
-              <div className="from-time">{selectedEmail.time}</div>
-            </div>
-
-            <div className="detail-body">
-              <p>{selectedEmail.preview}</p>
+            {/* Rich Email Preview */}
+            <div className="detail-content" style={{ padding: '0', overflowY: 'auto', height: 'calc(100% - 80px)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+              {loadingContent ? (
+                <div style={{ width: '100%', padding: '1rem' }}>
+                  <EmailSkeleton />
+                </div>
+              ) : emailContent ? (
+                <div style={{ width: '100%', padding: '1rem' }}>
+                  {(() => {
+                    const source = detectEmailSource(selectedEmail.from, selectedEmail.subject);
+                    
+                    switch (source) {
+                      case 'linkedin':
+                        const linkedinData = parseLinkedInEmail(
+                          emailContent.body.html,
+                          emailContent.body.text,
+                          emailContent.subject
+                        );
+                        return (
+                          <LinkedInPreview
+                            data={linkedinData}
+                            emailSubject={emailContent.subject}
+                            emailDate={emailContent.date}
+                          />
+                        );
+                      
+                      case 'github':
+                        const githubData = parseGitHubEmail(
+                          emailContent.body.html,
+                          emailContent.body.text,
+                          emailContent.subject
+                        );
+                        return (
+                          <GitHubPreview
+                            data={githubData}
+                            emailSubject={emailContent.subject}
+                            emailDate={emailContent.date}
+                          />
+                        );
+                      
+                      default:
+                        return (
+                          <GenericPreview
+                            emailContent={emailContent}
+                            source={source}
+                          />
+                        );
+                    }
+                  })()}
+                </div>
+              ) : (
+                <div className="detail-from">
+                  <div className="from-avatar">
+                    {selectedEmail.from.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="from-info">
+                    <div className="from-name">{selectedEmail.from}</div>
+                    <div className="from-email">to me</div>
+                  </div>
+                  <div className="from-time">{selectedEmail.time}</div>
+                </div>
+              )}
             </div>
           </>
         ) : (
@@ -578,6 +735,21 @@ function InboxPage({ user }: InboxPageProps) {
           </div>
         )}
       </div>
+
+      {/* Profile Settings Modal */}
+      <ProfileSettings 
+        user={user}
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
+
+      {/* Compose Modal */}
+      {isComposeOpen && (
+        <ComposeModal 
+          onClose={() => setIsComposeOpen(false)}
+          replyTo={replyTo}
+        />
+      )}
     </div>
   );
 }

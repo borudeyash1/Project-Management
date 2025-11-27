@@ -1,0 +1,261 @@
+.profile-menu {
+    position: relative;
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.profile-button:hover {
+    transform: scale(1.05);
+}
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    transition: box-shadow 0.2s;
+}
+
+.profile-button:hover .profile-avatar {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    min-width: 320px;
+    z-index: 1000;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-info {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-avatar-large {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.profile-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-email {
+    font-size: 0.875rem;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.menu-divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 0;
+}
+
+.menu-section {
+    padding: 1rem 1.5rem;
+}
+
+.menu-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.theme-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.theme-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #666;
+}
+
+.theme-option:hover {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+.theme-option.active {
+    background: #ede9fe;
+    border-color: #6366f1;
+    color: #6366f1;
+}
+
+.theme-option svg {
+    flex-shrink: 0;
+}
+
+.theme-option span {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.menu-actions {
+    padding: 0.5rem;
+}
+
+.menu-action {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #1a1a1a;
+    font-size: 0.875rem;
+    text-align: left;
+}
+
+.menu-action:hover {
+    background: #f9fafb;
+}
+
+.menu-action:last-child {
+    color: #ef4444;
+}
+
+.menu-action:last-child:hover {
+    background: #fef2f2;
+}
+
+.menu-action svg {
+    flex-shrink: 0;
+}
+
+/* Dark Mode */
+.dark .profile-dropdown {
+    background: #1e1e1e;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.dark .profile-name {
+    color: #e5e7eb;
+}
+
+.dark .profile-email {
+    color: #9ca3af;
+}
+
+.dark .menu-divider {
+    background: #374151;
+}
+
+.dark .menu-section-title {
+    color: #9ca3af;
+}
+
+.dark .theme-option {
+    background: #2a2a2a;
+    color: #9ca3af;
+}
+
+.dark .theme-option:hover {
+    background: #333;
+    border-color: #374151;
+}
+
+.dark .theme-option.active {
+    background: #312e81;
+    border-color: #6366f1;
+    color: #a5b4fc;
+}
+
+.dark .menu-action {
+    color: #e5e7eb;
+}
+
+.dark .menu-action:hover {
+    background: #2a2a2a;
+}
+
+.dark .menu-action:last-child {
+    color: #f87171;
+}
+
+.dark .menu-action:last-child:hover {
+    background: #3f1f1f;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .profile-dropdown {
+        min-width: 280px;
+        right: -1rem;
+    }
+}

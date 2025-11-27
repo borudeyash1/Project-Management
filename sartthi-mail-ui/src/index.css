@@ -5,6 +5,42 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        --bg-page: #ffffff;
+        --bg-sidebar: #f8fafc;
+        --bg-list: #ffffff;
+        --bg-detail: #ffffff;
+        --bg-hover: #f1f5f9;
+        --bg-active: #e0e7ff;
+        --bg-input: #f1f5f9;
+        --bg-input-focus: #ffffff;
+        --border-color: #e2e8f0;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        --accent-color: #6366f1;
+        --accent-bg: rgba(99, 102, 241, 0.1);
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .dark {
+        --bg-page: #0f0f0f;
+        --bg-sidebar: rgba(255, 255, 255, 0.03);
+        --bg-list: rgba(255, 255, 255, 0.02);
+        --bg-detail: rgba(255, 255, 255, 0.01);
+        --bg-hover: rgba(255, 255, 255, 0.05);
+        --bg-active: rgba(99, 102, 241, 0.15);
+        --bg-input: rgba(255, 255, 255, 0.05);
+        --bg-input-focus: rgba(255, 255, 255, 0.08);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0a0;
+        --text-muted: #606060;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+    }
+
     * {
         margin: 0;
         padding: 0;
@@ -15,8 +51,9 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background: #191919;
-        color: #E3E3E3;
+        background: var(--bg-page);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     #root {

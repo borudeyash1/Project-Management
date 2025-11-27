@@ -316,8 +316,23 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
 
     console.log('✅ [RELEASES] Redirecting to R2, count:', release.downloadCount);
 
+    let redirectUrl = release.downloadUrl;
+
+    // Sanitize localhost URL if the request host is not localhost
+    // This fixes issues where a release was created in dev environment (localhost)
+    // but is being accessed in production
+    if (redirectUrl.includes('localhost') && req.get('host') && !req.get('host')?.includes('localhost')) {
+      try {
+        const urlObj = new URL(redirectUrl);
+        redirectUrl = urlObj.pathname + urlObj.search;
+        console.log('🔧 [RELEASES] Sanitized localhost URL to relative path:', redirectUrl);
+      } catch (e) {
+        console.warn('⚠️ [RELEASES] Failed to sanitize URL:', e);
+      }
+    }
+
     // Redirect to R2 public URL
-    res.redirect(release.downloadUrl);
+    res.redirect(redirectUrl);
   } catch (error: any) {
     console.error('❌ [RELEASES] Error downloading release:', error);
     res.status(500).json({

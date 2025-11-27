@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { authenticate } from '../middleware/auth';
-import { listEmails, getGmailClient } from '../services/gmailService';
+import { listEmails, getGmailClient, getEmailContent } from '../services/gmailService';
 
 const router = express.Router();
 
@@ -11,7 +11,16 @@ const router = express.Router();
 router.get('/messages', authenticate, async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
-        const messages = await listEmails(userId);
+
+        // Get labels from query parameter (comma-separated)
+        // Default to INBOX if not specified
+        let labelIds = ['INBOX'];
+        if (req.query.labels) {
+            labelIds = (req.query.labels as string).split(',').map(l => l.trim());
+        }
+
+        const maxResults = req.query.maxResults ? parseInt(req.query.maxResults as string) : 50;
+        const messages = await listEmails(userId, labelIds, maxResults);
 
         res.json({
             success: true,
@@ -249,6 +258,39 @@ router.delete('/delete', authenticate, async (req: Request, res: Response) => {
         res.status(500).json({
             success: false,
             message: 'Failed to delete email',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/mail/messages/:id
+ * Get full email content for rich preview
+ */
+router.get('/messages/:id', authenticate, async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const { id } = req.params;
+
+        if (!id) {
+            res.status(400).json({
+                success: false,
+                message: 'Message ID is required'
+            });
+            return;
+        }
+
+        const emailContent = await getEmailContent(userId, id as string);
+
+        res.json({
+            success: true,
+            data: emailContent
+        });
+    } catch (error: any) {
+        console.error('Get Email Content Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch email content',
             error: error.message
         });
     }

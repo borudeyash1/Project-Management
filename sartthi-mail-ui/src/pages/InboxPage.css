@@ -2,14 +2,15 @@
     display: grid;
     grid-template-columns: 280px 400px 1fr;
     height: 100vh;
-    background: #0f0f0f;
+    background: var(--bg-page);
     overflow: hidden;
+    color: var(--text-primary);
 }
 
 /* Sidebar */
 .inbox-sidebar {
-    background: rgba(255, 255, 255, 0.03);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
@@ -34,7 +35,7 @@
 .logo h1 {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
 .btn-compose {
@@ -63,7 +64,7 @@
 .section-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #606060;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 1rem 1rem 0.5rem;
@@ -89,7 +90,7 @@
     background: transparent;
     border: none;
     border-radius: 10px;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     font-size: 0.9375rem;
     font-weight: 500;
     cursor: pointer;
@@ -99,13 +100,13 @@
 }
 
 .folder-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
+    background: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 .folder-item.active {
-    background: rgba(99, 102, 241, 0.15);
-    color: #6366f1;
+    background: var(--bg-active);
+    color: var(--accent-color);
 }
 
 .folder-icon {
@@ -118,8 +119,8 @@
 
 .folder-count {
     padding: 0.125rem 0.5rem;
-    background: rgba(99, 102, 241, 0.2);
-    color: #6366f1;
+    background: var(--bg-active);
+    color: var(--accent-color);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
@@ -127,7 +128,7 @@
 
 .sidebar-footer {
     padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--border-color);
     margin-top: auto;
 }
 
@@ -159,7 +160,7 @@
 .user-name {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -167,7 +168,7 @@
 
 .user-email {
     font-size: 0.75rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -175,8 +176,8 @@
 
 /* Email List */
 .email-list {
-    background: rgba(255, 255, 255, 0.02);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-list);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -187,13 +188,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .list-header h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
 .list-actions {
@@ -207,17 +208,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-hover);
     border: none;
     border-radius: 8px;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    background: var(--bg-active);
+    color: var(--accent-color);
 }
 
 /* Filter Bar */
@@ -226,8 +227,8 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-list);
+    border-bottom: 1px solid var(--border-color);
     flex-wrap: wrap;
 }
 
@@ -239,16 +240,16 @@
 
 .filter-group label {
     font-size: 0.875rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 .search-input {
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    color: #ffffff;
+    color: var(--text-primary);
     font-size: 0.875rem;
     min-width: 200px;
     outline: none;
@@ -256,20 +257,20 @@
 }
 
 .search-input:focus {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #6366f1;
+    background: var(--bg-input-focus);
+    border-color: var(--accent-color);
 }
 
 .search-input::placeholder {
-    color: #606060;
+    color: var(--text-muted);
 }
 
 .filter-select {
     padding: 0.5rem 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    color: #ffffff;
+    color: var(--text-primary);
     font-size: 0.875rem;
     cursor: pointer;
     outline: none;
@@ -277,18 +278,18 @@
 }
 
 .filter-select:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg-input-focus);
 }
 
 .filter-select option {
-    background: #1a1a1a;
-    color: #ffffff;
+    background: var(--bg-page);
+    color: var(--text-primary);
 }
 
 .filter-stats {
     margin-left: auto;
     font-size: 0.875rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 .emails-container {
@@ -301,28 +302,28 @@
     align-items: flex-start;
     gap: 0.75rem;
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .email-item:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--bg-hover);
 }
 
 .email-item.selected {
-    background: rgba(99, 102, 241, 0.1);
-    border-left: 3px solid #6366f1;
+    background: var(--bg-active);
+    border-left: 3px solid var(--accent-color);
 }
 
 .email-item.unread {
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--bg-hover);
 }
 
 .email-item.unread .email-from,
 .email-item.unread .email-subject {
     font-weight: 700;
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
 .email-checkbox input {
@@ -360,17 +361,17 @@
 .email-from {
     font-size: 0.9375rem;
     font-weight: 600;
-    color: #e0e0e0;
+    color: var(--text-primary);
 }
 
 .email-time {
     font-size: 0.8125rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 .email-subject {
     font-size: 0.875rem;
-    color: #d0d0d0;
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
     white-space: nowrap;
     overflow: hidden;
@@ -379,7 +380,7 @@
 
 .email-preview {
     font-size: 0.8125rem;
-    color: #808080;
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -387,15 +388,16 @@
 
 .email-attachment {
     font-size: 1rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 /* Email Detail */
 .email-detail {
-    background: rgba(255, 255, 255, 0.01);
+    background: var(--bg-detail);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    color: var(--text-primary);
 }
 
 .detail-header {
@@ -403,13 +405,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .detail-header h3 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--text-primary);
     flex: 1;
 }
 
@@ -423,7 +425,7 @@
     align-items: center;
     gap: 1rem;
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .from-avatar {
@@ -447,18 +449,18 @@
 .from-name {
     font-size: 1rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-primary);
     margin-bottom: 0.125rem;
 }
 
 .from-email {
     font-size: 0.875rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 .from-time {
     font-size: 0.875rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 .detail-body {
@@ -466,7 +468,7 @@
     padding: 2rem;
     overflow-y: auto;
     line-height: 1.8;
-    color: #d0d0d0;
+    color: var(--text-primary);
 }
 
 .detail-body p {
@@ -492,13 +494,13 @@
 .detail-empty h3 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
 .detail-empty p {
     font-size: 1rem;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 /* Loading State */
@@ -508,7 +510,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 .spinner {
@@ -532,202 +534,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #a0a0a0;
-}
-
-/* Scrollbar */
-.emails-container::-webkit-scrollbar,
-.detail-body::-webkit-scrollbar,
-.inbox-sidebar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.emails-container::-webkit-scrollbar-track,
-.detail-body::-webkit-scrollbar-track,
-.inbox-sidebar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.emails-container::-webkit-scrollbar-thumb,
-.detail-body::-webkit-scrollbar-thumb,
-.inbox-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-}
-
-.emails-container::-webkit-scrollbar-thumb:hover,
-.detail-body::-webkit-scrollbar-thumb:hover,
-.inbox-sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-/* Responsive */
-@media (max-width: 1280px) {
-    .inbox-page {
-        grid-template-columns: 260px 350px 1fr;
-    }
-}
-
-@media (max-width: 1024px) {
-    .inbox-page {
-        grid-template-columns: 240px 1fr;
-    }
-
-    .email-detail {
-        display: none;
-    }
-}
-
-
-
-.email-attachment {
-    font-size: 1rem;
-    color: #a0a0a0;
-}
-
-/* Email Detail */
-.email-detail {
-    background: rgba(255, 255, 255, 0.01);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.detail-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.detail-header h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    flex: 1;
-}
-
-.detail-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.detail-from {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.from-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: white;
-    flex-shrink: 0;
-}
-
-.from-info {
-    flex: 1;
-}
-
-.from-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 0.125rem;
-}
-
-.from-email {
-    font-size: 0.875rem;
-    color: #a0a0a0;
-}
-
-.from-time {
-    font-size: 0.875rem;
-    color: #a0a0a0;
-}
-
-.detail-body {
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
-    line-height: 1.8;
-    color: #d0d0d0;
-}
-
-.detail-body p {
-    margin-bottom: 1rem;
-}
-
-.detail-empty {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.3;
-}
-
-.detail-empty h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-}
-
-.detail-empty p {
-    font-size: 1rem;
-    color: #a0a0a0;
-}
-
-/* Loading State */
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #a0a0a0;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(99, 102, 241, 0.3);
-    border-radius: 50%;
-    border-top-color: #6366f1;
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 1rem;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.empty-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #a0a0a0;
+    color: var(--text-secondary);
 }
 
 /* Scrollbar */

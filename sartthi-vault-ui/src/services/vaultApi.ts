@@ -2,13 +2,19 @@ const API_URL = ''; // Use Vite proxy configured in vite.config.ts
 
 // Helper for fetch options with credentials
 const getFetchOptions = (options: RequestInit = {}): RequestInit => {
+    const token = localStorage.getItem('accessToken');
+    const headers: any = {
+        ...options.headers,
+    };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     return {
         ...options,
-        credentials: 'include', // Send cookies with request
-        headers: {
-            ...options.headers,
-            // 'Authorization': `Bearer ...` is no longer needed as we use cookies
-        },
+        credentials: 'include',
+        headers,
     };
 };
 

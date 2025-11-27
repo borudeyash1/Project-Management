@@ -1,0 +1,411 @@
+.linkedin-preview {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.linkedin-header {
+    background: linear-gradient(135deg, #0A66C2 0%, #004182 100%);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.linkedin-logo svg {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.linkedin-title {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.platform-name {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.email-date {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+}
+
+.linkedin-content {
+    padding: 2rem;
+}
+
+/* Connection Request */
+.linkedin-connection-request {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.connection-header {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid #0A66C2;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(10, 102, 194, 0.3);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0A66C2 0%, #004182 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.sender-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 0.5rem 0;
+    transition: color 0.2s;
+}
+
+.sender-name:hover {
+    color: #0A66C2;
+}
+
+.sender-title {
+    font-size: 1rem;
+    color: #666666;
+    margin: 0.25rem 0;
+}
+
+.sender-company {
+    font-size: 0.875rem;
+    color: #888888;
+    margin: 0.25rem 0;
+}
+
+.connection-message {
+    background: #f3f6f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #0A66C2;
+}
+
+.connection-message p {
+    margin: 0;
+    color: #333333;
+    line-height: 1.6;
+}
+
+.connection-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-accept,
+.btn-view,
+.btn-reply,
+.btn-view-job {
+    padding: 0.75rem 1.5rem;
+    border-radius: 24px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-accept {
+    background: #0A66C2;
+    color: white;
+    flex: 1;
+}
+
+.btn-accept:hover {
+    background: #004182;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 102, 194, 0.3);
+}
+
+.btn-view,
+.btn-reply,
+.btn-view-job {
+    background: white;
+    color: #0A66C2;
+    border: 2px solid #0A66C2;
+    flex: 1;
+}
+
+.btn-view:hover,
+.btn-reply:hover,
+.btn-view-job:hover {
+    background: #f3f6f8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 102, 194, 0.2);
+}
+
+/* Message */
+.linkedin-message {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.message-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.profile-avatar.small {
+    width: 50px;
+    height: 50px;
+}
+
+.message-info h4 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: #000000;
+}
+
+.message-content {
+    background: #f3f6f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #0A66C2;
+}
+
+.message-content p {
+    margin: 0;
+    color: #333333;
+    line-height: 1.6;
+}
+
+/* Job Alert */
+.linkedin-job-alert {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.job-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.job-icon {
+    font-size: 2.5rem;
+}
+
+.job-badge {
+    background: linear-gradient(135deg, #0A66C2 0%, #004182 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.job-details {
+    background: #f3f6f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #0A66C2;
+}
+
+.job-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 1rem 0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.job-title:hover {
+    color: #0A66C2;
+}
+
+.job-company,
+.job-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    color: #666666;
+    font-size: 1rem;
+}
+
+.job-company svg,
+.job-location svg {
+    color: #0A66C2;
+}
+
+/* Generic */
+.linkedin-generic {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.generic-content {
+    background: #f3f6f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #0A66C2;
+}
+
+.generic-content h3 {
+    margin: 0 0 1rem 0;
+    color: #000000;
+}
+
+.generic-content p {
+    margin: 0;
+    color: #333333;
+    line-height: 1.6;
+}
+
+/* Footer */
+.linkedin-footer {
+    background: #f3f6f8;
+    padding: 1rem 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.footer-text {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #666666;
+    text-align: center;
+}
+
+.footer-link {
+    color: #0A66C2;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: #004182;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .linkedin-preview {
+        background: #1e1e1e;
+    }
+
+    .linkedin-content {
+        background: #1e1e1e;
+    }
+
+    .sender-name,
+    .job-title,
+    .generic-content h3 {
+        color: #ffffff;
+    }
+
+    .sender-title,
+    .sender-company,
+    .job-company,
+    .job-location {
+        color: #b0b0b0;
+    }
+
+    .connection-message,
+    .message-content,
+    .job-details,
+    .generic-content {
+        background: #2a2a2a;
+    }
+
+    .connection-message p,
+    .message-content p,
+    .generic-content p {
+        color: #e0e0e0;
+    }
+
+    .btn-view,
+    .btn-reply,
+    .btn-view-job {
+        background: #2a2a2a;
+        color: #0A66C2;
+    }
+
+    .btn-view:hover,
+    .btn-reply:hover,
+    .btn-view-job:hover {
+        background: #3a3a3a;
+    }
+
+    .linkedin-footer {
+        background: #2a2a2a;
+        border-top-color: #3a3a3a;
+    }
+
+    .footer-text {
+        color: #b0b0b0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .linkedin-content {
+        padding: 1.5rem;
+    }
+
+    .connection-actions {
+        flex-direction: column;
+    }
+
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .sender-name {
+        font-size: 1.25rem;
+    }
+
+    .job-title {
+        font-size: 1.25rem;
+    }
+}

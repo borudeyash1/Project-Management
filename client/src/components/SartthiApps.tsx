@@ -46,13 +46,37 @@ const SartthiApps: React.FC = () => {
   };
 
   const handleDownload = (release: Release) => {
-    if (release.downloadUrl.startsWith('http')) {
-      window.open(release.downloadUrl, '_blank');
+    let url = release.downloadUrl;
+
+    // Fix for localhost URLs in production/remote environments
+    if (url.includes('localhost') && !window.location.hostname.includes('localhost')) {
+      try {
+        // If it's a localhost URL but we're not on localhost, try to convert it to a relative path
+        // or use the current base URL
+        const urlObj = new URL(url);
+        // Keep the path and query, discard the localhost origin
+        const relativePath = urlObj.pathname + urlObj.search;
+        
+        let baseUrl = process.env.REACT_APP_API_URL || '/api';
+        baseUrl = baseUrl.replace(/\/api\/?$/, '');
+        baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        
+        // If the path starts with /uploads, we can likely serve it from the API server
+        if (relativePath.startsWith('/uploads')) {
+            url = `${baseUrl}${relativePath}`;
+        }
+      } catch (e) {
+        console.error('Error parsing download URL:', e);
+      }
+    }
+
+    if (url.startsWith('http')) {
+      window.open(url, '_blank');
     } else {
       let baseUrl = process.env.REACT_APP_API_URL || '/api';
       baseUrl = baseUrl.replace(/\/api\/?$/, '');
       baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-      window.open(`${baseUrl}${release.downloadUrl}`, '_blank');
+      window.open(`${baseUrl}${url}`, '_blank');
     }
   };
 

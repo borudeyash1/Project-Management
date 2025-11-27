@@ -131,6 +131,7 @@ router.get('/analytics/user-distribution-detail', getDetailedUserDistribution);
 router.get('/analytics/device-risk-detail', getDetailedDeviceRisk);
 router.get('/analytics/growth-metrics-detail', getDetailedGrowthMetrics);
 router.get('/analytics/device-security-detail', getDetailedDeviceSecurity);
+// Note: user-locations route temporarily disabled due to corrupted analyticsController.ts
 // Subscription management
 router.get('/subscriptions', authenticate, getAdminSubscriptionPlans);
 router.put('/subscriptions/:planKey', authenticate, updateSubscriptionPlan);

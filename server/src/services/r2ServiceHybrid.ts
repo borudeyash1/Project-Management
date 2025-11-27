@@ -48,15 +48,9 @@ export const uploadToR2 = async (
         const localPath = path.join(localStoragePath, fileName);
         fs.writeFileSync(localPath, fileBuffer);
 
-        // In production, use relative URL (browser will use current domain)
-        // In development, use absolute localhost URL
-        let publicUrl: string;
-        if (process.env.NODE_ENV === 'production') {
-            publicUrl = `/uploads/${subfolder}/${fileName}`;
-        } else {
-            const baseUrl = process.env.API_BASE_URL || process.env.BACKEND_URL || 'http://localhost:5000';
-            publicUrl = `${baseUrl}/uploads/${subfolder}/${fileName}`;
-        }
+        // Always use relative URL for local uploads
+        // The client is responsible for prepending the API base URL if needed
+        const publicUrl = `/uploads/${subfolder}/${fileName}`;
 
         console.log('✅ [LOCAL] File stored:', publicUrl);
         return publicUrl;

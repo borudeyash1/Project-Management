@@ -100,8 +100,11 @@ function App() {
           <p>Secure, unlimited cloud storage for your workspace.</p>
           <p className="powered-by">Powered by Google Drive</p>
           <button className="btn-connect" onClick={() => {
-            // Cookies will be sent automatically
-            window.location.href = `${API_URL}/api/auth/sartthi/connect-vault`;
+            const token = localStorage.getItem('accessToken');
+            const url = token 
+              ? `${API_URL}/api/auth/sartthi/connect-vault?token=${encodeURIComponent(token)}`
+              : `${API_URL}/api/auth/sartthi/connect-vault`;
+            window.location.href = url;
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
