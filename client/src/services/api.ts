@@ -41,7 +41,7 @@ class ApiService {
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
-    // this.token = localStorage.getItem('accessToken'); // No longer needed with cookies
+    this.token = localStorage.getItem('accessToken');
   }
 
   private async request<T>(
@@ -54,8 +54,7 @@ class ApiService {
       credentials: 'include', // Send cookies with request
       headers: {
         'Content-Type': 'application/json',
-        // Authorization header is no longer needed as we use cookies
-        // ...(this.token && { Authorization: `Bearer ${this.token}` }),
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
         ...options.headers,
       },
       ...options,
@@ -105,10 +104,9 @@ class ApiService {
       body: JSON.stringify(credentials),
     });
 
-    // Token management is now handled by cookies
-    // if (response.data && response.data.accessToken) {
-    //   this.setToken(response.data.accessToken);
-    // }
+    if (response.data && response.data.accessToken) {
+      this.setToken(response.data.accessToken);
+    }
 
     return response.data!;
   }
@@ -181,6 +179,10 @@ class ApiService {
       body: JSON.stringify(googleUserData),
     });
 
+    if (response.data && response.data.accessToken) {
+      this.setToken(response.data.accessToken);
+    }
+
     return response.data!;
   }
 
@@ -206,6 +208,11 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ email, otp }),
     });
+
+    if (response.data && response.data.accessToken) {
+      this.setToken(response.data.accessToken);
+    }
+
     return response.data!;
   }
 
@@ -222,6 +229,7 @@ class ApiService {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
     });
     if (!response.ok) {
@@ -246,6 +254,7 @@ class ApiService {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
     });
     if (!response.ok) {
@@ -260,6 +269,7 @@ class ApiService {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
       body: JSON.stringify({ otp: code })
     });
@@ -276,6 +286,7 @@ class ApiService {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
       body: JSON.stringify(workspaceData)
     });
@@ -392,13 +403,13 @@ class ApiService {
   // Token management methods
   private setToken(token: string): void {
     this.token = token;
-    // localStorage.setItem('accessToken', token);
+    localStorage.setItem('accessToken', token);
   }
 
   private clearToken(): void {
     this.token = null;
-    // localStorage.removeItem('accessToken');
-    // localStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   }
 
   // Workspace endpoints
@@ -594,7 +605,7 @@ class ApiService {
       method: 'POST',
       credentials: 'include',
       headers: {
-        // ...(this.token && { Authorization: `Bearer ${this.token}` })
+        ...(this.token && { Authorization: `Bearer ${this.token}` })
       },
       body: formData
     });
@@ -612,7 +623,7 @@ class ApiService {
       method: 'POST',
       credentials: 'include',
       headers: {
-        // ...(this.token && { Authorization: `Bearer ${this.token}` })
+        ...(this.token && { Authorization: `Bearer ${this.token}` })
       },
       body: formData
     });

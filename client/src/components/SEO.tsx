@@ -24,7 +24,7 @@ const SEO: React.FC<SEOProps> = ({
   publishedTime,
   modifiedTime
 }) => {
-  const siteUrl = 'http://localhost:3000'; // TODO: Replace with actual domain
+  const siteUrl = process.env.REACT_APP_URL || 'https://sartthi.com';
   const fullUrl = url ? `${siteUrl}${url}` : siteUrl;
   const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
   const siteName = 'Sartthi - Project & Payroll Suite';
