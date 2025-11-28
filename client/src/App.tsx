@@ -67,6 +67,7 @@ import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import AdminDocs from './components/admin/AdminDocs';
 import AdminContent from './components/admin/AdminContent';
 import CanvasEditorPage from './components/admin/CanvasEditorPage';
+import FolderDemo from './components/FolderDemo';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -148,7 +149,9 @@ const AppContent: React.FC = () => {
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         <Route path="/desktop-handshake" element={<DesktopHandshake />} />
+        <Route path="/desktop-handshake" element={<DesktopHandshake />} />
         <Route path="/desktop-shell" element={<DesktopShell />} />
+        <Route path="/folder-demo" element={<FolderDemo />} />
 
         {/* Admin Routes - Hidden */}
         <Route path="/my-admin/login" element={<AdminLoginWrapper />} />

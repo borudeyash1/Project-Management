@@ -461,50 +461,65 @@
     "densityError": "Failed to update density"
   },
   "landing": {
-    "trustedBy": "Trusted by 10,000+ teams worldwide",
     "hero": {
-      "title": "Project Management",
-      "subtitle": "Made Simple",
-      "description": "Streamline your projects, collaborate with your team, and achieve your goals with our intuitive project management platform.",
+      "title": "Sartthi: The Operating System for Modern Work.",
+      "subtitle": "Streamline operations, synchronize teams, and automate the mundane. The all-in-one suite designed to move your business forward.",
       "getStarted": "Get Started Free",
       "learnMore": "Learn More"
     },
-    "dashboard": {
-      "title": "Sartthi Dashboard",
-      "activeProjects": "Active Projects",
-      "completed": "Completed",
-      "inProgress": "In Progress",
-      "projectProgress": "Project Progress",
-      "last7Days": "Last 7 days"
-    },
-    "trust": {
-      "noCreditCard": "No credit card required",
-      "freeTrial": "14-day free trial",
-      "cancelAnytime": "Cancel anytime"
-    },
-    "features": {
-      "badge": "FEATURES",
-      "title": "Everything you need to manage projects",
-      "subtitle": "Powerful features designed to help you and your team succeed",
+    "coreEngine": {
+      "title": "One Suite. Infinite Capabilities.",
       "taskManagement": {
         "title": "Task Management",
-        "description": "Create, assign, and track tasks with ease. Keep your team organized and on track with powerful task management tools."
+        "description": "Create, assign, and track with precision. A workflow so clear, nothing falls through the cracks."
       },
-      "teamCollaboration": {
-        "title": "Team Collaboration",
-        "description": "Work together seamlessly with real-time updates and communication tools that keep everyone in sync."
+      "collaboration": {
+        "title": "Real-Time Collaboration",
+        "description": "Unified workspaces, instant updates, and threaded context. Keep everyone aligned, everywhere."
       },
       "analytics": {
-        "title": "Analytics & Reports",
-        "description": "Get insights into your project performance with detailed analytics and comprehensive reports."
+        "title": "Intelligence & Analytics",
+        "description": "Turn data into decisions. Visualize project health, team velocity, and ROI in real-time."
       }
     },
-    "cta": {
-      "title": "Ready to get started?",
-      "description": "Join thousands of teams already using Sartthi to manage their projects efficiently.",
-      "startTrial": "Start Your Free Trial",
-      "learnMore": "Learn More About Us",
-      "footer": "No credit card required • 14-day free trial • Cancel anytime"
+    "useCases": {
+      "title": "Built for Every Team. Optimized for Every Workflow.",
+      "hr": {
+        "title": "HR & Payroll",
+        "description": "Automate attendance and payroll. Zero manual errors."
+      },
+      "operations": {
+        "title": "Operations",
+        "description": "From planning to delivery—monitor every moving part."
+      },
+      "managers": {
+        "title": "Managers",
+        "description": "Approve requests and track performance from a single dashboard."
+      },
+      "fieldTeams": {
+        "title": "Field Teams",
+        "description": "Seamless coordination between the office and the frontline."
+      },
+      "finance": {
+        "title": "Finance",
+        "description": "Accurate records and expense monitoring without the tool fatigue."
+      },
+      "founders": {
+        "title": "Founders",
+        "description": "Total visibility. See the pulse of your entire organization at a glance."
+      }
+    },
+    "ai": {
+      "title": "AI That Acts. Not Just Thinks.",
+      "subtitle": "Most AI gives you ideas. Sartthi AI does the work—creating schedules, drafting reports, and automating operations while you sleep.",
+      "permission": {
+        "title": "Permission Aware",
+        "description": "Secure by design. It knows who can see what."
+      },
+      "context": {
+        "title": "Context Driven",
+        "description": "It learns your workflow to provide proactive solutions."
+      }
     }
   },
   "about": {

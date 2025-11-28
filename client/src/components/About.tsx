@@ -9,14 +9,14 @@ import ContentBanner from './ContentBanner';
 
 const About: React.FC = () => {
   const { t } = useTranslation();
-  const { isDarkMode } = useTheme();
+  useTheme();
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'} relative overflow-hidden`}>
+    <div className={`min-h-screen flex flex-col bg-gradient-to-b from-amber-50 via-white to-white relative overflow-hidden`}>
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-40 right-20 w-96 h-96 ${isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-200/20'} rounded-full blur-3xl animate-pulse`}></div>
-        <div className={`absolute bottom-40 left-20 w-96 h-96 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-200/20'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+        <div className={`absolute top-40 right-20 w-96 h-96 bg-yellow-200/20 rounded-full blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-40 left-20 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl animate-pulse delay-1000`}></div>
       </div>
       <SharedNavbar />
       <ContentBanner route="/about" />
@@ -27,7 +27,7 @@ const About: React.FC = () => {
           {/* Back Button */}
           <Link
             to="/"
-            className={`inline-flex items-center gap-2 ${isDarkMode ? 'text-yellow-600 hover:text-yellow-700' : 'text-yellow-600 hover:text-yellow-700'} mb-8 transition-colors duration-200 font-medium`}
+            className={`inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 mb-8 transition-colors duration-200 font-medium`}
           >
             <ArrowLeft size={18} />
             {t('about.backToHome')}
@@ -35,108 +35,108 @@ const About: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-20">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 bg-amber-100 text-amber-700`}>
               {t('about.badge')}
             </span>
-            <h1 className={`text-4xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              {t('about.title')} <span className="text-accent">Sartthi</span>
+            <h1 className={`text-4xl md:text-6xl font-bold text-gray-900 mb-6`}>
+              {t('about.title')} <span className="text-[accent]">Sartthi</span>
             </h1>
-            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
+            <p className={`text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed`}>
               {t('about.subtitle')}
             </p>
           </div>
 
           {/* Mission Section */}
-          <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16 hover:shadow-3xl transition-shadow duration-300`}>
+          <div className={`bg-white/70 backdrop-blur-sm border-white/40 rounded-2xl p-10 border shadow-2xl mb-16 hover:shadow-3xl transition-shadow duration-300`}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-[accent] rounded-xl flex items-center justify-center shadow-lg">
                 <Award className="w-6 h-6 text-white" />
               </div>
-              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.mission.title')}</h2>
+              <h2 className={`text-3xl font-bold text-gray-900`}>{t('about.mission.title')}</h2>
             </div>
-            <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed`}>
+            <p className={`text-gray-600 text-lg leading-relaxed`}>
               {t('about.mission.description')}
             </p>
           </div>
 
           {/* Features Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            <div className={`group ${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30 hover:bg-gray-800/80' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
+            <div className={`group bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90 rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-blue-500 to-purple-500' : 'bg-gradient-to-br from-blue-400 to-purple-400'} rounded-lg flex items-center justify-center shadow-lg`}>
+                <div className={`w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-400 rounded-lg flex items-center justify-center shadow-lg`}>
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.offer.title')}</h3>
+                <h3 className={`text-2xl font-bold text-gray-900`}>{t('about.offer.title')}</h3>
               </div>
-              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
+              <ul className={`space-y-4 text-gray-600`}>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-[accent] rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.offer.items.tracking')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-[accent] rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.offer.items.collaboration')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-[accent] rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.offer.items.analytics')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-[accent] rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.offer.items.communication')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-accent/20' : 'bg-blue-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-accent-light' : 'bg-accent'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-[accent] rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.offer.items.workflows')}</span>
                 </li>
               </ul>
             </div>
 
-            <div className={`group ${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30 hover:bg-gray-800/80' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
+            <div className={`group bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90 rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className={`w-10 h-10 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-lg flex items-center justify-center shadow-lg`}>
+                <div className={`w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center shadow-lg`}>
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.choose.title')}</h3>
+                <h3 className={`text-2xl font-bold text-gray-900`}>{t('about.choose.title')}</h3>
               </div>
-              <ul className={`space-y-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-600'}`}>
+              <ul className={`space-y-4 text-gray-600`}>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-purple-600 rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.choose.items.interface')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-purple-600 rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.choose.items.scalable')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-purple-600 rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.choose.items.support')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-purple-600 rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.choose.items.updates')}</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className={`w-6 h-6 ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                    <div className={`w-2 h-2 ${isDarkMode ? 'bg-purple-400' : 'bg-purple-600'} rounded-full`}></div>
+                  <div className={`w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-2 h-2 bg-purple-600 rounded-full`}></div>
                   </div>
                   <span className="leading-relaxed">{t('about.choose.items.security')}</span>
                 </li>
@@ -145,14 +145,14 @@ const About: React.FC = () => {
           </div>
 
           {/* Team Section */}
-          <div className={`${isDarkMode ? 'bg-gray-800/60 backdrop-blur-sm border-gray-700/30' : 'bg-white/70 backdrop-blur-sm border-white/40'} rounded-2xl p-10 border shadow-2xl mb-16`}>
+          <div className={`bg-white/70 backdrop-blur-sm border-white/40 rounded-2xl p-10 border shadow-2xl mb-16`}>
             <div className="flex items-center gap-3 mb-6">
-              <div className={`w-12 h-12 ${isDarkMode ? 'bg-gradient-to-br from-green-500 to-blue-500' : 'bg-gradient-to-br from-green-400 to-blue-400'} rounded-xl flex items-center justify-center shadow-lg`}>
+              <div className={`w-12 h-12 bg-gradient-to-br from-green-400 to-blue-400 rounded-xl flex items-center justify-center shadow-lg`}>
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('about.team.title')}</h2>
+              <h2 className={`text-3xl font-bold text-gray-900`}>{t('about.team.title')}</h2>
             </div>
-            <p className={`${isDarkMode ? 'text-gray-700' : 'text-gray-600'} text-lg leading-relaxed mb-8`}>
+            <p className={`text-gray-600 text-lg leading-relaxed mb-8`}>
               {t('about.team.description')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -160,22 +160,22 @@ const About: React.FC = () => {
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">D</span>
                 </div>
-                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('about.team.development.title')}</h4>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>{t('about.team.development.subtitle')}</p>
+                <h4 className={`font-bold text-lg text-gray-900 mb-2`}>{t('about.team.development.title')}</h4>
+                <p className={`text-gray-600 text-sm`}>{t('about.team.development.subtitle')}</p>
               </div>
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">D</span>
                 </div>
-                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('about.team.design.title')}</h4>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>{t('about.team.design.subtitle')}</p>
+                <h4 className={`font-bold text-lg text-gray-900 mb-2`}>{t('about.team.design.title')}</h4>
+                <p className={`text-gray-600 text-sm`}>{t('about.team.design.subtitle')}</p>
               </div>
               <div className="text-center group">
                 <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-2xl">S</span>
                 </div>
-                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('about.team.support.title')}</h4>
-                <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} text-sm`}>{t('about.team.support.subtitle')}</p>
+                <h4 className={`font-bold text-lg text-gray-900 mb-2`}>{t('about.team.support.title')}</h4>
+                <p className={`text-gray-600 text-sm`}>{t('about.team.support.subtitle')}</p>
               </div>
               {/* Map Embed */}
               <div className="relative">
@@ -197,7 +197,7 @@ const About: React.FC = () => {
                     href="https://maps.app.goo.gl/Tp1gahGcSXTAR1sz9"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${isDarkMode ? 'bg-gray-800/80 hover:bg-gray-800' : 'bg-white/80 hover:bg-white'} backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
+                    className={`bg-white/80 hover:bg-white backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg`}
                   >
                     <ExternalLink size={14} />
                     {t('about.office.openMaps')}
@@ -208,7 +208,7 @@ const About: React.FC = () => {
           </div>
 
           {/* Contact Section */}
-          <div className={`relative bg-gradient-to-r ${isDarkMode ? 'from-yellow-600 via-orange-600 to-red-600' : 'from-yellow-500 via-orange-500 to-red-500'} rounded-2xl p-12 text-center overflow-hidden shadow-2xl`}>
+          <div className={`relative bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-2xl p-12 text-center overflow-hidden shadow-2xl`}>
             {/* Decorative Elements */}
             <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Calendar, Shield, Monitor, Download, ArrowRight, ExternalLink } from 'lucide-react';
 import api from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import SharedNavbar from './SharedNavbar';
+import SharedFooter from './SharedFooter';
 
 interface Release {
   _id: string;
@@ -17,7 +19,7 @@ interface Release {
 }
 
 const SartthiApps: React.FC = () => {
-  const { isDarkMode } = useTheme();
+  useTheme();
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(false);
   const [showOlderVersions, setShowOlderVersions] = useState(false);
@@ -91,29 +93,31 @@ const SartthiApps: React.FC = () => {
       id: 'mail',
       name: 'Sartthi Mail',
       description: 'Experience a connected workspace where your emails, calendar, and tasks work in harmony. Manage your workspace with your connected email and enjoy a seamless, secure experience.',
-      icon: <Mail className="w-12 h-12 text-blue-500" />,
+      icon: Mail,
       link: 'https://mail.sartthi.com',
-      color: 'bg-blue-500/10 border-blue-500/20 hover:border-blue-500',
-      buttonColor: 'bg-blue-500 hover:bg-blue-600'
+      color: 'from-blue-500 to-cyan-500',
+      features: ['Unified Inbox', 'Smart Filtering', 'Secure Encryption'],
+      status: 'coming-soon'
     },
     {
       id: 'calendar',
       name: 'Sartthi Calendar',
       description: 'Automated tasks sync directly to your Google Calendar. Set a task in Sartthi, and see it instantly in your calendar, ensuring you never miss a deadline while keeping your data secure.',
-      icon: <Calendar className="w-12 h-12 text-purple-500" />,
+      icon: Calendar,
       link: 'https://calendar.sartthi.com',
-      color: 'bg-purple-500/10 border-purple-500/20 hover:border-purple-500',
-      buttonColor: 'bg-purple-500 hover:bg-purple-600'
+      color: 'from-purple-500 to-pink-500',
+      features: ['Two-way Sync', 'Smart Scheduling', 'Team Availability'],
+      status: 'coming-soon'
     },
     {
       id: 'vault',
       name: 'Sartthi Vault',
-      description: 'Your private, secure workspace in Google Drive. We create a dedicated "Sartthi Vault" folder - we ONLY access files you store there, never your personal files. Your data stays in YOUR Google Drive with enterprise-grade security. Disconnect anytime, your files remain yours.',
-      icon: <Shield className="w-12 h-12 text-green-500" />,
+      description: 'Your private, secure workspace in Google Drive. We create a dedicated "Sartthi Vault" folder - we ONLY access files you store there, never your personal files. Your data stays in YOUR Google Drive with enterprise-grade security.',
+      icon: Shield,
       link: 'https://vault.sartthi.com',
-      color: 'bg-green-500/10 border-green-500/20 hover:border-green-500',
-      buttonColor: 'bg-green-500 hover:bg-green-600',
-      isVault: true // Special flag for vault
+      color: 'from-green-500 to-emerald-500',
+      features: ['Zero-Knowledge Encryption', 'Google Drive Integration', 'Secure Sharing'],
+      status: 'coming-soon'
     }
   ];
 
@@ -121,134 +125,160 @@ const SartthiApps: React.FC = () => {
   const olderReleases = releases.filter(r => !r.isLatest && r.platform === 'windows');
 
   return (
-    <div className={`min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold mb-4">Our Apps</h1>
-          <p className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            A complete suite of tools designed to boost your productivity.
-          </p>
-        </div>
+    <div className={`min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-white to-white relative overflow-hidden`}>
+      <div className={`absolute top-20 left-10 w-72 h-72 bg-[accent]/10 rounded-full blur-3xl animate-pulse`}></div>
+      <div className={`absolute bottom-20 right-10 w-96 h-96 bg-[accent]/10 rounded-full blur-3xl animate-pulse delay-1000`}></div>
+      
+      <SharedNavbar />
+      
+      <div className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-amber-100 text-amber-700`}>
+              <Monitor className="w-4 h-4" />
+              Our Ecosystem
+            </span>
+            <h1 className={`text-4xl md:text-6xl font-bold text-gray-900 mb-6`}>
+              Our <span className="text-[accent]">Apps</span>
+            </h1>
+            <p className={`text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed`}>
+              A complete suite of tools designed to boost your productivity.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {apps.map((app) => (
-            <div 
-              key={app.id}
-              className={`rounded-2xl p-8 border transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl ${app.color} ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
-            >
-              <div className="mb-6">{app.icon}</div>
-              <h3 className="text-2xl font-bold mb-3">{app.name}</h3>
-              <p className={`mb-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {app.description}
-              </p>
-              <a 
-                href={app.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium transition-colors ${app.buttonColor}`}
-              >
-                Launch App <ExternalLink size={18} />
-              </a>
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop App Section */}
-        <div className={`rounded-3xl p-8 md:p-12 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden relative`}>
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent mb-6">
-                <Monitor size={20} />
-                <span className="font-semibold">Desktop Application</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Sartthi Desktop</h2>
-              <p className={`text-lg mb-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Experience the full power of Sartthi on your desktop. Native notifications, 
-                offline support, and deeper system integration for maximum performance.
-              </p>
-              
-              {loading ? (
-                <div className="flex items-center gap-2 text-accent">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
-                  Loading releases...
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {apps.map((app) => (
+              <div key={app.id} className={`group bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90 rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative overflow-hidden`}>
+                <div className={`w-16 h-16 bg-gradient-to-br ${app.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <app.icon className="w-8 h-8 text-white" />
                 </div>
-              ) : latestWindowsRelease ? (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <button
-                      onClick={() => handleDownload(latestWindowsRelease)}
-                      className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-accent hover:bg-accent-hover text-white font-bold text-lg transition-all shadow-lg hover:shadow-accent/25"
-                    >
-                      <Download size={24} />
-                      Download for Windows
-                    </button>
-                    <div className={`flex flex-col justify-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      <span>Version {latestWindowsRelease.version}</span>
-                      <span>{formatFileSize(latestWindowsRelease.fileSize)}</span>
-                    </div>
+                <h3 className={`text-2xl font-bold text-gray-900 mb-4`}>{app.name}</h3>
+                <p className={`text-gray-600 leading-relaxed mb-6`}>
+                  {app.description}
+                </p>
+                <ul className="space-y-3 mb-8">
+                  {app.features.map((feature, i) => (
+                    <li key={i} className={`flex items-center gap-2 text-sm text-gray-600`}>
+                      <div className={`w-1.5 h-1.5 bg-[accent] rounded-full`}></div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
+                  app.status === 'active'
+                    ? 'bg-[accent] hover:bg-[accent-hover] text-white shadow-lg hover:shadow-[accent]/50'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}>
+                  {app.status === 'active' ? 'Launch App' : 'Coming Soon'}
+                </button>
+
+                {app.status === 'coming-soon' && (
+                  <div className={`absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10`}>
+                    <span className={`bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg transform -rotate-12 border border-gray-700`}>
+                      Coming Soon
+                    </span>
                   </div>
+                )}
+              </div>
+            ))}
+          </div>
 
-                  {olderReleases.length > 0 && (
-                    <div className="mt-4">
-                      <button
-                        onClick={() => setShowOlderVersions(!showOlderVersions)}
-                        className={`text-sm font-medium flex items-center gap-2 ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
-                      >
-                        {showOlderVersions ? 'Hide older versions' : 'Show older versions'}
-                        <ArrowRight size={16} className={`transform transition-transform ${showOlderVersions ? 'rotate-90' : ''}`} />
-                      </button>
-
-                      {showOlderVersions && (
-                        <div className={`mt-4 rounded-xl border ${isDarkMode ? 'bg-gray-900/50 border-gray-700' : 'bg-gray-50 border-gray-200'} overflow-hidden`}>
-                          {olderReleases.map((release) => (
-                            <div 
-                              key={release._id}
-                              className={`flex items-center justify-between p-4 border-b last:border-0 ${isDarkMode ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-200 hover:bg-gray-100'} transition-colors`}
-                            >
-                              <div>
-                                <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                  v{release.version}
-                                </div>
-                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {new Date(release.createdAt).toLocaleDateString()} • {formatFileSize(release.fileSize)}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => handleDownload(release)}
-                                className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'} transition-colors`}
-                                title="Download"
-                              >
-                                <Download size={20} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                  <p className="text-center">No desktop releases available at the moment.</p>
-                </div>
-              )}
-            </div>
+          {/* Desktop App Section */}
+          <div className={`relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl overflow-hidden shadow-2xl`}>
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-[accent]/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
             
-            <div className="flex-1 w-full max-w-md">
-              <div className={`aspect-video rounded-xl overflow-hidden border-4 ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'} shadow-2xl relative group`}>
-                <div className="absolute inset-0 flex items-center justify-center">
-                   {/* Placeholder for app screenshot or illustration */}
-                   <Monitor className={`w-32 h-32 ${isDarkMode ? 'text-gray-800' : 'text-gray-200'}`} />
+            <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-12">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[accent]/20 text-[accent] mb-6 border border-[accent]/30">
+                  <Monitor size={20} />
+                  <span className="font-semibold">Desktop Application</span>
                 </div>
-                {/* You could add an actual screenshot image here if available */}
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Sartthi Desktop</h2>
+                <p className={`text-lg mb-8 text-gray-300`}>
+                  Experience the full power of Sartthi on your desktop. Native notifications, 
+                  offline support, and deeper system integration for maximum performance.
+                </p>
+                
+                {loading ? (
+                  <div className="flex items-center gap-2 text-[accent]">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
+                    Loading releases...
+                  </div>
+                ) : latestWindowsRelease ? (
+                  <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                      <button
+                        onClick={() => handleDownload(latestWindowsRelease)}
+                        className={`bg-[accent] hover:bg-[accent-hover] text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-[accent]/50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group`}
+                      >
+                        <Download size={24} />
+                        Download for Windows
+                      </button>
+                      <div className={`flex flex-col justify-center text-sm text-gray-400`}>
+                        <span>Version {latestWindowsRelease.version}</span>
+                        <span>{formatFileSize(latestWindowsRelease.fileSize)}</span>
+                      </div>
+                    </div>
+
+                    {olderReleases.length > 0 && (
+                      <div className="mt-4">
+                        <button
+                          onClick={() => setShowOlderVersions(!showOlderVersions)}
+                          className={`text-sm font-medium flex items-center gap-2 text-gray-400 hover:text-white transition-colors`}
+                        >
+                          {showOlderVersions ? 'Hide older versions' : 'Show older versions'}
+                          <ArrowRight size={16} className={`transform transition-transform ${showOlderVersions ? 'rotate-90' : ''}`} />
+                        </button>
+
+                        {showOlderVersions && (
+                          <div className={`mt-4 rounded-xl border border-gray-700 bg-gray-900/50 overflow-hidden`}>
+                            {olderReleases.map((release) => (
+                              <div 
+                                key={release._id}
+                                className={`flex items-center justify-between p-4 border-b border-gray-700 last:border-0 hover:bg-gray-800 transition-colors`}
+                              >
+                                <div>
+                                  <div className={`font-medium text-white`}>
+                                    v{release.version}
+                                  </div>
+                                  <div className={`text-xs text-gray-400`}>
+                                    {new Date(release.createdAt).toLocaleDateString()} • {formatFileSize(release.fileSize)}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleDownload(release)}
+                                  className={`p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors`}
+                                  title="Download"
+                                >
+                                  <Download size={20} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className={`p-4 rounded-lg border border-gray-700 bg-gray-900`}>
+                    <p className="text-center text-gray-400">No desktop releases available at the moment.</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex-1 w-full max-w-md">
+                <div className={`aspect-video rounded-xl overflow-hidden border-4 border-gray-700 bg-gray-900 shadow-2xl relative group`}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <Monitor className={`w-32 h-32 text-gray-800`} />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <SharedFooter />
     </div>
   );
 };

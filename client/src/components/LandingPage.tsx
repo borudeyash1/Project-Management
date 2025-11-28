@@ -1,283 +1,780 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Users, BarChart3, Zap, Play, TrendingUp, Clock, Shield } from 'lucide-react';
+import { ArrowRight, CheckCircle, Users, BarChart3, Shield, Brain, Zap, ClipboardCheck, Activity, Briefcase, MapPin, DollarSign, Eye, Sparkles, Play } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import ContentBanner from './ContentBanner';
+import Orb from './animations/Orb';
+import GradualBlur from './animations/GradualBlur';
+import StarBorder from './animations/StarBorder';
+import SpotlightCard from './animations/SpotlightCard';
+import CardSwap, { Card } from './animations/CardSwap';
+import ScrollStack, { ScrollStackItem } from './animations/ScrollStack';
+import CenterCarousel from './animations/CenterCarousel';
+import { ExpandingCardsDemo } from './animations/ExpandingCardsDemo';
+import { TasksTabsDemo } from './animations/TasksTabsDemo';
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
-  const { isDarkMode } = useTheme();
-  const [scrollY, setScrollY] = useState(0);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  const [featuresVisible, setFeaturesVisible] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setFeaturesVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (featuresRef.current) {
-      observer.observe(featuresRef.current);
-    }
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (featuresRef.current) {
-        observer.unobserve(featuresRef.current);
-      }
-    };
-  }, []);
+  useTheme();
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-br from-amber-50 via-white to-white'} relative overflow-hidden`}>
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-20 left-10 w-72 h-72 ${isDarkMode ? 'bg-accent/10' : 'bg-amber-200/30'} rounded-full blur-3xl animate-pulse`}></div>
-        <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? 'bg-accent/10' : 'bg-amber-200/30'} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#FFFFFF] to-[#F0F9FF] relative">
+      {/* Orb Background Animation */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
+        <Orb 
+          hoverIntensity={0.5} 
+          rotateOnHover={true} 
+          hue={0} 
+          forceHoverState={false} 
+        />
       </div>
-      <SharedNavbar />
-      <ContentBanner route="/" />
+      
+      {/* Main Content Wrapper */}
+      <div className="relative z-10">
+        <SharedNavbar />
+        <ContentBanner route="/" />
 
-      {/* Hero Section */}
-      <div className="pt-16 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 shadow-lg animate-fade-in ${isDarkMode ? 'bg-gray-800 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
-              <Zap className="w-4 h-4" />
-              <span className="text-sm font-medium">{t('landing.trustedBy')}</span>
+      {/* HERO SECTION: Enhanced with better positioning */}
+      <div className="pt-32 pb-20 relative z-10">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center relative">
+            {/* Decorative elements */}
+            <div className="absolute -top-20 left-1/4 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute -top-10 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            
+            {/* Main Headline with Gradual Blur */}
+            <div className="relative z-10 mb-8">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-tight">
+                
+                <span className="block text-[#44a0d1]">
+                  All in One Office Suite
+                </span>
+                <span className="block text-[#44a0d1]">
+                  for Modern Work
+                </span>
+              </h1>
             </div>
-            <h1 className={`text-4xl md:text-7xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6 animate-fade-in-up`}>
-              {t('landing.hero.title')}
-              <span className="block text-accent mt-2">
-                {t('landing.hero.subtitle')}
-              </span>
-            </h1>
-            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200`}>
-              {t('landing.hero.description')}
+            
+            {/* Subheadline */}
+            <p className="text-xl md:text-2xl lg:text-3xl text-gray-700 mb-6 max-w-4xl mx-auto leading-relaxed font-medium">
+              Streamline operations, synchronize teams, and automate the mundane.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
-              <Link
-                to="/register"
-                className="group bg-accent hover:bg-accent-hover text-gray-900 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl hover:shadow-accent/50 hover:scale-105 transform"
-              >
-                {t('landing.hero.getStarted')}
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+              The all-in-one suite designed to move your business forward.
+            </p>
+
+            {/* CTA Buttons with Star Border */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+              <StarBorder color="#FFD700">
+                <Link
+                  to="/register"
+                  className="group bg-[#44a0d1] hover:bg-[#3688b5] text-white px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl hover:shadow-blue-500/50 hover:scale-105 transform"
+                >
+                  {t('landing.hero.getStarted')}
+                  <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </StarBorder>
+              
               <Link
                 to="/user-guide"
-                className={`border-2 ${isDarkMode ? 'border-gray-300 text-gray-100 hover:border-accent hover:text-accent hover:bg-accent/10' : 'border-gray-300 text-gray-800 hover:border-accent hover:text-accent hover:bg-amber-50'} px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 transform shadow-lg`}
+                className="group bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 transform shadow-xl flex items-center gap-3 border-2 border-[#E6C200]"
               >
+                <Play size={20} className="group-hover:scale-110 transition-transform" />
                 {t('landing.hero.learnMore')}
               </Link>
             </div>
 
-            {/* Hero Mockup/Screenshot */}
-            <div className="mt-16 mb-8 animate-fade-in-up animation-delay-600">
-              <div className="relative max-w-5xl mx-auto">
-                {/* Floating Dashboard Mockup */}
-                <div
-                  className={`relative rounded-2xl overflow-hidden shadow-2xl border-4 ${isDarkMode ? 'border-gray-700' : 'border-white'} animate-float`}
-                  style={{ transform: `translateY(${scrollY * 0.1}px)` }}
-                >
-                  {/* Mockup Header */}
-                  <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} px-6 py-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} flex items-center gap-2`}>
-                    <div className="flex gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
-                    <div className={`flex-1 text-center text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
-                      {t('landing.dashboard.title')}
-                    </div>
-                  </div>
-
-                  {/* Mockup Content - Gradient Placeholder */}
-                  <div className={`relative h-96 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'} p-8`}>
-                    {/* Simulated Dashboard Elements */}
-                    <div className="grid grid-cols-3 gap-4 mb-6">
-                      <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-4 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} animate-pulse-slow`}>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                            <TrendingUp className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.activeProjects')}</div>
-                            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>24</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-4 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} animate-pulse-slow animation-delay-200`}>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                            <CheckCircle className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.completed')}</div>
-                            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>156</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-4 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} animate-pulse-slow animation-delay-400`}>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-                            <Clock className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.inProgress')}</div>
-                            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>12</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Simulated Chart/Graph */}
-                    <div className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/80'} backdrop-blur-sm rounded-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('landing.dashboard.projectProgress')}</div>
-                        <div className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{t('landing.dashboard.last7Days')}</div>
-                      </div>
-                      <div className="flex items-end gap-2 h-32">
-                        {[40, 65, 45, 80, 60, 90, 75].map((height, i) => (
-                          <div key={i} className="flex-1 bg-gradient-to-t from-amber-400 to-amber-300 rounded-t animate-slide-in-up" style={{ height: `${height}%`, animationDelay: `${i * 0.1}s` }}></div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Floating Play Button */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <button className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm shadow-2xl flex items-center justify-center hover:scale-110 transition-transform duration-300 animate-bounce-subtle">
-                        <Play className="w-8 h-8 text-accent ml-1" fill="currentColor" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating Elements Around Mockup */}
-                <div className="absolute -top-8 -left-8 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl shadow-xl animate-float animation-delay-300 opacity-80"></div>
-                <div className="absolute -bottom-8 -right-8 w-20 h-20 bg-accent rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
-              </div>
-            </div>
-
             {/* Trust Indicators */}
-            <div className="mt-12 flex flex-wrap justify-center items-center gap-8 opacity-70 animate-fade-in-up animation-delay-800">
+            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-600 max-w-2xl mx-auto">
               <div className="flex items-center gap-2">
-                <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{t('landing.trust.noCreditCard')}</span>
+                <CheckCircle size={20} className="text-green-500" />
+                <span className="font-medium">No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{t('landing.trust.freeTrial')}</span>
+                <CheckCircle size={20} className="text-green-500" />
+                <span className="font-medium">14-day free trial</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className={`${isDarkMode ? 'text-green-600' : 'text-green-600'}`} size={20} />
-                <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{t('landing.trust.cancelAnytime')}</span>
+                <CheckCircle size={20} className="text-green-500" />
+                <span className="font-medium">Cancel anytime</span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Features Section */}
-        <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-          <div className={`text-center mb-16 ${featuresVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-            <span className={`inline-block px-4 py-2 rounded-full ${isDarkMode ? 'bg-accent/20 text-accent' : 'bg-amber-100 text-amber-700'} text-sm font-semibold mb-4`}>
-              {t('landing.features.badge')}
-            </span>
-            <h2 className={`text-3xl md:text-5xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-              {t('landing.features.title')}
-            </h2>
-            <p className={`text-xl ${isDarkMode ? 'text-gray-200' : 'text-gray-800'} max-w-2xl mx-auto`}>
-              {t('landing.features.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className={`group ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border-gray-700/20 hover:bg-gray-800/70' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer ${featuresVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-              <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>{t('landing.features.taskManagement.title')}</h3>
-              <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
-                {t('landing.features.taskManagement.description')}
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className={`group ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border-gray-700/20 hover:bg-gray-800/70' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer ${featuresVisible ? 'animate-fade-in-up animation-delay-200' : 'opacity-0'}`}>
-              <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-accent transition-colors`}>{t('landing.features.teamCollaboration.title')}</h3>
-              <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
-                {t('landing.features.teamCollaboration.description')}
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className={`group ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border-gray-700/20 hover:bg-gray-800/70' : 'bg-white/70 backdrop-blur-sm border-white/40 hover:bg-white/90'} rounded-2xl p-8 border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer ${featuresVisible ? 'animate-fade-in-up animation-delay-400' : 'opacity-0'}`}>
-              <div className={`w-16 h-16 ${isDarkMode ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-purple-400 to-pink-400'} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                <BarChart3 className="w-8 h-8 text-white" />
-              </div>
-              <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 group-hover:text-purple-500 transition-colors`}>{t('landing.features.analytics.title')}</h3>
-              <p className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} leading-relaxed`}>
-                {t('landing.features.analytics.description')}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto relative">
-            <div className="relative bg-accent rounded-3xl overflow-hidden py-16 px-8 md:px-16 text-center shadow-2xl">
-              {/* Decorative Elements */}
-              <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]"></div>
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-
-              <div className="relative z-10">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                  {t('landing.cta.title')}
-                </h2>
-                <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
-                  {t('landing.cta.description')}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link
-                    to="/register"
-                    className="group bg-white text-orange-600 px-10 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-2xl hover:scale-105 transform"
-                  >
-                    {t('landing.cta.startTrial')}
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                  <Link
-                    to="/about"
-                    className="border-2 border-white text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-white hover:text-orange-600 transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-xl hover:scale-105 transform"
-                  >
-                    {t('landing.cta.learnMore')}
-                  </Link>
-                </div>
-                <p className="text-white/80 text-sm mt-6">{t('landing.cta.footer')}</p>
-              </div>
+          {/* Hero Dashboard Image */}
+          <div className="mt-20 relative">
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10 pointer-events-none"></div>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#FFD700] transform hover:scale-[1.02] transition-transform duration-500">
+              <img 
+                src="/hero_dashboard_mockup_1764317223182.png"
+                alt="Sartthi Dashboard Interface"
+                className="w-full h-auto"
+                onError={(e) => {
+                  // Fallback to gradient if image fails to load
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = `
+                    <div class="aspect-video bg-gradient-to-br from-blue-100 via-white to-cyan-100 flex items-center justify-center">
+                      <div class="text-center">
+                        <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-2xl">
+                          <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-700">Sartthi Dashboard</p>
+                        <p class="text-gray-500 mt-2">Your Command Center</p>
+                      </div>
+                    </div>
+                  `;
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
+
+      {/* SECTION 2: ONE SUITE. INFINITE CAPABILITIES */}
+      <div className="py-32 bg-white relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-30">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-blue-200 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-200 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+              One Suite. <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Infinite Capabilities.</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to manage, collaborate, and succeed—all in one powerful platform.
+            </p>
+          </div>
+
+          {/* Core Features Grid with SpotlightCards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Card 1: Task Management */}
+            <SpotlightCard 
+              backgroundColor="#44a0d1"
+              spotlightColor="rgba(255, 215, 0, 0.3)"
+              className="p-8 transition-all duration-500 hover:-translate-y-2"
+            >
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <ClipboardCheck className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-3">{t('landing.coreEngine.taskManagement.title')}</h3>
+                <p className="text-white/90 text-lg leading-relaxed mb-6">
+                  {t('landing.coreEngine.taskManagement.description')}
+                </p>
+              </div>
+              
+              {/* Feature Image */}
+              <div className="rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                <img 
+                  src="/task_management_ui_1764317282097.png"
+                  alt="Task Management Interface"
+                  className="w-full h-auto"
+                />
+              </div>
+            </SpotlightCard>
+
+            {/* Card 2: Real-Time Collaboration */}
+            <SpotlightCard 
+              backgroundColor="#44a0d1"
+              spotlightColor="rgba(255, 215, 0, 0.3)"
+              className="p-8 transition-all duration-500 hover:-translate-y-2"
+            >
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-3">{t('landing.coreEngine.collaboration.title')}</h3>
+                <p className="text-white/90 text-lg leading-relaxed mb-6">
+                  {t('landing.coreEngine.collaboration.description')}
+                </p>
+              </div>
+              
+              {/* Feature Image */}
+              <div className="rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                <img 
+                  src="/collaboration_ui_1764317298899.png"
+                  alt="Collaboration Interface"
+                  className="w-full h-auto"
+                />
+              </div>
+            </SpotlightCard>
+
+            {/* Card 3: Intelligence & Analytics */}
+            <SpotlightCard 
+              backgroundColor="#44a0d1"
+              spotlightColor="rgba(255, 215, 0, 0.3)"
+              className="p-8 transition-all duration-500 hover:-translate-y-2"
+            >
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <BarChart3 className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-3">{t('landing.coreEngine.analytics.title')}</h3>
+                <p className="text-white/90 text-lg leading-relaxed mb-6">
+                  {t('landing.coreEngine.analytics.description')}
+                </p>
+              </div>
+              
+              {/* Feature Image */}
+              <div className="rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                <img 
+                  src="/analytics_ui_1764317315064.png"
+                  alt="Analytics Dashboard"
+                  className="w-full h-auto"
+                />
+              </div>
+            </SpotlightCard>
+          </div>
+        </div>
+      </div>
+
+      {/* FEATURE DEEP DIVE: Full-Width Sections with ScrollStack */}
+      <div className="py-20 bg-white">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+          <div className="text-center">
+            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+              Explore <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Every Feature.</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Comprehensive tools for every aspect of your work. Scroll to explore.
+            </p>
+          </div>
+        </div>
+
+        {/* HOME DASHBOARD - CardSwap Animation */}
+        <div className="w-full bg-white py-20 mb-20">
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-6 mb-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
+                <BarChart3 className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black text-gray-900">Home Dashboard</h3>
+                <p className="text-xl text-gray-600">Your Command Center - Click or scroll to see more</p>
+              </div>
+            </div>
+            
+            {/* CardSwap Animation - Click or Scroll Triggered */}
+            <div className="w-full flex justify-center" style={{ height: '650px', position: 'relative' }}>
+              <div className="w-full max-w-6xl h-[550px]">
+                <CardSwap
+                  width="100%"
+                  height="100%"
+                  cardDistance={50}
+                  verticalDistance={60}
+                  delay={999999}
+                  pauseOnHover={false}
+                  easing="elastic"
+                  onCardClick={() => {
+                    // Trigger next card on click
+                  }}
+                >
+                <Card customClass="cursor-pointer">
+                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
+                    <img 
+                      src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop" 
+                      alt="Overview" 
+                      className="w-full h-64 object-cover" 
+                    />
+                    <div className="p-6">
+                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Overview</h4>
+                      <p className="text-gray-600">Get a complete snapshot of your work at a glance</p>
+                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to see next view</p>
+                    </div>
+                  </div>
+                </Card>
+                <Card customClass="cursor-pointer">
+                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
+                    <img 
+                      src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop" 
+                      alt="Quick Stats" 
+                      className="w-full h-64 object-cover" 
+                    />
+                    <div className="p-6">
+                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Quick Stats</h4>
+                      <p className="text-gray-600">Track key metrics and performance indicators</p>
+                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to see next view</p>
+                    </div>
+                  </div>
+                </Card>
+                <Card customClass="cursor-pointer">
+                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
+                    <img 
+                      src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop" 
+                      alt="Activity Feed" 
+                      className="w-full h-64 object-cover" 
+                    />
+                    <div className="p-6">
+                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Activity Feed</h4>
+                      <p className="text-gray-600">Stay updated with real-time team activities</p>
+                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to see next view</p>
+                    </div>
+                  </div>
+                </Card>
+                <Card customClass="cursor-pointer">
+                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
+                    <img 
+                      src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop" 
+                      alt="Upcoming Tasks" 
+                      className="w-full h-64 object-cover" 
+                    />
+                    <div className="p-6">
+                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Upcoming Tasks</h4>
+                      <p className="text-gray-600">Never miss a deadline with smart reminders</p>
+                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to cycle back</p>
+                    </div>
+                  </div>
+                </Card>
+                </CardSwap>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PROJECTS - ScrollStack Animation */}
+        <div className="w-full bg-white py-20 mb-20" style={{ minHeight: '5000px' }}>
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
+                <Briefcase className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black text-gray-900">Projects</h3>
+                <p className="text-xl text-gray-600">Organize & Execute - Scroll to stack</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* ScrollStack with window scroll */}
+          <div className="w-full">
+            <ScrollStack
+              useWindowScroll={true}
+              itemDistance={200}
+              itemScale={0.05}
+              itemStackDistance={60}
+              stackPosition="20%"
+              scaleEndPosition="10%"
+              baseScale={0.9}
+            >
+              {[
+                { title: 'Grid View', url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=600&fit=crop', desc: 'Visualize all projects in a clean grid layout' },
+                { title: 'List View', url: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=1200&h=600&fit=crop', desc: 'Detailed list view with all project information' },
+                { title: 'Kanban Board', url: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200&h=600&fit=crop', desc: 'Drag and drop projects across stages' },
+                { title: 'Timeline', url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=600&fit=crop', desc: 'Track project timelines and milestones' },
+                { title: 'Team View', url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=600&fit=crop', desc: 'See who\'s working on what' },
+                { title: 'Analytics', url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop', desc: 'Deep insights into project performance' }
+              ].map((view, index) => (
+                <ScrollStackItem key={index}>
+                  <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30 h-full flex flex-col md:flex-row max-w-5xl mx-auto">
+                    <div className="md:w-1/2">
+                      <img src={view.url} alt={view.title} className="w-full h-64 md:h-full object-cover" />
+                    </div>
+                    <div className="md:w-1/2 p-8 flex flex-col justify-center">
+                      <h4 className="text-3xl font-bold text-gray-900 mb-4">{view.title}</h4>
+                      <p className="text-xl text-gray-600 mb-6">{view.desc}</p>
+                      <Link to="/projects" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] text-white px-6 py-3 rounded-xl font-bold hover:from-[#3688b5] hover:to-[#2b6d8a] transition-colors w-fit">
+                        Explore Projects
+                        <ArrowRight size={20} />
+                      </Link>
+                    </div>
+                  </div>
+                </ScrollStackItem>
+              ))}
+            </ScrollStack>
+          </div>
+        </div>
+
+
+        {/* TASKS - TabsSwitcher */}
+        <div className="w-full bg-white py-20 mb-20" style={{ minHeight: '800px' }}>
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-6 mb-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
+                <ClipboardCheck className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black text-gray-900">Tasks</h3>
+                <p className="text-xl text-gray-600">Get Things Done</p>
+              </div>
+            </div>
+            
+            {/* TabsSwitcher Component */}
+            <div className="w-full">
+              <TasksTabsDemo />
+            </div>
+          </div>
+        </div>
+
+        {/* TRACKER - Grid with Fade-in */}
+        <div className="w-full bg-white py-20 mb-20">
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-6 mb-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
+                <Activity className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black text-gray-900">Tracker</h3>
+                <p className="text-xl text-gray-600">Time & Performance</p>
+              </div>
+            </div>
+            
+            {/* Grid layout with stagger */}
+            <div className="w-full overflow-hidden">
+              <div className="max-w-6xl mx-auto">
+                <ExpandingCardsDemo />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* GOALS - Diagonal Layout */}
+        <div className="w-full bg-gradient-to-b from-blue-50/30 to-white py-20 mb-20">
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-6 mb-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
+                <Eye className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black text-gray-900">Goals</h3>
+                <p className="text-xl text-gray-600">Track Progress & Achieve More</p>
+              </div>
+            </div>
+            
+            {/* Diagonal grid */}
+            <div className="w-full">
+              <CenterCarousel autoplay={true}>
+                {[
+                  { title: 'Goal Overview', url: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=400&fit=crop' },
+                  { title: 'Progress Tracking', url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop' },
+                  { title: 'Milestones', url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop' },
+                  { title: 'Team Goals', url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop' },
+                  { title: 'Analytics', url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop' }
+                ].map((view, index) => (
+                  <div key={index} className="transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1 h-full p-4">
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-[#44a0d1]/30 hover:border-[#FFD700] h-full">
+                      <img src={view.url} alt={view.title} className="w-full h-48 object-cover" />
+                      <div className="p-6">
+                        <h4 className="text-xl font-bold text-gray-900">{view.title}</h4>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CenterCarousel>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-gray-600 text-lg mb-6">And there's more: Reports, Team Management, Reminders, Workspace Settings, Planner, and beyond.</p>
+          <Link to="/register" className="inline-flex items-center gap-3 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] hover:from-[#3688b5] hover:to-[#2b6d8a] text-white px-12 py-5 rounded-2xl text-xl font-bold transition-all duration-300 shadow-2xl hover:scale-105">
+            Explore All Features
+            <ArrowRight size={24} />
+          </Link>
+        </div>
+      </div>
+
+      {/* SECTION 3: BUILT FOR EVERY TEAM */}
+      <div className="py-32 bg-gradient-to-b from-blue-50/30 via-white to-blue-50/30 relative overflow-hidden">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+              Built for <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Every Team.</span>
+            </h2>
+            <p className="text-2xl font-semibold text-gray-700 mb-4">
+              Optimized for Every Workflow.
+            </p>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From HR to field operations, Sartthi adapts to your team's unique needs.
+            </p>
+          </div>
+
+          {/* Use Cases Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { 
+                key: 'hr', 
+                icon: Users, 
+                gradient: 'from-[#44a0d1] to-[#3380a1]',
+                bgGradient: 'from-blue-50 to-blue-100',
+                iconBg: 'bg-[#44a0d1]'
+              },
+              { 
+                key: 'operations', 
+                icon: Activity, 
+                gradient: 'from-[#FFD700] to-[#E6C200]',
+                bgGradient: 'from-yellow-50 to-yellow-100',
+                iconBg: 'bg-[#FFD700]'
+              },
+              { 
+                key: 'managers', 
+                icon: Briefcase, 
+                gradient: 'from-[#44a0d1] to-[#3380a1]',
+                bgGradient: 'from-cyan-50 to-cyan-100',
+                iconBg: 'bg-[#44a0d1]'
+              },
+              { 
+                key: 'fieldTeams', 
+                icon: MapPin, 
+                gradient: 'from-[#FFD700] to-[#E6C200]',
+                bgGradient: 'from-orange-50 to-orange-100',
+                iconBg: 'bg-[#FFD700]'
+              },
+              { 
+                key: 'finance', 
+                icon: DollarSign, 
+                gradient: 'from-[#44a0d1] to-[#3380a1]',
+                bgGradient: 'from-blue-50 to-blue-100',
+                iconBg: 'bg-[#44a0d1]'
+              },
+              { 
+                key: 'founders', 
+                icon: Eye, 
+                gradient: 'from-[#FFD700] to-[#E6C200]',
+                bgGradient: 'from-yellow-50 to-yellow-100',
+                iconBg: 'bg-[#FFD700]'
+              }
+            ].map((item, index) => (
+              <div 
+                key={item.key} 
+                className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-2 border-gray-100 hover:border-[#FFD700] overflow-hidden"
+                style={{
+                  animationDelay: `${index * 100}ms`
+                }}
+              >
+                {/* Background gradient on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  {/* Icon */}
+                  <div className={`w-16 h-16 ${item.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <item.icon className="w-8 h-8 text-white" />
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-black transition-colors duration-300">
+                    {t(`landing.useCases.${item.key}.title`)}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-gray-600 text-lg leading-relaxed group-hover:text-gray-900 transition-colors duration-300">
+                    {t(`landing.useCases.${item.key}.description`)}
+                  </p>
+
+                  {/* Decorative element */}
+                  <div className={`absolute -bottom-2 -right-2 w-24 h-24 bg-gradient-to-br ${item.gradient} rounded-full opacity-0 group-hover:opacity-20 blur-2xl transition-opacity duration-500`}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="mt-16 text-center">
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] hover:from-[#3688b5] hover:to-[#2b6d8a] text-white px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
+            >
+              Start Your Free Trial
+              <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 4: AI THAT ACTS */}
+      <div className="py-32 bg-white relative overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 -left-48 w-96 h-96 bg-yellow-200 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+          <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30 animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-[#FFD700] mb-8">
+              <Sparkles className="w-6 h-6 text-[#44a0d1]" />
+              <span className="text-lg font-bold text-blue-900">Sartthi AI</span>
+            </div>
+            
+            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+              AI That <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Acts.</span>
+            </h2>
+            <h3 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
+              Not Just Thinks.
+            </h3>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              {t('landing.ai.subtitle')}
+            </p>
+          </div>
+
+          {/* AI Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+            {/* Permission Aware Card */}
+            <div className="group relative bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-[#44a0d1]/30 hover:border-[#FFD700] overflow-hidden">
+              {/* Decorative corner */}
+              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500"></div>
+              
+              <div className="relative z-10">
+                {/* Icon */}
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform duration-300">
+                  <Shield className="w-10 h-10 text-white" />
+                </div>
+                
+                {/* Title */}
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                  {t('landing.ai.permission.title')}
+                </h3>
+                
+                {/* Description */}
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  {t('landing.ai.permission.description')}
+                </p>
+
+                {/* Feature list */}
+                <ul className="mt-6 space-y-3">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Role-based access control</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Data privacy guaranteed</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Audit logs for compliance</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Context Driven Card */}
+            <div className="group relative bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-[#44a0d1]/30 hover:border-[#FFD700] overflow-hidden">
+              {/* Decorative corner */}
+              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500"></div>
+              
+              <div className="relative z-10">
+                {/* Icon */}
+                <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform duration-300">
+                  <Brain className="w-10 h-10 text-white" />
+                </div>
+                
+                {/* Title */}
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                  {t('landing.ai.context.title')}
+                </h3>
+                
+                {/* Description */}
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  {t('landing.ai.context.description')}
+                </p>
+
+                {/* Feature list */}
+                <ul className="mt-6 space-y-3">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Learns from your patterns</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Proactive suggestions</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Automated workflows</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* AI CTA */}
+          <div className="text-center">
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] hover:from-[#3688b5] hover:to-[#2b6d8a] text-white px-12 py-6 rounded-2xl text-xl font-bold transition-all duration-300 shadow-2xl hover:shadow-blue-500/50 hover:scale-105 transform"
+            >
+              <Sparkles size={28} />
+              Experience AI-Powered Work
+              <ArrowRight size={28} />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* FINAL CTA SECTION */}
+      <div className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50/30 to-white">
+        <div className="max-w-[1920px] mx-auto relative">
+          <div className="relative bg-gradient-to-r from-[#44a0d1] to-[#3380a1] rounded-3xl overflow-hidden py-20 px-8 md:px-16 text-center shadow-2xl border-4 border-[#FFD700]">
+            {/* Decorative Elements */}
+            <div className="absolute inset-0 bg-grid-white/10 bg-[size:30px_30px]"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            
+            {/* Floating elements */}
+            <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 rounded-2xl shadow-xl animate-float opacity-80"></div>
+            <div className="absolute bottom-10 right-10 w-16 h-16 bg-white rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
+
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
+                Ready to get started?
+              </h2>
+              <p className="text-xl md:text-2xl text-white/95 mb-4 max-w-3xl mx-auto font-semibold">
+                Join thousands of teams already using Sartthi
+              </p>
+              <p className="text-lg md:text-xl text-white/90 mb-12 max-w-2xl mx-auto">
+                to manage their projects efficiently.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-6 justify-center mb-10">
+                <Link
+                  to="/register"
+                  className="group bg-white text-[#44a0d1] px-12 py-5 rounded-2xl text-xl font-black hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-2xl hover:scale-105 transform border-4 border-[#FFD700]"
+                >
+                  Start Your Free Trial
+                  <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  to="/about"
+                  className="border-4 border-white text-white px-12 py-5 rounded-2xl text-xl font-black hover:bg-white hover:text-[#44a0d1] transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-xl hover:scale-105 transform"
+                >
+                  Learn More About Us
+                </Link>
+              </div>
+              
+              {/* Trust indicators */}
+              <div className="flex flex-wrap justify-center items-center gap-6 text-white/90 text-sm">
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={20} className="text-[#FFD700]" />
+                  <span className="font-semibold">No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={20} className="text-[#FFD700]" />
+                  <span className="font-semibold">14-day free trial</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={20} className="text-[#FFD700]" />
+                  <span className="font-semibold">Cancel anytime</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
       <SharedFooter />
     </div>
   );

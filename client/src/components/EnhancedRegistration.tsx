@@ -87,8 +87,16 @@ const steps = [
 const EnhancedRegistration: React.FC = () => {
   const navigate = useNavigate();
   const { dispatch } = useApp();
-  const { isDarkMode } = useTheme();
   const { t } = useTranslation();
+
+  // Force light theme for registration pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
+    return () => {
+      // Optional: Restore theme preference on unmount if needed
+    };
+  }, []);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -1279,11 +1287,11 @@ const EnhancedRegistration: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950' : 'bg-gradient-to-b from-amber-50 via-white to-white'} relative overflow-hidden`}>
+    <div className={`min-h-screen bg-gradient-to-b from-amber-50 via-white to-white relative overflow-hidden`}>
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-20 left-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse`}></div>
-        <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse delay-1000`}></div>
+        <div className={`absolute top-20 left-10 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-20 right-10 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl animate-pulse delay-1000`}></div>
       </div>
       <SharedNavbar />
       <section className="min-h-screen flex pt-16 relative z-10">
@@ -1341,7 +1349,7 @@ const EnhancedRegistration: React.FC = () => {
               })}
             </div>
 
-            <form className={`${isDarkMode ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200'} border backdrop-blur-sm rounded-2xl p-8 shadow-2xl`}>
+            <form className={`bg-white border-gray-200 border backdrop-blur-sm rounded-2xl p-8 shadow-2xl`}>
               {renderStepContent()}
 
               {!showOtpVerification && (

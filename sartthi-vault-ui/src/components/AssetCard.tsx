@@ -1,5 +1,6 @@
 import React from 'react';
-import { Folder, FileText, Image, Video, Music, File } from 'lucide-react';
+import { FileText, Image, Video, Music, File } from 'lucide-react';
+import AnimatedFolder from './Folder';
 
 interface AssetCardProps {
   name: string;
@@ -22,7 +23,11 @@ const AssetCard: React.FC<AssetCardProps> = ({
 }) => {
   const getFileIcon = () => {
     if (type === 'folder') {
-      return <Folder className="w-12 h-12 text-blue-400" />;
+      return (
+        <div className="scale-75">
+          <AnimatedFolder color="#3B82F6" size={1} />
+        </div>
+      );
     }
 
     // Smart icon based on extension
@@ -71,7 +76,7 @@ const AssetCard: React.FC<AssetCardProps> = ({
       {/* Icon/Thumbnail Container */}
       <div className="h-2/3 flex items-center justify-center mb-4 relative">
         <div className={`
-          relative z-10 transition-transform duration-300 group-hover:scale-110
+          relative z-10 transition-transform duration-300 ${type !== 'folder' ? 'group-hover:scale-110' : ''}
           ${type === 'folder' ? 'drop-shadow-lg' : ''}
         `}>
           {getFileIcon()}

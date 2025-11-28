@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { LoginRequest, RegisterRequest, User, Workspace } from '../types';
 import { apiService } from '../services/api';
-import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import SharedNavbar from './SharedNavbar';
 import EnhancedRegistration from './EnhancedRegistration';
@@ -15,8 +14,17 @@ const Auth: React.FC = () => {
   const { dispatch } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDarkMode } = useTheme();
   const { t } = useTranslation();
+  
+  // Force light theme for auth pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
+    return () => {
+      // Optional: Restore theme preference on unmount if needed
+    };
+  }, []);
+
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -359,15 +367,15 @@ const Auth: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950" : "bg-gradient-to-br from-amber-50 via-white to-white"} relative overflow-hidden`}
+      className={`min-h-screen bg-gradient-to-br from-amber-50 via-white to-white relative overflow-hidden`}
     >
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className={`absolute top-20 left-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse`}
+          className={`absolute top-20 left-10 w-96 h-96 bg-[accent]/10 rounded-full blur-3xl animate-pulse`}
         ></div>
         <div
-          className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-accent/10" : "bg-amber-200/20"} rounded-full blur-3xl animate-pulse delay-1000`}
+          className={`absolute bottom-20 right-10 w-96 h-96 bg-[accent]/10 rounded-full blur-3xl animate-pulse delay-1000`}
         ></div>
       </div>
       <SharedNavbar />
@@ -402,13 +410,13 @@ const Auth: React.FC = () => {
             </div>
 
             <div
-              className={`flex ${isDarkMode ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200"} border rounded-xl p-1.5 mb-8 shadow-lg`}
+              className={`flex bg-white border-gray-200 border rounded-xl p-1.5 mb-8 shadow-lg`}
             >
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "login"
-                    ? "bg-accent text-gray-900 shadow-md"
-                    : `${isDarkMode ? "text-gray-600 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
+                    ? "bg-[accent] text-white shadow-md"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
                 onClick={switchToLogin}
               >
@@ -417,8 +425,8 @@ const Auth: React.FC = () => {
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "register"
-                    ? "bg-accent text-gray-900 shadow-md"
-                    : `${isDarkMode ? "text-gray-600 hover:text-white" : "text-slate-600 hover:text-slate-900"}`
+                    ? "bg-[accent] text-white shadow-md"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
                 onClick={switchToRegister}
               >
@@ -429,12 +437,12 @@ const Auth: React.FC = () => {
 
             {isDesktopFlow && (
               <div
-                className={`mb-8 rounded-2xl border ${isDarkMode ? "border-yellow-500/40 bg-yellow-500/10" : "border-yellow-200 bg-yellow-50"} p-4 text-sm leading-relaxed`}
+                className={`mb-8 rounded-2xl border border-yellow-200 bg-yellow-50 p-4 text-sm leading-relaxed`}
               >
-                <p className={`font-semibold ${isDarkMode ? "text-yellow-200" : "text-yellow-800"}`}>
+                <p className={`font-semibold text-yellow-800`}>
                   {t('auth.login.desktopSignIn')}
                 </p>
-                <p className={isDarkMode ? "text-gray-200" : "text-slate-600"}>
+                <p className={"text-slate-600"}>
                   {t('auth.login.desktopMessage')}
                 </p>
               </div>
@@ -443,12 +451,12 @@ const Auth: React.FC = () => {
             {/* Login Form */}
             {authTab === "login" && (
               <form
-                className={`${isDarkMode ? "bg-gray-800/60 border-gray-700/50" : "bg-white border-gray-200"} border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
+                className={`bg-white border-gray-200 border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
                 onSubmit={handleLogin}
               >
                 <div>
                   <label
-                    className={`text-sm font-semibold block mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}
+                    className={`text-sm font-semibold block mb-2 text-gray-700`}
                   >
                     {t('auth.login.emailLabel')}
                   </label>
@@ -457,7 +465,7 @@ const Auth: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-600" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
+                    className={`w-full rounded-xl border border-gray-300 bg-white text-gray-900 placeholder:text-slate-400 px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] transition-all duration-200`}
                     placeholder={t('auth.login.emailPlaceholder')}
                     required
                   />
@@ -465,13 +473,13 @@ const Auth: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label
-                      className={`text-sm font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}
+                      className={`text-sm font-semibold text-gray-700`}
                     >
                       {t('auth.login.passwordLabel')}
                     </label>
                     <button
                       type="button"
-                      className={`text-xs font-medium ${isDarkMode ? "text-yellow-600 hover:text-yellow-700" : "text-yellow-600 hover:text-yellow-700"} transition-colors`}
+                      className={`text-xs font-medium text-[accent] hover:text-[#3b8fc0] transition-colors`}
                     >
                       {t('auth.login.forgotPassword')}
                     </button>
@@ -482,7 +490,7 @@ const Auth: React.FC = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className={`w-full rounded-xl border ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white placeholder:text-gray-600" : "border-gray-300 bg-white text-gray-900 placeholder:text-slate-400"} px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition-all duration-200`}
+                      className={`w-full rounded-xl border border-gray-300 bg-white text-gray-900 placeholder:text-slate-400 px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] transition-all duration-200`}
                       placeholder={t('auth.login.passwordPlaceholder')}
                       required
                     />
@@ -493,11 +501,11 @@ const Auth: React.FC = () => {
                     >
                       {showPassword ? (
                         <EyeOff
-                          className={`w-5 h-5 ${isDarkMode ? "text-gray-600" : "text-slate-400"}`}
+                          className={`w-5 h-5 text-slate-400`}
                         />
                       ) : (
                         <Eye
-                          className={`w-5 h-5 ${isDarkMode ? "text-gray-600" : "text-slate-400"}`}
+                          className={`w-5 h-5 text-slate-400`}
                         />
                       )}
                     </button>
@@ -506,18 +514,18 @@ const Auth: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-2">
                   <label
-                    className={`inline-flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-200" : "text-slate-700"} cursor-pointer font-medium`}
+                    className={`inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer font-medium`}
                     onClick={() => setRememberMe(!rememberMe)}
                   >
                     <span
-                      className={`relative inline-flex h-6 w-11 rounded-full ${rememberMe ? "bg-accent" : (isDarkMode ? "bg-gray-600" : "bg-slate-200")} transition-colors shadow-inner`}
+                      className={`relative inline-flex h-6 w-11 rounded-full ${rememberMe ? "bg-[accent]" : "bg-slate-200"} transition-colors shadow-inner`}
                     >
                       <span className={`absolute top-1 ${rememberMe ? "left-6" : "left-1"} h-4 w-4 rounded-full bg-white shadow-md transition-all`}></span>
                     </span>
                     {t('auth.login.rememberMe')}
                   </label>
                   <div
-                    className={`text-xs ${isDarkMode ? "text-gray-600" : "text-slate-500"} font-medium`}
+                    className={`text-xs text-slate-500 font-medium`}
                   >
                     {t('auth.login.ssoEnabled')}
                   </div>
@@ -526,7 +534,7 @@ const Auth: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-4 py-3.5 rounded-xl text-gray-900 text-base font-bold bg-accent hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-[accent] hover:bg-[#3b8fc0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? t('auth.login.signingIn') : t('auth.login.continueButton')}
                 </button>
@@ -534,12 +542,12 @@ const Auth: React.FC = () => {
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <div
-                      className={`w-full border-t ${isDarkMode ? "border-gray-600" : "border-gray-200"}`}
+                      className={`w-full border-t border-gray-200`}
                     ></div>
                   </div>
                   <div className="relative flex justify-center">
                     <span
-                      className={`${isDarkMode ? "bg-gray-800" : "bg-white"} px-4 text-sm font-medium ${isDarkMode ? "text-gray-600" : "text-slate-500"}`}
+                      className={`bg-white px-4 text-sm font-medium text-slate-500`}
                     >
                       {t('auth.login.orDivider')}
                     </span>
@@ -548,7 +556,7 @@ const Auth: React.FC = () => {
 
                 <button
                   type="button"
-                  className={`w-full px-4 py-3.5 rounded-xl border-2 ${isDarkMode ? "border-gray-600 hover:bg-gray-700/50 text-gray-200" : "border-gray-300 hover:bg-gray-50 text-gray-700"} text-sm font-semibold flex items-center justify-center gap-3 transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
+                  className={`w-full px-4 py-3.5 rounded-xl border-2 border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-semibold flex items-center justify-center gap-3 transition-all duration-200 hover:scale-[1.02] transform shadow-lg`}
                   onClick={handleGoogleAuth}
                 >
                   <img
@@ -564,24 +572,24 @@ const Auth: React.FC = () => {
             {/* OTP Verification for Login */}
             {authTab === "login" && showOtpVerification && (
               <div
-                className={`${isDarkMode ? "bg-gray-800/60 border-gray-700/50" : "bg-white border-gray-200"} border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
+                className={`bg-white border-gray-200 border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                  <div className="w-16 h-16 bg-[accent] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
                     <span className="text-3xl">📧</span>
                   </div>
                   <h3
-                    className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-900"} mb-3`}
+                    className={`text-2xl font-bold text-slate-900 mb-3`}
                   >
                     {t('auth.otp.title')}
                   </h3>
                   <p
-                    className={`text-sm ${isDarkMode ? "text-gray-700" : "text-slate-600"} mb-6`}
+                    className={`text-sm text-slate-600 mb-6`}
                   >
                     {t('auth.otp.description')}{" "}
                     <strong
                       className={
-                        isDarkMode ? "text-yellow-600" : "text-yellow-600"
+                        "text-[accent]"
                       }
                     >
                       {loginEmail}
@@ -598,7 +606,7 @@ const Auth: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(e.target, index)}
                       onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                      className={`w-14 h-14 text-center text-xl font-bold border-2 ${isDarkMode ? "border-gray-600 bg-gray-700/50 text-white" : "border-gray-300 bg-white text-gray-900"} rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200`}
+                      className={`w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[accent] focus:border-[accent] transition-all duration-200`}
                       autoComplete="off"
                     />
                   ))}
@@ -608,7 +616,7 @@ const Auth: React.FC = () => {
                   type="button"
                   onClick={handleOtpVerification}
                   disabled={loading || otp.join("").length !== 6}
-                  className="w-full px-4 py-3.5 rounded-xl text-gray-900 text-base font-bold bg-accent hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-[accent] hover:bg-[#3b8fc0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? t('auth.otp.verifying') : t('auth.otp.verifyButton')}
                 </button>
@@ -616,12 +624,12 @@ const Auth: React.FC = () => {
                 <div className="text-center">
                   {otpTimer > 0 ? (
                     <p
-                      className={`text-sm ${isDarkMode ? "text-gray-600" : "text-slate-500"} font-medium`}
+                      className={`text-sm text-slate-500 font-medium`}
                     >
                       {t('auth.otp.resendIn')}{" "}
                       <span
                         className={
-                          isDarkMode ? "text-yellow-600" : "text-yellow-600"
+                          "text-[accent]"
                         }
                       >
                         {otpTimer}{t('auth.otp.seconds')}
@@ -632,7 +640,7 @@ const Auth: React.FC = () => {
                       type="button"
                       onClick={handleResendOtp}
                       disabled={loading}
-                      className={`text-sm ${isDarkMode ? "text-yellow-600 hover:text-yellow-700" : "text-yellow-600 hover:text-yellow-700"} font-bold disabled:opacity-50 transition-colors`}
+                      className={`text-sm text-[accent] hover:text-[#3b8fc0] font-bold disabled:opacity-50 transition-colors`}
                     >
                       {t('auth.otp.resendOtp')}
                     </button>
