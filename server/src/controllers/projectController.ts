@@ -21,15 +21,8 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
 
     let resolvedWorkspaceId: string | undefined = workspaceId;
 
-    if (needsWorkspace) {
-      if (!workspaceId) {
-        res.status(400).json({
-          success: false,
-          message: 'Workspace is required for your current plan/tier'
-        });
-        return;
-      }
-
+    if (workspaceId) {
+      // Creating project in a workspace
       const workspace = await Workspace.findOne({
         _id: workspaceId,
         $or: [
@@ -48,23 +41,35 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
 
       // Enforce workspace project limits when applicable
       const currentWorkspaceProjectCount = await Project.countDocuments({ workspace: workspaceId, isActive: true });
+      console.log('📊 Project limit check:', { currentCount: currentWorkspaceProjectCount, workspaceLimit: workspace.subscription?.maxProjects, planLimit: planLimits.maxProjects });
+      
       const workspaceLimit = workspace.subscription?.maxProjects ?? planLimits.maxProjects;
-      if (workspaceLimit !== -1 && currentWorkspaceProjectCount >= workspaceLimit) {
+      
+      // Only enforce if limit is explicitly set and not unlimited
+      if (workspaceLimit && workspaceLimit !== -1 && currentWorkspaceProjectCount >= workspaceLimit) {
         res.status(403).json({
           success: false,
-          message: 'Workspace project limit reached'
+          message: `Workspace project limit reached (${currentWorkspaceProjectCount}/${workspaceLimit})`
         });
         return;
       }
 
       resolvedWorkspaceId = workspaceId;
     } else {
-      // Free users can only have 1 active project
-      const existingProjectCount = await Project.countDocuments({ createdBy: user._id, tier: 'free', isActive: true });
+      // Creating personal project (no workspace)
+      // Free users can only have 1 active personal project
+      const existingProjectCount = await Project.countDocuments({ 
+        createdBy: user._id, 
+        workspace: null,  // Only count personal projects
+        isActive: true 
+      });
+      
+      console.log('📊 Personal project check:', { existingCount: existingProjectCount, limit: planLimits.maxProjects });
+      
       if (planLimits.maxProjects !== -1 && existingProjectCount >= planLimits.maxProjects) {
         res.status(403).json({
           success: false,
-          message: 'Free plan allows only one active project. Upgrade to add more.'
+          message: `Free plan allows only ${planLimits.maxProjects} personal project(s). Create projects in a workspace for more.`
         });
         return;
       }
@@ -230,7 +235,7 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
     // If user is not workspace owner/admin, only show projects they're assigned to
     if (!isWorkspaceOwner && !isWorkspaceAdmin) {
       projectQuery['teamMembers.user'] = userId;
-      console.log('🔍 [GET PROJECTS] Regular member - filtering by team membership');
+      console.log('🔍 [GET PROJECTS] Regular member - filtering by team membership (includes managers)');
     } else {
       console.log('🔍 [GET PROJECTS] Owner/Admin - showing all workspace projects');
     }

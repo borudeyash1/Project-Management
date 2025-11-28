@@ -21,7 +21,8 @@ import {
   Eye,
   Play,
   Pause,
-  Archive
+  Archive,
+  X
 } from 'lucide-react';
 
 const WorkspaceProjects: React.FC = () => {
@@ -33,6 +34,10 @@ const WorkspaceProjects: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<any>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const currentWorkspace = state.workspaces.find((w) => w._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
@@ -79,6 +84,70 @@ const WorkspaceProjects: React.FC = () => {
       case 'medium': return 'text-yellow-600';
       case 'low': return 'text-green-600';
       default: return 'text-gray-600';
+    }
+  };
+
+  const handleDeleteProject = (project: any) => {
+    setProjectToDelete(project);
+    setDeleteConfirmText('');
+    setShowDeleteModal(true);
+    setOpenDropdown(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmText.toUpperCase() !== 'DELETE') {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Please type DELETE to confirm',
+        },
+      });
+      return;
+    }
+
+    if (!projectToDelete) return;
+
+    try {
+      const response = await fetch(`/api/projects/${projectToDelete._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete project');
+      }
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Project deleted successfully',
+        },
+      });
+      
+      setShowDeleteModal(false);
+      setProjectToDelete(null);
+      setDeleteConfirmText('');
+      
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Failed to delete project', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to delete project',
+        },
+      });
     }
   };
 
