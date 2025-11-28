@@ -74,6 +74,13 @@ const WorkspaceOwner: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showAICreateProject, setShowAICreateProject] = useState(false);
+  const [showFreezeModal, setShowFreezeModal] = useState(false);
+  const [clientToFreeze, setClientToFreeze] = useState<Client | null>(null);
+  const [freezeConfirmText, setFreezeConfirmText] = useState('');
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // Mock data - replace with actual API calls
   const clients: Client[] = [
@@ -215,6 +222,133 @@ const WorkspaceOwner: React.FC = () => {
     }
   };
 
+
+
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+    dispatch({ type: 'TOGGLE_MODAL', payload: 'client' });
+  };
+
+  const handleFreezeClient = (client: Client) => {
+    setClientToFreeze(client);
+    setFreezeConfirmText('');
+    setShowFreezeModal(true);
+  };
+
+  const handleConfirmFreeze = async () => {
+    if (freezeConfirmText.toUpperCase() !== 'FREEZE') {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Please type FREEZE to confirm',
+          duration: 3000,
+        },
+      });
+      return;
+    }
+
+    if (!clientToFreeze) return;
+
+    try {
+      const newStatus = clientToFreeze.status === 'active' ? 'inactive' : 'active';
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: newStatus === 'inactive' ? 'Client frozen successfully' : 'Client unfrozen successfully',
+          duration: 3000,
+        },
+      });
+      
+      setShowFreezeModal(false);
+      setClientToFreeze(null);
+      setFreezeConfirmText('');
+    } catch (error: any) {
+      console.error('Failed to update client status', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to update client status',
+          duration: 3000,
+        },
+      });
+    }
+  };
+
+  const handleDeleteProject = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteConfirmText('');
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmText.toUpperCase() !== 'DELETE') {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Please type DELETE to confirm',
+          duration: 3000,
+        },
+      });
+      return;
+    }
+
+    if (!projectToDelete) return;
+
+    try {
+      // Call API to delete project
+      const response = await fetch(`/api/projects/${projectToDelete._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete project');
+      }
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Project deleted successfully',
+          duration: 3000,
+        },
+      });
+      
+      setShowDeleteModal(false);
+      setProjectToDelete(null);
+      setDeleteConfirmText('');
+      
+      // Refresh the page to update projects list
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Failed to delete project', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to delete project',
+          duration: 3000,
+        },
+      });
+    }
+  };
+
   const renderDashboard = () => (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -338,7 +472,7 @@ const WorkspaceOwner: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {clients.map((client) => (
-          <div key={client._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={client._id} className={`bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow ${client.status === 'inactive' ? 'grayscale opacity-60' : ''}`}>
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{client.name}</h4>

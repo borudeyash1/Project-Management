@@ -39,7 +39,6 @@ import ProjectProgressTab from './project-tabs/ProjectProgressTab';
 import ProjectRequestsTab from './project-tabs/ProjectRequestsTab';
 import ProjectTaskAssignmentTab from './project-tabs/ProjectTaskAssignmentTab';
 import EmployeeTasksTab from './project-tabs/EmployeeTasksTab';
-import RoleSwitcher from './RoleSwitcher';
 import WorkspaceInbox from './workspace/WorkspaceInbox';
 import ProjectAttendanceManagerTab from './project-tabs/ProjectAttendanceManagerTab';
 import ProjectAttendanceEmployeeTab from './project-tabs/ProjectAttendanceEmployeeTab';
@@ -697,14 +696,6 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   // Role Switcher Handler (Testing only)
-  const handleRoleChange = (role: 'owner' | 'project-manager' | 'employee') => {
-    // Role switching is deprecated - roles are now derived from actual membership
-    console.warn('[ProjectViewDetailed] handleRoleChange is deprecated. Roles are now derived from workspace/project membership.');
-  };
-
-  const handleUserChange = (userId: string, userName: string, role: string) => {
-    // No-op for now; kept for compatibility with RoleSwitcher props
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -1933,30 +1924,33 @@ const ProjectViewDetailed: React.FC = () => {
           <ProjectTeamTab
             projectId={activeProject?._id || ''}
             workspaceId={(activeProject as any)?.workspace || state.currentWorkspace || ''}
-            projectTeam={(activeProject as any)?.team || []}
+            projectTeam={(activeProject as any)?.teamMembers || []}
             projectManager={(activeProject as any)?.projectManager}
             isOwner={isWorkspaceOwner}
             isProjectManager={isProjectManager}
-            onAddMember={(memberId, role) => {
-              // Add member to project team
-              const member = { _id: memberId, name: 'Member Name', email: 'email@example.com', role, addedAt: new Date() };
-              const updatedTeam = [...((activeProject as any)?.team || []), member];
-              dispatch({
-                type: 'UPDATE_PROJECT',
-                payload: {
-                  projectId: activeProject?._id || '',
-                  updates: { team: updatedTeam }
+            onAddMember={async (memberId, role) => {
+              try {
+                const response = await apiService.post(`/projects/${activeProject?._id}/members`, { userId: memberId, role });
+                if (response.data.success) {
+                  const updatedProject = response.data.data;
+                  setActiveProject(updatedProject);
+                  dispatch({ type: 'UPDATE_PROJECT', payload: { projectId: activeProject?._id || '', updates: { teamMembers: updatedProject.teamMembers } } });
+                  dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: `Member added with role: ${role}`, duration: 3000 } });
                 }
-              });
+              } catch (error) {
+                console.error('Failed to add team member:', error);
+                console.error('Error response:', error.response?.data);
+                dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: 'Failed to add team member.', duration: 4000 } });
+              }
             }}
             onRemoveMember={(memberId) => {
               // Remove member from project team
-              const updatedTeam = ((activeProject as any)?.team || []).filter((m: any) => m._id !== memberId);
+              const updatedTeam = ((activeProject as any)?.teamMembers || []).filter((m: any) => m._id !== memberId);
               dispatch({
                 type: 'UPDATE_PROJECT',
                 payload: {
                   projectId: activeProject?._id || '',
-                  updates: { team: updatedTeam }
+                  updates: { teamMembers: updatedTeam }
                 }
               });
             }}
@@ -1979,7 +1973,7 @@ const ProjectViewDetailed: React.FC = () => {
           return (
             <ProjectTaskAssignmentTab
               projectId={activeProject?._id || ''}
-              projectTeam={(activeProject as any)?.team || []}
+              projectTeam={(activeProject as any)?.teamMembers || []}
               tasks={projectTasks}
               isProjectManager={true}
               onCreateTask={handleCreateTask}
@@ -2273,14 +2267,6 @@ const ProjectViewDetailed: React.FC = () => {
         task={selectedTask}
         onApprove={handleApproveTask}
         onReject={handleRejectTask}
-      />
-
-      {/* Role Switcher (Testing Only) */}
-      <RoleSwitcher
-        currentRole={(currentUserRole === 'manager' ? 'project-manager' : currentUserRole) as any}
-        onRoleChange={handleRoleChange}
-        currentUserId={currentTestUserId}
-        onUserChange={handleUserChange}
       />
     </div>
   );
