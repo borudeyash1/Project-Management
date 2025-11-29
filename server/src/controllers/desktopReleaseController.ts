@@ -314,13 +314,37 @@ export const downloadRelease = async (req: AuthenticatedRequest, res: Response):
     release.downloadCount += 1;
     await release.save();
 
-    console.log('✅ [RELEASES] Redirecting to R2, count:', release.downloadCount);
+    console.log('✅ [RELEASES] Incrementing count to:', release.downloadCount);
+
+    // CHECK FOR LOCAL FILE FIRST
+    // Construct potential local path
+    // We know uploads are in project_root/uploads/releases
+    const uploadsDir = path.join(process.cwd(), 'uploads', 'releases');
+    // The filename might be the end of the downloadUrl or filePath
+    const targetFileName = path.basename(release.filePath || release.downloadUrl);
+    const localFilePath = path.join(uploadsDir, targetFileName);
+
+    console.log('🔍 [RELEASES] Checking local file path:', localFilePath);
+
+    if (fs.existsSync(localFilePath)) {
+      console.log('✅ [RELEASES] Serving local file:', localFilePath);
+      res.download(localFilePath, release.fileName || targetFileName, (err) => {
+        if (err) {
+          console.error('❌ [RELEASES] Error sending file:', err);
+          if (!res.headersSent) {
+            res.status(500).send('Error downloading file');
+          }
+        }
+      });
+      return;
+    }
+
+    // If local file not found, try redirecting (for R2 or external URLs)
+    console.log('⚠️ [RELEASES] Local file not found, trying redirect to:', release.downloadUrl);
 
     let redirectUrl = release.downloadUrl;
 
     // Sanitize localhost URL if the request host is not localhost
-    // This fixes issues where a release was created in dev environment (localhost)
-    // but is being accessed in production
     if (redirectUrl.includes('localhost') && req.get('host') && !req.get('host')?.includes('localhost')) {
       try {
         const urlObj = new URL(redirectUrl);
