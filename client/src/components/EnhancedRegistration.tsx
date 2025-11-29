@@ -1318,8 +1318,23 @@ const EnhancedRegistration: React.FC = () => {
 
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md">
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-10">
               <img src="/logo.png" alt="Sartthi Logo" className="h-7 w-auto" />
+            </div>
+
+            {/* Login/Register Toggler */}
+            <div className="flex bg-white border-gray-200 border rounded-xl p-1.5 mb-8 shadow-lg">
+              <button
+                className="flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-700 hover:text-gray-900 font-medium"
+                onClick={() => navigate('/login')}
+              >
+                {t('auth.login.title')}
+              </button>
+              <button
+                className="flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-yellow-500 text-white shadow-md"
+              >
+                {t('auth.login.switchToRegister')}
+              </button>
             </div>
 
             <div className="flex items-center justify-center space-x-4 mb-6">

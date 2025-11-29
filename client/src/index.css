@@ -1,10 +1,428 @@
-/* Theme CSS Variables */:root {  /* Accent Color - Default Yellow */  --accent-color: #FBBF24;  --accent-color-rgb: 251, 191, 36;  /* Font Sizes */  --base-font-size: 16px;  /* Density/Spacing */  --spacing-unit: 1rem;  /* Animations */  --animation-duration: 200ms;}/* Font size variations */[data-font-size="small"] {  --base-font-size: 14px;}[data-font-size="medium"] {  --base-font-size: 16px;}[data-font-size="large"] {  --base-font-size: 18px;}/* Density variations */[data-density="compact"] {  --spacing-unit: 0.75rem;}[data-density="comfortable"] {  --spacing-unit: 1rem;}@tailwind base;@tailwind components;@tailwind utilities;@layer base {  html {    background-color: #F7F9FC;    transition: background-color 0.3s ease;  }  body {    font-family: 'Inter', sans-serif;    background-color: #F7F9FC;    color: #111827;    transition: background-color 0.3s ease, color 0.3s ease;    min-height: 100vh;  }  /* Dark mode styles */  .dark html {    background-color: #111827;  }  .dark body {    background-color: #111827;    color: #F9FAFB;  }  .dark {    color-scheme: dark;  }  /* Ensure root element has dark background with smooth transition */  #root {    background-color: #F7F9FC;    min-height: 100vh;    transition: background-color 0.3s ease;  }  .dark #root {    background-color: #111827;    min-height: 100vh;  }  /* Dark mode for common elements */  .dark .bg-white {    background-color: #374151 !important;  }  .dark .bg-gray-50 {    background-color: #1F2937 !important;  }  .dark .bg-gray-100 {    background-color: #374151 !important;  }  .dark .bg-gray-200 {    background-color: #4B5563 !important;  }  /* Text colors - ensure visibility in dark mode */  .dark .text-gray-900,  .dark .text-gray-800 {    color: #F9FAFB !important;  }  .dark .text-gray-700 {    color: #E5E7EB !important;  }  .dark .text-gray-600 {    color: #D1D5DB !important;  }  .dark .text-gray-500 {    color: #D1D5DB !important;  }  .dark .text-gray-400 {    color: #D1D5DB !important;  }  /* Improved color contrast in dark mode */  .dark .text-blue-700,  .dark .text-blue-600 {    color: #93C5FD !important;  }  .dark .text-blue-800 {    color: #BFDBFE !important;  }  .dark .text-green-700,  .dark .text-green-600 {    color: #86EFAC !important;  }  .dark .text-green-800 {    color: #BBF7D0 !important;  }  .dark .text-orange-700,  .dark .text-orange-600 {    color: #FDBA74 !important;  }  .dark .text-orange-800 {    color: #FED7AA !important;  }  .dark .text-yellow-700,  .dark .text-yellow-600 {    color: #FDE047 !important;  }  .dark .text-yellow-800 {    color: #FEF08A !important;  }  .dark .text-red-700,  .dark .text-red-600 {    color: #FCA5A5 !important;  }  .dark .text-red-800 {    color: #FECACA !important;  }  .dark .text-purple-700,  .dark .text-purple-600 {    color: #C4B5FD !important;  }  .dark .text-purple-800 {    color: #DDD6FE !important;  }  /* Additional dark mode improvements for better contrast */  .dark .text-gray-200 {    color: #E5E7EB !important;  }  .dark .text-gray-300 {    color: #D1D5DB !important;  }  /* Cyan/Teal colors for dark mode */  .dark .text-cyan-200,  .dark .text-cyan-300 {    color: #A5F3FC !important;  }  /* Ensure all badge text is visible in dark mode */  .dark .text-blue-200 {    color: #BFDBFE !important;  }  .dark .text-green-200 {    color: #BBF7D0 !important;  }  .dark .text-orange-200 {    color: #FED7AA !important;  }  .dark .text-yellow-200 {    color: #FEF08A !important;  }  .dark .text-red-200 {    color: #FECACA !important;  }  .dark .text-purple-200 {    color: #DDD6FE !important;  }  .dark .text-black {    color: #F9FAFB !important;  }  /* Ensure labels and spans are visible */  .dark label,  .dark span,  .dark p,  .dark h1,  .dark h2,  .dark h3,  .dark h4,  .dark h5,  .dark h6 {    color: inherit;  }  .dark label {    color: #E5E7EB;  }  /* Border colors */  .dark .border-gray-200,  .dark .border-gray-300 {    border-color: #4B5563 !important;  }  /* Form elements */  .dark input,  .dark textarea,  .dark select {    background-color: #374151;    color: #F9FAFB;    border-color: #4B5563;  }  .dark input::placeholder,  .dark textarea::placeholder {    color: #9CA3AF;  }  /* Select dropdowns */  .dark select option {    background-color: #374151;    color: #F9FAFB;  }  /* Hover states */  .dark .hover\:bg-gray-50:hover {    background-color: #4B5563 !important;  }  .dark .hover\:bg-gray-100:hover {    background-color: #4B5563 !important;  }  .dark .hover\:text-gray-900:hover {    color: #F9FAFB !important;  }  /* Buttons and interactive elements */  .dark button {    color: inherit;  }  .dark button.bg-white {    color: #111827;  }  /* Cards and containers */  .dark .shadow,  .dark .shadow-sm,  .dark .shadow-md,  .dark .shadow-lg {    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);  }  /* Disabled states */  .dark input:disabled,  .dark textarea:disabled,  .dark select:disabled {    background-color: #1F2937;    color: #6B7280;    opacity: 0.6;  }  /* Focus states */  .dark input:focus,  .dark textarea:focus,  .dark select:focus {    border-color: #60A5FA;    ring-color: #60A5FA;  }}@layer utilities {  .selection-bg-primary {    @apply selection:bg-yellow-200;  }}/* Custom animations */@keyframes fadeIn {  from {    opacity: 0;    transform: translateY(-4px);  }  to {    opacity: 1;    transform: translateY(0);  }}.animate-fadeIn {  animation: fadeIn 0.2s ease;}/* Scroll animations */@keyframes fadeInUp {  from {    opacity: 0;    transform: translateY(30px);  }  to {    opacity: 1;    transform: translateY(0);  }}@keyframes fadeInDown {  from {    opacity: 0;    transform: translateY(-30px);  }  to {    opacity: 1;    transform: translateY(0);  }}@keyframes fadeInLeft {  from {    opacity: 0;    transform: translateX(-30px);  }  to {    opacity: 1;    transform: translateX(0);  }}@keyframes fadeInRight {  from {    opacity: 0;    transform: translateX(30px);  }  to {    opacity: 1;    transform: translateX(0);  }}@keyframes scaleIn {  from {    opacity: 0;    transform: scale(0.9);  }  to {    opacity: 1;    transform: scale(1);  }}@keyframes float {  0%,  100% {    transform: translateY(0px);  }  50% {    transform: translateY(-20px);  }}@keyframes pulse-slow {  0%,  100% {    opacity: 1;  }  50% {    opacity: 0.5;  }}@keyframes shimmer {  0% {    background-position: -1000px 0;  }  100% {    background-position: 1000px 0;  }}@keyframes slideInUp {  from {    opacity: 0;    transform: translateY(100px);  }  to {    opacity: 1;    transform: translateY(0);  }}@keyframes bounce-subtle {  0%,  100% {    transform: translateY(0);  }  50% {    transform: translateY(-10px);  }}/* Animation classes */.animate-fade-in-up {  animation: fadeInUp 0.6s ease-out forwards;}.animate-fade-in-down {  animation: fadeInDown 0.6s ease-out forwards;}.animate-fade-in-left {  animation: fadeInLeft 0.6s ease-out forwards;}.animate-fade-in-right {  animation: fadeInRight 0.6s ease-out forwards;}.animate-scale-in {  animation: scaleIn 0.5s ease-out forwards;}.animate-float {  animation: float 3s ease-in-out infinite;}.animate-pulse-slow {  animation: pulse-slow 3s ease-in-out infinite;}.animate-shimmer {  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);  background-size: 1000px 100%;  animation: shimmer 2s infinite;}.animate-slide-in-up {  animation: slideInUp 0.8s ease-out forwards;}.animate-bounce-subtle {  animation: bounce-subtle 2s ease-in-out infinite;}/* Delay classes for staggered animations */.animation-delay-100 {  animation-delay: 0.1s;}.animation-delay-200 {  animation-delay: 0.2s;}.animation-delay-300 {  animation-delay: 0.3s;}.animation-delay-400 {  animation-delay: 0.4s;}.animation-delay-500 {  animation-delay: 0.5s;}.animation-delay-600 {  animation-delay: 0.6s;}.animation-delay-700 {  animation-delay: 0.7s;}.animation-delay-800 {  animation-delay: 0.8s;}/* Scroll reveal */.scroll-reveal {  opacity: 0;  transform: translateY(30px);  transition: opacity 0.6s ease-out, transform 0.6s ease-out;}.scroll-reveal.revealed {  opacity: 1;  transform: translateY(0);}/* Hover effects */.hover-lift {  transition: transform 0.3s ease, box-shadow 0.3s ease;}.hover-lift:hover {  transform: translateY(-8px);  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);}/* Gradient animation */@keyframes gradient-shift {  0% {    background-position: 0% 50%;  }  50% {    background-position: 100% 50%;  }  100% {    background-position: 0% 50%;  }}@keyframes fadeInRight {  from {    opacity: 0;    transform: translateX(30px);  }  to {    opacity: 1;    transform: translateX(0);  }}@keyframes scaleIn {  from {    opacity: 0;    transform: scale(0.9);  }  to {    opacity: 1;    transform: scale(1);  }}@keyframes float {  0%,  100% {    transform: translateY(0px);  }  50% {    transform: translateY(-20px);  }}@keyframes pulse-slow {  0%,  100% {    opacity: 1;  }  50% {    opacity: 0.5;  }}@keyframes shimmer {  0% {    background-position: -1000px 0;  }  100% {    background-position: 1000px 0;  }}@keyframes slideInUp {  from {    opacity: 0;    transform: translateY(100px);  }  to {    opacity: 1;    transform: translateY(0);  }}@keyframes bounce-subtle {  0%,  100% {    transform: translateY(0);  }  50% {    transform: translateY(-10px);  }}/* Animation classes */.animate-fade-in-up {  animation: fadeInUp 0.6s ease-out forwards;}.animate-fade-in-down {  animation: fadeInDown 0.6s ease-out forwards;}.animate-fade-in-left {  animation: fadeInLeft 0.6s ease-out forwards;}.animate-fade-in-right {  animation: fadeInRight 0.6s ease-out forwards;}.animate-scale-in {  animation: scaleIn 0.5s ease-out forwards;}.animate-float {  animation: float 3s ease-in-out infinite;}.animate-pulse-slow {  animation: pulse-slow 3s ease-in-out infinite;}.animate-shimmer {  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);  background-size: 1000px 100%;  animation: shimmer 2s infinite;}.animate-slide-in-up {  animation: slideInUp 0.8s ease-out forwards;}.animate-bounce-subtle {  animation: bounce-subtle 2s ease-in-out infinite;}/* Delay classes for staggered animations */.animation-delay-100 {  animation-delay: 0.1s;}.animation-delay-200 {  animation-delay: 0.2s;}.animation-delay-300 {  animation-delay: 0.3s;}.animation-delay-400 {  animation-delay: 0.4s;}.animation-delay-500 {  animation-delay: 0.5s;}.animation-delay-600 {  animation-delay: 0.6s;}.animation-delay-700 {  animation-delay: 0.7s;}.animation-delay-800 {  animation-delay: 0.8s;}/* Scroll reveal */.scroll-reveal {  opacity: 0;  transform: translateY(30px);  transition: opacity 0.6s ease-out, transform 0.6s ease-out;}.scroll-reveal.revealed {  opacity: 1;  transform: translateY(0);}/* Hover effects */.hover-lift {  transition: transform 0.3s ease, box-shadow 0.3s ease;}.hover-lift:hover {  transform: translateY(-8px);  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);}/* Gradient animation */@keyframes gradient-shift {  0% {    background-position: 0% 50%;  }  50% {    background-position: 100% 50%;  }  100% {    background-position: 0% 50%;  }}.animate-gradient {  background-size: 200% 200%;  animation: gradient-shift 8s ease infinite;}/* Parallax effect */.parallax {  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);}/* Ensure gradient buttons have white text in both light and dark modes */button[class*="bg-gradient-to"] {  color: white !important;}button[class*="bg-gradient-to"] * {  color: white !important;}/* Force dark text for goal buttons in light mode */.goal-button-light {  color: rgb(17, 24, 39) !important;}.dark .goal-button-light {  color: white !important;}/* Onboarding Tour Animations */@keyframes fadeIn {  from {    opacity: 0;  }  to {    opacity: 1;  }}@keyframes slideUp {  from {    opacity: 0;    transform: translate(-50%, 20px);  }  to {    opacity: 1;    transform: translate(-50%, 0);  }}@keyframes pulse-slow {  0%,  100% {    opacity: 1;  }  50% {    opacity: 0.7;  }}.animate-fadeIn {  animation: fadeIn 0.3s ease-out;}  .hide-scrollbar::-webkit-scrollbar  {      display:  none;    }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Hide scrollbar utility */
-.hide-scrollbar {
-  scrollbar-width: none;
+/* Root CSS Variables for Light Mode */
+:root {
+  /* Primary Accent Color - Modern Blue */
+  --accent-color: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-light: #3B82F6;
+  
+  /* Background Colors - Light Mode */
+  --bg-color: #F7F9FC;
+  --surface-color: #FFFFFF;
+  --border-color: #E5E7EB;
+  
+  /* Text Colors - Light Mode with High Contrast */
+  --text-color: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6B7280;
+  
+  /* Status Colors */
+  --success-color: #059669;
+  --warning-color: #D97706;
+  --error-color: #DC2626;
+  --info-color: #0284C7;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Dark Mode Variables */
+.dark {
+  /* Primary Accent Color - Brighter for dark mode */
+  --accent-color: #3B82F6;
+  --accent-hover: #2563EB;
+  --accent-light: #60A5FA;
+  
+  /* Background Colors - Dark Mode */
+  --bg-color: #0F172A;
+  --surface-color: #1E293B;
+  --border-color: #334155;
+  
+  /* Text Colors - Dark Mode with High Contrast */
+  --text-color: #F1F5F9;
+  --text-secondary: #E2E8F0;
+  --text-muted: #94A3B8;
+  
+  /* Status Colors - Adjusted for dark mode */
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --error-color: #EF4444;
+  --info-color: #06B6D4;
 }
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Ensure proper text contrast on all backgrounds */
+.bg-white,
+.bg-surface {
+  color: #111827 !important;
+}
+
+.dark .bg-white,
+.dark .bg-surface {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+/* Fix white text on white background issues */
+.text-white {
+  color: #FFFFFF !important;
+}
+
+/* Ensure headings have proper contrast */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+/* Button text contrast fixes */
+button {
+  color: inherit;
+}
+
+button.bg-white,
+button[class*="bg-white"] {
+  color: #111827 !important;
+}
+
+.dark button.bg-white,
+.dark button[class*="bg-white"] {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+/* Primary button styles */
+button.bg-primary,
+button[class*="bg-primary"],
+.bg-primary {
+  background-color: var(--accent-color) !important;
+  color: #FFFFFF !important;
+}
+
+button.bg-primary:hover,
+button[class*="bg-primary"]:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+/* Input field contrast */
+input,
+textarea,
+select {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* Card backgrounds */
+.card,
+[class*="card"],
+.bg-card {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}
+
+/* Link colors */
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* Ensure proper contrast for muted text */
+.text-muted,
+.text-gray-400,
+.text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+/* Fix for light backgrounds in dark mode */
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+/* Fix for very light text colors */
+.text-gray-100,
+.text-gray-200 {
+  color: #111827 !important;
+}
+
+.dark .text-gray-100,
+.dark .text-gray-200 {
+  color: #F1F5F9 !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection Color */
+::selection {
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+}
+
+/* Focus Styles */
+*:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Utility Classes for Better Contrast */
+.text-high-contrast {
+  color: var(--text-color) !important;
+}
+
+.text-medium-contrast {
+  color: var(--text-secondary) !important;
+}
+
+.text-low-contrast {
+  color: var(--text-muted) !important;
+}
+
+/* Modal and Overlay Backgrounds */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dark .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Ensure proper contrast for disabled elements */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Fix for badge/chip components */
+.badge,
+.chip,
+[class*="badge"],
+[class*="chip"] {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+/* Status badges with proper contrast */
+.badge-success {
+  background-color: var(--success-color);
+  color: #FFFFFF;
+}
+
+.badge-warning {
+  background-color: var(--warning-color);
+  color: #FFFFFF;
+}
+
+.badge-error {
+  background-color: var(--error-color);
+  color: #FFFFFF;
+}
+
+.badge-info {
+  background-color: var(--info-color);
+  color: #FFFFFF;
+}
+
+/* Dropdown menu contrast */
+.dropdown-menu,
+[role="menu"] {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .dropdown-menu,
+.dark [role="menu"] {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Table contrast fixes */
+table {
+  color: var(--text-color);
+}
+
+thead {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:hover {
+  background-color: var(--bg-color);
+}
+
+/* Toast/Notification contrast */
+.toast,
+.notification {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .toast,
+.dark .notification {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Skeleton loading states */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-color) 25%,
+    var(--border-color) 50%,
+    var(--bg-color) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Ensure proper contrast for all text elements */
+p, span, div, label {
+  color: inherit;
+}
+
+/* Fix for very light or very dark backgrounds */
+.bg-opacity-10,
+.bg-opacity-20,
+.bg-opacity-30 {
+  color: var(--text-color) !important;
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Animation utilities */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-in-out;
+}
+
+/* Marquee animations */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration) linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+

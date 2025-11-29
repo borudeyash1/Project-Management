@@ -372,10 +372,10 @@ const Auth: React.FC = () => {
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className={`absolute top-20 left-10 w-96 h-96 bg-[accent]/10 rounded-full blur-3xl animate-pulse`}
+          className={`absolute top-20 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse`}
         ></div>
         <div
-          className={`absolute bottom-20 right-10 w-96 h-96 bg-[accent]/10 rounded-full blur-3xl animate-pulse delay-1000`}
+          className={`absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000`}
         ></div>
       </div>
       <SharedNavbar />
@@ -415,8 +415,8 @@ const Auth: React.FC = () => {
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "login"
-                    ? "bg-[accent] text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900 font-medium"
                 }`}
                 onClick={switchToLogin}
               >
@@ -425,8 +425,8 @@ const Auth: React.FC = () => {
               <button
                 className={`flex-1 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   authTab === "register"
-                    ? "bg-[accent] text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900 font-medium"
                 }`}
                 onClick={switchToRegister}
               >
@@ -442,7 +442,7 @@ const Auth: React.FC = () => {
                 <p className={`font-semibold text-yellow-800`}>
                   {t('auth.login.desktopSignIn')}
                 </p>
-                <p className={"text-slate-600"}>
+                <p className={"text-gray-700 font-medium"}>
                   {t('auth.login.desktopMessage')}
                 </p>
               </div>
@@ -465,7 +465,7 @@ const Auth: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full rounded-xl border border-gray-300 bg-white text-gray-900 placeholder:text-slate-400 px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] transition-all duration-200`}
+                    className={`w-full rounded-xl border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 transition-all duration-200`}
                     placeholder={t('auth.login.emailPlaceholder')}
                     required
                   />
@@ -479,7 +479,7 @@ const Auth: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      className={`text-xs font-medium text-[accent] hover:text-[#3b8fc0] transition-colors`}
+                      className={`text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors`}
                     >
                       {t('auth.login.forgotPassword')}
                     </button>
@@ -490,7 +490,7 @@ const Auth: React.FC = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className={`w-full rounded-xl border border-gray-300 bg-white text-gray-900 placeholder:text-slate-400 px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] transition-all duration-200`}
+                      className={`w-full rounded-xl border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 px-4 py-3 pr-12 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 transition-all duration-200`}
                       placeholder={t('auth.login.passwordPlaceholder')}
                       required
                     />
@@ -518,7 +518,7 @@ const Auth: React.FC = () => {
                     onClick={() => setRememberMe(!rememberMe)}
                   >
                     <span
-                      className={`relative inline-flex h-6 w-11 rounded-full ${rememberMe ? "bg-[accent]" : "bg-slate-200"} transition-colors shadow-inner`}
+                      className={`relative inline-flex h-6 w-11 rounded-full ${rememberMe ? "bg-blue-600" : "bg-gray-300"} transition-colors shadow-inner`}
                     >
                       <span className={`absolute top-1 ${rememberMe ? "left-6" : "left-1"} h-4 w-4 rounded-full bg-white shadow-md transition-all`}></span>
                     </span>
@@ -534,7 +534,7 @@ const Auth: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-[accent] hover:bg-[#3b8fc0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-blue-600 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? t('auth.login.signingIn') : t('auth.login.continueButton')}
                 </button>

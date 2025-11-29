@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import DockNavigation from './DockNavigation';
 import api from '../services/api';
+import LoadingAnimation from './LoadingAnimation';
 
 interface Activity {
   _id: string;
@@ -196,12 +197,7 @@ const ActivityPage: React.FC = () => {
 
         {/* Activities List */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center space-y-3">
-              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-              <p className="text-sm text-gray-500">{t('activity.loading')}</p>
-            </div>
-          </div>
+          <LoadingAnimation message={t('activity.loading')} />
         ) : filteredActivities.length === 0 ? (
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-12 text-center border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <ActivityIcon className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />

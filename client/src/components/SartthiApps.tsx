@@ -139,9 +139,9 @@ const SartthiApps: React.FC = () => {
               Our Ecosystem
             </span>
             <h1 className={`text-4xl md:text-6xl font-bold text-gray-900 mb-6`}>
-              Our <span className="text-[accent]">Apps</span>
+              Our <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Apps</span>
             </h1>
-            <p className={`text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed`}>
+            <p className={`text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed font-medium`}>
               A complete suite of tools designed to boost your productivity.
             </p>
           </div>
@@ -153,21 +153,21 @@ const SartthiApps: React.FC = () => {
                   <app.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className={`text-2xl font-bold text-gray-900 mb-4`}>{app.name}</h3>
-                <p className={`text-gray-600 leading-relaxed mb-6`}>
+                <p className={`text-gray-700 leading-relaxed mb-6`}>
                   {app.description}
                 </p>
                 <ul className="space-y-3 mb-8">
                   {app.features.map((feature, i) => (
-                    <li key={i} className={`flex items-center gap-2 text-sm text-gray-600`}>
-                      <div className={`w-1.5 h-1.5 bg-[accent] rounded-full`}></div>
+                    <li key={i} className={`flex items-center gap-2 text-sm text-gray-700 font-medium`}>
+                      <div className={`w-1.5 h-1.5 bg-blue-600 rounded-full`}></div>
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <button className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
                   app.status === 'active'
-                    ? 'bg-[accent] hover:bg-[accent-hover] text-white shadow-lg hover:shadow-[accent]/50'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/50'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed font-bold'
                 }`}>
                   {app.status === 'active' ? 'Launch App' : 'Coming Soon'}
                 </button>
@@ -190,7 +190,7 @@ const SartthiApps: React.FC = () => {
             
             <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-12">
               <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[accent]/20 text-[accent] mb-6 border border-[accent]/30">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 mb-6 border border-blue-500/30">
                   <Monitor size={20} />
                   <span className="font-semibold">Desktop Application</span>
                 </div>
@@ -201,7 +201,7 @@ const SartthiApps: React.FC = () => {
                 </p>
                 
                 {loading ? (
-                  <div className="flex items-center gap-2 text-[accent]">
+                  <div className="flex items-center gap-2 text-blue-400">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
                     Loading releases...
                   </div>
@@ -210,7 +210,7 @@ const SartthiApps: React.FC = () => {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                       <button
                         onClick={() => handleDownload(latestWindowsRelease)}
-                        className={`bg-[accent] hover:bg-[accent-hover] text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-[accent]/50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group`}
+                        className={`bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group`}
                       >
                         <Download size={24} />
                         Download for Windows

@@ -86,6 +86,7 @@ import InviteEmployeeModal from './components/InviteEmployeeModal';
 import ClientModal from './components/ClientModal';
 import PricingModal from './components/PricingModal';
 import RequestChangeModal from './components/RequestChangeModal';
+import LoadingAnimation from './components/LoadingAnimation';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -96,11 +97,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { state } = useApp();
 
   if (state.isAuthLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingAnimation fullScreen message="Authenticating..." />;
   }
 
   // Check if user is authenticated
