@@ -382,8 +382,8 @@ const Auth: React.FC = () => {
       <section className="min-h-screen flex pt-16 relative z-10">
         <div className="hidden lg:flex w-1/2 bg-white border-r border-border relative overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
-            alt=""
+            src="/ProjectManagement.jpg"
+            alt="Project Management"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-tr from-black/50 to-black/20"></div>
