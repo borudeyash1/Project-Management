@@ -15,35 +15,30 @@ import ScrollStack, { ScrollStackItem } from './animations/ScrollStack';
 import CenterCarousel from './animations/CenterCarousel';
 import { ExpandingCardsDemo } from './animations/ExpandingCardsDemo';
 import { TasksTabsDemo } from './animations/TasksTabsDemo';
+import { ProjectsMarquee } from './animations/ProjectsMarquee';
+import { AuroraBackground } from './ui/aurora-background';
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
   useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#FFFFFF] to-[#F0F9FF] relative">
-      {/* Orb Background Animation */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
-        <Orb 
-          hoverIntensity={0.5} 
-          rotateOnHover={true} 
-          hue={0} 
-          forceHoverState={false} 
-        />
-      </div>
-      
+    <div className="min-h-screen flex flex-col relative bg-white">
       {/* Main Content Wrapper */}
       <div className="relative z-10">
         <SharedNavbar />
         <ContentBanner route="/" />
 
-      {/* HERO SECTION: Enhanced with better positioning */}
-      <div className="pt-32 pb-20 relative z-10">
+      {/* HERO SECTION with Aurora Background */}
+      <div className="relative pt-32 pb-20 overflow-hidden">
+        {/* Aurora Background Animation - Only for Hero Section */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+          <AuroraBackground showRadialGradient={false}>
+            <div></div>
+          </AuroraBackground>
+        </div>
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center relative">
-            {/* Decorative elements */}
-            <div className="absolute -top-20 left-1/4 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute -top-10 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
             
             {/* Main Headline with Gradual Blur */}
             <div className="relative z-10 mb-8">
@@ -250,152 +245,27 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* HOME DASHBOARD - CardSwap Animation */}
+        {/* PROJECTS - Marquee Animation */}
         <div className="w-full bg-white py-20 mb-20">
-          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6 mb-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
-                <BarChart3 className="w-10 h-10 text-white" />
-              </div>
-              <div>
-                <h3 className="text-4xl font-black text-gray-900">Home Dashboard</h3>
-                <p className="text-xl text-gray-600">Your Command Center - Click or scroll to see more</p>
-              </div>
-            </div>
-            
-            {/* CardSwap Animation - Click or Scroll Triggered */}
-            <div className="w-full flex justify-center" style={{ height: '650px', position: 'relative' }}>
-              <div className="w-full max-w-6xl h-[550px]">
-                <CardSwap
-                  width="100%"
-                  height="100%"
-                  cardDistance={50}
-                  verticalDistance={60}
-                  delay={999999}
-                  pauseOnHover={false}
-                  easing="elastic"
-                  onCardClick={() => {
-                    // Trigger next card on click
-                  }}
-                >
-                <Card customClass="cursor-pointer">
-                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
-                    <img 
-                      src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop" 
-                      alt="Overview" 
-                      className="w-full h-64 object-cover" 
-                    />
-                    <div className="p-6">
-                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Overview</h4>
-                      <p className="text-gray-600">Get a complete snapshot of your work at a glance</p>
-                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to see next view</p>
-                    </div>
-                  </div>
-                </Card>
-                <Card customClass="cursor-pointer">
-                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
-                    <img 
-                      src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop" 
-                      alt="Quick Stats" 
-                      className="w-full h-64 object-cover" 
-                    />
-                    <div className="p-6">
-                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Quick Stats</h4>
-                      <p className="text-gray-600">Track key metrics and performance indicators</p>
-                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to see next view</p>
-                    </div>
-                  </div>
-                </Card>
-                <Card customClass="cursor-pointer">
-                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
-                    <img 
-                      src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop" 
-                      alt="Activity Feed" 
-                      className="w-full h-64 object-cover" 
-                    />
-                    <div className="p-6">
-                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Activity Feed</h4>
-                      <p className="text-gray-600">Stay updated with real-time team activities</p>
-                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to see next view</p>
-                    </div>
-                  </div>
-                </Card>
-                <Card customClass="cursor-pointer">
-                  <div className="w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30">
-                    <img 
-                      src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop" 
-                      alt="Upcoming Tasks" 
-                      className="w-full h-64 object-cover" 
-                    />
-                    <div className="p-6">
-                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Upcoming Tasks</h4>
-                      <p className="text-gray-600">Never miss a deadline with smart reminders</p>
-                      <p className="text-sm text-[#44a0d1] mt-4 font-semibold">👆 Click to cycle back</p>
-                    </div>
-                  </div>
-                </Card>
-                </CardSwap>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* PROJECTS - ScrollStack Animation */}
-        <div className="w-full bg-white py-20 mb-20" style={{ minHeight: '5000px' }}>
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 justify-center">
               <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
                 <Briefcase className="w-10 h-10 text-white" />
               </div>
-              <div>
+              <div className="text-center">
                 <h3 className="text-4xl font-black text-gray-900">Projects</h3>
-                <p className="text-xl text-gray-600">Organize & Execute - Scroll to stack</p>
+                <p className="text-xl text-gray-700">Organize & Execute with Ease</p>
               </div>
             </div>
           </div>
           
-          {/* ScrollStack with window scroll */}
-          <div className="w-full">
-            <ScrollStack
-              useWindowScroll={true}
-              itemDistance={200}
-              itemScale={0.05}
-              itemStackDistance={60}
-              stackPosition="20%"
-              scaleEndPosition="10%"
-              baseScale={0.9}
-            >
-              {[
-                { title: 'Grid View', url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=600&fit=crop', desc: 'Visualize all projects in a clean grid layout' },
-                { title: 'List View', url: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=1200&h=600&fit=crop', desc: 'Detailed list view with all project information' },
-                { title: 'Kanban Board', url: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200&h=600&fit=crop', desc: 'Drag and drop projects across stages' },
-                { title: 'Timeline', url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=600&fit=crop', desc: 'Track project timelines and milestones' },
-                { title: 'Team View', url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=600&fit=crop', desc: 'See who\'s working on what' },
-                { title: 'Analytics', url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop', desc: 'Deep insights into project performance' }
-              ].map((view, index) => (
-                <ScrollStackItem key={index}>
-                  <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-[#44a0d1]/30 h-full flex flex-col md:flex-row max-w-5xl mx-auto">
-                    <div className="md:w-1/2">
-                      <img src={view.url} alt={view.title} className="w-full h-64 md:h-full object-cover" />
-                    </div>
-                    <div className="md:w-1/2 p-8 flex flex-col justify-center">
-                      <h4 className="text-3xl font-bold text-gray-900 mb-4">{view.title}</h4>
-                      <p className="text-xl text-gray-600 mb-6">{view.desc}</p>
-                      <Link to="/projects" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] text-white px-6 py-3 rounded-xl font-bold hover:from-[#3688b5] hover:to-[#2b6d8a] transition-colors w-fit">
-                        Explore Projects
-                        <ArrowRight size={20} />
-                      </Link>
-                    </div>
-                  </div>
-                </ScrollStackItem>
-              ))}
-            </ScrollStack>
-          </div>
+          {/* Projects Marquee */}
+          <ProjectsMarquee />
         </div>
 
 
         {/* TASKS - TabsSwitcher */}
-        <div className="w-full bg-white py-20 mb-20" style={{ minHeight: '800px' }}>
+        <div className="w-full bg-white py-20 mb-20">
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-6 mb-12">
               <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
@@ -775,7 +645,9 @@ const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      <SharedFooter />
+      <div className="relative z-10">
+        <SharedFooter />
+      </div>
     </div>
   );
 };
