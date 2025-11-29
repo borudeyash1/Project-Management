@@ -48,38 +48,23 @@ const SartthiApps: React.FC = () => {
   };
 
   const handleDownload = (release: Release) => {
-    let url = release.downloadUrl;
-
-    // Fix for localhost URLs in production/remote environments
-    if (url.includes('localhost') && !window.location.hostname.includes('localhost')) {
-      try {
-        // If it's a localhost URL but we're not on localhost, try to convert it to a relative path
-        // or use the current base URL
-        const urlObj = new URL(url);
-        // Keep the path and query, discard the localhost origin
-        const relativePath = urlObj.pathname + urlObj.search;
-        
-        let baseUrl = process.env.REACT_APP_API_URL || '/api';
-        baseUrl = baseUrl.replace(/\/api\/?$/, '');
-        baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-        
-        // If the path starts with /uploads, we can likely serve it from the API server
-        if (relativePath.startsWith('/uploads')) {
-            url = `${baseUrl}${relativePath}`;
-        }
-      } catch (e) {
-        console.error('Error parsing download URL:', e);
-      }
+    // Extract the unique filename from the download URL or file path
+    // This ensures we hit the backend controller which handles local files and stats
+    let filename = '';
+    if (release.downloadUrl) {
+      filename = release.downloadUrl.split('/').pop() || '';
     }
 
-    if (url.startsWith('http')) {
-      window.open(url, '_blank');
-    } else {
-      let baseUrl = process.env.REACT_APP_API_URL || '/api';
-      baseUrl = baseUrl.replace(/\/api\/?$/, '');
-      baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-      window.open(`${baseUrl}${url}`, '_blank');
+    if (!filename) {
+      console.error('Could not determine filename for release');
+      return;
     }
+
+    const baseUrl = process.env.REACT_APP_API_URL || '/api';
+    const cleanBaseUrl = baseUrl.replace(/\/api\/?$/, '');
+    const downloadEndpoint = `${cleanBaseUrl}/api/releases/download/${filename}`;
+
+    window.open(downloadEndpoint, '_self');
   };
 
   const formatFileSize = (bytes: number) => {
@@ -126,11 +111,11 @@ const SartthiApps: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-white to-white relative overflow-hidden`}>
-      <div className={`absolute top-20 left-10 w-72 h-72 bg-[accent]/10 rounded-full blur-3xl animate-pulse`}></div>
-      <div className={`absolute bottom-20 right-10 w-96 h-96 bg-[accent]/10 rounded-full blur-3xl animate-pulse delay-1000`}></div>
-      
+      <div className={`absolute top-20 left-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-pulse`}></div>
+      <div className={`absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000`}></div>
+
       <SharedNavbar />
-      
+
       <div className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
@@ -164,11 +149,10 @@ const SartthiApps: React.FC = () => {
                     </li>
                   ))}
                 </ul>
-                <button className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  app.status === 'active'
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/50'
+                <button className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${app.status === 'active'
+                    ? 'bg-accent hover:bg-accent-hover text-white shadow-lg hover:shadow-accent/50'
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed font-bold'
-                }`}>
+                  }`}>
                   {app.status === 'active' ? 'Launch App' : 'Coming Soon'}
                 </button>
               </div>
@@ -177,80 +161,43 @@ const SartthiApps: React.FC = () => {
 
           {/* Desktop App Section */}
           <div className={`relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl overflow-hidden shadow-2xl`}>
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-[accent]/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-accent/20 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
-            
-            <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-12">
-              <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 mb-6 border border-blue-500/30">
+
+            <div className="relative z-10 p-8 md:p-12 flex flex-col lg:flex-row items-start gap-12">
+              <div className="flex-1 text-center md:text-left w-full">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent mb-6 border border-accent/30">
                   <Monitor size={20} />
                   <span className="font-semibold">Desktop Application</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Sartthi Desktop</h2>
-                <p className={`text-lg mb-8 text-gray-300`}>
-                  Experience the full power of Sartthi on your desktop. Native notifications, 
+                <p className={`text-lg mb-8 text-gray-300 max-w-2xl`}>
+                  Experience the full power of Sartthi on your desktop. Native notifications,
                   offline support, and deeper system integration for maximum performance.
                 </p>
-                
+
                 {loading ? (
                   <div className="flex items-center gap-2 text-blue-400">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
                     Loading releases...
                   </div>
                 ) : latestWindowsRelease ? (
-                  <div className="space-y-6">
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                      <button
-                        onClick={() => handleDownload(latestWindowsRelease)}
-                        className={`bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group`}
-                      >
-                        <Download size={24} />
-                        Download for Windows
-                      </button>
-                      <div className={`flex flex-col justify-center text-sm text-gray-400`}>
-                        <span>Version {latestWindowsRelease.version}</span>
-                        <span>{formatFileSize(latestWindowsRelease.fileSize)}</span>
+                  <div className="space-y-8">
+                    <div className="flex flex-col sm:flex-row gap-6 items-center md:items-start">
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => handleDownload(latestWindowsRelease)}
+                          className={`bg-accent hover:bg-accent-hover text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-accent/50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group`}
+                        >
+                          <Download size={24} />
+                          Download for Windows
+                        </button>
+                        <div className={`flex justify-between text-sm text-gray-400 px-1`}>
+                          <span>Version {latestWindowsRelease.version}</span>
+                          <span>{formatFileSize(latestWindowsRelease.fileSize)}</span>
+                        </div>
                       </div>
                     </div>
-
-                    {olderReleases.length > 0 && (
-                      <div className="mt-4">
-                        <button
-                          onClick={() => setShowOlderVersions(!showOlderVersions)}
-                          className={`text-sm font-medium flex items-center gap-2 text-gray-400 hover:text-white transition-colors`}
-                        >
-                          {showOlderVersions ? 'Hide older versions' : 'Show older versions'}
-                          <ArrowRight size={16} className={`transform transition-transform ${showOlderVersions ? 'rotate-90' : ''}`} />
-                        </button>
-
-                        {showOlderVersions && (
-                          <div className={`mt-4 rounded-xl border border-gray-700 bg-gray-900/50 overflow-hidden`}>
-                            {olderReleases.map((release) => (
-                              <div 
-                                key={release._id}
-                                className={`flex items-center justify-between p-4 border-b border-gray-700 last:border-0 hover:bg-gray-800 transition-colors`}
-                              >
-                                <div>
-                                  <div className={`font-medium text-white`}>
-                                    v{release.version}
-                                  </div>
-                                  <div className={`text-xs text-gray-400`}>
-                                    {new Date(release.createdAt).toLocaleDateString()} • {formatFileSize(release.fileSize)}
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handleDownload(release)}
-                                  className={`p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors`}
-                                  title="Download"
-                                >
-                                  <Download size={20} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <div className={`p-4 rounded-lg border border-gray-700 bg-gray-900`}>
@@ -258,13 +205,48 @@ const SartthiApps: React.FC = () => {
                   </div>
                 )}
               </div>
-              
-              <div className="flex-1 w-full max-w-md">
+
+              {/* Right Side: Older Versions & Illustration */}
+              <div className="flex-1 w-full max-w-md flex flex-col gap-6">
                 <div className={`aspect-video rounded-xl overflow-hidden border-4 border-gray-700 bg-gray-900 shadow-2xl relative group`}>
                   <div className="absolute inset-0 flex items-center justify-center">
-                     <Monitor className={`w-32 h-32 text-gray-800`} />
+                    <Monitor className={`w-32 h-32 text-gray-800`} />
                   </div>
                 </div>
+
+                {/* Older Versions List - Always visible if exists */}
+                {olderReleases.length > 0 && (
+                  <div className="rounded-xl border border-gray-700 bg-gray-900/50 overflow-hidden">
+                    <div className="p-4 bg-gray-800/50 border-b border-gray-700 font-semibold text-gray-300 flex items-center gap-2">
+                      <Download size={16} />
+                      Older Versions
+                    </div>
+                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                      {olderReleases.map((release) => (
+                        <div
+                          key={release._id}
+                          className={`flex items-center justify-between p-3 border-b border-gray-700 last:border-0 hover:bg-gray-800 transition-colors`}
+                        >
+                          <div>
+                            <div className={`font-medium text-white text-sm`}>
+                              v{release.version}
+                            </div>
+                            <div className={`text-xs text-gray-400`}>
+                              {new Date(release.createdAt).toLocaleDateString()} • {formatFileSize(release.fileSize)}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDownload(release)}
+                            className={`p-2 rounded-lg text-gray-400 hover:text-accent hover:bg-gray-700 transition-colors`}
+                            title="Download"
+                          >
+                            <Download size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

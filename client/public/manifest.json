@@ -1,0 +1,15 @@
+{
+    "short_name": "Sartthi",
+    "name": "Sartthi — Projects, Payroll, Planner & Tracking",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#FFD700",
+    "background_color": "#0B0F18"
+}
