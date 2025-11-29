@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Upload, Download, Package, Trash2, Edit, CheckCircle, 
+import {
+  Upload, Download, Package, Trash2, Edit, CheckCircle,
   XCircle, Monitor, Apple, Plus, X, HardDrive
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -37,6 +37,7 @@ const ReleaseManagement: React.FC = () => {
   const [releases, setReleases] = useState<Release[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [stats, setStats] = useState<any>(null);
 
   // Form state
@@ -54,7 +55,7 @@ const ReleaseManagement: React.FC = () => {
   useEffect(() => {
     // Clear expired tokens first
     clearExpiredTokens();
-    
+
     const adminToken = localStorage.getItem('adminToken');
     if (!adminToken || !validateAdminToken(adminToken)) {
       localStorage.removeItem('adminToken');
@@ -63,7 +64,7 @@ const ReleaseManagement: React.FC = () => {
       return;
     }
     localStorage.setItem('accessToken', adminToken);
-    
+
     fetchReleases();
     fetchStats();
   }, []);
@@ -72,9 +73,9 @@ const ReleaseManagement: React.FC = () => {
     try {
       setLoading(true);
       console.log('🔍 [RELEASES] Fetching releases...');
-      
+
       const response = await api.get('/releases');
-      
+
       if (response?.success) {
         console.log('✅ [RELEASES] Fetched', response.data.length, 'releases');
         setReleases(response.data);
@@ -129,7 +130,9 @@ const ReleaseManagement: React.FC = () => {
       formDataToSend.append('architecture', formData.architecture);
       formDataToSend.append('isLatest', formData.isLatest.toString());
 
-      const data = await api.uploadRelease(formDataToSend);
+      const data = await api.uploadRelease(formDataToSend, (percent) => {
+        setUploadProgress(percent);
+      });
 
       if (data?.success) {
         console.log('✅ [RELEASES] Release created successfully');
@@ -155,6 +158,7 @@ const ReleaseManagement: React.FC = () => {
       addToast(error?.message || 'Failed to create release', 'error');
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -164,7 +168,7 @@ const ReleaseManagement: React.FC = () => {
     try {
       console.log('🔍 [RELEASES] Deleting release:', id);
       const response = await api.delete(`/releases/${id}`);
-      
+
       if (response?.success) {
         console.log('✅ [RELEASES] Release deleted');
         addToast('Release deleted successfully', 'success');
@@ -182,7 +186,7 @@ const ReleaseManagement: React.FC = () => {
       const response = await api.put(`/releases/${id}`, {
         isLatest: !currentValue
       });
-      
+
       if (response?.success) {
         addToast('Release updated', 'success');
         fetchReleases();
@@ -534,27 +538,31 @@ const ReleaseManagement: React.FC = () => {
                   </label>
                 </div>
 
+                {uploading && (
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-4">
+                    <div className="bg-yellow-500 h-2.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+                  </div>
+                )}
+
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className={`flex-1 px-4 py-3 rounded-xl border-2 ${
-                      isDarkMode 
-                        ? 'border-gray-600 hover:bg-gray-700 text-white' 
+                    className={`flex-1 px-4 py-3 rounded-xl border-2 ${isDarkMode
+                        ? 'border-gray-600 hover:bg-gray-700 text-white'
                         : 'border-gray-300 hover:bg-gray-50 text-gray-900'
-                    } font-semibold transition-colors`}
+                      } font-semibold transition-colors`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleCreateRelease}
                     disabled={uploading}
-                    className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
-                      uploading
+                    className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${uploading
                         ? 'bg-gray-400 cursor-not-allowed text-white'
                         : 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white'
-                    }`}
+                      }`}
                   >
-                    {uploading ? 'Uploading...' : 'Create Release'}
+                    {uploading ? `Uploading... ${uploadProgress}%` : 'Create Release'}
                   </button>
                 </div>
               </div>
