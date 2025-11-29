@@ -82,7 +82,7 @@ const SartthiApps: React.FC = () => {
       link: 'https://mail.sartthi.com',
       color: 'from-blue-500 to-cyan-500',
       features: ['Unified Inbox', 'Smart Filtering', 'Secure Encryption'],
-      status: 'coming-soon'
+      status: 'active'
     },
     {
       id: 'calendar',
@@ -92,7 +92,7 @@ const SartthiApps: React.FC = () => {
       link: 'https://calendar.sartthi.com',
       color: 'from-purple-500 to-pink-500',
       features: ['Two-way Sync', 'Smart Scheduling', 'Team Availability'],
-      status: 'coming-soon'
+      status: 'active'
     },
     {
       id: 'vault',
@@ -102,7 +102,7 @@ const SartthiApps: React.FC = () => {
       link: 'https://vault.sartthi.com',
       color: 'from-green-500 to-emerald-500',
       features: ['Zero-Knowledge Encryption', 'Google Drive Integration', 'Secure Sharing'],
-      status: 'coming-soon'
+      status: 'active'
     }
   ];
 
@@ -155,14 +155,6 @@ const SartthiApps: React.FC = () => {
                   }`}>
                   {app.status === 'active' ? 'Launch App' : 'Coming Soon'}
                 </button>
-
-                {app.status === 'coming-soon' && (
-                  <div className={`absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10`}>
-                    <span className={`bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg transform -rotate-12 border border-gray-700`}>
-                      Coming Soon
-                    </span>
-                  </div>
-                )}
               </div>
             ))}
           </div>
