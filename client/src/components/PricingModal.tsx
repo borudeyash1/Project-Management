@@ -349,18 +349,18 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                     </div>
                   </div>
 
-                  {/* CTA Button */}
                   <button
                     onClick={(event) => {
                       event.stopPropagation();
                       openPlanDetail(planKey);
                     }}
-                    className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${planKey === 'pro'
-                      ? 'bg-accent text-gray-900 hover:bg-accent-hover'
-                      : planKey === 'free'
-                        ? 'bg-gray-100 text-gray-900 hover:bg-gray-300'
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors shadow-md ${
+                      planKey === 'free'
+                        ? 'bg-gray-900 text-white hover:bg-gray-800'
+                        : planKey === 'pro'
+                        ? 'bg-gradient-to-r from-[#44a0d1] to-[#3688b5] text-white hover:from-[#3688b5] hover:to-[#2b6d8a]'
                         : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500'
-                      } shadow-md`}
+                    }`}
                   >
                     {buttonLabel}
                     {planKey !== 'free' && (
