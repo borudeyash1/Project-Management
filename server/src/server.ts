@@ -95,8 +95,8 @@ app.use("/api/", limiter);
 app.use(morgan("combined"));
 
 // Body parsing middleware
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "500mb" }));
+app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 
 // Initialize Passport
 app.use(passport.initialize());
