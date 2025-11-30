@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import EventCard from './EventCard';
 
-interface Event {
+export interface Event {
   id: string;
   title: string;
   startTime: string;
@@ -10,7 +10,11 @@ interface Event {
   color?: 'blue' | 'gray' | 'green' | 'purple' | 'orange';
 }
 
-const WeekGrid: React.FC = () => {
+interface WeekGridProps {
+  events?: Event[];
+}
+
+const WeekGrid: React.FC<WeekGridProps> = ({ events = [] }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -23,50 +27,6 @@ const WeekGrid: React.FC = () => {
 
   const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   const hours = Array.from({ length: 24 }, (_, i) => i);
-
-  // Sample events
-  const events: Event[] = [
-    {
-      id: '1',
-      title: 'Team Standup',
-      startTime: '9:00 AM',
-      endTime: '9:30 AM',
-      day: 0,
-      color: 'blue',
-    },
-    {
-      id: '2',
-      title: 'Design Review',
-      startTime: '11:00 AM',
-      endTime: '12:00 PM',
-      day: 0,
-      color: 'purple',
-    },
-    {
-      id: '3',
-      title: 'Lunch Break',
-      startTime: '12:30 PM',
-      endTime: '1:30 PM',
-      day: 0,
-      color: 'gray',
-    },
-    {
-      id: '4',
-      title: 'Client Meeting',
-      startTime: '2:00 PM',
-      endTime: '3:30 PM',
-      day: 1,
-      color: 'orange',
-    },
-    {
-      id: '5',
-      title: 'Code Review',
-      startTime: '10:00 AM',
-      endTime: '11:00 AM',
-      day: 2,
-      color: 'green',
-    },
-  ];
 
   // Get current day and time for the "now" indicator
   const currentDay = currentTime.getDay() === 0 ? 6 : currentTime.getDay() - 1; // Convert to Mon=0

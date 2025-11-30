@@ -142,6 +142,28 @@ const workspaceSchema = new Schema<IWorkspace>({
   isActive: {
     type: Boolean,
     default: true
+  },
+  vaultFolderId: {
+    type: Schema.Types.ObjectId,
+    ref: 'VaultDocument'
+  },
+  quickAccessDocs: [{
+    type: Schema.Types.ObjectId,
+    ref: 'VaultDocument'
+  }],
+  documentSettings: {
+    autoSync: {
+      type: Boolean,
+      default: true
+    },
+    allowedFileTypes: [{
+      type: String,
+      default: ['*']
+    }],
+    maxStorageGB: {
+      type: Number,
+      default: 10
+    }
   }
 }, {
   timestamps: true
@@ -153,16 +175,16 @@ workspaceSchema.index({ 'members.user': 1 });
 workspaceSchema.index({ name: 1 });
 
 // Virtual for member count
-workspaceSchema.virtual('memberCount').get(function() {
+workspaceSchema.virtual('memberCount').get(function (this: IWorkspace) {
   return this.members.filter((member: any) => member.status === 'active').length;
 });
 
 // Method to add member
-workspaceSchema.methods.addMember = function(userId: string, role: string = 'member') {
-  const existingMember = this.members.find((member: any) => 
+workspaceSchema.methods.addMember = function (userId: string, role: string = 'member') {
+  const existingMember = this.members.find((member: any) =>
     member.user.toString() === userId.toString()
   );
-  
+
   if (existingMember) {
     existingMember.status = 'active';
     existingMember.role = role;
@@ -173,54 +195,54 @@ workspaceSchema.methods.addMember = function(userId: string, role: string = 'mem
       status: 'active'
     });
   }
-  
+
   return this.save();
 };
 
 // Method to remove member
-workspaceSchema.methods.removeMember = function(userId: string) {
-  this.members = this.members.filter((member: any) => 
+workspaceSchema.methods.removeMember = function (userId: string) {
+  this.members = this.members.filter((member: any) =>
     member.user.toString() !== userId.toString()
   );
   return this.save();
 };
 
 // Method to update member role
-workspaceSchema.methods.updateMemberRole = function(userId: string, role: string) {
-  const member = this.members.find((member: any) => 
+workspaceSchema.methods.updateMemberRole = function (userId: string, role: string) {
+  const member = this.members.find((member: any) =>
     member.user.toString() === userId.toString()
   );
-  
+
   if (member) {
     member.role = role;
   }
-  
+
   return this.save();
 };
 
 // Method to check if user is member
-workspaceSchema.methods.isMember = function(userId: string) {
-  return this.members.some((member: any) => 
+workspaceSchema.methods.isMember = function (userId: string) {
+  return this.members.some((member: any) =>
     member.user.toString() === userId.toString() && member.status === 'active'
   );
 };
 
 // Method to check if user has permission
-workspaceSchema.methods.hasPermission = function(userId: string, permission: string) {
-  const member = this.members.find((member: any) => 
+workspaceSchema.methods.hasPermission = function (userId: string, permission: string) {
+  const member = this.members.find((member: any) =>
     member.user.toString() === userId.toString() && member.status === 'active'
   );
-  
+
   if (!member) return false;
-  
+
   // Owner has all permissions
   if (member.role === 'owner') return true;
-  
+
   return member.permissions[permission] || false;
 };
 
 // Transform JSON output
-workspaceSchema.methods.toJSON = function() {
+workspaceSchema.methods.toJSON = function () {
   const workspaceObject = this.toObject();
   workspaceObject.memberCount = this.memberCount;
   return workspaceObject;

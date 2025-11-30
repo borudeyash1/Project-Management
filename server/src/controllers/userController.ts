@@ -355,17 +355,24 @@ export const getPreferences = async (req: AuthenticatedRequest, res: Response): 
   try {
     const user = req.user!;
 
-    const response: ApiResponse = {
-      success: true,
-      message: 'Preferences retrieved successfully',
-      data: user.preferences || {
+    // Initialize preferences if they don't exist
+    if (!user.preferences) {
+      user.preferences = {
         theme: 'system',
         accentColor: '#FBBF24',
         fontSize: 'medium',
         density: 'comfortable',
         animations: true,
         reducedMotion: false
-      }
+      };
+      // We don't save here to avoid unnecessary writes on read, 
+      // but we return the default structure
+    }
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Preferences retrieved successfully',
+      data: user.preferences
     };
 
     res.status(200).json(response);
@@ -381,20 +388,31 @@ export const getPreferences = async (req: AuthenticatedRequest, res: Response): 
 // Update user preferences
 export const updatePreferences = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { theme, accentColor, fontSize, density, animations, reducedMotion } = req.body;
+    const updates = req.body;
     const user = req.user!;
 
-    // Update preferences
+    // Initialize preferences if they don't exist
     if (!user.preferences) {
-      user.preferences = {};
+      user.preferences = {
+        theme: 'system',
+        accentColor: '#FBBF24',
+        fontSize: 'medium',
+        density: 'comfortable',
+        animations: true,
+        reducedMotion: false
+      };
     }
 
-    if (theme) user.preferences.theme = theme;
-    if (accentColor) user.preferences.accentColor = accentColor;
-    if (fontSize) user.preferences.fontSize = fontSize;
-    if (density) user.preferences.density = density;
-    if (animations !== undefined) user.preferences.animations = animations;
-    if (reducedMotion !== undefined) user.preferences.reducedMotion = reducedMotion;
+    // Apply updates
+    if (updates.theme) user.preferences.theme = updates.theme;
+    if (updates.accentColor) user.preferences.accentColor = updates.accentColor;
+    if (updates.fontSize) user.preferences.fontSize = updates.fontSize;
+    if (updates.density) user.preferences.density = updates.density;
+    if (updates.animations !== undefined) user.preferences.animations = updates.animations;
+    if (updates.reducedMotion !== undefined) user.preferences.reducedMotion = updates.reducedMotion;
+
+    // Mark modified because it's a mixed/nested type sometimes
+    user.markModified('preferences');
 
     await user.save();
 

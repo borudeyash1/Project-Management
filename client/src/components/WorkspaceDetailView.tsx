@@ -6,13 +6,14 @@ import {
   ArrowLeft, Edit, Users, UserPlus, Building, FolderOpen,
   Search, Mail, Phone, MapPin, Globe, Eye, EyeOff,
   Save, X, Plus, Trash2, Check, Clock, Briefcase,
-  FileText, Tag, DollarSign, Calendar, User
+  FileText, Tag, DollarSign, Calendar, User, Files
 } from 'lucide-react';
 import WorkspaceEditTab from './workspace-detail/WorkspaceEditTab';
 import WorkspaceCollaborateTab from './workspace-detail/WorkspaceCollaborateTab';
 import WorkspaceMembersTab from './workspace-detail/WorkspaceMembersTab';
 import WorkspaceClientsTab from './workspace-detail/WorkspaceClientsTab';
 import WorkspaceProjectsTab from './workspace-detail/WorkspaceProjectsTab';
+import VaultIntegration from './workspace-detail/VaultIntegration';
 
 const WorkspaceDetailView: React.FC = () => {
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ const WorkspaceDetailView: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
   
-  const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects'>('edit');
+  const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects' | 'documents'>('edit');
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
   // Listen for client click events from ClientsTab
@@ -66,7 +67,8 @@ const WorkspaceDetailView: React.FC = () => {
     { id: 'collaborate', label: t('workspace.detail.tabs.collaborate'), icon: Users },
     { id: 'members', label: t('workspace.detail.tabs.members'), icon: UserPlus },
     { id: 'clients', label: t('workspace.detail.tabs.clients'), icon: Briefcase },
-    { id: 'projects', label: t('workspace.detail.tabs.projects'), icon: FolderOpen }
+    { id: 'projects', label: t('workspace.detail.tabs.projects'), icon: FolderOpen },
+    { id: 'documents', label: 'Documents', icon: Files }
   ];
 
   return (
@@ -129,6 +131,7 @@ const WorkspaceDetailView: React.FC = () => {
               onClearClientFilter={() => setSelectedClientId(null)}
             />
           )}
+          {activeTab === 'documents' && <VaultIntegration workspaceId={workspace._id} />}
         </div>
       </div>
     </div>

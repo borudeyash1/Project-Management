@@ -4,10 +4,14 @@ import {
   Users, Target, Clock, DollarSign, PieChart, LineChart,
   FileText, Share2, Eye, MoreVertical, RefreshCw,
   Bot, Crown, Star, Zap, AlertCircle, CheckCircle,
-  ArrowUp, ArrowDown, Minus, Plus, Search
+  ArrowUp, ArrowDown, Minus, Plus, Search, Printer
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import CreateReportModal from './CreateReportModal';
+import ScheduleReportModal from './ScheduleReportModal';
+import { downloadReportPDF, printReportPDF } from '../utils/pdfGenerator';
+import * as XLSX from 'xlsx';
 
 interface ReportData {
   _id: string;
@@ -71,6 +75,7 @@ const ReportsPage: React.FC = () => {
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
   const [reportType, setReportType] = useState<'all' | 'productivity' | 'time' | 'team' | 'financial' | 'project'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Mock data - replace with actual API calls
@@ -334,6 +339,97 @@ const ReportsPage: React.FC = () => {
 
   const getProjectProgress = () => {
     return projectMetrics.reduce((total, project) => total + project.progress, 0) / projectMetrics.length;
+  };
+
+  // New Report Creation
+  const handleCreateReport = (reportData: any) => {
+    const newReport: ReportData = {
+      _id: Date.now().toString(),
+      name: reportData.name,
+      type: reportData.type,
+      description: reportData.description,
+      data: {
+        dateRange: reportData.dateRange,
+        generatedAt: new Date(),
+        // Add actual data based on report type
+        summary: 'Report data will be populated based on selected criteria'
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isPublic: false,
+      tags: reportData.tags
+    };
+    setReports([newReport, ...reports]);
+  };
+
+  // Quick Actions
+  const handleExportAllData = () => {
+    const workbook = XLSX.utils.book_new();
+    
+    // Reports sheet
+    const reportsData = reports.map(r => ({
+      Name: r.name,
+      Type: r.type,
+      Description: r.description,
+      Created: r.createdAt.toLocaleDateString(),
+      Tags: r.tags.join(', ')
+    }));
+    const reportsSheet = XLSX.utils.json_to_sheet(reportsData);
+    XLSX.utils.book_append_sheet(workbook, reportsSheet, 'Reports');
+    
+    // Projects sheet
+    const projectsData = projectMetrics.map(p => ({
+      Name: p.name,
+      'Total Tasks': p.totalTasks,
+      'Completed Tasks': p.completedTasks,
+      'Progress %': p.progress,
+      Budget: p.budget,
+      Spent: p.spent,
+      'Team Size': p.teamSize,
+      Status: p.status
+    }));
+    const projectsSheet = XLSX.utils.json_to_sheet(projectsData);
+    XLSX.utils.book_append_sheet(workbook, projectsSheet, 'Projects');
+    
+    // Team sheet
+    const teamData = teamPerformance.map(m => ({
+      Name: m.name,
+      Role: m.role,
+      'Tasks Completed': m.tasksCompleted,
+      'Total Tasks': m.totalTasks,
+      'Completion Rate %': m.completionRate,
+      'Avg Rating': m.averageRating,
+      'Hours Worked': m.hoursWorked,
+      'Productivity Score': m.productivityScore
+    }));
+    const teamSheet = XLSX.utils.json_to_sheet(teamData);
+    XLSX.utils.book_append_sheet(workbook, teamSheet, 'Team Performance');
+    
+    // Time tracking sheet
+    const timeData = timeTrackingData.map(t => ({
+      Date: t.date,
+      'Total Hours': t.hours,
+      'Billable Hours': t.billableHours
+    }));
+    const timeSheet = XLSX.utils.json_to_sheet(timeData);
+    XLSX.utils.book_append_sheet(workbook, timeSheet, 'Time Tracking');
+    
+    // Download
+    XLSX.writeFile(workbook, `reports_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const handleShareDashboard = () => {
+    const shareUrl = `${window.location.origin}/reports/shared/${Date.now()}`;
+    navigator.clipboard.writeText(shareUrl);
+    
+    // Show toast notification (you can implement a toast system)
+    alert('Dashboard link copied to clipboard!\n' + shareUrl);
+  };
+
+  const handleScheduleReport = (scheduleData: any) => {
+    console.log('Scheduling report:', scheduleData);
+    // In a real implementation, this would call an API to set up the schedule
+    alert(`Report scheduled successfully!\nType: ${scheduleData.reportType}\nFrequency: ${scheduleData.frequency}\nRecipients: ${scheduleData.recipients.length}`);
   };
 
   return (
@@ -632,15 +728,24 @@ const ReportsPage: React.FC = () => {
             <div className="bg-white rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
               <div className="space-y-2">
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                <button 
+                  onClick={handleExportAllData}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   <Download className="w-4 h-4 inline mr-2" />
                   Export All Data
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                <button 
+                  onClick={handleShareDashboard}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   <Share2 className="w-4 h-4 inline mr-2" />
                   Share Dashboard
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                <button 
+                  onClick={() => setShowScheduleModal(true)}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   <Calendar className="w-4 h-4 inline mr-2" />
                   Schedule Report
                 </button>
@@ -653,7 +758,7 @@ const ReportsPage: React.FC = () => {
       {/* Report Detail Modal */}
       {selectedReport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -675,9 +780,58 @@ const ReportsPage: React.FC = () => {
             </div>
             
             <div className="p-6">
-              <pre className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 overflow-x-auto">
-                {JSON.stringify(selectedReport.data, null, 2)}
-              </pre>
+              <div className="bg-gradient-to-r from-accent/10 to-blue-100 rounded-lg p-6 mb-4">
+                <h4 className="font-semibold text-gray-900 mb-2">Report Preview</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  This report contains {Object.keys(selectedReport.data).length} data points. 
+                  Download as PDF for a formatted view or export as JSON for raw data.
+                </p>
+                
+                {/* Data Summary */}
+                <div className="bg-white rounded-lg p-4">
+                  {selectedReport.data.insights ? (
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-2">Key Insights:</h5>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                        {selectedReport.data.insights.map((insight: string, i: number) => (
+                          <li key={i}>{insight}</li>
+                        ))}
+                      </ul>
+                      {selectedReport.data.recommendations && (
+                        <div className="mt-4">
+                          <h5 className="font-medium text-gray-900 mb-2">Recommendations:</h5>
+                          <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                            {selectedReport.data.recommendations.map((rec: string, i: number) => (
+                              <li key={i}>{rec}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      {Object.entries(selectedReport.data).map(([key, value]) => (
+                        <div key={key} className="border-l-2 border-accent pl-3">
+                          <p className="text-xs text-gray-600">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Raw JSON (collapsible) */}
+              <details className="bg-gray-50 rounded-lg p-4">
+                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+                  View Raw JSON Data
+                </summary>
+                <pre className="mt-3 text-xs text-gray-700 overflow-x-auto">
+                  {JSON.stringify(selectedReport.data, null, 2)}
+                </pre>
+              </details>
             </div>
             
             <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
@@ -687,18 +841,49 @@ const ReportsPage: React.FC = () => {
               >
                 Close
               </button>
+              <button
+                onClick={() => printReportPDF(selectedReport)}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 inline-flex items-center gap-2"
+              >
+                <Printer className="w-4 h-4" />
+                Print
+              </button>
               {canExportReports() && (
-                <button
-                  onClick={() => exportReport(selectedReport)}
-                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
-                >
-                  Export
-                </button>
+                <>
+                  <button
+                    onClick={() => exportReport(selectedReport)}
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 inline-flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Export JSON
+                  </button>
+                  <button
+                    onClick={() => downloadReportPDF(selectedReport)}
+                    className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover inline-flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PDF
+                  </button>
+                </>
               )}
             </div>
           </div>
         </div>
       )}
+
+      {/* Create Report Modal */}
+      <CreateReportModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreateReport={handleCreateReport}
+      />
+
+      {/* Schedule Report Modal */}
+      <ScheduleReportModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={handleScheduleReport}
+      />
     </div>
   );
 };

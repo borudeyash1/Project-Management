@@ -6,6 +6,8 @@ import { AuthenticatedRequest, ApiResponse, IProject } from '../types';
 import { PlanName, SUBSCRIPTION_LIMITS, requiresWorkspaceForProjects } from '../config/subscriptionLimits';
 import { sendEmail } from '../services/emailService';
 import { createActivity } from '../utils/activityUtils';
+import { getCalendarService } from '../services/sartthi/calendarService';
+import { getMailService } from '../services/sartthi/mailService';
 
 // Create project
 export const createProject = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -42,9 +44,9 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       // Enforce workspace project limits when applicable
       const currentWorkspaceProjectCount = await Project.countDocuments({ workspace: workspaceId, isActive: true });
       console.log('📊 Project limit check:', { currentCount: currentWorkspaceProjectCount, workspaceLimit: workspace.subscription?.maxProjects, planLimit: planLimits.maxProjects });
-      
+
       const workspaceLimit = workspace.subscription?.maxProjects ?? planLimits.maxProjects;
-      
+
       // Only enforce if limit is explicitly set and not unlimited
       if (workspaceLimit && workspaceLimit !== -1 && currentWorkspaceProjectCount >= workspaceLimit) {
         res.status(403).json({
@@ -58,14 +60,14 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
     } else {
       // Creating personal project (no workspace)
       // Free users can only have 1 active personal project
-      const existingProjectCount = await Project.countDocuments({ 
-        createdBy: user._id, 
+      const existingProjectCount = await Project.countDocuments({
+        createdBy: user._id,
         workspace: null,  // Only count personal projects
-        isActive: true 
+        isActive: true
       });
-      
+
       console.log('📊 Personal project check:', { existingCount: existingProjectCount, limit: planLimits.maxProjects });
-      
+
       if (planLimits.maxProjects !== -1 && existingProjectCount >= planLimits.maxProjects) {
         res.status(403).json({
           success: false,
@@ -134,6 +136,23 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       }
     } catch (emailErr) {
       console.error('Project creation email failed:', emailErr);
+    }
+
+    // Sartthi Integration: Calendar Sync
+    const calendarService = getCalendarService();
+    if (calendarService) {
+      await calendarService.createEventFromProject(project);
+    }
+
+    // Sartthi Integration: Mail Notification
+    const mailService = getMailService();
+    if (mailService) {
+      // Collect team emails
+      const teamEmails: string[] = [];
+      if (req.user?.email) teamEmails.push(req.user.email);
+      // Add other members if any (though usually just creator at start)
+
+      await mailService.sendProjectCreationNotification(project, teamEmails);
     }
 
     res.status(201).json(response);
@@ -218,8 +237,8 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
     // Check if user is workspace owner or admin
     const isWorkspaceOwner = workspace.owner.toString() === userId.toString();
     const isWorkspaceAdmin = workspace.members.some(
-      (member: any) => 
-        member.user.toString() === userId.toString() && 
+      (member: any) =>
+        member.user.toString() === userId.toString() &&
         (member.role === 'admin' || member.role === 'owner')
     );
 
@@ -386,6 +405,14 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     } catch (emailErr) {
       console.error('Project update email failed:', emailErr);
     }
+
+    // Sartthi Integration: Calendar Sync
+    const calendarService = getCalendarService();
+    if (calendarService) {
+      // await calendarService.updateEvent(project.calendarEventId, { ... });
+    }
+
+    // Sartthi Integration: Mail Notification (already handled by existing email logic, but could be enhanced)
 
     res.status(200).json(response);
   } catch (error: any) {

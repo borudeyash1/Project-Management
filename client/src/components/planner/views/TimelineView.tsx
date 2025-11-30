@@ -199,7 +199,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
                   onClick={() => setZoomLevel(level)}
                   className={`px-3 py-2 text-sm font-medium ${
                     zoomLevel === level
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
@@ -218,7 +218,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
           <div className="border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
             <div className="flex">
               <div className="w-48 flex-shrink-0 px-4 py-3 border-r border-gray-300 dark:border-gray-600">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-700">{t('planner.timeline.task.title')}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('planner.timeline.task.title')}</span>
               </div>
               <div className="flex-1 relative">
                 <div className="flex h-full">
@@ -325,7 +325,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ searchQuery }) => {
                       {/* Hover Info */}
                       <div className="absolute -top-16 left-0 hidden group-hover:block bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl z-20 min-w-64">
                         <div className="font-semibold mb-2">{task.title}</div>
-                        <div className="space-y-1 text-gray-700">
+                        <div className="space-y-1 text-gray-300">
                           <div>{t('planner.timeline.task.start')}: {position.startDate.toLocaleDateString()}</div>
                           <div>{t('planner.timeline.task.end')}: {position.endDate.toLocaleDateString()}</div>
                           <div>{t('planner.timeline.task.duration')}: {position.duration} {t('planner.timeline.task.days')}</div>

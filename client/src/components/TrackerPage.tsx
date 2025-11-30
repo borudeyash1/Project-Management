@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useTheme } from '../context/ThemeContext';
 
 interface TimeEntry {
   _id: string;
@@ -43,6 +44,7 @@ const TrackerPage: React.FC = () => {
   const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics } = useFeatureAccess();
+  const { isDarkMode } = useTheme();
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentEntry, setCurrentEntry] = useState<TimeEntry | null>(null);
@@ -297,13 +299,13 @@ const TrackerPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} border-b px-6 py-4`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{t('tracker.title')}</h1>
-            <p className="text-gray-600 mt-1">{t('tracker.subtitle')}</p>
+            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('tracker.title')}</h1>
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>{t('tracker.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -322,9 +324,9 @@ const TrackerPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Timer Section */}
-            <div className="bg-white rounded-lg border border-gray-300 p-6">
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} rounded-lg border p-6`}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">{t('tracker.timer')}</h2>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('tracker.timer')}</h2>
                 <div className="flex items-center gap-2">
                   {['timer', 'entries', 'reports'].map(tab => (
                     <button
@@ -332,8 +334,8 @@ const TrackerPage: React.FC = () => {
                       onClick={() => setActiveTab(tab as any)}
                       className={`px-3 py-2 text-sm font-medium rounded-lg ${
                         activeTab === tab
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'text-gray-600 hover:text-gray-900'
+                          ? isDarkMode ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-700'
+                          : isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
                       }`}
                     >
                       {t(`tracker.${tab}`)}
@@ -354,17 +356,6 @@ const TrackerPage: React.FC = () => {
                       }">
                         {formatElapsedTime(elapsedTime)}
                       </div>
-                      {isPaused && (
-                        <div className="text-lg text-yellow-700 mb-2 font-medium">
-                          ⏸️ {t('tracker.timerPaused')}
-                        </div>
-                      )}
-                      <div className="text-lg text-gray-700 mb-4">
-                        {currentEntry.projectName} - {currentEntry.taskTitle}
-                      </div>
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={pauseTracking}
                           className={`p-3 text-white rounded-lg ${
                             isPaused 
                               ? 'bg-green-500 hover:bg-green-600' 
@@ -383,11 +374,11 @@ const TrackerPage: React.FC = () => {
                     </div>
                   ) : (
                     <div className="text-center p-8">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Clock className="w-8 h-8 text-gray-600" />
+                      <div className={`w-16 h-16 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                        <Clock className={`w-8 h-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tracker.noActiveTimer')}</h3>
-                      <p className="text-gray-600 mb-4">{t('tracker.startTrackingTime')}</p>
+                      <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('tracker.noActiveTimer')}</h3>
+                      <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>{t('tracker.startTrackingTime')}</p>
                       <button
                         onClick={() => setShowAddEntry(true)}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
@@ -400,17 +391,17 @@ const TrackerPage: React.FC = () => {
 
                   {/* Quick Stats */}
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">{formatDuration(getTotalTimeToday())}</div>
-                      <div className="text-sm text-gray-600">{t('tracker.today')}</div>
+                    <div className={`text-center p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                      <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatDuration(getTotalTimeToday())}</div>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('tracker.today')}</div>
                     </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">{formatDuration(getTotalTimeThisWeek())}</div>
-                      <div className="text-sm text-gray-600">{t('tracker.thisWeek')}</div>
+                    <div className={`text-center p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                      <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatDuration(getTotalTimeThisWeek())}</div>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('tracker.thisWeek')}</div>
                     </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">${getBillableAmount().toFixed(0)}</div>
-                      <div className="text-sm text-gray-600">{t('tracker.billable')}</div>
+                    <div className={`text-center p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                      <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>${getBillableAmount().toFixed(0)}</div>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('tracker.billable')}</div>
                     </div>
                   </div>
                 </div>
@@ -419,17 +410,17 @@ const TrackerPage: React.FC = () => {
               {activeTab === 'entries' && (
                 <div className="space-y-4">
                   {timeEntries.map(entry => (
-                    <div key={entry._id} className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
+                    <div key={entry._id} className={`flex items-center justify-between p-4 border ${isDarkMode ? 'border-gray-700' : 'border-gray-300'} rounded-lg`}>
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <div className={`w-3 h-3 rounded-full ${entry.projectId === 'p1' ? 'bg-accent' : 'bg-green-500'}`} />
-                          <h3 className="font-medium text-gray-900">{entry.taskTitle}</h3>
-                          <span className="text-sm text-gray-600">{entry.projectName}</span>
+                          <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{entry.taskTitle}</h3>
+                          <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{entry.projectName}</span>
                         </div>
                         {entry.description && (
-                          <p className="text-sm text-gray-600 mb-2">{entry.description}</p>
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>{entry.description}</p>
                         )}
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className={`flex items-center gap-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                           <span>{formatTime(entry.startTime)}</span>
                           {entry.endTime && <span>- {formatTime(entry.endTime)}</span>}
                           <span>{formatDuration(entry.duration)}</span>
@@ -445,7 +436,7 @@ const TrackerPage: React.FC = () => {
                             <span className="text-sm">{t('tracker.running')}</span>
                           </div>
                         )}
-                        <button className="p-2 text-gray-600 hover:text-gray-600">
+                        <button className={`p-2 ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -458,15 +449,15 @@ const TrackerPage: React.FC = () => {
                 <div className="space-y-6">
                   {canUseAdvancedAnalytics() ? (
                     <div className="text-center py-8">
-                      <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tracker.advancedReports')}</h3>
-                      <p className="text-gray-600">{t('tracker.detailedReports')}</p>
+                      <BarChart3 className={`w-16 h-16 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mx-auto mb-4`} />
+                      <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('tracker.advancedReports')}</h3>
+                      <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('tracker.detailedReports')}</p>
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <Crown className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tracker.upgradeRequired')}</h3>
-                      <p className="text-gray-600">{t('tracker.upgradeMessage')}</p>
+                      <Crown className={`w-16 h-16 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mx-auto mb-4`} />
+                      <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>{t('tracker.upgradeRequired')}</h3>
+                      <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('tracker.upgradeMessage')}</p>
                     </div>
                   )}
                 </div>
@@ -491,16 +482,16 @@ const TrackerPage: React.FC = () => {
             </div>
 
             {/* Projects */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('tracker.projects')}</h3>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} rounded-lg border p-4`}>
+              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('tracker.projects')}</h3>
               <div className="space-y-3">
                 {projects.map(project => (
                   <div key={project._id} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${project.color}`} />
-                      <span className="text-sm font-medium text-gray-900">{project.name}</span>
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                       {formatDuration(project.totalTime)}
                     </div>
                   </div>
@@ -509,14 +500,14 @@ const TrackerPage: React.FC = () => {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('tracker.recentActivity')}</h3>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} rounded-lg border p-4`}>
+              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('tracker.recentActivity')}</h3>
               <div className="space-y-2">
                 {timeEntries.slice(0, 5).map(entry => (
                   <div key={entry._id} className="flex items-center gap-2 text-sm">
                     <div className={`w-2 h-2 rounded-full ${entry.projectId === 'p1' ? 'bg-accent' : 'bg-green-500'}`} />
-                    <span className="text-gray-900">{entry.taskTitle}</span>
-                    <span className="text-gray-600 ml-auto">{formatDuration(entry.duration)}</span>
+                    <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>{entry.taskTitle}</span>
+                    <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} ml-auto`}>{formatDuration(entry.duration)}</span>
                   </div>
                 ))}
               </div>
@@ -528,12 +519,12 @@ const TrackerPage: React.FC = () => {
       {/* Add Entry Modal */}
       {showAddEntry && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
+          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl max-w-md w-full p-6`}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">{t('tracker.startTimer')}</h3>
+              <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('tracker.startTimer')}</h3>
               <button
                 onClick={() => setShowAddEntry(false)}
-                className="text-gray-600 hover:text-gray-600"
+                className={isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}
               >
                 ×
               </button>
@@ -541,11 +532,11 @@ const TrackerPage: React.FC = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('tracker.project')}</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>{t('tracker.project')}</label>
                 <select
                   value={selectedProject}
                   onChange={(e) => setSelectedProject(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  className={`w-full px-3 py-2 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent`}
                 >
                   <option value="">{t('tracker.selectProject')}</option>
                   {projects.map(project => (
@@ -555,11 +546,11 @@ const TrackerPage: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('tracker.task')}</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>{t('tracker.task')}</label>
                 <select
                   value={selectedTask}
                   onChange={(e) => setSelectedTask(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  className={`w-full px-3 py-2 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent`}
                 >
                   <option value="">{t('tracker.selectTask')}</option>
                   {selectedProject && projects.find(p => p._id === selectedProject)?.tasks.map(task => (
@@ -569,12 +560,12 @@ const TrackerPage: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('tracker.descriptionOptional')}</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>{t('tracker.descriptionOptional')}</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  className={`w-full px-3 py-2 border ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent`}
                   placeholder={t('tracker.whatAreYouWorkingOn')}
                 />
               </div>
@@ -582,7 +573,7 @@ const TrackerPage: React.FC = () => {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowAddEntry(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className={`px-4 py-2 border rounded-lg ${isDarkMode ? 'text-gray-300 border-gray-600 hover:bg-gray-700' : 'text-gray-600 border-gray-300 hover:bg-gray-50'}`}
                 >
                   {t('common.cancel')}
                 </button>
@@ -603,3 +594,4 @@ const TrackerPage: React.FC = () => {
 };
 
 export default TrackerPage;
+// Force recompile

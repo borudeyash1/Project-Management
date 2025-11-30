@@ -95,6 +95,14 @@ export interface IUser extends Document {
       twoFactorAuth: boolean;
     };
   };
+  preferences?: {
+    theme: 'light' | 'dark' | 'system';
+    accentColor: string;
+    fontSize: 'small' | 'medium' | 'large';
+    density: 'compact' | 'comfortable' | 'spacious';
+    animations: boolean;
+    reducedMotion: boolean;
+  };
   // Sartthi Ecosystem Modules
   modules?: {
     mail?: {
@@ -312,6 +320,13 @@ export interface IWorkspace extends Document {
       apiAccess: boolean;
       prioritySupport: boolean;
     };
+  };
+  vaultFolderId?: string;
+  quickAccessDocs?: string[];
+  documentSettings?: {
+    autoSync: boolean;
+    allowedFileTypes: string[];
+    maxStorageGB: number;
   };
   isActive: boolean;
   memberCount: number;

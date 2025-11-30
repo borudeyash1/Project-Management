@@ -68,6 +68,8 @@ import AdminDocs from './components/admin/AdminDocs';
 import AdminContent from './components/admin/AdminContent';
 import CanvasEditorPage from './components/admin/CanvasEditorPage';
 import FolderDemo from './components/FolderDemo';
+import CalendarPage from './components/calendar/CalendarPage';
+import InboxPage from './components/mail/InboxPage';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -360,6 +362,22 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <GoalsPage />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/calendar" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <CalendarPage />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/mail" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <InboxPage />
             </AppLayout>
           </ProtectedRoute>
         } />

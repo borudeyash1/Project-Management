@@ -189,24 +189,23 @@ const Sidebar: React.FC = () => {
               </div>
               <div className="space-y-1">
                 {/* Sartthi Mail */}
-                <a
-                  href={getAppUrl('mail')}
-                  target="_self"
+                {/* Sartthi Mail */}
+                <button
+                  onClick={() => navigate('/mail')}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-700 dark:text-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-gray-100"
                 >
                   <Mail className="w-5 h-5 flex-shrink-0" />
                   <span className="truncate">Sartthi Mail</span>
-                </a>
+                </button>
 
                 {/* Sartthi Calendar */}
-                <a
-                  href={getAppUrl('calendar')}
-                  target="_self"
+                <button
+                  onClick={() => navigate('/calendar')}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-700 dark:text-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-gray-100"
                 >
                   <Calendar className="w-5 h-5 flex-shrink-0" />
                   <span className="truncate">Sartthi Calendar</span>
-                </a>
+                </button>
               </div>
             </div>
           )}

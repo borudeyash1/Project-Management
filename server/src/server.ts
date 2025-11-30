@@ -40,7 +40,10 @@ import sartthiAuthRoutes from "./routes/sartthi-auth";
 import sartthiMailRoutes from "./routes/sartthi-mail";
 import sartthiCalendarRoutes from "./routes/sartthi-calendar";
 import sartthiVaultRoutes from "./routes/sartthi-vault";
+import vaultWorkspaceRoutes from "./routes/vaultWorkspace";
+import sartthiRoutes from "./routes/sartthiRoutes";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
+import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 
 // Load environment variables
 // Environment variables loaded in ./config/env
@@ -145,6 +148,7 @@ app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/docs", documentationRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/content", contentRoutes);
+app.use("/api/sartthi", sartthiRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -183,6 +187,7 @@ mongoose
   .connect(process.env.MONGODB_URI || "")
   .then(async () => {
     await ensureDefaultSubscriptionPlans();
+    initializeSartthiServices();
     console.log("Connected to MongoDB");
   })
   .catch((error) => {

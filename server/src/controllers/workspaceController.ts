@@ -8,6 +8,7 @@ import JoinRequest from '../models/JoinRequest';
 import { sendEmail } from '../services/emailService';
 import { generateOTP, OTP_VALIDITY_MS } from '../utils/otp';
 import { AuthenticatedRequest, ApiResponse, IWorkspace } from '../types';
+import { getMailService } from '../services/sartthi/mailService';
 
 const buildBillingResponse = (plan: any, type: string, estimatedMembers: number) => {
   const workspaceType = type === 'enterprise' ? 'enterprise' : type === 'personal' ? 'personal' : 'team';
@@ -489,7 +490,7 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     }
 
     // Check if member exists in workspace
-    const memberExists = workspace.members.some((member: any) => 
+    const memberExists = workspace.members.some((member: any) =>
       member.user.toString() === memberId
     );
 
@@ -503,18 +504,18 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     }
 
     console.log('🔄 [REMOVE MEMBER] Removing member from workspace...');
-    
+
     // IMPORTANT: Clean up any pending join requests first
     // This prevents duplicate key errors if the user tries to rejoin later
     const deletedRequests = await JoinRequest.deleteMany({
       workspace: id,
       user: memberId
     });
-    
+
     if (deletedRequests.deletedCount > 0) {
       console.log(`🗑️ [REMOVE MEMBER] Deleted ${deletedRequests.deletedCount} pending join request(s)`);
     }
-    
+
     // Remove member from workspace
     // Their historical data (tasks, activities, project contributions) is preserved
     // This only filters the members array
@@ -679,6 +680,13 @@ export const sendWorkspaceInvite: RequestHandler = async (req, res) => {
       userId: targetUser._id.toString(),
       relatedId: workspace._id.toString()
     });
+
+    // Sartthi Integration: Send Email Invitation
+    const mailService = getMailService();
+    if (mailService && targetUser.email) {
+      const inviteLink = `${process.env.CLIENT_URL}/workspaces/join/${workspace._id}`;
+      await mailService.sendWorkspaceInvitation(workspace, targetUser.email, inviteLink);
+    }
 
     const response: ApiResponse = {
       success: true,

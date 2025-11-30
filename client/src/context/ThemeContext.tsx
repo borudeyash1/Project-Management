@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import apiService from '../services/api';
 import { useApp } from './AppContext';
 
@@ -44,68 +45,87 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const { state } = useApp();
-  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const location = useLocation();
+  
+  // Lazy initialization from localStorage to prevent flash of wrong theme
+  const [preferences, setPreferences] = useState<UserPreferences>(() => {
+    const savedPrefs = localStorage.getItem('preferences');
+    if (savedPrefs) {
+      try {
+        return JSON.parse(savedPrefs);
+      } catch (e) {
+        console.error('Failed to parse saved preferences:', e);
+      }
+    }
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    if (savedTheme) {
+      return { ...defaultPreferences, theme: savedTheme };
+    }
+    return defaultPreferences;
+  });
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Initial calculation based on preferences
+    if (preferences.theme === 'system') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return preferences.theme === 'dark';
+  });
   
   const isAuthenticated = !!state.userProfile._id;
+
+  // Define public routes where light mode is enforced
+  const isPublicRoute = () => {
+    const path = location.pathname;
+    // Exact matches
+    if (['/', '/about', '/pricing', '/apps', '/contact'].includes(path)) return true;
+    // Prefix matches
+    if (path.startsWith('/docs')) return true;
+    if (path.startsWith('/auth')) return true;
+    return false;
+  };
 
   // Fetch preferences from API if authenticated
   useEffect(() => {
     const fetchPreferences = async () => {
-      if (!isAuthenticated) {
-        // Load from localStorage for non-authenticated users
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-        const savedPrefs = localStorage.getItem('preferences');
-        
-        if (savedPrefs) {
-          try {
-            const parsed = JSON.parse(savedPrefs);
-            setPreferences(parsed);
-            applyAllSettings(parsed);
-          } catch (e) {
-            console.error('Failed to parse saved preferences:', e);
-          }
-        } else if (savedTheme) {
-          const prefs = { ...defaultPreferences, theme: savedTheme };
-          setPreferences(prefs);
-          applyAllSettings(prefs);
-        }
-        return;
-      }
+      if (!isAuthenticated) return;
 
       try {
         const response = await apiService.get<UserPreferences>('/users/preferences');
         if (response.success && response.data) {
           setPreferences(response.data);
-          applyAllSettings(response.data);
+          // We don't immediately apply settings here, the effect below will handle it
+          // based on the new preferences and current route
         }
       } catch (error) {
         console.error('Failed to fetch preferences:', error);
-        // Fallback to localStorage
-        const savedPrefs = localStorage.getItem('preferences');
-        if (savedPrefs) {
-          try {
-            const parsed = JSON.parse(savedPrefs);
-            setPreferences(parsed);
-            applyAllSettings(parsed);
-          } catch (e) {
-            console.error('Failed to parse saved preferences:', e);
-          }
-        }
       }
     };
 
     fetchPreferences();
   }, [isAuthenticated]);
 
-  // Apply all theme settings
-  const applyAllSettings = (prefs: UserPreferences) => {
-    applyThemeMode(prefs.theme);
-    applyAccentColor(prefs.accentColor);
-    applyFontSize(prefs.fontSize);
-    applyDensity(prefs.density);
-    applyAnimations(prefs.animations, prefs.reducedMotion);
-  };
+  // Apply theme based on preferences and route
+  useEffect(() => {
+    const applyThemeSettings = () => {
+      // 1. Determine if we should enforce light mode
+      if (isPublicRoute()) {
+        setIsDarkMode(false);
+        document.documentElement.classList.remove('dark');
+      } else {
+        // 2. Apply user preference
+        applyThemeMode(preferences.theme);
+      }
+
+      // 3. Apply other settings (always apply these)
+      applyAccentColor(preferences.accentColor);
+      applyFontSize(preferences.fontSize);
+      applyDensity(preferences.density);
+      applyAnimations(preferences.animations, preferences.reducedMotion);
+    };
+
+    applyThemeSettings();
+  }, [preferences, location.pathname]); // Re-run when preferences or route changes
 
   // Apply theme mode (light/dark/system)
   const applyThemeMode = (theme: 'light' | 'dark' | 'system') => {
@@ -175,18 +195,29 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Toggle theme (for navbar button)
   const toggleTheme = () => {
+    // If on public route, we might not want to allow toggling, or we allow it but it only affects preference?
+    // For now, let's allow it to update preference, and if we are on private route it will reflect immediately.
+    // If on public route, it will update preference but visual might stay light until they go to dashboard.
+    
     const newTheme: 'light' | 'dark' = isDarkMode ? 'light' : 'dark';
-    const newPrefs = { ...preferences, theme: newTheme };
+    // If we are forced light (public route) but user clicks toggle, they probably want dark.
+    // But if we are enforcing light, maybe we shouldn't toggle visually?
+    // Let's stick to standard toggle logic for preferences.
+    
+    // Actually, if we are on public route (isDarkMode=false forced), toggle will try to set 'dark'.
+    
+    const nextTheme = preferences.theme === 'dark' ? 'light' : 'dark'; // Simple toggle based on current pref
+    
+    const newPrefs = { ...preferences, theme: nextTheme };
     setPreferences(newPrefs);
-    applyThemeMode(newTheme);
     
     // Save to localStorage
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('theme', nextTheme);
     localStorage.setItem('preferences', JSON.stringify(newPrefs));
     
     // Save to API if authenticated
     if (isAuthenticated) {
-      updatePreferences({ theme: newTheme }).catch(console.error);
+      updatePreferences({ theme: nextTheme }).catch(console.error);
     }
   };
 
@@ -194,7 +225,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const applyTheme = (theme: 'light' | 'dark' | 'system') => {
     const newPrefs = { ...preferences, theme };
     setPreferences(newPrefs);
-    applyThemeMode(theme);
     
     // Save to localStorage
     localStorage.setItem('theme', theme);
@@ -208,9 +238,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Update preferences
   const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
-    const updated = { ...preferences, ...newPrefs };
+    const updated: UserPreferences = { ...preferences, ...newPrefs };
     setPreferences(updated);
-    applyAllSettings(updated);
+    // applyAllSettings called by effect
     
     // Save to localStorage
     localStorage.setItem('preferences', JSON.stringify(updated));
@@ -228,7 +258,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Listen for system theme changes
   useEffect(() => {
-    if (preferences.theme === 'system') {
+    if (preferences.theme === 'system' && !isPublicRoute()) {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const handler = (e: MediaQueryListEvent) => {
         setIsDarkMode(e.matches);
@@ -242,7 +272,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       mediaQuery.addEventListener('change', handler);
       return () => mediaQuery.removeEventListener('change', handler);
     }
-  }, [preferences.theme]);
+  }, [preferences.theme, location.pathname]);
 
   const value = {
     isDarkMode,

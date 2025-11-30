@@ -3,6 +3,9 @@ import Task from '../models/Task';
 import Project from '../models/Project';
 import { ApiResponse } from '../types';
 import { createActivity } from '../utils/activityUtils';
+import { getCalendarService } from '../services/sartthi/calendarService';
+import { getMailService } from '../services/sartthi/mailService';
+import User from '../models/User';
 
 // Map frontend-style status values to backend Task.status
 const mapFrontendStatusToBackend = (status?: string): string | undefined => {
@@ -186,6 +189,21 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       String(task._id)
     );
 
+    // Sartthi Integration: Calendar Sync
+    const calendarService = getCalendarService();
+    if (calendarService && task.dueDate) {
+      await calendarService.createEventFromTask(task);
+    }
+
+    // Sartthi Integration: Mail Notification
+    const mailService = getMailService();
+    if (mailService && task.assignee) {
+      const assigneeUser = await User.findById(task.assignee);
+      if (assigneeUser && assigneeUser.email) {
+        await mailService.sendTaskAssignmentNotification(task, assigneeUser.email);
+      }
+    }
+
     const response: ApiResponse = {
       success: true,
       message: 'Task created successfully',
@@ -261,6 +279,21 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         'Task',
         String(task._id)
       );
+    }
+
+    // Sartthi Integration: Calendar Sync
+    const calendarService = getCalendarService();
+    if (calendarService && (dueDate !== undefined || title !== undefined)) {
+      // Logic to update event would go here
+    }
+
+    // Sartthi Integration: Mail Notification
+    const mailService = getMailService();
+    if (mailService && assignee !== undefined) {
+      const assigneeUser = await User.findById(assignee);
+      if (assigneeUser && assigneeUser.email) {
+        await mailService.sendTaskAssignmentNotification(task, assigneeUser.email);
+      }
     }
 
     const response: ApiResponse = {

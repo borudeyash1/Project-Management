@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Search, RefreshCw, MoreVertical } from 'lucide-react';
 import MailSidebar from './MailSidebar';
 import MailRow from './MailRow';
@@ -17,55 +18,35 @@ const InboxPage: React.FC = () => {
   const [activeFolder, setActiveFolder] = useState('inbox');
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedMail, setSelectedMail] = useState<string | null>(null);
+  const [mails, setMails] = useState<Mail[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample data
-  const mails: Mail[] = [
-    {
-      id: '1',
-      sender: 'Sarah Johnson',
-      subject: 'Project Update - Q4 Review',
-      preview: 'Hi team, I wanted to share the latest updates on our Q4 project milestones...',
-      time: '10:30 AM',
-      isUnread: true,
-      isStarred: false,
-    },
-    {
-      id: '2',
-      sender: 'Michael Chen',
-      subject: 'Meeting Notes from Yesterday',
-      preview: 'Here are the key takeaways from our discussion about the new feature rollout...',
-      time: '9:15 AM',
-      isUnread: true,
-      isStarred: true,
-    },
-    {
-      id: '3',
-      sender: 'Emily Davis',
-      subject: 'Design System Updates',
-      preview: 'The new component library is ready for review. Please check the Figma file...',
-      time: 'Yesterday',
-      isUnread: false,
-      isStarred: false,
-    },
-    {
-      id: '4',
-      sender: 'Alex Thompson',
-      subject: 'Budget Approval Request',
-      preview: 'I need your approval on the Q1 budget proposal. Attached is the detailed breakdown...',
-      time: 'Yesterday',
-      isUnread: false,
-      isStarred: true,
-    },
-    {
-      id: '5',
-      sender: 'Jessica Lee',
-      subject: 'Team Lunch Next Friday',
-      preview: 'Let\'s plan a team lunch next Friday to celebrate the successful launch...',
-      time: 'Nov 23',
-      isUnread: false,
-      isStarred: false,
-    },
-  ];
+  useEffect(() => {
+    fetchEmails();
+  }, [activeFolder]);
+
+  const fetchEmails = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/api/sartthi/mail/messages', {
+        params: { folder: activeFolder }
+      });
+      const fetchedEmails = response.data.emails.map((email: any) => ({
+        id: email.id || Math.random().toString(),
+        sender: email.sender || email.from || 'Unknown',
+        subject: email.subject || 'No Subject',
+        preview: email.preview || email.body || '',
+        time: email.time || new Date().toLocaleDateString(),
+        isUnread: email.isUnread !== undefined ? email.isUnread : true,
+        isStarred: email.isStarred !== undefined ? email.isStarred : false,
+      }));
+      setMails(fetchedEmails);
+    } catch (error) {
+      console.error('Error fetching emails:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filters = [
     { id: 'all', label: 'All' },

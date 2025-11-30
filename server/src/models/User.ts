@@ -512,6 +512,35 @@ const userSchema = new Schema<IUser>({
         default: false
       }
     }
+  },
+  preferences: {
+    theme: {
+      type: String,
+      enum: ['light', 'dark', 'system'],
+      default: 'system'
+    },
+    accentColor: {
+      type: String,
+      default: '#FBBF24'
+    },
+    fontSize: {
+      type: String,
+      enum: ['small', 'medium', 'large'],
+      default: 'medium'
+    },
+    density: {
+      type: String,
+      enum: ['compact', 'comfortable', 'spacious'],
+      default: 'comfortable'
+    },
+    animations: {
+      type: Boolean,
+      default: true
+    },
+    reducedMotion: {
+      type: Boolean,
+      default: false
+    }
   }
 }, {
   timestamps: true
