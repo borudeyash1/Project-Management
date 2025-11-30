@@ -71,6 +71,9 @@ class ApiService {
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorMessage;
+          if (errorData.error) {
+            errorMessage += ` | Details: ${errorData.error}`;
+          }
           // If a specific error code like "requiresOtpVerification" is returned, include it
           if (errorData.data?.requiresOtpVerification) {
             const error = new Error(errorMessage);
@@ -600,22 +603,44 @@ class ApiService {
     return this.request<any>('/admin/sessions/recent');
   }
 
-  async uploadRelease(formData: FormData) {
-    const response = await fetch(`${this.baseURL}/releases`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        ...(this.token && { Authorization: `Bearer ${this.token}` })
-      },
-      body: formData
+  async uploadRelease(formData: FormData, onProgress?: (percent: number) => void) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${this.baseURL}/releases`);
+      xhr.withCredentials = true;
+
+      if (this.token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${this.token}`);
+      }
+
+      if (onProgress) {
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            onProgress(percentComplete);
+          }
+        };
+      }
+
+      xhr.onload = () => {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300 && data?.success) {
+            resolve(data);
+          } else {
+            reject(new Error(data?.message || 'Failed to create release'));
+          }
+        } catch (e) {
+          reject(new Error('Invalid response from server'));
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error('Network error occurred'));
+      };
+
+      xhr.send(formData);
     });
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data?.success) {
-      throw new Error(data?.message || 'Failed to create release');
-    }
-
-    return data;
   }
 
   async upload<T = any>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {

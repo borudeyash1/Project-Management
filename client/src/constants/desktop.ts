@@ -1,5 +1,5 @@
 export const DESKTOP_FLOW_STORAGE_KEY = 'saarthi-desktop-flow';
-export const DESKTOP_PROTOCOL_URL = 'sartthi-desktop://auth';
+export const DESKTOP_PROTOCOL_URL = 'sartthi-desktop:auth';
 
 export const markDesktopFlowIntent = () => {
   sessionStorage.setItem(DESKTOP_FLOW_STORAGE_KEY, 'true');

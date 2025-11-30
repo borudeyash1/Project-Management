@@ -102,7 +102,7 @@ const DockNavigation: React.FC = () => {
     } catch (error) {
       console.error('Logout error:', error);
     }
-    
+
     sessionStorage.clear();
     dispatch({ type: 'LOGOUT' });
     console.log(' [USER DOCK] Session cleared, redirecting to login');
@@ -115,34 +115,34 @@ const DockNavigation: React.FC = () => {
     navigate('/login', { replace: true });
   };
 
-const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
-  // Check if module is connected
-  const isConnected = state.userProfile.modules?.[appName]?.refreshToken;
-  
-  if (!isConnected) {
-    // Show info card
-    setShowInfoCard(appName);
-    return;
-  }
-  
-  // Module is connected, open the app
-  const url = getAppUrl(appName);
-  
-  // Pass the token via URL parameter for seamless SSO across subdomains
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    const separator = url.includes('?') ? '&' : '?';
-    const authUrl = `${url}${separator}token=${token}`;
-    window.open(authUrl, '_blank');
-    return;
-  }
-  
-  window.open(url, '_blank');
-};
+  const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
+    // Check if module is connected
+    const isConnected = state.userProfile.modules?.[appName]?.refreshToken;
+
+    if (!isConnected) {
+      // Show info card
+      setShowInfoCard(appName);
+      return;
+    }
+
+    // Module is connected, open the app
+    const url = getAppUrl(appName);
+
+    // Pass the token via URL parameter for seamless SSO across subdomains
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const separator = url.includes('?') ? '&' : '?';
+      const authUrl = `${url}${separator}token=${token}`;
+      window.open(authUrl, '_blank');
+      return;
+    }
+
+    window.open(url, '_blank');
+  };
 
   const isActive = (path: string) => {
-    return location.pathname === path || 
-           (path !== '/home' && location.pathname.startsWith(path));
+    return location.pathname === path ||
+      (path !== '/home' && location.pathname.startsWith(path));
   };
 
   return (
@@ -153,7 +153,7 @@ const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
           const Icon = item.icon;
           const active = isActive(item.path);
           const isEnglish = i18n.language === 'en';
-          
+
           return (
             <DockIcon
               key={item.id}
@@ -253,18 +253,18 @@ const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
 
       {/* Workspace Selector Modal */}
       {showWorkspaces && state.workspaces.length > 0 && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 flex items-center justify-center"
           onClick={() => setShowWorkspaces(false)}
         >
-          <div 
+          <div
             className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               Select Workspace
             </h3>
-            
+
             {/* My Workspaces */}
             {state.workspaces.filter(w => w.owner === state.userProfile._id).length > 0 && (
               <div className="mb-4">
@@ -345,6 +345,18 @@ const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
           onConnect={() => {
             const token = localStorage.getItem('accessToken');
             window.location.href = `/api/auth/sartthi/connect-${showInfoCard}?token=${token}`;
+          }}
+          onOpen={() => {
+            const url = getAppUrl(showInfoCard);
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+              const separator = url.includes('?') ? '&' : '?';
+              const authUrl = `${url}${separator}token=${token}`;
+              window.open(authUrl, '_blank');
+            } else {
+              window.open(url, '_blank');
+            }
+            setShowInfoCard(null);
           }}
         />
       )}

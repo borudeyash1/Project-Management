@@ -16,7 +16,7 @@
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-class-names": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
-    "framer-motion": "^11.0.0",
+    "framer-motion": "^11.0.8",
     "google-auth-library": "^10.4.1",
     "gsap": "^3.13.0",
     "i18next": "^25.6.3",
