@@ -44,7 +44,7 @@ export const linkVaultToWorkspace = async (req: AuthenticatedRequest, res: Respo
         }
 
         // Link folder to workspace
-        workspace.vaultFolderId = new mongoose.Types.ObjectId(folderId);
+        workspace.vaultFolderId = folderId;
         await workspace.save();
 
         // Update folder to be workspace-linked
@@ -167,7 +167,7 @@ export const pinDocumentToWorkspace = async (req: AuthenticatedRequest, res: Res
         );
 
         if (!isAlreadyPinned) {
-            workspace.quickAccessDocs.push(new mongoose.Types.ObjectId(documentId));
+            workspace.quickAccessDocs.push(documentId);
             await workspace.save();
         }
 
