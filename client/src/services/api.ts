@@ -603,7 +603,7 @@ class ApiService {
     return this.request<any>('/admin/sessions/recent');
   }
 
-  async uploadRelease(formData: FormData, onProgress?: (percent: number) => void) {
+  async uploadRelease(formData: FormData, onProgress?: (percent: number) => void): Promise<any> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${this.baseURL}/releases`);
