@@ -69,10 +69,10 @@ const ConnectedAccounts: React.FC = () => {
   const handleUnlink = async (type: string) => {
     try {
       setUnlinking(type);
-      
+
       // Call API to disconnect the module
       const response = await apiService.post(`/api/auth/sartthi/disconnect-${type}`, {});
-      
+
       if (response.success) {
         // Refresh user profile
         window.location.reload();
@@ -100,10 +100,10 @@ const ConnectedAccounts: React.FC = () => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -121,15 +121,14 @@ const ConnectedAccounts: React.FC = () => {
       <div className="grid gap-4">
         {accounts.map((account) => {
           const config = appConfig[account.type];
-          
+
           return (
             <div
               key={account.type}
-              className={`p-6 bg-white dark:bg-gray-800 rounded-xl border-2 ${
-                account.isConnected 
-                  ? `${config.borderColor} border-opacity-50` 
-                  : 'border-gray-200 dark:border-gray-700'
-              } transition-all hover:shadow-lg`}
+              className={`p-6 bg-white dark:bg-gray-800 rounded-xl border-2 ${account.isConnected
+                ? `${config.borderColor} border-opacity-50`
+                : 'border-gray-200 dark:border-gray-700'
+                } transition-all hover:shadow-lg`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
@@ -216,11 +215,10 @@ const ConnectedAccounts: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => handleConnect(account.type)}
-                      className={`px-4 py-2 bg-gradient-to-r ${
-                        account.type === 'mail' ? 'from-blue-500 to-blue-600' :
+                      className={`px-4 py-2 bg-gradient-to-r ${account.type === 'mail' ? 'from-blue-500 to-blue-600' :
                         account.type === 'calendar' ? 'from-purple-500 to-purple-600' :
-                        'from-green-500 to-emerald-600'
-                      } text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2 font-medium`}
+                          'from-green-500 to-emerald-600'
+                        } text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2 font-medium`}
                     >
                       <LinkIcon className="w-4 h-4" />
                       Connect
@@ -261,6 +259,18 @@ const ConnectedAccounts: React.FC = () => {
           app={showInfoCard}
           onClose={() => setShowInfoCard(null)}
           onConnect={() => proceedToConnect(showInfoCard)}
+          onOpen={() => {
+            const url = getAppUrl(showInfoCard);
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+              const separator = url.includes('?') ? '&' : '?';
+              const authUrl = `${url}${separator}token=${token}`;
+              window.open(authUrl, '_blank');
+            } else {
+              window.open(url, '_blank');
+            }
+            setShowInfoCard(null);
+          }}
         />
       )}
     </div>

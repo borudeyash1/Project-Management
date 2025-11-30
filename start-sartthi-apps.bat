@@ -17,7 +17,7 @@ timeout /t 2 /nobreak >nul
 start "Sartthi Calendar (Port 3002)" cmd /k "cd sartthi-calendar-ui && npm install && npm run dev"
 timeout /t 2 /nobreak >nul
 
-start "Sartthi Vault (Port 3003)" cmd /k "cd sartthi-vault-ui && npm install && npm run dev"
+start "Sartthi Vault (Port 3004)" cmd /k "cd sartthi-vault-ui && npm install && npm run dev"
 
 echo.
 echo ========================================
@@ -26,7 +26,7 @@ echo ========================================
 echo.
 echo   Mail:     http://localhost:3001
 echo   Calendar: http://localhost:3002
-echo   Vault:    http://localhost:3003
+echo   Vault:    http://localhost:3004
 echo.
 echo Press any key to close this window...
 pause >nul
