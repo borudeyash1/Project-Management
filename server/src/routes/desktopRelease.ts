@@ -40,7 +40,7 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
   // Allow common desktop app file types
   const allowedExtensions = ['.exe', '.dmg', '.pkg', '.deb', '.rpm', '.appimage', '.zip', '.tar.gz'];
   const ext = path.extname(file.originalname).toLowerCase();
-  
+
   if (allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
@@ -52,7 +52,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 500 * 1024 * 1024 // 500MB max file size
+    fileSize: 1024 * 1024 * 1024 // 1GB max file size
   }
 });
 
