@@ -1,3 +1,4 @@
+import "./config/env";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -42,12 +43,14 @@ import sartthiVaultRoutes from "./routes/sartthi-vault";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 
 // Load environment variables
-dotenv.config({ path: "./.env" });
+// Environment variables loaded in ./config/env
+// dotenv.config({ path: "./.env" });
 
 const app = express();
 
 // Security middleware
 app.use(helmet());
+app.set('trust proxy', 1); // Trust first proxy
 
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production'
@@ -69,10 +72,13 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1) {
+
+      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
         callback(null, true);
       } else {
+        console.log('Blocked by CORS:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     },

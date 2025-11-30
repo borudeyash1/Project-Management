@@ -18,6 +18,17 @@ import {
   setCookieToken,
   clearCookieToken
 } from '../utils/cookieUtils';
+import fs from 'fs';
+import path from 'path';
+
+const logFile = path.join(process.cwd(), 'debug.log');
+const log = (msg: string) => {
+  try {
+    fs.appendFileSync(logFile, new Date().toISOString() + ' ' + msg + '\n');
+  } catch (e) {
+    console.error('Failed to write to log file', e);
+  }
+};
 
 // Initialize Google OAuth2 client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -797,6 +808,9 @@ export const resetPassword = async (
 };
 
 
+
+
+
 // Google OAuth authentication
 export const googleAuth = async (
   req: Request,
@@ -813,6 +827,15 @@ export const googleAuth = async (
       isRegistration,
       registrationData,
     } = req.body;
+
+    log(`[DEBUG] Google Auth Request: email=${email}, isRegistration=${isRegistration}`);
+    log(`[DEBUG] Env Check: hasJwtSecret=${!!process.env.JWT_SECRET}, hasRefreshSecret=${!!process.env.JWT_REFRESH_SECRET}`);
+
+    console.log('🔍 [DEBUG] Google Auth Request:', { email, isRegistration });
+    console.log('🔍 [DEBUG] Env Check:', {
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      hasRefreshSecret: !!process.env.JWT_REFRESH_SECRET
+    });
 
     // Verify Google access token by fetching user info
     let userInfo: any;
@@ -979,6 +1002,9 @@ export const googleAuth = async (
     res.status(500).json({
       success: false,
       message: "Internal server error during Google authentication",
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
+    log(`[ERROR] Google Auth Failed: ${error.message}\n${error.stack}`);
   }
 };

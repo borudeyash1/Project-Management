@@ -71,6 +71,9 @@ class ApiService {
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorMessage;
+          if (errorData.error) {
+            errorMessage += ` | Details: ${errorData.error}`;
+          }
           // If a specific error code like "requiresOtpVerification" is returned, include it
           if (errorData.data?.requiresOtpVerification) {
             const error = new Error(errorMessage);

@@ -5,9 +5,10 @@ interface AppInfoCardProps {
   app: 'mail' | 'calendar' | 'vault';
   onClose: () => void;
   onConnect: () => void;
+  onOpen: () => void;
 }
 
-const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect }) => {
+const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect, onOpen }) => {
   const appConfig = {
     mail: {
       icon: <Mail className="w-12 h-12" />,
@@ -61,11 +62,11 @@ const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect }) =>
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4 animate-fadeIn">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      
+
       {/* Card */}
       <div className="relative w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-700 overflow-hidden animate-slideUp">
         {/* Header with gradient */}
@@ -76,7 +77,7 @@ const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect }) =>
           >
             <X size={20} />
           </button>
-          
+
           <div className="flex items-center gap-4 text-white">
             <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
               {config.icon}
@@ -123,10 +124,10 @@ const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect }) =>
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <button
-              onClick={onClose}
+              onClick={onOpen}
               className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
             >
-              Maybe Later
+              Open App
             </button>
             <button
               onClick={onConnect}
