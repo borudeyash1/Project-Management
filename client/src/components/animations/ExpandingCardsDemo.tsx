@@ -46,8 +46,8 @@ export function ExpandingCardsDemo() {
     <div className="w-full">
       <ExpandingCards
         cards={trackerCards}
-        gap="gap-2 md:gap-3"
-        height="h-[300px] md:h-[350px]"
+        gap="gap-3 md:gap-4"
+        height="h-[400px] md:h-[500px] lg:h-[550px]"
         classNames={{
           container: "rounded-xl",
           card: "rounded-xl",
@@ -59,27 +59,34 @@ export function ExpandingCardsDemo() {
         breakpoints={[
           {
             maxWidth: 640,
-            activeWidth: 200,
-            inactiveWidth: 80,
-            titleActive: "18px",
-            titleInactive: "14px",
+            activeWidth: 280,
+            inactiveWidth: 60,
+            titleActive: "20px",
+            titleInactive: "0px",
           },
           {
             maxWidth: 768,
-            activeWidth: 250,
-            inactiveWidth: 100,
-            titleActive: "20px",
-            titleInactive: "16px",
+            activeWidth: 350,
+            inactiveWidth: 80,
+            titleActive: "24px",
+            titleInactive: "0px",
           },
           {
             maxWidth: 1024,
-            activeWidth: 300,
-            inactiveWidth: 120,
-            titleActive: "22px",
+            activeWidth: 450,
+            inactiveWidth: 100,
+            titleActive: "28px",
             titleInactive: "16px",
           },
+          {
+            maxWidth: 1920,
+            activeWidth: 550,
+            inactiveWidth: 120,
+            titleActive: "32px",
+            titleInactive: "18px",
+          },
         ]}
-        transitionDuration={0.4}
+        transitionDuration={0.5}
       />
     </div>
   );

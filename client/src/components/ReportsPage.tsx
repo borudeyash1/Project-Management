@@ -267,7 +267,7 @@ const ReportsPage: React.FC = () => {
       case 'team': return 'text-purple-600 bg-purple-100';
       case 'financial': return 'text-yellow-600 bg-yellow-100';
       case 'project': return 'text-orange-600 bg-orange-200';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
     }
   };
 
@@ -433,13 +433,13 @@ const ReportsPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className="h-full bg-gray-50 dark:bg-gray-700">
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Reports & Analytics</h1>
-            <p className="text-gray-600 mt-1">Track performance and generate insights</p>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Reports & Analytics</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Track performance and generate insights</p>
           </div>
           <div className="flex items-center gap-3">
             {canUseAI() && (
@@ -458,7 +458,7 @@ const ReportsPage: React.FC = () => {
             )}
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               New Report
@@ -473,11 +473,11 @@ const ReportsPage: React.FC = () => {
           <div className="lg:col-span-3 space-y-6">
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg border border-gray-300 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Total Hours</p>
-                    <p className="text-2xl font-bold text-gray-900">{getTotalHours().toFixed(1)}h</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Hours</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalHours().toFixed(1)}h</p>
                   </div>
                   <Clock className="w-8 h-8 text-accent" />
                 </div>
@@ -487,11 +487,11 @@ const ReportsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-300 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Billable Hours</p>
-                    <p className="text-2xl font-bold text-gray-900">{getBillableHours().toFixed(1)}h</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Billable Hours</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getBillableHours().toFixed(1)}h</p>
                   </div>
                   <DollarSign className="w-8 h-8 text-green-500" />
                 </div>
@@ -501,11 +501,11 @@ const ReportsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-300 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Team Productivity</p>
-                    <p className="text-2xl font-bold text-gray-900">{getAverageProductivity().toFixed(0)}%</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Team Productivity</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getAverageProductivity().toFixed(0)}%</p>
                   </div>
                   <TrendingUp className="w-8 h-8 text-purple-500" />
                 </div>
@@ -515,11 +515,11 @@ const ReportsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-300 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Project Progress</p>
-                    <p className="text-2xl font-bold text-gray-900">{getProjectProgress().toFixed(0)}%</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Project Progress</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getProjectProgress().toFixed(0)}%</p>
                   </div>
                   <Target className="w-8 h-8 text-orange-500" />
                 </div>
@@ -531,7 +531,7 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex items-center gap-3">
                   <select
@@ -560,10 +560,10 @@ const ReportsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 ml-auto">
-                  <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                  <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700">
                     <RefreshCw className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                  <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700">
                     <Filter className="w-4 h-4" />
                   </button>
                 </div>
@@ -571,13 +571,13 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Reports List */}
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Reports</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Reports</h2>
               </div>
               <div className="divide-y divide-gray-200">
                 {getFilteredReports().map(report => (
-                  <div key={report._id} className="p-4 hover:bg-gray-50">
+                  <div key={report._id} className="p-4 hover:bg-gray-50 dark:bg-gray-700">
                     <div className="flex items-start gap-3">
                       <div className={`p-2 rounded-lg ${getReportColor(report.type)}`}>
                         {getReportIcon(report.type)}
@@ -585,7 +585,7 @@ const ReportsPage: React.FC = () => {
                       
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-medium text-gray-900">{report.name}</h3>
+                          <h3 className="font-medium text-gray-900 dark:text-gray-100">{report.name}</h3>
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getReportColor(report.type)}`}>
                             {report.type}
                           </span>
@@ -596,14 +596,14 @@ const ReportsPage: React.FC = () => {
                           )}
                         </div>
                         
-                        <p className="text-sm text-gray-600 mb-3">{report.description}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{report.description}</p>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <span>Created {report.createdAt.toLocaleDateString()}</span>
                           <span>Updated {report.updatedAt.toLocaleDateString()}</span>
                           <div className="flex items-center gap-1">
                             {report.tags.map(tag => (
-                              <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                              <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs">
                                 {tag}
                               </span>
                             ))}
@@ -614,19 +614,19 @@ const ReportsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedReport(report)}
-                          className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                          className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         {canExportReports() && (
                           <button
                             onClick={() => exportReport(report)}
-                            className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700"
                           >
                             <Download className="w-4 h-4" />
                           </button>
                         )}
-                        <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                        <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -652,7 +652,7 @@ const ReportsPage: React.FC = () => {
                 <button
                   onClick={generateAIReport}
                   disabled={isGenerating}
-                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  className="w-full bg-white dark:bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {isGenerating ? 'Generating...' : 'Generate Insights'}
                 </button>
@@ -660,14 +660,14 @@ const ReportsPage: React.FC = () => {
             )}
 
             {/* Project Performance */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Project Performance</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Project Performance</h3>
               <div className="space-y-3">
                 {projectMetrics.map(project => (
                   <div key={project._id} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900">{project.name}</span>
-                      <span className="text-sm text-gray-600">{project.progress}%</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{project.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-300 rounded-full h-2">
                       <div
@@ -675,7 +675,7 @@ const ReportsPage: React.FC = () => {
                         style={{ width: `${project.progress}%` }}
                       />
                     </div>
-                    <div className="flex items-center justify-between text-xs text-gray-600">
+                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{project.completedTasks}/{project.totalTasks} tasks</span>
                       <span>${project.spent.toLocaleString()}/${project.budget.toLocaleString()}</span>
                     </div>
@@ -685,15 +685,15 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Team Leaderboard */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Team Leaderboard</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Team Leaderboard</h3>
               <div className="space-y-3">
                 {teamPerformance
                   .sort((a, b) => b.productivityScore - a.productivityScore)
                   .slice(0, 5)
                   .map((member, index) => (
                     <div key={member._id} className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-xs font-medium">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium">
                         {index + 1}
                       </div>
                       <div className="flex items-center gap-2 flex-1">
@@ -705,19 +705,19 @@ const ReportsPage: React.FC = () => {
                           />
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                               {member.name.charAt(0)}
                             </span>
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-600">{member.role}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{member.name}</p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">{member.role}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{member.productivityScore}%</p>
-                        <p className="text-xs text-gray-600">{member.completionRate}% tasks</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.productivityScore}%</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{member.completionRate}% tasks</p>
                       </div>
                     </div>
                   ))}
@@ -725,26 +725,26 @@ const ReportsPage: React.FC = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <button 
                   onClick={handleExportAllData}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors"
                 >
                   <Download className="w-4 h-4 inline mr-2" />
                   Export All Data
                 </button>
                 <button 
                   onClick={handleShareDashboard}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors"
                 >
                   <Share2 className="w-4 h-4 inline mr-2" />
                   Share Dashboard
                 </button>
                 <button 
                   onClick={() => setShowScheduleModal(true)}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors"
                 >
                   <Calendar className="w-4 h-4 inline mr-2" />
                   Schedule Report
@@ -758,21 +758,21 @@ const ReportsPage: React.FC = () => {
       {/* Report Detail Modal */}
       {selectedReport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${getReportColor(selectedReport.type)}`}>
                     {getReportIcon(selectedReport.type)}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{selectedReport.name}</h3>
-                    <p className="text-sm text-gray-600">{selectedReport.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{selectedReport.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{selectedReport.description}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedReport(null)}
-                  className="text-gray-600 hover:text-gray-600"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400"
                 >
                   ×
                 </button>
@@ -781,17 +781,17 @@ const ReportsPage: React.FC = () => {
             
             <div className="p-6">
               <div className="bg-gradient-to-r from-accent/10 to-blue-100 rounded-lg p-6 mb-4">
-                <h4 className="font-semibold text-gray-900 mb-2">Report Preview</h4>
-                <p className="text-sm text-gray-600 mb-4">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Report Preview</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   This report contains {Object.keys(selectedReport.data).length} data points. 
                   Download as PDF for a formatted view or export as JSON for raw data.
                 </p>
                 
                 {/* Data Summary */}
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
                   {selectedReport.data.insights ? (
                     <div>
-                      <h5 className="font-medium text-gray-900 mb-2">Key Insights:</h5>
+                      <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Key Insights:</h5>
                       <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                         {selectedReport.data.insights.map((insight: string, i: number) => (
                           <li key={i}>{insight}</li>
@@ -799,7 +799,7 @@ const ReportsPage: React.FC = () => {
                       </ul>
                       {selectedReport.data.recommendations && (
                         <div className="mt-4">
-                          <h5 className="font-medium text-gray-900 mb-2">Recommendations:</h5>
+                          <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Recommendations:</h5>
                           <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                             {selectedReport.data.recommendations.map((rec: string, i: number) => (
                               <li key={i}>{rec}</li>
@@ -812,8 +812,8 @@ const ReportsPage: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                       {Object.entries(selectedReport.data).map(([key, value]) => (
                         <div key={key} className="border-l-2 border-accent pl-3">
-                          <p className="text-xs text-gray-600">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-xs text-gray-600 dark:text-gray-400">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                           </p>
                         </div>
@@ -824,8 +824,8 @@ const ReportsPage: React.FC = () => {
               </div>
               
               {/* Raw JSON (collapsible) */}
-              <details className="bg-gray-50 rounded-lg p-4">
-                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+              <details className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-100">
                   View Raw JSON Data
                 </summary>
                 <pre className="mt-3 text-xs text-gray-700 overflow-x-auto">
@@ -837,13 +837,13 @@ const ReportsPage: React.FC = () => {
             <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedReport(null)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
               >
                 Close
               </button>
               <button
                 onClick={() => printReportPDF(selectedReport)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 inline-flex items-center gap-2"
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 inline-flex items-center gap-2"
               >
                 <Printer className="w-4 h-4" />
                 Print
@@ -852,14 +852,14 @@ const ReportsPage: React.FC = () => {
                 <>
                   <button
                     onClick={() => exportReport(selectedReport)}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 inline-flex items-center gap-2"
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 inline-flex items-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
                     Export JSON
                   </button>
                   <button
                     onClick={() => downloadReportPDF(selectedReport)}
-                    className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover inline-flex items-center gap-2"
+                    className="px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover inline-flex items-center gap-2"
                   >
                     <Download className="w-4 h-4" />
                     Download PDF

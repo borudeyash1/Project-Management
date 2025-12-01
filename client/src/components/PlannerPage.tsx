@@ -8,6 +8,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
 
 interface Task {
   _id: string;
@@ -53,6 +54,7 @@ const PlannerPage: React.FC = () => {
   const { state, dispatch } = useApp();
   const { t } = useTranslation();
   const { canUseAI } = useFeatureAccess();
+  const { isDarkMode } = useTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -377,13 +379,13 @@ const PlannerPage: React.FC = () => {
   const timeSlots = getTimeSlots();
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{t('planner.title')}</h1>
-            <p className="text-gray-600 mt-1">{t('planner.description')}</p>
+            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('planner.title')}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('planner.description')}</p>
           </div>
           <div className="flex items-center gap-3">
             {/* View Mode Toggle */}
@@ -431,7 +433,7 @@ const PlannerPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar View */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg border border-gray-300 p-6">
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
               {/* Calendar Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -441,7 +443,7 @@ const PlannerPage: React.FC = () => {
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     {viewMode === 'week' && `${formatDate(weekDays[0])} - ${formatDate(weekDays[6])}`}
                     {viewMode === 'day' && formatDate(currentDate)}
                     {viewMode === 'month' && currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -617,8 +619,8 @@ const PlannerPage: React.FC = () => {
             )}
 
             {/* Today's Tasks */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('planner.todaysTasks')}</h3>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4`}>
+              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('planner.todaysTasks')}</h3>
               <div className="space-y-2">
                 {getTasksForDate(new Date()).slice(0, 5).map(task => (
                   <div
@@ -657,8 +659,8 @@ const PlannerPage: React.FC = () => {
             </div>
 
             {/* Upcoming Events */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('planner.upcomingEvents')}</h3>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4`}>
+              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('planner.upcomingEvents')}</h3>
               <div className="space-y-2">
                 {events.slice(0, 5).map(event => (
                   <div key={event._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50">
@@ -678,23 +680,23 @@ const PlannerPage: React.FC = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('planner.quickStats')}</h3>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4`}>
+              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('planner.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('planner.pendingTasks')}</span>
-                  <span className="text-sm font-medium">{tasks.filter(t => t.status === 'pending').length}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('planner.pendingTasks')}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{tasks.filter(t => t.status === 'pending').length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('planner.inProgress')}</span>
-                  <span className="text-sm font-medium">{tasks.filter(t => t.status === 'in-progress').length}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('planner.inProgress')}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{tasks.filter(t => t.status === 'in-progress').length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('planner.completedToday')}</span>
-                  <span className="text-sm font-medium">{tasks.filter(t => t.status === 'completed').length}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('planner.completedToday')}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{tasks.filter(t => t.status === 'completed').length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('planner.overdue')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('planner.overdue')}</span>
                   <span className="text-sm font-medium text-red-600">
                     {tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'completed').length}
                   </span>

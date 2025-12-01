@@ -50,6 +50,7 @@ import NotificationsPanel from './components/NotificationsPanel';
 import TaskDrawer from './components/TaskDrawer';
 import TaskManagement from './components/TaskManagement';
 import LandingPage from './components/LandingPage';
+import AIInformationPage from './components/AIInformationPage';
 import About from './components/About';
 import SartthiApps from './components/SartthiApps';
 import Docs from './components/Docs';
@@ -70,6 +71,7 @@ import CanvasEditorPage from './components/admin/CanvasEditorPage';
 import FolderDemo from './components/FolderDemo';
 import CalendarPage from './components/calendar/CalendarPage';
 import InboxPage from './components/mail/InboxPage';
+import NotesPage from './components/NotesPage';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -140,6 +142,7 @@ const AppContent: React.FC = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/ai" element={<AIInformationPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/apps" element={<SartthiApps />} />
         <Route path="/docs" element={<Docs />} />
@@ -379,6 +382,12 @@ const AppContent: React.FC = () => {
             <AppLayout>
               <InboxPage />
             </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/notes" element={
+          <ProtectedRoute>
+            <NotesPage />
           </ProtectedRoute>
         } />
 

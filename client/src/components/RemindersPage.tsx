@@ -246,8 +246,8 @@ const RemindersPage: React.FC = () => {
       case 'urgent': return 'text-red-600 bg-red-100';
       case 'high': return 'text-orange-600 bg-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'low': return 'text-gray-600 dark:text-gray-400 bg-gray-100';
+      default: return 'text-gray-600 dark:text-gray-400 bg-gray-100';
     }
   };
 
@@ -414,13 +414,13 @@ const RemindersPage: React.FC = () => {
   const filteredReminders = getFilteredReminders();
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className="h-full bg-gray-50 dark:bg-gray-700">
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{t('reminders.title')}</h1>
-            <p className="text-gray-600 mt-1">{t('reminders.subtitle')}</p>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('reminders.title')}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('reminders.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Notification Permission */}
@@ -444,28 +444,28 @@ const RemindersPage: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
               >
                 <Download className="w-4 h-4" />
                 {t('buttons.export')}
               </button>
               {showExportMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-300 py-1 z-10">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-300 py-1 z-10">
                   <button
                     onClick={() => handleExport('all')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-700"
                   >
                     {t('reminders.exportAll')}
                   </button>
                   <button
                     onClick={() => handleExport('pending')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-700"
                   >
                     {t('reminders.exportPending')}
                   </button>
                   <button
                     onClick={() => handleExport('completed')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-700"
                   >
                     {t('reminders.exportCompleted')}
                   </button>
@@ -478,7 +478,7 @@ const RemindersPage: React.FC = () => {
                 setSelectedReminder(null);
                 setShowAddModal(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
               {t('reminders.addReminder')}
@@ -492,12 +492,12 @@ const RemindersPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Search and Filters */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 {/* Search */}
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
                     <input
                       type="text"
                       placeholder={t('reminders.searchPlaceholder')}
@@ -549,7 +549,7 @@ const RemindersPage: React.FC = () => {
                         className={`flex items-center gap-2 px-3 py-2 text-sm font-medium ${
                           viewMode === mode.id
                             ? 'bg-blue-100 text-blue-700'
-                            : 'text-gray-600 hover:text-gray-900'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -563,13 +563,13 @@ const RemindersPage: React.FC = () => {
 
             {/* Content Area */}
             {viewMode === 'list' && (
-              <div className="bg-white rounded-lg border border-gray-200">
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">{t('reminders.title')}</h2>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('reminders.title')}</h2>
                 </div>
                 <div className="divide-y divide-gray-200">
                   {filteredReminders.map(reminder => (
-                    <div key={reminder._id} className="p-4 hover:bg-gray-50">
+                    <div key={reminder._id} className="p-4 hover:bg-gray-50 dark:bg-gray-700">
                       <div className="flex items-start gap-3">
                         <button
                           onClick={() => toggleReminderCompletion(reminder._id)}
@@ -586,7 +586,7 @@ const RemindersPage: React.FC = () => {
                           <div className="flex items-center gap-3 mb-2">
                             <div className="flex items-center gap-2">
                               {getTypeIcon(reminder.type)}
-                              <h3 className={`font-medium ${reminder.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                              <h3 className={`font-medium ${reminder.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                                 {reminder.title}
                               </h3>
                             </div>
@@ -601,10 +601,10 @@ const RemindersPage: React.FC = () => {
                           </div>
                           
                           {reminder.description && (
-                            <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{reminder.description}</p>
                           )}
                           
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                             <span>{formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}</span>
                             {reminder.project && (
                               <div className="flex items-center gap-1">
@@ -618,7 +618,7 @@ const RemindersPage: React.FC = () => {
                           </div>
                         </div>
                         
-                        <button className="text-gray-600 hover:text-gray-600">
+                        <button className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -629,29 +629,29 @@ const RemindersPage: React.FC = () => {
             )}
 
             {viewMode === 'calendar' && (
-              <div className="bg-white rounded-lg border border-gray-300 p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6">
                 {/* Calendar Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setCurrentDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000))}
-                      className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       {formatDate(weekDays[0])} - {formatDate(weekDays[6])}
                     </h2>
                     <button
                       onClick={() => setCurrentDate(new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000))}
-                      className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                   <button
                     onClick={() => setCurrentDate(new Date())}
-                    className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
                   >
                     {t('common.today')}
                   </button>
@@ -661,7 +661,7 @@ const RemindersPage: React.FC = () => {
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day Headers */}
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
+                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
                       {day}
                     </div>
                   ))}
@@ -677,16 +677,16 @@ const RemindersPage: React.FC = () => {
                       <div
                         key={index}
                         onClick={() => setSelectedDate(day)}
-                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-700 ${
                           isToday ? 'bg-blue-50 border-blue-200' : ''
                         } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900'}`}>
+                          <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900 dark:text-gray-100'}`}>
                             {day.getDate()}
                           </span>
                           {(dayReminders.length + dayEvents.length) > 0 && (
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
                               {dayReminders.length + dayEvents.length}
                             </span>
                           )}
@@ -705,7 +705,7 @@ const RemindersPage: React.FC = () => {
                             </div>
                           ))}
                           {dayReminders.length > 2 && (
-                            <div className="text-xs text-gray-600">
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
                               +{dayReminders.length - 2} more
                             </div>
                           )}
@@ -734,8 +734,8 @@ const RemindersPage: React.FC = () => {
                   return (
                     <div key={column.status} className={`rounded-lg border-2 border-dashed ${column.color} p-4`}>
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-medium text-gray-900">{column.title}</h3>
-                        <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
+                        <h3 className="font-medium text-gray-900 dark:text-gray-100">{column.title}</h3>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded-full">
                           {columnReminders.length}
                         </span>
                       </div>
@@ -743,15 +743,15 @@ const RemindersPage: React.FC = () => {
                         {columnReminders.map(reminder => (
                           <div
                             key={reminder._id}
-                            className="bg-white rounded-lg border border-gray-300 p-3 shadow-sm"
+                            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-3 shadow-sm"
                           >
                             <div className="flex items-start gap-2 mb-2">
                               {getTypeIcon(reminder.type)}
-                              <h4 className="font-medium text-gray-900 text-sm">{reminder.title}</h4>
+                              <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{reminder.title}</h4>
                             </div>
-                            <p className="text-xs text-gray-600 mb-2">{reminder.description}</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{reminder.description}</p>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">
+                              <span className="text-xs text-gray-600 dark:text-gray-400">
                                 {formatDate(reminder.dueDate)} {formatTime(reminder.dueDate)}
                               </span>
                               <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(reminder.priority)}`}>
@@ -780,34 +780,34 @@ const RemindersPage: React.FC = () => {
                 <p className="text-sm text-purple-100 mb-3">
                   {t('dashboard.aiDescription')}
                 </p>
-                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+                <button className="w-full bg-white dark:bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
                   {t('dashboard.askAI')}
                 </button>
               </div>
             )}
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('reminders.quickStats')}</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('reminders.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('common.pending')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('common.pending')}</span>
                   <span className="text-sm font-medium">{reminders.filter(r => !r.completed).length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('reminders.completedToday')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.completedToday')}</span>
                   <span className="text-sm font-medium">
                     {reminders.filter(r => r.completed && r.completedAt && new Date(r.completedAt).toDateString() === new Date().toDateString()).length}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('reminders.overdue')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.overdue')}</span>
                   <span className="text-sm font-medium text-red-600">
                     {reminders.filter(r => isOverdue(r.dueDate, r.completed)).length}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{t('reminders.thisWeek')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.thisWeek')}</span>
                   <span className="text-sm font-medium">
                     {reminders.filter(r => {
                       const reminderDate = new Date(r.dueDate);
@@ -822,29 +822,29 @@ const RemindersPage: React.FC = () => {
             </div>
 
             {/* Upcoming Deadlines */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('reminders.upcomingDeadlines')}</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('reminders.upcomingDeadlines')}</h3>
               <div className="space-y-2">
                 {reminders
                   .filter(r => !r.completed && new Date(r.dueDate) >= new Date())
                   .slice(0, 5)
                   .map(reminder => (
-                    <div key={reminder._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50">
+                    <div key={reminder._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-700">
                       <div className={`w-2 h-2 rounded-full ${
                         reminder.priority === 'urgent' ? 'bg-red-500' :
                         reminder.priority === 'high' ? 'bg-orange-500' :
                         reminder.priority === 'medium' ? 'bg-yellow-500' : 'bg-gray-500'
                       }`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{reminder.title}</p>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{reminder.title}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
                           {formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}
                         </p>
                       </div>
                     </div>
                   ))}
                 {reminders.filter(r => !r.completed && new Date(r.dueDate) >= new Date()).length === 0 && (
-                  <p className="text-sm text-gray-600 text-center py-4">{t('reminders.noUpcomingDeadlines')}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center py-4">{t('reminders.noUpcomingDeadlines')}</p>
                 )}
               </div>
             </div>

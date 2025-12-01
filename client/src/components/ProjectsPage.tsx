@@ -316,7 +316,7 @@ const ProjectsPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h1>
-            <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>{t('descriptions.projects')}</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('descriptions.projects')}</p>
           </div>
           <div className="flex items-center gap-3">
             {canCreateProject() ? (
@@ -342,7 +342,7 @@ const ProjectsPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder={t('projects.searchPlaceholder')}
@@ -439,7 +439,7 @@ const ProjectsPage: React.FC = () => {
           <div className={`max-w-lg mx-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-6 text-center`}>
             <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-2" />
             <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.loadError')}</h3>
-            <p className={`${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-4`}>{error}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
             <button
               onClick={loadProjects}
               className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
@@ -450,14 +450,14 @@ const ProjectsPage: React.FC = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map(project => (
-              <div key={project._id} className="bg-white rounded-lg border border-gray-300 p-6 hover:shadow-md transition-shadow">
+              <div key={project._id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
                 {/* Project Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{project.name}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">{project.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{project.description}</p>
                   </div>
-                  <button className="text-gray-600 hover:text-gray-600">
+                  <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 </div>
@@ -467,21 +467,21 @@ const ProjectsPage: React.FC = () => {
                   {project.tags.slice(0, 3).map(tag => (
                     <span
                       key={tag}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700"
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                     >
                       {tag}
                     </span>
                   ))}
                   {project.tags.length > 3 && (
-                    <span className="text-xs text-gray-600">+{project.tags.length - 3}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">+{project.tags.length - 3}</span>
                   )}
                 </div>
 
                 {/* Progress */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-600">{t('projects.progress')}</span>
-                    <span className="font-medium">{project.progress}%</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t('projects.progress')}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{project.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-2">
                     <div
@@ -518,32 +518,32 @@ const ProjectsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <span className="text-sm text-gray-600">{project.team.length} {t('common.members')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{project.team.length} {t('common.members')}</span>
                 </div>
 
                 {/* Budget and Due Date */}
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('projects.budget')}</span>
-                    <span className="font-medium">
+                    <span className="text-gray-600 dark:text-gray-400">{t('projects.budget')}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
                       {formatCurrency(project.budget.actual, project.budget.currency)} / {formatCurrency(project.budget.estimated, project.budget.currency)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('projects.dueDate')}</span>
-                    <span className="font-medium">
+                    <span className="text-gray-600 dark:text-gray-400">{t('projects.dueDate')}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
                       {new Date(project.endDate).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-300 flex-wrap">
+                <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-700 flex-wrap">
                   <button 
                     onClick={() => handleViewProject(project._id)}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
                       isDarkMode
-                        ? 'text-gray-700 border-gray-600 hover:bg-gray-700'
+                        ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
                         : 'text-gray-600 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -554,7 +554,7 @@ const ProjectsPage: React.FC = () => {
                     onClick={() => handleEditProject(project._id)}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
                       isDarkMode
-                        ? 'text-gray-700 border-gray-600 hover:bg-gray-700'
+                        ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
                         : 'text-gray-600 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -592,12 +592,12 @@ const ProjectsPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.title')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">{t('projects.title')}</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.status')}</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.progress')}</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('projects.team')}</th>
@@ -606,24 +606,24 @@ const ProjectsPage: React.FC = () => {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">{t('common.actions')}</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredProjects.map(project => (
-                    <tr key={project._id} className="hover:bg-gray-50">
+                    <tr key={project._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{project.name}</div>
-                          <div className="text-sm text-gray-600">{project.description}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{project.description}</div>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {project.tags.slice(0, 2).map(tag => (
                               <span
                                 key={tag}
-                                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700"
+                                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                               >
                                 {tag}
                               </span>
                             ))}
                             {project.tags.length > 2 && (
-                              <span className="text-xs text-gray-600">+{project.tags.length - 2}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">+{project.tags.length - 2}</span>
                             )}
                           </div>
                         </div>
@@ -646,7 +646,7 @@ const ProjectsPage: React.FC = () => {
                               style={{ width: `${project.progress}%` }}
                             />
                           </div>
-                          <span className="text-sm text-gray-600">{project.progress}%</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{project.progress}%</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -661,10 +661,10 @@ const ProjectsPage: React.FC = () => {
                               />
                             ))}
                           </div>
-                          <span className="text-sm text-gray-600">{project.team.length}</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{project.team.length}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                         {new Date(project.endDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
@@ -672,7 +672,7 @@ const ProjectsPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button className="text-gray-600 hover:text-gray-600" onClick={() => handleViewProject(project._id)}>
+                          <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" onClick={() => handleViewProject(project._id)}>
                             <Eye className="w-4 h-4" />
                           </button>
                           <button className="text-gray-600 hover:text-gray-600" onClick={() => handleEditProject(project._id)}>
@@ -710,10 +710,10 @@ const ProjectsPage: React.FC = () => {
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
               isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
             }`}>
-              <Target className={`w-8 h-8 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
+              <Target className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             </div>
             <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.noProjects')}</h3>
-            <p className={`mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
+            <p className="mb-4 text-gray-600 dark:text-gray-400">
               {searchTerm || selectedStatus !== 'all' || selectedPriority !== 'all'
                 ? t('projects.adjustFilters')
                 : t('projects.createFirst')}
@@ -749,8 +749,8 @@ const ProjectSkeletonGrid: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {skeletonCards.map((_, index) => (
-        <div key={index} className="bg-white rounded-lg border border-gray-300 p-6 animate-pulse space-y-4">
-          <div className="h-6 bg-gray-300 rounded w-3/4" />
+        <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6 animate-pulse space-y-4">
+          <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-3/4" />
           <div className="h-4 bg-gray-300 rounded w-full" />
           <div className="h-4 bg-gray-300 rounded w-5/6" />
           <div className="h-3 bg-gray-300 rounded w-full" />

@@ -73,15 +73,15 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
     <div className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
       >
-        <CurrentIcon className="w-4 h-4 text-gray-600" />
-        <span className="text-sm font-medium text-gray-900">{currentMode.label}</span>
-        <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <CurrentIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{currentMode.label}</span>
+        <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-300 rounded-lg shadow-lg z-50">
           <div className="p-2">
             {/* Personal Mode */}
             <button
@@ -89,13 +89,13 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                 state.mode === 'Personal' 
                   ? 'bg-blue-50 text-blue-700' 
-                  : 'hover:bg-gray-50 text-gray-700'
+                  : 'hover:bg-gray-50 text-gray-700 dark:text-gray-300'
               }`}
             >
               <Home className="w-4 h-4" />
               <div>
                 <div className="font-medium">{t('switcher.personalMode')}</div>
-                <div className="text-xs text-gray-600">{t('switcher.individualWorkspace')}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">{t('switcher.individualWorkspace')}</div>
               </div>
               {state.mode === 'Personal' && (
                 <div className="ml-auto w-2 h-2 bg-accent rounded-full" />
@@ -107,7 +107,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
 
             {/* Workspace Modes */}
             <div className="space-y-1">
-              <div className="px-3 py-1 text-xs font-medium text-gray-600 uppercase tracking-wide">
+              <div className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                 {t('switcher.workspaces')}
               </div>
               {state.workspaces.map(workspace => (
@@ -117,7 +117,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                     state.mode === 'Workspace' && state.currentWorkspace === workspace._id
                       ? 'bg-blue-50 text-blue-700'
-                      : 'hover:bg-gray-50 text-gray-700'
+                      : 'hover:bg-gray-50 text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   <Building className="w-4 h-4" />
@@ -128,7 +128,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                         <Crown className="w-3 h-3 text-yellow-500" />
                       )}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
                       {t('switcher.members', { count: workspace.memberCount })} • {workspace.type}
                     </div>
                   </div>
@@ -141,7 +141,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
 
             {/* Quick Actions */}
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="px-3 py-1 text-xs font-medium text-gray-600 uppercase tracking-wide">
+              <div className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                 {t('switcher.quickActions')}
               </div>
               <div className="space-y-1">
@@ -150,12 +150,12 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                     dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' });
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 dark:text-gray-300 transition-colors"
                 >
                   <Building className="w-4 h-4" />
                   <div>
                     <div className="font-medium">{t('switcher.createWorkspace')}</div>
-                    <div className="text-xs text-gray-600">{t('switcher.createWorkspaceDesc')}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">{t('switcher.createWorkspaceDesc')}</div>
                   </div>
                 </button>
                 <button
@@ -164,12 +164,12 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                     navigate('/workspace');
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 dark:text-gray-300 transition-colors"
                 >
                   <Users className="w-4 h-4" />
                   <div>
                     <div className="font-medium">{t('switcher.discoverWorkspaces')}</div>
-                    <div className="text-xs text-gray-600">{t('switcher.discoverWorkspacesDesc')}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">{t('switcher.discoverWorkspacesDesc')}</div>
                   </div>
                 </button>
               </div>

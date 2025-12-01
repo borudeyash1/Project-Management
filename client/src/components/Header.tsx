@@ -110,7 +110,7 @@ const Header: React.FC = () => {
         {/* Search */}
         <div className="hidden md:flex items-center gap-2">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 dark:text-gray-400" />
             <input
               type="text"
               className="w-64 rounded-lg border border-border dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
@@ -124,7 +124,7 @@ const Header: React.FC = () => {
           className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 relative"
           onClick={toggleNotifications}
         >
-          <Bell className="w-4 h-4" />
+          <Bell className="w-4 h-4 text-gray-700 dark:text-gray-300" />
           <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
             3
           </span>
@@ -132,10 +132,10 @@ const Header: React.FC = () => {
 
         {/* Settings */}
         <button
-          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 dark:text-gray-700"
+          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700"
           onClick={() => navigate('/settings')}
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="w-4 h-4 text-gray-700 dark:text-gray-300" />
         </button>
 
         {/* Language Switcher */}
@@ -144,7 +144,7 @@ const Header: React.FC = () => {
             className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700"
             onClick={() => setShowLanguageMenu(!showLanguageMenu)}
           >
-            <Globe className="w-4 h-4" />
+            <Globe className="w-4 h-4 text-gray-700 dark:text-gray-300" />
           </button>
 
           {showLanguageMenu && (
@@ -211,7 +211,7 @@ const Header: React.FC = () => {
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h3>
                 <button 
                   onClick={toggleUserMenu}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -234,12 +234,12 @@ const Header: React.FC = () => {
                 </div>
                 <div className="overflow-hidden">
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{state.userProfile.fullName}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{state.userProfile.email}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 truncate">{state.userProfile.email}</p>
                 </div>
               </div>
 
               <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-3">
                   {t('settings.theme')}
                 </p>
                 <div className="grid grid-cols-3 gap-3">
@@ -248,7 +248,7 @@ const Header: React.FC = () => {
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all h-24 ${
                       preferences.theme === 'light'
                         ? 'bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Sun className="w-5 h-5 mb-2" />
@@ -260,7 +260,7 @@ const Header: React.FC = () => {
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all h-24 ${
                       preferences.theme === 'dark'
                         ? 'bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Moon className="w-5 h-5 mb-2" />
@@ -272,7 +272,7 @@ const Header: React.FC = () => {
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all h-24 ${
                       preferences.theme === 'system'
                         ? 'bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Monitor className="w-5 h-5 mb-2" />
@@ -288,7 +288,7 @@ const Header: React.FC = () => {
                     navigate('/home');
                     setIsUserMenuOpen(false);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
                 >
                   <Home className="w-4 h-4" />
                   Main App

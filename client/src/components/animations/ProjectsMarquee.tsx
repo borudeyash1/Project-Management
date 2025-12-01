@@ -50,12 +50,12 @@ const ProjectCard = ({
   return (
     <figure
       className={cn(
-        "relative h-full w-80 cursor-pointer overflow-hidden rounded-2xl border-2 p-0",
+        "relative h-full w-96 cursor-pointer overflow-hidden rounded-2xl border-2 p-0",
         // light styles
-        "border-blue-500/20 bg-white hover:bg-gray-50",
+        "border-yellow-500/20 bg-white hover:bg-yellow-50",
         // dark styles
         "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-        "transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+        "transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-yellow-500/40"
       )}
     >
       <img 
@@ -78,14 +78,9 @@ const ProjectCard = ({
 
 export function ProjectsMarquee() {
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-white py-20">
-      <Marquee pauseOnHover className="[--duration:30s] mb-4">
-        {firstRow.map((project) => (
-          <ProjectCard key={project.name} {...project} />
-        ))}
-      </Marquee>
-      <Marquee reverse pauseOnHover className="[--duration:30s]">
-        {secondRow.map((project) => (
+    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-white">
+      <Marquee pauseOnHover className="[--duration:40s]">
+        {projects.map((project) => (
           <ProjectCard key={project.name} {...project} />
         ))}
       </Marquee>

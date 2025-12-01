@@ -1,3 +1,6 @@
+/* Import Google Fonts - Poppins for headings */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,17 +11,17 @@
   --accent-color: #2563EB;
   --accent-hover: #1D4ED8;
   --accent-light: #3B82F6;
-  
+
   /* Background Colors - Light Mode */
   --bg-color: #F7F9FC;
   --surface-color: #FFFFFF;
   --border-color: #E5E7EB;
-  
+
   /* Text Colors - Light Mode with High Contrast */
   --text-color: #111827;
   --text-secondary: #374151;
   --text-muted: #6B7280;
-  
+
   /* Status Colors */
   --success-color: #059669;
   --warning-color: #D97706;
@@ -32,17 +35,17 @@
   --accent-color: #3B82F6;
   --accent-hover: #2563EB;
   --accent-light: #60A5FA;
-  
+
   /* Background Colors - Dark Mode */
   --bg-color: #0F172A;
   --surface-color: #1E293B;
   --border-color: #334155;
-  
+
   /* Text Colors - Dark Mode with High Contrast */
   --text-color: #F1F5F9;
   --text-secondary: #E2E8F0;
   --text-muted: #94A3B8;
-  
+
   /* Status Colors - Adjusted for dark mode */
   --success-color: #10B981;
   --warning-color: #F59E0B;
@@ -74,48 +77,6 @@ code {
     monospace;
 }
 
-/* Ensure proper text contrast on all backgrounds */
-.bg-white,
-.bg-surface {
-  color: #111827 !important;
-}
-
-.dark .bg-white,
-.dark .bg-surface {
-  background-color: #1E293B !important;
-  color: #F1F5F9 !important;
-}
-
-/* Fix white text on white background issues */
-.text-white {
-  color: #FFFFFF !important;
-}
-
-/* Ensure headings have proper contrast */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-color);
-  font-weight: 600;
-}
-
-/* Button text contrast fixes */
-button {
-  color: inherit;
-}
-
-button.bg-white,
-button[class*="bg-white"] {
-  color: #111827 !important;
-}
-
-.dark button.bg-white,
-.dark button[class*="bg-white"] {
-  background-color: #1E293B !important;
-  color: #F1F5F9 !important;
-}
-
-/* Primary button styles */
-button.bg-primary,
-button[class*="bg-primary"],
 .bg-primary {
   background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
@@ -326,12 +287,10 @@ tbody tr:hover {
 
 /* Skeleton loading states */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-color) 25%,
-    var(--border-color) 50%,
-    var(--bg-color) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--bg-color) 25%,
+      var(--border-color) 50%,
+      var(--bg-color) 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
 }
@@ -340,13 +299,17 @@ tbody tr:hover {
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
 }
 
 /* Ensure proper contrast for all text elements */
-p, span, div, label {
+p,
+span,
+div,
+label {
   color: inherit;
 }
 
@@ -375,6 +338,7 @@ p, span, div, label {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -385,6 +349,7 @@ p, span, div, label {
     transform: translateY(10px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -404,6 +369,7 @@ p, span, div, label {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(calc(-100% - var(--gap)));
   }
@@ -413,6 +379,7 @@ p, span, div, label {
   from {
     transform: translateY(0);
   }
+
   to {
     transform: translateY(calc(-100% - var(--gap)));
   }
@@ -425,4 +392,3 @@ p, span, div, label {
 .animate-marquee-vertical {
   animation: marquee-vertical var(--duration) linear infinite;
 }
-

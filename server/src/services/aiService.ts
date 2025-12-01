@@ -61,6 +61,17 @@ class AIService {
             return await this.handleSuggestMilestonesTasks(userMessage, userContext);
           } else if (message.includes('project') && (message.includes('working') || message.includes('current'))) {
             return await this.handleGetWorkingProjects(userContext);
+          } else if (
+            message.includes('refine') ||
+            message.includes('improve') ||
+            message.includes('fix') ||
+            message.includes('grammar') ||
+            message.includes('summarize') ||
+            message.includes('expand') ||
+            message.includes('shorten') ||
+            message.includes('rewrite')
+          ) {
+            return await this.handleGeneralQuery(userMessage, userContext, language);
           } else {
             return this.handleUnknownIntent();
           }

@@ -42,6 +42,7 @@ import sartthiCalendarRoutes from "./routes/sartthi-calendar";
 import sartthiVaultRoutes from "./routes/sartthi-vault";
 import vaultWorkspaceRoutes from "./routes/vaultWorkspace";
 import sartthiRoutes from "./routes/sartthiRoutes";
+import notesRoutes from "./routes/notes";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 
@@ -148,7 +149,9 @@ app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/docs", documentationRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/content", contentRoutes);
+app.use("/api/content", contentRoutes);
 app.use("/api/sartthi", sartthiRoutes);
+app.use("/api/notes", notesRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

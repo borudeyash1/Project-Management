@@ -92,7 +92,7 @@ const UserDisplay: React.FC<UserDisplayProps> = ({
       )}
       
       <div className="flex items-center gap-2 min-w-0">
-        <span className={`${textSize} font-medium text-gray-900 truncate`}>
+        <span className={`${textSize} font-medium text-gray-900 dark:text-gray-100 truncate`}>
           {name}
         </span>
         

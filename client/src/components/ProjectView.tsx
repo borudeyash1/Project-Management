@@ -61,6 +61,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface Task {
   _id: string;
@@ -155,6 +156,7 @@ interface Milestone {
 
 const ProjectView: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { isDarkMode } = useTheme();
   const [activeView, setActiveView] = useState('flowboard');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -312,12 +314,12 @@ const ProjectView: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'backlog': return 'bg-gray-100 text-gray-800';
+      case 'backlog': return 'bg-gray-100 dark:bg-gray-700 text-gray-800';
       case 'todo': return 'bg-blue-100 text-blue-800';
       case 'in-progress': return 'bg-yellow-100 text-yellow-800';
       case 'review': return 'bg-purple-100 text-purple-800';
       case 'done': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800';
     }
   };
 
@@ -327,7 +329,7 @@ const ProjectView: React.FC = () => {
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'high': return 'bg-orange-200 text-orange-800';
       case 'critical': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800';
     }
   };
 
@@ -377,7 +379,7 @@ const ProjectView: React.FC = () => {
 
   const renderFlowBoard = () => {
     const columns = [
-      { id: 'backlog', title: 'Backlog', color: 'bg-gray-50' },
+      { id: 'backlog', title: 'Backlog', color: 'bg-gray-50 dark:bg-gray-900' },
       { id: 'todo', title: 'To Do', color: 'bg-blue-50' },
       { id: 'in-progress', title: 'In Progress', color: 'bg-yellow-50' },
       { id: 'review', title: 'Review', color: 'bg-purple-50' },
@@ -399,8 +401,8 @@ const ProjectView: React.FC = () => {
               onDrop={(e) => handleDrop(e, column.id)}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">{column.title}</h3>
-                <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{column.title}</h3>
+                <span className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded-full">
                   {columnTasks.length}
                 </span>
               </div>
@@ -411,7 +413,7 @@ const ProjectView: React.FC = () => {
                     key={task._id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, task)}
-                    className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-move border-l-4"
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-move border-l-4"
                     style={{ borderLeftColor: task.color }}
                     onClick={() => {
                       setSelectedTask(task);
@@ -419,14 +421,14 @@ const ProjectView: React.FC = () => {
                     }}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-gray-900 text-sm">{task.title}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{task.title}</h4>
                       <div className="flex items-center gap-1">
                         {task.isStarred && <Star className="w-3 h-3 text-yellow-500 fill-current" />}
                         {getPriorityIcon(task.priority)}
                       </div>
                     </div>
                     
-                    <p className="text-xs text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{task.description}</p>
                     
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -435,51 +437,22 @@ const ProjectView: React.FC = () => {
                           alt={task.assignee.name}
                           className="w-6 h-6 rounded-full"
                         />
-                        <span className="text-xs text-gray-600">{task.assignee.name}</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-400">{task.assignee.name}</span>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
                         {task.priority}
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between text-xs text-gray-600">
+                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{task.estimatedHours}h</span>
                       <span>{task.dueDate.toLocaleDateString()}</span>
                     </div>
-                    
-                    {task.progress > 0 && (
-                      <div className="mt-2">
-                        <div className="w-full bg-gray-300 rounded-full h-1">
-                          <div
-                            className="bg-accent h-1 rounded-full transition-all duration-300"
-                            style={{ width: `${task.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {task.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {task.tags.slice(0, 3).map((tag, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {task.tags.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                            +{task.tags.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    )}
                   </div>
                 ))}
                 
                 <button
-                  className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-600 transition-colors"
+                  className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:text-gray-400 transition-colors"
                   onClick={() => {
                     // Create new task
                     console.log('Create new task');
@@ -512,17 +485,17 @@ const ProjectView: React.FC = () => {
     }
 
     return (
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
             </h3>
             <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <button className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg">
                 <ArrowLeft className="w-4 h-4" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <button className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg">
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -532,7 +505,7 @@ const ProjectView: React.FC = () => {
         <div className="p-4">
           <div className="grid grid-cols-7 gap-1 mb-4">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-              <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
+              <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
                 {day}
               </div>
             ))}
@@ -550,18 +523,18 @@ const ProjectView: React.FC = () => {
               return (
                 <div
                   key={index}
-                  className={`min-h-24 p-2 border border-gray-300 ${
-                    day === today.getDate() ? 'bg-blue-50' : 'bg-white'
-                  } hover:bg-gray-50 transition-colors`}
+                  className={`min-h-24 p-2 border border-gray-300 dark:border-gray-700 ${
+                    day === today.getDate() ? 'bg-blue-50' : 'bg-white dark:bg-gray-800'
+                  } hover:bg-gray-50 dark:bg-gray-900 transition-colors`}
                 >
                   {day && (
                     <>
-                      <div className="text-sm font-medium text-gray-900 mb-1">{day}</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{day}</div>
                       <div className="space-y-1">
                         {dayTasks.slice(0, 2).map((task) => (
                           <div
                             key={task._id}
-                            className="text-xs p-1 rounded truncate cursor-pointer hover:bg-white hover:shadow-sm transition-all"
+                            className="text-xs p-1 rounded truncate cursor-pointer hover:bg-white dark:bg-gray-800 hover:shadow-sm transition-all"
                             style={{ backgroundColor: task.color + '20', color: task.color }}
                             onClick={() => {
                               setSelectedTask(task);
@@ -572,7 +545,7 @@ const ProjectView: React.FC = () => {
                           </div>
                         ))}
                         {dayTasks.length > 2 && (
-                          <div className="text-xs text-gray-600">
+                          <div className="text-xs text-gray-600 dark:text-gray-400">
                             +{dayTasks.length - 2} more
                           </div>
                         )}
@@ -593,8 +566,8 @@ const ProjectView: React.FC = () => {
     
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg border border-gray-300 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Timeline</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Timeline</h3>
           
           <div className="relative">
             <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
@@ -612,9 +585,9 @@ const ProjectView: React.FC = () => {
                 </div>
                 
                 <div className="ml-6 flex-1">
-                  <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+                  <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-gray-900">{milestone.title}</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">{milestone.title}</h4>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         milestone.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                       }`}>
@@ -622,9 +595,9 @@ const ProjectView: React.FC = () => {
                       </span>
                     </div>
                     
-                    <p className="text-sm text-gray-600 mb-3">{milestone.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{milestone.description}</p>
                     
-                    <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                       <span>Due: {milestone.dueDate.toLocaleDateString()}</span>
                       <span>{milestone.tasks.length} tasks</span>
                     </div>
@@ -641,13 +614,13 @@ const ProjectView: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-lg border border-gray-300 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Progress</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Progress</h3>
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-              <span className="text-sm font-semibold text-gray-900">{project.progress}%</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Overall Progress</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{project.progress}%</span>
             </div>
             
             <div className="w-full bg-gray-300 rounded-full h-3">
@@ -658,15 +631,15 @@ const ProjectView: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900">{project.tasks.length}</div>
-                <div className="text-sm text-gray-600">Total Tasks</div>
+              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{project.tasks.length}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Total Tasks</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900">
+              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {project.tasks.filter(t => t.status === 'done').length}
                 </div>
-                <div className="text-sm text-gray-600">Completed</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Completed</div>
               </div>
             </div>
           </div>
@@ -688,10 +661,10 @@ const ProjectView: React.FC = () => {
 
     return (
       <div className="space-y-4">
-        <div className="bg-white rounded-lg border border-gray-300 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Task Matrix</h3>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Task Matrix</h3>
+            <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors">
               <Plus className="w-4 h-4" />
               Add Task
             </button>
@@ -699,20 +672,20 @@ const ProjectView: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400" />
               <input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                className="pl-10 pr-4 py-2 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
             
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Status</option>
               <option value="backlog">Backlog</option>
@@ -725,7 +698,7 @@ const ProjectView: React.FC = () => {
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Priority</option>
               <option value="low">Low</option>
@@ -737,7 +710,7 @@ const ProjectView: React.FC = () => {
             <select
               value={filterAssignee}
               onChange={(e) => setFilterAssignee(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Assignees</option>
               {project.team.map((member) => (
@@ -747,37 +720,37 @@ const ProjectView: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Task
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Priority
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Assignee
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Due Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Progress
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                 {filteredTasks.map((task) => (
-                  <tr key={task._id} className="hover:bg-gray-50">
+                  <tr key={task._id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -789,8 +762,8 @@ const ProjectView: React.FC = () => {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{task.title}</div>
-                          <div className="text-sm text-gray-600">{task.description}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{task.description}</div>
                         </div>
                       </div>
                     </td>
@@ -815,11 +788,11 @@ const ProjectView: React.FC = () => {
                           className="h-8 w-8 rounded-full"
                         />
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{task.assignee.name}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.assignee.name}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {task.dueDate.toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -830,7 +803,7 @@ const ProjectView: React.FC = () => {
                             style={{ width: `${task.progress}%` }}
                           ></div>
                         </div>
-                        <span className="text-sm text-gray-600">{task.progress}%</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{task.progress}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -838,7 +811,7 @@ const ProjectView: React.FC = () => {
                         <button className="text-accent-dark hover:text-blue-900">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="text-gray-600 hover:text-gray-900">
+                        <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100">
                           <Edit className="w-4 h-4" />
                         </button>
                         <button className="text-red-600 hover:text-red-900">
@@ -869,11 +842,11 @@ const ProjectView: React.FC = () => {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white border border-gray-300 rounded-lg p-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                <p className="text-2xl font-semibold text-gray-900">{totalTasks}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tasks</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{totalTasks}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <List className="w-6 h-6 text-accent-dark" />
@@ -885,11 +858,11 @@ const ProjectView: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Completion Rate</p>
-                <p className="text-2xl font-semibold text-gray-900">{Math.round(completionRate)}%</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Completion Rate</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{Math.round(completionRate)}%</p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
                 <Target className="w-6 h-6 text-green-600" />
@@ -901,11 +874,11 @@ const ProjectView: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Team Members</p>
-                <p className="text-2xl font-semibold text-gray-900">{project.team.length}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Team Members</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{project.team.length}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Users className="w-6 h-6 text-purple-600" />
@@ -917,11 +890,11 @@ const ProjectView: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Budget Used</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Budget Used</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   ${(project.spent / 1000).toFixed(0)}k
                 </p>
               </div>
@@ -937,14 +910,14 @@ const ProjectView: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white border border-gray-300 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tasks by Priority</h3>
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Tasks by Priority</h3>
             <div className="space-y-3">
               {Object.entries(tasksByPriority).map(([priority, count]) => (
                 <div key={priority} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getPriorityIcon(priority)}
-                    <span className="text-sm font-medium text-gray-700 capitalize">{priority}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{priority}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-20 bg-gray-300 rounded-full h-2">
@@ -957,15 +930,15 @@ const ProjectView: React.FC = () => {
                         style={{ width: `${(count / totalTasks) * 100}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">{count}</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{count}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Team Performance</h3>
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Team Performance</h3>
             <div className="space-y-4">
               {project.team.map((member) => {
                 const memberTasks = project.tasks.filter(t => t.assignee._id === member._id);
@@ -981,13 +954,13 @@ const ProjectView: React.FC = () => {
                         className="w-8 h-8 rounded-full"
                       />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{member.name}</p>
-                        <p className="text-xs text-gray-600">{member.role}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.name}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{member.role}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-gray-900">{Math.round(completionRate)}%</p>
-                      <p className="text-xs text-gray-600">{completedTasks}/{memberTasks.length} tasks</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{Math.round(completionRate)}%</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{completedTasks}/{memberTasks.length} tasks</p>
                     </div>
                   </div>
                 );
@@ -996,16 +969,16 @@ const ProjectView: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-300 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Recent Activity</h3>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-4 h-4 text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-900">Task "Write API Documentation" completed</p>
-                <p className="text-xs text-gray-600">2 hours ago by Mike Chen</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100">Task "Write API Documentation" completed</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">2 hours ago by Mike Chen</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -1013,8 +986,8 @@ const ProjectView: React.FC = () => {
                 <Plus className="w-4 h-4 text-accent-dark" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-900">New task "Implement User Authentication" created</p>
-                <p className="text-xs text-gray-600">5 hours ago by Mike Chen</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100">New task "Implement User Authentication" created</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">5 hours ago by Mike Chen</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -1022,12 +995,12 @@ const ProjectView: React.FC = () => {
                 <Edit className="w-4 h-4 text-purple-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-900">Task "Design Homepage Layout" updated</p>
-                <p className="text-xs text-gray-600">1 day ago by Sarah Johnson</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100">Task "Design Homepage Layout" updated</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">1 day ago by Sarah Johnson</p>
               </div>
             </div>
+          </div>
         </div>
-      </div>
       </div>
     );
   };
@@ -1041,31 +1014,29 @@ const ProjectView: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="bg-white border border-border rounded-xl">
-        {/* Header */}
-        <div className="p-6 border-b border-border">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">{project.name}</h1>
-              <p className="text-sm text-gray-600 mt-1">{project.description}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                <Share2 className="w-4 h-4" />
-                Share
-              </button>
-              <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                <Settings className="w-4 h-4" />
-                Settings
-              </button>
-            </div>
+    <div className={`h-full ${isDarkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+      {/* Header */}
+      <div className={`${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{project.description}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <Share2 className="w-4 h-4" />
+              Share
+            </button>
+            <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <Settings className="w-4 h-4" />
+              Settings
+            </button>
           </div>
         </div>
 
         {/* View Tabs */}
-        <div className="border-b border-border">
-          <nav className="flex space-x-8 px-6 overflow-x-auto">
+        <div className="mt-6">
+          <nav className="flex space-x-8 overflow-x-auto">
             {views.map((view) => {
               const Icon = view.icon;
               return (
@@ -1075,7 +1046,7 @@ const ProjectView: React.FC = () => {
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                     activeView === view.id
                       ? 'border-accent text-accent-dark'
-                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700'
                   }`}
                   title={view.description}
                 >
@@ -1086,26 +1057,26 @@ const ProjectView: React.FC = () => {
             })}
           </nav>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {activeView === 'flowboard' && renderFlowBoard()}
-          {activeView === 'timegrid' && renderTimeGrid()}
-          {activeView === 'projectpath' && renderProjectPath()}
-          {activeView === 'taskmatrix' && renderTaskMatrix()}
-          {activeView === 'smartdashboard' && renderSmartDashboard()}
-        </div>
+      {/* Content */}
+      <div className="p-6">
+        {activeView === 'flowboard' && renderFlowBoard()}
+        {activeView === 'timegrid' && renderTimeGrid()}
+        {activeView === 'projectpath' && renderProjectPath()}
+        {activeView === 'taskmatrix' && renderTaskMatrix()}
+        {activeView === 'smartdashboard' && renderSmartDashboard()}
       </div>
 
       {/* Task Modal */}
       {showTaskModal && selectedTask && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">{selectedTask.title}</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{selectedTask.title}</h2>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="text-gray-600 hover:text-gray-600"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -1113,20 +1084,20 @@ const ProjectView: React.FC = () => {
             
             <div className="p-6 space-y-6">
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                <p className="text-sm text-gray-900">{selectedTask.description}</p>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100">{selectedTask.description}</p>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Status</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedTask.status)}`}>
                     {selectedTask.status}
                   </span>
                 </div>
                 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Priority</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</h3>
                   <div className="flex items-center gap-2">
                     {getPriorityIcon(selectedTask.priority)}
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedTask.priority)}`}>
@@ -1136,31 +1107,31 @@ const ProjectView: React.FC = () => {
                 </div>
                 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Assignee</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assignee</h3>
                   <div className="flex items-center gap-2">
                     <img
                       src={selectedTask.assignee.avatar}
                       alt={selectedTask.assignee.name}
                       className="w-6 h-6 rounded-full"
                     />
-                    <span className="text-sm text-gray-900">{selectedTask.assignee.name}</span>
+                    <span className="text-sm text-gray-900 dark:text-gray-100">{selectedTask.assignee.name}</span>
                   </div>
                 </div>
                 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Due Date</h3>
-                  <span className="text-sm text-gray-900">{selectedTask.dueDate.toLocaleDateString()}</span>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Due Date</h3>
+                  <span className="text-sm text-gray-900 dark:text-gray-100">{selectedTask.dueDate.toLocaleDateString()}</span>
                 </div>
               </div>
               
               {selectedTask.tags.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Tags</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedTask.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
+                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs"
                       >
                         {tag}
                       </span>
@@ -1170,24 +1141,24 @@ const ProjectView: React.FC = () => {
               )}
               
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Progress</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Progress</h3>
                 <div className="w-full bg-gray-300 rounded-full h-2">
                   <div
                     className="bg-accent h-2 rounded-full transition-all duration-300"
                     style={{ width: `${selectedTask.progress}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">{selectedTask.progress}% complete</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{selectedTask.progress}% complete</p>
               </div>
             </div>
             
-            <div className="flex gap-3 p-6 border-t border-gray-200">
-              <button className="flex-1 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
+            <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+              <button className="flex-1 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors">
                 Edit Task
               </button>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors"
               >
                 Close
               </button>

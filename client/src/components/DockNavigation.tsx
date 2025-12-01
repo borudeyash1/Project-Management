@@ -17,13 +17,15 @@ import {
   Settings,
   User,
   Shield,
-  Mail
+  Mail,
+  FileEdit
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
+import StickyNote from './StickyNote';
 
 interface NavItem {
   id: string;
@@ -65,6 +67,7 @@ const DockNavigation: React.FC = () => {
   const mainNavItems: NavItem[] = useMemo(() => {
     const items: NavItem[] = [
       { id: 'home', label: 'Home', translationKey: 'navigation.home', icon: Home, path: '/home' },
+      { id: 'notes', label: 'Notes', translationKey: 'navigation.notes', icon: FileEdit, path: '/notes' },
       { id: 'projects', label: 'Projects', translationKey: 'navigation.projects', icon: FolderOpen, path: '/projects' },
       { id: 'planner', label: 'Planner', translationKey: 'planner.title', icon: Calendar, path: '/planner' },
       { id: 'tracker', label: 'Tracker', translationKey: 'tracker.title', icon: Clock, path: '/tracker' },
@@ -145,24 +148,78 @@ const DockNavigation: React.FC = () => {
       (path !== '/home' && location.pathname.startsWith(path));
   };
 
+  const [activeStickyNotes, setActiveStickyNotes] = useState<string[]>([]);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+  const handleCreateStickyNote = () => {
+    const id = Date.now().toString();
+    setActiveStickyNotes(prev => [...prev, id]);
+  };
+
+  const handleCloseStickyNote = (id: string) => {
+    setActiveStickyNotes(prev => prev.filter(noteId => noteId !== id));
+  };
+
   return (
     <>
+      {/* Sticky Notes Layer */}
+      {activeStickyNotes.map(id => (
+        <StickyNote
+          key={id}
+          id={id} // Pass ID for auto-save to work correctly if we want to persist specific instances
+          onClose={() => handleCloseStickyNote(id)}
+        />
+      ))}
+
       {/* Main Dock */}
       <Dock direction="middle">
         {mainNavItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
           const isEnglish = i18n.language === 'en';
+          const isNotes = item.id === 'notes';
 
           return (
-            <DockIcon
+            <div
               key={item.id}
-              onClick={() => handleItemClick(item)}
-              active={active}
-              tooltip={isEnglish ? t(item.translationKey) : `${t(item.translationKey)} (${item.label})`}
+              className="relative group"
+              onMouseEnter={() => setHoveredItem(item.id)}
+              onMouseLeave={() => setHoveredItem(null)}
             >
-              <Icon className="w-5 h-5" />
-            </DockIcon>
+              <DockIcon
+                onClick={() => handleItemClick(item)}
+                active={active}
+                tooltip={isEnglish ? t(item.translationKey) : `${t(item.translationKey)} (${item.label})`}
+              >
+                <Icon className="w-5 h-5" />
+              </DockIcon>
+
+              {/* Notes Hover Menu */}
+              {isNotes && hoveredItem === 'notes' && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[120px] z-50 animate-in fade-in slide-in-from-bottom-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCreateStickyNote();
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-yellow-300 border border-yellow-400"></span>
+                    Sticky Note
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/notes');
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <FileText size={14} />
+                    All Notes
+                  </button>
+                </div>
+              )}
+            </div>
           );
         })}
 

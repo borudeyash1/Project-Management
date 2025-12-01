@@ -37,16 +37,16 @@ const ManageWorkspace: React.FC = () => {
 
   if (ownedWorkspaces.length === 0) {
     return (
-      <div className="h-full bg-gray-50 flex items-center justify-center">
+      <div className="h-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('workspace.manage.noWorkspacesTitle')}</h2>
-          <p className="text-gray-600 mb-6">
+          <Shield className="w-16 h-16 text-gray-600 dark:text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('workspace.manage.noWorkspacesTitle')}</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             {t('workspace.manage.noWorkspacesDesc')}
           </p>
           <button
             onClick={() => navigate('/workspace')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
           >
             <Plus className="w-5 h-5" />
             {t('workspace.manage.create')}
@@ -57,21 +57,21 @@ const ManageWorkspace: React.FC = () => {
   }
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className="h-full bg-gray-50 dark:bg-gray-700">
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Shield className="w-6 h-6 text-accent-dark" />
               {t('workspace.manage.title')}
             </h1>
-            <p className="text-gray-600 mt-1">{t('workspace.manage.subtitle')}</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('workspace.manage.subtitle')}</p>
           </div>
           
           <button
             onClick={() => navigate('/workspace')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
           >
             <Plus className="w-4 h-4" />
             {t('workspace.manage.create')}
@@ -82,9 +82,9 @@ const ManageWorkspace: React.FC = () => {
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
           {/* Search Bar */}
-          <div className="bg-white rounded-lg border border-gray-300 p-4 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4 mb-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder={t('workspace.manage.searchPlaceholder')}
@@ -98,27 +98,27 @@ const ManageWorkspace: React.FC = () => {
           {/* Workspace Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredWorkspaces.map((workspace) => (
-              <div key={workspace._id} className="bg-white rounded-lg border border-gray-300 p-6 hover:shadow-lg transition-shadow">
+              <div key={workspace._id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6 hover:shadow-lg transition-shadow">
                 {/* Workspace Icon */}
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <Building className="w-6 h-6 text-accent-dark" />
                 </div>
 
                 {/* Workspace Info */}
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{workspace.name}</h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{workspace.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
                   {workspace.description || t('workspace.detail.noDescription')}
                 </p>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="flex items-center gap-2 text-sm">
-                    <Users className="w-4 h-4 text-gray-600" />
-                    <span className="text-gray-600">{workspace.memberCount} {t('workspace.manage.members')}</span>
+                    <Users className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-gray-600 dark:text-gray-400">{workspace.memberCount} {t('workspace.manage.members')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-600" />
-                    <span className="text-gray-600">{workspace.region}</span>
+                    <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-gray-600 dark:text-gray-400">{workspace.region}</span>
                   </div>
                 </div>
 
@@ -127,7 +127,7 @@ const ManageWorkspace: React.FC = () => {
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     workspace.type === 'enterprise' ? 'bg-purple-100 text-purple-700' :
                     workspace.type === 'team' ? 'bg-blue-100 text-blue-700' :
-                    'bg-gray-100 text-gray-700'
+                    'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                   }`}>
                     {t(`workspace.edit.types.${workspace.type}`) || workspace.type}
                   </span>
@@ -136,7 +136,7 @@ const ManageWorkspace: React.FC = () => {
                       {t('workspace.manage.public')}
                     </span>
                   ) : (
-                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                       {t('workspace.manage.private')}
                     </span>
                   )}
@@ -145,7 +145,7 @@ const ManageWorkspace: React.FC = () => {
                 {/* Actions */}
                 <button
                   onClick={() => handleVisitWorkspace(workspace._id)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors"
                 >
                   {t('workspace.manage.visit')}
                   <ArrowRight className="w-4 h-4" />
@@ -157,8 +157,8 @@ const ManageWorkspace: React.FC = () => {
           {/* Empty State */}
           {filteredWorkspaces.length === 0 && searchQuery && (
             <div className="text-center py-12">
-              <Search className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-600">{t('workspace.manage.noResults')} "{searchQuery}"</p>
+              <Search className="w-12 h-12 text-gray-600 dark:text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-600 dark:text-gray-400">{t('workspace.manage.noResults')} "{searchQuery}"</p>
             </div>
           )}
         </div>

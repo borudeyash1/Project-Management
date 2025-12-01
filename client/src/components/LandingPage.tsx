@@ -29,56 +29,44 @@ const LandingPage: React.FC = () => {
         <SharedNavbar />
         <ContentBanner route="/" />
 
-      {/* HERO SECTION with Aurora Background */}
-      <div className="relative pt-32 pb-20 overflow-hidden">
-        {/* Aurora Background Animation - Only for Hero Section */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          <AuroraBackground showRadialGradient={false}>
-            <div></div>
-          </AuroraBackground>
-        </div>
+      {/* HERO SECTION */}
+      <div className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center relative">
             
-            {/* Main Headline with Gradual Blur */}
-            <div className="relative z-10 mb-8">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-tight">
-                
-                <span className="block text-[#44a0d1]">
-                  All in One Office Suite
+            {/* Main Headline - More Impactful */}
+            <div className="relative z-10 mb-10">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-tight tracking-tight">
+                <span className="block mb-2">
+                  Your work,
                 </span>
-                <span className="block text-[#44a0d1]">
-                  for Modern Work
+                <span className="block bg-gradient-to-r from-[#FFD700] to-[#E6C200] bg-clip-text text-transparent">
+                  supercharged
                 </span>
               </h1>
             </div>
             
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl lg:text-3xl text-gray-700 mb-6 max-w-4xl mx-auto leading-relaxed font-medium">
+            {/* Subheadline - More Concise */}
+            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
               Streamline operations, synchronize teams, and automate the mundane.
             </p>
-            <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-              The all-in-one suite designed to move your business forward.
-            </p>
 
-            {/* CTA Buttons with Star Border */}
+            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <StarBorder color="#FFD700">
-                <Link
-                  to="/register"
-                  className="group bg-[#44a0d1] hover:bg-[#3688b5] text-white px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl hover:shadow-blue-500/50 hover:scale-105 transform"
-                >
-                  {t('landing.hero.getStarted')}
-                  <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </StarBorder>
+              <Link
+                to="/register"
+                className="group bg-[#FFD700] hover:bg-[#FFC700] text-gray-900 px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform flex items-center gap-3"
+              >
+                Get Started Free
+                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
               
               <Link
                 to="/user-guide"
-                className="group bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 transform shadow-xl flex items-center gap-3 border-2 border-[#E6C200]"
+                className="group bg-white hover:bg-gray-50 text-gray-900 px-10 py-5 rounded-2xl text-lg font-bold border-2 border-gray-900 hover:border-[#FFD700] transition-all duration-300 hover:scale-105 transform shadow-md flex items-center gap-3"
               >
                 <Play size={20} className="group-hover:scale-110 transition-transform" />
-                {t('landing.hero.learnMore')}
+                Learn More
               </Link>
             </div>
 
@@ -99,44 +87,130 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Hero Dashboard Image */}
-          <div className="mt-20 relative">
+          {/* Hero Dashboard Image - Smaller and Better Proportioned */}
+          <div className="mt-16 relative max-w-5xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10 pointer-events-none"></div>
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#FFD700] transform hover:scale-[1.02] transition-transform duration-500">
-              <img 
-                src="/hero_dashboard_mockup_1764317223182.png"
-                alt="Sartthi Dashboard Interface"
-                className="w-full h-auto"
-                onError={(e) => {
-                  // Fallback to gradient if image fails to load
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = `
-                    <div class="aspect-video bg-gradient-to-br from-blue-100 via-white to-cyan-100 flex items-center justify-center">
-                      <div class="text-center">
-                        <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-2xl">
-                          <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-[#FFD700] transform hover:scale-[1.02] transition-transform duration-500">
+              {/* This will be replaced with an animated GIF/video */}
+              <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100">
+                <img 
+                  src="/hero_dashboard_mockup_1764317223182.png"
+                  alt="Sartthi Dashboard Interface"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to gradient if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement!.innerHTML = `
+                      <div class="aspect-video bg-gradient-to-br from-yellow-50 via-white to-yellow-100 flex items-center justify-center">
+                        <div class="text-center">
+                          <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
+                            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                          </div>
+                          <p class="text-2xl font-bold text-gray-900">Sartthi Dashboard</p>
+                          <p class="text-gray-600 mt-2">Your Command Center</p>
                         </div>
-                        <p class="text-2xl font-bold text-gray-700">Sartthi Dashboard</p>
-                        <p class="text-gray-500 mt-2">Your Command Center</p>
                       </div>
-                    </div>
-                  `;
-                }}
-              />
+                    `;
+                  }}
+                />
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SARTTHI AI - AI THAT ACTS */}
+      <div className="py-32 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <div className="inline-block px-6 py-2 bg-[#FFD700]/10 rounded-full mb-6">
+              <span className="text-[#FFD700] font-bold text-sm uppercase tracking-wide">Sartthi AI</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6">
+              AI That Acts.
+            </h2>
+            <h3 className="text-4xl md:text-5xl font-bold text-gray-600 mb-8">
+              Not Just Thinks.
+            </h3>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Most AI gives you ideas. Sartthi AI does the work—creating schedules, drafting reports, and automating operations while you sleep.
+            </p>
+          </div>
+
+          {/* AI Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+            {/* Permission Aware */}
+            <div className="bg-white rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-500">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <Shield className="w-10 h-10 text-gray-900" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Permission Aware</h3>
+              <p className="text-xl text-gray-600 mb-8">
+                Secure by design. It knows who can see what.
+              </p>
+              
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
+                  <span className="text-lg text-gray-700">Role-based access control</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
+                  <span className="text-lg text-gray-700">Data privacy guaranteed</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
+                  <span className="text-lg text-gray-700">Audit logs for compliance</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Context Driven */}
+            <div className="bg-white rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-500">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <Sparkles className="w-10 h-10 text-gray-900" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Context Driven</h3>
+              <p className="text-xl text-gray-600 mb-8">
+                It learns your workflow to provide proactive solutions.
+              </p>
+              
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
+                  <span className="text-lg text-gray-700">Learns from your patterns</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
+                  <span className="text-lg text-gray-700">Proactive suggestions</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
+                  <span className="text-lg text-gray-700">Automated workflows</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center">
+            <Link
+              to="/ai"
+              className="inline-flex items-center gap-3 bg-[#FFD700] hover:bg-[#FFC700] text-gray-900 px-10 py-5 rounded-2xl text-xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
+            >
+              Experience AI-Powered Work
+              <ArrowRight size={24} />
+            </Link>
           </div>
         </div>
       </div>
 
       {/* SECTION 2: ONE SUITE. INFINITE CAPABILITIES */}
       <div className="py-32 bg-white relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-30">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-blue-200 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-200 rounded-full blur-3xl"></div>
-        </div>
+        {/* Clean background - no decorations */}
 
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Section Header */}
@@ -149,85 +223,73 @@ const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Core Features Grid with SpotlightCards */}
+          {/* Core Features Grid - Clean Design */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Card 1: Task Management */}
-            <SpotlightCard 
-              backgroundColor="#44a0d1"
-              spotlightColor="rgba(255, 215, 0, 0.3)"
-              className="p-8 transition-all duration-500 hover:-translate-y-2"
-            >
+            <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500">
               <div className="mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                  <ClipboardCheck className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <ClipboardCheck className="w-8 h-8 text-black" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-3">{t('landing.coreEngine.taskManagement.title')}</h3>
-                <p className="text-white/90 text-lg leading-relaxed mb-6">
-                  {t('landing.coreEngine.taskManagement.description')}
+                <h3 className="text-3xl font-bold text-gray-900 mb-3">Task Management</h3>
+                <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                  Create, assign, and track tasks with ease. Set priorities, deadlines, and dependencies.
                 </p>
               </div>
               
-              {/* Feature Image */}
-              <div className="rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
-                <img 
-                  src="/task_management_ui_1764317282097.png"
-                  alt="Task Management Interface"
-                  className="w-full h-auto"
-                />
+              {/* Video Placeholder */}
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-yellow-50 to-yellow-100 flex items-center justify-center border-2 border-yellow-200">
+                <div className="text-center p-6">
+                  <ClipboardCheck className="mx-auto mb-3 text-yellow-600" size={48} />
+                  <p className="text-sm font-semibold text-gray-700">Task Management Demo</p>
+                  <p className="text-xs text-gray-500 mt-1">Video placeholder</p>
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
 
             {/* Card 2: Real-Time Collaboration */}
-            <SpotlightCard 
-              backgroundColor="#44a0d1"
-              spotlightColor="rgba(255, 215, 0, 0.3)"
-              className="p-8 transition-all duration-500 hover:-translate-y-2"
-            >
+            <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500">
               <div className="mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                  <Users className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <Users className="w-8 h-8 text-black" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-3">{t('landing.coreEngine.collaboration.title')}</h3>
-                <p className="text-white/90 text-lg leading-relaxed mb-6">
-                  {t('landing.coreEngine.collaboration.description')}
+                <h3 className="text-3xl font-bold text-gray-900 mb-3">Real-Time Collaboration</h3>
+                <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                  Work together seamlessly with live updates, comments, and instant notifications.
                 </p>
               </div>
               
-              {/* Feature Image */}
-              <div className="rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
-                <img 
-                  src="/collaboration_ui_1764317298899.png"
-                  alt="Collaboration Interface"
-                  className="w-full h-auto"
-                />
+              {/* Video Placeholder */}
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center border-2 border-blue-200">
+                <div className="text-center p-6">
+                  <Users className="mx-auto mb-3 text-blue-600" size={48} />
+                  <p className="text-sm font-semibold text-gray-700">Collaboration Demo</p>
+                  <p className="text-xs text-gray-500 mt-1">Video placeholder</p>
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
 
             {/* Card 3: Intelligence & Analytics */}
-            <SpotlightCard 
-              backgroundColor="#44a0d1"
-              spotlightColor="rgba(255, 215, 0, 0.3)"
-              className="p-8 transition-all duration-500 hover:-translate-y-2"
-            >
+            <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500">
               <div className="mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                  <BarChart3 className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <BarChart3 className="w-8 h-8 text-black" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-3">{t('landing.coreEngine.analytics.title')}</h3>
-                <p className="text-white/90 text-lg leading-relaxed mb-6">
-                  {t('landing.coreEngine.analytics.description')}
+                <h3 className="text-3xl font-bold text-gray-900 mb-3">Intelligence & Analytics</h3>
+                <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                  Gain insights with powerful analytics and AI-driven recommendations.
                 </p>
               </div>
               
-              {/* Feature Image */}
-              <div className="rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
-                <img 
-                  src="/analytics_ui_1764317315064.png"
-                  alt="Analytics Dashboard"
-                  className="w-full h-auto"
-                />
+              {/* Video Placeholder */}
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center border-2 border-purple-200">
+                <div className="text-center p-6">
+                  <BarChart3 className="mx-auto mb-3 text-purple-600" size={48} />
+                  <p className="text-sm font-semibold text-gray-700">Analytics Demo</p>
+                  <p className="text-xs text-gray-500 mt-1">Video placeholder</p>
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
           </div>
         </div>
       </div>
@@ -245,35 +307,17 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* PROJECTS - Marquee Animation */}
-        <div className="w-full bg-white py-20 mb-20">
-          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-            <div className="flex items-center gap-6 justify-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
-                <Briefcase className="w-10 h-10 text-white" />
-              </div>
-              <div className="text-center">
-                <h3 className="text-4xl font-black text-gray-900">Projects</h3>
-                <p className="text-xl text-gray-700">Organize & Execute with Ease</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Projects Marquee */}
-          <ProjectsMarquee />
-        </div>
-
 
         {/* TASKS - TabsSwitcher */}
         <div className="w-full bg-white py-20 mb-20">
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6 mb-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
-                <ClipboardCheck className="w-10 h-10 text-white" />
+            <div className="flex flex-col items-center gap-4 justify-center text-center mb-16">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
+                <ClipboardCheck className="w-12 h-12 text-white" />
               </div>
               <div>
-                <h3 className="text-4xl font-black text-gray-900">Tasks</h3>
-                <p className="text-xl text-gray-600">Get Things Done</p>
+                <h3 className="text-5xl md:text-6xl font-black text-gray-900 mb-2">Tasks</h3>
+                <p className="text-2xl text-gray-600">Get Things Done</p>
               </div>
             </div>
             
@@ -287,35 +331,33 @@ const LandingPage: React.FC = () => {
         {/* TRACKER - Grid with Fade-in */}
         <div className="w-full bg-white py-20 mb-20">
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6 mb-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
-                <Activity className="w-10 h-10 text-white" />
+            <div className="flex flex-col items-center gap-4 justify-center text-center mb-16">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
+                <Activity className="w-12 h-12 text-white" />
               </div>
               <div>
-                <h3 className="text-4xl font-black text-gray-900">Tracker</h3>
-                <p className="text-xl text-gray-600">Time & Performance</p>
+                <h3 className="text-5xl md:text-6xl font-black text-gray-900 mb-2">Tracker</h3>
+                <p className="text-2xl text-gray-600">Monitor Time & Productivity</p>
               </div>
             </div>
             
             {/* Grid layout with stagger */}
             <div className="w-full overflow-hidden">
-              <div className="max-w-6xl mx-auto">
-                <ExpandingCardsDemo />
-              </div>
+              <ExpandingCardsDemo />
             </div>
           </div>
         </div>
 
         {/* GOALS - Diagonal Layout */}
-        <div className="w-full bg-gradient-to-b from-blue-50/30 to-white py-20 mb-20">
+        <div className="w-full bg-gradient-to-b from-yellow-50/30 to-white py-20 mb-20">
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6 mb-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-[#3380a1] rounded-3xl flex items-center justify-center shadow-2xl">
-                <Eye className="w-10 h-10 text-white" />
+            <div className="flex flex-col items-center gap-4 justify-center text-center mb-16">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
+                <Eye className="w-12 h-12 text-white" />
               </div>
               <div>
-                <h3 className="text-4xl font-black text-gray-900">Goals</h3>
-                <p className="text-xl text-gray-600">Track Progress & Achieve More</p>
+                <h3 className="text-5xl md:text-6xl font-black text-gray-900 mb-2">Goals</h3>
+                <p className="text-2xl text-gray-600">Set & Achieve Your Objectives</p>
               </div>
             </div>
             
@@ -375,44 +417,44 @@ const LandingPage: React.FC = () => {
               { 
                 key: 'hr', 
                 icon: Users, 
-                gradient: 'from-[#44a0d1] to-[#3380a1]',
-                bgGradient: 'from-blue-50 to-blue-100',
-                iconBg: 'bg-[#44a0d1]'
+                gradient: 'from-[#FFD700] to-[#E6C200]',
+                bgGradient: 'from-yellow-50 to-white',
+                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
               },
               { 
                 key: 'operations', 
                 icon: Activity, 
                 gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-yellow-100',
-                iconBg: 'bg-[#FFD700]'
+                bgGradient: 'from-yellow-50 to-white',
+                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
               },
               { 
                 key: 'managers', 
                 icon: Briefcase, 
-                gradient: 'from-[#44a0d1] to-[#3380a1]',
-                bgGradient: 'from-cyan-50 to-cyan-100',
-                iconBg: 'bg-[#44a0d1]'
+                gradient: 'from-[#FFD700] to-[#E6C200]',
+                bgGradient: 'from-yellow-50 to-white',
+                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
               },
               { 
                 key: 'fieldTeams', 
                 icon: MapPin, 
                 gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-orange-50 to-orange-100',
-                iconBg: 'bg-[#FFD700]'
+                bgGradient: 'from-yellow-50 to-white',
+                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
               },
               { 
                 key: 'finance', 
                 icon: DollarSign, 
-                gradient: 'from-[#44a0d1] to-[#3380a1]',
-                bgGradient: 'from-blue-50 to-blue-100',
-                iconBg: 'bg-[#44a0d1]'
+                gradient: 'from-[#FFD700] to-[#E6C200]',
+                bgGradient: 'from-yellow-50 to-white',
+                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
               },
               { 
                 key: 'founders', 
                 icon: Eye, 
                 gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-yellow-100',
-                iconBg: 'bg-[#FFD700]'
+                bgGradient: 'from-yellow-50 to-white',
+                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
               }
             ].map((item, index) => (
               <div 
@@ -462,187 +504,234 @@ const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 4: AI THAT ACTS */}
-      <div className="py-32 bg-white relative overflow-hidden">
-        {/* Background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 -left-48 w-96 h-96 bg-yellow-200 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-          <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30 animate-pulse delay-1000"></div>
-        </div>
+      {/* SARTTHI AI TEASER */}
+      <div className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-[#FFD700]/20 px-6 py-3 rounded-full mb-8">
+            <Sparkles size={24} className="text-[#E6C200]" />
+            <span className="text-lg font-bold text-gray-900">Introducing Sartthi AI</span>
+          </div>
 
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Headline */}
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+            AI That <span className="bg-gradient-to-r from-[#FFD700] to-[#E6C200] bg-clip-text text-transparent">Acts.</span>
+          </h2>
+          <h3 className="text-4xl md:text-5xl font-black text-gray-600 mb-8">
+            Not Just Thinks.
+          </h3>
+
+          {/* Description */}
+          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+            Most AI gives you ideas. Sartthi AI does the work—creating schedules, drafting reports, and automating operations while you sleep.
+          </p>
+
+          {/* Key Features - Simple List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12">
+            <div className="flex items-start gap-4 text-left">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 text-gray-900" />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">Permission Aware</h4>
+                <p className="text-gray-600">Secure by design. It knows who can see what.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 text-left">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-6 h-6 text-gray-900" />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">Context Driven</h4>
+                <p className="text-gray-600">Learns your workflow to provide proactive solutions.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <Link
+            to="/ai"
+            className="inline-flex items-center gap-3 bg-gray-900 hover:bg-gray-800 text-white px-10 py-5 rounded-xl text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105"
+          >
+            Explore Sartthi AI
+            <ArrowRight size={24} />
+          </Link>
+        </div>
+      </div>
+
+      {/* SARTTHI APPS SHOWCASE - At Bottom */}
+      <div className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-[#FFD700] mb-8">
-              <Sparkles className="w-6 h-6 text-[#44a0d1]" />
-              <span className="text-lg font-bold text-blue-900">Sartthi AI</span>
-            </div>
-            
             <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
-              AI That <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Acts.</span>
+              One platform. <span className="bg-gradient-to-r from-[#FFD700] to-[#E6C200] bg-clip-text text-transparent">Four powerful apps.</span>
             </h2>
-            <h3 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
-              Not Just Thinks.
-            </h3>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              {t('landing.ai.subtitle')}
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to run your business, all in one place.
             </p>
           </div>
 
-          {/* AI Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
-            {/* Permission Aware Card */}
-            <div className="group relative bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-[#44a0d1]/30 hover:border-[#FFD700] overflow-hidden">
-              {/* Decorative corner */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500"></div>
-              
-              <div className="relative z-10">
-                {/* Icon */}
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform duration-300">
-                  <Shield className="w-10 h-10 text-white" />
+          {/* Apps Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Sartthi Mail */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-5xl">📧</div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Sartthi Mail</h3>
+                  <p className="text-gray-600">Professional email with AI-powered features</p>
                 </div>
-                
-                {/* Title */}
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                  {t('landing.ai.permission.title')}
-                </h3>
-                
-                {/* Description */}
-                <p className="text-gray-600 text-lg leading-relaxed">
-                  {t('landing.ai.permission.description')}
-                </p>
-
-                {/* Feature list */}
-                <ul className="mt-6 space-y-3">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Role-based access control</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Data privacy guaranteed</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Audit logs for compliance</span>
-                  </li>
-                </ul>
               </div>
+              
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📧</div>
+                    <p className="text-sm">Mail Demo Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Link to="/mail" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
+                Learn more →
+              </Link>
             </div>
 
-            {/* Context Driven Card */}
-            <div className="group relative bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-[#44a0d1]/30 hover:border-[#FFD700] overflow-hidden">
-              {/* Decorative corner */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500"></div>
-              
-              <div className="relative z-10">
-                {/* Icon */}
-                <div className="w-20 h-20 bg-gradient-to-br from-[#44a0d1] to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform duration-300">
-                  <Brain className="w-10 h-10 text-white" />
+            {/* Calendar */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-5xl">📅</div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Calendar</h3>
+                  <p className="text-gray-600">Smart scheduling and time management</p>
                 </div>
-                
-                {/* Title */}
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                  {t('landing.ai.context.title')}
-                </h3>
-                
-                {/* Description */}
-                <p className="text-gray-600 text-lg leading-relaxed">
-                  {t('landing.ai.context.description')}
-                </p>
-
-                {/* Feature list */}
-                <ul className="mt-6 space-y-3">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Learns from your patterns</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Proactive suggestions</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Automated workflows</span>
-                  </li>
-                </ul>
               </div>
+              
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📅</div>
+                    <p className="text-sm">Calendar Demo Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Link to="/calendar" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
+                Learn more →
+              </Link>
             </div>
-          </div>
 
-          {/* AI CTA */}
-          <div className="text-center">
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] hover:from-[#3688b5] hover:to-[#2b6d8a] text-white px-12 py-6 rounded-2xl text-xl font-bold transition-all duration-300 shadow-2xl hover:shadow-blue-500/50 hover:scale-105 transform"
-            >
-              <Sparkles size={28} />
-              Experience AI-Powered Work
-              <ArrowRight size={28} />
-            </Link>
+            {/* Vault */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-5xl">🔒</div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Vault</h3>
+                  <p className="text-gray-600">Secure document storage and sharing</p>
+                </div>
+              </div>
+              
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🔒</div>
+                    <p className="text-sm">Vault Demo Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Link to="/vault" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
+                Learn more →
+              </Link>
+            </div>
+
+            {/* Desktop */}
+            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-5xl">💻</div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Desktop App</h3>
+                  <p className="text-gray-600">Native performance, offline access</p>
+                </div>
+              </div>
+              
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">💻</div>
+                    <p className="text-sm">Desktop Demo Video</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Link to="/desktop" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
+                Learn more →
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* FINAL CTA SECTION */}
+      {/* FINAL CALL TO ACTION */}
       <div className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50/30 to-white">
         <div className="max-w-[1920px] mx-auto relative">
-          <div className="relative bg-gradient-to-r from-[#44a0d1] to-[#3380a1] rounded-3xl overflow-hidden py-20 px-8 md:px-16 text-center shadow-2xl border-4 border-[#FFD700]">
+          <div className="relative bg-gradient-to-r from-[#FFD700] to-[#FFC700] rounded-3xl overflow-hidden py-20 px-8 md:px-16 text-center shadow-2xl border-4 border-[#E6C200]">
             {/* Decorative Elements */}
             <div className="absolute inset-0 bg-grid-white/10 bg-[size:30px_30px]"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
             
             {/* Floating elements */}
-            <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 rounded-2xl shadow-xl animate-float opacity-80"></div>
+            <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-2xl shadow-xl animate-float opacity-80"></div>
             <div className="absolute bottom-10 right-10 w-16 h-16 bg-white rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
 
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
+              <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6">
                 Ready to get started?
               </h2>
-              <p className="text-xl md:text-2xl text-white/95 mb-4 max-w-3xl mx-auto font-semibold">
+              <p className="text-xl md:text-2xl text-gray-800 mb-4 max-w-3xl mx-auto font-semibold">
                 Join thousands of teams already using Sartthi
               </p>
-              <p className="text-lg md:text-xl text-white/90 mb-12 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-gray-700 mb-12 max-w-2xl mx-auto">
                 to manage their projects efficiently.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center mb-10">
                 <Link
                   to="/register"
-                  className="group bg-white text-[#44a0d1] px-12 py-5 rounded-2xl text-xl font-black hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-2xl hover:scale-105 transform border-4 border-[#FFD700]"
+                  className="group bg-[#FFD700] hover:bg-[#FFC700] text-gray-900 px-12 py-5 rounded-2xl text-xl font-black transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-2xl hover:scale-105 transform"
                 >
                   Start Your Free Trial
                   <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   to="/about"
-                  className="border-4 border-white text-white px-12 py-5 rounded-2xl text-xl font-black hover:bg-white hover:text-[#44a0d1] transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-xl hover:scale-105 transform"
+                  className="bg-white text-gray-900 border-2 border-gray-900 px-12 py-5 rounded-2xl text-xl font-black hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-xl hover:scale-105 transform"
                 >
                   Learn More About Us
                 </Link>
               </div>
               
               {/* Trust indicators */}
-              <div className="flex flex-wrap justify-center items-center gap-6 text-white/90 text-sm">
+              <div className="flex flex-wrap justify-center items-center gap-6 text-gray-800 text-sm">
                 <div className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-[#FFD700]" />
+                  <CheckCircle size={20} className="text-gray-900" />
                   <span className="font-semibold">No credit card required</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-[#FFD700]" />
+                  <CheckCircle size={20} className="text-gray-900" />
                   <span className="font-semibold">14-day free trial</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-[#FFD700]" />
+                  <CheckCircle size={20} className="text-gray-900" />
                   <span className="font-semibold">Cancel anytime</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        </div>
+      </div>
       </div>
 
       <div className="relative z-10">

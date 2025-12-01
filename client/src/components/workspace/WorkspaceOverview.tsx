@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { getProjects as getWorkspaceProjects } from '../../services/projectService';
+import { apiService } from '../../services/api';
 import { 
   FolderKanban, 
   Users, 
@@ -10,18 +11,46 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Plus
+  Plus,
+  FileText,
+  Sparkles,
+  Edit3
 } from 'lucide-react';
+
+interface Note {
+  _id: string;
+  title: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const WorkspaceOverview: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [recentNotes, setRecentNotes] = useState<Note[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(true);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const workspaceProjects = state.projects.filter(
     (project) => project.workspace === state.currentWorkspace
   );
+
+  // Fetch recent notes
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const notes = await apiService.get('/notes') as unknown as Note[];
+        setRecentNotes(notes.slice(0, 3)); // Get 3 most recent
+        setLoadingNotes(false);
+      } catch (error) {
+        console.error('Failed to fetch notes:', error);
+        setLoadingNotes(false);
+      }
+    };
+    fetchNotes();
+  }, []);
 
   // Ensure projects for the active workspace are loaded from the backend
   // so they persist in MongoDB and are available after page refresh.
@@ -185,7 +214,83 @@ const WorkspaceOverview: React.FC = () => {
           </div>
         </div>
 
-        {/* Upcoming Milestones */}
+        {/* AI Notes Widget */}
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-700 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                AI Notes
+              </h3>
+            </div>
+            <button
+              onClick={() => navigate('/notes')}
+              className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+            >
+              View All
+            </button>
+          </div>
+
+          {loadingNotes ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : recentNotes.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                No notes yet. Create your first AI-powered note!
+              </p>
+              <button
+                onClick={() => navigate('/notes')}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm font-medium"
+              >
+                <Plus className="w-4 h-4 inline mr-1" />
+                Create Note
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-3 mb-4">
+                {recentNotes.map((note) => (
+                  <div
+                    key={note._id}
+                    onClick={() => navigate('/notes')}
+                    className="bg-white dark:bg-gray-800 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="flex items-start gap-2">
+                      <Edit3 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
+                          {note.title || 'Untitled'}
+                        </h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
+                          {note.content || 'No content'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(note.updatedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => navigate('/notes')}
+                className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm font-medium"
+              >
+                <Sparkles className="w-4 h-4 inline mr-1" />
+                Create AI Note
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upcoming Milestones - moved to its own row */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

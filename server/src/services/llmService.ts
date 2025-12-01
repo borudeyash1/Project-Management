@@ -26,7 +26,7 @@ interface GeminiResponse {
 class LLMService {
   private apiKey: string;
   private apiUrl: string =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent";
 
   constructor() {
     this.apiKey = "";

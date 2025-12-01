@@ -264,26 +264,26 @@ const WorkspaceDiscover: React.FC = () => {
       case 'team':
         return 'bg-blue-100 text-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 dark:bg-gray-700 text-gray-800';
     }
   };
 
   return (
     <div className="p-4 sm:p-6">
-      <div className="bg-white border border-border rounded-xl">
+      <div className="bg-white dark:bg-gray-800 border border-border rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">{t('workspace.discoverWorkspaces')}</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('workspace.discoverWorkspaces')}</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {t('workspace.findWorkspaces')}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t('workspace.customWorkspace')}
@@ -293,7 +293,7 @@ const WorkspaceDiscover: React.FC = () => {
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${
                   isDarkMode 
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700' 
-                    : 'bg-white text-gray-900 border border-purple-200 hover:bg-purple-50'
+                    : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
                 }`}
               >
                 <Bot className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
@@ -313,7 +313,7 @@ const WorkspaceDiscover: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 placeholder={t('workspace.searchWorkspaces')}
@@ -326,7 +326,7 @@ const WorkspaceDiscover: React.FC = () => {
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors"
             >
               <Filter className="w-4 h-4" />
               {t('workspace.filters')}
@@ -337,7 +337,7 @@ const WorkspaceDiscover: React.FC = () => {
           {showFilters && (
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Workspace Type
                 </label>
                 <select
@@ -352,7 +352,7 @@ const WorkspaceDiscover: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Region
                 </label>
                 <select
@@ -378,7 +378,7 @@ const WorkspaceDiscover: React.FC = () => {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="bg-gray-100 rounded-lg p-6 animate-pulse">
+                <div key={index} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 animate-pulse">
                   <div className="h-4 bg-gray-400 rounded mb-2"></div>
                   <div className="h-3 bg-gray-400 rounded mb-4"></div>
                   <div className="h-3 bg-gray-400 rounded w-2/3"></div>
@@ -388,19 +388,19 @@ const WorkspaceDiscover: React.FC = () => {
           ) : filteredWorkspaces.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredWorkspaces.map((workspace) => (
-                <div key={workspace._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div key={workspace._id} className="bg-white dark:bg-gray-800 border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
                   {/* Workspace Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{workspace.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{workspace.name}</h3>
                         {workspace.settings.isPublic ? (
                           <Eye className="w-4 h-4 text-green-600" />
                         ) : (
-                          <EyeOff className="w-4 h-4 text-gray-600" />
+                          <EyeOff className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-2">{workspace.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{workspace.description}</p>
                     </div>
                   </div>
 
@@ -412,11 +412,11 @@ const WorkspaceDiscover: React.FC = () => {
                         {workspace.type.charAt(0).toUpperCase() + workspace.type.slice(1)}
                       </span>
                       {workspace.region && (
-                        <span className="text-xs text-gray-600">{workspace.region}</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-400">{workspace.region}</span>
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
                         <span>{workspace.memberCount} members</span>
@@ -479,7 +479,7 @@ const WorkspaceDiscover: React.FC = () => {
                       className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
                         requestingWorkspaceId === workspace._id
                           ? 'bg-blue-500 text-white cursor-not-allowed'
-                          : 'bg-accent text-gray-900 hover:bg-accent-hover hover:shadow-md active:scale-95'
+                          : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover hover:shadow-md active:scale-95'
                       }`}
                     >
                       {requestingWorkspaceId === workspace._id ? (
@@ -497,11 +497,11 @@ const WorkspaceDiscover: React.FC = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="text-gray-600 mb-4">
+              <div className="text-gray-600 dark:text-gray-400 mb-4">
                 <Building2 className="w-12 h-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('workspace.noWorkspacesFound')}</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('workspace.noWorkspacesFound')}</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 {t('workspace.tryAdjustingFilters')}
               </p>
               <button

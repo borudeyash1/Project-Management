@@ -67,45 +67,45 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'planning': return 'bg-gray-100 text-gray-700';
-      case 'active': return 'bg-green-100 text-green-700';
-      case 'on-hold': return 'bg-yellow-100 text-yellow-700';
-      case 'completed': return 'bg-blue-100 text-blue-700';
-      case 'cancelled': return 'bg-red-100 text-red-700';
-      case 'abandoned': return 'bg-orange-200 text-orange-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'planning': return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+      case 'active': return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+      case 'on-hold': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'completed': return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+      case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
+      case 'abandoned': return 'bg-orange-200 text-orange-700 dark:bg-orange-900 dark:text-orange-300';
+      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return 'bg-gray-100 text-gray-700';
-      case 'medium': return 'bg-blue-100 text-blue-700';
-      case 'high': return 'bg-orange-200 text-orange-700';
-      case 'critical': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'low': return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+      case 'medium': return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+      case 'high': return 'bg-orange-200 text-orange-700 dark:bg-orange-900 dark:text-orange-300';
+      case 'critical': return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
+      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
   if (!project) {
     return (
-      <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
-        <AlertCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-        <p className="text-gray-600">{t('project.info.notAvailable')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-12 text-center">
+        <AlertCircle className="w-12 h-12 text-gray-600 dark:text-gray-400 mx-auto mb-3" />
+        <p className="text-gray-600 dark:text-gray-400">{t('project.info.notAvailable')}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-300 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">{t('project.info.title')}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('project.info.title')}</h3>
           {canEdit && !isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <Edit className="w-4 h-4" />
               {t('project.info.edit')}
@@ -122,7 +122,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
               </button>
               <button
                 onClick={handleCancel}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <X className="w-4 h-4" />
                 {t('project.info.cancel')}
@@ -136,7 +136,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <FileText className="w-4 h-4 inline mr-1" />
                 {t('project.info.projectName')}
               </label>
@@ -145,15 +145,15 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               ) : (
-                <p className="text-gray-900 font-medium">{project.name}</p>
+                <p className="text-gray-900 dark:text-gray-100 font-medium">{project.name}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Briefcase className="w-4 h-4 inline mr-1" />
                 {t('project.info.client')}
               </label>
@@ -162,17 +162,17 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="text"
                   value={formData.client}
                   onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               ) : (
-                <p className="text-gray-900">{project.client || t('project.info.noClient')}</p>
+                <p className="text-gray-900 dark:text-gray-100">{project.client || t('project.info.noClient')}</p>
               )}
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('project.info.description')}
             </label>
             {isEditing ? (
@@ -180,24 +180,24 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             ) : (
-              <p className="text-gray-700">{project.description || t('project.info.noDescription')}</p>
+              <p className="text-gray-700 dark:text-gray-300">{project.description || t('project.info.noDescription')}</p>
             )}
           </div>
 
           {/* Status & Priority */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('project.info.status')}
               </label>
               {isEditing ? (
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   <option value="planning">{t('project.status.planning')}</option>
                   <option value="active">{t('project.status.active')}</option>
@@ -214,14 +214,14 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('project.info.priority')}
               </label>
               {isEditing ? (
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   <option value="low">{t('project.priority.low')}</option>
                   <option value="medium">{t('project.priority.medium')}</option>
@@ -239,7 +239,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           {/* Timeline */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
                 {t('project.info.startDate')}
               </label>
@@ -248,17 +248,17 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="date"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               ) : (
-                <p className="text-gray-900">
+                <p className="text-gray-900 dark:text-gray-100">
                   {project.startDate ? new Date(project.startDate).toLocaleDateString() : t('project.info.notSet')}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Clock className="w-4 h-4 inline mr-1" />
                 {t('project.info.dueDate')}
               </label>
@@ -267,10 +267,10 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="date"
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               ) : (
-                <p className="text-gray-900">
+                <p className="text-gray-900 dark:text-gray-100">
                   {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : t('project.info.notSet')}
                 </p>
               )}
@@ -280,7 +280,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           {/* Budget */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <DollarSign className="w-4 h-4 inline mr-1" />
                 {t('project.info.estimatedBudget')}
               </label>
@@ -289,18 +289,18 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="number"
                   value={formData.budgetEstimated}
                   onChange={(e) => setFormData({ ...formData, budgetEstimated: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   placeholder="0"
                 />
               ) : (
-                <p className="text-gray-900 font-medium">
+                <p className="text-gray-900 dark:text-gray-100 font-medium">
                   ${project.budget?.estimated?.toLocaleString() || '0'}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <TrendingUp className="w-4 h-4 inline mr-1" />
                 {t('project.info.actualSpent')}
               </label>
@@ -309,11 +309,11 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   type="number"
                   value={formData.budgetActual}
                   onChange={(e) => setFormData({ ...formData, budgetActual: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   placeholder="0"
                 />
               ) : (
-                <p className="text-gray-900 font-medium">
+                <p className="text-gray-900 dark:text-gray-100 font-medium">
                   ${project.budget?.actual?.toLocaleString() || '0'}
                 </p>
               )}
@@ -322,24 +322,24 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
 
           {/* Progress */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <TrendingUp className="w-4 h-4 inline mr-1" />
               {t('project.info.progress')}
             </label>
             <div className="flex items-center gap-4">
-              <div className="flex-1 bg-gray-300 rounded-full h-3">
+              <div className="flex-1 bg-gray-300 dark:bg-gray-600 rounded-full h-3">
                 <div
                   className="bg-accent h-3 rounded-full transition-all"
                   style={{ width: `${project.progress || 0}%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-900">{project.progress || 0}%</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.progress || 0}%</span>
             </div>
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <Tag className="w-4 h-4 inline mr-1" />
               {t('project.info.tags')}
             </label>
@@ -348,7 +348,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 type="text"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('project.info.tagsPlaceholder')}
               />
             ) : (
@@ -357,13 +357,13 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                   project.tags.map((tag: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full"
+                      className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
                     >
                       {tag}
                     </span>
                   ))
                 ) : (
-                  <p className="text-gray-600 text-sm">{t('project.info.noTags')}</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">{t('project.info.noTags')}</p>
                 )}
               </div>
             )}
@@ -371,11 +371,11 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
 
           {/* Team Size */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <Users className="w-4 h-4 inline mr-1" />
               {t('project.info.teamSize')}
             </label>
-            <p className="text-gray-900 font-medium">
+            <p className="text-gray-900 dark:text-gray-100 font-medium">
               {t('project.info.membersCount', { count: project.team?.length || project.teamMemberCount || 0 })}
             </p>
           </div>

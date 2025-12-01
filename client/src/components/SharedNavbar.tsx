@@ -1,18 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  Home,
-  Info,
-  FileText,
-  BadgeDollarSign,
-  LogIn,
-  UserPlus,
-  Palette,
-  Menu,
-  X,
-  Languages,
-  Grid
-} from 'lucide-react';
+import { Home, Info, FileText, BadgeDollarSign, Grid, Globe, ChevronDown, Menu, X, Sparkles, LogIn, UserPlus, Palette, Languages } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
@@ -26,10 +14,22 @@ const SharedNavbar: React.FC = () => {
   // Force light theme logic for public pages
   const effectiveDarkMode = isPublicPage ? false : isDarkMode;
 
-  
+  // Scroll detection for navbar behavior
+  const [scrolled, setScrolled] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+  const [showProductsMenu, setShowProductsMenu] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const languageDropdownRef = useRef<HTMLDivElement>(null);
+  const productsDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Scroll listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -48,15 +48,25 @@ const SharedNavbar: React.FC = () => {
     { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
   ];
 
+  const products = [
+    { name: 'Sartthi Mail', icon: '📧', path: '/mail', description: 'Professional email' },
+    { name: 'Calendar', icon: '📅', path: '/calendar', description: 'Smart scheduling' },
+    { name: 'Vault', icon: '🔒', path: '/vault', description: 'Secure storage' },
+    { name: 'Desktop', icon: '💻', path: '/desktop', description: 'Native app' },
+  ];
+
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
         setShowLanguageMenu(false);
+      }
+      if (productsDropdownRef.current && !productsDropdownRef.current.contains(event.target as Node)) {
+        setShowProductsMenu(false);
       }
     };
 
@@ -73,34 +83,73 @@ const SharedNavbar: React.FC = () => {
 
   const navLinks = [
     { path: '/', label: 'Home', icon: <Home size={18} /> },
-    { path: '/apps', label: 'Our Apps', icon: <Grid size={18} /> },
+    { path: '/ai', label: 'AI', icon: <Sparkles size={18} /> },
     { path: '/about', label: 'About', icon: <Info size={18} /> },
     { path: '/docs', label: 'Docs', icon: <FileText size={18} /> },
     { path: '/pricing', label: 'Pricing', icon: <BadgeDollarSign size={18} /> },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-gradient-to-r from-[#5ab8e0] to-[#2d7a9e] backdrop-blur-md border-b border-white/20" style={{ boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.3), 0 2px 4px -1px rgba(68, 160, 209, 0.2)' }}>
+    <nav className={`
+      fixed top-0 left-0 right-0 z-50 
+      transition-all duration-500 ease-in-out
+      ${scrolled 
+        ? 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-200' 
+        : 'bg-transparent py-6'
+      }
+    `} 
+    style={scrolled ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center">
 
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/2.png" alt="Sartthi Logo" className="h-8 w-auto" />
+              <img src="/2.png" alt="Sartthi Logo" className={`transition-all duration-500 ${scrolled ? 'h-8' : 'h-10'} w-auto`} />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
+            {/* Products Dropdown */}
+            <div className="relative" ref={productsDropdownRef}>
+              <button
+                onClick={() => setShowProductsMenu(!showProductsMenu)}
+                className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-gray-900 hover:bg-yellow-50 hover:text-gray-900"
+              >
+                <Grid size={18} />
+                Products
+              </button>
+              
+              {showProductsMenu && (
+                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn">
+                  {products.map((product) => (
+                    <Link
+                      key={product.path}
+                      to={product.path}
+                      className="flex items-start gap-4 px-4 py-3 hover:bg-yellow-50 transition-colors duration-200"
+                      onClick={() => setShowProductsMenu(false)}
+                    >
+                      <span className="text-3xl">{product.icon}</span>
+                      <div>
+                        <div className="font-semibold text-gray-900">{product.name}</div>
+                        <div className="text-sm text-gray-600">{product.description}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Regular Nav Links */}
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                   isActive(link.path)
-                    ? 'bg-white/20 text-white font-semibold'
-                    : 'text-white/90 hover:bg-white/10 hover:text-white'
+                    ? 'bg-yellow-50 text-gray-900 font-semibold'
+                    : 'text-gray-900 hover:bg-yellow-50 hover:text-gray-900'
                 }`}
               >
                 {link.icon}
@@ -108,15 +157,13 @@ const SharedNavbar: React.FC = () => {
               </Link>
             ))}
           </div>
-
-          {/* Desktop Right Actions */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
             {/* Language Selector - Hidden on public pages */}
             {!isPublicPage && (
               <div className="relative" ref={languageDropdownRef}>
                 <button
                   onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                  className="p-2 rounded-lg transition-colors duration-200 text-white/90 hover:bg-white/10 hover:text-white"
+                  className="p-2 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
                   title="Change Language"
                 >
                   <Languages size={20} />
@@ -161,18 +208,18 @@ const SharedNavbar: React.FC = () => {
 
             <Link
               to="/login"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${
-                isActive('/login')
-                  ? 'bg-white/20 text-white font-semibold'
-                  : 'text-white/90 hover:bg-white/10 hover:text-white'
-              }`}
+              className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-50"
             >
               <LogIn size={18} />
               Login
             </Link>
             <Link
               to="/register"
-              className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg transform hover:-translate-y-0.5"
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${
+                scrolled
+                  ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+                  : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+              }`}
             >
               <UserPlus size={18} />
               Register
@@ -203,7 +250,7 @@ const SharedNavbar: React.FC = () => {
       <div 
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        } bg-gradient-to-b from-[#5ab8e0] to-[#2d7a9e] border-b border-white/20`}
+        } bg-white/95 border-b border-gray-200 shadow-sm`}
       >
         <div className="px-4 pt-2 pb-6 space-y-1">
           {navLinks.map((link) => (
@@ -213,8 +260,8 @@ const SharedNavbar: React.FC = () => {
               onClick={() => setIsMobileMenuOpen(false)}
               className={`block px-3 py-3 rounded-lg text-base font-medium transition-colors ${
                 isActive(link.path)
-                  ? 'bg-white/20 text-white font-semibold'
-                  : 'text-white/90 hover:bg-white/10 hover:text-white'
+                  ? 'bg-yellow-50 text-gray-900 font-semibold'
+                  : 'text-gray-700 hover:bg-yellow-50 hover:text-gray-900'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -230,7 +277,7 @@ const SharedNavbar: React.FC = () => {
             <Link
               to="/login"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block px-3 py-3 rounded-lg text-base font-medium transition-colors text-white/90 hover:bg-white/10 hover:text-white"
+              className="block px-3 py-3 rounded-lg text-base font-medium transition-colors text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
             >
               <div className="flex items-center gap-3">
                 <LogIn size={18} />

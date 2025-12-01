@@ -199,7 +199,7 @@ const TeamPage: React.FC = () => {
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-1">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-accent border-b-2 border-gray-300"></div>
-          <p className="text-sm text-gray-600">Loading your teams...</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Loading your teams...</p>
         </div>
       </div>
     );
@@ -218,10 +218,10 @@ const TeamPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'text-green-600 bg-green-100';
-      case 'inactive': return 'text-gray-600 bg-gray-100';
+      case 'inactive': return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
       case 'pending': return 'text-yellow-600 bg-yellow-100';
       case 'away': return 'text-orange-600 bg-orange-200';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
     }
   };
 
@@ -230,8 +230,8 @@ const TeamPage: React.FC = () => {
       case 'admin': return 'text-red-600 bg-red-100';
       case 'manager': return 'text-accent-dark bg-blue-100';
       case 'member': return 'text-green-600 bg-green-100';
-      case 'viewer': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'viewer': return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
+      default: return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
     }
   };
 
@@ -271,19 +271,19 @@ const TeamPage: React.FC = () => {
   const filteredMembers = getFilteredMembers();
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className="h-full bg-gray-50 dark:bg-gray-700">
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{t('team.title')}</h1>
-            <p className="text-gray-600 mt-1">{t('team.subtitle')}</p>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('team.title')}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('team.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             {canAddTeamMember() && (
               <button
                 onClick={() => setShowInviteModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <UserPlus className="w-4 h-4" />
                 {t('team.inviteMember')}
@@ -292,7 +292,7 @@ const TeamPage: React.FC = () => {
             {canManageTeam() && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
               >
                 <Plus className="w-4 h-4" />
                 {t('team.addMember')}
@@ -309,41 +309,41 @@ const TeamPage: React.FC = () => {
             {/* Stats Cards */}
             {teamStats && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-lg border border-gray-300 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">{t('team.totalMembers')}</p>
-                      <p className="text-2xl font-bold text-gray-900">{teamStats.totalMembers}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('team.totalMembers')}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{teamStats.totalMembers}</p>
                     </div>
                     <Users className="w-8 h-8 text-accent" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-300 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">{t('team.activeMembers')}</p>
-                      <p className="text-2xl font-bold text-gray-900">{teamStats.activeMembers}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('team.activeMembers')}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{teamStats.activeMembers}</p>
                     </div>
                     <UserCheck className="w-8 h-8 text-green-500" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-300 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">{t('team.pendingInvites')}</p>
-                      <p className="text-2xl font-bold text-gray-900">{teamStats.pendingInvites}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('team.pendingInvites')}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{teamStats.pendingInvites}</p>
                     </div>
                     <Clock className="w-8 h-8 text-yellow-500" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-300 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">{t('team.avgProductivity')}</p>
-                      <p className="text-2xl font-bold text-gray-900">{teamStats.averageProductivity}%</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('team.avgProductivity')}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{teamStats.averageProductivity}%</p>
                     </div>
                     <TrendingUp className="w-8 h-8 text-purple-500" />
                   </div>
@@ -352,7 +352,7 @@ const TeamPage: React.FC = () => {
             )}
 
             {/* Tab Navigation */}
-            <div className="bg-white rounded-lg border border-gray-300 p-1">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-1">
               <div className="flex items-center gap-2">
                 {[
                   { id: 'members', label: t('team.tabs.members'), icon: Users },
@@ -368,8 +368,8 @@ const TeamPage: React.FC = () => {
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         activeTab === tab.id
-                          ? 'bg-accent text-gray-900'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          ? 'bg-accent text-gray-900 dark:text-gray-100'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-gray-700'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -381,11 +381,11 @@ const TeamPage: React.FC = () => {
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
                     <input
                       type="text"
                       placeholder={t('team.searchPlaceholder')}
@@ -432,7 +432,7 @@ const TeamPage: React.FC = () => {
                         <button
                           key={mode.id}
                           onClick={() => setViewMode(mode.id as any)}
-                          className={`p-2 ${viewMode === mode.id ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}
+                          className={`p-2 ${viewMode === mode.id ? 'bg-blue-100 text-blue-700' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100'}`}
                         >
                           <Icon className="w-4 h-4" />
                         </button>
@@ -445,9 +445,9 @@ const TeamPage: React.FC = () => {
 
             {/* Content based on active tab */}
             {activeTab === 'members' && (
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">{t('team.members')} ({filteredMembers.length})</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('team.members')} ({filteredMembers.length})</h2>
               </div>
               
               {viewMode === 'grid' && (
@@ -465,7 +465,7 @@ const TeamPage: React.FC = () => {
                         />
                         
                         <div className="flex-1 min-w-0 ml-2">
-                          <p className="text-sm text-gray-600 truncate">{member.email}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{member.email}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(member.role)}`}>
                               {member.role}
@@ -477,19 +477,19 @@ const TeamPage: React.FC = () => {
                           </div>
                         </div>
                         
-                        <button className="text-gray-600 hover:text-gray-600">
+                        <button className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
                       
                       <div className="space-y-2">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           <span className="font-medium">{t('team.department')}:</span> {member.department}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           <span className="font-medium">{t('team.lastActive')}:</span> {formatLastActive(member.lastActive)}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           <span className="font-medium">{t('team.productivity')}:</span> {member.performance.productivityScore}%
                         </div>
                       </div>
@@ -497,12 +497,12 @@ const TeamPage: React.FC = () => {
                       <div className="flex items-center gap-2 mt-4">
                         <button
                           onClick={() => setSelectedMember(member)}
-                          className="flex-1 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                          className="flex-1 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
                         >
                           <Eye className="w-4 h-4 inline mr-1" />
                           {t('team.view')}
                         </button>
-                        <button className="px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        <button className="px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700">
                           <MessageSquare className="w-4 h-4" />
                         </button>
                       </div>
@@ -514,7 +514,7 @@ const TeamPage: React.FC = () => {
               {viewMode === 'list' && (
                 <div className="divide-y divide-gray-200">
                   {filteredMembers.map(member => (
-                    <div key={member._id} className="p-4 hover:bg-gray-50">
+                    <div key={member._id} className="p-4 hover:bg-gray-50 dark:bg-gray-700">
                       <div className="flex items-center gap-4">
                         {member.avatar ? (
                           <img
@@ -524,7 +524,7 @@ const TeamPage: React.FC = () => {
                           />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                               {member.name.charAt(0)}
                             </span>
                           </div>
@@ -532,7 +532,7 @@ const TeamPage: React.FC = () => {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-medium text-gray-900">{member.name}</h3>
+                            <h3 className="font-medium text-gray-900 dark:text-gray-100">{member.name}</h3>
                             <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(member.role)}`}>
                               {member.role}
                             </span>
@@ -541,10 +541,10 @@ const TeamPage: React.FC = () => {
                               {member.status}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">{member.email} • {member.department}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{member.email} • {member.department}</p>
                         </div>
                         
-                        <div className="text-right text-sm text-gray-600">
+                        <div className="text-right text-sm text-gray-600 dark:text-gray-400">
                           <div>{t('team.lastActive')}: {formatLastActive(member.lastActive)}</div>
                           <div>{t('team.productivity')}: {member.performance.productivityScore}%</div>
                         </div>
@@ -552,14 +552,14 @@ const TeamPage: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedMember(member)}
-                            className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700">
                             <MessageSquare className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:bg-gray-700">
                             <MoreVertical className="w-4 h-4" />
                           </button>
                         </div>
@@ -572,20 +572,20 @@ const TeamPage: React.FC = () => {
               {viewMode === 'table' && (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.members')}</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.role')}</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.status')}</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.department')}</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.productivity')}</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.lastActive')}</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{t('team.actions')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.members')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.role')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.status')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.department')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.productivity')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.lastActive')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('team.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {filteredMembers.map(member => (
-                        <tr key={member._id} className="hover:bg-gray-50">
+                        <tr key={member._id} className="hover:bg-gray-50 dark:bg-gray-700">
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               {member.avatar ? (
@@ -596,14 +596,14 @@ const TeamPage: React.FC = () => {
                                 />
                               ) : (
                                 <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
-                                  <span className="text-xs font-medium text-gray-600">
+                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                                     {member.name.charAt(0)}
                                   </span>
                                 </div>
                               )}
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                <div className="text-sm text-gray-600">{member.email}</div>
+                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.name}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{member.email}</div>
                               </div>
                             </div>
                           </td>
@@ -618,7 +618,7 @@ const TeamPage: React.FC = () => {
                               {member.status}
                             </span>
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{member.department}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{member.department}</td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <div className="w-16 bg-gray-300 rounded-full h-2">
@@ -627,10 +627,10 @@ const TeamPage: React.FC = () => {
                                   style={{ width: `${member.performance.productivityScore}%` }}
                                 />
                               </div>
-                              <span className="text-sm text-gray-900">{member.performance.productivityScore}%</span>
+                              <span className="text-sm text-gray-900 dark:text-gray-100">{member.performance.productivityScore}%</span>
                             </div>
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{formatLastActive(member.lastActive)}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{formatLastActive(member.lastActive)}</td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex items-center gap-2">
                               <button
@@ -639,10 +639,10 @@ const TeamPage: React.FC = () => {
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
-                              <button className="text-gray-600 hover:text-gray-900">
+                              <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100">
                                 <MessageSquare className="w-4 h-4" />
                               </button>
-                              <button className="text-gray-600 hover:text-gray-900">
+                              <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100">
                                 <MoreVertical className="w-4 h-4" />
                               </button>
                             </div>
@@ -658,11 +658,11 @@ const TeamPage: React.FC = () => {
 
             {/* Organization Chart View */}
             {activeTab === 'orgchart' && (
-              <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.orgChart.title')}</h2>
-                <p className="text-gray-600 mb-6">{t('team.orgChart.subtitle')}</p>
-                <div className="text-center py-12 text-gray-600">
-                  <Target className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('team.orgChart.title')}</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t('team.orgChart.subtitle')}</p>
+                <div className="text-center py-12 text-gray-600 dark:text-gray-400">
+                  <Target className="w-16 h-16 mx-auto mb-4 text-gray-600 dark:text-gray-400" />
                   <p className="text-lg font-medium">{t('team.orgChart.comingSoon')}</p>
                   <p className="text-sm mt-2">{t('team.orgChart.description')}</p>
                 </div>
@@ -671,9 +671,9 @@ const TeamPage: React.FC = () => {
 
             {/* Capacity Planning View */}
             {activeTab === 'capacity' && (
-              <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.capacity.title')}</h2>
-                <p className="text-gray-600 mb-6">{t('team.capacity.subtitle')}</p>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('team.capacity.title')}</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t('team.capacity.subtitle')}</p>
                 <div className="space-y-4">
                   {filteredMembers.map(member => (
                     <div key={member._id} className="border border-gray-300 rounded-lg p-4">
@@ -683,22 +683,22 @@ const TeamPage: React.FC = () => {
                             <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full" />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-600">{member.name.charAt(0)}</span>
+                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{member.name.charAt(0)}</span>
                             </div>
                           )}
                           <div>
-                            <h3 className="font-medium text-gray-900">{member.name}</h3>
-                            <p className="text-sm text-gray-600">{t(`team.role${member.role}`)}</p>
+                            <h3 className="font-medium text-gray-900 dark:text-gray-100">{member.name}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{t(`team.role${member.role}`)}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-gray-900">85%</div>
-                          <div className="text-xs text-gray-600">{t('team.capacity.utilization')}</div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">85%</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">{t('team.capacity.utilization')}</div>
                         </div>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">{t('team.capacity.weeklyCapacity')}</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('team.capacity.weeklyCapacity')}</span>
                           <span className="font-medium">34h / 40h</span>
                         </div>
                         <div className="w-full bg-gray-300 rounded-full h-2">
@@ -708,7 +708,7 @@ const TeamPage: React.FC = () => {
                           {member.projects.map(project => (
                             <div key={project._id} className="text-xs">
                               <div className={`w-full h-1 rounded ${project.color} mb-1`} />
-                              <span className="text-gray-600">{project.name}</span>
+                              <span className="text-gray-600 dark:text-gray-400">{project.name}</span>
                             </div>
                           ))}
                         </div>
@@ -721,14 +721,14 @@ const TeamPage: React.FC = () => {
 
             {/* Skills Matrix View */}
             {activeTab === 'skills' && (
-              <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.skills.title')}</h2>
-                <p className="text-gray-600 mb-6">{t('team.skills.subtitle')}</p>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('team.skills.title')}</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t('team.skills.subtitle')}</p>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left p-3 font-medium text-gray-900">{t('team.skills.teamMember')}</th>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-gray-100">{t('team.skills.teamMember')}</th>
                         {[
                           { key: 'react', label: 'React' },
                           { key: 'node', label: 'Node.js' },
@@ -737,23 +737,23 @@ const TeamPage: React.FC = () => {
                           { key: 'devops', label: 'DevOps' },
                           { key: 'testing', label: 'Testing' }
                         ].map(skill => (
-                          <th key={skill.key} className="text-center p-3 font-medium text-gray-900">{t(`team.skills.${skill.key}`)}</th>
+                          <th key={skill.key} className="text-center p-3 font-medium text-gray-900 dark:text-gray-100">{t(`team.skills.${skill.key}`)}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {filteredMembers.map(member => (
-                        <tr key={member._id} className="border-b border-gray-300 hover:bg-gray-50">
+                        <tr key={member._id} className="border-b border-gray-300 hover:bg-gray-50 dark:bg-gray-700">
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               {member.avatar ? (
                                 <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full" />
                               ) : (
                                 <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
-                                  <span className="text-xs font-medium text-gray-600">{member.name.charAt(0)}</span>
+                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{member.name.charAt(0)}</span>
                                 </div>
                               )}
-                              <span className="font-medium text-gray-900">{member.name}</span>
+                              <span className="font-medium text-gray-900 dark:text-gray-100">{member.name}</span>
                             </div>
                           </td>
                           {[
@@ -789,14 +789,14 @@ const TeamPage: React.FC = () => {
 
             {/* Team Health View */}
             {activeTab === 'health' && (
-              <div className="bg-white rounded-lg border border-gray-300 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('team.health.title')}</h2>
-                <p className="text-gray-600 mb-6">{t('team.health.subtitle')}</p>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('team.health.title')}</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t('team.health.subtitle')}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">{t('team.health.burnoutRisk')}</h3>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('team.health.burnoutRisk')}</h3>
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                         <span className="text-lg font-bold text-green-600">25</span>
                       </div>
@@ -804,12 +804,12 @@ const TeamPage: React.FC = () => {
                     <div className="w-full bg-gray-300 rounded-full h-2">
                       <div className="bg-green-500 h-2 rounded-full" style={{ width: '25%' }} />
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">{t('team.health.lowRisk')}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{t('team.health.lowRisk')}</p>
                   </div>
 
                   <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">{t('team.health.satisfaction')}</h3>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('team.health.satisfaction')}</h3>
                       <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                         <span className="text-lg font-bold text-accent-dark">4.2</span>
                       </div>
@@ -819,23 +819,23 @@ const TeamPage: React.FC = () => {
                         <Star key={star} className={`w-5 h-5 ${star <= 4 ? 'text-yellow-500 fill-current' : 'text-gray-700'}`} />
                       ))}
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">{t('team.health.highSatisfaction')}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{t('team.health.highSatisfaction')}</p>
                   </div>
 
                   <div className="border border-gray-300 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">{t('team.health.retentionRisk')}</h3>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('team.health.retentionRisk')}</h3>
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                         <CheckCircle className="w-6 h-6 text-green-600" />
                       </div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900">95%</div>
-                    <p className="text-xs text-gray-600 mt-2">{t('team.health.stable')}</p>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">95%</div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{t('team.health.stable')}</p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="font-medium text-gray-900">{t('team.health.individualScores')}</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('team.health.individualScores')}</h3>
                   {filteredMembers.map(member => {
                     const healthScore = Math.floor(Math.random() * 30) + 70;
                     const riskLevel = healthScore >= 80 ? 'low' : healthScore >= 60 ? 'medium' : 'high';
@@ -848,18 +848,18 @@ const TeamPage: React.FC = () => {
                             <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full" />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-600">{member.name.charAt(0)}</span>
+                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{member.name.charAt(0)}</span>
                             </div>
                           )}
                           <div className="flex-1">
-                            <h4 className="font-medium text-gray-900">{member.name}</h4>
-                            <p className="text-sm text-gray-600">{t(`team.role${member.role}`)}</p>
+                            <h4 className="font-medium text-gray-900 dark:text-gray-100">{member.name}</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{t(`team.role${member.role}`)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="text-right">
-                            <div className="text-lg font-bold text-gray-900">{healthScore}</div>
-                            <div className="text-xs text-gray-600">{t('team.health.healthScore')}</div>
+                            <div className="text-lg font-bold text-gray-900 dark:text-gray-100">{healthScore}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('team.health.healthScore')}</div>
                           </div>
                           <div className="w-24 bg-gray-300 rounded-full h-2">
                             <div className={`${colorClass} h-2 rounded-full`} style={{ width: `${healthScore}%` }} />
@@ -885,7 +885,7 @@ const TeamPage: React.FC = () => {
                 <p className="text-sm text-purple-100 mb-3">
                   {t('team.aiAssistant.description')}
                 </p>
-                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+                <button className="w-full bg-white dark:bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
                   {t('team.aiAssistant.ask')}
                 </button>
               </div>
@@ -893,15 +893,15 @@ const TeamPage: React.FC = () => {
 
             {/* Recent Activity */}
             {teamStats && (
-              <div className="bg-white rounded-lg border border-gray-300 p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">{t('team.recentActivity')}</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('team.recentActivity')}</h3>
                 <div className="space-y-3">
                   {teamStats.recentActivity.map(activity => (
                     <div key={activity._id} className="flex items-start gap-3">
                       <div className="w-2 h-2 bg-accent rounded-full mt-2" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900">{activity.description}</p>
-                        <p className="text-xs text-gray-600">{formatLastActive(activity.timestamp)}</p>
+                        <p className="text-sm text-gray-900 dark:text-gray-100">{activity.description}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{formatLastActive(activity.timestamp)}</p>
                       </div>
                     </div>
                   ))}
@@ -910,15 +910,15 @@ const TeamPage: React.FC = () => {
             )}
 
             {/* Top Performers */}
-            <div className="bg-white rounded-lg border border-gray-300 p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('team.topPerformers')}</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('team.topPerformers')}</h3>
               <div className="space-y-3">
                 {teamMembers
                   .sort((a, b) => b.performance.productivityScore - a.performance.productivityScore)
                   .slice(0, 3)
                   .map((member, index) => (
                     <div key={member._id} className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-xs font-medium">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium">
                         {index + 1}
                       </div>
                       <div className="flex items-center gap-2 flex-1">
@@ -930,21 +930,21 @@ const TeamPage: React.FC = () => {
                           />
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                               {member.name.charAt(0)}
                             </span>
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-600">{t(`team.role${member.role}`)}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{member.name}</p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">{t(`team.role${member.role}`)}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{member.performance.productivityScore}%</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.performance.productivityScore}%</p>
                         <div className="flex items-center">
                           <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                          <span className="text-xs text-gray-600 ml-1">{member.performance.averageRating}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400 ml-1">{member.performance.averageRating}</span>
                         </div>
                       </div>
                     </div>
@@ -958,8 +958,8 @@ const TeamPage: React.FC = () => {
       {/* Member Detail Modal */}
       {selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {selectedMember.avatar ? (
@@ -970,14 +970,14 @@ const TeamPage: React.FC = () => {
                     />
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center">
-                      <span className="text-2xl font-medium text-gray-600">
+                      <span className="text-2xl font-medium text-gray-600 dark:text-gray-400">
                         {selectedMember.name.charAt(0)}
                       </span>
                     </div>
                   )}
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{selectedMember.name}</h3>
-                    <p className="text-gray-600">{selectedMember.email}</p>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{selectedMember.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{selectedMember.email}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(selectedMember.role)}`}>
                         {t(`team.role${selectedMember.role}`)}
@@ -991,7 +991,7 @@ const TeamPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setSelectedMember(null)}
-                  className="text-gray-600 hover:text-gray-600"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400"
                 >
                   ×
                 </button>
@@ -1001,48 +1001,48 @@ const TeamPage: React.FC = () => {
             <div className="p-6 space-y-6">
               {/* Basic Info */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3">{t('profile.personalInfo')}</h4>
+                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">{t('profile.personalInfo')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">{t('team.department')}</label>
-                    <p className="text-sm text-gray-900">{selectedMember.department}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{selectedMember.department}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">{t('profile.location')}</label>
-                    <p className="text-sm text-gray-900">{selectedMember.location}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{selectedMember.location}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Timezone</label>
-                    <p className="text-sm text-gray-900">{selectedMember.timezone}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{selectedMember.timezone}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Phone</label>
-                    <p className="text-sm text-gray-900">{selectedMember.phone || 'Not provided'}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{selectedMember.phone || 'Not provided'}</p>
                   </div>
                 </div>
               </div>
 
               {/* Performance */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3">Performance</h4>
+                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Performance</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Productivity Score</label>
-                    <p className="text-2xl font-bold text-gray-900">{selectedMember.performance.productivityScore}%</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{selectedMember.performance.productivityScore}%</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Completion Rate</label>
-                    <p className="text-2xl font-bold text-gray-900">{selectedMember.performance.completionRate}%</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{selectedMember.performance.completionRate}%</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Tasks Completed</label>
-                    <p className="text-sm text-gray-900">{selectedMember.performance.tasksCompleted}/{selectedMember.performance.totalTasks}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{selectedMember.performance.tasksCompleted}/{selectedMember.performance.totalTasks}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Average Rating</label>
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      <span className="text-sm text-gray-900 ml-1">{selectedMember.performance.averageRating}</span>
+                      <span className="text-sm text-gray-900 dark:text-gray-100 ml-1">{selectedMember.performance.averageRating}</span>
                     </div>
                   </div>
                 </div>
@@ -1050,7 +1050,7 @@ const TeamPage: React.FC = () => {
 
               {/* Skills */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3">Skills</h4>
+                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Skills</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedMember.skills.map(skill => (
                     <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
@@ -1062,19 +1062,19 @@ const TeamPage: React.FC = () => {
 
               {/* Projects */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3">Current Projects</h4>
+                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Current Projects</h4>
                 <div className="space-y-3">
                   {selectedMember.projects.map(project => (
                     <div key={project._id} className="flex items-center justify-between p-3 border border-gray-300 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${project.color}`} />
                         <div>
-                          <p className="font-medium text-gray-900">{project.name}</p>
-                          <p className="text-sm text-gray-600">{project.role}</p>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{project.name}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{project.role}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{project.progress}%</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.progress}%</p>
                         <div className="w-16 bg-gray-300 rounded-full h-2 mt-1">
                           <div
                             className="bg-accent h-2 rounded-full"
@@ -1091,11 +1091,11 @@ const TeamPage: React.FC = () => {
             <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedMember(null)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
               >
                 Close
               </button>
-              <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
+              <button className="px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover">
                 Edit Member
               </button>
             </div>
