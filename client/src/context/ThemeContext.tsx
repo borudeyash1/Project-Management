@@ -206,7 +206,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     
     // Actually, if we are on public route (isDarkMode=false forced), toggle will try to set 'dark'.
     
-    const nextTheme = preferences.theme === 'dark' ? 'light' : 'dark'; // Simple toggle based on current pref
+    const nextTheme: UserPreferences['theme'] = preferences.theme === 'dark' ? 'light' : 'dark'; // Simple toggle based on current pref
     
     const newPrefs = { ...preferences, theme: nextTheme };
     setPreferences(newPrefs);

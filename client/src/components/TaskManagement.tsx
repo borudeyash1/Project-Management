@@ -208,7 +208,7 @@ const TaskManagement: React.FC = () => {
   useEffect(() => {
     setTasks(mockTasks);
     setColumns(mockColumns);
-    dispatch({ type: 'SET_TASKS', payload: mockTasks });
+    dispatch({ type: 'SET_TASKS', payload: mockTasks as any });
   }, []);
 
   // Column management functions

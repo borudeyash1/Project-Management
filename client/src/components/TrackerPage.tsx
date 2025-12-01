@@ -351,11 +351,15 @@ const TrackerPage: React.FC = () => {
                     <div className={`text-center p-8 rounded-lg ${
                       isPaused ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-blue-50'
                     }`}>
-                      <div className="text-4xl font-mono font-bold mb-2 ${
+                      <div className={`text-4xl font-mono font-bold mb-2 ${
                         isPaused ? 'text-yellow-600' : 'text-accent-dark'
-                      }">
+                      }`}>
                         {formatElapsedTime(elapsedTime)}
                       </div>
+                      
+                      <div className="flex justify-center gap-4 mt-6">
+                        <button
+                          onClick={pauseTracking}
                           className={`p-3 text-white rounded-lg ${
                             isPaused 
                               ? 'bg-green-500 hover:bg-green-600' 

@@ -3,6 +3,7 @@ import { Mail, Calendar, Shield, Link as LinkIcon, Unlink, CheckCircle, AlertCir
 import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
 import AppInfoCard from './AppInfoCard';
+import { getAppUrl } from '../utils/appUrls';
 
 interface ConnectedAccount {
   type: 'mail' | 'calendar' | 'vault';

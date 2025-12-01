@@ -132,7 +132,7 @@ const AdminDockComponent: React.FC<AdminDockProps> = ({ children, direction = 'm
       pointerEvents: 'none',
       x,
       y
-    } as React.CSSProperties;
+    } as any as React.CSSProperties;
     if (dockPosition === 'top') {
       return {
         ...base,

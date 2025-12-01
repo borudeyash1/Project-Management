@@ -1939,7 +1939,7 @@ const ProjectViewDetailed: React.FC = () => {
                 }
               } catch (error) {
                 console.error('Failed to add team member:', error);
-                console.error('Error response:', error.response?.data);
+                console.error('Error response:', (error as any).response?.data);
                 dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: 'Failed to add team member.', duration: 4000 } });
               }
             }}

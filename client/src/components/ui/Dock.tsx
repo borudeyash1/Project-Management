@@ -127,7 +127,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       pointerEvents: 'none',
       x,
       y
-    } as React.CSSProperties;
+    } as any as React.CSSProperties;
     if (dockPosition === 'top') {
       return {
         ...base,
