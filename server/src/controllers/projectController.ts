@@ -467,11 +467,23 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
     const { userId, role } = req.body;
     const currentUserId = req.user!._id;
 
+    console.log('🔍 [ADD PROJECT MEMBER] Project:', id, 'User to add:', userId, 'Role:', role);
+
+    // Validate input
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+      return;
+    }
+
+    // Find the project
     const project = await Project.findOne({
       _id: id,
       isActive: true,
       $or: [
-        { owner: currentUserId },
+        { createdBy: currentUserId },
         { 'teamMembers.user': currentUserId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
       ]
     });
@@ -484,21 +496,138 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
       return;
     }
 
-    // Add member
+    // Check if project belongs to a workspace
+    if (!project.workspace) {
+      res.status(400).json({
+        success: false,
+        message: 'Cannot add members to personal projects. Please upgrade to a workspace.'
+      });
+      return;
+    }
+
+    // Verify that the user being added is a member of the workspace
+    const workspace = await Workspace.findOne({
+      _id: project.workspace,
+      $or: [
+        { owner: userId },
+        { 'members.user': userId, 'members.status': 'active' }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(403).json({
+        success: false,
+        message: 'User is not a member of this workspace. Only workspace members can be added to projects.'
+      });
+      return;
+    }
+
+    // Check if user is already a team member
+    const existingMember = (project as any).teamMembers?.find(
+      (member: any) => member.user.toString() === userId.toString()
+    );
+
+    if (existingMember) {
+      res.status(400).json({
+        success: false,
+        message: 'User is already a member of this project'
+      });
+      return;
+    }
+
+    // Set permissions based on role
+    let permissions = {
+      canEdit: false,
+      canDelete: false,
+      canManageMembers: false,
+      canViewReports: true
+    };
+
+    // Define role-based permissions
+    switch (role) {
+      case 'owner':
+        permissions = {
+          canEdit: true,
+          canDelete: true,
+          canManageMembers: true,
+          canViewReports: true
+        };
+        break;
+      case 'manager':
+      case 'project-manager':
+        permissions = {
+          canEdit: true,
+          canDelete: false,
+          canManageMembers: true,
+          canViewReports: true
+        };
+        break;
+      case 'member':
+      case 'developer':
+      case 'designer':
+      case 'tester':
+      case 'analyst':
+      case 'qa-engineer':
+      case 'devops':
+        permissions = {
+          canEdit: false,
+          canDelete: false,
+          canManageMembers: false,
+          canViewReports: true
+        };
+        break;
+      case 'viewer':
+        permissions = {
+          canEdit: false,
+          canDelete: false,
+          canManageMembers: false,
+          canViewReports: true
+        };
+        break;
+      default:
+        // For custom roles, use member permissions
+        permissions = {
+          canEdit: false,
+          canDelete: false,
+          canManageMembers: false,
+          canViewReports: true
+        };
+    }
+
+    // Add member to project
     (project as any).teamMembers = (project as any).teamMembers || [];
     (project as any).teamMembers.push({
       user: userId,
       role: role || 'member',
-      permissions: {
-        canEdit: false,
-        canDelete: false,
-        canManageMembers: false,
-        canViewReports: true
-      }
+      permissions: permissions,
+      joinedAt: new Date()
     });
+
     await project.save();
 
-    await project.populate('teamMembers.user', 'fullName email avatarUrl');
+    // Populate user details for ALL team members
+    await project.populate({
+      path: 'teamMembers.user',
+      select: 'fullName email avatarUrl username'
+    });
+
+    console.log('✅ [ADD PROJECT MEMBER] Member added successfully');
+    console.log('📊 [ADD PROJECT MEMBER] Team members count:', (project as any).teamMembers.length);
+    console.log('👤 [ADD PROJECT MEMBER] New member data:', {
+      userId,
+      role,
+      populated: typeof (project as any).teamMembers[(project as any).teamMembers.length - 1]?.user === 'object'
+    });
+
+    // Create activity log
+    await createActivity(
+      currentUserId,
+      'member_added',
+      `Added member to project: ${project.name}`,
+      `New member added with role: ${role}`,
+      'Project',
+      project._id
+    );
 
     const response: ApiResponse<IProject> = {
       success: true,
@@ -508,7 +637,7 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
 
     res.status(200).json(response);
   } catch (error: any) {
-    console.error('Add member error:', error);
+    console.error('❌ [ADD PROJECT MEMBER] Error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'
@@ -570,11 +699,21 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
     const { role } = req.body;
     const currentUserId = req.user!._id;
 
+    console.log('🔍 [UPDATE MEMBER ROLE] Project:', id, 'Member:', memberId, 'New Role:', role);
+
+    if (!role) {
+      res.status(400).json({
+        success: false,
+        message: 'Role is required'
+      });
+      return;
+    }
+
     const project = await Project.findOne({
       _id: id,
       isActive: true,
       $or: [
-        { owner: currentUserId },
+        { createdBy: currentUserId },
         { 'teamMembers.user': currentUserId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
       ]
     });
@@ -587,16 +726,97 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
       return;
     }
 
-    // Update member role
+    // Find and update member role
     const member = ((project as any).teamMembers || []).find((member: any) =>
       member.user.toString() === memberId
     );
-    if (member) {
-      member.role = role;
+    
+    if (!member) {
+      res.status(404).json({
+        success: false,
+        message: 'Member not found in project'
+      });
+      return;
     }
+
+    // Set permissions based on new role
+    let permissions = {
+      canEdit: false,
+      canDelete: false,
+      canManageMembers: false,
+      canViewReports: true
+    };
+
+    switch (role) {
+      case 'owner':
+        permissions = {
+          canEdit: true,
+          canDelete: true,
+          canManageMembers: true,
+          canViewReports: true
+        };
+        break;
+      case 'manager':
+      case 'project-manager':
+        permissions = {
+          canEdit: true,
+          canDelete: false,
+          canManageMembers: true,
+          canViewReports: true
+        };
+        break;
+      case 'member':
+      case 'developer':
+      case 'designer':
+      case 'tester':
+      case 'analyst':
+      case 'qa-engineer':
+      case 'devops':
+        permissions = {
+          canEdit: false,
+          canDelete: false,
+          canManageMembers: false,
+          canViewReports: true
+        };
+        break;
+      case 'viewer':
+        permissions = {
+          canEdit: false,
+          canDelete: false,
+          canManageMembers: false,
+          canViewReports: true
+        };
+        break;
+      default:
+        permissions = {
+          canEdit: false,
+          canDelete: false,
+          canManageMembers: false,
+          canViewReports: true
+        };
+    }
+
+    member.role = role;
+    member.permissions = permissions;
+    
     await project.save();
 
-    await project.populate('teamMembers.user', 'fullName email avatarUrl');
+    await project.populate({
+      path: 'teamMembers.user',
+      select: 'fullName email avatarUrl username'
+    });
+
+    console.log('✅ [UPDATE MEMBER ROLE] Role updated successfully');
+
+    // Create activity log
+    await createActivity(
+      currentUserId,
+      'member_role_updated',
+      `Updated member role in project: ${project.name}`,
+      `Member role changed to: ${role}`,
+      'Project',
+      project._id
+    );
 
     const response: ApiResponse<IProject> = {
       success: true,
@@ -606,7 +826,7 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
 
     res.status(200).json(response);
   } catch (error: any) {
-    console.error('Update member role error:', error);
+    console.error('❌ [UPDATE MEMBER ROLE] Error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'

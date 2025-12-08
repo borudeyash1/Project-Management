@@ -128,26 +128,6 @@ const Sidebar: React.FC = () => {
            (item.path !== '/home' && location.pathname.startsWith(item.path));
   };
 
-  // Separate workspaces into owned and joined
-  const myWorkspaces = state.workspaces.filter(w => w.owner === state.userProfile._id);
-  const joinedWorkspaces = state.workspaces.filter(w => w.owner !== state.userProfile._id);
-
-  const handleWorkspaceClick = (workspaceId: string) => {
-    dispatch({ type: 'SET_MODE', payload: 'Workspace' });
-    dispatch({ type: 'SET_WORKSPACE', payload: workspaceId });
-    navigate(`/workspace/${workspaceId}/overview`);
-    
-    const workspace = state.workspaces.find(w => w._id === workspaceId);
-    if (workspace) {
-      dispatch({ 
-        type: 'ADD_TOAST', 
-        payload: { 
-          message: `Switched to ${workspace.name}`, 
-          type: 'success' 
-        } 
-      });
-    }
-  };
 
   return (
     <aside className={`bg-white dark:bg-gray-800 border-r border-border dark:border-gray-600 transition-all duration-300 ${
@@ -207,77 +187,6 @@ const Sidebar: React.FC = () => {
                   <span className="truncate">Sartthi Calendar</span>
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Workspaces Section */}
-          {!state.sidebar.collapsed && (
-            <div className="pt-4 mt-4 border-t border-gray-300 dark:border-gray-600">
-              {/* My Workspaces */}
-              {myWorkspaces.length > 0 && (
-                <div className="mb-4">
-                  <div className="px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    My Workspaces
-                  </div>
-                  <div className="space-y-1">
-                    {myWorkspaces.map((workspace) => (
-                      <button
-                        key={workspace._id}
-                        onClick={() => handleWorkspaceClick(workspace._id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                          state.currentWorkspace === workspace._id
-                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-700'
-                            : 'text-gray-700 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        <Building className="w-4 h-4 flex-shrink-0" />
-                        <div className="flex-1 text-left truncate">
-                          <div className="font-medium truncate">{workspace.name}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-200">
-                            {workspace.memberCount} members
-                          </div>
-                        </div>
-                        {state.currentWorkspace === workspace._id && (
-                          <div className="w-2 h-2 bg-accent rounded-full" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Joined Workspaces */}
-              {joinedWorkspaces.length > 0 && (
-                <div>
-                  <div className="px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Joined Workspaces
-                  </div>
-                  <div className="space-y-1">
-                    {joinedWorkspaces.map((workspace) => (
-                      <button
-                        key={workspace._id}
-                        onClick={() => handleWorkspaceClick(workspace._id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                          state.currentWorkspace === workspace._id
-                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-700'
-                            : 'text-gray-700 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        <Building className="w-4 h-4 flex-shrink-0" />
-                        <div className="flex-1 text-left truncate">
-                          <div className="font-medium truncate">{workspace.name}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-200">
-                            {workspace.memberCount} members
-                          </div>
-                        </div>
-                        {state.currentWorkspace === workspace._id && (
-                          <div className="w-2 h-2 bg-accent rounded-full" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </nav>

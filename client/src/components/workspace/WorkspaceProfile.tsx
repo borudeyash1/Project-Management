@@ -1,19 +1,175 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
-import { Mail, Phone, Shield, User as UserIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { 
+  Mail, Phone, Shield, User as UserIcon, BarChart3, MessageSquare, Bot, 
+  Calendar, Building2, Clock, AlertCircle, TrendingUp, Users, CheckSquare,
+  Bell, Search, Plus, Filter, Eye, ArrowRight
+} from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import apiService from '../../services/api';
 
 const WorkspaceProfile: React.FC = () => {
   const { t } = useTranslation();
   const { state, addToast } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
   const currentWorkspace = state.workspaces.find((ws) => ws._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
+
+  const [activeTab, setActiveTab] = useState('profile');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [facePreview, setFacePreview] = useState<string | null>(null);
+  const [faceStatus, setFaceStatus] = useState<string | null>(null);
+  const [faceSaving, setFaceSaving] = useState(false);
+  const [autoScanTriggered, setAutoScanTriggered] = useState(false);
+  const [workspaceMembers, setWorkspaceMembers] = useState<any[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profileData, setProfileData] = useState({
+    fullName: state.userProfile.fullName || '',
+    email: state.userProfile.email || '',
+    phone: state.userProfile.phone || '',
+    bio: (state.userProfile as any).bio || ''
+  });
 
   const memberRecord = currentWorkspace?.members?.find((member) => member.user === state.userProfile._id);
   const derivedRole = memberRecord?.role || (isOwner ? 'owner' : 'member');
   const displayRole = derivedRole === 'owner' ? t('workspace.profile.role.owner') : t('workspace.profile.role.member');
+
+  // Fetch workspace members for inbox
+  useEffect(() => {
+    const fetchWorkspaceMembers = async () => {
+      if (!state.currentWorkspace) return;
+      
+      try {
+        const response = await apiService.get(`/messages/workspace/${state.currentWorkspace}/members`);
+        if (response.data.success && response.data.data) {
+          setWorkspaceMembers(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch workspace members:', error);
+      }
+    };
+
+    fetchWorkspaceMembers();
+  }, [state.currentWorkspace]);
+
+  // Auto face scan trigger
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const shouldAutoScan = params.get('autoFaceScan') === '1';
+
+    if (!shouldAutoScan || autoScanTriggered) {
+      return;
+    }
+
+    if (activeTab !== 'profile') {
+      setActiveTab('profile');
+      return;
+    }
+
+    if (videoRef.current) {
+      handleCaptureFaceScan();
+      setAutoScanTriggered(true);
+    }
+  }, [location.search, autoScanTriggered, activeTab]);
+
+  const handleCaptureFaceScan = async () => {
+    setFaceStatus(null);
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setFaceStatus('Camera access is not supported in this browser.');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        const videoEl = videoRef.current;
+        videoEl.srcObject = stream as any;
+        await new Promise((resolve) => {
+          const handler = () => {
+            videoEl.removeEventListener('loadedmetadata', handler);
+            resolve(null);
+          };
+          videoEl.addEventListener('loadedmetadata', handler);
+        });
+      }
+
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) {
+        stream.getTracks().forEach((t) => t.stop());
+        setFaceStatus('Unable to access camera elements.');
+        return;
+      }
+
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        stream.getTracks().forEach((t) => t.stop());
+        setFaceStatus('Unable to capture from camera.');
+        return;
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      setFacePreview(dataUrl);
+
+      stream.getTracks().forEach((t) => t.stop());
+      if (videoRef.current) {
+        (videoRef.current.srcObject as any) = null;
+      }
+
+      setFaceSaving(true);
+      try {
+        await apiService.post('/users/face-scan', { imageData: dataUrl });
+        setFaceStatus('Face scan saved successfully. This will be used for attendance verification.');
+      } catch (err: any) {
+        console.error('Failed to save face scan', err);
+        setFaceStatus(err?.message || 'Failed to save face scan.');
+      } finally {
+        setFaceSaving(false);
+      }
+    } catch (err: any) {
+      console.error('Camera error', err);
+      setFaceStatus('Could not access camera. Please allow camera permissions.');
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    try {
+      await apiService.put('/users/profile', profileData);
+      
+      // Update context with new data
+      const updatedUser = { ...state.userProfile, ...profileData };
+      // Dispatch update to context (you may need to add this action to your reducer)
+      
+      addToast?.('Profile updated successfully', 'success');
+      setIsEditMode(false);
+    } catch (error: any) {
+      console.error('Failed to save profile:', error);
+      addToast?.('Failed to update profile', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setProfileData({
+      fullName: state.userProfile.fullName || '',
+      email: state.userProfile.email || '',
+      phone: state.userProfile.phone || '',
+      bio: (state.userProfile as any).bio || ''
+    });
+    setIsEditMode(false);
+  };
 
   if (!currentWorkspace) {
     return (
@@ -31,37 +187,99 @@ const WorkspaceProfile: React.FC = () => {
     navigate(`/workspace/${currentWorkspace._id}/members`);
   };
 
-  return (
-    <div className="p-6 space-y-6">
+  const tabs = [
+    { id: 'profile', label: 'Profile', icon: UserIcon },
+    { id: 'inbox', label: 'Inbox', icon: MessageSquare },
+    { id: 'chatbot', label: 'Chatbot', icon: Bot },
+    { id: 'planner', label: 'Personal Planner', icon: Calendar },
+    { id: 'projects', label: 'Projects', icon: Building2 }
+  ];
+
+  const renderProfileTab = () => (
+    <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 space-y-4">
-          <div>
-            <p className="text-sm uppercase text-gray-600 dark:text-gray-300 tracking-wide">{t('workspace.profile.workspaceLabel')}</p>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{currentWorkspace.name}</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-200">{currentWorkspace.description || t('workspace.profile.noDescription')}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm uppercase text-gray-600 dark:text-gray-300 tracking-wide">{t('workspace.profile.workspaceLabel')}</p>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{currentWorkspace.name}</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{currentWorkspace.description || t('workspace.profile.noDescription')}</p>
+            </div>
+            {!isEditMode ? (
+              <button
+                onClick={() => setIsEditMode(true)}
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
+              >
+                Edit Profile
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50"
+                >
+                  {isSaving ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors text-sm font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <UserIcon className="w-5 h-5 text-accent" />
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.nameLabel')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">{state.userProfile.fullName || t('workspace.profile.unnamedUser')}</p>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    value={profileData.fullName}
+                    onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{state.userProfile.fullName || t('workspace.profile.unnamedUser')}</p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-accent" />
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.emailLabel')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">{state.userProfile.email || t('workspace.profile.notAvailable')}</p>
+                {isEditMode ? (
+                  <input
+                    type="email"
+                    value={profileData.email}
+                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{state.userProfile.email || t('workspace.profile.notAvailable')}</p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-accent" />
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.mobileLabel')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                  {state.userProfile.phone || t('workspace.profile.notProvided')}
-                </p>
+                {isEditMode ? (
+                  <input
+                    type="tel"
+                    value={profileData.phone}
+                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                    {state.userProfile.phone || t('workspace.profile.notProvided')}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -72,9 +290,22 @@ const WorkspaceProfile: React.FC = () => {
               </div>
             </div>
           </div>
+          
+          {/* Bio Section */}
+          {isEditMode && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-200 mb-2">Bio</label>
+              <textarea
+                value={profileData.bio}
+                onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+          )}
         </div>
       </div>
-
 
       <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6">
         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('workspace.profile.insights.title')}</h4>
@@ -94,24 +325,222 @@ const WorkspaceProfile: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* Face Scan Section */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Face Scan for Attendance</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-200 mb-4">
+          Capture your face once so the system can verify you during automatic attendance.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="space-y-3">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              className="w-full rounded-lg border border-gray-300 bg-gray-100"
+            />
+            <canvas ref={canvasRef} className="hidden" />
+            {facePreview && (
+              <img
+                src={facePreview}
+                alt="Face scan preview"
+                className="w-full rounded-lg border border-gray-200"
+              />
+            )}
+          </div>
+          <div className="md:col-span-2 space-y-3 text-sm">
+            <p className="text-gray-600 dark:text-gray-200">
+              Make sure your face is clearly visible, with good lighting. This basic capture is stored securely in
+              your profile and used only for attendance verification.
+            </p>
+            <button
+              type="button"
+              onClick={handleCaptureFaceScan}
+              disabled={faceSaving}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-gray-900 hover:bg-accent-hover disabled:opacity-60"
+            >
+              {faceSaving ? 'Saving...' : 'Capture & Save Face Scan'}
+            </button>
+            {faceStatus && (
+              <p className="text-xs text-gray-600 dark:text-gray-200 mt-2 max-w-md">{faceStatus}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderInbox = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">{t('workspace.profile.faceScan.title')}</h4>
-          <p className="text-sm text-gray-600 dark:text-gray-200">
-            {t('workspace.profile.faceScan.description')}
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Team Inbox</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-200">Chat with your workspace members</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
+            <input
+              type="text"
+              placeholder="Search members..."
+              className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
+            <Plus className="w-4 h-4" />
+            New Chat
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-600">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100">Workspace Members</h4>
+            </div>
+            <div className="divide-y divide-gray-200 dark:divide-gray-600 max-h-96 overflow-y-auto">
+              {workspaceMembers.length === 0 ? (
+                <div className="p-4 text-center text-gray-600 dark:text-gray-300">
+                  <p className="text-sm">No members found</p>
+                </div>
+              ) : (
+                workspaceMembers.map((member) => (
+                  <div key={member._id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                        <UserIcon className="w-5 h-5 text-accent-dark" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.fullName || member.name || 'Unknown'}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">{member.role || 'Member'}</p>
+                      </div>
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg h-96 flex flex-col">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <UserIcon className="w-4 h-4 text-accent-dark" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">Select a member to start chatting</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">Click on a member from the list</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-gray-600 dark:text-gray-300">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <p className="text-sm">No conversation selected</p>
+                  <p className="text-xs mt-1">Choose a workspace member to start chatting</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Type a message..."
+                  disabled
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                />
+                <button disabled className="px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed">
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderChatbot = () => (
+    <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+          <Bot className="w-6 h-6 text-accent-dark" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">AI Assistant</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-200">Get help with your tasks and deadlines</p>
+        </div>
+      </div>
+      <p className="text-sm text-gray-600 dark:text-gray-200">AI Assistant coming soon...</p>
+    </div>
+  );
+
+  const renderPlanner = () => (
+    <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Personal Planner</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-200">Personal planner coming soon...</p>
+    </div>
+  );
+
+  const renderProjects = () => (
+    <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">My Projects</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-200">Projects view coming soon...</p>
+    </div>
+  );
+
+  return (
+    <div className="p-6">
+      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-300 dark:border-gray-600">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Workspace Profile</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-200 mt-1">
+            Manage your workspace profile and settings
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => navigate(`/workspace/${currentWorkspace._id}/member?autoFaceScan=1`)}
-          className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-accent text-gray-900 text-sm font-medium hover:bg-accent-hover transition-colors"
-        >
-          {t('workspace.profile.faceScan.button')}
-        </button>
+
+        {/* Tabs */}
+        <div className="border-b border-gray-300 dark:border-gray-600">
+          <nav className="flex space-x-8 px-6 overflow-x-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-accent text-accent-dark'
+                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {activeTab === 'profile' && renderProfileTab()}
+          {activeTab === 'inbox' && renderInbox()}
+          {activeTab === 'chatbot' && renderChatbot()}
+          {activeTab === 'planner' && renderPlanner()}
+          {activeTab === 'projects' && renderProjects()}
+        </div>
       </div>
     </div>
   );
 };
 
 export default WorkspaceProfile;
-

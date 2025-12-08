@@ -89,16 +89,19 @@ const SharedNavbar: React.FC = () => {
     { path: '/pricing', label: 'Pricing', icon: <BadgeDollarSign size={18} /> },
   ];
 
+  // Check if we're on auth pages (login/register)
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
   return (
     <nav className={`
       fixed top-0 left-0 right-0 z-50 
       transition-all duration-500 ease-in-out
-      ${scrolled 
+      ${scrolled || isAuthPage
         ? 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-200' 
         : 'bg-transparent py-6'
       }
     `} 
-    style={scrolled ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
+    style={(scrolled || isAuthPage) ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
 

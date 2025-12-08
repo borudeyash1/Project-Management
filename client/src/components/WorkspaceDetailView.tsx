@@ -14,6 +14,7 @@ import WorkspaceMembersTab from './workspace-detail/WorkspaceMembersTab';
 import WorkspaceClientsTab from './workspace-detail/WorkspaceClientsTab';
 import WorkspaceProjectsTab from './workspace-detail/WorkspaceProjectsTab';
 import VaultIntegration from './workspace-detail/VaultIntegration';
+import WorkspaceAttendanceTab from './workspace-detail/WorkspaceAttendanceTab';
 
 const WorkspaceDetailView: React.FC = () => {
   const { t } = useTranslation();
@@ -21,7 +22,7 @@ const WorkspaceDetailView: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
   
-  const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects' | 'documents'>('edit');
+  const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects' | 'documents' | 'attendance'>('edit');
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
   // Listen for client click events from ClientsTab
@@ -68,7 +69,8 @@ const WorkspaceDetailView: React.FC = () => {
     { id: 'members', label: t('workspace.detail.tabs.members'), icon: UserPlus },
     { id: 'clients', label: t('workspace.detail.tabs.clients'), icon: Briefcase },
     { id: 'projects', label: t('workspace.detail.tabs.projects'), icon: FolderOpen },
-    { id: 'documents', label: 'Documents', icon: Files }
+    { id: 'documents', label: 'Documents', icon: Files },
+    { id: 'attendance', label: 'Attendance', icon: Clock }
   ];
 
   return (
@@ -132,6 +134,7 @@ const WorkspaceDetailView: React.FC = () => {
             />
           )}
           {activeTab === 'documents' && <VaultIntegration workspaceId={workspace._id} />}
+          {activeTab === 'attendance' && <WorkspaceAttendanceTab workspaceId={workspace._id} />}
         </div>
       </div>
     </div>

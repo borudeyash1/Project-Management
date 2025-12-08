@@ -75,6 +75,7 @@ const WorkspaceMember: React.FC = () => {
   const [faceStatus, setFaceStatus] = useState<string | null>(null);
   const [faceSaving, setFaceSaving] = useState(false);
   const [autoScanTriggered, setAutoScanTriggered] = useState(false);
+  const [workspaceMembers, setWorkspaceMembers] = useState<any[]>([]);
 
   // Mock data - replace with actual API calls
   const projects: Project[] = [
@@ -335,6 +336,24 @@ const WorkspaceMember: React.FC = () => {
     }
   }, [location.search, autoScanTriggered, activeTab]);
 
+  // Fetch workspace members for inbox
+  useEffect(() => {
+    const fetchWorkspaceMembers = async () => {
+      if (!state.currentWorkspace) return;
+      
+      try {
+        const response = await apiService.get(`/messages/workspace/${state.currentWorkspace}/members`);
+        if (response.data.success && response.data.data) {
+          setWorkspaceMembers(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch workspace members:', error);
+      }
+    };
+
+    fetchWorkspaceMembers();
+  }, [state.currentWorkspace]);
+
   const handleCaptureFaceScan = async () => {
     setFaceStatus(null);
 
@@ -525,14 +544,14 @@ const WorkspaceMember: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Team Inbox</h3>
-          <p className="text-sm text-gray-600">Chat with your team members</p>
+          <p className="text-sm text-gray-600">Chat with your workspace members</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
             <input
               type="text"
-              placeholder="Search conversations..."
+              placeholder="Search members..."
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
           </div>
@@ -544,37 +563,33 @@ const WorkspaceMember: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Chat List */}
+        {/* Chat List - Workspace Members */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-300 rounded-lg">
             <div className="p-4 border-b border-gray-200">
-              <h4 className="font-medium text-gray-900">Recent Conversations</h4>
+              <h4 className="font-medium text-gray-900">Workspace Members</h4>
             </div>
-            <div className="divide-y divide-gray-200">
-              <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-accent-dark" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">Website Redesign Team</p>
-                    <p className="text-xs text-gray-600">Mike Chen: "Great work on the homepage!"</p>
-                  </div>
-                  <span className="text-xs text-gray-600">2m</span>
+            <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+              {workspaceMembers.length === 0 ? (
+                <div className="p-4 text-center text-gray-600">
+                  <p className="text-sm">No members found</p>
                 </div>
-              </div>
-              <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-green-600" />
+              ) : (
+                workspaceMembers.map((member) => (
+                  <div key={member._id} className="p-4 hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-accent-dark" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{member.fullName || member.name || 'Unknown'}</p>
+                        <p className="text-xs text-gray-600">{member.role || 'Member'}</p>
+                      </div>
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">Emily Davis</p>
-                    <p className="text-xs text-gray-600">"Can we discuss the API integration?"</p>
-                  </div>
-                  <span className="text-xs text-gray-600">1h</span>
-                </div>
-              </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -585,29 +600,21 @@ const WorkspaceMember: React.FC = () => {
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Users className="w-4 h-4 text-accent-dark" />
+                  <User className="w-4 h-4 text-accent-dark" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Website Redesign Team</p>
-                  <p className="text-xs text-gray-600">4 members</p>
+                  <p className="font-medium text-gray-900">Select a member to start chatting</p>
+                  <p className="text-xs text-gray-600">Click on a member from the list</p>
                 </div>
               </div>
             </div>
             
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="space-y-4">
-                <div className="flex justify-start">
-                  <div className="max-w-xs bg-gray-100 rounded-lg p-3">
-                    <p className="text-sm text-gray-900">Hey team! How's the homepage design coming along?</p>
-                    <p className="text-xs text-gray-600 mt-1">Mike Chen • 2 minutes ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end">
-                  <div className="max-w-xs bg-accent text-gray-900 rounded-lg p-3">
-                    <p className="text-sm">Great work on the homepage!</p>
-                    <p className="text-xs text-blue-700 mt-1">You • 1 minute ago</p>
-                  </div>
+            <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-gray-600">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <p className="text-sm">No conversation selected</p>
+                  <p className="text-xs mt-1">Choose a workspace member to start chatting</p>
                 </div>
               </div>
             </div>
@@ -617,9 +624,10 @@ const WorkspaceMember: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Type a message..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  disabled
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent disabled:bg-gray-100"
                 />
-                <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
+                <button disabled className="px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed">
                   Send
                 </button>
               </div>

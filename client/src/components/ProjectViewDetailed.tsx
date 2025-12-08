@@ -1930,16 +1930,22 @@ const ProjectViewDetailed: React.FC = () => {
             isProjectManager={isProjectManager}
             onAddMember={async (memberId, role) => {
               try {
+                console.log('🔄 [ADD MEMBER] Sending request:', { memberId, role, projectId: activeProject?._id });
                 const response = await apiService.post(`/projects/${activeProject?._id}/members`, { userId: memberId, role });
+                console.log('✅ [ADD MEMBER] Response received:', response.data);
+                
                 if (response.data.success) {
                   const updatedProject = response.data.data;
+                  console.log('📊 [ADD MEMBER] Updated project team members:', updatedProject.teamMembers);
+                  console.log('👤 [ADD MEMBER] Last member:', updatedProject.teamMembers[updatedProject.teamMembers.length - 1]);
+                  
                   setActiveProject(updatedProject);
                   dispatch({ type: 'UPDATE_PROJECT', payload: { projectId: activeProject?._id || '', updates: { teamMembers: updatedProject.teamMembers } } });
                   dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: `Member added with role: ${role}`, duration: 3000 } });
                 }
               } catch (error) {
-                console.error('Failed to add team member:', error);
-                console.error('Error response:', (error as any).response?.data);
+                console.error('❌ [ADD MEMBER] Failed to add team member:', error);
+                console.error('❌ [ADD MEMBER] Error response:', (error as any).response?.data);
                 dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: 'Failed to add team member.', duration: 4000 } });
               }
             }}
@@ -1963,6 +1969,45 @@ const ProjectViewDetailed: React.FC = () => {
                   updates: { projectManager: memberId }
                 }
               });
+            }}
+            onUpdateMemberRole={async (memberId, newRole) => {
+              try {
+                console.log('🔄 [UPDATE ROLE] Updating role for member:', memberId, 'to:', newRole);
+                const response = await apiService.put(`/projects/${activeProject?._id}/members/${memberId}/role`, { role: newRole });
+                console.log('✅ [UPDATE ROLE] Response:', response.data);
+                
+                if (response.data.success) {
+                  const updatedProject = response.data.data;
+                  setActiveProject(updatedProject);
+                  dispatch({ 
+                    type: 'UPDATE_PROJECT', 
+                    payload: { 
+                      projectId: activeProject?._id || '', 
+                      updates: { teamMembers: updatedProject.teamMembers } 
+                    } 
+                  });
+                  dispatch({ 
+                    type: 'ADD_TOAST', 
+                    payload: { 
+                      id: Date.now().toString(), 
+                      type: 'success', 
+                      message: `Member role updated to: ${newRole}`, 
+                      duration: 3000 
+                    } 
+                  });
+                }
+              } catch (error) {
+                console.error('❌ [UPDATE ROLE] Failed:', error);
+                dispatch({ 
+                  type: 'ADD_TOAST', 
+                  payload: { 
+                    id: Date.now().toString(), 
+                    type: 'error', 
+                    message: 'Failed to update member role.', 
+                    duration: 4000 
+                  } 
+                });
+              }
             }}
           />
         );
@@ -1994,11 +2039,23 @@ const ProjectViewDetailed: React.FC = () => {
       
       case 'attendance': {
         const isManagerView = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
+        
+        // Map teamMembers to the format expected by attendance component
+        const teamForAttendance = ((activeProject as any)?.teamMembers || []).map((tm: any) => {
+          const user = typeof tm.user === 'object' ? tm.user : { _id: tm.user, fullName: 'Unknown', email: '' };
+          return {
+            _id: user._id,
+            name: user.fullName || user.name || 'Unknown User',
+            email: user.email || '',
+            role: tm.role || 'member'
+          };
+        });
+        
         if (isManagerView) {
           return (
             <ProjectAttendanceManagerTab
               projectId={activeProject?._id || ''}
-              team={(activeProject as any)?.team || []}
+              team={teamForAttendance}
             />
           );
         }

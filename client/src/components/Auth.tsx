@@ -575,7 +575,7 @@ const Auth: React.FC = () => {
                 className={`bg-white border-gray-200 border backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl`}
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-[accent] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
                     <span className="text-3xl">📧</span>
                   </div>
                   <h3
@@ -587,11 +587,7 @@ const Auth: React.FC = () => {
                     className={`text-sm text-slate-600 mb-6`}
                   >
                     {t('auth.otp.description')}{" "}
-                    <strong
-                      className={
-                        "text-[accent]"
-                      }
-                    >
+                    <strong className="text-blue-600">
                       {loginEmail}
                     </strong>
                   </p>
@@ -606,7 +602,7 @@ const Auth: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(e.target, index)}
                       onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                      className={`w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[accent] focus:border-[accent] transition-all duration-200`}
+                      className="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200"
                       autoComplete="off"
                     />
                   ))}
@@ -616,7 +612,7 @@ const Auth: React.FC = () => {
                   type="button"
                   onClick={handleOtpVerification}
                   disabled={loading || otp.join("").length !== 6}
-                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-[accent] hover:bg-[#3b8fc0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[accent] shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
+                  className="w-full px-4 py-3.5 rounded-xl text-white text-base font-bold bg-blue-600 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] transform"
                 >
                   {loading ? t('auth.otp.verifying') : t('auth.otp.verifyButton')}
                 </button>
@@ -627,11 +623,7 @@ const Auth: React.FC = () => {
                       className={`text-sm text-slate-500 font-medium`}
                     >
                       {t('auth.otp.resendIn')}{" "}
-                      <span
-                        className={
-                          "text-[accent]"
-                        }
-                      >
+                      <span className="text-blue-600">
                         {otpTimer}{t('auth.otp.seconds')}
                       </span>
                     </p>
@@ -640,7 +632,7 @@ const Auth: React.FC = () => {
                       type="button"
                       onClick={handleResendOtp}
                       disabled={loading}
-                      className={`text-sm text-[accent] hover:text-[#3b8fc0] font-bold disabled:opacity-50 transition-colors`}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-bold disabled:opacity-50 transition-colors"
                     >
                       {t('auth.otp.resendOtp')}
                     </button>

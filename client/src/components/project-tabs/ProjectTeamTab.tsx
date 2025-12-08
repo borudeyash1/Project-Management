@@ -12,11 +12,22 @@ interface WorkspaceMember {
 }
 
 interface TeamMember {
-  _id: string;
-  name: string;
-  email: string;
+  _id?: string;
+  user: {
+    _id: string;
+    fullName?: string;
+    name?: string;
+    email: string;
+    avatarUrl?: string;
+  } | string; // Can be ObjectId string or populated object
   role: string;
-  addedAt: Date;
+  joinedAt?: Date;
+  permissions?: {
+    canEdit: boolean;
+    canDelete: boolean;
+    canManageMembers: boolean;
+    canViewReports: boolean;
+  };
 }
 
 interface ProjectTeamTabProps {
@@ -29,7 +40,9 @@ interface ProjectTeamTabProps {
   onAddMember: (memberId: string, role: string) => void;
   onRemoveMember: (memberId: string) => void;
   onChangeProjectManager: (memberId: string) => void;
+  onUpdateMemberRole?: (memberId: string, newRole: string) => void;
 }
+
 
 const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   projectId,
@@ -40,7 +53,8 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   isProjectManager,
   onAddMember,
   onRemoveMember,
-  onChangeProjectManager
+  onChangeProjectManager,
+  onUpdateMemberRole
 }) => {
   const { t } = useTranslation();
   const { state } = useApp();
@@ -51,6 +65,26 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   const [showCustomRoleInput, setShowCustomRoleInput] = useState(false);
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingRoleFor, setEditingRoleFor] = useState<string | null>(null);
+  const [newRole, setNewRole] = useState('');
+
+  // Helper function to extract user data from team member
+  const getUserData = (member: TeamMember) => {
+    if (typeof member.user === 'string') {
+      return {
+        _id: member.user,
+        name: 'Unknown User',
+        email: '',
+        avatarUrl: ''
+      };
+    }
+    return {
+      _id: member.user._id,
+      name: member.user.fullName || member.user.name || 'Unknown User',
+      email: member.user.email || '',
+      avatarUrl: member.user.avatarUrl || ''
+    };
+  };
 
   // Fetch workspace members from API
   useEffect(() => {
@@ -63,11 +97,13 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         if (response.data.success && response.data.data) {
           // Map the response to WorkspaceMember format
           const members = response.data.data.map((m: any) => ({
-            _id: m.user._id || m.user,
-            name: m.user.fullName || m.user.name || 'Unknown',
-            email: m.user.email || '',
+            _id: m._id || m.user?._id,
+            name: m.fullName || m.name || 'Unknown',
+            email: m.email || '',
             role: m.role || 'member'
           }));
+          
+          console.log('✅ [PROJECT TEAM] Loaded workspace members:', members.length);
           setWorkspaceMembers(members);
         }
       } catch (error) {
@@ -75,12 +111,15 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         // Fallback to workspace members from context if API fails
         const workspace = state.workspaces.find(w => w._id === workspaceId);
         if (workspace?.members) {
-          const contextMembers = workspace.members.map((m: any) => ({
-            _id: m.user._id || m.user,
-            name: m.user?.fullName || m.user?.name || 'Unknown',
-            email: m.user?.email || '',
-            role: m.role || 'member'
-          }));
+          const contextMembers = workspace.members
+            .filter((m: any) => m.status === 'active')
+            .map((m: any) => ({
+              _id: m.user._id || m.user,
+              name: m.user?.fullName || m.user?.name || 'Unknown',
+              email: m.user?.email || '',
+              role: m.role || 'member'
+            }));
+          console.log('⚠️ [PROJECT TEAM] Using fallback workspace members:', contextMembers.length);
           setWorkspaceMembers(contextMembers);
         }
       } finally {
@@ -93,7 +132,10 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   
   // Filter out members already in project
   const availableMembers = workspaceMembers.filter(
-    (wm) => !projectTeam.some(pt => pt._id === wm._id)
+    (wm) => !projectTeam.some(pt => {
+      const userData = getUserData(pt);
+      return userData._id === wm._id;
+    })
   );
 
   const handleAddMember = () => {
@@ -123,7 +165,10 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
     }
   };
 
-  const currentPM = projectTeam.find(m => m._id === projectManager);
+  const currentPM = projectTeam.find(m => {
+    const userData = getUserData(m);
+    return userData._id === projectManager;
+  });
 
   // Role display helper
   const getRoleDisplay = (role: string) => {
@@ -171,12 +216,12 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">{currentPM.name}</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">{getUserData(currentPM).name}</h4>
                   <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full">
                     {t('project.team.projectManager')}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{currentPM.email}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{getUserData(currentPM).email}</p>
               </div>
             </div>
           </div>
@@ -191,61 +236,122 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               <p className="text-sm mt-1">{t('project.team.noMembersSubtitle')}</p>
             </div>
           ) : (
-            projectTeam.map((member) => (
-              <div
-                key={member._id}
-                className="flex items-center justify-between p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-accent-dark dark:text-accent-light" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">{member.name}</h4>
-                      {member.role === 'project-manager' && (
-                        <Crown className="w-4 h-4 text-purple-600" />
-                      )}
+            projectTeam.map((member, index) => {
+              const userData = getUserData(member);
+              const joinedDate = member.joinedAt ? new Date(member.joinedAt) : new Date();
+              const isValidDate = !isNaN(joinedDate.getTime());
+              
+              return (
+                <div
+                  key={userData._id || index}
+                  className="flex items-center justify-between p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-accent-dark dark:text-accent-light" />
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{member.email}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {t('project.team.added', { date: new Date(member.addedAt).toLocaleDateString() })}
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">{userData.name}</h4>
+                        {member.role === 'project-manager' && (
+                          <Crown className="w-4 h-4 text-purple-600" />
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{userData.email}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {isValidDate 
+                          ? t('project.team.added', { date: joinedDate.toLocaleDateString() })
+                          : 'Recently added'
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Role Badge - Editable for workspace owners */}
+                    {isOwner && editingRoleFor === userData._id ? (
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={newRole}
+                          onChange={(e) => setNewRole(e.target.value)}
+                          className="px-3 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                          autoFocus
+                        >
+                          <option value="member">Member</option>
+                          <option value="project-manager">Project Manager</option>
+                          <option value="developer">Developer</option>
+                          <option value="designer">Designer</option>
+                          <option value="tester">Tester</option>
+                          <option value="analyst">Analyst</option>
+                          <option value="qa-engineer">QA Engineer</option>
+                          <option value="devops">DevOps</option>
+                        </select>
+                        <button
+                          onClick={() => {
+                            if (onUpdateMemberRole && newRole) {
+                              onUpdateMemberRole(userData._id, newRole);
+                              setEditingRoleFor(null);
+                              setNewRole('');
+                            }
+                          }}
+                          className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingRoleFor(null);
+                            setNewRole('');
+                          }}
+                          className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (isOwner) {
+                            setEditingRoleFor(userData._id);
+                            setNewRole(member.role);
+                          }
+                        }}
+                        disabled={!isOwner}
+                        className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          member.role === 'project-manager'
+                            ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        } ${isOwner ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+                        title={isOwner ? 'Click to edit role' : ''}
+                      >
+                        {getRoleDisplay(member.role)}
+                      </button>
+                    )}
+
+                    {(isOwner || isProjectManager) && userData._id !== projectManager && (
+                      <button
+                        onClick={() => onRemoveMember(userData._id)}
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        title={t('project.team.removeMember')}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+
+                    {isOwner && member.role !== 'project-manager' && (
+                      <button
+                        onClick={() => onChangeProjectManager(userData._id)}
+                        className="px-3 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-800"
+                        title={t('project.team.makePM')}
+                      >
+                        <Crown className="w-3 h-3 inline mr-1" />
+                        {t('project.team.makePM')}
+                      </button>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                    member.role === 'project-manager'
-                      ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}>
-                    {getRoleDisplay(member.role)}
-                  </span>
-
-                  {(isOwner || isProjectManager) && member._id !== projectManager && (
-                    <button
-                      onClick={() => onRemoveMember(member._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                      title={t('project.team.removeMember')}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-
-                  {isOwner && member.role !== 'project-manager' && (
-                    <button
-                      onClick={() => onChangeProjectManager(member._id)}
-                      className="px-3 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-800"
-                      title={t('project.team.makePM')}
-                    >
-                      <Crown className="w-3 h-3 inline mr-1" />
-                      {t('project.team.makePM')}
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

@@ -271,7 +271,7 @@ const Settings: React.FC = () => {
                   className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
                     otp.length === 6
                       ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white'
-                      : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                      : 'bg-gray-400 text-white cursor-not-allowed'
                   }`}
                 >
                   Verify & Change Password

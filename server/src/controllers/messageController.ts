@@ -86,12 +86,9 @@ export const getWorkspaceMembers: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Filter active members and exclude current user
+    // Return all active members (including current user for project management)
     const members = workspace.members
-      .filter((m: any) =>
-        m.status === 'active' &&
-        m.user._id.toString() !== currentUserId.toString()
-      )
+      .filter((m: any) => m.status === 'active')
       .map((m: any) => ({
         _id: m.user._id,
         fullName: m.user.fullName,
@@ -101,7 +98,7 @@ export const getWorkspaceMembers: RequestHandler = async (req, res) => {
         role: m.role
       }));
 
-    console.log('✅ [GET WORKSPACE MEMBERS] Found', members.length, 'members');
+    console.log('✅ [GET WORKSPACE MEMBERS] Found', members.length, 'active members');
 
     const response: ApiResponse = {
       success: true,

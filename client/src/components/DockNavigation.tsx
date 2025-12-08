@@ -75,7 +75,6 @@ const DockNavigation: React.FC = () => {
       { id: 'reminders', label: 'Reminders', translationKey: 'navigation.notifications', icon: Bell, path: '/reminders' },
       { id: 'workspace', label: 'Workspace', translationKey: 'workspace.title', icon: Building, path: '/workspace' },
       { id: 'reports', label: 'Reports', translationKey: 'navigation.reports', icon: BarChart3, path: '/reports' },
-      { id: 'team', label: 'Team', translationKey: 'navigation.team', icon: Users, path: '/team' },
       { id: 'goals', label: 'Goals', translationKey: 'dashboard.insights', icon: Target, path: '/goals' }
     ];
 
@@ -223,34 +222,6 @@ const DockNavigation: React.FC = () => {
           );
         })}
 
-        {/* Workspace Icons - Show all joined/created workspaces */}
-        {state.workspaces.slice(0, 3).map((workspace) => (
-          <DockIcon
-            key={workspace._id}
-            onClick={() => {
-              dispatch({ type: 'SET_MODE', payload: 'Workspace' });
-              dispatch({ type: 'SET_WORKSPACE', payload: workspace._id });
-              navigate(`/workspace/${workspace._id}/overview`);
-            }}
-            active={state.currentWorkspace === workspace._id}
-            tooltip={workspace.name}
-          >
-            <Building className="w-5 h-5" />
-          </DockIcon>
-        ))}
-
-        {/* More Workspaces if > 3 */}
-        {state.workspaces.length > 3 && (
-          <DockIcon
-            onClick={() => setShowWorkspaces(true)}
-            tooltip="More Workspaces"
-          >
-            <Building className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-accent text-gray-900 text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              +{state.workspaces.length - 3}
-            </span>
-          </DockIcon>
-        )}
 
         {/* Sartthi Mail */}
         <DockIcon
@@ -357,40 +328,7 @@ const DockNavigation: React.FC = () => {
               </div>
             )}
 
-            {/* Joined Workspaces */}
-            {state.workspaces.filter(w => w.owner !== state.userProfile._id).length > 0 && (
-              <div>
-                <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
-                  Joined Workspaces
-                </div>
-                <div className="space-y-2">
-                  {state.workspaces
-                    .filter(w => w.owner !== state.userProfile._id)
-                    .map((workspace) => (
-                      <button
-                        key={workspace._id}
-                        onClick={() => {
-                          dispatch({ type: 'SET_MODE', payload: 'Workspace' });
-                          dispatch({ type: 'SET_WORKSPACE', payload: workspace._id });
-                          navigate(`/workspace/${workspace._id}/overview`);
-                          setShowWorkspaces(false);
-                        }}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <Building className="w-5 h-5 text-purple-600" />
-                        <div className="flex-1 text-left">
-                          <div className="font-medium text-gray-900 dark:text-gray-100">
-                            {workspace.name}
-                          </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-200">
-                            {workspace.memberCount} members
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                </div>
-              </div>
-            )}
+
           </div>
         </div>
       )}

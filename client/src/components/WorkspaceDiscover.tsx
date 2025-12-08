@@ -62,8 +62,13 @@ const WorkspaceDiscover: React.FC = () => {
 
     const loadWorkspaces = async () => {
       try {
+        console.log('[WorkspaceDiscover] Starting to load workspaces...');
+        
         // Load discover workspaces for display
         const apiWorkspaces = await api.getDiscoverWorkspaces();
+        console.log('[WorkspaceDiscover] API returned workspaces:', apiWorkspaces);
+        console.log('[WorkspaceDiscover] Number of workspaces:', apiWorkspaces?.length || 0);
+        
         const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
           _id: ws._id,
           name: ws.name,
@@ -81,18 +86,25 @@ const WorkspaceDiscover: React.FC = () => {
           hasPendingJoinRequest: ws.hasPendingJoinRequest || false
         }));
 
+        console.log('[WorkspaceDiscover] Normalized workspaces:', normalized);
         setWorkspaces(normalized);
         setFilteredWorkspaces(normalized);
 
         // Also refresh the global workspaces state to update dock navigation
         try {
+          console.log('[WorkspaceDiscover] Refreshing user workspaces...');
           const userWorkspaces = await api.getWorkspaces();
+          console.log('[WorkspaceDiscover] User workspaces:', userWorkspaces);
           dispatch({ type: 'SET_WORKSPACES', payload: userWorkspaces });
         } catch (error) {
-          console.error('Failed to refresh user workspaces', error);
+          console.error('[WorkspaceDiscover] Failed to refresh user workspaces', error);
         }
       } catch (error) {
-        console.error('Failed to load workspaces for discovery', error);
+        console.error('[WorkspaceDiscover] Failed to load workspaces for discovery', error);
+        console.error('[WorkspaceDiscover] Error details:', {
+          message: (error as Error).message,
+          stack: (error as Error).stack
+        });
       } finally {
         setLoading(false);
       }

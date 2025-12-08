@@ -316,14 +316,6 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         } />
 
-        <Route path="/workspace/:workspaceId/member" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <WorkspaceMember />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-
         {/* Workspace Internal Routes */}
         <Route path="/workspace/:workspaceId" element={
           <ProtectedRoute>
@@ -349,14 +341,6 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <ReportsPage />
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-
-        <Route path="/team" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <TeamPage />
             </AppLayout>
           </ProtectedRoute>
         } />
