@@ -38,6 +38,7 @@ import WorkspaceCollaborate from './components/workspace/WorkspaceCollaborate';
 import WorkspaceSettings from './components/workspace/WorkspaceSettings';
 import WorkspaceInbox from './components/workspace/WorkspaceInbox';
 import WorkspaceProfile from './components/workspace/WorkspaceProfile';
+import WorkspaceAttendanceTab from './components/workspace-detail/WorkspaceAttendanceTab';
 import ProjectLayout from './components/project/ProjectLayout';
 import ProjectOverview from './components/project/ProjectOverview';
 import Profile from './components/Profile';
@@ -112,6 +113,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   return <>{children}</>;
+};
+
+// Workspace Attendance Wrapper to get workspaceId from route
+const WorkspaceAttendanceWrapper: React.FC = () => {
+  const { workspaceId } = require('react-router-dom').useParams();
+  return <WorkspaceAttendanceTab workspaceId={workspaceId || ''} />;
 };
 
 // Main App Layout Component
@@ -326,6 +333,9 @@ const AppContent: React.FC = () => {
         }>
           <Route path="overview" element={<WorkspaceOverview />} />
           <Route path="members" element={<WorkspaceMembersInternal />} />
+          <Route path="attendance" element={
+            <WorkspaceAttendanceWrapper />
+          } />
           <Route path="projects" element={<WorkspaceProjects />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />

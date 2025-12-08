@@ -83,12 +83,6 @@ const ProjectInternalNav: React.FC = () => {
       managerOnly: true
     },
     {
-      id: 'attendance',
-      label: t('project.tabs.attendance'),
-      icon: Clock,
-      path: `/project/${projectId}/attendance`,
-    },
-    {
       id: 'reports',
       label: t('project.tabs.reports'),
       icon: BarChart3,

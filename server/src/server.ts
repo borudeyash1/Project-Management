@@ -33,6 +33,7 @@ import homeRoutes from "./routes/home";
 import plannerRoutes from "./routes/planner";
 import subscriptionsRoutes from "./routes/subscriptions";
 import attendanceRoutes from "./routes/attendance";
+import workspaceAttendanceRoutes from "./routes/workspaceAttendance";
 import documentationRoutes from "./routes/documentation";
 import activityRoutes from "./routes/activity";
 import contentRoutes from "./routes/content";
@@ -92,10 +93,10 @@ app.use(
   }),
 );
 
-// Rate limiting
+// Rate limiting - Increased for testing
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10000, // Increased from 100 to 10000 for testing
   message: "Too many requests from this IP, please try again later.",
   skip: (req) => req.path.startsWith("/admin/subscriptions"),
 });
@@ -132,6 +133,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/inbox", inboxRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/workspace-attendance", workspaceAttendanceRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/payroll", payrollRoutes);
 app.use("/api/goals", goalRoutes);

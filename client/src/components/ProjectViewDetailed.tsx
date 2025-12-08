@@ -199,6 +199,7 @@ interface TeamMemberPermissions {
 const ProjectViewDetailed: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
   const { isDarkMode } = useTheme();
@@ -234,6 +235,11 @@ const ProjectViewDetailed: React.FC = () => {
   const [taskFilter, setTaskFilter] = useState<'all' | 'my' | 'overdue' | 'review'>('all');
   const [requests, setRequests] = useState<any[]>([]); // Workload/deadline requests
   const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment (loaded from backend)
+  
+  // Project Settings State
+  const [officeLatitude, setOfficeLatitude] = useState('');
+  const [officeLongitude, setOfficeLongitude] = useState('');
+  const [projectProgress, setProjectProgress] = useState(0);
 
   // Derive role from actual workspace and project membership
   const project = state.projects.find(p => p._id === projectId);
@@ -1939,9 +1945,17 @@ const ProjectViewDetailed: React.FC = () => {
                   console.log('📊 [ADD MEMBER] Updated project team members:', updatedProject.teamMembers);
                   console.log('👤 [ADD MEMBER] Last member:', updatedProject.teamMembers[updatedProject.teamMembers.length - 1]);
                   
-                  setActiveProject(updatedProject);
-                  dispatch({ type: 'UPDATE_PROJECT', payload: { projectId: activeProject?._id || '', updates: { teamMembers: updatedProject.teamMembers } } });
-                  dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: `Member added with role: ${role}`, duration: 3000 } });
+                  // Force immediate refresh by creating new object with new array reference
+                  const refreshedProject = {
+                    ...updatedProject,
+                    teamMembers: [...updatedProject.teamMembers] // New array reference forces React re-render
+                  };
+                  
+                  setActiveProject(refreshedProject);
+                  dispatch({ type: 'UPDATE_PROJECT', payload: { projectId: activeProject?._id || '', updates: { teamMembers: refreshedProject.teamMembers } } });
+                  dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: `Member added successfully!`, duration: 3000 } });
+                  
+                  console.log('🔄 [ADD MEMBER] State updated, refreshing UI with', refreshedProject.teamMembers.length, 'members');
                 }
               } catch (error) {
                 console.error('❌ [ADD MEMBER] Failed to add team member:', error);
@@ -1949,16 +1963,78 @@ const ProjectViewDetailed: React.FC = () => {
                 dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'error', message: 'Failed to add team member.', duration: 4000 } });
               }
             }}
-            onRemoveMember={(memberId) => {
-              // Remove member from project team
-              const updatedTeam = ((activeProject as any)?.teamMembers || []).filter((m: any) => m._id !== memberId);
-              dispatch({
-                type: 'UPDATE_PROJECT',
-                payload: {
-                  projectId: activeProject?._id || '',
-                  updates: { teamMembers: updatedTeam }
+            onRemoveMember={async (memberId) => {
+              try {
+                console.log('🗑️ [REMOVE MEMBER] Removing member:', memberId, 'from project:', activeProject?._id);
+                console.log('🗑️ [REMOVE MEMBER] Current user ID:', state.userProfile._id);
+                
+                // Call API to remove member from database
+                const response = await apiService.delete(`/projects/${activeProject?._id}/members/${memberId}`);
+                console.log('✅ [REMOVE MEMBER] Response:', response.data);
+                
+                if (response.data.success) {
+                  // Check if removed user is current user
+                  if (memberId === state.userProfile._id) {
+                    console.log('⚠️ [REMOVE MEMBER] Current user was removed from project, redirecting...');
+                    dispatch({ 
+                      type: 'ADD_TOAST', 
+                      payload: { 
+                        id: Date.now().toString(), 
+                        type: 'info', 
+                        message: 'You have been removed from this project', 
+                        duration: 4000 
+                      } 
+                    });
+                    
+                    // Clear active project
+                    setActiveProject(null);
+                    
+                    // Redirect to workspace
+                    navigate('/workspace');
+                    return;
+                  }
+                  
+                  const updatedProject = response.data.data;
+                  
+                  // Force immediate refresh with new object reference
+                  const refreshedProject = {
+                    ...updatedProject,
+                    teamMembers: [...updatedProject.teamMembers]
+                  };
+                  
+                  setActiveProject(refreshedProject);
+                  dispatch({
+                    type: 'UPDATE_PROJECT',
+                    payload: {
+                      projectId: activeProject?._id || '',
+                      updates: { teamMembers: refreshedProject.teamMembers }
+                    }
+                  });
+                  dispatch({ 
+                    type: 'ADD_TOAST', 
+                    payload: { 
+                      id: Date.now().toString(), 
+                      type: 'success', 
+                      message: 'Member removed successfully', 
+                      duration: 3000 
+                    } 
+                  });
+                  
+                  console.log('🔄 [REMOVE MEMBER] State updated, team now has', refreshedProject.teamMembers.length, 'members');
                 }
-              });
+              } catch (error) {
+                console.error('❌ [REMOVE MEMBER] Failed:', error);
+                console.error('❌ [REMOVE MEMBER] Error details:', (error as any).response?.data);
+                dispatch({ 
+                  type: 'ADD_TOAST', 
+                  payload: { 
+                    id: Date.now().toString(), 
+                    type: 'error', 
+                    message: 'Failed to remove team member', 
+                    duration: 4000 
+                  } 
+                });
+              }
             }}
             onChangeProjectManager={(memberId) => {
               // Change project manager
@@ -1972,18 +2048,35 @@ const ProjectViewDetailed: React.FC = () => {
             }}
             onUpdateMemberRole={async (memberId, newRole) => {
               try {
-                console.log('🔄 [UPDATE ROLE] Updating role for member:', memberId, 'to:', newRole);
+                console.log('🔄 [UPDATE ROLE] Starting role update...');
+                console.log('🔄 [UPDATE ROLE] Member ID:', memberId);
+                console.log('🔄 [UPDATE ROLE] New Role:', newRole);
+                console.log('🔄 [UPDATE ROLE] Project ID:', activeProject?._id);
+                console.log('🔄 [UPDATE ROLE] API URL:', `/projects/${activeProject?._id}/members/${memberId}/role`);
+                console.log('🔄 [UPDATE ROLE] Request body:', { role: newRole });
+                
                 const response = await apiService.put(`/projects/${activeProject?._id}/members/${memberId}/role`, { role: newRole });
-                console.log('✅ [UPDATE ROLE] Response:', response.data);
+                console.log('✅ [UPDATE ROLE] Response received:', response.data);
+                console.log('✅ [UPDATE ROLE] Response success:', response.data.success);
+                console.log('✅ [UPDATE ROLE] Updated project:', response.data.data);
                 
                 if (response.data.success) {
                   const updatedProject = response.data.data;
-                  setActiveProject(updatedProject);
+                  console.log('✅ [UPDATE ROLE] Team members count:', updatedProject.teamMembers?.length);
+                  
+                  // Force immediate refresh with new object reference
+                  const refreshedProject = {
+                    ...updatedProject,
+                    teamMembers: [...updatedProject.teamMembers]
+                  };
+                  
+                  console.log('🔄 [UPDATE ROLE] Setting active project with refreshed data');
+                  setActiveProject(refreshedProject);
                   dispatch({ 
                     type: 'UPDATE_PROJECT', 
                     payload: { 
                       projectId: activeProject?._id || '', 
-                      updates: { teamMembers: updatedProject.teamMembers } 
+                      updates: { teamMembers: refreshedProject.teamMembers } 
                     } 
                   });
                   dispatch({ 
@@ -1995,9 +2088,13 @@ const ProjectViewDetailed: React.FC = () => {
                       duration: 3000 
                     } 
                   });
+                  
+                  console.log('🔄 [UPDATE ROLE] State updated, UI should refresh now');
                 }
               } catch (error) {
                 console.error('❌ [UPDATE ROLE] Failed:', error);
+                console.error('❌ [UPDATE ROLE] Error response:', (error as any).response?.data);
+                console.error('❌ [UPDATE ROLE] Error status:', (error as any).response?.status);
                 dispatch({ 
                   type: 'ADD_TOAST', 
                   payload: { 
@@ -2099,32 +2196,133 @@ const ProjectViewDetailed: React.FC = () => {
       case 'settings':
         return (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
-              <Settings className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Settings</h3>
-              <p className="text-gray-600">Project configuration and management settings coming soon!</p>
+            {/* Project Status */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Status</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Manually adjust the project completion status
+              </p>
+              
+              <div className="space-y-4">
+                {/* Progress Slider */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Completion Progress
+                    </label>
+                    <span className="text-lg font-bold text-accent">
+                      {projectProgress}%
+                    </span>
+                  </div>
+                  
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={projectProgress}
+                    onChange={(e) => setProjectProgress(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-accent"
+                    style={{
+                      background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${projectProgress}%, #e5e7eb ${projectProgress}%, #e5e7eb 100%)`
+                    }}
+                  />
+                  
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <span>0%</span>
+                    <span>25%</span>
+                    <span>50%</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+                
+                {/* Status Indicator */}
+                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className={`w-3 h-3 rounded-full ${
+                    projectProgress === 0 ? 'bg-gray-400' :
+                    projectProgress < 25 ? 'bg-red-500' :
+                    projectProgress < 50 ? 'bg-orange-500' :
+                    projectProgress < 75 ? 'bg-yellow-500' :
+                    projectProgress < 100 ? 'bg-blue-500' :
+                    'bg-green-500'
+                  }`} />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {projectProgress === 0 ? 'Not Started' :
+                     projectProgress < 25 ? 'Just Started' :
+                     projectProgress < 50 ? 'In Progress' :
+                     projectProgress < 75 ? 'More Than Half' :
+                     projectProgress < 100 ? 'Almost Complete' :
+                     'Completed'}
+                  </span>
+                </div>
+                
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('💾 [SAVE PROGRESS] Saving project progress:', projectProgress);
+                      console.log('💾 [SAVE PROGRESS] Project ID:', activeProject?._id);
+                      
+                      const response = await apiService.put(`/projects/${activeProject?._id}`, {
+                        progress: projectProgress
+                      });
+                      
+                      console.log('✅ [SAVE PROGRESS] Response:', response.data);
+                      
+                      dispatch({
+                        type: 'ADD_TOAST',
+                        payload: {
+                          id: Date.now().toString(),
+                          type: 'success',
+                          message: 'Project progress updated successfully',
+                          duration: 3000
+                        }
+                      });
+                    } catch (error) {
+                      console.error('❌ [SAVE PROGRESS] Failed:', error);
+                      console.error('❌ [SAVE PROGRESS] Error details:', (error as any).response?.data);
+                      dispatch({
+                        type: 'ADD_TOAST',
+                        payload: {
+                          id: Date.now().toString(),
+                          type: 'error',
+                          message: 'Failed to update project progress',
+                          duration: 3000
+                        }
+                      });
+                    }
+                  }}
+                  className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover font-medium"
+                >
+                  Save Progress
+                </button>
+              </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-300 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Attendance Office Location</h3>
-              <p className="text-sm text-gray-600 mb-4">
+            {/* Attendance Office Location */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Attendance Office Location</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Set your primary office location. This will be used as a reference for automatic attendance
                 verification for this project.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Latitude</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    value={officeLatitude}
+                    onChange={(e) => setOfficeLatitude(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg text-sm"
                     placeholder="e.g. 28.6139"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Longitude</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    value={officeLongitude}
+                    onChange={(e) => setOfficeLongitude(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg text-sm"
                     placeholder="e.g. 77.2090"
                   />
                 </div>
@@ -2132,33 +2330,177 @@ const ProjectViewDetailed: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
+                      console.log('📍 [LOCATION] Requesting location permission...');
+                      
                       if (!navigator.geolocation) {
-                        alert('Geolocation is not supported by this browser.');
+                        console.error('❌ [LOCATION] Geolocation not supported');
+                        dispatch({
+                          type: 'ADD_TOAST',
+                          payload: {
+                            id: Date.now().toString(),
+                            type: 'error',
+                            message: 'Geolocation is not supported by this browser',
+                            duration: 3000
+                          }
+                        });
                         return;
                       }
+                      
+                      dispatch({
+                        type: 'ADD_TOAST',
+                        payload: {
+                          id: Date.now().toString(),
+                          type: 'info',
+                          message: 'Requesting location permission...',
+                          duration: 2000
+                        }
+                      });
+                      
+                      // Request with high accuracy and timeout
                       navigator.geolocation.getCurrentPosition(
                         (pos) => {
-                          const latInput = document.querySelector<HTMLInputElement>('input[placeholder="e.g. 28.6139"]');
-                          const lngInput = document.querySelector<HTMLInputElement>('input[placeholder="e.g. 77.2090"]');
-                          if (latInput && lngInput) {
-                            latInput.value = String(pos.coords.latitude.toFixed(6));
-                            lngInput.value = String(pos.coords.longitude.toFixed(6));
-                          }
+                          console.log('✅ [LOCATION] Location detected:', pos.coords);
+                          const lat = pos.coords.latitude.toFixed(6);
+                          const lng = pos.coords.longitude.toFixed(6);
+                          
+                          setOfficeLatitude(lat);
+                          setOfficeLongitude(lng);
+                          
+                          console.log('✅ [LOCATION] Set latitude:', lat, 'longitude:', lng);
+                          
+                          dispatch({
+                            type: 'ADD_TOAST',
+                            payload: {
+                              id: Date.now().toString(),
+                              type: 'success',
+                              message: 'Location detected successfully',
+                              duration: 3000
+                            }
+                          });
                         },
-                        () => {
-                          alert('Unable to detect current location. Please allow location permission.');
+                        (error) => {
+                          console.error('❌ [LOCATION] Error:', error);
+                          console.error('❌ [LOCATION] Error code:', error.code);
+                          console.error('❌ [LOCATION] Error message:', error.message);
+                          
+                          let errorMessage = 'Unable to detect location. ';
+                          
+                          switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                              errorMessage += 'Please allow location permission in your browser settings.';
+                              break;
+                            case error.POSITION_UNAVAILABLE:
+                              errorMessage += 'Location information is unavailable.';
+                              break;
+                            case error.TIMEOUT:
+                              errorMessage += 'Location request timed out.';
+                              break;
+                            default:
+                              errorMessage += 'An unknown error occurred.';
+                          }
+                          
+                          dispatch({
+                            type: 'ADD_TOAST',
+                            payload: {
+                              id: Date.now().toString(),
+                              type: 'error',
+                              message: errorMessage,
+                              duration: 5000
+                            }
+                          });
+                        },
+                        {
+                          enableHighAccuracy: true,
+                          timeout: 10000,
+                          maximumAge: 0
                         }
                       );
                     }}
-                    className="w-full px-3 py-2 bg-accent text-gray-900 rounded-lg text-sm hover:bg-accent-hover"
+                    className="w-full px-3 py-2 bg-accent text-gray-900 rounded-lg text-sm hover:bg-accent-hover font-medium"
                   >
-                    Use My Current Location
+                    📍 Use My Current Location
                   </button>
-                  <p className="text-xs text-gray-600">
-                    (UI only for now) We can later connect this to backend attendance configuration.
-                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!officeLatitude || !officeLongitude) {
+                        dispatch({
+                          type: 'ADD_TOAST',
+                          payload: {
+                            id: Date.now().toString(),
+                            type: 'error',
+                            message: 'Please enter both latitude and longitude',
+                            duration: 3000
+                          }
+                        });
+                        return;
+                      }
+                      
+                      try {
+                        console.log('💾 [SAVE LOCATION] Saving office location...');
+                        console.log('💾 [SAVE LOCATION] Latitude:', officeLatitude);
+                        console.log('💾 [SAVE LOCATION] Longitude:', officeLongitude);
+                        console.log('💾 [SAVE LOCATION] Project ID:', activeProject?._id);
+                        
+                        const locationData = {
+                          officeLocation: {
+                            latitude: parseFloat(officeLatitude),
+                            longitude: parseFloat(officeLongitude)
+                          }
+                        };
+                        
+                        console.log('💾 [SAVE LOCATION] Request data:', locationData);
+                        
+                        const response = await apiService.put(`/projects/${activeProject?._id}`, locationData);
+                        
+                        console.log('✅ [SAVE LOCATION] Response:', response.data);
+                        
+                        dispatch({
+                          type: 'ADD_TOAST',
+                          payload: {
+                            id: Date.now().toString(),
+                            type: 'success',
+                            message: 'Office location saved successfully',
+                            duration: 3000
+                          }
+                        });
+                      } catch (error) {
+                        console.error('❌ [SAVE LOCATION] Failed:', error);
+                        console.error('❌ [SAVE LOCATION] Error details:', (error as any).response?.data);
+                        console.error('❌ [SAVE LOCATION] Error status:', (error as any).response?.status);
+                        dispatch({
+                          type: 'ADD_TOAST',
+                          payload: {
+                            id: Date.now().toString(),
+                            type: 'error',
+                            message: 'Failed to save office location',
+                            duration: 3000
+                          }
+                        });
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 font-medium"
+                  >
+                    💾 Save Location
+                  </button>
                 </div>
               </div>
+              
+              {officeLatitude && officeLongitude && (
+                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-sm text-blue-800 dark:text-blue-300">
+                    <strong>Current Location:</strong> {officeLatitude}, {officeLongitude}
+                  </p>
+                  <a
+                    href={`https://www.google.com/maps?q=${officeLatitude},${officeLongitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block"
+                  >
+                    🗺️ View on Google Maps
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         );

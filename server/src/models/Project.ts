@@ -38,8 +38,9 @@ const projectSchema = new Schema<IProject>({
     },
     role: {
       type: String,
-      enum: ['owner', 'manager', 'member', 'viewer'],
       default: 'member'
+      // Removed enum to allow custom roles
+      // Common roles: owner, manager, project-manager, member, viewer, developer, designer, tester, analyst, qa-engineer, devops
     },
     permissions: {
       canEdit: {
@@ -134,6 +135,14 @@ const projectSchema = new Schema<IProject>({
     enableFileSharing: {
       type: Boolean,
       default: true
+    }
+  },
+  officeLocation: {
+    latitude: {
+      type: Number
+    },
+    longitude: {
+      type: Number
     }
   },
   isActive: {

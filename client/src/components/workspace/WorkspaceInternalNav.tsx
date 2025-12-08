@@ -9,7 +9,8 @@ import {
   MessageSquare,
   UserPlus,
   Briefcase,
-  UserCircle
+  UserCircle,
+  Calendar
 } from 'lucide-react';
 
 interface WorkspaceTab {
@@ -43,6 +44,12 @@ const WorkspaceInternalNav: React.FC = () => {
       label: t('workspace.tabs.members'),
       icon: Users,
       path: `/workspace/${activeWorkspaceId}/members`
+    },
+    {
+      id: 'attendance',
+      label: 'Attendance',
+      icon: Calendar,
+      path: `/workspace/${activeWorkspaceId}/attendance`
     },
     {
       id: 'projects',

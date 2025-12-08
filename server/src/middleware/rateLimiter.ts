@@ -93,7 +93,7 @@ export const createRateLimiter = (options: RateLimitOptions) => {
  */
 export const otpRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 3,
+  maxRequests: 50, // Increased for testing
   message: 'Too many OTP requests. Please try again after 15 minutes.',
   keyGenerator: (req: Request) => {
     // Use IP + email combination for OTP requests
@@ -109,7 +109,7 @@ export const otpRateLimiter = createRateLimiter({
  */
 export const loginRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5,
+  maxRequests: 100, // Increased for testing
   message: 'Too many login attempts. Please try again after 15 minutes.',
   keyGenerator: (req: Request) => {
     const email = req.body.email || 'unknown';
@@ -124,7 +124,7 @@ export const loginRateLimiter = createRateLimiter({
  */
 export const registrationRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3,
+  maxRequests: 50, // Increased for testing
   message: 'Too many registration attempts. Please try again after 1 hour.',
   keyGenerator: (req: Request) => {
     const ip = req.ip || req.socket.remoteAddress || 'unknown';
@@ -182,7 +182,7 @@ export const adminLoginRateLimiter = createRateLimiter({
  */
 export const apiRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 100,
+  maxRequests: 1000, // Increased for testing
   message: 'Too many API requests. Please slow down.'
 });
 

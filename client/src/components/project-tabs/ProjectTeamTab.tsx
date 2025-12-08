@@ -67,6 +67,31 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   const [loading, setLoading] = useState(false);
   const [editingRoleFor, setEditingRoleFor] = useState<string | null>(null);
   const [newRole, setNewRole] = useState('');
+  const [editCustomRole, setEditCustomRole] = useState('');
+  const [showEditCustomRoleInput, setShowEditCustomRoleInput] = useState(false);
+
+  // Check if current user is the workspace owner
+  const isWorkspaceOwner = React.useMemo(() => {
+    console.log('🔍 [WORKSPACE OWNER CHECK]', {
+      currentWorkspace: state.currentWorkspace,
+      userProfile: state.userProfile,
+      isOwnerProp: isOwner
+    });
+    
+    if (!state.currentWorkspace || typeof state.currentWorkspace === 'string') {
+      console.log('⚠️ [WORKSPACE OWNER] No workspace or workspace is string');
+      return isOwner; // Fallback to isOwner prop
+    }
+    
+    const workspace = state.currentWorkspace as any;
+    const ownerId = typeof workspace.owner === 'string' 
+      ? workspace.owner 
+      : workspace.owner?._id;
+    
+    const result = ownerId === state.userProfile._id;
+    console.log('✅ [WORKSPACE OWNER] Result:', result, 'ownerId:', ownerId, 'userId:', state.userProfile._id);
+    return result;
+  }, [state.currentWorkspace, state.userProfile, isOwner]);
 
   // Helper function to extract user data from team member
   const getUserData = (member: TeamMember) => {
@@ -180,9 +205,22 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
       'tester': 'Tester',
       'analyst': 'Analyst',
       'qa-engineer': 'QA Engineer',
-      'devops': 'DevOps'
+      'devops': 'DevOps',
+      'owner': 'Owner',
+      'manager': 'Manager',
+      'viewer': 'Viewer'
     };
-    return roleMap[role] || role;
+    
+    // Return mapped role or capitalize custom role
+    if (roleMap[role]) {
+      return roleMap[role];
+    }
+    
+    // Capitalize custom role (e.g., "technical-lead" -> "Technical Lead")
+    return role
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   return (
@@ -269,66 +307,108 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
 
                   <div className="flex items-center gap-2">
                     {/* Role Badge - Editable for workspace owners */}
-                    {isOwner && editingRoleFor === userData._id ? (
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={newRole}
-                          onChange={(e) => setNewRole(e.target.value)}
-                          className="px-3 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                          autoFocus
-                        >
-                          <option value="member">Member</option>
-                          <option value="project-manager">Project Manager</option>
-                          <option value="developer">Developer</option>
-                          <option value="designer">Designer</option>
-                          <option value="tester">Tester</option>
-                          <option value="analyst">Analyst</option>
-                          <option value="qa-engineer">QA Engineer</option>
-                          <option value="devops">DevOps</option>
-                        </select>
-                        <button
-                          onClick={() => {
-                            if (onUpdateMemberRole && newRole) {
-                              onUpdateMemberRole(userData._id, newRole);
-                              setEditingRoleFor(null);
-                              setNewRole('');
-                            }
-                          }}
+                    {isWorkspaceOwner && editingRoleFor === userData._id && member.role !== 'owner' ? (
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={newRole}
+                            onChange={(e) => {
+                              setNewRole(e.target.value);
+                              setShowEditCustomRoleInput(e.target.value === 'custom');
+                              if (e.target.value !== 'custom') {
+                                setEditCustomRole('');
+                              }
+                            }}
+                            className="px-3 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                            autoFocus
+                          >
+                            <option value="member">Member</option>
+                            <option value="project-manager">Project Manager</option>
+                            <option value="developer">Developer</option>
+                            <option value="designer">Designer</option>
+                            <option value="tester">Tester</option>
+                            <option value="analyst">Analyst</option>
+                            <option value="qa-engineer">QA Engineer</option>
+                            <option value="devops">DevOps</option>
+                            <option value="custom">Custom Role</option>
+                          </select>
+                          <button
+                            onClick={() => {
+                              if (onUpdateMemberRole) {
+                                const finalRole = newRole === 'custom' ? editCustomRole.trim() : newRole;
+                                if (!finalRole) {
+                                  alert('Please enter a role name');
+                                  return;
+                                }
+                                onUpdateMemberRole(userData._id, finalRole);
+                                setEditingRoleFor(null);
+                                setNewRole('');
+                                setEditCustomRole('');
+                                setShowEditCustomRoleInput(false);
+                              }
+                            }}
                           className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
                         >
                           Save
                         </button>
-                        <button
-                          onClick={() => {
-                            setEditingRoleFor(null);
-                            setNewRole('');
-                          }}
-                          className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
-                        >
+                          <button
+                            onClick={() => {
+                              setEditingRoleFor(null);
+                              setNewRole('');
+                              setEditCustomRole('');
+                              setShowEditCustomRoleInput(false);
+                            }}
+                            className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
+                          >
                           Cancel
-                        </button>
+                          </button>
+                        </div>
+                        {showEditCustomRoleInput && (
+                          <input
+                            type="text"
+                            value={editCustomRole}
+                            onChange={(e) => setEditCustomRole(e.target.value)}
+                            placeholder="Enter custom role (e.g., Technical Lead)"
+                            className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                          />
+                        )}
                       </div>
                     ) : (
                       <button
                         onClick={() => {
-                          if (isOwner) {
+                          if (isWorkspaceOwner && member.role !== 'owner') {
                             setEditingRoleFor(userData._id);
                             setNewRole(member.role);
+                            setEditCustomRole('');
+                            setShowEditCustomRoleInput(false);
                           }
                         }}
-                        disabled={!isOwner}
-                        className={`px-3 py-1 text-xs font-medium rounded-full ${
+                        disabled={!isWorkspaceOwner || member.role === 'owner'}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border-2 transition-all ${
                           member.role === 'project-manager'
-                            ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        } ${isOwner ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
-                        title={isOwner ? 'Click to edit role' : ''}
+                            ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                            : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                        } ${isWorkspaceOwner && member.role !== 'owner' ? 'cursor-pointer hover:shadow-md hover:scale-105 hover:border-accent' : 'cursor-default opacity-60'}`}
+                        title={member.role === 'owner' ? '🔒 Owner role cannot be changed' : (isWorkspaceOwner ? '✏️ Click to edit role' : '')}
                       >
-                        {getRoleDisplay(member.role)}
+                        <span className="flex items-center gap-1">
+                          {getRoleDisplay(member.role)}
+                          {isWorkspaceOwner && member.role !== 'owner' && (
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          )}
+                          {member.role === 'owner' && (
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          )}
+                        </span>
                       </button>
                     )}
 
-                    {(isOwner || isProjectManager) && userData._id !== projectManager && (
+                    {/* Delete button - Only visible to workspace owner */}
+                    {isWorkspaceOwner && userData._id !== projectManager && (
                       <button
                         onClick={() => onRemoveMember(userData._id)}
                         className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
@@ -358,8 +438,8 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
 
       {/* Add Member Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('project.team.modal.title')}</h3>
               <button
@@ -388,6 +468,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                   <select
                     value={selectedMemberId}
                     onChange={(e) => setSelectedMemberId(e.target.value)}
+                    size={Math.min(availableMembers.length + 1, 8)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent"
                   >
                     <option value="">{t('project.team.modal.chooseMember')}</option>

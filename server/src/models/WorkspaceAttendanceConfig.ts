@@ -2,6 +2,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IWorkspaceAttendanceConfig extends Document {
   workspace: string;
+  attendanceSlots?: Array<{
+    name: string;
+    time: string; // HH:MM format
+    windowMinutes: number; // Time window before/after
+    isActive: boolean;
+  }>;
   location?: {
     lat: number;
     lng: number;
@@ -39,6 +45,29 @@ const workspaceAttendanceConfigSchema = new Schema<IWorkspaceAttendanceConfig>({
     ref: 'Workspace',
     index: true,
   },
+  attendanceSlots: [
+    {
+      name: {
+        type: String,
+        required: true
+      },
+      time: {
+        type: String,
+        required: true,
+        match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+      },
+      windowMinutes: {
+        type: Number,
+        default: 30,
+        min: 0,
+        max: 120
+      },
+      isActive: {
+        type: Boolean,
+        default: true
+      }
+    }
+  ],
   location: {
     lat: { type: Number },
     lng: { type: Number },

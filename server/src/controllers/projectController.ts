@@ -77,6 +77,60 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       }
     }
 
+    // Extract projectManager and teamMembers from request body
+    const { projectManager, teamMembers: initialTeamMembers } = req.body;
+    console.log('📋 Creating project with:', { projectManager, initialTeamMembers });
+
+    // Build team members array
+    const teamMembersArray: any[] = [{
+      user: user._id,
+      role: 'owner',
+      permissions: {
+        canEdit: true,
+        canDelete: true,
+        canManageMembers: true,
+        canViewReports: true
+      }
+    }];
+
+    // Add project manager if specified and different from owner
+    if (projectManager && projectManager !== user._id.toString()) {
+      console.log('➕ Adding project manager:', projectManager);
+      teamMembersArray.push({
+        user: projectManager,
+        role: 'manager',
+        permissions: {
+          canEdit: true,
+          canDelete: false,
+          canManageMembers: true,
+          canViewReports: true
+        }
+      });
+    }
+
+    // Add any additional team members
+    if (initialTeamMembers && Array.isArray(initialTeamMembers)) {
+      console.log('➕ Adding initial team members:', initialTeamMembers.length);
+      initialTeamMembers.forEach((member: any) => {
+        const memberId = typeof member === 'string' ? member : member.user;
+        // Don't add duplicates (owner or manager)
+        if (memberId !== user._id.toString() && memberId !== projectManager) {
+          teamMembersArray.push({
+            user: memberId,
+            role: (typeof member === 'object' && member.role) ? member.role : 'member',
+            permissions: (typeof member === 'object' && member.permissions) ? member.permissions : {
+              canEdit: false,
+              canDelete: false,
+              canManageMembers: false,
+              canViewReports: true
+            }
+          });
+        }
+      });
+    }
+
+    console.log('👥 Final team members array:', teamMembersArray.length, 'members');
+
     // Create project
     const project = new Project({
       name,
@@ -84,16 +138,7 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       workspace: resolvedWorkspaceId || null,
       tier: tier || plan,
       createdBy: user._id,
-      teamMembers: [{
-        user: user._id,
-        role: 'owner',
-        permissions: {
-          canEdit: true,
-          canDelete: true,
-          canManageMembers: true,
-          canViewReports: true
-        }
-      }],
+      teamMembers: teamMembersArray,
       startDate: startDate ? new Date(startDate) : undefined,
       dueDate: dueDate ? new Date(dueDate) : undefined,
       priority: priority || 'medium',
@@ -726,12 +771,28 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
       return;
     }
 
+    console.log('🔍 [UPDATE MEMBER ROLE] Searching for member in teamMembers array...');
+    console.log('🔍 [UPDATE MEMBER ROLE] Team members count:', (project as any).teamMembers?.length);
+    console.log('🔍 [UPDATE MEMBER ROLE] Looking for memberId:', memberId);
+    
     // Find and update member role
-    const member = ((project as any).teamMembers || []).find((member: any) =>
-      member.user.toString() === memberId
-    );
+    const member = ((project as any).teamMembers || []).find((member: any) => {
+      const memberUserId = member.user.toString();
+      console.log('🔍 [UPDATE MEMBER ROLE] Checking member.user:', memberUserId, 'against:', memberId);
+      return memberUserId === memberId;
+    });
+    
+    console.log('🔍 [UPDATE MEMBER ROLE] Member found:', member ? 'YES' : 'NO');
+    if (member) {
+      console.log('🔍 [UPDATE MEMBER ROLE] Current role:', member.role);
+      console.log('🔍 [UPDATE MEMBER ROLE] New role:', role);
+    }
     
     if (!member) {
+      console.error('❌ [UPDATE MEMBER ROLE] Member not found in project');
+      console.error('❌ [UPDATE MEMBER ROLE] Available member IDs:', 
+        ((project as any).teamMembers || []).map((m: any) => m.user.toString())
+      );
       res.status(404).json({
         success: false,
         message: 'Member not found in project'
@@ -798,6 +859,9 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
 
     member.role = role;
     member.permissions = permissions;
+    
+    // Mark the teamMembers array as modified so Mongoose saves it
+    (project as any).markModified('teamMembers');
     
     await project.save();
 

@@ -402,6 +402,10 @@ export interface IProject extends Document {
       deadlineAlerts: boolean;
     };
   };
+  officeLocation?: {
+    latitude?: number;
+    longitude?: number;
+  };
   isActive: boolean;
   teamMemberCount: number;
   completedTasksCount: number;
