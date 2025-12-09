@@ -144,28 +144,31 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       dueDate,
       estimatedHours,
       progress,
+      subtasks,
     } = req.body;
 
-    if (!title || !projectId) {
-      res.status(400).json({ success: false, message: 'Title and project are required' });
+    // Only title is required now - project and workspace are optional
+    if (!title) {
+      res.status(400).json({ success: false, message: 'Title is required' });
       return;
     }
 
-    const project = await Project.findById(projectId);
-    if (!project) {
-      res.status(404).json({ success: false, message: 'Project not found' });
-      return;
+    // Validate project if provided
+    let project = null;
+    if (projectId) {
+      project = await Project.findById(projectId);
+      if (!project) {
+        res.status(404).json({ success: false, message: 'Project not found' });
+        return;
+      }
     }
 
     const backendStatus = mapFrontendStatusToBackend(status) || 'todo';
     const backendPriority = mapFrontendPriorityToBackend(priority) || 'medium';
 
-    const task = new Task({
+    const taskData: any = {
       title,
       description,
-      project: project._id,
-      workspace: workspaceId || project.workspace || null,
-      assignee: assignee || undefined,
       reporter: authUser._id,
       status: backendStatus,
       priority: backendPriority,
@@ -175,7 +178,16 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       dueDate: dueDate ? new Date(dueDate) : undefined,
       estimatedHours,
       progress: typeof progress === 'number' ? progress : 0,
-    });
+    };
+
+    // Add optional fields
+    if (projectId) taskData.project = projectId;
+    if (workspaceId) taskData.workspace = workspaceId;
+    else if (project) taskData.workspace = project.workspace;
+    if (assignee) taskData.assignee = assignee;
+    if (subtasks && Array.isArray(subtasks)) taskData.subtasks = subtasks;
+
+    const task = new Task(taskData);
 
     await task.save();
 

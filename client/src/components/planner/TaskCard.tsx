@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, User, MessageSquare, Paperclip, Flag, CheckCircle } from 'lucide-react';
 import { Task } from '../../context/PlannerContext';
+import { getCompletedSubtasksCount, getTotalSubtasksCount, getTaskTags, getTaskComments, getTaskAttachments, getTaskAssignees } from '../../utils/taskHelpers';
 
 interface TaskCardProps {
   task: Task;
@@ -22,8 +23,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
   };
 
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
-  const completedSubtasks = task.subtasks.filter(st => st.completed).length;
-  const totalSubtasks = task.subtasks.length;
+  const completedSubtasks = getCompletedSubtasksCount(task);
+  const totalSubtasks = getTotalSubtasksCount(task);
+  const tags = getTaskTags(task);
+  const comments = getTaskComments(task);
+  const attachments = getTaskAttachments(task);
+  const assignees = getTaskAssignees(task);
 
   return (
     <div
@@ -39,9 +44,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
       )}
 
       {/* Tags */}
-      {task.tags.length > 0 && (
+      {tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
-          {task.tags.slice(0, 3).map(tag => (
+          {tags.slice(0, 3).map(tag => (
             <span key={tag} className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded">
               {tag}
             </span>
@@ -74,30 +79,30 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
               {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
-          {task.comments.length > 0 && (
+          {comments.length > 0 && (
             <span className="flex items-center gap-1">
               <MessageSquare className="w-3 h-3" />
-              {task.comments.length}
+              {comments.length}
             </span>
           )}
-          {task.attachments.length > 0 && (
+          {attachments.length > 0 && (
             <span className="flex items-center gap-1">
               <Paperclip className="w-3 h-3" />
-              {task.attachments.length}
+              {attachments.length}
             </span>
           )}
         </div>
         
         {/* Assignees */}
-        {task.assignees.length > 0 && (
+        {assignees.length > 0 && (
           <div className="flex -space-x-2">
-            {task.assignees.slice(0, 3).map((assignee, idx) => (
+            {assignees.slice(0, 3).map((assignee: any, idx: number) => (
               <div
-                key={assignee}
+                key={idx}
                 className="w-6 h-6 rounded-full bg-accent border-2 border-white dark:border-gray-600 flex items-center justify-center text-gray-900 text-xs font-medium"
                 title={assignee}
               >
-                {assignee[0].toUpperCase()}
+                {typeof assignee === 'string' ? assignee[0].toUpperCase() : 'U'}
               </div>
             ))}
           </div>

@@ -23,10 +23,12 @@ export interface IReminder extends Document {
   createdBy: mongoose.Types.ObjectId;
   assignedTo?: mongoose.Types.ObjectId;
   project?: mongoose.Types.ObjectId;
+  workspace?: mongoose.Types.ObjectId;
   tags: string[];
   recurring?: IRecurring;
   notifications: INotification[];
   expiresAt?: Date;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -109,6 +111,10 @@ const reminderSchema = new Schema<IReminder>({
     type: Schema.Types.ObjectId,
     ref: 'Project'
   },
+  workspace: {
+    type: Schema.Types.ObjectId,
+    ref: 'Workspace'
+  },
   tags: [{
     type: String,
     trim: true
@@ -118,6 +124,10 @@ const reminderSchema = new Schema<IReminder>({
   expiresAt: {
     type: Date,
     default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true

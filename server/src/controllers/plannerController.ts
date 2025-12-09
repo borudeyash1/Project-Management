@@ -335,3 +335,262 @@ export const updateParticipation = async (req: AuthenticatedRequest, res: Respon
     res.status(500).json({ success: false, message: 'Failed to update participation' });
   }
 };
+
+// Import models for tasks, reminders, and milestones
+import Task from '../models/Task';
+import { Reminder } from '../models/Reminder';
+import Milestone from '../models/Milestone';
+
+// Get all planner data (tasks, reminders, milestones, events)
+export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!._id;
+    const { workspaceId, startDate, endDate } = req.query;
+
+    const dateFilter: any = {};
+    if (startDate && endDate) {
+      dateFilter.$gte = new Date(startDate as string);
+      dateFilter.$lte = new Date(endDate as string);
+    }
+
+    // Base query
+    const baseQuery: any = {};
+    if (workspaceId) {
+      baseQuery.workspace = workspaceId;
+    }
+
+    // Fetch tasks
+    const taskQuery: any = { ...baseQuery, isActive: true };
+    if (Object.keys(dateFilter).length > 0) {
+      taskQuery.$or = [
+        { startDate: dateFilter },
+        { dueDate: dateFilter }
+      ];
+    }
+
+    const tasks = await Task.find(taskQuery)
+      .populate('assignee', 'fullName email avatarUrl')
+      .populate('reporter', 'fullName email avatarUrl')
+      .populate('project', 'name')
+      .sort({ dueDate: 1 });
+
+    // Fetch reminders
+    const reminderQuery: any = { ...baseQuery, isActive: true };
+    if (Object.keys(dateFilter).length > 0) {
+      reminderQuery.dueDate = dateFilter;
+    }
+
+    const reminders = await Reminder.find(reminderQuery)
+      .populate('assignedTo', 'fullName email avatarUrl')
+      .populate('createdBy', 'fullName email avatarUrl')
+      .sort({ dueDate: 1 });
+
+    // Fetch milestones
+    const milestoneQuery: any = { ...baseQuery, isActive: true };
+    if (Object.keys(dateFilter).length > 0) {
+      milestoneQuery.dueDate = dateFilter;
+    }
+
+    const milestones = await Milestone.find(milestoneQuery)
+      .populate('createdBy', 'fullName email avatarUrl')
+      .populate('project', 'name')
+      .populate('tasks', 'title status progress')
+      .sort({ dueDate: 1 });
+
+    // Fetch events
+    const eventQuery: any = {
+      $or: [
+        { createdBy: userId },
+        { 'participants.user': userId }
+      ]
+    };
+    if (Object.keys(dateFilter).length > 0) {
+      eventQuery.start = dateFilter;
+    }
+
+    const events = await PlannerEvent.find(eventQuery)
+      .populate('participants.user', 'fullName email avatarUrl')
+      .sort({ start: 1 });
+
+    res.json({
+      success: true,
+      data: {
+        tasks,
+        reminders,
+        milestones,
+        events
+      }
+    });
+  } catch (error) {
+    console.error('[Planner] Failed to fetch all data:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch planner data' });
+  }
+};
+
+// Get calendar view data
+export const getCalendarViewData = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!._id;
+    const { workspaceId, month, year } = req.query;
+
+    const startDate = new Date(Number(year), Number(month) - 1, 1);
+    const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59);
+
+    const baseQuery: any = { isActive: true };
+    if (workspaceId) {
+      baseQuery.workspace = workspaceId;
+    }
+
+    // Fetch all data types
+    const [tasks, reminders, milestones, events] = await Promise.all([
+      Task.find({
+        ...baseQuery,
+        $or: [
+          { startDate: { $gte: startDate, $lte: endDate } },
+          { dueDate: { $gte: startDate, $lte: endDate } }
+        ]
+      })
+        .populate('assignee', 'fullName email avatarUrl')
+        .populate('project', 'name')
+        .select('title status priority dueDate startDate project assignee'),
+
+      Reminder.find({
+        ...baseQuery,
+        dueDate: { $gte: startDate, $lte: endDate }
+      })
+        .populate('assignedTo', 'fullName email avatarUrl')
+        .select('title dueDate priority assignedTo'),
+
+      Milestone.find({
+        ...baseQuery,
+        dueDate: { $gte: startDate, $lte: endDate }
+      })
+        .populate('project', 'name')
+        .select('title status dueDate progress project'),
+
+      PlannerEvent.find({
+        $or: [
+          { createdBy: userId },
+          { 'participants.user': userId }
+        ],
+        start: { $gte: startDate, $lte: endDate }
+      })
+        .populate('participants.user', 'fullName email avatarUrl')
+        .select('title start end allDay color')
+    ]);
+
+    // Format for calendar
+    const calendarEvents = [
+      ...tasks.map(task => ({
+        id: task._id,
+        type: 'task',
+        title: task.title,
+        start: task.startDate,
+        end: task.dueDate,
+        status: task.status,
+        priority: task.priority,
+        project: task.project,
+        assignee: task.assignee
+      })),
+      ...reminders.map(reminder => ({
+        id: reminder._id,
+        type: 'reminder',
+        title: reminder.title,
+        start: reminder.dueDate,
+        end: reminder.dueDate,
+        priority: reminder.priority,
+        assignee: reminder.assignedTo
+      })),
+      ...milestones.map(milestone => ({
+        id: milestone._id,
+        type: 'milestone',
+        title: milestone.title,
+        start: milestone.dueDate,
+        end: milestone.dueDate,
+        status: milestone.status,
+        progress: milestone.progress,
+        project: milestone.project
+      })),
+      ...events.map(event => ({
+        id: event._id,
+        type: 'event',
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        allDay: event.allDay,
+        color: event.color
+      }))
+    ];
+
+    res.json({ success: true, data: calendarEvents });
+  } catch (error) {
+    console.error('[Planner] Failed to fetch calendar data:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch calendar data' });
+  }
+};
+
+// Get timeline view data
+export const getTimelineViewData = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { workspaceId, projectId } = req.query;
+
+    const query: any = { isActive: true };
+    if (workspaceId) query.workspace = workspaceId;
+    if (projectId) query.project = projectId;
+
+    const milestones = await Milestone.find(query)
+      .populate('project', 'name')
+      .populate({
+        path: 'tasks',
+        populate: { path: 'assignee', select: 'fullName email avatarUrl' }
+      })
+      .sort({ startDate: 1, dueDate: 1 });
+
+    const milestoneTaskIds = milestones.flatMap(m => m.tasks.map((t: any) => t._id));
+    const standaloneTasks = await Task.find({
+      ...query,
+      _id: { $nin: milestoneTaskIds }
+    })
+      .populate('assignee', 'fullName email avatarUrl')
+      .populate('project', 'name')
+      .sort({ startDate: 1, dueDate: 1 });
+
+    res.json({
+      success: true,
+      data: { milestones, standaloneTasks }
+    });
+  } catch (error) {
+    console.error('[Planner] Failed to fetch timeline data:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch timeline data' });
+  }
+};
+
+// Get kanban view data
+export const getKanbanViewData = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { workspaceId, projectId } = req.query;
+
+    const query: any = { isActive: true };
+    if (workspaceId) query.workspace = workspaceId;
+    if (projectId) query.project = projectId;
+
+    const tasks = await Task.find(query)
+      .populate('assignee', 'fullName email avatarUrl')
+      .populate('reporter', 'fullName email avatarUrl')
+      .populate('project', 'name')
+      .sort({ createdAt: -1 });
+
+    const kanbanData = {
+      todo: tasks.filter(t => t.status === 'todo'),
+      'in-progress': tasks.filter(t => t.status === 'in-progress'),
+      'in-review': tasks.filter(t => t.status === 'in-review'),
+      done: tasks.filter(t => t.status === 'done'),
+      cancelled: tasks.filter(t => t.status === 'cancelled')
+    };
+
+    res.json({ success: true, data: kanbanData });
+  } catch (error) {
+    console.error('[Planner] Failed to fetch kanban data:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch kanban data' });
+  }
+};

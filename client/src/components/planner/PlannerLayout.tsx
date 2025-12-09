@@ -13,7 +13,7 @@ import MyWorkView from './views/MyWorkView';
 import QuickAddDrawer from './QuickAddDrawer';
 import CommandPalette from './CommandPalette';
 import NotificationCenter from './NotificationCenter';
-import TaskCreateModal from './TaskCreateModal';
+import QuickAddModal from './QuickAddModal';
 
 type ViewType = 'board' | 'list' | 'timeline' | 'calendar' | 'mywork';
 
@@ -181,11 +181,10 @@ const PlannerLayout: React.FC = () => {
       {showCommandPalette && <CommandPalette onClose={() => setShowCommandPalette(false)} />}
       {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} />}
       {showTaskCreate && (
-        <TaskCreateModal 
+        <QuickAddModal 
           onClose={handleCloseTaskCreate}
           defaultDate={taskCreateDefaults.date}
           defaultTime={taskCreateDefaults.time}
-          defaultStatus={taskCreateDefaults.status}
         />
       )}
     </div>

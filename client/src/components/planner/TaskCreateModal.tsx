@@ -106,10 +106,9 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       estimatedTime: formData.estimatedTime,
       assignees: formData.assignees,
       tags: formData.tags,
-      recurrence: formData.recurrence !== 'none' ? formData.recurrence : undefined,
-      clientVisible: formData.clientVisible,
-      project: formData.project || undefined,
-      milestone: formData.milestone || undefined
+      subtasks: [],
+      comments: [],
+      attachments: []
     });
     
     onClose();

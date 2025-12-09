@@ -40,9 +40,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
     if (newComment.trim()) {
       addComment(task._id, {
         author: 'Current User',
-        content: newComment,
-        mentions: [],
-        attachments: []
+        content: newComment
       });
       setNewComment('');
     }
@@ -146,12 +144,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   {t('planner.taskDetail.subtasks')} ({task.subtasks.filter(st => st.completed).length}/{task.subtasks.length})
                 </label>
                 <div className="space-y-2">
-                  {task.subtasks.map(subtask => (
-                    <div key={subtask._id} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                  {task.subtasks.map((subtask, idx) => (
+                    <div key={subtask._id || idx} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                       <input
                         type="checkbox"
                         checked={subtask.completed}
-                        onChange={() => toggleSubtask(task._id, subtask._id)}
+                        onChange={() => subtask._id && toggleSubtask(task._id, subtask._id)}
                         className="w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent"
                       />
                       <span className={`flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white'}`}>

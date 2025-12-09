@@ -18,12 +18,12 @@ const taskSchema: Schema<any> = new Schema<any>(
     project: {
       type: Schema.Types.ObjectId,
       ref: "Project",
-      required: true,
+      required: false,
     },
     workspace: {
       type: Schema.Types.ObjectId,
       ref: "Workspace",
-      required: true,
+      required: false,
     },
     assignee: {
       type: Schema.Types.ObjectId,

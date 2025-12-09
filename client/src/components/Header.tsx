@@ -87,9 +87,6 @@ const Header: React.FC = () => {
   return (
     <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-50">
       <div className="flex items-center gap-3">
-        {/* Theme Toggle */}
-        <AnimatedThemeToggler />
-        
         <button
           className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 md:hidden"
           onClick={toggleSidebar}
@@ -238,68 +235,57 @@ const Header: React.FC = () => {
                 </div>
               </div>
 
-              <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-3">
+              <div className="px-4 py-3">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
                   {t('settings.theme')}
                 </p>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => applyTheme('light')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all h-24 ${
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
                       preferences.theme === 'light'
-                        ? 'bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
-                    <Sun className="w-5 h-5 mb-2" />
-                    <span className="text-xs font-semibold mb-1">Light</span>
-                    <span className="text-[10px] opacity-70 leading-tight">Bright and clear</span>
+                    {preferences.theme === 'light' && (
+                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
+                    )}
+                    <Sun className="w-4 h-4 mb-1.5 relative z-10" />
+                    <span className="text-[11px] font-semibold relative z-10">Light</span>
+                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Bright</span>
                   </button>
                   <button
                     onClick={() => applyTheme('dark')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all h-24 ${
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
                       preferences.theme === 'dark'
-                        ? 'bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
-                    <Moon className="w-5 h-5 mb-2" />
-                    <span className="text-xs font-semibold mb-1">Dark</span>
-                    <span className="text-[10px] opacity-70 leading-tight">Easy on the eyes</span>
+                    {preferences.theme === 'dark' && (
+                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
+                    )}
+                    <Moon className="w-4 h-4 mb-1.5 relative z-10" />
+                    <span className="text-[11px] font-semibold relative z-10">Dark</span>
+                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Easy</span>
                   </button>
                   <button
                     onClick={() => applyTheme('system')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all h-24 ${
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
                       preferences.theme === 'system'
-                        ? 'bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
-                    <Monitor className="w-5 h-5 mb-2" />
-                    <span className="text-xs font-semibold mb-1">System</span>
-                    <span className="text-[10px] opacity-70 leading-tight">Matches device</span>
+                    {preferences.theme === 'system' && (
+                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
+                    )}
+                    <Monitor className="w-4 h-4 mb-1.5 relative z-10" />
+                    <span className="text-[11px] font-semibold relative z-10">System</span>
+                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Auto</span>
                   </button>
                 </div>
-              </div>
-
-              <div className="p-4 mt-2 border-t border-border dark:border-gray-600 flex gap-3">
-                <button
-                  onClick={() => {
-                    navigate('/home');
-                    setIsUserMenuOpen(false);
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
-                >
-                  <Home className="w-4 h-4" />
-                  Main App
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors text-sm font-medium"
-                >
-                  <LogOut className="w-4 h-4" />
-                  {t('buttons.logOut')}
-                </button>
               </div>
             </div>
           )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronDown, ChevronUp, Edit2, Trash2, CheckSquare, Square,
   User, Calendar, Flag, Tag, MoreVertical, Filter, Download, Plus
@@ -6,6 +6,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
+import apiService from '../../../services/api';
 
 interface ListViewProps {
   searchQuery: string;
@@ -16,8 +17,39 @@ type SortDirection = 'asc' | 'desc';
 type GroupBy = 'none' | 'status' | 'priority' | 'assignee' | 'project';
 
 const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
-  const { tasks, updateTask, deleteTask, bulkUpdateTasks } = usePlanner();
+  const { updateTask, deleteTask, bulkUpdateTasks } = usePlanner();
   const { t } = useTranslation();
+  
+  // Fetch data directly
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const timestamp = new Date().getTime();
+        const response = await apiService.get(`/planner/data?_t=${timestamp}`);
+        if (response.data && response.data.success) {
+          const normalizedTasks = (response.data.data.tasks || []).map((task: any) => ({
+            ...task,
+            subtasks: task.subtasks || [],
+            tags: task.tags || [],
+            comments: task.comments || [],
+            attachments: task.attachments || [],
+            assignees: task.assignee ? [task.assignee] : [],
+            estimatedTime: task.estimatedHours || task.estimatedTime || 0
+          }));
+          setTasks(normalizedTasks);
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTasks();
+  }, []);
+  
   const [sortField, setSortField] = useState<SortField>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [groupBy, setGroupBy] = useState<GroupBy>('none');
