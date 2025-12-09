@@ -204,7 +204,7 @@ const DockNavigation: React.FC = () => {
                     className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
                     <span className="w-2 h-2 rounded-full bg-yellow-300 border border-yellow-400"></span>
-                    Sticky Note
+                    {t('notes.stickyNote')}
                   </button>
                   <button
                     onClick={(e) => {
@@ -214,7 +214,7 @@ const DockNavigation: React.FC = () => {
                     className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
                     <FileText size={14} />
-                    All Notes
+                    {t('notes.allNotes')}
                   </button>
                 </div>
               )}

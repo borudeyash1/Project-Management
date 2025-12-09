@@ -35,10 +35,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
       draggable={draggable}
       onDragStart={onDragStart}
       onClick={onClick}
-      className={`bg-white dark:bg-gray-700 rounded-lg border-l-4 ${getPriorityColor(task.priority)} p-3 cursor-pointer hover:shadow-md transition-shadow`}
+      className={`bg-white dark:bg-gray-700 rounded-lg border-l-4 ${getPriorityColor(task.priority)} p-3 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500`}
     >
       <h4 className="font-medium text-gray-900 dark:text-white mb-2">{task.title}</h4>
-      
+
       {task.description && !compact && (
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">{task.description}</p>
       )}
@@ -92,7 +92,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
             </span>
           )}
         </div>
-        
+
         {/* Assignees */}
         {assignees.length > 0 && (
           <div className="flex -space-x-2">
@@ -100,9 +100,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
               <div
                 key={idx}
                 className="w-6 h-6 rounded-full bg-accent border-2 border-white dark:border-gray-600 flex items-center justify-center text-gray-900 text-xs font-medium"
-                title={assignee}
+                title={typeof assignee === 'object' ? (assignee.fullName || assignee.username) : assignee}
               >
-                {typeof assignee === 'string' ? assignee[0].toUpperCase() : 'U'}
+                {typeof assignee === 'string' ? assignee[0].toUpperCase() : (assignee.fullName || assignee.username || 'U')[0].toUpperCase()}
               </div>
             ))}
           </div>

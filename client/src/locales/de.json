@@ -75,7 +75,8 @@
     "fri": "Fr",
     "sat": "Sa",
     "progress": "Fortschritt",
-    "critical": "Kritisch"
+    "critical": "Kritisch",
+    "complete": "Complete"
   },
   "navigation": {
     "home": "Startseite",
@@ -91,7 +92,12 @@
     "help": "Hilfe",
     "docs": "Dokumentation",
     "support": "Support",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "sartthiMail": "Sartthi Mail",
+    "sartthiCalendar": "Sartthi Calendar",
+    "sartthiVault": "Sartthi Vault",
+    "notes": "Notes",
+    "profile": "Profile"
   },
   "switcher": {
     "workspaces": "Workspaces",
@@ -176,7 +182,8 @@
     "viewFullReport": "Vollständigen Bericht anzeigen"
   },
   "descriptions": {
-    "projects": "Verwaltung und Verfolgung von Projekten"
+    "projects": "Verwaltung und Verfolgung von Projekten",
+    "profile": "Manage your personal profile and account settings"
   },
   "sort": {
     "nameAsc": "Name (aufsteigend)",
@@ -222,7 +229,12 @@
     "due": "Due {{date}}",
     "planning": "Planning",
     "createProject": "Create Project",
-    "loadError": "Failed to load projects"
+    "loadError": "Failed to load projects",
+    "enterProjectName": "Enter project name",
+    "describeProject": "Describe your project",
+    "estimatedBudget": "Estimated Budget",
+    "currency": "Currency",
+    "addTag": "Add Tag"
   },
   "tasks": {
     "title": "Aufgaben",
@@ -356,6 +368,25 @@
       "design": "Design",
       "qa": "QA",
       "general": "Allgemein"
+    },
+    "sections": {
+      "description": "Description",
+      "subtasks": "Subtasks",
+      "attachments": "Attachments",
+      "tags": "Tags",
+      "comments": "Comments",
+      "activity": "Activity",
+      "milestones": "Milestones"
+    },
+    "actions": {
+      "editTask": "Edit Task",
+      "duplicateTask": "Duplicate Task",
+      "deleteTask": "Delete Task",
+      "addComment": "Add Comment",
+      "assignTask": "Assign Task",
+      "setDueDate": "Set Due Date",
+      "setPriority": "Set Priority",
+      "addSubtask": "Add Subtask"
     }
   },
   "settings": {
@@ -1044,7 +1075,13 @@
     "socialMedia": "Soziale Medien",
     "linkedin": "LinkedIn",
     "twitter": "Twitter",
-    "github": "GitHub"
+    "github": "GitHub",
+    "memberSince": "Member Since",
+    "nonEditable": "This field cannot be edited",
+    "changePassword": "Change Password",
+    "visibility": "Profile Visibility",
+    "showEmail": "Show Email",
+    "showPhone": "Show Phone"
   },
   "workspace": {
     "tabs": {
@@ -2277,7 +2314,10 @@
     "enterValue": "Wert eingeben",
     "searchPlaceholder": "Suchen...",
     "selectDate": "Datum auswählen",
-    "selectTime": "Zeit auswählen"
+    "selectTime": "Zeit auswählen",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password"
   },
   "buttons": {
     "save": "Speichern",
@@ -2799,5 +2839,71 @@
     "noGoalsYet": "Noch keine Ziele",
     "noMatchingGoals": "Keine passenden Ziele",
     "tryDifferentFilters": "Passen Sie Ihre Filter an, um mehr Ziele zu sehen"
+  },
+  "notes": {
+    "title": "Notes",
+    "subtitle": "Capture and organize your thoughts",
+    "newNote": "New Note",
+    "searchPlaceholder": "Search notes...",
+    "allNotes": "All Notes",
+    "stickyNote": "Sticky Note",
+    "favorites": "Favorites",
+    "recent": "Recent",
+    "archived": "Archived",
+    "tags": "Tags",
+    "noNotes": "No notes yet",
+    "noNotesDesc": "Create your first note to get started",
+    "createNote": "Create Note",
+    "editNote": "Edit Note",
+    "deleteNote": "Delete Note",
+    "archiveNote": "Archive Note",
+    "favoriteNote": "Add to Favorites",
+    "unfavoriteNote": "Remove from Favorites",
+    "noteTitle": "Note Title",
+    "noteTitlePlaceholder": "Enter note title",
+    "noteContent": "Content",
+    "noteContentPlaceholder": "Start typing your note...",
+    "addTag": "Add Tag",
+    "tagPlaceholder": "Enter tag name",
+    "lastEdited": "Last edited {{date}}",
+    "createdOn": "Created on {{date}}",
+    "wordCount": "{{count}} words",
+    "characterCount": "{{count}} characters",
+    "saveNote": "Save Note",
+    "discardChanges": "Discard Changes",
+    "unsavedChanges": "You have unsaved changes",
+    "deleteConfirm": "Are you sure you want to delete this note?",
+    "archiveConfirm": "Are you sure you want to archive this note?",
+    "noteDeleted": "Note deleted successfully",
+    "noteArchived": "Note archived successfully",
+    "noteSaved": "Note saved successfully",
+    "noteCreated": "Note created successfully",
+    "noteUpdated": "Note updated successfully"
+  },
+  "connectedAccounts": {
+    "title": "Connected Accounts",
+    "subtitle": "Manage your connected Google services. You can disconnect and reconnect at any time.",
+    "sartthiMail": "Sartthi Mail",
+    "sartthiMailDesc": "Gmail integration for email management",
+    "sartthiCalendar": "Sartthi Calendar",
+    "sartthiCalendarDesc": "Google Calendar integration",
+    "sartthiVault": "Sartthi Vault",
+    "sartthiVaultDesc": "Secure file storage with Google Drive",
+    "email": "Email",
+    "notAvailable": "Not available",
+    "connectedOn": "Connected on {{date}}",
+    "disconnect": "Disconnect",
+    "connect": "Connect",
+    "privacyTitle": "Privacy",
+    "privacyMessage": "We only access files in your \"Sartthi Vault\" folder. Your personal files remain private.",
+    "aboutTitle": "About Connected Accounts",
+    "aboutPoint1": "You can disconnect and reconnect accounts at any time",
+    "aboutPoint2": "Disconnecting will remove access but won't delete your data",
+    "aboutPoint3": "Your data remains in your Google account",
+    "aboutPoint4": "You can connect a different Google account after disconnecting",
+    "disconnectConfirm": "Are you sure you want to disconnect this account?",
+    "disconnectSuccess": "Account disconnected successfully",
+    "connectSuccess": "Account connected successfully",
+    "connectionError": "Failed to connect account. Please try again."
   }
 }

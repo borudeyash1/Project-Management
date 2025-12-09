@@ -314,10 +314,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                 <div className="flex flex-wrap gap-2">
                   {task.assignees.map(assignee => (
                     <span
-                      key={assignee}
+                      key={typeof assignee === 'object' ? assignee._id : assignee}
                       className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded-lg"
                     >
-                      {assignee}
+                      {typeof assignee === 'object' ? (assignee.fullName || assignee.username || assignee.email || 'Unknown') : assignee}
                     </span>
                   ))}
                   {task.assignees.length === 0 && (

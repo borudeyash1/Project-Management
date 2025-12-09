@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Plus, MoreVertical, Filter, Search, SortAsc, Settings, 
+import {
+  Plus, MoreVertical, Filter, Search, SortAsc, Settings,
   MessageSquare, Paperclip, CheckSquare, Clock, AlertCircle,
   User, Tag, Calendar, Flag, Eye, Edit, Trash2, Copy,
   ChevronDown, ChevronUp, X, Check, Save, RefreshCw,
@@ -126,8 +126,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   useEffect(() => {
     const completedTasks = tasks.filter(task => task.isCompleted && task.completedAt);
     if (completedTasks.length > 0) {
-      const latestCompleted = completedTasks.reduce((latest, task) => 
-        task.completedAt! > latest ? task.completedAt! : latest, 
+      const latestCompleted = completedTasks.reduce((latest, task) =>
+        task.completedAt! > latest ? task.completedAt! : latest,
         completedTasks[0].completedAt!
       );
       setLastCompletedDate(latestCompleted);
@@ -139,7 +139,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     let filtered = tasks;
 
     if (searchQuery) {
-      filtered = filtered.filter(task => 
+      filtered = filtered.filter(task =>
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -150,7 +150,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     }
 
     if (filterLabel !== 'all') {
-      filtered = filtered.filter(task => 
+      filtered = filtered.filter(task =>
         task.labels.some(label => label._id === filterLabel)
       );
     }
@@ -161,7 +161,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   // Get tasks for a specific column
   const getTasksForColumn = (columnId: string) => {
     const filteredTasks = getFilteredTasks().filter(task => task.status === columnId);
-    
+
     // Sort tasks
     return filteredTasks.sort((a, b) => {
       switch (sortBy) {
@@ -192,17 +192,24 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   const handleDragOver = (e: React.DragEvent, columnId: string) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent bubbling
     setDraggedOverColumn(columnId);
   };
 
-  const handleDragLeave = () => {
-    setDraggedOverColumn(null);
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation(); // Prevent bubbling
+    // Only clear if leaving the column container, not child elements
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    const currentTarget = e.currentTarget as HTMLElement;
+    if (!currentTarget.contains(relatedTarget)) {
+      setDraggedOverColumn(null);
+    }
   };
 
   const handleDrop = (e: React.DragEvent, columnId: string) => {
     e.preventDefault();
     if (draggedTask && draggedTask.status !== columnId) {
-      onTaskUpdate(draggedTask._id, { 
+      onTaskUpdate(draggedTask._id, {
         status: columnId,
         updatedAt: new Date()
       });
@@ -236,14 +243,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       actualHours: 0,
       isCompleted: false
     };
-    
+
     onTaskCreate(newTask);
   };
 
   // Get unique assignees for filter
   const getUniqueAssignees = () => {
     const assignees = tasks.map(task => task.assignee);
-    return assignees.filter((assignee, index, self) => 
+    return assignees.filter((assignee, index, self) =>
       index === self.findIndex(a => a._id === assignee._id)
     );
   };
@@ -251,16 +258,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   // Get unique labels for filter
   const getUniqueLabels = () => {
     const allLabels = tasks.flatMap(task => task.labels);
-    return allLabels.filter((label, index, self) => 
+    return allLabels.filter((label, index, self) =>
       index === self.findIndex(l => l._id === label._id)
     );
   };
 
   // Format date for display
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -305,13 +312,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">{t('tasks.setStatus')}</span>
               <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
-            
+
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
                 {getUniqueAssignees().slice(0, 3).map(assignee => (
@@ -330,12 +337,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 )}
               </div>
             </div>
-            
+
             <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <Share2 className="w-4 h-4" />
               {t('common.share')}
             </button>
-            
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
               <input
@@ -346,7 +353,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent w-64"
               />
             </div>
-            
+
             <button className="p-2 hover:bg-gray-100 rounded-lg">
               <HelpCircle className="w-5 h-5 text-gray-600" />
             </button>
@@ -360,7 +367,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               <span className="text-sm text-gray-600">{t('tasks.allTasks')}</span>
               <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
-            
+
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -368,7 +375,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               <Filter className="w-4 h-4" />
               {t('common.filter')}
             </button>
-            
+
             <div className="flex items-center gap-2">
               <SortAsc className="w-4 h-4 text-gray-600" />
               <select
@@ -382,12 +389,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 <option value="priority">{t('tasks.priority')}</option>
               </select>
             </div>
-            
+
             <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <Settings className="w-4 h-4" />
               {t('tasks.rules')}
             </button>
-            
+
             <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <BarChart3 className="w-4 h-4" />
               {t('tasks.fields')}
@@ -412,7 +419,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.labels')}</label>
                 <select
@@ -437,13 +444,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           {columns.map((column) => {
             const columnTasks = getTasksForColumn(column._id);
             const isOverLimit = column.taskLimit && columnTasks.length >= column.taskLimit;
-            
+
             return (
               <div
                 key={column._id}
-                className={`flex-shrink-0 w-80 bg-white rounded-lg border border-gray-300 ${
-                  draggedOverColumn === column._id ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                }`}
+                className={`flex-shrink-0 w-80 bg-white rounded-lg border border-gray-300 ${draggedOverColumn === column._id ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                  }`}
                 onDragOver={(e) => handleDragOver(e, column._id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, column._id)}
@@ -458,7 +464,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         {column.taskLimit && `/${column.taskLimit}`}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCreateTask(column._id)}
@@ -474,7 +480,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       </button>
                     </div>
                   </div>
-                  
+
                   {isOverLimit && (
                     <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
                       Task limit reached
@@ -487,7 +493,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <div className="absolute z-10 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                     <div className="py-1">
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      {t('common.edit')} {t('tasks.status')}
+                        {t('common.edit')} {t('tasks.status')}
                       </button>
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         {t('tasks.setStatus')}
@@ -495,7 +501,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         {t('common.archive')}
                       </button>
-                      <button 
+                      <button
                         onClick={() => onColumnDelete(column._id)}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                       >
@@ -565,7 +571,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           >
                             {task.assignee.initials || task.assignee.name.charAt(0)}
                           </div>
-                          
+
                           {/* Task Counts */}
                           <div className="flex items-center gap-2 text-xs text-gray-600">
                             {task.comments.length > 0 && (
@@ -591,11 +597,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
                         {/* Due Date */}
                         {task.dueDate && (
-                          <div className={`text-xs px-2 py-1 rounded ${
-                            new Date(task.dueDate) < new Date() && !task.isCompleted
+                          <div className={`text-xs px-2 py-1 rounded ${new Date(task.dueDate) < new Date() && !task.isCompleted
                               ? 'bg-red-200 text-red-800'
                               : 'bg-gray-100 text-gray-600'
-                          }`}>
+                            }`}>
                             {formatDate(task.dueDate)}
                           </div>
                         )}
@@ -665,8 +670,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-2">{t('tasks.priority')}</label>
                   <select
                     value={selectedTask.priority}
-                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
-                      priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' 
+                    onChange={(e) => onTaskUpdate(selectedTask._id, {
+                      priority: e.target.value as 'low' | 'medium' | 'high' | 'critical'
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
@@ -700,8 +705,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <input
                     type="date"
                     value={selectedTask.dueDate ? selectedTask.dueDate.toISOString().split('T')[0] : ''}
-                    onChange={(e) => onTaskUpdate(selectedTask._id, { 
-                      dueDate: e.target.value ? new Date(e.target.value) : undefined 
+                    onChange={(e) => onTaskUpdate(selectedTask._id, {
+                      dueDate: e.target.value ? new Date(e.target.value) : undefined
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />

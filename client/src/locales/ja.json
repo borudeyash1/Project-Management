@@ -75,7 +75,8 @@
         "fri": "金",
         "sat": "土",
         "progress": "進捗",
-        "critical": "重大"
+        "critical": "重大",
+        "complete": "完了"
     },
     "navigation": {
         "home": "ホーム",
@@ -94,7 +95,9 @@
         "feedback": "フィードバック",
         "sartthiMail": "Sartthi Mail",
         "sartthiCalendar": "Sartthi Calendar",
-        "sartthiVault": "Sartthi Vault"
+        "sartthiVault": "Sartthi Vault",
+        "notes": "ノート",
+        "profile": "プロフィール"
     },
     "switcher": {
         "workspaces": "ワークスペース",
@@ -179,7 +182,8 @@
         "viewFullReport": "完全なレポートを表示"
     },
     "descriptions": {
-        "projects": "プロジェクトの管理と追跡"
+        "projects": "プロジェクトの管理と追跡",
+        "profile": "個人プロフィールとアカウント設定を管理"
     },
     "sort": {
         "nameAsc": "名前 (昇順)",
@@ -225,7 +229,12 @@
         "due": "期限: {{date}}",
         "planning": "計画中",
         "createProject": "プロジェクトを作成",
-        "loadError": "プロジェクトの読み込みに失敗しました"
+        "loadError": "プロジェクトの読み込みに失敗しました",
+        "enterProjectName": "プロジェクト名を入力",
+        "describeProject": "プロジェクトを説明してください",
+        "estimatedBudget": "予算",
+        "currency": "通貨",
+        "addTag": "タグを追加"
     },
     "tasks": {
         "title": "タスク",
@@ -360,6 +369,25 @@
             "design": "デザイン",
             "qa": "QA",
             "general": "一般"
+        },
+        "sections": {
+            "description": "説明",
+            "subtasks": "サブタスク",
+            "attachments": "添付ファイル",
+            "tags": "タグ",
+            "comments": "コメント",
+            "activity": "アクティビティ",
+            "milestones": "マイルストーン"
+        },
+        "actions": {
+            "editTask": "タスクを編集",
+            "duplicateTask": "タスクを複製",
+            "deleteTask": "タスクを削除",
+            "addComment": "コメントを追加",
+            "assignTask": "タスクを割り当て",
+            "setDueDate": "期限を設定",
+            "setPriority": "優先度を設定",
+            "addSubtask": "サブタスクを追加"
         }
     },
     "settings": {
@@ -1048,7 +1076,13 @@
         "socialMedia": "ソーシャルメディア",
         "linkedin": "LinkedIn",
         "twitter": "Twitter",
-        "github": "GitHub"
+        "github": "GitHub",
+        "memberSince": "メンバー登録日",
+        "nonEditable": "このフィールドは編集できません",
+        "changePassword": "パスワードを変更",
+        "visibility": "プロフィールの公開設定",
+        "showEmail": "メールアドレスを表示",
+        "showPhone": "電話番号を表示"
     },
     "workspace": {
         "tabs": {
@@ -2281,7 +2315,10 @@
         "enterValue": "値を入力",
         "searchPlaceholder": "検索...",
         "selectDate": "日付を選択",
-        "selectTime": "時間を選択"
+        "selectTime": "時間を選択",
+        "currentPassword": "現在のパスワード",
+        "newPassword": "新しいパスワード",
+        "confirmNewPassword": "新しいパスワードを確認"
     },
     "buttons": {
         "save": "保存",
@@ -2803,5 +2840,71 @@
         "noGoalsYet": "まだ目標がありません",
         "noMatchingGoals": "一致する目標がありません",
         "tryDifferentFilters": "フィルターを調整してより多くの目標を表示してください"
+    },
+    "notes": {
+        "title": "ノート",
+        "subtitle": "あなたの考えを記録して整理する",
+        "newNote": "新しいノート",
+        "searchPlaceholder": "ノートを検索...",
+        "allNotes": "すべてのノート",
+        "stickyNote": "付箋",
+        "favorites": "お気に入り",
+        "recent": "最近",
+        "archived": "アーカイブ済み",
+        "tags": "タグ",
+        "noNotes": "まだノートがありません",
+        "noNotesDesc": "最初のノートを作成して始めましょう",
+        "createNote": "ノートを作成",
+        "editNote": "ノートを編集",
+        "deleteNote": "ノートを削除",
+        "archiveNote": "ノートをアーカイブ",
+        "favoriteNote": "お気に入りに追加",
+        "unfavoriteNote": "お気に入りから削除",
+        "noteTitle": "ノートのタイトル",
+        "noteTitlePlaceholder": "ノートのタイトルを入力",
+        "noteContent": "内容",
+        "noteContentPlaceholder": "ノートの入力を開始...",
+        "addTag": "タグを追加",
+        "tagPlaceholder": "タグ名を入力",
+        "lastEdited": "最終編集 {{date}}",
+        "createdOn": "作成日 {{date}}",
+        "wordCount": "{{count}} 語",
+        "characterCount": "{{count}} 文字",
+        "saveNote": "ノートを保存",
+        "discardChanges": "変更を破棄",
+        "unsavedChanges": "保存されていない変更があります",
+        "deleteConfirm": "このノートを削除してもよろしいですか？",
+        "archiveConfirm": "このノートをアーカイブしてもよろしいですか？",
+        "noteDeleted": "ノートが削除されました",
+        "noteArchived": "ノートがアーカイブされました",
+        "noteSaved": "ノートが保存されました",
+        "noteCreated": "ノートが作成されました",
+        "noteUpdated": "ノートが更新されました"
+    },
+    "connectedAccounts": {
+        "title": "接続されたアカウント",
+        "subtitle": "接続されたGoogleサービスを管理します。いつでも切断および再接続できます。",
+        "sartthiMail": "Sartthi Mail",
+        "sartthiMailDesc": "メール管理のためのGmail統合",
+        "sartthiCalendar": "Sartthi Calendar",
+        "sartthiCalendarDesc": "Googleカレンダー統合",
+        "sartthiVault": "Sartthi Vault",
+        "sartthiVaultDesc": "Google Driveによる安全なファイルストレージ",
+        "email": "メール",
+        "notAvailable": "利用不可",
+        "connectedOn": "接続日 {{date}}",
+        "disconnect": "切断",
+        "connect": "接続",
+        "privacyTitle": "プライバシー",
+        "privacyMessage": "\"Sartthi Vault\"フォルダ内のファイルのみにアクセスします。個人ファイルはプライベートのままです。",
+        "aboutTitle": "接続されたアカウントについて",
+        "aboutPoint1": "アカウントはいつでも切断および再接続できます",
+        "aboutPoint2": "切断するとアクセスが削除されますが、データは削除されません",
+        "aboutPoint3": "データはGoogleアカウントに残ります",
+        "aboutPoint4": "切断後、別のGoogleアカウントを接続できます",
+        "disconnectConfirm": "このアカウントを切断してもよろしいですか？",
+        "disconnectSuccess": "アカウントが切断されました",
+        "connectSuccess": "アカウントが接続されました",
+        "connectionError": "アカウントの接続に失敗しました。もう一度お試しください。"
     }
 }

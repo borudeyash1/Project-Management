@@ -7,15 +7,16 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
-  darkMode: 'class', // Enable dark mode with class strategy
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: 'var(--accent-color)', // Use accent color as primary
-        'primary-700': 'var(--accent-color)', // Fallback for now
+        // Existing colors
+        primary: 'var(--accent-color)',
+        'primary-700': 'var(--accent-color)',
         'primary-100': '#E8F0FF',
         accent: 'var(--accent-color)',
-        'accent-dark': 'var(--accent-color)', // We can add a darker variant variable later if needed
+        'accent-dark': 'var(--accent-color)',
         'accent-light': 'var(--accent-color)',
         'accent-hover': 'var(--accent-color)',
         teal: '#13B6A8',
@@ -30,7 +31,16 @@ module.exports = {
         warning: '#F59E0B',
         error: '#DC2626',
         info: '#0EA5E9',
-        // High-Density Dark Mode Theme
+        
+        // Notion-inspired Timeline Colors
+        'notion-sidebar': '#F7F6F3',
+        'notion-canvas': '#FFFFFF',
+        'notion-border': '#E1E1E0',
+        'notion-text': '#37352F',
+        'notion-text-secondary': '#787774',
+        'notion-hover': '#EFEFED',
+        
+        // Dark mode variants
         'app-bg': '#191919',
         'sidebar-bg': '#202020',
         'card-bg': '#202020',
@@ -45,12 +55,18 @@ module.exports = {
         'accent-red': '#EF4444',
       },
       fontFamily: {
-        'inter': ['Inter', 'sans-serif']
+        'inter': ['Inter', 'sans-serif'],
+        'system': ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'Segoe UI', 'Roboto', 'sans-serif']
       },
       fontSize: {
         '2xs': '0.625rem', // 10px
-        'xs': '0.75rem',   // 12px
+        'xs': '0.75rem',   // 12px (metadata)
         '13': '0.8125rem', // 13px
+        'sm': '0.875rem',  // 14px (base)
+      },
+      boxShadow: {
+        'notion-card': 'rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px',
+        'notion-hover': 'rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.15) 0px 3px 6px',
       },
       aspectRatio: {
         '4/3': '4 / 3',
@@ -68,12 +84,15 @@ module.exports = {
           },
         },
       },
+      transitionProperty: {
+        'transform-opacity': 'transform, opacity',
+      },
     },
   },
   plugins: [addVariablesForColors],
 }
 
-// This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
+// This plugin adds each Tailwind color as a global CSS variable
 function addVariablesForColors({ addBase, theme }) {
   let allColors = flattenColorPalette(theme("colors"));
   let newVars = Object.fromEntries(

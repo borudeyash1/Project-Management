@@ -45,7 +45,7 @@ npm run build
 
 # Restart PM2 processes
 echo "🔄 Restarting PM2 processes..."
-pm2 restart all
+pm2 restart proxima-server
 
 # Reload Nginx
 echo "🌐 Reloading Nginx..."

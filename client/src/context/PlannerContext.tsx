@@ -135,10 +135,10 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
       const timestamp = new Date().getTime();
       const response = await apiService.get(`/planner/data?_t=${timestamp}`);
       console.log('✅ [PlannerContext] Response:', response.data);
-      
-      if (response.data && response.data.success) {
-        const data = response.data.data;
-        
+
+      if (response && response.success) {
+        const data = response.data;
+
         const normalizedTasks = (data.tasks || []).map((task: any) => ({
           ...task,
           subtasks: task.subtasks || [],
@@ -148,16 +148,16 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
           assignees: task.assignee ? [task.assignee] : [],
           estimatedTime: task.estimatedHours || task.estimatedTime || 0
         }));
-        
+
         console.log('💾 [PlannerContext] Setting tasks:', normalizedTasks.length);
         console.log('📋 [PlannerContext] Tasks data:', normalizedTasks);
-        
+
         // Update global state
         globalTasks = normalizedTasks;
         globalMilestones = data.milestones || [];
         globalReminders = data.reminders || [];
         globalEvents = data.events || [];
-        
+
         // Force update with new data
         setTasks([...normalizedTasks]);
         setMilestones([...globalMilestones]);
@@ -165,9 +165,9 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
         setEvents([...globalEvents]);
         setDataVersion(v => v + 1);
         forceUpdate();
-        
+
         console.log('✅ [PlannerContext] State updated. Version:', dataVersion + 1);
-        
+
         // Verify
         setTimeout(() => {
           console.log('🔍 [PlannerContext] Verification - globalTasks:', globalTasks.length);
@@ -209,7 +209,7 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const moveTask = async (taskId: string, newStatus: string) => {
     await apiService.put(`/tasks/${taskId}`, { status: newStatus });
-    const updatedTasks = tasks.map(task => 
+    const updatedTasks = tasks.map(task =>
       task._id === taskId ? { ...task, status: newStatus } : task
     );
     globalTasks = updatedTasks;

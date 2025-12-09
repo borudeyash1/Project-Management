@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
 import AppInfoCard from './AppInfoCard';
 import { getAppUrl } from '../utils/appUrls';
+import { useTranslation } from 'react-i18next';
 
 interface ConnectedAccount {
   type: 'mail' | 'calendar' | 'vault';
@@ -13,6 +14,7 @@ interface ConnectedAccount {
 }
 
 const ConnectedAccounts: React.FC = () => {
+  const { t } = useTranslation();
   const { state } = useApp();
   const [unlinking, setUnlinking] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<string | null>(null);
@@ -43,24 +45,24 @@ const ConnectedAccounts: React.FC = () => {
   const appConfig = {
     mail: {
       icon: <Mail className="w-6 h-6" />,
-      title: 'Sartthi Mail',
-      description: 'Gmail integration for email management',
+      title: t('connectedAccounts.sartthiMail'),
+      description: t('connectedAccounts.sartthiMailDesc'),
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
       borderColor: 'border-blue-500/20'
     },
     calendar: {
       icon: <Calendar className="w-6 h-6" />,
-      title: 'Sartthi Calendar',
-      description: 'Google Calendar integration',
+      title: t('connectedAccounts.sartthiCalendar'),
+      description: t('connectedAccounts.sartthiCalendarDesc'),
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
       borderColor: 'border-purple-500/20'
     },
     vault: {
       icon: <Shield className="w-6 h-6" />,
-      title: 'Sartthi Vault',
-      description: 'Secure file storage with Google Drive',
+      title: t('connectedAccounts.sartthiVault'),
+      description: t('connectedAccounts.sartthiVaultDesc'),
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
       borderColor: 'border-green-500/20'
@@ -112,10 +114,10 @@ const ConnectedAccounts: React.FC = () => {
     <div className="space-y-4">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Connected Accounts
+          {t('connectedAccounts.title')}
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Manage your connected Google services. You can disconnect and reconnect at any time.
+          {t('connectedAccounts.subtitle')}
         </p>
       </div>
 
@@ -155,16 +157,16 @@ const ConnectedAccounts: React.FC = () => {
                     {account.isConnected ? (
                       <div className="space-y-1">
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          <span className="font-medium">Email:</span> {account.email || 'Not available'}
+                          <span className="font-medium">{t('connectedAccounts.email')}:</span> {account.email || t('connectedAccounts.notAvailable')}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Connected on {formatDate(account.connectedAt)}
+                          {t('connectedAccounts.connectedOn', { date: formatDate(account.connectedAt) })}
                         </p>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <AlertCircle className="w-4 h-4" />
-                        Not connected
+                        {t('connectedAccounts.connect')}
                       </div>
                     )}
                   </div>
@@ -176,14 +178,14 @@ const ConnectedAccounts: React.FC = () => {
                     showConfirm === account.type ? (
                       <div className="flex flex-col gap-2">
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          Are you sure?
+                          {t('connectedAccounts.disconnectConfirm')}
                         </p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setShowConfirm(null)}
                             className="px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                           >
-                            Cancel
+                            {t('common.cancel')}
                           </button>
                           <button
                             onClick={() => handleUnlink(account.type)}
@@ -198,7 +200,7 @@ const ConnectedAccounts: React.FC = () => {
                             ) : (
                               <>
                                 <Unlink className="w-4 h-4" />
-                                Confirm
+                                {t('common.confirm')}
                               </>
                             )}
                           </button>
@@ -210,7 +212,7 @@ const ConnectedAccounts: React.FC = () => {
                         className="px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition-colors flex items-center gap-2 font-medium"
                       >
                         <Unlink className="w-4 h-4" />
-                        Disconnect
+                        {t('connectedAccounts.disconnect')}
                       </button>
                     )
                   ) : (
@@ -222,7 +224,7 @@ const ConnectedAccounts: React.FC = () => {
                         } text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2 font-medium`}
                     >
                       <LinkIcon className="w-4 h-4" />
-                      Connect
+                      {t('connectedAccounts.connect')}
                     </button>
                   )}
                 </div>
@@ -232,7 +234,7 @@ const ConnectedAccounts: React.FC = () => {
               {account.type === 'vault' && account.isConnected && (
                 <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
-                    <span className="font-semibold text-green-600 dark:text-green-400">🔒 Privacy:</span> We only access files in your "Sartthi Vault" folder. Your personal files remain private.
+                    <span className="font-semibold text-green-600 dark:text-green-400">🔒 {t('connectedAccounts.privacyTitle')}:</span> {t('connectedAccounts.privacyMessage')}
                   </p>
                 </div>
               )}
@@ -244,13 +246,13 @@ const ConnectedAccounts: React.FC = () => {
       {/* Info Box */}
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
         <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
-          About Connected Accounts
+          {t('connectedAccounts.aboutTitle')}
         </h4>
         <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-          <li>• You can disconnect and reconnect accounts at any time</li>
-          <li>• Disconnecting will remove access but won't delete your data</li>
-          <li>• Your data remains in your Google account</li>
-          <li>• You can connect a different Google account after disconnecting</li>
+          <li>• {t('connectedAccounts.aboutPoint1')}</li>
+          <li>• {t('connectedAccounts.aboutPoint2')}</li>
+          <li>• {t('connectedAccounts.aboutPoint3')}</li>
+          <li>• {t('connectedAccounts.aboutPoint4')}</li>
         </ul>
       </div>
 

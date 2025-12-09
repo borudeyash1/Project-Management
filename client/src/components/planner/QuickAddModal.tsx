@@ -8,6 +8,7 @@ interface QuickAddModalProps {
   onClose: () => void;
   defaultDate?: Date;
   defaultTime?: string;
+  defaultStatus?: string;
 }
 
 type ItemType = 'task' | 'reminder' | 'milestone' | 'event';
@@ -23,7 +24,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState(defaultDate ? defaultDate.toISOString().split('T')[0] : '');
   const [dueTime, setDueTime] = useState(defaultTime || '');
-  
+
   // Task specific
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
   const [project, setProject] = useState('');
@@ -33,7 +34,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
 
   // Milestone specific
   const [startDate, setStartDate] = useState('');
-  
+
   // Event specific
   const [endDate, setEndDate] = useState('');
   const [allDay, setAllDay] = useState(false);
@@ -62,7 +63,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
 
     try {
       let response;
-      
+
       // Get workspace - optional now
       const selectedWorkspace = workspace || null;
 
@@ -79,7 +80,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
           };
           if (selectedWorkspace) taskData.workspace = selectedWorkspace;
           if (project) taskData.project = project;
-          
+
           console.log('Creating task:', taskData);
           response = await apiService.post('/tasks', taskData);
           break;
@@ -95,7 +96,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
             assignedTo: state.userProfile._id
           };
           if (selectedWorkspace) reminderData.workspace = selectedWorkspace;
-          
+
           console.log('Creating reminder:', reminderData);
           response = await apiService.post('/reminders', reminderData);
           break;
@@ -110,7 +111,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
           };
           if (selectedWorkspace) milestoneData.workspace = selectedWorkspace;
           if (project) milestoneData.project = project;
-          
+
           console.log('Creating milestone:', milestoneData);
           response = await apiService.post('/milestones', milestoneData);
           break;
@@ -119,7 +120,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
           // For events, we need start date (use dueDate as start if no startDate)
           const eventStartDate = startDate || dueDate;
           const eventEndDate = endDate || dueDate;
-          
+
           if (!eventStartDate) {
             throw new Error('Start date is required for events');
           }
@@ -194,11 +195,10 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
                 <button
                   key={type.id}
                   onClick={() => setActiveType(type.id as ItemType)}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
-                    activeType === type.id
+                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${activeType === type.id
                       ? `border-${type.color}-500 bg-${type.color}-50 dark:bg-${type.color}-900/20`
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                  }`}
+                    }`}
                 >
                   <Icon className={`w-5 h-5 ${activeType === type.id ? `text-${type.color}-600 dark:text-${type.color}-400` : 'text-gray-600 dark:text-gray-400'}`} />
                   <span className={`text-sm font-medium ${activeType === type.id ? `text-${type.color}-700 dark:text-${type.color}-300` : 'text-gray-700 dark:text-gray-300'}`}>
@@ -257,7 +257,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
                 />
               </div>
             )}
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {activeType === 'event' ? 'End Date' : 'Due Date'} *

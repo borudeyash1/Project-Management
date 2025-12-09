@@ -75,7 +75,8 @@
     "fri": "Ven",
     "sat": "Sam",
     "progress": "Progrès",
-    "critical": "Critique"
+    "critical": "Critique",
+    "complete": "Complete"
   },
   "navigation": {
     "home": "Accueil",
@@ -356,6 +357,25 @@
       "design": "Design",
       "qa": "QA",
       "general": "Général"
+    },
+    "sections": {
+      "description": "Description",
+      "subtasks": "Subtasks",
+      "attachments": "Attachments",
+      "tags": "Tags",
+      "comments": "Comments",
+      "activity": "Activity",
+      "milestones": "Milestones"
+    },
+    "actions": {
+      "editTask": "Edit Task",
+      "duplicateTask": "Duplicate Task",
+      "deleteTask": "Delete Task",
+      "addComment": "Add Comment",
+      "assignTask": "Assign Task",
+      "setDueDate": "Set Due Date",
+      "setPriority": "Set Priority",
+      "addSubtask": "Add Subtask"
     }
   },
   "settings": {
@@ -1044,7 +1064,13 @@
     "socialMedia": "Réseaux sociaux",
     "linkedin": "LinkedIn",
     "twitter": "Twitter",
-    "github": "GitHub"
+    "github": "GitHub",
+    "memberSince": "Member Since",
+    "nonEditable": "This field cannot be edited",
+    "changePassword": "Change Password",
+    "visibility": "Profile Visibility",
+    "showEmail": "Show Email",
+    "showPhone": "Show Phone"
   },
   "workspace": {
     "tabs": {

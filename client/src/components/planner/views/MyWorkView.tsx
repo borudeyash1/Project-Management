@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { 
+import {
   CheckCircle, Circle, Clock, Flag, Play, Pause, Plus,
   ChevronDown, ChevronRight, Calendar, User, AlertCircle
 } from 'lucide-react';
@@ -120,14 +120,13 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       {/* Task Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <h4 className={`font-medium text-gray-900 dark:text-white truncate ${
-            task.status === 'done' ? 'line-through text-gray-500' : ''
-          }`}>
+          <h4 className={`font-medium text-gray-900 dark:text-white truncate ${task.status === 'done' ? 'line-through text-gray-500' : ''
+            }`}>
             {task.title}
           </h4>
           {getPriorityIcon(task.priority)}
         </div>
-        
+
         <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-200">
           {task.dueDate && (
             <span className="flex items-center gap-1">
@@ -146,7 +145,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
           )}
           {task.project && (
             <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded">
-              {task.project}
+              {typeof task.project === 'object' ? (task.project?.name || 'No Project') : (task.project || 'No Project')}
             </span>
           )}
         </div>
@@ -156,11 +155,10 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => handleStartTimer(task._id)}
-          className={`p-2 rounded-lg border ${
-            activeTimer === task._id
+          className={`p-2 rounded-lg border ${activeTimer === task._id
               ? 'bg-blue-100 border-blue-300 text-blue-700'
               : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-          }`}
+            }`}
           title={activeTimer === task._id ? t('planner.myWork.stopTimer') : t('planner.myWork.startTimer')}
         >
           {activeTimer === task._id ? (
@@ -173,17 +171,17 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
     </div>
   );
 
-  const Section = ({ 
-    title, 
-    count, 
-    tasks, 
-    sectionKey, 
+  const Section = ({
+    title,
+    count,
+    tasks,
+    sectionKey,
     icon: Icon,
-    color 
-  }: { 
-    title: string; 
-    count: number; 
-    tasks: Task[]; 
+    color
+  }: {
+    title: string;
+    count: number;
+    tasks: Task[];
     sectionKey: string;
     icon: any;
     color: string;

@@ -6,6 +6,7 @@ import ContentBanner from './ContentBanner';
 import Header from './Header';
 import DockNavigation from './DockNavigation';
 import { apiService } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 interface Note {
   _id: string;
@@ -16,6 +17,7 @@ interface Note {
 }
 
 const NotesPage: React.FC = () => {
+  const { t } = useTranslation();
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -48,7 +50,7 @@ const NotesPage: React.FC = () => {
         content: content,
         isSticky: false
       };
-      
+
       const createdNote = await apiService.post('/notes', newNoteData) as unknown as Note;
       setNotes([createdNote, ...notes]);
       setSelectedNote(createdNote);
@@ -61,7 +63,7 @@ const NotesPage: React.FC = () => {
 
   const handleSaveNote = async () => {
     if (!selectedNote) return;
-    
+
     try {
       const updatedNote = await apiService.put(`/notes/${selectedNote._id}`, {
         title,
@@ -100,7 +102,7 @@ const NotesPage: React.FC = () => {
 
   const handleAIGenerate = async () => {
     if (!aiPrompt.trim()) return;
-    
+
     setIsGenerating(true);
     try {
       const response = await fetch('/api/ai/chat', {
@@ -109,7 +111,7 @@ const NotesPage: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: aiAction === 'generate' 
+          message: aiAction === 'generate'
             ? `Generate a detailed note about: ${aiPrompt}`
             : `Refine and improve this note:\n\n${content}\n\nInstructions: ${aiPrompt}`,
           userContext: {},
@@ -117,7 +119,7 @@ const NotesPage: React.FC = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         if (aiAction === 'generate') {
           setContent(data.data.response);
@@ -150,8 +152,8 @@ const NotesPage: React.FC = () => {
                 <FileText className="w-6 h-6 text-gray-900" />
               </div>
               <div>
-                <h1 className="text-3xl font-black text-gray-900">AI Notes</h1>
-                <p className="text-gray-600">Create, edit, and refine notes with AI assistance</p>
+                <h1 className="text-3xl font-black text-gray-900">{t('notes.title')}</h1>
+                <p className="text-gray-600">{t('notes.subtitle')}</p>
               </div>
             </div>
           </div>
@@ -169,27 +171,26 @@ const NotesPage: React.FC = () => {
                 className="w-full flex items-center gap-2 bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-4 py-3 rounded-lg font-bold transition-colors mb-4"
               >
                 <Plus size={20} />
-                New Note
+                {t('notes.newNote')}
               </button>
 
               <div className="space-y-2">
                 {isLoading ? (
                   <div className="text-center py-8">
                     <div className="w-8 h-8 border-4 border-[#FFD700] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                    <p className="text-gray-500 text-sm">Loading notes...</p>
+                    <p className="text-gray-500 text-sm">{t('common.loading')}</p>
                   </div>
                 ) : notes.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-8">No notes yet</p>
+                  <p className="text-gray-500 text-sm text-center py-8">{t('notes.noNotes')}</p>
                 ) : (
                   notes.map(note => (
                     <div
                       key={note._id}
                       onClick={() => handleSelectNote(note)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedNote?._id === note._id
-                          ? 'bg-[#FFD700]/20 border-2 border-[#FFD700]'
-                          : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
-                      }`}
+                      className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedNote?._id === note._id
+                        ? 'bg-[#FFD700]/20 border-2 border-[#FFD700]'
+                        : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                        }`}
                     >
                       <h3 className="font-bold text-gray-900 truncate">{note.title || 'Untitled'}</h3>
                       <p className="text-xs text-gray-500 mt-1">
@@ -235,7 +236,7 @@ const NotesPage: React.FC = () => {
                       className="flex items-center gap-2 text-red-600 hover:text-red-700 px-4 py-2 rounded-lg font-semibold transition-colors"
                     >
                       <Trash2 size={18} />
-                      Delete
+                      {t('common.delete')}
                     </button>
                   )}
                   <button
@@ -243,7 +244,7 @@ const NotesPage: React.FC = () => {
                     className="flex items-center gap-2 bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-4 py-2 rounded-lg font-semibold transition-colors"
                   >
                     <Save size={18} />
-                    {selectedNote ? 'Save' : 'Create'}
+                    {selectedNote ? t('common.save') : t('common.create')}
                   </button>
                 </div>
               </div>
@@ -253,7 +254,7 @@ const NotesPage: React.FC = () => {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Note title..."
+                placeholder={t('notes.noteTitlePlaceholder')}
                 className="w-full text-3xl font-bold text-gray-900 bg-transparent border-none outline-none mb-4 placeholder-gray-400"
               />
 
@@ -261,7 +262,7 @@ const NotesPage: React.FC = () => {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Start writing or use AI to generate content..."
+                placeholder={t('notes.noteContentPlaceholder')}
                 className="w-full h-[calc(100vh-450px)] text-gray-700 bg-transparent border-none outline-none resize-none placeholder-gray-400 leading-relaxed"
               />
             </div>
@@ -328,7 +329,7 @@ const NotesPage: React.FC = () => {
                 disabled={isGenerating}
                 className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>

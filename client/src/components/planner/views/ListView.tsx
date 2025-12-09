@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   ChevronDown, ChevronUp, Edit2, Trash2, CheckSquare, Square,
   User, Calendar, Flag, Tag, MoreVertical, Filter, Download, Plus
 } from 'lucide-react';
@@ -19,18 +19,18 @@ type GroupBy = 'none' | 'status' | 'priority' | 'assignee' | 'project';
 const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   const { updateTask, deleteTask, bulkUpdateTasks } = usePlanner();
   const { t } = useTranslation();
-  
+
   // Fetch data directly
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         const timestamp = new Date().getTime();
         const response = await apiService.get(`/planner/data?_t=${timestamp}`);
-        if (response.data && response.data.success) {
-          const normalizedTasks = (response.data.data.tasks || []).map((task: any) => ({
+        if (response && response.success) {
+          const normalizedTasks = (response.data.tasks || []).map((task: any) => ({
             ...task,
             subtasks: task.subtasks || [],
             tags: task.tags || [],
@@ -49,7 +49,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
     };
     fetchTasks();
   }, []);
-  
+
   const [sortField, setSortField] = useState<SortField>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [groupBy, setGroupBy] = useState<GroupBy>('none');
@@ -85,19 +85,19 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   });
 
   // Group tasks
-  const groupedTasks = groupBy === 'none' 
+  const groupedTasks = groupBy === 'none'
     ? { 'All Tasks': sortedTasks }
     : sortedTasks.reduce((groups, task) => {
-        let key = 'Ungrouped';
-        if (groupBy === 'status') key = task.status;
-        else if (groupBy === 'priority') key = task.priority;
-        else if (groupBy === 'assignee') key = task.assignees[0] || 'Unassigned';
-        else if (groupBy === 'project') key = task.project || 'No Project';
-        
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(task);
-        return groups;
-      }, {} as Record<string, Task[]>);
+      let key = 'Ungrouped';
+      if (groupBy === 'status') key = task.status;
+      else if (groupBy === 'priority') key = task.priority;
+      else if (groupBy === 'assignee') key = task.assignees[0] || 'Unassigned';
+      else if (groupBy === 'project') key = task.project || 'No Project';
+
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(task);
+      return groups;
+    }, {} as Record<string, Task[]>);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -177,7 +177,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ChevronDown className="w-4 h-4 text-gray-600" />;
-    return sortDirection === 'asc' 
+    return sortDirection === 'asc'
       ? <ChevronUp className="w-4 h-4 text-blue-600" />
       : <ChevronDown className="w-4 h-4 text-blue-600" />;
   };
@@ -244,7 +244,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                 {groupName} ({groupTasks.length})
               </h3>
             )}
-            
+
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
@@ -368,9 +368,9 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                             <div
                               key={idx}
                               className="w-7 h-7 rounded-full bg-blue-500 border-2 border-white dark:border-gray-700 flex items-center justify-center text-white text-xs font-medium"
-                              title={assignee}
+                              title={typeof assignee === 'object' ? (assignee.fullName || assignee.username) : assignee}
                             >
-                              {assignee[0].toUpperCase()}
+                              {typeof assignee === 'string' ? assignee[0].toUpperCase() : (assignee.fullName || assignee.username || 'U')[0].toUpperCase()}
                             </div>
                           ))}
                           {task.assignees.length > 3 && (

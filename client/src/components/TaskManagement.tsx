@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, Clock, Users, BarChart3, Settings, MessageSquare, 
-  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye, 
-  CheckCircle, AlertCircle, TrendingUp, FileText, Download, 
-  Upload, Link, Tag, Flag, User, Clock3, Target, Zap, 
-  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star, 
-  Heart, Bookmark, Share2, Copy, Move, Archive, Play, 
-  Pause, Square, Circle, Triangle, Hexagon, Layers, 
-  Activity, PieChart, LineChart, TrendingDown, Minus, 
-  Maximize, Minimize, RotateCcw, Save, RefreshCw, 
-  CheckSquare, Timer, UserCheck, UserX, MessageCircle, 
-  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot, 
-  Sparkles, Lightbulb, Globe, Shield, Key, Lock, 
-  Unlock, EyeOff, Bell, Mail, Phone, MapPin, 
+import {
+  Calendar, Clock, Users, BarChart3, Settings, MessageSquare,
+  Plus, Filter, Search, MoreVertical, Edit, Trash2, Eye,
+  CheckCircle, AlertCircle, TrendingUp, FileText, Download,
+  Upload, Link, Tag, Flag, User, Clock3, Target, Zap,
+  ArrowRight, ArrowLeft, ChevronDown, ChevronUp, Star,
+  Heart, Bookmark, Share2, Copy, Move, Archive, Play,
+  Pause, Square, Circle, Triangle, Hexagon, Layers,
+  Activity, PieChart, LineChart, TrendingDown, Minus,
+  Maximize, Minimize, RotateCcw, Save, RefreshCw,
+  CheckSquare, Timer, UserCheck, UserX, MessageCircle,
+  ThumbsUp, ThumbsDown, Award, Trophy, Medal, Bot,
+  Sparkles, Lightbulb, Globe, Shield, Key, Lock,
+  Unlock, EyeOff, Bell, Mail, Phone, MapPin,
   Building, Home, Crown, DollarSign, CreditCard,
   Database, Server, Cloud, Wifi, Monitor, Smartphone,
   Tablet, Headphones, Camera, Mic, Volume2, VolumeX,
@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import TaskTimeline from './TaskTimeline';
-import TimelineView from './TimelineView';
+import TaskTimelineView from './TaskTimelineView';
 import KanbanBoard from './KanbanBoard';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
@@ -203,7 +203,7 @@ const TaskManagement: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [calendarDate, setCalendarDate] = useState(new Date());
-  
+
   // Initialize tasks state with mock data
   useEffect(() => {
     setTasks(mockTasks);
@@ -213,9 +213,9 @@ const TaskManagement: React.FC = () => {
 
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {
-    setColumns(prevColumns => 
-      prevColumns.map(column => 
-        column._id === columnId 
+    setColumns(prevColumns =>
+      prevColumns.map(column =>
+        column._id === columnId
           ? { ...column, ...updates }
           : column
       )
@@ -230,7 +230,7 @@ const TaskManagement: React.FC = () => {
       position: columnData.position || columns.length,
       taskLimit: columnData.taskLimit
     };
-    
+
     setColumns(prevColumns => [...prevColumns, newColumn]);
   };
 
@@ -255,9 +255,9 @@ const TaskManagement: React.FC = () => {
       isImportant: false
     };
 
-    setTasks((prevTasks: Task[]) => 
-      prevTasks.map((task: Task) => 
-        task._id === taskId 
+    setTasks((prevTasks: Task[]) =>
+      prevTasks.map((task: Task) =>
+        task._id === taskId
           ? { ...task, notes: [...task.notes, newNote] }
           : task
       )
@@ -265,11 +265,11 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleNoteUpdate = (noteId: string, content: string) => {
-    setTasks((prevTasks: Task[]) => 
+    setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) => ({
         ...task,
-        notes: task.notes.map((note: Note) => 
-          note._id === noteId 
+        notes: task.notes.map((note: Note) =>
+          note._id === noteId
             ? { ...note, content }
             : note
         )
@@ -278,7 +278,7 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleNoteDelete = (noteId: string) => {
-    setTasks((prevTasks: Task[]) => 
+    setTasks((prevTasks: Task[]) =>
       prevTasks.map((task: Task) => ({
         ...task,
         notes: task.notes.filter((note: Note) => note._id !== noteId)
@@ -287,9 +287,9 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
-    setTasks((prevTasks: Task[]) => 
-      prevTasks.map((task: Task) => 
-        task._id === taskId 
+    setTasks((prevTasks: Task[]) =>
+      prevTasks.map((task: Task) =>
+        task._id === taskId
           ? { ...task, ...updates }
           : task
       )
@@ -324,7 +324,7 @@ const TaskManagement: React.FC = () => {
       notes: [],
       isCompleted: false
     };
-    
+
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
@@ -461,54 +461,54 @@ const TaskManagement: React.FC = () => {
       timeTracking: [],
       notes: [
         { _id: 'n3', content: 'All tests completed successfully. Ready for production deployment.', type: 'manual', author: { _id: 'u3', name: 'Bob Wilson', avatarUrl: '' }, createdAt: new Date('2024-03-15'), taskId: '3', tags: ['testing', 'completion'], isImportant: true }
-    ]
-  }
-];
+      ]
+    }
+  ];
 
-const mockColumns: Column[] = [
-  {
-    _id: 'backlog',
-    name: 'Backlog',
-    color: '#6B7280',
-    position: 0,
-    taskLimit: 50
-  },
-  {
-    _id: 'in-progress',
-    name: 'In Progress',
-    color: '#3B82F6',
-    position: 1,
-    taskLimit: 20
-  },
-  {
-    _id: 'review-internal',
-    name: 'Review (internal)',
-    color: '#F59E0B',
-    position: 2,
-    taskLimit: 15
-  },
-  {
-    _id: 'check-comments',
-    name: 'Check comments, make edits',
-    color: '#8B5CF6',
-    position: 3,
-    taskLimit: 10
-  },
-  {
-    _id: 'qa-client',
-    name: 'QA (client)',
-    color: '#10B981',
-    position: 4,
-    taskLimit: 8
-  },
-  {
-    _id: 'publication',
-    name: 'Publication',
-    color: '#EF4444',
-    position: 5,
-    taskLimit: 5
-  }
-];
+  const mockColumns: Column[] = [
+    {
+      _id: 'backlog',
+      name: 'Backlog',
+      color: '#6B7280',
+      position: 0,
+      taskLimit: 50
+    },
+    {
+      _id: 'in-progress',
+      name: 'In Progress',
+      color: '#3B82F6',
+      position: 1,
+      taskLimit: 20
+    },
+    {
+      _id: 'review-internal',
+      name: 'Review (internal)',
+      color: '#F59E0B',
+      position: 2,
+      taskLimit: 15
+    },
+    {
+      _id: 'check-comments',
+      name: 'Check comments, make edits',
+      color: '#8B5CF6',
+      position: 3,
+      taskLimit: 10
+    },
+    {
+      _id: 'qa-client',
+      name: 'QA (client)',
+      color: '#10B981',
+      position: 4,
+      taskLimit: 8
+    },
+    {
+      _id: 'publication',
+      name: 'Publication',
+      color: '#EF4444',
+      position: 5,
+      taskLimit: 5
+    }
+  ];
 
   const projects: Project[] = [
     { _id: '1', name: 'E-commerce Platform', color: '#3B82F6', status: 'active', progress: 65 },
@@ -557,7 +557,7 @@ const mockColumns: Column[] = [
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', task._id);
-    
+
     // Add visual feedback to the dragged element
     const target = e.target as HTMLElement;
     target.style.opacity = '0.5';
@@ -584,20 +584,20 @@ const mockColumns: Column[] = [
     e.preventDefault();
     if (draggedTask && draggedTask.status !== status) {
       console.log(`Moving task ${draggedTask._id} to ${status}`);
-      
+
       // Update the task status in the state
-      setTasks((prevTasks: Task[]) => 
-        prevTasks.map((task: Task) => 
-          task._id === draggedTask._id 
+      setTasks((prevTasks: Task[]) =>
+        prevTasks.map((task: Task) =>
+          task._id === draggedTask._id
             ? { ...task, status: status as 'pending' | 'in-progress' | 'completed' | 'blocked', updatedAt: new Date() }
             : task
         )
       );
-      
+
       // Show success toast
       setToastMessage(`Task "${draggedTask.title}" moved to ${status.replace('-', ' ')}`);
       setShowToast(true);
-      
+
       // Hide toast after 3 seconds
       setTimeout(() => {
         setShowToast(false);
@@ -681,11 +681,10 @@ const mockColumns: Column[] = [
         {['pending', 'in-progress', 'completed', 'blocked'].map(status => (
           <div
             key={status}
-            className={`bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-h-[500px] transition-all duration-200 ${
-              draggedOverColumn === status 
-                ? 'ring-2 ring-blue-500 bg-blue-50 border-2 border-blue-300' 
-                : 'border border-gray-200 dark:border-gray-700'
-            }`}
+            className={`bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-h-[500px] transition-all duration-200 ${draggedOverColumn === status
+              ? 'ring-2 ring-blue-500 bg-blue-50 border-2 border-blue-300'
+              : 'border border-gray-200 dark:border-gray-700'
+              }`}
             onDragOver={(e) => handleDragOver(e, status)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, status)}
@@ -698,7 +697,7 @@ const mockColumns: Column[] = [
                 {tasks.filter((t: Task) => t.status === status).length}
               </span>
             </div>
-            
+
             <div className="space-y-3">
               {draggedOverColumn === status && draggedTask && draggedTask.status !== status && (
                 <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-accent-dark text-sm font-medium">
@@ -725,9 +724,9 @@ const mockColumns: Column[] = [
                         {getPriorityIcon(task.priority)}
                       </div>
                     </div>
-                    
+
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{task.description}</p>
-                    
+
                     <div className="flex items-center gap-2 mb-2">
                       <div
                         className="w-3 h-3 rounded-full"
@@ -735,7 +734,7 @@ const mockColumns: Column[] = [
                       />
                       <span className="text-xs text-gray-600 dark:text-gray-400">{task.project.name}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <img
@@ -749,7 +748,7 @@ const mockColumns: Column[] = [
                         {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
                       </span>
                     </div>
-                    
+
                     {task.milestones.length > 0 && (
                       <div className="mt-2">
                         <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -769,7 +768,7 @@ const mockColumns: Column[] = [
                         </div>
                       </div>
                     )}
-                    
+
                     {task.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {task.tags.slice(0, 2).map((tag: string) => (
@@ -814,7 +813,7 @@ const mockColumns: Column[] = [
             <CheckSquare className="w-8 h-8 text-accent-dark" />
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -826,7 +825,7 @@ const mockColumns: Column[] = [
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -838,7 +837,7 @@ const mockColumns: Column[] = [
             <Clock className="w-8 h-8 text-orange-600" />
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -859,15 +858,14 @@ const mockColumns: Column[] = [
             {['pending', 'in-progress', 'completed', 'blocked'].map(status => {
               const count = tasks.filter(t => t.status === status).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
-              
+
               return (
                 <div key={status} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${
-                      status === 'pending' ? 'bg-gray-400' :
+                    <div className={`w-3 h-3 rounded-full ${status === 'pending' ? 'bg-gray-400' :
                       status === 'in-progress' ? 'bg-accent-light' :
-                      status === 'completed' ? 'bg-green-400' : 'bg-red-400'
-                    }`} />
+                        status === 'completed' ? 'bg-green-400' : 'bg-red-400'
+                      }`} />
                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
                       {t(`common.${status.replace('-', '')}`)}
                     </span>
@@ -875,11 +873,10 @@ const mockColumns: Column[] = [
                   <div className="flex items-center gap-2">
                     <div className="w-20 bg-gray-300 rounded-full h-2">
                       <div
-                        className={`h-2 rounded-full ${
-                          status === 'pending' ? 'bg-gray-400' :
+                        className={`h-2 rounded-full ${status === 'pending' ? 'bg-gray-400' :
                           status === 'in-progress' ? 'bg-accent-light' :
-                          status === 'completed' ? 'bg-green-400' : 'bg-red-400'
-                        }`}
+                            status === 'completed' ? 'bg-green-400' : 'bg-red-400'
+                          }`}
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -897,7 +894,7 @@ const mockColumns: Column[] = [
             {projects.map(project => {
               const count = tasks.filter(t => t.projectId === project._id).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
-              
+
               return (
                 <div key={project._id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -911,7 +908,7 @@ const mockColumns: Column[] = [
                     <div className="w-20 bg-gray-300 rounded-full h-2">
                       <div
                         className="h-2 rounded-full"
-                        style={{ 
+                        style={{
                           width: `${percentage}%`,
                           backgroundColor: project.color
                         }}
@@ -1193,7 +1190,7 @@ const mockColumns: Column[] = [
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{attachment.name}</p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {attachment.type === 'file' && attachment.size 
+                          {attachment.type === 'file' && attachment.size
                             ? `${(attachment.size / 1024 / 1024).toFixed(2)} MB`
                             : 'Link'
                           }
@@ -1310,7 +1307,7 @@ const mockColumns: Column[] = [
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('tasks.sections.actions')}</h4>
                 <div className="space-y-2">
-                  <button 
+                  <button
                     onClick={() => {
                       setShowTaskModal(false);
                       setShowEditTask(true);
@@ -1324,7 +1321,7 @@ const mockColumns: Column[] = [
                     <Copy className="w-4 h-4" />
                     {t('tasks.actions.duplicateTask')}
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       if (window.confirm(t('planner.taskDetail.deleteConfirm'))) {
                         handleTaskDelete(selectedTask._id);
@@ -1371,7 +1368,7 @@ const mockColumns: Column[] = [
               const assignee = teamMembers.find(m => m._id === assigneeId);
               const tagsString = formData.get('tags') as string;
               const tags = tagsString ? tagsString.split(',').map(t => t.trim()).filter(t => t) : [];
-              
+
               const taskData = {
                 title: formData.get('title') as string,
                 description: formData.get('description') as string,
@@ -1589,7 +1586,7 @@ const mockColumns: Column[] = [
               const assignee = teamMembers.find(m => m._id === assigneeId);
               const tagsString = formData.get('tags') as string;
               const tags = tagsString ? tagsString.split(',').map(t => t.trim()).filter(t => t) : [];
-              
+
               const updates = {
                 title: formData.get('title') as string,
                 description: formData.get('description') as string,
@@ -1803,7 +1800,7 @@ const mockColumns: Column[] = [
               <X className="w-5 h-5" />
             </button>
           </div>
-          
+
           <div className="space-y-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -1811,7 +1808,7 @@ const mockColumns: Column[] = [
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t('tracker.timeSpent')}</p>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.description')}</label>
               <textarea
@@ -1820,7 +1817,7 @@ const mockColumns: Column[] = [
                 rows={3}
               />
             </div>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={stopTimeTracking}
@@ -1860,7 +1857,7 @@ const mockColumns: Column[] = [
         return renderTaskList();
       case 'timeline':
         return (
-          <TimelineView
+          <TaskTimelineView
             tasks={tasks as any}
             onTaskUpdate={handleTaskUpdate}
             onTaskCreate={handleTaskCreate}
@@ -1912,7 +1909,7 @@ const mockColumns: Column[] = [
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('tasks.subtitle')}</p>
             </div>
             <div className="flex items-center gap-3">
-              <button 
+              <button
                 onClick={() => setShowCreateTask(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors"
               >
@@ -1932,11 +1929,10 @@ const mockColumns: Column[] = [
                 <button
                   key={view.id}
                   onClick={() => setActiveView(view.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    activeView === view.id
-                      ? 'border-accent text-accent-dark'
-                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeView === view.id
+                    ? 'border-accent text-accent-dark'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
+                    }`}
                   title={view.description}
                 >
                   <Icon className="w-4 h-4" />
@@ -1955,16 +1951,16 @@ const mockColumns: Column[] = [
 
       {/* Create Task Modal */}
       {showCreateTask && renderCreateTaskModal()}
-      
+
       {/* Edit Task Modal */}
       {showEditTask && selectedTask && renderEditTaskModal()}
-      
+
       {/* Task Modal */}
       {showTaskModal && renderTaskModal()}
-      
+
       {/* Time Tracking Modal */}
       {renderTimeTrackingModal()}
-      
+
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right">
