@@ -2,14 +2,17 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../types';
 import WorkspaceAttendanceConfig from '../models/WorkspaceAttendanceConfig';
 import WorkspaceAttendanceRecord from '../models/WorkspaceAttendanceRecord';
+import DailyWorkspaceAttendance from '../models/DailyWorkspaceAttendance';
 import Workspace from '../models/Workspace';
 
 // Configure workspace attendance settings (Owner only)
 export const configureWorkspaceAttendance = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { workspaceId } = req.params;
-    const { attendanceSlots, requireLocation, requireFaceVerification, officeLocation } = req.body;
+    const { checkInTime, checkOutTime, location, requireLocation, requireFaceVerification } = req.body;
     const userId = req.user!._id;
+
+    console.log('⚙️ [CONFIGURE ATTENDANCE] Request:', { workspaceId, checkInTime, checkOutTime, location });
 
     // Check if user is workspace owner
     const workspace = await Workspace.findById(workspaceId);
@@ -28,13 +31,17 @@ export const configureWorkspaceAttendance = async (req: AuthenticatedRequest, re
       { workspace: workspaceId },
       {
         workspace: workspaceId,
-        attendanceSlots,
-        requireLocation,
-        requireFaceVerification,
-        officeLocation
+        checkInTime,
+        checkOutTime,
+        location,
+        requireLocation: requireLocation ?? true,
+        requireFaceVerification: requireFaceVerification ?? false,
+        updatedBy: userId
       },
       { upsert: true, new: true }
     );
+
+    console.log('✅ [CONFIGURE ATTENDANCE] Configuration saved:', config._id);
 
     res.status(200).json({
       success: true,
@@ -52,9 +59,15 @@ export const getWorkspaceAttendanceConfig = async (req: AuthenticatedRequest, re
   try {
     const { workspaceId } = req.params;
 
-    const config = await WorkspaceAttendanceConfig.findOne({ workspace: workspaceId, isActive: true });
+    console.log('📥 [GET CONFIG] Looking for workspace:', workspaceId);
+
+    const config = await WorkspaceAttendanceConfig.findOne({ workspace: workspaceId });
+
+    console.log('📥 [GET CONFIG] Found config:', config?._id);
+    console.log('📥 [GET CONFIG] Config data:', JSON.stringify(config, null, 2));
 
     if (!config) {
+      console.log('⚠️ [GET CONFIG] No config found, returning defaults');
       // Return default configuration
       res.status(200).json({
         success: true,
@@ -72,6 +85,7 @@ export const getWorkspaceAttendanceConfig = async (req: AuthenticatedRequest, re
       return;
     }
 
+    console.log('✅ [GET CONFIG] Returning saved config');
     res.status(200).json({
       success: true,
       data: config
@@ -262,6 +276,154 @@ export const getWorkspaceAttendance = async (req: AuthenticatedRequest, res: Res
     });
   } catch (error: any) {
     console.error('❌ [GET WORKSPACE ATTENDANCE] Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Manual Attendance Marking (Owner only) - Optimized Version
+export const markManualAttendance = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { workspaceId } = req.params;
+    const { userId, date, status, slotName } = req.body;
+    const markerId = req.user!._id;
+
+    console.log('📝 [MARK MANUAL ATTENDANCE] Request:', { workspaceId, userId, date, status, slotName, markerId });
+
+    // Verify workspace exists and user is owner
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      res.status(404).json({ success: false, message: 'Workspace not found' });
+      return;
+    }
+
+    if (workspace.owner.toString() !== markerId.toString()) {
+      res.status(403).json({ success: false, message: 'Only workspace owner can mark manual attendance' });
+      return;
+    }
+
+    // Check if user is a member of the workspace
+    const isMember = workspace.members.some(
+      (member: any) => member.user.toString() === userId
+    );
+
+    if (!isMember) {
+      res.status(400).json({ success: false, message: 'User is not a member of this workspace' });
+      return;
+    }
+
+    // Find or create daily attendance document
+    let dailyAttendance = await DailyWorkspaceAttendance.findOne({
+      workspace: workspaceId,
+      date: date
+    });
+
+    if (dailyAttendance) {
+      // Update existing document
+      const userIndex = dailyAttendance.attendance.findIndex(
+        (att: any) => att.user.toString() === userId
+      );
+
+      if (userIndex >= 0) {
+        // Update existing user attendance
+        dailyAttendance.attendance[userIndex] = {
+          user: userId as any,
+          status,
+          markedAt: new Date(),
+          markedBy: markerId as any,
+          slotName: slotName || 'Manual Entry',
+          notes: `Manually marked by ${req.user!.fullName}`
+        };
+      } else {
+        // Add new user attendance
+        dailyAttendance.attendance.push({
+          user: userId as any,
+          status,
+          markedAt: new Date(),
+          markedBy: markerId as any,
+          slotName: slotName || 'Manual Entry',
+          notes: `Manually marked by ${req.user!.fullName}`
+        });
+      }
+
+      await dailyAttendance.save();
+    } else {
+      // Create new daily attendance document
+      dailyAttendance = await DailyWorkspaceAttendance.create({
+        workspace: workspaceId,
+        date: date,
+        attendance: [{
+          user: userId,
+          status,
+          markedAt: new Date(),
+          markedBy: markerId,
+          slotName: slotName || 'Manual Entry',
+          notes: `Manually marked by ${req.user!.fullName}`
+        }]
+      });
+    }
+
+    console.log('✅ [MARK MANUAL ATTENDANCE] Success:', dailyAttendance._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Attendance marked successfully',
+      data: dailyAttendance
+    });
+  } catch (error: any) {
+    console.error('❌ [MARK MANUAL ATTENDANCE] Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Get Attendance by Date - Optimized Version
+export const getAttendanceByDate = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { workspaceId, date } = req.params;
+
+    console.log('📅 [GET ATTENDANCE BY DATE] Request:', { workspaceId, date });
+
+    // Verify workspace exists
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      res.status(404).json({ success: false, message: 'Workspace not found' });
+      return;
+    }
+
+    // Get daily attendance document
+    const dailyAttendance = await DailyWorkspaceAttendance.findOne({
+      workspace: workspaceId,
+      date: date
+    }).populate('attendance.user', 'fullName email avatarUrl');
+
+    if (!dailyAttendance) {
+      console.log('✅ [GET ATTENDANCE BY DATE] No records found');
+      res.status(200).json({
+        success: true,
+        data: []
+      });
+      return;
+    }
+
+    // Transform to match old format for compatibility
+    const records = dailyAttendance.attendance.map((att: any) => ({
+      user: att.user,
+      slots: [{
+        slotName: att.slotName,
+        status: att.status,
+        markedAt: att.markedAt,
+        faceVerified: att.faceVerified,
+        notes: att.notes
+      }]
+    }));
+
+    console.log(`✅ [GET ATTENDANCE BY DATE] Found ${records.length} records`);
+
+    res.status(200).json({
+      success: true,
+      data: records
+    });
+  } catch (error: any) {
+    console.error('❌ [GET ATTENDANCE BY DATE] Error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

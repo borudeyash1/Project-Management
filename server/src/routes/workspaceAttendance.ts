@@ -6,7 +6,9 @@ import {
   markWorkspaceAttendance,
   getTodayAttendance,
   getMyAttendanceHistory,
-  getWorkspaceAttendance
+  getWorkspaceAttendance,
+  markManualAttendance,
+  getAttendanceByDate
 } from '../controllers/workspaceAttendanceController';
 
 const router = express.Router();
@@ -22,6 +24,12 @@ router.get('/workspace/:workspaceId/config', getWorkspaceAttendanceConfig);
 
 // Mark attendance for a slot
 router.post('/workspace/:workspaceId/mark', markWorkspaceAttendance);
+
+// Manual attendance marking (Owner only)
+router.post('/workspace/:workspaceId/mark-manual', markManualAttendance);
+
+// Get attendance for a specific date
+router.get('/workspace/:workspaceId/date/:date', getAttendanceByDate);
 
 // Get today's attendance for current user
 router.get('/workspace/:workspaceId/today', getTodayAttendance);

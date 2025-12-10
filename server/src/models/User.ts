@@ -315,6 +315,17 @@ const userSchema = new Schema<IUser>({
     type: String,
     trim: true
   },
+  faceData: {
+    images: {
+      type: [String],
+      default: []
+    },
+    verified: {
+      type: Boolean,
+      default: false
+    },
+    lastUpdated: Date
+  },
   isEmailVerified: {
     type: Boolean,
     default: false

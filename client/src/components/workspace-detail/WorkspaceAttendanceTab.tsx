@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import apiService from '../../services/api';
 import { useApp } from '../../context/AppContext';
 import { Clock, Settings, Users, Calendar, MapPin } from 'lucide-react';
+import ManualAttendanceView from './ManualAttendanceView';
+import AttendanceConfigModal from './AttendanceConfigModal';
+import { DayPicker } from 'react-day-picker';
+import { format } from 'date-fns';
+import 'react-day-picker/dist/style.css';
 
 interface WorkspaceAttendanceTabProps {
   workspaceId: string;
@@ -65,8 +70,8 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
     { name: 'Morning Check-in', time: '09:00', windowMinutes: 30, isActive: true },
     { name: 'Evening Check-out', time: '18:00', windowMinutes: 30, isActive: true }
   ]);
-  const [requireLocation, setRequireLocation] = useState(true);
-  const [requireFace, setRequireFace] = useState(false);
+  const [requireLocation, setRequireLocation] = useState(true); // Always required
+  const [requireFace, setRequireFace] = useState(false); // Disabled by default
   const [officeLocation, setOfficeLocation] = useState({ latitude: 0, longitude: 0, radiusMeters: 100 });
 
   // Load configuration
@@ -76,21 +81,45 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
 
   const loadConfig = async () => {
     try {
+      console.log('⚙️ [LOAD CONFIG] Loading configuration for workspace:', workspaceId);
+      
       const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/config`);
+      
+      console.log('⚙️ [LOAD CONFIG] Response:', response.data);
+      
       if (response.data.success && response.data.data) {
         const cfg = response.data.data;
+        console.log('⚙️ [LOAD CONFIG] Config data:', cfg);
+        console.log('⚙️ [LOAD CONFIG] attendanceSlots:', cfg.attendanceSlots);
+        
         setConfig(cfg);
+        
+        // Load attendanceSlots
         if (cfg.attendanceSlots && cfg.attendanceSlots.length > 0) {
+          console.log('⚙️ [LOAD CONFIG] ✅ Loading slots:', cfg.attendanceSlots);
+          console.log('⚙️ [LOAD CONFIG] Slot times:', cfg.attendanceSlots.map((s: any) => `${s.name}: ${s.time}`));
           setSlots(cfg.attendanceSlots);
         }
+        
         setRequireLocation(cfg.requireLocation ?? true);
         setRequireFace(cfg.requireFaceVerification ?? false);
-        if (cfg.officeLocation) {
-          setOfficeLocation(cfg.officeLocation);
+        
+        // Handle location
+        if (cfg.location) {
+          console.log('⚙️ [LOAD CONFIG] Setting office location:', cfg.location);
+          setOfficeLocation({
+            latitude: cfg.location.lat || 0,
+            longitude: cfg.location.lng || 0,
+            radiusMeters: cfg.location.radiusMeters || 100
+          });
         }
+        
+        console.log('⚙️ [LOAD CONFIG] Configuration loaded successfully');
+      } else {
+        console.log('⚙️ [LOAD CONFIG] No configuration found');
       }
     } catch (error) {
-      console.error('Failed to load attendance config:', error);
+      console.error('❌ [LOAD CONFIG] Failed to load attendance config:', error);
     }
   };
 
@@ -169,165 +198,17 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
         </div>
       </div>
 
-      {/* Configuration Panel */}
+
+      {/* Configuration Modal */}
       {showConfig && (
-        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Attendance Configuration</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Set up attendance time slots and verification requirements</p>
-          </div>
-          
-          <div className="p-6 space-y-6">
-            {/* Attendance Slots */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                Attendance Time Slots
-              </label>
-              <div className="space-y-3">
-                {slots.map((slot, index) => (
-                  <div key={index} className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <input
-                      type="text"
-                      value={slot.name}
-                      onChange={(e) => updateSlot(index, 'name', e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                      placeholder="Slot name"
-                    />
-                    <input
-                      type="time"
-                      value={slot.time}
-                      onChange={(e) => updateSlot(index, 'time', e.target.value)}
-                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                    />
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={slot.windowMinutes}
-                        onChange={(e) => updateSlot(index, 'windowMinutes', parseInt(e.target.value))}
-                        className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                        min="0"
-                        max="120"
-                      />
-                      <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">min</span>
-                    </div>
-                    <label className="flex items-center gap-2 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        checked={slot.isActive}
-                        onChange={(e) => updateSlot(index, 'isActive', e.target.checked)}
-                        className="rounded border-gray-300 text-accent focus:ring-accent"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Active</span>
-                    </label>
-                    <button
-                      onClick={() => removeSlot(index)}
-                      className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={addSlot}
-                  className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-accent hover:text-accent dark:hover:border-accent dark:hover:text-accent transition-colors font-medium"
-                >
-                  + Add Time Slot
-                </button>
-              </div>
-            </div>
-
-            {/* Verification Options */}
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                Verification Requirements
-              </label>
-              <label className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={requireLocation}
-                  onChange={(e) => setRequireLocation(e.target.checked)}
-                  className="rounded border-gray-300 text-accent focus:ring-accent"
-                />
-                <div className="flex-1">
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Require Location Verification</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Employees must be within office radius</p>
-                </div>
-              </label>
-              <label className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={requireFace}
-                  onChange={(e) => setRequireFace(e.target.checked)}
-                  className="rounded border-gray-300 text-accent focus:ring-accent"
-                />
-                <div className="flex-1">
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Require Face Verification</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Verify identity using face recognition</p>
-                </div>
-              </label>
-            </div>
-
-            {/* Office Location */}
-            {requireLocation && (
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  Office Location
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Latitude</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={officeLocation.latitude}
-                      onChange={(e) => setOfficeLocation({ ...officeLocation, latitude: parseFloat(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                      placeholder="0.000000"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Longitude</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={officeLocation.longitude}
-                      onChange={(e) => setOfficeLocation({ ...officeLocation, longitude: parseFloat(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                      placeholder="0.000000"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Radius (meters)</label>
-                    <input
-                      type="number"
-                      value={officeLocation.radiusMeters}
-                      onChange={(e) => setOfficeLocation({ ...officeLocation, radiusMeters: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                      placeholder="100"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Save Button */}
-          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-            <button
-              onClick={() => setShowConfig(false)}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={saveConfig}
-              disabled={loading}
-              className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm"
-            >
-              {loading ? 'Saving...' : 'Save Configuration'}
-            </button>
-          </div>
-        </div>
+        <AttendanceConfigModal
+          workspaceId={workspaceId}
+          onClose={() => setShowConfig(false)}
+          onSave={() => {
+            loadConfig();
+            setShowConfig(false);
+          }}
+        />
       )}
 
       {/* Mode Selection */}
@@ -370,28 +251,60 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
 // Owner Automatic View - Shows current attendance status
 const OwnerAutomaticView: React.FC<{ workspaceId: string; config: AttendanceConfig | null }> = ({ workspaceId, config }) => {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
-  const [selectedDate, setSelectedDate] = useState(formatDateInput(new Date()));
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDateStr, setSelectedDateStr] = useState(formatDateInput(new Date()));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+    setSelectedDateStr(dateStr);
     loadAttendance();
   }, [workspaceId, selectedDate]);
 
   const loadAttendance = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/all?date=${selectedDate}`);
-      if (response.data.success) {
-        setRecords(response.data.data || []);
-      }
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      console.log('📊 [OWNER AUTO VIEW] Loading attendance for date:', dateStr);
+      
+      // Use the new date-based endpoint
+      const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/date/${dateStr}`);
+      
+      console.log('📊 [OWNER AUTO VIEW] Response:', response.data);
+      
+      // Handle array response (new format)
+      const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
+      
+      console.log('📊 [OWNER AUTO VIEW] Parsed records:', records);
+      setRecords(records);
     } catch (error) {
       console.error('Failed to load attendance:', error);
+      setRecords([]);
     } finally {
       setLoading(false);
     }
   };
 
   const getSlotStatus = (record: AttendanceRecord, slotName: string) => {
+    // Check if this is manual attendance (slotName will be 'Manual Entry')
+    const isManualAttendance = record.slots.some(s => s.slotName === 'Manual Entry');
+    
+    if (isManualAttendance) {
+      // For manual attendance, use the first slot's status for all columns
+      const manualSlot = record.slots[0];
+      switch (manualSlot.status) {
+        case 'present':
+          return { status: 'Present', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' };
+        case 'work-from-home':
+          return { status: 'WFH', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' };
+        case 'absent':
+          return { status: 'Absent', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' };
+        default:
+          return { status: 'Not Marked', color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' };
+      }
+    }
+    
+    // For automatic attendance, check specific slot
     const slot = record.slots.find(s => s.slotName === slotName);
     if (!slot) return { status: 'Absent', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' };
     
@@ -413,19 +326,57 @@ const OwnerAutomaticView: React.FC<{ workspaceId: string; config: AttendanceConf
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Attendance Overview</h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Real-time attendance tracking for all members</p>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Calendar Section */}
+      <div className="lg:col-span-1">
+        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="w-5 h-5 text-accent" />
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Select Date</h4>
+          </div>
+          
+          <DayPicker
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => date && setSelectedDate(date)}
+            className="rdp-custom"
+            classNames={{
+              months: "flex flex-col",
+              month: "space-y-4",
+              caption: "flex justify-center pt-1 relative items-center",
+              caption_label: "text-sm font-medium text-gray-900 dark:text-gray-100",
+              nav: "space-x-1 flex items-center",
+              nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+              nav_button_previous: "absolute left-1",
+              nav_button_next: "absolute right-1",
+              table: "w-full border-collapse space-y-1",
+              head_row: "flex",
+              head_cell: "text-gray-500 dark:text-gray-400 rounded-md w-9 font-normal text-[0.8rem]",
+              row: "flex w-full mt-2",
+              cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+              day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md",
+              day_selected: "bg-accent text-gray-900 hover:bg-accent hover:text-gray-900 focus:bg-accent focus:text-gray-900",
+              day_today: "bg-gray-100 dark:bg-gray-700 text-accent font-bold",
+              day_outside: "text-gray-400 dark:text-gray-600 opacity-50",
+              day_disabled: "text-gray-400 dark:text-gray-600 opacity-50",
+              day_hidden: "invisible",
+            }}
+          />
+
+          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Selected Date:</p>
+            <p className="text-lg font-bold text-accent">{format(selectedDate, 'MMMM dd, yyyy')}</p>
+          </div>
         </div>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-        />
       </div>
+
+      {/* Attendance Table Section */}
+      <div className="lg:col-span-2">
+        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Attendance Overview</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Real-time attendance tracking for all members</p>
+          </div>
 
       {loading ? (
         <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center">
@@ -486,19 +437,15 @@ const OwnerAutomaticView: React.FC<{ workspaceId: string; config: AttendanceConf
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };
 
 // Owner Manual View - Allows manual marking
 const OwnerManualView: React.FC<{ workspaceId: string }> = ({ workspaceId }) => {
-  return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center">
-      <Settings className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Manual Attendance Mode</h4>
-      <p className="text-gray-600 dark:text-gray-400">Manual attendance marking feature coming soon</p>
-    </div>
-  );
+  return <ManualAttendanceView workspaceId={workspaceId} />;
 };
 
 // Employee Attendance View

@@ -1,5 +1,16 @@
-import { addMinutes, startOfDay, differenceInMilliseconds, roundToNearestMinutes } from 'date-fns';
+import { addMinutes, startOfDay, differenceInMilliseconds } from 'date-fns';
 import { PIXELS_PER_HOUR, SNAP_INTERVAL_MINUTES } from '../types/timeline';
+
+/**
+ * Round a date to the nearest interval in minutes
+ * @param date - The date to round
+ * @param nearestTo - The interval to round to (in minutes)
+ * @returns Rounded date
+ */
+function roundToNearestMinutes(date: Date, options: { nearestTo: number }): Date {
+    const ms = 1000 * 60 * options.nearestTo;
+    return new Date(Math.round(date.getTime() / ms) * ms);
+}
 
 /**
  * Convert a pixel position on the timeline to a Date object

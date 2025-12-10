@@ -1,0 +1,274 @@
+# PROMPT FOR AI ASSISTANT: Fix Planner Data Display Issue
+
+I need help fixing a critical bug in my React/TypeScript project management application. The Planner feature is fetching data successfully from the backend but not displaying it in the UI.
+
+## PROBLEM DESCRIPTION
+
+**Route:** `http://localhost:3000/planner`
+**Issue:** Tasks are fetched from API but show as 0 in the UI despite console logs showing 7 tasks received.
+
+**What's Working:**
+- Backend API `/api/planner/data` returns correct data (7 tasks, 1 reminder, 1 milestone, 2 events)
+- Network requests are successful (status 200/304)
+- Data appears in browser console logs
+- No CORS or network errors
+
+**What's NOT Working:**
+- UI shows "Total Tasks: 0" in debug panel
+- No tasks visible in BoardView (Kanban)
+- No tasks visible in ListView (Table)
+- React components don't re-render with fetched data
+
+## TECHNICAL STACK
+
+- **Frontend:** React 18, TypeScript, React Router
+- **Backend:** Node.js, Express, MongoDB
+- **State Management:** React Context API
+- **API Client:** Axios (via custom apiService)
+
+## FILE STRUCTURE
+
+```
+client/src/
+├── context/PlannerContext.tsx          # Context provider (SUSPECTED ISSUE)
+├── components/planner/views/
+│   ├── BoardView.tsx                   # Kanban board
+│   ├── ListView.tsx                    # Table view
+│   ├── TimelineView.tsx
+│   ├── CalendarView.tsx
+│   └── MyWorkView.tsx
+├── services/api.ts                     # Axios wrapper
+└── App.tsx
+
+server/src/
+├── controllers/plannerController.ts    # getAllPlannerData endpoint
+├── routes/planner.ts
+└── models/Task.ts
+```
+
+## CURRENT CODE
+
+### PlannerContext.tsx (Simplified)
+```typescript
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import apiService from '../services/api';
+
+// Global state to persist across re-renders
+let globalTasks: Task[] = [];
+
+export const PlannerProvider = ({ children }) => {
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const timestamp = new Date().getTime();
+      const response = await apiService.get(`/planner/data?_t=${timestamp}`);
+      
+      if (response.data && response.data.success) {
+        const normalizedTasks = (response.data.data.tasks || []).map((task: any) => ({
+          ...task,
+          subtasks: task.subtasks || [],
+          tags: task.tags || [],
+          comments: task.comments || [],
+          attachments: task.attachments || [],
+          assignees: task.assignee ? [task.assignee] : [],
+          estimatedTime: task.estimatedHours || task.estimatedTime || 0
+        }));
+        
+        globalTasks = normalizedTasks;
+        setTasks([...normalizedTasks]);
+        forceUpdate();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return (
+    <PlannerContext.Provider value={{ tasks, loading, fetchData }}>
+      {children}
+    </PlannerContext.Provider>
+  );
+};
+```
+
+### BoardView.tsx (Current - Direct Fetching)
+```typescript
+import React, { useState, useEffect } from 'react';
+import apiService from '../../../services/api';
+
+const BoardView = ({ searchQuery }) => {
+  const { columns, addTask, moveTask } = usePlanner();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      console.log('📡 [BoardView] Fetching tasks directly...');
+      try {
+        const timestamp = new Date().getTime();
+        const response = await apiService.get(`/planner/data?_t=${timestamp}`);
+        console.log('✅ [BoardView] Response:', response.data);
+        
+        if (response.data && response.data.success) {
+          const normalizedTasks = (response.data.data.tasks || []).map((task: any) => ({
+            ...task,
+            subtasks: task.subtasks || [],
+            tags: task.tags || [],
+            comments: task.comments || [],
+            attachments: task.attachments || [],
+            assignees: task.assignee ? [task.assignee] : [],
+            estimatedTime: task.estimatedHours || task.estimatedTime || 0
+          }));
+          
+          console.log('💾 [BoardView] Setting tasks:', normalizedTasks.length);
+          setTasks(normalizedTasks);
+        }
+      } catch (error) {
+        console.error('❌ [BoardView] Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    console.log('🔄 [BoardView] Tasks state updated. Count:', tasks.length);
+  }, [tasks]);
+
+  const filteredTasks = (columnId: string) => {
+    return tasks.filter(task => task.status === columnId);
+  };
+
+  return (
+    <div>
+      {/* Debug panel */}
+      <div className="bg-yellow-100 p-4">
+        <h3>DEBUG INFO</h3>
+        <div>Total Tasks: {tasks.length}</div>
+        <div>Loading: {loading ? 'Yes' : 'No'}</div>
+      </div>
+      
+      {/* Board columns */}
+      {columns.map(column => (
+        <div key={column.id}>
+          <h3>{column.name}</h3>
+          {filteredTasks(column.id).map(task => (
+            <TaskCard key={task._id} task={task} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+## CONSOLE LOGS OBSERVED
+
+```
+📡 [BoardView] Fetching tasks directly...
+✅ [BoardView] Response: {success: true, data: {tasks: Array(7), ...}}
+💾 [BoardView] Setting tasks: 7
+📋 [BoardView] Tasks: [{_id: "...", title: "Design hero section", ...}, ...]
+🔄 [BoardView] Tasks state updated. Count: 0  ← PROBLEM: Should be 7!
+📊 [BoardView] Current tasks: []  ← PROBLEM: Should have 7 tasks!
+```
+
+**Key Observation:** The console shows `setTasks()` is called with 7 tasks, but the state update shows 0 tasks. This suggests React is not persisting the state update.
+
+## API RESPONSE FORMAT
+
+```json
+{
+  "success": true,
+  "data": {
+    "tasks": [
+      {
+        "_id": "68fd9abd12f39c3d0faa98c6",
+        "title": "Design hero section",
+        "status": "in-progress",
+        "priority": "high",
+        "tags": ["UI"],
+        "subtasks": [],
+        "dueDate": "2024-10-20T00:00:00.000Z",
+        "estimatedHours": 8
+      }
+      // ... 6 more tasks
+    ],
+    "reminders": [...],
+    "milestones": [...],
+    "events": [...]
+  }
+}
+```
+
+## ATTEMPTED SOLUTIONS (ALL FAILED)
+
+1. **Data Normalization** - Added default values for optional fields
+2. **Safe Accessors** - Created helper functions for property access
+3. **Global State Variables** - Used variables outside React lifecycle
+4. **useReducer Force Updates** - Added forceUpdate() calls
+5. **Direct Component Fetching** - Bypassed Context, fetch in each component
+6. **Cache Busting** - Added timestamps to prevent 304 responses
+
+## SUSPECTED ROOT CAUSES
+
+1. **React Strict Mode** - Double mounting causing state resets
+2. **Multiple Provider Instances** - Multiple `<PlannerProvider>` wrapping components
+3. **State Update Batching** - React batching setState calls incorrectly
+4. **Closure Issues** - Stale closures capturing old state
+
+## ENVIRONMENT
+
+- React: 18.x
+- TypeScript: 5.x
+- Node.js: 18.x
+- MongoDB: 6.x
+- Development mode (npm start)
+
+## WHAT I NEED
+
+Please analyze this issue and provide:
+
+1. **Root Cause Identification** - Why is `setTasks()` not persisting the state?
+2. **Working Solution** - Code that will display the tasks
+3. **Explanation** - Why the current approach fails
+4. **Best Practices** - Recommended pattern for this scenario
+
+## DEBUGGING INFORMATION TO PROVIDE
+
+If you need more info, I can provide:
+- Full component code
+- React DevTools screenshots
+- Network tab screenshots
+- App.tsx routing configuration
+- Package.json dependencies
+
+## CONSTRAINTS
+
+- Must use React 18 (cannot downgrade)
+- Must use TypeScript
+- Prefer solutions without adding new dependencies (but open to React Query/SWR if necessary)
+- Need to maintain existing API structure
+
+## SUCCESS CRITERIA
+
+Solution is successful when:
+1. Navigate to `/planner` route
+2. Debug panel shows "Total Tasks: 7"
+3. Tasks appear in board columns
+4. Can switch to List view and see tasks in table
+5. Console shows state updated with 7 tasks
+
+Please provide a complete, working solution with explanation. Thank you!

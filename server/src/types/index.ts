@@ -22,6 +22,11 @@ export interface IUser extends Document {
   location?: string;
   about?: string;
   avatarUrl?: string;
+  faceData?: {
+    images: string[];
+    verified: boolean;
+    lastUpdated?: Date;
+  };
   isEmailVerified: boolean;
   faceScanImage?: string;
   emailVerificationOTP?: string; // New field for OTP
