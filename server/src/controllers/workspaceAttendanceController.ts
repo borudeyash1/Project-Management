@@ -9,10 +9,10 @@ import Workspace from '../models/Workspace';
 export const configureWorkspaceAttendance = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { workspaceId } = req.params;
-    const { checkInTime, checkOutTime, location, requireLocation, requireFaceVerification } = req.body;
+    const { checkInTime, checkOutTime, location, holidays, requireLocation, requireFaceVerification } = req.body;
     const userId = req.user!._id;
 
-    console.log('⚙️ [CONFIGURE ATTENDANCE] Request:', { workspaceId, checkInTime, checkOutTime, location });
+    console.log('⚙️ [CONFIGURE ATTENDANCE] Request:', { workspaceId, checkInTime, checkOutTime, location, holidays });
 
     // Check if user is workspace owner
     const workspace = await Workspace.findById(workspaceId);
@@ -34,6 +34,7 @@ export const configureWorkspaceAttendance = async (req: AuthenticatedRequest, re
         checkInTime,
         checkOutTime,
         location,
+        holidays: holidays || [],
         requireLocation: requireLocation ?? true,
         requireFaceVerification: requireFaceVerification ?? false,
         updatedBy: userId
@@ -42,6 +43,7 @@ export const configureWorkspaceAttendance = async (req: AuthenticatedRequest, re
     );
 
     console.log('✅ [CONFIGURE ATTENDANCE] Configuration saved:', config._id);
+    console.log('✅ [CONFIGURE ATTENDANCE] Holidays saved:', config.holidays);
 
     res.status(200).json({
       success: true,

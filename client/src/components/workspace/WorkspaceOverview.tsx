@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { getProjects as getWorkspaceProjects } from '../../services/projectService';
 import { apiService } from '../../services/api';
+import { format } from 'date-fns';
 import { 
   FolderKanban, 
   Users, 
@@ -25,17 +26,60 @@ interface Note {
   updatedAt: Date;
 }
 
+interface AttendanceStats {
+  present: number;
+  absent: number;
+  wfh: number;
+  total: number;
+}
+
 const WorkspaceOverview: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
+  const [attendanceStats, setAttendanceStats] = useState<AttendanceStats>({ present: 0, absent: 0, wfh: 0, total: 0 });
+  const [loadingAttendance, setLoadingAttendance] = useState(true);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const workspaceProjects = state.projects.filter(
     (project) => project.workspace === state.currentWorkspace
   );
+
+  // Fetch attendance data
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      if (!state.currentWorkspace) return;
+      
+      try {
+        setLoadingAttendance(true);
+        const today = format(new Date(), 'yyyy-MM-dd');
+        const response = await apiService.get(`/workspace-attendance/workspace/${state.currentWorkspace}/date/${today}`);
+        
+        const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        
+        let present = 0, absent = 0, wfh = 0;
+        
+        records.forEach((record: any) => {
+          if (record.slots && record.slots.length > 0) {
+            const status = record.slots[0].status;
+            if (status === 'present') present++;
+            else if (status === 'work-from-home') wfh++;
+            else if (status === 'absent') absent++;
+          }
+        });
+        
+        setAttendanceStats({ present, absent, wfh, total: records.length });
+      } catch (error) {
+        console.error('Failed to fetch attendance:', error);
+      } finally {
+        setLoadingAttendance(false);
+      }
+    };
+    
+    fetchAttendance();
+  }, [state.currentWorkspace]);
 
   // Fetch recent notes
   useEffect(() => {
@@ -205,83 +249,37 @@ const WorkspaceOverview: React.FC = () => {
 
       {/* Attendance Section */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Attendance</h2>
-        </div>
-        
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
-          {isOwner ? (
-            <div className="space-y-6">
-              {/* Owner Controls */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Check-In Time (Opens for 1 hour)
-                  </label>
-                  <input
-                    type="time"
-                    defaultValue="09:00"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Window: 9:00 AM - 10:00 AM
-                  </p>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Check-Out Time (Opens for 1 hour)
-                  </label>
-                  <input
-                    type="time"
-                    defaultValue="17:00"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Window: 5:00 PM - 6:00 PM
-                  </p>
-                </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Today's Attendance</h3>
+            <Clock className="w-5 h-5 text-gray-400" />
+          </div>
+          
+          {attendanceStats.total > 0 ? (
+            <div className="grid grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                <div className="text-2xl font-bold text-green-600">{attendanceStats.present}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Present</div>
               </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-gray-300 dark:border-gray-600">
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    Today's Attendance
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">0</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Present</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">0</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Absent</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">0</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">WFH</div>
-                  </div>
-                </div>
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                <div className="text-2xl font-bold text-red-600">{attendanceStats.absent}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Absent</div>
+              </div>
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">{attendanceStats.wfh}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">WFH</div>
+              </div>
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-600 dark:text-gray-300">{attendanceStats.total}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total</div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <Clock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                Mark your attendance for today
+            <div className="text-center py-6">
+              <Clock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                No attendance data available for today
               </p>
-              <div className="flex items-center justify-center gap-4">
-                <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                  Check In
-                </button>
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Check Out
-                </button>
-              </div>
             </div>
           )}
         </div>

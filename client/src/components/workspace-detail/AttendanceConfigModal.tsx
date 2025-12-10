@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Clock } from 'lucide-react';
+import { X, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import apiService from '../../services/api';
 import { useApp } from '../../context/AppContext';
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, addDays, getDay } from 'date-fns';
 
 interface AttendanceConfigModalProps {
   workspaceId: string;
@@ -21,6 +22,8 @@ const AttendanceConfigModal: React.FC<AttendanceConfigModalProps> = ({ workspace
   const [longitude, setLongitude] = useState(0);
   const [radius, setRadius] = useState(100);
   const [fetchingLocation, setFetchingLocation] = useState(false);
+  const [holidays, setHolidays] = useState<string[]>([]); // Array of date strings in YYYY-MM-DD format
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
 
   useEffect(() => {
     loadConfiguration();
@@ -70,6 +73,12 @@ const AttendanceConfigModal: React.FC<AttendanceConfigModalProps> = ({ workspace
           setRadius(cfg.location.radiusMeters || 100);
         }
         
+        // Load holidays
+        if (cfg.holidays && Array.isArray(cfg.holidays)) {
+          console.log('📥 [LOAD CONFIG] Setting holidays:', cfg.holidays);
+          setHolidays(cfg.holidays);
+        }
+        
         console.log('✅ [LOAD CONFIG] Configuration loaded successfully');
       } else {
         console.log('⚠️ [LOAD CONFIG] No configuration found');
@@ -79,6 +88,26 @@ const AttendanceConfigModal: React.FC<AttendanceConfigModalProps> = ({ workspace
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleHoliday = (date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    setHolidays(prev => {
+      if (prev.includes(dateStr)) {
+        return prev.filter(d => d !== dateStr);
+      } else {
+        return [...prev, dateStr];
+      }
+    });
+  };
+
+  const isSunday = (date: Date) => {
+    return date.getDay() === 0;
+  };
+
+  const isHoliday = (date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return holidays.includes(dateStr) || isSunday(date);
   };
 
   const fetchLiveLocation = () => {
@@ -145,6 +174,7 @@ const AttendanceConfigModal: React.FC<AttendanceConfigModalProps> = ({ workspace
           lng: longitude,
           radiusMeters: radius
         },
+        holidays: holidays, // Save holidays array
         requireLocation: true,
         requireFaceVerification: false
       };
@@ -309,6 +339,98 @@ const AttendanceConfigModal: React.FC<AttendanceConfigModalProps> = ({ workspace
                   placeholder="100"
                   min="10"
                 />
+              </div>
+            </div>
+
+            {/* Holiday Calendar */}
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <Clock className="w-4 h-4 inline mr-2" />
+                Holidays & Non-Working Days
+              </label>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Sundays are automatically marked. Double-click any date to toggle holiday.
+              </p>
+              
+              {/* Month Navigation */}
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={() => setSelectedMonth(subMonths(selectedMonth, 1))}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  {format(selectedMonth, 'MMMM yyyy')}
+                </div>
+                <button
+                  onClick={() => setSelectedMonth(addMonths(selectedMonth, 1))}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+                {/* Day Headers */}
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-center text-xs font-semibold text-gray-600 dark:text-gray-400 py-1">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Days */}
+                <div className="grid grid-cols-7 gap-1">
+                  {(() => {
+                    const start = startOfMonth(selectedMonth);
+                    const end = endOfMonth(selectedMonth);
+                    const days = [];
+                    
+                    // Add empty cells for days before month starts
+                    const startDay = getDay(start);
+                    for (let i = 0; i < startDay; i++) {
+                      days.push(<div key={`empty-${i}`} className="aspect-square" />);
+                    }
+                    
+                    // Add all days of the month
+                    let currentDate = start;
+                    while (currentDate <= end) {
+                      const date = new Date(currentDate);
+                      const isHol = isHoliday(date);
+                      const isSun = isSunday(date);
+                      
+                      days.push(
+                        <div
+                          key={date.toISOString()}
+                          onDoubleClick={() => !isSun && toggleHoliday(date)}
+                          className={`
+                            aspect-square flex items-center justify-center text-xs rounded cursor-pointer
+                            transition-colors
+                            ${isHol 
+                              ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-bold' 
+                              : 'bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                            }
+                            ${isSun ? 'cursor-not-allowed' : ''}
+                          `}
+                          title={isSun ? 'Sunday (auto-holiday)' : isHol ? 'Holiday (double-click to remove)' : 'Double-click to mark as holiday'}
+                        >
+                          {format(date, 'd')}
+                        </div>
+                      );
+                      
+                      currentDate = addDays(currentDate, 1);
+                    }
+                    
+                    return days;
+                  })()}
+                </div>
+              </div>
+              
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                {holidays.length} custom holiday{holidays.length !== 1 ? 's' : ''} marked
               </div>
             </div>
           </div>

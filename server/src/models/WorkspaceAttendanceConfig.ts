@@ -23,6 +23,7 @@ export interface IWorkspaceAttendanceConfig extends Document {
     start: string; // e.g., "17:00"
     end: string;   // e.g., "18:00" - Grace period
   };
+  holidays?: string[]; // Array of date strings in YYYY-MM-DD format
   workingDays: number[]; // 0-6 (Sunday-Saturday)
   workFromHomeAllowed: boolean;
   autoModeEnabled: boolean;
@@ -82,6 +83,10 @@ const workspaceAttendanceConfigSchema = new Schema<IWorkspaceAttendanceConfig>({
   checkOutTime: {
     start: { type: String, default: '17:00' },
     end: { type: String, default: '18:00' },
+  },
+  holidays: {
+    type: [String],
+    default: []
   },
   workingDays: {
     type: [Number],
