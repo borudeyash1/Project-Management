@@ -2090,6 +2090,18 @@ const ProjectViewDetailed: React.FC = () => {
                   });
                   
                   console.log('🔄 [UPDATE ROLE] State updated, UI should refresh now');
+                  
+                  // Force reload project from server to ensure sync
+                  console.log('🔄 [UPDATE ROLE] Force reloading project from server...');
+                  const reloadResponse = await apiService.get(`/projects/${activeProject?._id}`);
+                  if (reloadResponse.data.success) {
+                    const reloadedProject = {
+                      ...reloadResponse.data.data,
+                      teamMembers: [...reloadResponse.data.data.teamMembers]
+                    };
+                    setActiveProject(reloadedProject);
+                    console.log('✅ [UPDATE ROLE] Project reloaded successfully');
+                  }
                 }
               } catch (error) {
                 console.error('❌ [UPDATE ROLE] Failed:', error);
@@ -2100,7 +2112,7 @@ const ProjectViewDetailed: React.FC = () => {
                   payload: { 
                     id: Date.now().toString(), 
                     type: 'error', 
-                    message: 'Failed to update member role.', 
+                    message: 'Failed to update member role', 
                     duration: 4000 
                   } 
                 });

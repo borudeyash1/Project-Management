@@ -282,24 +282,31 @@ export const getWorkspaceAttendance = async (req: AuthenticatedRequest, res: Res
   }
 };
 
-// Manual Attendance Marking (Owner only) - Optimized Version
+// Manual Attendance Marking - Allows owner to mark for others, employees to mark for themselves
 export const markManualAttendance = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { workspaceId } = req.params;
-    const { userId, date, status, slotName } = req.body;
+    const { userId, date, status, slotName, location, notes } = req.body;
     const markerId = req.user!._id;
 
     console.log('📝 [MARK MANUAL ATTENDANCE] Request:', { workspaceId, userId, date, status, slotName, markerId });
 
-    // Verify workspace exists and user is owner
+    // Verify workspace exists
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
       res.status(404).json({ success: false, message: 'Workspace not found' });
       return;
     }
 
-    if (workspace.owner.toString() !== markerId.toString()) {
-      res.status(403).json({ success: false, message: 'Only workspace owner can mark manual attendance' });
+    const isOwner = workspace.owner.toString() === markerId.toString();
+    const isSelfMarking = userId === markerId.toString();
+
+    // Check permissions: Owner can mark for anyone, employees can only mark for themselves
+    if (!isOwner && !isSelfMarking) {
+      res.status(403).json({ 
+        success: false, 
+        message: 'You can only mark your own attendance. Only workspace owner can mark attendance for others.' 
+      });
       return;
     }
 
@@ -313,38 +320,64 @@ export const markManualAttendance = async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    // Find or create daily attendance document
+    // Find existing daily attendance document
     let dailyAttendance = await DailyWorkspaceAttendance.findOne({
       workspace: workspaceId,
       date: date
     });
 
+    // Check if attendance is already marked
+    if (dailyAttendance) {
+      const existingAttendance = dailyAttendance.attendance.find(
+        (att: any) => att.user.toString() === userId
+      );
+
+      if (existingAttendance) {
+        // Check if it was marked manually by owner
+        const wasMarkedByOwner = existingAttendance.markedBy && 
+                                 existingAttendance.markedBy.toString() !== userId;
+
+        if (wasMarkedByOwner && isSelfMarking) {
+          res.status(400).json({ 
+            success: false, 
+            message: 'Your attendance has already been marked by the workspace owner. You cannot change it.' 
+          });
+          return;
+        }
+
+        if (isSelfMarking && existingAttendance.markedBy?.toString() === userId) {
+          res.status(400).json({ 
+            success: false, 
+            message: 'You have already marked your attendance for today.' 
+          });
+          return;
+        }
+      }
+    }
+
+    // Mark attendance
     if (dailyAttendance) {
       // Update existing document
       const userIndex = dailyAttendance.attendance.findIndex(
         (att: any) => att.user.toString() === userId
       );
 
+      const attendanceEntry = {
+        user: userId as any,
+        status,
+        markedAt: new Date(),
+        markedBy: markerId as any,
+        slotName: slotName || (isSelfMarking ? 'Self Check-in' : 'Manual Entry'),
+        location: location,
+        notes: notes || (isSelfMarking ? `Self-marked` : `Manually marked by ${req.user!.fullName}`)
+      };
+
       if (userIndex >= 0) {
         // Update existing user attendance
-        dailyAttendance.attendance[userIndex] = {
-          user: userId as any,
-          status,
-          markedAt: new Date(),
-          markedBy: markerId as any,
-          slotName: slotName || 'Manual Entry',
-          notes: `Manually marked by ${req.user!.fullName}`
-        };
+        dailyAttendance.attendance[userIndex] = attendanceEntry;
       } else {
         // Add new user attendance
-        dailyAttendance.attendance.push({
-          user: userId as any,
-          status,
-          markedAt: new Date(),
-          markedBy: markerId as any,
-          slotName: slotName || 'Manual Entry',
-          notes: `Manually marked by ${req.user!.fullName}`
-        });
+        dailyAttendance.attendance.push(attendanceEntry);
       }
 
       await dailyAttendance.save();
@@ -358,8 +391,9 @@ export const markManualAttendance = async (req: AuthenticatedRequest, res: Respo
           status,
           markedAt: new Date(),
           markedBy: markerId,
-          slotName: slotName || 'Manual Entry',
-          notes: `Manually marked by ${req.user!.fullName}`
+          slotName: slotName || (isSelfMarking ? 'Self Check-in' : 'Manual Entry'),
+          location: location,
+          notes: notes || (isSelfMarking ? `Self-marked` : `Manually marked by ${req.user!.fullName}`)
         }]
       });
     }

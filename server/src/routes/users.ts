@@ -8,6 +8,7 @@ import {
   uploadAvatar,
   searchUsers,
   saveFaceScan,
+  verifyFace,
   getPreferences,
   updatePreferences
 } from '../controllers/userController';
@@ -59,6 +60,7 @@ const updateProfileValidation = [
 router.get('/profile', getProfile);
 router.put('/profile', updateProfileValidation, validateRequest, updateProfile);
 router.post('/face-scan', saveFaceScan);
+router.post('/verify-face', verifyFace);
 router.put('/settings', validateRequest, updateSettings);
 router.delete('/account', deleteAccount);
 router.post('/avatar', uploadAvatar);

@@ -105,8 +105,15 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       const today = format(new Date(), 'yyyy-MM-dd');
       const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/date/${today}`);
       
+      console.log('📅 [TODAY ATTENDANCE] Response:', response.data);
+      
       const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
-      const myRecord = records.find((r: any) => r.user === userId);
+      const myRecord = records.find((r: any) => {
+        const recordUserId = typeof r.user === 'object' ? r.user._id : r.user;
+        return recordUserId === userId;
+      });
+      
+      console.log('📅 [TODAY ATTENDANCE] My Record:', myRecord);
       
       if (myRecord && myRecord.slots && myRecord.slots.length > 0) {
         const slot = myRecord.slots[0];
@@ -115,7 +122,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
           status: slot.status,
           markedAt: slot.markedAt,
           markedBy: slot.markedBy,
-          isManual: slot.slotName === 'Manual Entry'
+          isManual: slot.slotName === 'Manual Entry' || slot.slotName === 'Self Check-in'
         });
       } else {
         setTodayAttendance(null);
@@ -127,6 +134,8 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
 
   const loadAttendanceHistory = async () => {
     try {
+      console.log('📊 [ATTENDANCE HISTORY] Loading for user:', userId);
+      
       // Load last 30 days of attendance
       const history = new Map<string, AttendanceRecord>();
       
@@ -138,7 +147,11 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         try {
           const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/date/${dateStr}`);
           const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
-          const myRecord = records.find((r: any) => r.user === userId);
+          
+          const myRecord = records.find((r: any) => {
+            const recordUserId = typeof r.user === 'object' ? r.user._id : r.user;
+            return recordUserId === userId;
+          });
           
           if (myRecord && myRecord.slots && myRecord.slots.length > 0) {
             const slot = myRecord.slots[0];
@@ -147,7 +160,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
               status: slot.status,
               markedAt: slot.markedAt,
               markedBy: slot.markedBy,
-              isManual: slot.slotName === 'Manual Entry'
+              isManual: slot.slotName === 'Manual Entry' || slot.slotName === 'Self Check-in'
             });
           }
         } catch (err) {
@@ -155,6 +168,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         }
       }
       
+      console.log('📊 [ATTENDANCE HISTORY] Loaded:', history.size, 'days');
       setAttendanceHistory(history);
     } catch (error) {
       console.error('Failed to load attendance history:', error);
@@ -184,7 +198,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         navigator.geolocation.getCurrentPosition(
           (pos) => resolve(pos),
           () => resolve(null),
-          { enableHighAccuracy: true, timeout: 10000 }
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
       });
 
@@ -208,15 +222,21 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const distance = R * c; // Distance in meters
 
+        // Add tolerance for GPS accuracy (add 50m buffer for testing)
+        const tolerance = 50;
+        const effectiveRadius = allowedRadius + tolerance;
+
         console.log('📍 Location Check:', {
           employeeLocation: { lat: employeeLat, lng: employeeLng },
           configLocation: { lat: configLat, lng: configLng },
           distance: distance.toFixed(2) + 'm',
           allowedRadius: allowedRadius + 'm',
-          withinRange: distance <= allowedRadius
+          effectiveRadius: effectiveRadius + 'm',
+          accuracy: pos.coords.accuracy + 'm',
+          withinRange: distance <= effectiveRadius
         });
 
-        if (distance <= allowedRadius) {
+        if (distance <= effectiveRadius) {
           setCurrentLocation({
             latitude: employeeLat,
             longitude: employeeLng,
@@ -229,8 +249,8 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
             payload: {
               id: Date.now().toString(),
               type: 'success',
-              message: `Location verified! (${distance.toFixed(0)}m from office)`,
-              duration: 3000
+              message: `Location verified! (${distance.toFixed(0)}m from office, accuracy: ±${pos.coords.accuracy.toFixed(0)}m)`,
+              duration: 4000
             }
           });
         } else {
@@ -239,7 +259,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
             payload: {
               id: Date.now().toString(),
               type: 'error',
-              message: `You are ${distance.toFixed(0)}m away. Must be within ${allowedRadius}m of office location.`,
+              message: `You are ${distance.toFixed(0)}m away (accuracy: ±${pos.coords.accuracy.toFixed(0)}m). Must be within ${allowedRadius}m of office.`,
               duration: 5000
             }
           });
@@ -250,8 +270,8 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
           payload: {
             id: Date.now().toString(),
             type: 'error',
-            message: 'Failed to fetch location. Please enable location services.',
-            duration: 3000
+            message: 'Failed to fetch location. Please enable location services and ensure high accuracy mode.',
+            duration: 4000
           }
         });
       }
@@ -271,42 +291,106 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
 
   const scanFace = async (type: 'check-in' | 'check-out') => {
     try {
-      // TODO: Implement actual face recognition
-      // For now, simulate face scan with a delay
+      // Request camera access
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user', width: 640, height: 480 } 
+      });
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'info',
-          message: 'Scanning face...',
+          message: 'Camera opened. Please look at the camera...',
+          duration: 3000
+        }
+      });
+
+      // Create video element to capture frame
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+
+      // Wait for video to be ready
+      await new Promise((resolve) => {
+        video.onloadedmetadata = resolve;
+      });
+
+      // Wait 2 seconds for user to position face
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Capture frame
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error('Failed to get canvas context');
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const capturedImage = canvas.toDataURL('image/jpeg', 0.85);
+
+      // Stop camera
+      stream.getTracks().forEach(track => track.stop());
+
+      // Send to backend for verification
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'info',
+          message: 'Verifying face...',
           duration: 2000
         }
       });
 
-      // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await apiService.post('/users/verify-face', { 
+        capturedImage 
+      });
 
-      // Placeholder: Always succeed for now
-      // In production, this would call a face recognition API
-      setFaceScanned({ ...faceScanned, [type]: true });
+      if (response.data.success && response.data.data.matched) {
+        setFaceScanned({ ...faceScanned, [type]: true });
+        
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'success',
+            message: `Face verified successfully! (${response.data.data.confidence}% match)`,
+            duration: 3000
+          }
+        });
+      } else {
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: 'Face verification failed. Please try again or update your face scan in profile.',
+            duration: 5000
+          }
+        });
+      }
+    } catch (error: any) {
+      console.error('Face scan error:', error);
+      
+      let errorMessage = 'Face verification failed';
+      if (error.name === 'NotAllowedError') {
+        errorMessage = 'Camera access denied. Please allow camera access.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'No camera found on this device.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
       
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
-          type: 'success',
-          message: 'Face verified successfully!',
-          duration: 2000
-        }
-      });
-    } catch (error) {
-      console.error('Face scan error:', error);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
           type: 'error',
-          message: 'Face verification failed',
+          message: errorMessage,
           duration: 3000
         }
       });

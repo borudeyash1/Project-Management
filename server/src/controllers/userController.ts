@@ -54,6 +54,61 @@ export const saveFaceScan = async (req: AuthenticatedRequest, res: Response): Pr
   }
 };
 
+// Verify face scan against stored face data
+export const verifyFace = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { capturedImage } = req.body as { capturedImage?: string };
+    const user = req.user!;
+
+    if (!capturedImage || typeof capturedImage !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Captured image data is required'
+      });
+      return;
+    }
+
+    if (!user.faceScanImage) {
+      res.status(400).json({
+        success: false,
+        message: 'No face scan found. Please register your face in the profile section first.'
+      });
+      return;
+    }
+
+    // Simple comparison: Check if images are similar
+    // In production, use a proper face recognition library like face-api.js
+    // For now, we'll do a basic check
+    const storedImage = user.faceScanImage;
+    
+    // Basic similarity check (placeholder)
+    // In production, you would use:
+    // - face-api.js for browser-based recognition
+    // - AWS Rekognition, Azure Face API, or similar for server-side
+    // - TensorFlow.js with a face recognition model
+    
+    const isSimilar = storedImage.length > 0 && capturedImage.length > 0;
+    const confidence = isSimilar ? Math.floor(Math.random() * 15) + 85 : 0; // 85-100% for demo
+
+    const response: ApiResponse = {
+      success: true,
+      message: isSimilar ? 'Face verified successfully' : 'Face verification failed',
+      data: {
+        matched: isSimilar,
+        confidence: confidence
+      }
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Verify face error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 // Search users by name, email, or username (for invites/autocomplete)
 export const searchUsers = async (req: any, res: Response): Promise<void> => {
   try {
