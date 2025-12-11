@@ -360,13 +360,6 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
               {t('project.tasks.subtitle', { count: tasks.length })}
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            {t('project.tasks.assignNew')}
-          </button>
         </div>
 
         {/* Tasks List */}
@@ -856,24 +849,17 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     setTaskForm({ 
                       ...taskForm, 
                       taskType: type,
-                      requiresFile: type === 'file-submission',
-                      requiresLink: type === 'link-submission'
+                      requiresFile: type === 'file-submission'
                     });
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
                   <option value="general">{t('project.tasks.types.general')}</option>
-                  <option value="status-update">{t('project.tasks.types.statusUpdate')}</option>
                   <option value="file-submission">{t('project.tasks.types.fileSubmission')}</option>
-                  <option value="link-submission">{t('project.tasks.types.linkSubmission')}</option>
-                  <option value="review">{t('project.tasks.types.review')}</option>
                 </select>
                 <p className="text-xs text-gray-600 mt-1">
                   {taskForm.taskType === 'general' && t('project.tasks.modal.taskTypeDesc.general')}
-                  {taskForm.taskType === 'status-update' && t('project.tasks.modal.taskTypeDesc.statusUpdate')}
                   {taskForm.taskType === 'file-submission' && t('project.tasks.modal.taskTypeDesc.fileSubmission')}
-                  {taskForm.taskType === 'link-submission' && t('project.tasks.modal.taskTypeDesc.linkSubmission')}
-                  {taskForm.taskType === 'review' && t('project.tasks.modal.taskTypeDesc.review')}
                 </p>
               </div>
 
@@ -888,7 +874,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
                   <option value="">{t('project.tasks.modal.selectMember')}</option>
-                  {projectTeam.filter(m => m.role !== 'project-manager').map((member) => (
+                  {projectTeam.map((member) => (
                     <option key={member._id} value={member._id}>
                       {member.name} - {member.role}
                     </option>

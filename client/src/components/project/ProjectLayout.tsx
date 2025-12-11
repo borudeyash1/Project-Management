@@ -1,19 +1,101 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import ProjectInternalNav from './ProjectInternalNav';
+import { apiService } from '../../services/api';
 
 const ProjectLayout: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   
   const project = state.projects.find(p => p._id === projectId);
   const workspace = state.workspaces.find(w => w._id === project?.workspace);
   
   // Get all projects in the same workspace for the dropdown
   const workspaceProjects = state.projects.filter(p => p.workspace === project?.workspace);
+
+  // Load project from API if not in state (handles page refresh)
+  useEffect(() => {
+    const loadProject = async () => {
+      if (!projectId) {
+        setLoading(false);
+        return;
+      }
+
+      // Wait for user to be authenticated
+      if (!state.userProfile?._id) {
+        console.log('⏳ [PROJECT LAYOUT] Waiting for user authentication...');
+        return; // Don't set loading to false, keep waiting
+      }
+
+      // Check if project already in state
+      const existingProject = state.projects.find(p => p._id === projectId);
+      if (existingProject) {
+        console.log('✅ [PROJECT LAYOUT] Project found in state:', existingProject.name);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch from API
+      try {
+        console.log('📥 [PROJECT LAYOUT] Fetching project from API:', projectId);
+        const response = await apiService.get(`/projects/${projectId}`);
+        
+        if (response.data.success) {
+          const fetchedProject = response.data.data;
+          console.log('✅ [PROJECT LAYOUT] Project loaded:', fetchedProject.name);
+          
+          // Add to state
+          dispatch({
+            type: 'ADD_PROJECT',
+            payload: fetchedProject
+          });
+          
+          // Fetch workspace if needed
+          if (fetchedProject.workspace && !state.workspaces.find(w => w._id === fetchedProject.workspace)) {
+            console.log('📥 [PROJECT LAYOUT] Fetching workspace:', fetchedProject.workspace);
+            try {
+              const wsResponse = await apiService.get(`/workspaces/${fetchedProject.workspace}`);
+              if (wsResponse.data.success) {
+                console.log('✅ [PROJECT LAYOUT] Workspace loaded:', wsResponse.data.data.name);
+                dispatch({
+                  type: 'SET_WORKSPACE',
+                  payload: wsResponse.data.data
+                });
+              }
+            } catch (wsError) {
+              console.error('❌ [PROJECT LAYOUT] Failed to load workspace:', wsError);
+            }
+          }
+          
+          setLoading(false);
+        } else {
+          console.error('❌ [PROJECT LAYOUT] API returned success: false');
+          setLoading(false);
+        }
+      } catch (error: any) {
+        console.error('❌ [PROJECT LAYOUT] Failed to load project:', error);
+        console.error('❌ [PROJECT LAYOUT] Error details:', error.response?.data);
+        setLoading(false);
+      }
+    };
+
+    loadProject();
+  }, [projectId, state.projects.length, state.workspaces.length, state.userProfile?._id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading project...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!project) {
     return (

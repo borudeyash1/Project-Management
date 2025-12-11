@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Upload, Link as LinkIcon, Calendar, Clock, Flag, User, Tag, FileText } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { X, Plus, Trash2, Upload, Calendar, Flag, User } from 'lucide-react';
 
 interface TeamMember {
   _id: string;
-  name: string;
-  email: string;
+  user?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  name?: string;
+  email?: string;
   role: string;
 }
 
@@ -30,26 +34,60 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   projectTeam,
   projectId
 }) => {
-  const { t } = useTranslation();
   const [taskData, setTaskData] = useState({
     title: '',
     description: '',
     assigneeId: '',
-    taskType: 'task' as 'task' | 'bug' | 'feature' | 'improvement' | 'research' | 'documentation',
-    category: 'development' as 'development' | 'design' | 'testing' | 'deployment' | 'meeting' | 'review' | 'other',
+    taskType: 'general' as 'general' | 'report',
     priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
-    status: 'pending' as 'pending' | 'in-progress' | 'review' | 'completed' | 'blocked',
     dueDate: '',
-    estimatedHours: '',
-    tags: [] as string[],
-    attachments: [] as File[],
-    links: [] as string[]
+    referenceLinks: [] as string[]
   });
 
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
-  const [newTag, setNewTag] = useState('');
-  const [newLink, setNewLink] = useState('');
+  const [newReferenceLink, setNewReferenceLink] = useState('');
+
+  // Extract team members properly from project teamMembers
+  const getTeamMembers = () => {
+    console.log('📋 [TASK MODAL] Project team:', projectTeam);
+    
+    if (!projectTeam || projectTeam.length === 0) {
+      console.warn('⚠️ [TASK MODAL] No team members found');
+      return [];
+    }
+
+    return projectTeam
+      .filter(member => {
+        // Filter out workspace owner and project manager - they should not be assigned tasks
+        const isOwner = member.role === 'owner' || member.role === 'workspace-owner';
+        const isProjectManager = member.role === 'project-manager' || member.role === 'manager';
+        
+        if (isOwner || isProjectManager) {
+          console.log('🚫 [TASK MODAL] Filtering out:', member.role, member);
+          return false;
+        }
+        return true;
+      })
+      .map(member => {
+        // Handle teamMembers structure from project
+        const userId = member.user?._id || member._id;
+        const userName = member.user?.fullName || member.name || 'Unknown';
+        const userEmail = member.user?.email || member.email || '';
+        const userRole = member.role || 'Member';
+
+        console.log('👤 [TASK MODAL] Member:', { userId, userName, userRole });
+
+        return {
+          _id: userId,
+          name: userName,
+          email: userEmail,
+          role: userRole
+        };
+      });
+  };
+
+  const teamMembers = getTeamMembers();
 
   const handleAddSubtask = () => {
     if (newSubtask.trim()) {
@@ -69,74 +107,41 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
     setSubtasks(subtasks.filter(st => st.id !== id));
   };
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !taskData.tags.includes(newTag.trim())) {
+  const handleAddReferenceLink = () => {
+    if (newReferenceLink.trim()) {
       setTaskData({
         ...taskData,
-        tags: [...taskData.tags, newTag.trim()]
+        referenceLinks: [...taskData.referenceLinks, newReferenceLink.trim()]
       });
-      setNewTag('');
+      setNewReferenceLink('');
     }
   };
 
-  const handleRemoveTag = (tag: string) => {
+  const handleRemoveReferenceLink = (index: number) => {
     setTaskData({
       ...taskData,
-      tags: taskData.tags.filter(t => t !== tag)
-    });
-  };
-
-  const handleAddLink = () => {
-    if (newLink.trim()) {
-      setTaskData({
-        ...taskData,
-        links: [...taskData.links, newLink.trim()]
-      });
-      setNewLink('');
-    }
-  };
-
-  const handleRemoveLink = (index: number) => {
-    setTaskData({
-      ...taskData,
-      links: taskData.links.filter((_, i) => i !== index)
-    });
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setTaskData({
-        ...taskData,
-        attachments: [...taskData.attachments, ...filesArray]
-      });
-    }
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setTaskData({
-      ...taskData,
-      attachments: taskData.attachments.filter((_, i) => i !== index)
+      referenceLinks: taskData.referenceLinks.filter((_, i) => i !== index)
     });
   };
 
   const handleSubmit = () => {
     // Validation
     if (!taskData.title.trim()) {
-      alert(t('projects.pleaseEnterTitle'));
+      alert('Please enter a task title');
       return;
     }
     if (!taskData.assigneeId) {
-      alert(t('projects.pleaseSelectAssignee'));
+      alert('Please select a team member');
       return;
     }
     if (!taskData.dueDate) {
-      alert(t('projects.pleaseSelectDueDate'));
+      alert('Please select a due date');
       return;
     }
 
     // Find assignee details
-    const assignee = projectTeam.find(member => member._id === taskData.assigneeId);
+    const assignee = teamMembers.find(member => member._id === taskData.assigneeId);
+    const assigneeName = assignee?.name || 'Unknown';
 
     // Create task object
     const newTask = {
@@ -144,33 +149,21 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
       title: taskData.title,
       description: taskData.description,
       taskType: taskData.taskType,
-      category: taskData.category,
-      assignee: assignee,
+      assignedTo: taskData.assigneeId,
+      assignedToName: assigneeName,
       priority: taskData.priority,
-      status: taskData.status,
+      status: 'pending',
+      startDate: new Date(),
       dueDate: new Date(taskData.dueDate),
-      estimatedHours: parseFloat(taskData.estimatedHours) || 0,
-      actualHours: 0,
       progress: 0,
-      tags: taskData.tags,
       subtasks: subtasks,
-      comments: [],
-      attachments: taskData.attachments.map((file, index) => ({
-        _id: `attachment_${Date.now()}_${index}`,
-        name: file.name,
-        url: URL.createObjectURL(file), // Mock URL
-        type: file.type.startsWith('image/') ? 'image' : 'file',
-        size: file.size,
-        uploadedBy: { name: 'Current User' }, // Would be current user
-        uploadedAt: new Date()
-      })),
-      links: taskData.links,
+      files: [],
+      links: taskData.referenceLinks,
+      requiresLink: taskData.taskType === 'report',
+      requiresFile: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-      createdBy: 'current_user_id', // Would be actual user ID
-      projectId: projectId,
-      dependencies: [],
-      isMilestone: false
+      projectId: projectId
     };
 
     onCreateTask(newTask);
@@ -183,202 +176,138 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
       title: '',
       description: '',
       assigneeId: '',
-      taskType: 'task',
-      category: 'development',
+      taskType: 'general',
       priority: 'medium',
-      status: 'pending',
       dueDate: '',
-      estimatedHours: '',
-      tags: [],
-      attachments: [],
-      links: []
+      referenceLinks: []
     });
     setSubtasks([]);
     setNewSubtask('');
-    setNewTag('');
-    setNewLink('');
+    setNewReferenceLink('');
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-300 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">{t('projects.createTask')}</h2>
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Create New Task</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-4">
           {/* Task Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('projects.taskName')} <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Task Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={taskData.title}
               onChange={(e) => setTaskData({ ...taskData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              placeholder={t('projects.enterTaskTitle')}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+              placeholder="Enter task title"
             />
           </div>
 
           {/* Task Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('projects.taskDescription')}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Description
             </label>
             <textarea
               value={taskData.description}
               onChange={(e) => setTaskData({ ...taskData, description: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              placeholder={t('projects.describeTask')}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+              placeholder="Describe the task"
             />
           </div>
 
-          {/* Task Type and Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Tag className="w-4 h-4 inline mr-1" />
-                {t('projects.taskType')}
-              </label>
-              <select
-                value={taskData.taskType}
-                onChange={(e) => setTaskData({ ...taskData, taskType: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="task">📋 {t('projects.typeTask')}</option>
-                <option value="bug">🐛 {t('projects.typeBug')}</option>
-                <option value="feature">✨ {t('projects.typeFeature')}</option>
-                <option value="improvement">🔧 {t('projects.typeImprovement')}</option>
-                <option value="research">🔍 {t('projects.typeResearch')}</option>
-                <option value="documentation">📝 {t('projects.typeDocumentation')}</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FileText className="w-4 h-4 inline mr-1" />
-                {t('projects.category')}
-              </label>
-              <select
-                value={taskData.category}
-                onChange={(e) => setTaskData({ ...taskData, category: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="development">💻 {t('projects.catDevelopment')}</option>
-                <option value="design">🎨 {t('projects.catDesign')}</option>
-                <option value="testing">🧪 {t('projects.catTesting')}</option>
-                <option value="deployment">🚀 {t('projects.catDeployment')}</option>
-                <option value="meeting">👥 {t('projects.catMeeting')}</option>
-                <option value="review">👀 {t('projects.catReview')}</option>
-                <option value="other">📦 {t('projects.catOther')}</option>
-              </select>
-            </div>
+          {/* Task Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Task Type
+            </label>
+            <select
+              value={taskData.taskType}
+              onChange={(e) => setTaskData({ ...taskData, taskType: e.target.value as any })}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+            >
+              <option value="general">📋 General Task</option>
+              <option value="report">📊 Report Submission</option>
+            </select>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {taskData.taskType === 'general' && 'Employee can update status: Not Started → In Progress → Completed'}
+              {taskData.taskType === 'report' && 'Employee must submit report URL for review by project manager'}
+            </p>
           </div>
 
           {/* Assignee and Priority */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
-                {t('projects.assignTo')} <span className="text-red-500">*</span>
+                Assign To <span className="text-red-500">*</span>
               </label>
               <select
                 value={taskData.assigneeId}
                 onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="">{t('projects.selectMember')}</option>
-                {projectTeam.map((member) => (
+                <option value="">Select Team Member</option>
+                {teamMembers.map((member) => (
                   <option key={member._id} value={member._id}>
-                    {member.name} ({member.role})
+                    {member.name} - {member.role}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Flag className="w-4 h-4 inline mr-1" />
-                {t('projects.priority')}
+                Priority
               </label>
               <select
                 value={taskData.priority}
                 onChange={(e) => setTaskData({ ...taskData, priority: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="low">{t('projects.low')}</option>
-                <option value="medium">{t('projects.medium')}</option>
-                <option value="high">{t('projects.high')}</option>
-                <option value="critical">{t('projects.critical')}</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
               </select>
             </div>
           </div>
 
-          {/* Due Date and Estimated Hours */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Calendar className="w-4 h-4 inline mr-1" />
-                {t('projects.dueDate')} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={taskData.dueDate}
-                onChange={(e) => setTaskData({ ...taskData, dueDate: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Clock className="w-4 h-4 inline mr-1" />
-                {t('projects.estimatedTime')}
-              </label>
-              <input
-                type="number"
-                value={taskData.estimatedHours}
-                onChange={(e) => setTaskData({ ...taskData, estimatedHours: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                placeholder="0"
-                min="0"
-                step="0.5"
-              />
-            </div>
-          </div>
-
-          {/* Status */}
+          {/* Due Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('projects.initialStatus')}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Calendar className="w-4 h-4 inline mr-1" />
+              Due Date <span className="text-red-500">*</span>
             </label>
-            <select
-              value={taskData.status}
-              onChange={(e) => setTaskData({ ...taskData, status: e.target.value as any })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-            >
-              <option value="pending">{t('projects.todo')}</option>
-              <option value="in-progress">{t('projects.inProgress')}</option>
-              <option value="blocked">{t('projects.blocked')}</option>
-            </select>
+            <input
+              type="date"
+              value={taskData.dueDate}
+              onChange={(e) => setTaskData({ ...taskData, dueDate: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+            />
           </div>
 
-          {/* Subtasks/Milestones */}
+          {/* Subtasks */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FileText className="w-4 h-4 inline mr-1" />
-              {t('projects.subtasks')}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Subtasks (Optional)
             </label>
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -387,26 +316,26 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                   value={newSubtask}
                   onChange={(e) => setNewSubtask(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder={t('projects.addSubtask')}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                  placeholder="Add a subtask"
                 />
                 <button
                   onClick={handleAddSubtask}
                   className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  {t('common.add')}
+                  Add
                 </button>
               </div>
 
               {subtasks.length > 0 && (
-                <div className="border border-gray-300 rounded-lg p-3 space-y-2">
+                <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 space-y-2">
                   {subtasks.map((subtask) => (
-                    <div key={subtask.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">{subtask.title}</span>
+                    <div key={subtask.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{subtask.title}</span>
                       <button
                         onClick={() => handleRemoveSubtask(subtask.id)}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                        className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -417,126 +346,48 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             </div>
           </div>
 
-          {/* Tags */}
+          {/* Reference Links */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Tag className="w-4 h-4 inline mr-1" />
-              {t('projects.tags')}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Reference Links (Optional)
             </label>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder={t('projects.addTag')}
-                />
-                <button
-                  onClick={handleAddTag}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  {t('common.add')}
-                </button>
-              </div>
-
-              {taskData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {taskData.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                    >
-                      {tag}
-                      <button
-                        onClick={() => handleRemoveTag(tag)}
-                        className="hover:bg-blue-200 rounded-full p-0.5"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* File Attachments */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Upload className="w-4 h-4 inline mr-1" />
-              {t('projects.attachments')}
-            </label>
-            <div className="space-y-2">
-              <input
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              />
-
-              {taskData.attachments.length > 0 && (
-                <div className="border border-gray-300 rounded-lg p-3 space-y-2">
-                  {taskData.attachments.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">
-                        {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                      </span>
-                      <button
-                        onClick={() => handleRemoveFile(index)}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Links */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <LinkIcon className="w-4 h-4 inline mr-1" />
-              {t('projects.links')}
-            </label>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              Add URLs to reference documents, designs, or resources
+            </p>
             <div className="space-y-2">
               <div className="flex gap-2">
                 <input
                   type="url"
-                  value={newLink}
-                  onChange={(e) => setNewLink(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddLink()}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder={t('projects.enterLink')}
+                  value={newReferenceLink}
+                  onChange={(e) => setNewReferenceLink(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddReferenceLink()}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                  placeholder="https://example.com/document"
                 />
                 <button
-                  onClick={handleAddLink}
+                  onClick={handleAddReferenceLink}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  {t('common.add')}
+                  Add
                 </button>
               </div>
 
-              {taskData.links.length > 0 && (
-                <div className="border border-gray-300 rounded-lg p-3 space-y-2">
-                  {taskData.links.map((link, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+              {taskData.referenceLinks.length > 0 && (
+                <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 space-y-2">
+                  {taskData.referenceLinks.map((link, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
                       <a
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-accent-dark hover:underline truncate flex-1"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate flex-1"
                       >
                         {link}
                       </a>
                       <button
-                        onClick={() => handleRemoveLink(index)}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded ml-2"
+                        onClick={() => handleRemoveReferenceLink(index)}
+                        className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded ml-2"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -549,18 +400,18 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-300 px-6 py-4 flex items-center justify-end gap-3">
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            {t('common.cancel')}
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
             className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
           >
-            {t('projects.createTask')}
+            Create Task
           </button>
         </div>
       </div>

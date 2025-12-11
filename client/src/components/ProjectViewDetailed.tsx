@@ -245,9 +245,21 @@ const ProjectViewDetailed: React.FC = () => {
   const project = state.projects.find(p => p._id === projectId);
   const workspace = state.workspaces.find(w => w._id === project?.workspace);
   const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
-  const isProjectManager = project?.teamMembers?.some(
-    (m: any) => m.user === state.userProfile._id && (m.role === 'project-manager' || m.permissions?.canManageProject)
-  ) || false;
+  
+  // Check if user is project manager - handle both populated and unpopulated user field
+  const isProjectManager = React.useMemo(() => {
+    if (!project?.teamMembers) return false;
+    
+    return project.teamMembers.some((m: any) => {
+      const memberUserId = typeof m.user === 'object' ? m.user._id : m.user;
+      const isCurrentUser = memberUserId === state.userProfile._id;
+      const hasManagerRole = m.role === 'project-manager' || m.role === 'manager';
+      const hasManagerPermissions = m.permissions?.canManageMembers || m.permissions?.canManageProject;
+      
+      return isCurrentUser && (hasManagerRole || hasManagerPermissions);
+    });
+  }, [project?.teamMembers, state.userProfile._id]);
+  
   const currentUserRole = isWorkspaceOwner ? 'owner' : isProjectManager ? 'manager' : 'employee';
   const currentTestUserId = state.userProfile._id;
 
@@ -268,25 +280,87 @@ const ProjectViewDetailed: React.FC = () => {
     else setActiveView('overview');
   }, [location.pathname]);
 
-  // Load project data from AppContext (no dummy members)
+  // Load project data from API if not in state (handles page refresh)
   useEffect(() => {
-    if (projectId && state.projects.length > 0) {
-      const project = state.projects.find(p => p._id === projectId);
-      if (project) {
-        // Ensure project has all necessary fields
-        const enrichedProject = {
-          ...project,
-          tasks: (project as any).tasks || state.tasks.filter(t => t.project === projectId) || [],
-          // Use only real team members from backend (no dummy data)
-          team: (project as any).team && (project as any).team.length > 0 ? (project as any).team : [],
-          documents: (project as any).documents || [],
-          timeline: (project as any).timeline || [],
-          milestones: (project as any).milestones || []
-        };
-        setActiveProject(enrichedProject as any);
+    const loadProjectFromAPI = async () => {
+      if (!projectId) return;
+      
+      // If project already in state, use it
+      if (state.projects.length > 0) {
+        const project = state.projects.find(p => p._id === projectId);
+        if (project) {
+          const enrichedProject = {
+            ...project,
+            tasks: (project as any).tasks || state.tasks.filter(t => t.project === projectId) || [],
+            team: (project as any).team && (project as any).team.length > 0 ? (project as any).team : [],
+            documents: (project as any).documents || [],
+            timeline: (project as any).timeline || [],
+            milestones: (project as any).milestones || []
+          };
+          setActiveProject(enrichedProject as any);
+          return;
+        }
       }
-    }
-  }, [projectId, state.projects, state.tasks]);
+      
+      // If not in state (page refresh), fetch from API
+      try {
+        console.log('📥 [PROJECT LOAD] Fetching project from API:', projectId);
+        const response = await apiService.get(`/projects/${projectId}`);
+        
+        if (response.data.success) {
+          const fetchedProject = response.data.data;
+          console.log('✅ [PROJECT LOAD] Project fetched:', fetchedProject.name);
+          
+          // Add to app state
+          dispatch({
+            type: 'ADD_PROJECT',
+            payload: fetchedProject
+          });
+          
+          // Set as active project
+          const enrichedProject = {
+            ...fetchedProject,
+            tasks: fetchedProject.tasks || [],
+            team: fetchedProject.teamMembers || [],
+            documents: fetchedProject.documents || [],
+            timeline: fetchedProject.timeline || [],
+            milestones: fetchedProject.milestones || []
+          };
+          setActiveProject(enrichedProject as any);
+          
+          // Also fetch workspace if not in state
+          if (fetchedProject.workspace && state.workspaces.length === 0) {
+            console.log('📥 [WORKSPACE LOAD] Fetching workspace:', fetchedProject.workspace);
+            try {
+              const wsResponse = await apiService.get(`/workspaces/${fetchedProject.workspace}`);
+              if (wsResponse.data.success) {
+                dispatch({
+                  type: 'SET_WORKSPACE',
+                  payload: wsResponse.data.data
+                });
+              }
+            } catch (wsError) {
+              console.error('❌ [WORKSPACE LOAD] Failed:', wsError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ [PROJECT LOAD] Failed to fetch project:', error);
+        // Show error toast
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: 'Failed to load project. Please try again.',
+            duration: 4000
+          }
+        });
+      }
+    };
+    
+    loadProjectFromAPI();
+  }, [projectId, state.projects.length]);
 
   // Helper to map backend Task to UI task shape used in tabs
   const mapBackendTaskToUi = (task: any, team: any[]): any => {
@@ -537,24 +611,32 @@ const ProjectViewDetailed: React.FC = () => {
   const handleCreateTask = async (task: any) => {
     if (!activeProject?._id) return;
     try {
+      console.log('📝 [CREATE TASK] Creating task:', task);
+      
       const payload = {
         title: task.title,
         description: task.description,
         project: activeProject._id,
         workspace: (activeProject as any)?.workspace || state.currentWorkspace,
         assignee: task.assignedTo || undefined,
-        status: task.status,
-        // Keep priority in frontend Task union; backend will map 'critical' -> 'urgent'
-        priority: task.priority,
-        // omit type here; backend Task model defaults type to 'task'
-        startDate: task.startDate,
+        status: task.status || 'pending',
+        priority: task.priority || 'medium',
+        taskType: task.taskType || 'general',
+        startDate: task.startDate || new Date(),
         dueDate: task.dueDate,
-        estimatedHours: task.estimatedHours,
-        progress: task.progress,
+        estimatedHours: task.estimatedHours || 0,
+        progress: task.progress || 0,
+        subtasks: task.subtasks || [],
+        links: task.links || [],
+        requiresLink: task.requiresLink || false,
+        requiresFile: task.requiresFile || false
       };
 
+      console.log('📤 [CREATE TASK] Payload:', payload);
       const createdBackendTask = await apiService.createTask(payload);
-      const uiTask = mapBackendTaskToUi(createdBackendTask, (activeProject as any)?.team || []);
+      console.log('✅ [CREATE TASK] Task created:', createdBackendTask);
+      
+      const uiTask = mapBackendTaskToUi(createdBackendTask, (activeProject as any)?.teamMembers || (activeProject as any)?.team || []);
       setProjectTasks([...projectTasks, uiTask]);
 
       dispatch({
@@ -562,12 +644,12 @@ const ProjectViewDetailed: React.FC = () => {
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Task assigned successfully!',
+          message: 'Task created and assigned successfully!',
           duration: 3000,
         },
       });
     } catch (error) {
-      console.error('[ProjectViewDetailed] Failed to create task:', error);
+      console.error('[CREATE TASK] Failed to create task:', error);
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -748,14 +830,6 @@ const ProjectViewDetailed: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Share2 className="w-4 h-4" />
-            {t('project.header.share')}
-          </button>
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Settings className="w-4 h-4" />
-            {t('project.header.settings')}
-          </button>
           {(currentUserRole === 'owner' || currentUserRole === 'manager') && (
             <button
               onClick={() => setShowCreateTask(true)}
@@ -2650,7 +2724,7 @@ const ProjectViewDetailed: React.FC = () => {
         isOpen={showCreateTask}
         onClose={() => setShowCreateTask(false)}
         onCreateTask={handleCreateTask}
-        projectTeam={activeProject?.team || []}
+        projectTeam={(activeProject as any)?.teamMembers || (activeProject as any)?.team || []}
         projectId={activeProject?._id || ''}
       />
 
