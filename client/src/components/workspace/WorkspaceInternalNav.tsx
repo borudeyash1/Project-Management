@@ -70,13 +70,14 @@ const WorkspaceInternalNav: React.FC = () => {
       icon: UserCircle,
       path: `/workspace/${activeWorkspaceId}/profile`
     },
-    {
-      id: 'collaborate',
-      label: t('workspace.tabs.collaborate'),
-      icon: UserPlus,
-      path: `/workspace/${activeWorkspaceId}/collaborate`,
-      ownerOnly: true
-    },
+    // Hidden - Not fully implemented yet
+    // {
+    //   id: 'collaborate',
+    //   label: t('workspace.tabs.collaborate'),
+    //   icon: UserPlus,
+    //   path: `/workspace/${activeWorkspaceId}/collaborate`,
+    //   ownerOnly: true
+    // },
     {
       id: 'inbox',
       label: t('workspace.tabs.inbox'),

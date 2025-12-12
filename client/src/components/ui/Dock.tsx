@@ -344,10 +344,9 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
   const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
 
-  // Add margin to push adjacent icons away
-  const marginSync = useTransform(distance, [-150, 0, 150], [0, 16, 0]);
-  const marginLeft = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
-  const marginRight = useSpring(orientation === 'horizontal' ? marginSync : 0, { mass: 0.1, stiffness: 150, damping: 12 });
+  // Removed split-apart animation - icons stay in place
+  const marginLeft = useMotionValue(0);
+  const marginRight = useMotionValue(0);
 
   const handleMouseEnter = () => {
     if (ref.current && tooltip) {

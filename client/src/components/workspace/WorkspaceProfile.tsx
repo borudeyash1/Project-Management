@@ -189,10 +189,11 @@ const WorkspaceProfile: React.FC = () => {
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: UserIcon },
-    { id: 'inbox', label: 'Inbox', icon: MessageSquare },
-    { id: 'chatbot', label: 'Chatbot', icon: Bot },
-    { id: 'planner', label: 'Personal Planner', icon: Calendar },
-    { id: 'projects', label: 'Projects', icon: Building2 }
+    // Hidden - Not fully implemented yet
+    // { id: 'inbox', label: 'Inbox', icon: MessageSquare },
+    // { id: 'chatbot', label: 'Chatbot', icon: Bot },
+    // { id: 'planner', label: 'Personal Planner', icon: Calendar },
+    // { id: 'projects', label: 'Projects', icon: Building2 }
   ];
 
   const renderProfileTab = () => (
@@ -253,12 +254,16 @@ const WorkspaceProfile: React.FC = () => {
               <div className="flex-1">
                 <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.emailLabel')}</p>
                 {isEditMode ? (
-                  <input
-                    type="email"
-                    value={profileData.email}
-                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={profileData.email}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                      title="Email cannot be changed"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
+                  </div>
                 ) : (
                   <p className="font-medium text-gray-900 dark:text-gray-100">{state.userProfile.email || t('workspace.profile.notAvailable')}</p>
                 )}

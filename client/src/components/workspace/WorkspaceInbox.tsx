@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
-import { Send, Search, Plus, Users, User, Paperclip, Smile, MoreVertical } from 'lucide-react';
+import { Send, Users, User, Smile } from 'lucide-react';
 import apiService from '../../services/api';
+import { EmojiPicker } from '../ui/EmojiPicker';
 
 interface InboxThread {
   userId: string;
@@ -28,9 +29,10 @@ const WorkspaceInbox: React.FC = () => {
   const [messages, setMessages] = useState<InboxMessage[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingThreads, setIsLoadingThreads] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   const currentWorkspaceId = state.currentWorkspace;
   const currentUserId = state.userProfile._id;
@@ -107,9 +109,27 @@ const WorkspaceInbox: React.FC = () => {
     loadMessages();
   }, [currentWorkspaceId, selectedUserId]);
 
-  const filteredThreads = threads.filter((thread) =>
-    thread.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
+  const handleEmojiSelect = (emoji: string) => {
+    setMessageInput(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
 
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !currentWorkspaceId || !selectedUserId) return;
@@ -150,22 +170,14 @@ const WorkspaceInbox: React.FC = () => {
     <div className="h-[calc(100vh-12rem)] flex bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
       {/* Chat List Sidebar */}
       <div className="w-80 border-r border-gray-300 dark:border-gray-600 flex flex-col">
-        {/* Search Header */}
+        {/* Header */}
         <div className="p-4 border-b border-gray-300 dark:border-gray-600">
-          <div className="relative mb-3">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" />
-            <input
-              type="text"
-              placeholder={t('workspace.inbox.searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-accent"
-            />
-          </div>
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors text-sm">
-            <Plus className="w-4 h-4" />
-            {t('workspace.inbox.newChat')}
-          </button>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {t('workspace.inbox.title') || 'Team Inbox'}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {t('workspace.inbox.subtitle') || 'Chat with your workspace members'}
+          </p>
         </div>
 
         {/* Chat List */}
@@ -173,10 +185,10 @@ const WorkspaceInbox: React.FC = () => {
           {isLoadingThreads && (
             <div className="p-4 text-sm text-gray-600">{t('workspace.inbox.loadingConversations')}</div>
           )}
-          {!isLoadingThreads && filteredThreads.length === 0 && (
+          {!isLoadingThreads && threads.length === 0 && (
             <div className="p-4 text-sm text-gray-600">{t('workspace.inbox.noMembers')}</div>
           )}
-          {filteredThreads.map((thread) => (
+          {threads.map((thread) => (
             <button
               key={thread.userId}
               onClick={() => setSelectedUserId(thread.userId)}
@@ -219,7 +231,7 @@ const WorkspaceInbox: React.FC = () => {
       {selectedUserId ? (
         <div className="flex-1 flex flex-col">
           {/* Chat Header */}
-          <div className="p-4 border-b border-gray-300 dark:border-gray-600 flex items-center justify-between">
+          <div className="p-4 border-b border-gray-300 dark:border-gray-600">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                 <Users className="w-5 h-5 text-accent-dark" />
@@ -233,9 +245,6 @@ const WorkspaceInbox: React.FC = () => {
                 </p>
               </div>
             </div>
-            <button className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700">
-              <MoreVertical className="w-5 h-5" />
-            </button>
           </div>
 
           {/* Messages */}
@@ -281,11 +290,8 @@ const WorkspaceInbox: React.FC = () => {
           </div>
 
           {/* Message Input */}
-          <div className="p-4 border-t border-gray-300 dark:border-gray-600">
+          <div className="p-4 border-t border-gray-300 dark:border-gray-600 relative z-10">
             <div className="flex items-end gap-2">
-              <button className="p-2 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700">
-                <Paperclip className="w-5 h-5" />
-              </button>
               <div className="flex-1 relative">
                 <textarea
                   value={messageInput}
@@ -301,12 +307,26 @@ const WorkspaceInbox: React.FC = () => {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none focus:ring-2 focus:ring-accent"
                 />
               </div>
-              <button className="p-2 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700">
-                <Smile className="w-5 h-5" />
-              </button>
+              <div className="relative" ref={emojiPickerRef}>
+                <button 
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="p-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative z-20"
+                  title="Add emoji"
+                  type="button"
+                >
+                  <Smile className="w-5 h-5" />
+                </button>
+                {showEmojiPicker && (
+                  <EmojiPicker
+                    onEmojiSelect={handleEmojiSelect}
+                    onClose={() => setShowEmojiPicker(false)}
+                  />
+                )}
+              </div>
               <button
                 onClick={handleSendMessage}
-                className="p-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+                className="p-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors relative z-20"
+                type="button"
               >
                 <Send className="w-5 h-5" />
               </button>

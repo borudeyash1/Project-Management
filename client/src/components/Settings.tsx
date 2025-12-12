@@ -179,6 +179,18 @@ const Settings: React.FC = () => {
     fetchSettings();
   }, []);
 
+  // Apply font size to document
+  useEffect(() => {
+    if (preferences.fontSize) {
+      const fontSizeMap = {
+        small: '14px',
+        medium: '16px',
+        large: '18px'
+      };
+      document.documentElement.style.fontSize = fontSizeMap[preferences.fontSize];
+    }
+  }, [preferences.fontSize]);
+
   const fetchSettings = async () => {
     try {
       setLoading(true);
@@ -458,8 +470,8 @@ const Settings: React.FC = () => {
     { id: 'account', label: t('settings.account'), icon: User },
     { id: 'notifications', label: t('settings.notifications'), icon: Bell },
     { id: 'appearance', label: t('settings.appearance'), icon: Palette },
-    { id: 'billing', label: t('settings.billing'), icon: CreditCard },
-    { id: 'data', label: t('settings.dataExport'), icon: Database }
+    { id: 'billing', label: t('settings.billing'), icon: CreditCard }
+    // Data & Export tab removed - not fully implemented
   ];
 
   const renderAccount = () => (
