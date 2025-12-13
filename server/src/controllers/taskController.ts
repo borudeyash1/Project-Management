@@ -7,41 +7,6 @@ import { getCalendarService } from '../services/sartthi/calendarService';
 import { getMailService } from '../services/sartthi/mailService';
 import User from '../models/User';
 
-// Map frontend-style status values to backend Task.status
-const mapFrontendStatusToBackend = (status?: string): string | undefined => {
-  if (!status) return undefined;
-  switch (status) {
-    case 'pending':
-      return 'todo';
-    case 'in-progress':
-      return 'in-progress';
-    case 'completed':
-    case 'verified':
-      return 'done';
-    case 'blocked':
-      return 'cancelled';
-    default:
-      return status;
-  }
-};
-
-// Map frontend-style priority values to backend Task.priority
-// Frontend uses: 'low' | 'medium' | 'high' | 'critical'
-// Backend enum is: 'low' | 'medium' | 'high' | 'urgent'
-const mapFrontendPriorityToBackend = (priority?: string): string | undefined => {
-  if (!priority) return undefined;
-  switch (priority) {
-    case 'low':
-    case 'medium':
-    case 'high':
-      return priority;
-    case 'critical':
-      return 'urgent';
-    default:
-      return priority;
-  }
-};
-
 // GET /api/tasks?projectId=...&status=...&priority=...
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -62,20 +27,14 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       filter.project = projectId;
     }
 
-    // Add status filtering
+    // Add status filtering - now uses values directly
     if (status) {
-      const backendStatus = mapFrontendStatusToBackend(status);
-      if (backendStatus) {
-        filter.status = backendStatus;
-      }
+      filter.status = status;
     }
 
-    // Add priority filtering
+    // Add priority filtering - now uses values directly
     if (priority) {
-      const backendPriority = mapFrontendPriorityToBackend(priority);
-      if (backendPriority) {
-        filter.priority = backendPriority;
-      }
+      filter.priority = priority;
     }
 
     const tasks = await Task.find(filter).sort({ dueDate: 1, createdAt: -1 });
@@ -140,11 +99,15 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       priority,
       category,
       type,
+      taskType,
       startDate,
       dueDate,
       estimatedHours,
       progress,
       subtasks,
+      links,
+      requiresLink,
+      requiresFile,
     } = req.body;
 
     // Only title is required now - project and workspace are optional
@@ -163,21 +126,21 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       }
     }
 
-    const backendStatus = mapFrontendStatusToBackend(status) || 'todo';
-    const backendPriority = mapFrontendPriorityToBackend(priority) || 'medium';
-
     const taskData: any = {
       title,
       description,
       reporter: authUser._id,
-      status: backendStatus,
-      priority: backendPriority,
+      status: status || 'pending',
+      priority: priority || 'medium',
       type: type || 'task',
+      taskType: taskType || 'general',
       category,
       startDate: startDate ? new Date(startDate) : undefined,
       dueDate: dueDate ? new Date(dueDate) : undefined,
       estimatedHours,
       progress: typeof progress === 'number' ? progress : 0,
+      requiresLink: requiresLink || false,
+      requiresFile: requiresFile || false,
     };
 
     // Add optional fields
@@ -186,6 +149,11 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     else if (project) taskData.workspace = project.workspace;
     if (assignee) taskData.assignee = assignee;
     if (subtasks && Array.isArray(subtasks)) taskData.subtasks = subtasks;
+    if (links && Array.isArray(links)) taskData.links = links;
+
+    console.log('🔍 [CREATE TASK] taskType from request:', taskType);
+    console.log('🔍 [CREATE TASK] taskData.taskType:', taskData.taskType);
+    console.log('🔍 [CREATE TASK] Full taskData:', JSON.stringify(taskData, null, 2));
 
     const task = new Task(taskData);
 
@@ -255,24 +223,46 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       dueDate,
       estimatedHours,
       progress,
+      subtasks,
+      links,
+      files,
+      taskType,
+      requiresFile,
+      requiresLink,
+      rating,
+      ratingDetails,
+      verifiedBy,
+      verifiedAt,
     } = req.body;
 
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
     if (assignee !== undefined) task.assignee = assignee || undefined;
-    if (status !== undefined) task.status = mapFrontendStatusToBackend(status) || task.status;
-    if (priority !== undefined) task.priority = mapFrontendPriorityToBackend(priority) || task.priority;
+    if (status !== undefined) task.status = status;
+    if (priority !== undefined) task.priority = priority;
     if (category !== undefined) task.category = category;
     if (startDate !== undefined) task.startDate = startDate ? new Date(startDate) : undefined;
     if (dueDate !== undefined) task.dueDate = dueDate ? new Date(dueDate) : undefined;
     if (estimatedHours !== undefined) task.estimatedHours = estimatedHours;
     if (progress !== undefined) task.progress = progress;
+    if (subtasks !== undefined) task.subtasks = subtasks;
+    if (links !== undefined) task.links = links;
+    if (files !== undefined) task.files = files;
+    if (taskType !== undefined) task.taskType = taskType;
+    if (requiresFile !== undefined) task.requiresFile = requiresFile;
+    if (requiresLink !== undefined) task.requiresLink = requiresLink;
+    
+    // Handle verification and rating fields
+    if (rating !== undefined) task.rating = rating;
+    if (ratingDetails !== undefined) task.ratingDetails = ratingDetails;
+    if (verifiedBy !== undefined) task.verifiedBy = verifiedBy;
+    if (verifiedAt !== undefined) task.verifiedAt = verifiedAt ? new Date(verifiedAt) : undefined;
 
     const oldStatus = task.status;
     await task.save();
 
     // Create activity for task update
-    const isCompleted = oldStatus !== 'done' && task.status === 'done';
+    const isCompleted = oldStatus !== 'completed' && oldStatus !== 'verified' && (task.status === 'completed' || task.status === 'verified');
     if (isCompleted) {
       await createActivity(
         authUser._id,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, User, Calendar, Clock, Flag, CheckCircle, Upload, FileText } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Calendar, Clock, Flag, CheckCircle, Upload, FileText, Link } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import TaskVerificationModal from '../TaskVerificationModal';
 
 interface TaskFile {
   _id: string;
@@ -25,7 +26,7 @@ interface Task {
   _id: string;
   title: string;
   description: string;
-  taskType: 'status-update' | 'file-submission' | 'link-submission' | 'general' | 'review';
+  taskType: 'general' | 'submission';
   assignedTo: string;
   assignedToName: string;
   status: 'pending' | 'in-progress' | 'completed' | 'blocked' | 'verified';
@@ -56,6 +57,7 @@ interface ProjectTaskAssignmentTabProps {
   projectTeam: any[];
   tasks: Task[];
   isProjectManager: boolean;
+  currentUserId?: string;
   onCreateTask: (task: Partial<Task>) => void;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => void;
   onDeleteTask: (taskId: string) => void;
@@ -67,6 +69,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   projectTeam,
   tasks,
   isProjectManager,
+  currentUserId,
   onCreateTask,
   onUpdateTask,
   onDeleteTask,
@@ -80,6 +83,8 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   const [newLink, setNewLink] = useState('');
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [ratingTask, setRatingTask] = useState<Task | null>(null);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verifyingTask, setVerifyingTask] = useState<Task | null>(null);
   const [rating, setRating] = useState(0);
   const [ratingDetails, setRatingDetails] = useState({
     timeliness: 0,
@@ -250,11 +255,37 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   };
 
   const handleVerifyTask = (task: Task) => {
-    onUpdateTask(task._id, { 
+    setVerifyingTask(task);
+    setShowVerificationModal(true);
+  };
+
+  const handleVerificationComplete = (ratings: any[], comments: string) => {
+    if (!verifyingTask) return;
+
+    // Calculate average rating
+    const averageRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+
+    // Convert ratings array to object for storage
+    const ratingsObject = ratings.reduce((obj, r) => {
+      obj[r.key] = r.rating;
+      return obj;
+    }, {} as any);
+
+    onUpdateTask(verifyingTask._id, {
       status: 'verified',
-      verifiedBy: 'current_user_id', // Replace with actual user ID
-      verifiedAt: new Date()
+      verifiedBy: currentUserId || undefined,
+      verifiedAt: new Date(),
+      rating: averageRating,
+      ratingDetails: {
+        ...ratingsObject,
+        comments,
+        overallRating: averageRating,
+        ratedAt: new Date(),
+        ratedBy: currentUserId || undefined
+      }
     });
+
+    setVerifyingTask(null);
   };
 
   const handleRateTask = () => {
@@ -317,16 +348,10 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
   const getTaskTypeInfo = (taskType: Task['taskType']) => {
     switch (taskType) {
-      case 'status-update':
-        return { label: t('project.tasks.types.statusUpdate'), color: 'bg-blue-100 text-blue-700', icon: '📝' };
-      case 'file-submission':
-        return { label: t('project.tasks.types.fileSubmission'), color: 'bg-purple-100 text-purple-700', icon: '📎' };
-      case 'link-submission':
-        return { label: t('project.tasks.types.linkSubmission'), color: 'bg-indigo-100 text-indigo-700', icon: '🔗' };
-      case 'review':
-        return { label: t('project.tasks.types.review'), color: 'bg-yellow-100 text-yellow-700', icon: '👁️' };
+      case 'submission':
+        return { label: 'Submission Task', color: 'bg-indigo-100 text-indigo-700', icon: '🔗' };
       default:
-        return { label: t('project.tasks.types.general'), color: 'bg-gray-100 text-gray-700', icon: '📋' };
+        return { label: 'General Task', color: 'bg-gray-100 text-gray-700', icon: '📋' };
     }
   };
 
@@ -352,27 +377,31 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Active Tasks Section */}
       <div className="bg-white rounded-lg border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">{t('project.tasks.title')}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              {t('project.tasks.subtitle', { count: tasks.length })}
+              {t('project.tasks.subtitle', { count: tasks.filter(t => t.status !== 'verified').length })} Active Tasks
             </p>
           </div>
         </div>
 
-        {/* Tasks List */}
+        {/* Active Tasks List */}
         <div className="space-y-3">
-          {tasks.length === 0 ? (
+          {tasks.filter(t => t.status !== 'verified').length === 0 ? (
             <div className="text-center py-12 text-gray-600">
               <FileText className="w-12 h-12 mx-auto mb-3 text-gray-600" />
               <p className="font-medium">{t('project.tasks.noTasks')}</p>
               <p className="text-sm mt-1">{t('project.tasks.noTasksSubtitle')}</p>
             </div>
           ) : (
-            tasks.map((task) => (
-              <div key={task._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow">
+            tasks.filter(t => t.status !== 'verified').map((task) => (
+              <div 
+                key={task._id} 
+                className="border border-gray-300 bg-white rounded-lg p-4 hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900 mb-1">{task.title}</h4>
@@ -402,24 +431,41 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openEditModal(task)}
-                      className="p-2 text-accent-dark hover:bg-blue-50 rounded-lg"
-                      title="Edit Task"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (window.confirm(t('project.tasks.alert.deleteConfirm'))) {
-                          onDeleteTask(task._id);
-                        }
-                      }}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                      title="Delete Task"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {/* Verify Button - Only show for completed tasks */}
+                    {task.status === 'completed' && !task.verifiedBy && (
+                      <button
+                        onClick={() => handleVerifyTask(task)}
+                        className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center gap-1"
+                        title="Verify Task as Completed"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Verify
+                      </button>
+                    )}
+                    
+                    {/* Edit and Delete buttons - Hide for verified tasks */}
+                    {task.status !== 'verified' && (
+                      <>
+                        <button
+                          onClick={() => openEditModal(task)}
+                          className="p-2 text-accent-dark hover:bg-blue-50 rounded-lg"
+                          title="Edit Task"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(t('project.tasks.alert.deleteConfirm'))) {
+                              onDeleteTask(task._id);
+                            }
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                          title="Delete Task"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -439,6 +485,62 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     </p>
                   </div>
                 </div>
+
+                {/* Submitted URLs - For Submission Tasks */}
+                {task.taskType === 'submission' && (task.status === 'completed' || task.status === 'verified' || (task.links && task.links.length > 0)) && (
+                  <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                    <h5 className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-2 flex items-center gap-2">
+                      <Link className="w-4 h-4" />
+                      📎 Submitted URLs by Employee
+                    </h5>
+                    
+                    {/* Show links if they exist */}
+                    {task.links && task.links.length > 0 ? (
+                      <div className="space-y-2">
+                        {task.links.map((link, index) => (
+                          <a 
+                            key={index}
+                            href={link} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors group"
+                          >
+                            <Link className="w-3 h-3 text-indigo-600 flex-shrink-0" />
+                            <span className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline truncate flex-1">
+                              {link}
+                            </span>
+                            <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                              Open →
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                        No URLs submitted yet
+                      </p>
+                    )}
+                    
+                    {/* Verify Button - Show for completed submission tasks */}
+                    {task.status === 'completed' && !task.verifiedBy && (
+                      <button
+                        onClick={() => handleVerifyTask(task)}
+                        className="w-full mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Verify Submission
+                      </button>
+                    )}
+                    
+                    {/* Verified Status */}
+                    {task.verifiedBy && (
+                      <div className="mt-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
+                        <CheckCircle className="w-4 h-4" />
+                        Verified ✓
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Subtasks Section */}
                 {task.subtasks && task.subtasks.length > 0 && (
@@ -473,24 +575,6 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                             </button>
                           </div>
                         ))}
-                        
-                        {/* Add Subtask */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <input
-                            type="text"
-                            value={expandedTaskId === task._id ? newSubtaskTitle : ''}
-                            onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask(task._id)}
-                            placeholder={t('project.tasks.addSubtask')}
-                            className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
-                          />
-                          <button
-                            onClick={() => handleAddSubtask(task._id)}
-                            className="px-2 py-1 bg-accent text-gray-900 text-sm rounded hover:bg-accent-hover"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
                       </div>
                     )}
                   </div>
@@ -536,18 +620,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   </div>
                 )}
 
-                <div className="mt-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-600">{t('project.tasks.progress')}</span>
-                    <span className="text-xs font-medium text-gray-900">{task.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-300 rounded-full h-2">
-                    <div 
-                      className="bg-accent h-2 rounded-full transition-all"
-                      style={{ width: `${task.progress}%` }}
-                    />
-                  </div>
-                </div>
+
 
                 {/* PM Actions */}
                 {task.status === 'completed' && !task.isFinished && (
@@ -849,17 +922,18 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                     setTaskForm({ 
                       ...taskForm, 
                       taskType: type,
-                      requiresFile: type === 'file-submission'
+                      requiresFile: false,
+                      requiresLink: type === 'submission'
                     });
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="general">{t('project.tasks.types.general')}</option>
-                  <option value="file-submission">{t('project.tasks.types.fileSubmission')}</option>
+                  <option value="general">📋 General Task</option>
+                  <option value="submission">🔗 Submission Task</option>
                 </select>
                 <p className="text-xs text-gray-600 mt-1">
-                  {taskForm.taskType === 'general' && t('project.tasks.modal.taskTypeDesc.general')}
-                  {taskForm.taskType === 'file-submission' && t('project.tasks.modal.taskTypeDesc.fileSubmission')}
+                  {taskForm.taskType === 'general' && 'Employee can update status: Pending → In Progress → Completed'}
+                  {taskForm.taskType === 'submission' && 'Employee must submit URL for review'}
                 </p>
               </div>
 
@@ -928,25 +1002,6 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                 </div>
               </div>
 
-              {/* Progress - Only show when editing */}
-              {editingTask && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('project.tasks.modal.progress', { percent: taskForm.progress })}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={taskForm.progress}
-                    onChange={(e) => setTaskForm({ ...taskForm, progress: parseInt(e.target.value) })}
-                    className="w-full"
-                  />
-                  <p className="text-xs text-gray-600 mt-1">
-                    {t('project.tasks.modal.progressDesc')}
-                  </p>
-                </div>
-              )}
 
               {/* Actions */}
               <div className="flex items-center gap-3 pt-4">
@@ -971,6 +1026,113 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
           </div>
         </div>
       )}
+      
+      {/* Task History Section - Verified Tasks */}
+      {tasks.filter(t => t.status === 'verified').length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-300 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700">📜 Task History</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {tasks.filter(t => t.status === 'verified').length} Verified & Completed Tasks
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {tasks.filter(t => t.status === 'verified').map((task) => (
+              <div 
+                key={task._id} 
+                className="border border-gray-300 bg-gray-50 rounded-lg p-4 opacity-75"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-700 mb-1">{task.title}</h4>
+                    <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Task Type Badge */}
+                      {task.taskType && (() => {
+                        const typeInfo = getTaskTypeInfo(task.taskType);
+                        return (
+                          <span className={`px-2 py-1 text-xs rounded-full ${typeInfo.color}`}>
+                            {typeInfo.icon} {typeInfo.label}
+                          </span>
+                        );
+                      })()}
+                      
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                        <CheckCircle className="w-3 h-3 inline mr-1" />
+                        Verified
+                      </span>
+                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                        <User className="w-3 h-3 inline mr-1" />
+                        {task.assignedToName}
+                      </span>
+                      {task.verifiedAt && (
+                        <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">
+                          Verified on {new Date(task.verifiedAt).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-gray-300">
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Start Date</p>
+                    <p className="text-sm text-gray-700 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(task.startDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Completed Date</p>
+                    <p className="text-sm text-gray-700 flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      {new Date(task.dueDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Submitted URLs - For Submission Tasks */}
+                {task.taskType === 'submission' && task.links && task.links.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-300">
+                    <p className="text-xs font-medium text-gray-700 mb-2 flex items-center gap-1">
+                      <Link className="w-3 h-3" />
+                      Submitted URLs
+                    </p>
+                    <div className="space-y-2">
+                      {task.links.map((link, index) => (
+                        <a
+                          key={index}
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 p-2 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors text-sm text-indigo-600 hover:underline"
+                        >
+                          <Link className="w-3 h-3" />
+                          {link}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Task Verification Modal */}
+      <TaskVerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => {
+          setShowVerificationModal(false);
+          setVerifyingTask(null);
+        }}
+        onVerify={handleVerificationComplete}
+        taskTitle={verifyingTask?.title || ''}
+      />
     </div>
   );
 };

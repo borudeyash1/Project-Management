@@ -77,10 +77,9 @@ const ProjectInternalNav: React.FC = () => {
     },
     {
       id: 'workload',
-      label: t('project.tabs.workload'),
+      label: 'Workload & Deadlines',
       icon: Clock,
-      path: `/project/${projectId}/workload`,
-      managerOnly: true
+      path: `/project/${projectId}/workload`
     },
     {
       id: 'reports',

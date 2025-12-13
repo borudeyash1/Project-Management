@@ -240,6 +240,7 @@ const ProjectViewDetailed: React.FC = () => {
   const [officeLatitude, setOfficeLatitude] = useState('');
   const [officeLongitude, setOfficeLongitude] = useState('');
   const [projectProgress, setProjectProgress] = useState(0);
+  const [projectStatus, setProjectStatus] = useState<'draft' | 'active' | 'paused' | 'completed' | 'archived'>('active');
 
   // Derive role from actual workspace and project membership
   const project = state.projects.find(p => p._id === projectId);
@@ -367,51 +368,15 @@ const ProjectViewDetailed: React.FC = () => {
     const assigneeId = task.assignee || '';
     const assigneeMember = team?.find((m: any) => m.user === assigneeId || m._id === assigneeId);
 
-    // Map backend status/priority to UI values
-    let uiStatus: 'pending' | 'in-progress' | 'review' | 'completed' | 'blocked' = 'pending';
-    switch (task.status) {
-      case 'todo':
-        uiStatus = 'pending';
-        break;
-      case 'in-progress':
-        uiStatus = 'in-progress';
-        break;
-      case 'in-review':
-        uiStatus = 'review';
-        break;
-      case 'done':
-        uiStatus = 'completed';
-        break;
-      case 'cancelled':
-        uiStatus = 'blocked';
-        break;
-      default:
-        uiStatus = 'pending';
-    }
-
-    let uiPriority: 'low' | 'medium' | 'high' | 'critical' = 'medium';
-    switch (task.priority) {
-      case 'low':
-        uiPriority = 'low';
-        break;
-      case 'medium':
-        uiPriority = 'medium';
-        break;
-      case 'high':
-        uiPriority = 'high';
-        break;
-      case 'urgent':
-        uiPriority = 'critical';
-        break;
-      default:
-        uiPriority = 'medium';
-    }
+    // Status and priority now match directly - no mapping needed
+    const uiStatus = task.status || 'pending';
+    const uiPriority = task.priority || 'medium';
 
     return {
       _id: task._id,
       title: task.title,
       description: task.description || '',
-      taskType: 'general',
+      taskType: task.taskType || 'general',
       assignedTo: assigneeId,
       assignedToName: assigneeMember?.name || assigneeMember?.fullName || 'Unassigned',
       status: uiStatus,
@@ -419,15 +384,16 @@ const ProjectViewDetailed: React.FC = () => {
       startDate: task.startDate ? new Date(task.startDate) : new Date(),
       dueDate: task.dueDate ? new Date(task.dueDate) : new Date(),
       progress: typeof task.progress === 'number' ? task.progress : 0,
-      files: [],
-      links: [],
-      subtasks: [],
-      rating: undefined,
-      verifiedBy: undefined,
-      verifiedAt: undefined,
-      isFinished: uiStatus === 'completed',
-      requiresFile: false,
-      requiresLink: false,
+      files: task.files || [],
+      links: task.links || [],
+      subtasks: task.subtasks || [],
+      rating: task.rating,
+      ratingDetails: task.ratingDetails,
+      verifiedBy: task.verifiedBy,
+      verifiedAt: task.verifiedAt,
+      isFinished: uiStatus === 'verified' || uiStatus === 'completed',
+      requiresFile: task.requiresFile || false,
+      requiresLink: task.requiresLink || false,
     };
   };
 
@@ -582,6 +548,14 @@ const ProjectViewDetailed: React.FC = () => {
     }
   }, [state.projects.length]);
 
+  // Initialize project status and progress from activeProject
+  useEffect(() => {
+    if (activeProject) {
+      setProjectStatus(activeProject.status);
+      setProjectProgress(activeProject.progress);
+    }
+  }, [activeProject]);
+
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(section)) {
@@ -673,12 +647,17 @@ const ProjectViewDetailed: React.FC = () => {
         description: merged.description,
         assignee: merged.assignedTo || undefined,
         status: merged.status,
-        // Keep priority in frontend Task union; backend will map 'critical' -> 'urgent'
         priority: merged.priority,
         startDate: merged.startDate,
         dueDate: merged.dueDate,
         estimatedHours: merged.estimatedHours,
         progress: merged.progress,
+        subtasks: merged.subtasks,
+        links: merged.links,
+        files: merged.files,
+        taskType: merged.taskType,
+        requiresFile: merged.requiresFile,
+        requiresLink: merged.requiresLink,
       };
 
       const updatedBackendTask = await apiService.updateTask(taskId, payload);
@@ -744,43 +723,163 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   // Request Handlers
-  const handleCreateRequest = (request: any) => {
-    setRequests([...requests, request]);
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'info',
-        message: 'Request submitted to Project Manager!',
-        duration: 3000
-      }
-    });
+  const handleCreateRequest = async (request: any) => {
+    try {
+      console.log('📤 [CREATE REQUEST] Submitting request:', request);
+      
+      // Call API to create request
+      const response = await apiService.post(`/projects/${activeProject?._id}/requests`, request);
+      
+      console.log('✅ [CREATE REQUEST] Response:', response.data);
+      
+      // Add to local state
+      setRequests([...requests, response.data.data]);
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Request submitted to Project Manager!',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('❌ [CREATE REQUEST] Failed:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to submit request',
+          duration: 3000
+        }
+      });
+    }
   };
 
-  const handleApproveRequest = (requestId: string) => {
-    setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'approved' } : r));
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: 'Request approved!',
-        duration: 3000
-      }
-    });
+  const handleApproveRequest = async (requestId: string) => {
+    try {
+      console.log('✅ [APPROVE REQUEST] Approving request:', requestId);
+      
+      await apiService.put(`/projects/${activeProject?._id}/requests/${requestId}/approve`);
+      
+      setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'approved' } : r));
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Request approved!',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('❌ [APPROVE REQUEST] Failed:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to approve request',
+          duration: 3000
+        }
+      });
+    }
   };
 
-  const handleRejectRequest = (requestId: string, reason: string) => {
-    setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'rejected', rejectionReason: reason } : r));
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'info',
-        message: 'Request rejected!',
-        duration: 3000
-      }
-    });
+  const handleRejectRequest = async (requestId: string, reason: string) => {
+    try {
+      console.log('❌ [REJECT REQUEST] Rejecting request:', requestId);
+      
+      await apiService.put(`/projects/${activeProject?._id}/requests/${requestId}/reject`, { reason });
+      
+      setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'rejected', rejectionReason: reason } : r));
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'info',
+          message: 'Request rejected!',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('❌ [REJECT REQUEST] Failed:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to reject request',
+          duration: 3000
+        }
+      });
+    }
+  };
+
+  const handleManualReassign = async (taskId: string, newAssigneeId: string) => {
+    try {
+      console.log('👥 [MANUAL REASSIGN] Reassigning task:', taskId, 'to:', newAssigneeId);
+      
+      await apiService.put(`/tasks/${taskId}/reassign`, { assignedTo: newAssigneeId });
+      
+      // Task list will refresh on next component mount
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Task reassigned successfully!',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('❌ [MANUAL REASSIGN] Failed:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to reassign task',
+          duration: 3000
+        }
+      });
+    }
+  };
+
+  const handleManualDeadlineChange = async (taskId: string, newDeadline: string) => {
+    try {
+      console.log('⏰ [MANUAL DEADLINE] Changing deadline for task:', taskId, 'to:', newDeadline);
+      
+      await apiService.put(`/tasks/${taskId}`, { dueDate: newDeadline });
+      
+      // Task list will refresh on next component mount
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Deadline updated successfully!',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('❌ [MANUAL DEADLINE] Failed:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to update deadline',
+          duration: 3000
+        }
+      });
+    }
   };
 
   // Role Switcher Handler (Testing only)
@@ -2204,6 +2303,7 @@ const ProjectViewDetailed: React.FC = () => {
               projectTeam={(activeProject as any)?.teamMembers || []}
               tasks={projectTasks}
               isProjectManager={true}
+              currentUserId={state.userProfile?._id}
               onCreateTask={handleCreateTask}
               onUpdateTask={handleUpdateTask}
               onDeleteTask={handleDeleteTask}
@@ -2267,6 +2367,8 @@ const ProjectViewDetailed: React.FC = () => {
             onCreateRequest={handleCreateRequest}
             onApproveRequest={handleApproveRequest}
             onRejectRequest={handleRejectRequest}
+            onManualReassign={handleManualReassign}
+            onManualDeadlineChange={handleManualDeadlineChange}
           />
         );
       
@@ -2286,10 +2388,33 @@ const ProjectViewDetailed: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Status</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Manually adjust the project completion status
+                Manage project status and completion progress
               </p>
               
               <div className="space-y-4">
+                {/* Status Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Project Status
+                  </label>
+                  <select
+                    value={projectStatus}
+                    onChange={(e) => setProjectStatus(e.target.value as any)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                  >
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                    <option value="paused">Paused</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {projectStatus === 'active' && 'Project is currently active and in progress'}
+                    {projectStatus === 'completed' && 'Project has been completed'}
+                    {projectStatus === 'paused' && 'Project is temporarily paused'}
+                    {projectStatus === 'archived' && 'Project is archived and inactive'}
+                  </p>
+                </div>
+              
                 {/* Progress Slider */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -2345,33 +2470,44 @@ const ProjectViewDetailed: React.FC = () => {
                 <button
                   onClick={async () => {
                     try {
-                      console.log('💾 [SAVE PROGRESS] Saving project progress:', projectProgress);
-                      console.log('💾 [SAVE PROGRESS] Project ID:', activeProject?._id);
+                      console.log('💾 [SAVE PROJECT] Saving project status:', projectStatus);
+                      console.log('💾 [SAVE PROJECT] Saving project progress:', projectProgress);
+                      console.log('💾 [SAVE PROJECT] Project ID:', activeProject?._id);
                       
                       const response = await apiService.put(`/projects/${activeProject?._id}`, {
+                        status: projectStatus,
                         progress: projectProgress
                       });
                       
-                      console.log('✅ [SAVE PROGRESS] Response:', response.data);
+                      console.log('✅ [SAVE PROJECT] Response:', response.data);
+                      
+                      // Update local project state
+                      if (activeProject) {
+                        setActiveProject({
+                          ...activeProject,
+                          status: projectStatus,
+                          progress: projectProgress
+                        });
+                      }
                       
                       dispatch({
                         type: 'ADD_TOAST',
                         payload: {
                           id: Date.now().toString(),
                           type: 'success',
-                          message: 'Project progress updated successfully',
+                          message: 'Project status and progress updated successfully',
                           duration: 3000
                         }
                       });
                     } catch (error) {
-                      console.error('❌ [SAVE PROGRESS] Failed:', error);
-                      console.error('❌ [SAVE PROGRESS] Error details:', (error as any).response?.data);
+                      console.error('❌ [SAVE PROJECT] Failed:', error);
+                      console.error('❌ [SAVE PROJECT] Error details:', (error as any).response?.data);
                       dispatch({
                         type: 'ADD_TOAST',
                         payload: {
                           id: Date.now().toString(),
                           type: 'error',
-                          message: 'Failed to update project progress',
+                          message: 'Failed to update project',
                           duration: 3000
                         }
                       });
@@ -2379,7 +2515,7 @@ const ProjectViewDetailed: React.FC = () => {
                   }}
                   className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover font-medium"
                 >
-                  Save Progress
+                  Save Status & Progress
                 </button>
               </div>
             </div>

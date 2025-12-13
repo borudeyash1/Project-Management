@@ -9,7 +9,11 @@ import {
   addMember,
   removeMember,
   updateMemberRole,
-  linkProjectToWorkspace
+  linkProjectToWorkspace,
+  createRequest,
+  getProjectRequests,
+  approveRequest,
+  rejectRequest
 } from '../controllers/projectController';
 
 const router = express.Router();
@@ -29,5 +33,11 @@ router.post('/:id/link-workspace', linkProjectToWorkspace);
 router.post('/:id/members', addMember);
 router.delete('/:id/members/:memberId', removeMember);
 router.put('/:id/members/:memberId/role', updateMemberRole);
+
+// Request management routes
+router.post('/:id/requests', createRequest);
+router.get('/:id/requests', getProjectRequests);
+router.put('/:id/requests/:requestId/approve', approveRequest);
+router.put('/:id/requests/:requestId/reject', rejectRequest);
 
 export default router;

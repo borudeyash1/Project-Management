@@ -36,12 +36,12 @@ const taskSchema: Schema<any> = new Schema<any>(
     },
     status: {
       type: String,
-      enum: ["todo", "in-progress", "in-review", "done", "cancelled"],
-      default: "todo",
+      enum: ["pending", "in-progress", "completed", "blocked", "verified"],
+      default: "pending",
     },
     priority: {
       type: String,
-      enum: ["low", "medium", "high", "urgent"],
+      enum: ["low", "medium", "high", "critical"],
       default: "medium",
     },
     type: {
@@ -49,6 +49,45 @@ const taskSchema: Schema<any> = new Schema<any>(
       enum: ["task", "bug", "feature", "story", "epic"],
       default: "task",
     },
+    taskType: {
+      type: String,
+      enum: ["general", "submission", "task"],
+      default: "general",
+    },
+    requiresFile: {
+      type: Boolean,
+      default: false,
+    },
+    requiresLink: {
+      type: Boolean,
+      default: false,
+    },
+    links: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    files: [
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+        url: {
+          type: String,
+          required: true,
+        },
+        uploadedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        uploadedBy: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+      },
+    ],
     category: {
       type: String,
       trim: true,
@@ -217,6 +256,84 @@ const taskSchema: Schema<any> = new Schema<any>(
         },
       },
     ],
+    // Performance Rating & Verification
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+    },
+    ratingDetails: {
+      // 9 Performance Dimensions
+      timeliness: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      quality: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      effort: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      accuracy: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      collaboration: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      initiative: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      reliability: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      learning: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      compliance: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      // Additional metadata
+      comments: {
+        type: String,
+        trim: true,
+      },
+      overallRating: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      ratedAt: {
+        type: Date,
+      },
+      ratedBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+    verifiedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    verifiedAt: {
+      type: Date,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -323,11 +440,11 @@ taskSchema.methods.stopTimeEntry = function (userId: string) {
 taskSchema.methods.updateStatus = function (status: string) {
   this.status = status;
 
-  if (status === "done") {
+  if (status === "completed" || status === "verified") {
     this.completedDate = new Date();
     this.progress = 100;
-  } else if (status === "cancelled") {
-    this.completedDate = new Date();
+  } else if (status === "blocked") {
+    // Keep current progress for blocked tasks
   }
 
   return this.save();

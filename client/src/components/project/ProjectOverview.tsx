@@ -26,45 +26,39 @@ const ProjectOverview: React.FC = () => {
   const stats = [
     {
       label: t('project.overview.totalTasks'),
-      value: project.totalTasksCount,
+      value: project.totalTasksCount || 0,
       icon: CheckCircle,
       color: 'text-accent-dark',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30'
     },
     {
       label: t('project.overview.completed'),
-      value: project.completedTasksCount,
+      value: project.completedTasksCount || 0,
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100 dark:bg-green-900/30'
     },
     {
       label: t('project.overview.inProgress'),
-      value: project.totalTasksCount - project.completedTasksCount,
+      value: (project.totalTasksCount || 0) - (project.completedTasksCount || 0),
       icon: Activity,
       color: 'text-orange-600',
       bgColor: 'bg-orange-200 dark:bg-orange-900/30'
     },
     {
       label: t('project.overview.teamMembers'),
-      value: project.teamMemberCount,
+      value: project.teamMemberCount || 0,
       icon: Users,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100 dark:bg-purple-900/30'
     }
   ];
 
-  const milestones = [
-    { name: 'Phase 1 Complete', date: '2024-04-15', status: 'completed' },
-    { name: 'Beta Release', date: '2024-05-20', status: 'in-progress' },
-    { name: 'Final Launch', date: '2024-06-30', status: 'pending' }
-  ];
+  // Get milestones from project data (if available)
+  const milestones = (project as any).milestones || [];
 
-  const recentActivity = [
-    { user: 'John Doe', action: 'completed task', item: 'API Integration', time: '2 hours ago' },
-    { user: 'Jane Smith', action: 'added comment on', item: 'UI Design', time: '4 hours ago' },
-    { user: 'Bob Wilson', action: 'updated status of', item: 'Database Schema', time: '1 day ago' }
-  ];
+  // Get recent activity from project data (if available)
+  const recentActivity = (project as any).recentActivity || [];
 
   return (
     <div className="p-6 space-y-6">
@@ -135,28 +129,37 @@ const ProjectOverview: React.FC = () => {
               {t('project.overview.milestones')}
             </h2>
           </div>
-          <div className="space-y-3">
-            {milestones.map((milestone, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <div className={`w-3 h-3 rounded-full ${
-                  milestone.status === 'completed' ? 'bg-green-500' :
-                  milestone.status === 'in-progress' ? 'bg-accent' :
-                  'bg-gray-300'
-                }`} />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-gray-100">{milestone.name}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-200">{milestone.date}</div>
+          {milestones.length > 0 ? (
+            <div className="space-y-3">
+              {milestones.map((milestone: any, index: number) => (
+                <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div className={`w-3 h-3 rounded-full ${
+                    milestone.status === 'completed' ? 'bg-green-500' :
+                    milestone.status === 'in-progress' ? 'bg-accent' :
+                    'bg-gray-300'
+                  }`} />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{milestone.name}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-200">{milestone.date}</div>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
+                    milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light' :
+                    'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+                  }`}>
+                    {milestone.status}
+                  </span>
                 </div>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
-                  milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light' :
-                  'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
-                }`}>
-                  {milestone.status}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                No milestones have been set for this project yet.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Recent Activity */}
@@ -167,23 +170,32 @@ const ProjectOverview: React.FC = () => {
               {t('project.overview.recentActivity')}
             </h2>
           </div>
-          <div className="space-y-3">
-            {recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Users className="w-4 h-4 text-accent-dark" />
+          {recentActivity.length > 0 ? (
+            <div className="space-y-3">
+              {recentActivity.map((activity: any, index: number) => (
+                <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Users className="w-4 h-4 text-accent-dark" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      <span className="font-medium">{activity.user}</span>
+                      {' '}{activity.action}{' '}
+                      <span className="font-medium">{activity.item}</span>
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{activity.time}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900 dark:text-gray-100">
-                    <span className="font-medium">{activity.user}</span>
-                    {' '}{activity.action}{' '}
-                    <span className="font-medium">{activity.item}</span>
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                No recent activity to display.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

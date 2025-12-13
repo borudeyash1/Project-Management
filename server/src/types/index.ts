@@ -432,6 +432,17 @@ export interface ITask extends Document {
   title: string;
   description?: string;
   type: 'task' | 'bug' | 'feature' | 'epic' | 'story' | 'subtask';
+  taskType?: 'status-update' | 'file-submission' | 'link-submission' | 'general' | 'review' | 'report' | 'report-submission' | 'task';
+  requiresFile?: boolean;
+  requiresLink?: boolean;
+  links?: string[];
+  files?: Array<{
+    _id?: string;
+    name: string;
+    url: string;
+    uploadedAt?: Date;
+    uploadedBy?: string;
+  }>;
   startDate?: Date;
   dueDate?: Date;
   completedDate?: Date;
@@ -492,6 +503,25 @@ export interface ITask extends Document {
     allowTimeTracking: boolean;
     requireApproval: boolean;
   };
+  // Performance Rating & Verification
+  rating?: number;
+  ratingDetails?: {
+    timeliness?: number;
+    quality?: number;
+    effort?: number;
+    accuracy?: number;
+    collaboration?: number;
+    initiative?: number;
+    reliability?: number;
+    learning?: number;
+    compliance?: number;
+    comments?: string;
+    overallRating?: number;
+    ratedAt?: Date;
+    ratedBy?: string;
+  };
+  verifiedBy?: string;
+  verifiedAt?: Date;
   isActive: boolean;
   subtaskCompletionPercentage: number;
   totalTimeLogged: number;

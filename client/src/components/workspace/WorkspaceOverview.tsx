@@ -34,7 +34,7 @@ interface AttendanceStats {
 }
 
 const WorkspaceOverview: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
@@ -96,27 +96,31 @@ const WorkspaceOverview: React.FC = () => {
     fetchNotes();
   }, []);
 
-  // Ensure projects for the active workspace are loaded from the backend
-  // so they persist in MongoDB and are available after page refresh.
+  // Fetch workspace projects from backend to ensure data is synced
   useEffect(() => {
     const loadWorkspaceProjects = async () => {
       if (!state.currentWorkspace) return;
+      
       try {
+        console.log('[WorkspaceOverview] Fetching projects for workspace:', state.currentWorkspace);
         const projects = await getWorkspaceProjects(state.currentWorkspace);
-        // We intentionally replace the current project list so overview
-        // stays in sync with the backend.
-        (state as any).dispatch?.({ type: 'SET_PROJECTS', payload: projects });
+        console.log('[WorkspaceOverview] Fetched projects:', projects.length);
+        
+        // Transform projects to match state type (convert createdBy object to string)
+        const transformedProjects = projects.map((project: any) => ({
+          ...project,
+          createdBy: typeof project.createdBy === 'object' ? project.createdBy._id : project.createdBy
+        }));
+        
+        // Update the projects in state
+        dispatch({ type: 'SET_PROJECTS', payload: transformedProjects });
       } catch (error) {
-        console.error('Failed to load workspace projects for overview', error);
+        console.error('[WorkspaceOverview] Failed to load workspace projects:', error);
       }
     };
 
-    // Only run if we have a workspace and a dispatch function exposed
-    // (when using the hook outside of the AppProvider this will be undefined).
-    if ((state as any)?.currentWorkspace && (state as any)?.dispatch) {
-      loadWorkspaceProjects();
-    }
-  }, [state]);
+    loadWorkspaceProjects();
+  }, [state.currentWorkspace, dispatch]);
 
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
 

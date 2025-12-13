@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PlannerProvider } from './context/PlannerContext';
 import { TrackerProvider } from './context/TrackerContext';
+import { DockProvider, useDock } from './context/DockContext';
 import { HelmetProvider } from 'react-helmet-async';
 import './i18n'; // Initialize i18n
 import Auth from './components/Auth';
@@ -121,15 +122,75 @@ const WorkspaceAttendanceWrapper: React.FC = () => {
   return <WorkspaceAttendanceTab workspaceId={workspaceId || ''} />;
 };
 
-// Main App Layout Component
-const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Main App Layout Component with Flexible Dock Positioning
+const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { dockPosition } = useDock();
+
+  const isHorizontalDock = dockPosition === 'left' || dockPosition === 'right';
+  const isTopDock = dockPosition === 'top';
+  const isBottomDock = dockPosition === 'bottom';
+
+  // For top/bottom: Dock is fixed at viewport edges
+  if (!isHorizontalDock) {
+    return (
+      <div className="min-h-screen bg-bg dark:bg-gray-900">
+        {/* Dock Fixed at Top */}
+        {isTopDock && (
+          <div className="fixed top-0 left-0 right-0 z-[100]">
+            <DockNavigation />
+          </div>
+        )}
+
+        {/* Main Content Area (Header + Content) with padding for dock */}
+        <div className={`min-h-screen ${isTopDock ? 'pt-16' : ''} ${isBottomDock ? 'pb-16' : ''}`}>
+          <Header />
+          <main className="bg-bg dark:bg-gray-900">
+            {children}
+          </main>
+        </div>
+
+        {/* Dock Fixed at Bottom */}
+        {isBottomDock && (
+          <div className="fixed bottom-0 left-0 right-0 z-[100]">
+            <DockNavigation />
+          </div>
+        )}
+
+        {/* Fixed Components */}
+        <ToastContainer />
+        <NotificationsPanel />
+        <TaskDrawer />
+        <ChatbotButton />
+      </div>
+    );
+  }
+
+  // For left/right: Dock is alongside, content shifts automatically
   return (
-    <div className="min-h-screen bg-bg dark:bg-gray-900">
-      <Header />
-      <main className="min-h-[calc(100vh-56px)] bg-bg dark:bg-gray-900 pb-24">
-        {children}
-      </main>
-      <DockNavigation />
+    <div className="min-h-screen bg-bg dark:bg-gray-900 flex">
+      {/* Dock at Left */}
+      {dockPosition === 'left' && (
+        <div className="flex-shrink-0">
+          <DockNavigation />
+        </div>
+      )}
+
+      {/* Main Content Area (Header + Content) - Takes remaining space */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header />
+        <main className="flex-1 bg-bg dark:bg-gray-900 overflow-auto">
+          {children}
+        </main>
+      </div>
+
+      {/* Dock at Right */}
+      {dockPosition === 'right' && (
+        <div className="flex-shrink-0">
+          <DockNavigation />
+        </div>
+      )}
+
+      {/* Fixed Components */}
       <ToastContainer />
       <NotificationsPanel />
       <TaskDrawer />
@@ -418,11 +479,13 @@ const App: React.FC = () => {
       <Router>
         <AppProvider>
           <ThemeProvider>
-            <PlannerProvider>
-              <TrackerProvider>
-                <AppContent />
-              </TrackerProvider>
-            </PlannerProvider>
+            <DockProvider>
+              <PlannerProvider>
+                <TrackerProvider>
+                  <AppContent />
+                </TrackerProvider>
+              </PlannerProvider>
+            </DockProvider>
           </ThemeProvider>
         </AppProvider>
       </Router>

@@ -416,7 +416,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
       project._id
     );
 
-    await project.populate('owner', 'fullName email avatarUrl');
+    // Populate team members with user details
     await project.populate('teamMembers.user', 'fullName email avatarUrl');
 
     const response: ApiResponse<IProject> = {
@@ -977,6 +977,257 @@ export const linkProjectToWorkspace = async (req: AuthenticatedRequest, res: Res
     res.status(500).json({
       success: false,
       message: 'Internal server error while linking project'
+    });
+  }
+};
+
+// Request Management Controllers
+
+// Create a new request
+export const createRequest = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id: projectId } = req.params;
+    const user = req.user!;
+    const RequestModel = (await import('../models/Request')).default;
+
+    console.log('📤 [CREATE REQUEST] Project:', projectId, 'User:', user._id);
+    console.log('📦 [CREATE REQUEST] Body:', req.body);
+
+    // Validate project exists and user has access
+    const project = await Project.findById(projectId);
+    if (!project) {
+      res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+      return;
+    }
+
+    // Check if user is a member of the project
+    const isMember = project.teamMembers.some(
+      (member: any) => member.user.toString() === user._id.toString()
+    );
+
+    if (!isMember) {
+      res.status(403).json({
+        success: false,
+        message: 'You are not a member of this project'
+      });
+      return;
+    }
+
+    // Create the request
+    const request = new RequestModel({
+      project: projectId,
+      ...req.body,
+      requestedBy: user._id,
+      requestedAt: new Date(),
+      status: 'pending'
+    });
+
+    await request.save();
+
+    console.log('✅ [CREATE REQUEST] Request created:', request._id);
+
+    res.status(201).json({
+      success: true,
+      message: 'Request created successfully',
+      data: request
+    });
+  } catch (error: any) {
+    console.error('❌ [CREATE REQUEST] Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create request'
+    });
+  }
+};
+
+// Get all requests for a project
+export const getProjectRequests = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id: projectId } = req.params;
+    const user = req.user!;
+    const RequestModel = (await import('../models/Request')).default;
+
+    // Validate project exists and user has access
+    const project = await Project.findById(projectId);
+    if (!project) {
+      res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+      return;
+    }
+
+    // Check if user is a member of the project
+    const isMember = project.teamMembers.some(
+      (member: any) => member.user.toString() === user._id.toString()
+    );
+
+    if (!isMember) {
+      res.status(403).json({
+        success: false,
+        message: 'You are not a member of this project'
+      });
+      return;
+    }
+
+    // Get all requests for the project
+    const requests = await RequestModel.find({ project: projectId })
+      .populate('requestedBy', 'fullName email avatarUrl')
+      .populate('approvedBy', 'fullName email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: requests
+    });
+  } catch (error: any) {
+    console.error('Get requests error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get requests'
+    });
+  }
+};
+
+// Approve a request
+export const approveRequest = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id: projectId, requestId } = req.params;
+    const user = req.user!;
+    const RequestModel = (await import('../models/Request')).default;
+
+    console.log('✅ [APPROVE REQUEST] Project:', projectId, 'Request:', requestId);
+
+    // Validate project exists and user is manager
+    const project = await Project.findById(projectId);
+    if (!project) {
+      res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+      return;
+    }
+
+    // Check if user is project manager or workspace owner
+    const isManager = project.teamMembers.some(
+      (member: any) => 
+        member.user.toString() === user._id.toString() && 
+        (member.role === 'manager' || member.role === 'owner')
+    );
+
+    if (!isManager) {
+      res.status(403).json({
+        success: false,
+        message: 'Only project managers can approve requests'
+      });
+      return;
+    }
+
+    // Find and update the request
+    const request = await RequestModel.findOneAndUpdate(
+      { _id: requestId, project: projectId, status: 'pending' },
+      {
+        status: 'approved',
+        approvedBy: user._id,
+        approvedAt: new Date()
+      },
+      { new: true }
+    ).populate('requestedBy', 'fullName email');
+
+    if (!request) {
+      res.status(404).json({
+        success: false,
+        message: 'Request not found or already processed'
+      });
+      return;
+    }
+
+    console.log('✅ [APPROVE REQUEST] Request approved:', request._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Request approved successfully',
+      data: request
+    });
+  } catch (error: any) {
+    console.error('❌ [APPROVE REQUEST] Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to approve request'
+    });
+  }
+};
+
+// Reject a request
+export const rejectRequest = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id: projectId, requestId } = req.params;
+    const { reason } = req.body;
+    const user = req.user!;
+    const RequestModel = (await import('../models/Request')).default;
+
+    console.log('❌ [REJECT REQUEST] Project:', projectId, 'Request:', requestId);
+
+    // Validate project exists and user is manager
+    const project = await Project.findById(projectId);
+    if (!project) {
+      res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+      return;
+    }
+
+    // Check if user is project manager or workspace owner
+    const isManager = project.teamMembers.some(
+      (member: any) => 
+        member.user.toString() === user._id.toString() && 
+        (member.role === 'manager' || member.role === 'owner')
+    );
+
+    if (!isManager) {
+      res.status(403).json({
+        success: false,
+        message: 'Only project managers can reject requests'
+      });
+      return;
+    }
+
+    // Find and update the request
+    const request = await RequestModel.findOneAndUpdate(
+      { _id: requestId, project: projectId, status: 'pending' },
+      {
+        status: 'rejected',
+        rejectionReason: reason,
+        approvedBy: user._id,
+        approvedAt: new Date()
+      },
+      { new: true }
+    ).populate('requestedBy', 'fullName email');
+
+    if (!request) {
+      res.status(404).json({
+        success: false,
+        message: 'Request not found or already processed'
+      });
+      return;
+    }
+
+    console.log('❌ [REJECT REQUEST] Request rejected:', request._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Request rejected successfully',
+      data: request
+    });
+  } catch (error: any) {
+    console.error('❌ [REJECT REQUEST] Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reject request'
     });
   }
 };
