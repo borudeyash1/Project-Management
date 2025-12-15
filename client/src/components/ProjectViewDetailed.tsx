@@ -415,6 +415,24 @@ const ProjectViewDetailed: React.FC = () => {
     loadTasks();
   }, [activeProject?._id, (activeProject as any)?.team]);
 
+  // Load requests for active project from backend
+  useEffect(() => {
+    const loadRequests = async () => {
+      if (!activeProject?._id) return;
+      try {
+        console.log('📥 [LOAD REQUESTS] Loading requests for project:', activeProject._id);
+        const response = await apiService.get(`/projects/${activeProject._id}/requests`);
+        console.log('✅ [LOAD REQUESTS] Loaded requests:', response.data.data?.length || 0);
+        setRequests(response.data.data || []);
+      } catch (error) {
+        console.error('❌ [LOAD REQUESTS] Failed to load requests:', error);
+        setRequests([]);
+      }
+    };
+
+    loadRequests();
+  }, [activeProject?._id]);
+
   // Set projects from state
   useEffect(() => {
     if (state.projects.length > 0) {
@@ -728,12 +746,14 @@ const ProjectViewDetailed: React.FC = () => {
       console.log('📤 [CREATE REQUEST] Submitting request:', request);
       
       // Call API to create request
-      const response = await apiService.post(`/projects/${activeProject?._id}/requests`, request);
+      const response = await apiService.post(`/projects/${projectId}/requests`, request);
       
       console.log('✅ [CREATE REQUEST] Response:', response.data);
       
-      // Add to local state
-      setRequests([...requests, response.data.data]);
+      // Add to local state only if we got valid data
+      if (response.data && response.data.data) {
+        setRequests([...requests, response.data.data]);
+      }
       
       dispatch({
         type: 'ADD_TOAST',
@@ -2364,6 +2384,7 @@ const ProjectViewDetailed: React.FC = () => {
             isProjectManager={isProjectManager || isWorkspaceOwner}
             requests={requests}
             tasks={projectTasks}
+            teamMembers={project?.teamMembers || []}
             onCreateRequest={handleCreateRequest}
             onApproveRequest={handleApproveRequest}
             onRejectRequest={handleRejectRequest}
