@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Users, Clock, Star, Trash2, Cloud, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Clock, Star, Trash2, Cloud, ChevronLeft, ChevronRight } from 'lucide-react';
 import StorageMeter from './StorageMeter';
 import ProfileMenu from './ProfileMenu/ProfileMenu';
 
@@ -27,7 +27,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'home', label: 'My Vault', icon: <Home size={20} /> },
-    { id: 'shared', label: 'Shared with me', icon: <Users size={20} /> },
     { id: 'recent', label: 'Recent', icon: <Clock size={20} /> },
     { id: 'starred', label: 'Starred', icon: <Star size={20} /> },
     { id: 'trash', label: 'Trash', icon: <Trash2 size={20} /> },

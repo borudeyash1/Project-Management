@@ -11,7 +11,7 @@ interface ProfileMenuProps {
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { preferences, applyTheme, isDarkMode } = useTheme();
+    const { preferences, applyTheme } = useTheme();
     const menuRef = useRef<HTMLDivElement>(null);
 
     // Close menu when clicking outside

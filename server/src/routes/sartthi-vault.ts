@@ -28,8 +28,9 @@ router.get('/files', authenticate, async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
         const folderId = req.query.folderId as string | undefined;
+        const view = req.query.view as string | undefined;
 
-        const files = await listFiles(userId, folderId);
+        const files = await listFiles(userId, folderId, view);
 
         res.json({
             success: true,

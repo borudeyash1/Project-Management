@@ -34,10 +34,10 @@ export interface VaultFile {
 
 export const vaultApi = {
     // List files in a folder
-    listFiles: async (folderId?: string): Promise<VaultFile[]> => {
-        const url = folderId
-            ? `${API_URL}/api/vault/files?folderId=${folderId}`
-            : `${API_URL}/api/vault/files`;
+    listFiles: async (folderId?: string, view?: string): Promise<VaultFile[]> => {
+        let url = `${API_URL}/api/vault/files?`;
+        if (folderId) url += `folderId=${folderId}&`;
+        if (view) url += `view=${view}`;
 
         const response = await fetch(url, getFetchOptions());
 

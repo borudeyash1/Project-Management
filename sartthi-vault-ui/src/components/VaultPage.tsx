@@ -42,13 +42,25 @@ const VaultPage: React.FC = () => {
   // Fetch files from API
   useEffect(() => {
     loadFiles();
-  }, [currentFolderId]);
+  }, [currentFolderId, activeView]);
+
+  // Handle view changes
+  useEffect(() => {
+    setCurrentFolderId(undefined);
+    const viewNames: Record<string, string> = {
+      home: 'My Vault',
+      recent: 'Recent',
+      starred: 'Starred',
+      trash: 'Trash'
+    };
+    setBreadcrumbs([{ id: 'root', name: viewNames[activeView] || 'Files' }]);
+  }, [activeView]);
 
   const loadFiles = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const files = await vaultApi.listFiles(currentFolderId);
+      const files = await vaultApi.listFiles(currentFolderId, activeView);
       // Deduplicate files to prevent key collisions
       const uniqueFiles = Array.from(new Map(files.map(item => [item.id, item])).values());
       setAssets(uniqueFiles);

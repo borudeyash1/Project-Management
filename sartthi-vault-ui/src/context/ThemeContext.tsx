@@ -41,7 +41,7 @@ interface ThemeProviderProps {
 }
 
 // In development, we use relative path for proxy. In production, we might use env var.
-const API_URL = import.meta.env.VITE_API_URL || '';
+
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
