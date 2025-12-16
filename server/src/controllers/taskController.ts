@@ -339,3 +339,54 @@ export const deleteTask = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ success: false, message: 'Internal server error while deleting task' });
   }
 };
+
+// Reassign task to another user
+export const reassignTask = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const authUser = (req as any).user;
+    if (!authUser) {
+      res.status(401).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    const { assignedTo } = req.body;
+    
+    console.log('👥 [REASSIGN TASK] Task:', req.params.id, 'New Assignee:', assignedTo);
+
+    if (!assignedTo) {
+      res.status(400).json({ success: false, message: 'New assignee is required' });
+      return;
+    }
+
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      res.status(404).json({ success: false, message: 'Task not found' });
+      return;
+    }
+
+    const oldAssignee = task.assignedTo;
+    task.assignedTo = assignedTo;
+    await task.save();
+
+    // Create activity for task reassignment
+    await createActivity(
+      authUser._id,
+      'task_reassigned',
+      `Reassigned task: ${task.title}`,
+      task.project?.toString() || ''
+    );
+
+    console.log('✅ [REASSIGN TASK] Task reassigned successfully');
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Task reassigned successfully',
+      data: task
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('❌ [REASSIGN TASK] Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error while reassigning task' });
+  }
+};

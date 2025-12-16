@@ -21,6 +21,7 @@ const ProjectLayout: React.FC = () => {
   useEffect(() => {
     const loadProject = async () => {
       if (!projectId) {
+        console.log('❌ [PROJECT LAYOUT] No project ID provided');
         setLoading(false);
         return;
       }
@@ -62,7 +63,7 @@ const ProjectLayout: React.FC = () => {
               if (wsResponse.data.success) {
                 console.log('✅ [PROJECT LAYOUT] Workspace loaded:', wsResponse.data.data.name);
                 dispatch({
-                  type: 'SET_WORKSPACE',
+                  type: 'ADD_WORKSPACE',
                   payload: wsResponse.data.data
                 });
               }
@@ -84,7 +85,7 @@ const ProjectLayout: React.FC = () => {
     };
 
     loadProject();
-  }, [projectId, state.projects.length, state.workspaces.length, state.userProfile?._id]);
+  }, [projectId, state.userProfile?._id, state.projects, dispatch]);
 
   if (loading) {
     return (

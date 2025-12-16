@@ -21,6 +21,7 @@ interface ProjectRequestsTabProps {
   isProjectManager: boolean;
   requests: Request[];
   tasks: any[];
+  teamMembers: any[];
   onCreateRequest: (request: Partial<Request>) => void;
   onApproveRequest: (requestId: string) => void;
   onRejectRequest: (requestId: string, reason: string) => void;
@@ -34,6 +35,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   isProjectManager,
   requests,
   tasks,
+  teamMembers,
   onCreateRequest,
   onApproveRequest,
   onRejectRequest,
@@ -82,8 +84,8 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   console.log('[ProjectRequestsTab] Filtered out:', tasks.length - myTasks.length);
 
   // Filter requests
-  const myRequests = requests.filter(r => r.requestedBy === currentUserId);
-  const pendingApprovals = requests.filter(r => r.status === 'pending');
+  const myRequests = requests.filter(r => r && r.requestedBy === currentUserId);
+  const pendingApprovals = requests.filter(r => r && r.status === 'pending');
 
   const handleCreateRequest = () => {
     if (!selectedTaskId || !reason.trim()) {
@@ -95,7 +97,6 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
     if (!selectedTask) return;
 
     const newRequest: Partial<Request> = {
-      _id: `request_${Date.now()}`,
       type: requestType,
       taskId: selectedTaskId,
       taskName: selectedTask.title,
@@ -343,7 +344,17 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
                       <option value="">Select team member...</option>
-                      {/* Team members will be populated from project data */}
+                      {teamMembers.map((member: any) => {
+                        const userId = typeof member.user === 'object' ? member.user._id : member.user;
+                        const userName = typeof member.user === 'object' 
+                          ? (member.user.fullName || member.user.email)
+                          : member.user;
+                        return (
+                          <option key={userId} value={userId}>
+                            {userName}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
                   <button 
