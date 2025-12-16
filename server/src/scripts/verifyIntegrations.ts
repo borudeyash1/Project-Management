@@ -55,7 +55,7 @@ const verifyIntegrations = async () => {
                 const files = await listFiles(vaultUser._id.toString(), '', undefined);
                 console.log(`✅ Successfully fetched ${files.length} files.`);
                 if (files.length > 0) {
-                    console.log('First file:', files[0].name, `(${files[0].mimeType})`);
+                    console.log('First file:', files[0]?.name, `(${files[0]?.mimeType})`);
                 }
             } catch (error) {
                 console.error('❌ Vault Listing Failed:', error);
