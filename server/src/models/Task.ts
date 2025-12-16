@@ -36,7 +36,7 @@ const taskSchema: Schema<any> = new Schema<any>(
     },
     status: {
       type: String,
-      enum: ["pending", "in-progress", "completed", "blocked", "verified"],
+      enum: ["pending", "todo", "in-progress", "review", "in-review", "completed", "done", "blocked", "verified"],
       default: "pending",
     },
     priority: {
@@ -532,13 +532,13 @@ const rescheduleTaskReminders = async (task: any) => {
   }
 };
 
-taskSchema.post('save', function(doc) {
+taskSchema.post('save', function (doc) {
   rescheduleTaskReminders(doc).catch((err) => {
     console.error('[Task] Failed to schedule reminders after save:', err);
   });
 });
 
-taskSchema.post('findOneAndUpdate', function(doc: any) {
+taskSchema.post('findOneAndUpdate', function (doc: any) {
   if (doc) {
     rescheduleTaskReminders(doc).catch((err) => {
       console.error('[Task] Failed to schedule reminders after update:', err);
@@ -546,7 +546,7 @@ taskSchema.post('findOneAndUpdate', function(doc: any) {
   }
 });
 
-taskSchema.post('deleteOne', { document: true, query: false }, function(doc: any) {
+taskSchema.post('deleteOne', { document: true, query: false }, function (doc: any) {
   if (doc) {
     clearReminderTriggers('task', toIdString(doc._id)).catch((err) => {
       console.error('[Task] Failed to clear reminders after delete:', err);

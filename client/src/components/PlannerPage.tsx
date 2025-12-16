@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, Calendar, Clock, Target, Users, CheckCircle, 
+import {
+  Plus, Calendar, Clock, Target, Users, CheckCircle,
   AlertCircle, Star, Flag, Tag, MessageSquare, FileText,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot, X, Bell
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
@@ -52,6 +53,7 @@ interface CalendarEvent {
 
 const PlannerPage: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { t } = useTranslation();
   const { canUseAI } = useFeatureAccess();
   const { isDarkMode } = useTheme();
@@ -238,18 +240,18 @@ const PlannerPage: React.FC = () => {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('en-US', {
       weekday: 'short',
-      month: 'short', 
-      day: 'numeric' 
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -272,7 +274,7 @@ const PlannerPage: React.FC = () => {
     const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - startDate.getDay());
-    
+
     const days = [];
     for (let i = 0; i < 42; i++) {
       const day = new Date(startDate);
@@ -322,7 +324,7 @@ const PlannerPage: React.FC = () => {
         return {
           ...task,
           subtasks: task.subtasks.map(subtask =>
-            subtask._id === subtaskId 
+            subtask._id === subtaskId
               ? { ...subtask, completed: !subtask.completed }
               : subtask
           )
@@ -398,18 +400,17 @@ const PlannerPage: React.FC = () => {
                 <button
                   key={mode.id}
                   onClick={() => setViewMode(mode.id as any)}
-                  className={`px-3 py-2 text-sm font-medium ${
-                    viewMode === mode.id
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                  className={`px-3 py-2 text-sm font-medium ${viewMode === mode.id
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:text-gray-900'
+                    }`}
                 >
                   {mode.label}
                 </button>
               ))}
             </div>
 
-            <button 
+            <button
               onClick={() => {
                 const today = new Date();
                 setSelectedDate(today);
@@ -429,7 +430,13 @@ const PlannerPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-6">
+      <div
+        className="p-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar View */}
           <div className="lg:col-span-3">
@@ -472,21 +479,20 @@ const PlannerPage: React.FC = () => {
                       {day}
                     </div>
                   ))}
-                  
+
                   {/* Day Cells */}
                   {weekDays.map((day, index) => {
                     const dayTasks = getTasksForDate(day);
                     const dayEvents = getEventsForDate(day);
                     const isToday = day.toDateString() === new Date().toDateString();
                     const isSelected = day.toDateString() === selectedDate.toDateString();
-                    
+
                     return (
                       <div
                         key={index}
                         onClick={() => handleDateClick(day)}
-                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${
-                          isToday ? 'bg-blue-50 border-blue-200' : ''
-                        } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${isToday ? 'bg-blue-50 border-blue-200' : ''
+                          } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900'}`}>
@@ -496,7 +502,7 @@ const PlannerPage: React.FC = () => {
                             <span className="text-xs text-gray-600">{dayTasks.length}</span>
                           )}
                         </div>
-                        
+
                         {/* Tasks */}
                         <div className="space-y-1">
                           {dayTasks.slice(0, 2).map(task => (
@@ -529,11 +535,11 @@ const PlannerPage: React.FC = () => {
                       const taskTime = `${taskDate.getHours().toString().padStart(2, '0')}:${taskDate.getMinutes().toString().padStart(2, '0')}`;
                       return taskDate.toDateString() === currentDate.toDateString() && taskTime === time;
                     });
-                    
+
                     return (
                       <div key={time} className="flex gap-2 border-b border-gray-300 pb-2">
                         <div className="w-16 text-sm text-gray-600 pt-1">{time}</div>
-                        <div 
+                        <div
                           className="flex-1 min-h-12 border border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-50"
                           onClick={() => handleDateClick(currentDate, time)}
                         >
@@ -557,22 +563,20 @@ const PlannerPage: React.FC = () => {
                       {day}
                     </div>
                   ))}
-                  
+
                   {monthDays.map((day, index) => {
                     const dayTasks = getTasksForDate(day);
                     const isToday = day.toDateString() === new Date().toDateString();
                     const isCurrentMonth = day.getMonth() === currentDate.getMonth();
                     const isSelected = day.toDateString() === selectedDate.toDateString();
-                    
+
                     return (
                       <div
                         key={index}
                         onClick={() => handleDateClick(day)}
-                        className={`min-h-20 p-1 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${
-                          isToday ? 'bg-blue-50 border-blue-200' : ''
-                        } ${isSelected ? 'ring-2 ring-blue-500' : ''} ${
-                          !isCurrentMonth ? 'opacity-40' : ''
-                        }`}
+                        className={`min-h-20 p-1 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${isToday ? 'bg-blue-50 border-blue-200' : ''
+                          } ${isSelected ? 'ring-2 ring-blue-500' : ''} ${!isCurrentMonth ? 'opacity-40' : ''
+                          }`}
                       >
                         <div className="text-xs font-medium mb-1 ${
                           isToday ? 'text-accent-dark' : isCurrentMonth ? 'text-gray-900' : 'text-gray-600'
@@ -629,11 +633,10 @@ const PlannerPage: React.FC = () => {
                   >
                     <button
                       onClick={() => toggleTaskStatus(task._id)}
-                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                        task.status === 'completed'
-                          ? 'bg-green-500 border-green-500 text-white'
-                          : 'border-gray-300'
-                      }`}
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${task.status === 'completed'
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : 'border-gray-300'
+                        }`}
                     >
                       {task.status === 'completed' && <CheckCircle className="w-3 h-3" />}
                     </button>

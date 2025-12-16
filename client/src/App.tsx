@@ -94,6 +94,8 @@ import PricingModal from './components/PricingModal';
 import RequestChangeModal from './components/RequestChangeModal';
 import LoadingAnimation from './components/LoadingAnimation';
 
+import HomeHeader from './components/dashboard/HomeHeader';
+
 // Protected Route Component
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -123,7 +125,7 @@ const WorkspaceAttendanceWrapper: React.FC = () => {
 };
 
 // Main App Layout Component with Flexible Dock Positioning
-const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
+const AppLayout: React.FC<{ children: ReactNode; topBar?: ReactNode }> = ({ children, topBar }) => {
   const { dockPosition } = useDock();
 
   const isHorizontalDock = dockPosition === 'left' || dockPosition === 'right';
@@ -133,28 +135,27 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   // For top/bottom: Dock is fixed at viewport edges
   if (!isHorizontalDock) {
     return (
-      <div className="min-h-screen bg-bg dark:bg-gray-900">
+      <div className="min-h-screen bg-bg flex flex-col px-2">
         {/* Dock Fixed at Top */}
-        {isTopDock && (
-          <div className="fixed top-0 left-0 right-0 z-[100]">
-            <DockNavigation />
-          </div>
-        )}
+        {isTopDock && <DockNavigation />}
 
-        {/* Main Content Area (Header + Content) with padding for dock */}
-        <div className={`min-h-screen ${isTopDock ? 'pt-16' : ''} ${isBottomDock ? 'pb-16' : ''}`}>
+        {/* Header - Sticky */}
+        {/* If TopDock, push Header down so it starts below Fixed Dock */}
+        <div className={isTopDock ? 'mt-[52px]' : ''}>
           <Header />
-          <main className="bg-bg dark:bg-gray-900">
-            {children}
-          </main>
+        </div>
+
+        {/* TopBar */}
+        {topBar}
+
+        {/* Main Content Area */}
+        {/* Content follows naturally. Bottom padding for bottom dock. */}
+        <div className={`flex-1 relative ${isBottomDock ? 'mb-[52px]' : ''}`}>
+          {children}
         </div>
 
         {/* Dock Fixed at Bottom */}
-        {isBottomDock && (
-          <div className="fixed bottom-0 left-0 right-0 z-[100]">
-            <DockNavigation />
-          </div>
-        )}
+        {isBottomDock && <DockNavigation />}
 
         {/* Fixed Components */}
         <ToastContainer />
@@ -165,30 +166,25 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
     );
   }
 
-  // For left/right: Dock is alongside, content shifts automatically
+  // For left/right: Header and TopBar are FULL WIDTH, Dock sits BELOW them
   return (
-    <div className="min-h-screen bg-bg dark:bg-gray-900 flex">
-      {/* Dock at Left */}
-      {dockPosition === 'left' && (
-        <div className="flex-shrink-0">
-          <DockNavigation />
-        </div>
-      )}
+    <div className="min-h-screen bg-bg flex flex-col px-2">
+      {/* Header - Full Width */}
+      <Header />
 
-      {/* Main Content Area (Header + Content) - Takes remaining space */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        <main className="flex-1 bg-bg dark:bg-gray-900 overflow-auto">
+      {/* Top Bar (e.g. Welcome Banner) - Full Width */}
+      {topBar}
+
+      {/* Main Layout Container */}
+      <div className="flex-1 relative overflow-hidden">
+        {/* Dock Navigation (Fixed Position maintained by component) */}
+        <DockNavigation />
+
+        {/* Content Area with Padding for Dock */}
+        <div className="h-full w-full overflow-y-auto bg-bg">
           {children}
-        </main>
-      </div>
-
-      {/* Dock at Right */}
-      {dockPosition === 'right' && (
-        <div className="flex-shrink-0">
-          <DockNavigation />
         </div>
-      )}
+      </div>
 
       {/* Fixed Components */}
       <ToastContainer />
@@ -239,7 +235,7 @@ const AppContent: React.FC = () => {
         {/* Protected Routes */}
         <Route path="/home" element={
           <ProtectedRoute>
-            <AppLayout>
+            <AppLayout topBar={<HomeHeader />}>
               <HomePage />
             </AppLayout>
           </ProtectedRoute>

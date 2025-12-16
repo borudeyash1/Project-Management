@@ -23,6 +23,7 @@ import {
   Target as TargetIcon, Building as BuildingIcon, LayoutGrid, List
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import TaskTimeline from './TaskTimeline';
 import TaskTimelineView from './TaskTimelineView';
 import KanbanBoard from './KanbanBoard';
@@ -182,6 +183,7 @@ interface TeamMember {
 
 const TaskManagement: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { t, i18n } = useTranslation();
   const { isDarkMode } = useTheme();
   const [activeView, setActiveView] = useState('taskboard');
@@ -1899,8 +1901,8 @@ const TaskManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="bg-white dark:bg-gray-800 border border-border rounded-xl">
+    <div className="h-full bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 border-b border-border">
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1921,7 +1923,7 @@ const TaskManagement: React.FC = () => {
         </div>
 
         {/* View Tabs */}
-        <div className="border-b border-border">
+        <div>
           <nav className="flex space-x-8 px-6 overflow-x-auto">
             {views.map((view) => {
               const Icon = view.icon;
@@ -1942,8 +1944,16 @@ const TaskManagement: React.FC = () => {
             })}
           </nav>
         </div>
+      </div>
 
-        {/* Content */}
+      {/* Content */}
+      <div
+        className="transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         <div className="p-6">
           {renderContent()}
         </div>

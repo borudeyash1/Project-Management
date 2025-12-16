@@ -42,7 +42,8 @@ export const vaultApi = {
         const response = await fetch(url, getFetchOptions());
 
         if (!response.ok) {
-            throw new Error('Failed to fetch files');
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch files: ${response.status} ${response.statusText} - ${errorText}`);
         }
 
         const data = await response.json();
@@ -90,8 +91,9 @@ export const vaultApi = {
 
     // Get file view URL (for preview)
     getFileViewUrl: (fileId: string): string => {
-        // Cookies are automatically sent for same-site/subdomain requests
-        return `${API_URL}/api/vault/view/${fileId}`;
+        const token = localStorage.getItem('accessToken');
+        const baseUrl = `${API_URL}/api/vault/view/${fileId}`;
+        return token ? `${baseUrl}?token=${encodeURIComponent(token)}` : baseUrl;
     },
 
     // Delete a file

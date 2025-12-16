@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Edit2, Save, Upload, Link as LinkIcon, Calendar, Clock, Flag, User, Tag, FileText, Check, MessageSquare, Download, Trash2, Plus } from 'lucide-react';
+import axios from 'axios';
 
 interface Task {
   _id: string;
@@ -31,6 +32,7 @@ interface TaskDetailModalProps {
   onDeleteTask: (taskId: string) => void;
   currentUserRole: string; // 'manager' | 'employee'
   currentUserId: string;
+  workspaceId?: string;
 }
 
 const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
@@ -40,7 +42,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   onUpdateTask,
   onDeleteTask,
   currentUserRole,
-  currentUserId
+  currentUserId,
+  workspaceId
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<any>(null);
@@ -67,12 +70,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
   const handleStatusChange = (newStatus: string) => {
     const updates = { status: newStatus };
-    
+
     // If employee marks as completed, change to review
     if (newStatus === 'completed' && !isManager) {
       updates.status = 'review';
     }
-    
+
     onUpdateTask(task._id, updates);
     setEditedTask({ ...editedTask, ...updates });
   };
@@ -81,18 +84,18 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
     const updatedSubtasks = editedTask.subtasks.map((st: any) =>
       st.id === subtaskId ? { ...st, completed: !st.completed } : st
     );
-    
+
     // Calculate progress based on completed subtasks
     const completedCount = updatedSubtasks.filter((st: any) => st.completed).length;
-    const progress = updatedSubtasks.length > 0 
+    const progress = updatedSubtasks.length > 0
       ? Math.round((completedCount / updatedSubtasks.length) * 100)
       : 0;
-    
-    const updates = { 
+
+    const updates = {
       subtasks: updatedSubtasks,
       progress: progress
     };
-    
+
     onUpdateTask(task._id, updates);
     setEditedTask({ ...editedTask, ...updates });
   };
@@ -104,7 +107,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
         title: newSubtask.trim(),
         completed: false
       };
-      
+
       const updatedSubtasks = [...editedTask.subtasks, newSubtaskObj];
       onUpdateTask(task._id, { subtasks: updatedSubtasks });
       setEditedTask({ ...editedTask, subtasks: updatedSubtasks });
@@ -130,7 +133,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
         createdAt: new Date(),
         replies: []
       };
-      
+
       const updatedComments = [...editedTask.comments, comment];
       onUpdateTask(task._id, { comments: updatedComments });
       setEditedTask({ ...editedTask, comments: updatedComments });
@@ -138,19 +141,50 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      const newAttachments = filesArray.map((file, index) => ({
-        _id: `attachment_${Date.now()}_${index}`,
-        name: file.name,
-        url: URL.createObjectURL(file),
-        type: file.type.startsWith('image/') ? 'image' : 'file',
-        size: file.size,
-        uploadedBy: { name: 'Current User' },
-        uploadedAt: new Date()
-      }));
-      
+      const newAttachments: any[] = [];
+
+      for (const file of filesArray) {
+        // Optimistic UI update (placeholder)
+        const tempId = `temp_${Date.now()}`;
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          // Use passed prop workspaceId or fallback to task property
+          const targetWorkspaceId = workspaceId || (task as any).workspace?._id || (task as any).workspace;
+
+          if (!targetWorkspaceId) {
+            console.error("Workspace ID missing for upload");
+            alert("Cannot upload file: Workspace context missing.");
+            continue;
+          }
+
+          const response = await axios.post(`/api/vault-workspace/upload/${targetWorkspaceId}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+
+          const uploadedDoc = response.data.document;
+
+          // Map Vault Document to Task Attachment
+          newAttachments.push({
+            _id: uploadedDoc._id,
+            name: uploadedDoc.name,
+            url: uploadedDoc.url || uploadedDoc.webViewLink, // Use Google Drive Link
+            type: uploadedDoc.type,
+            size: uploadedDoc.size,
+            uploadedBy: { name: 'Current User' }, // Should be real user
+            uploadedAt: new Date()
+          });
+
+        } catch (error) {
+          console.error("Failed to upload file", error);
+          alert(`Failed to upload ${file.name}`);
+        }
+      }
+
       const updatedAttachments = [...editedTask.attachments, ...newAttachments];
       onUpdateTask(task._id, { attachments: updatedAttachments });
       setEditedTask({ ...editedTask, attachments: updatedAttachments });
@@ -311,7 +345,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   </h3>
                   <span className="text-sm text-gray-600">{editedTask.progress}% Complete</span>
                 </div>
-                
+
                 <div className="space-y-2">
                   {editedTask.subtasks.map((subtask: any) => (
                     <div key={subtask.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -335,7 +369,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       )}
                     </div>
                   ))}
-                  
+
                   {isManager && (
                     <div className="flex gap-2 mt-2">
                       <input
@@ -375,7 +409,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       </label>
                     </div>
                   )}
-                  
+
                   {editedTask.attachments.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {editedTask.attachments.map((file: any, index: number) => (
@@ -420,7 +454,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       </button>
                     </div>
                   )}
-                  
+
                   {editedTask.links.length > 0 && (
                     <div className="space-y-2">
                       {editedTask.links.map((link: string, index: number) => (
@@ -458,7 +492,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       <p className="text-sm text-gray-700">{comment.content}</p>
                     </div>
                   ))}
-                  
+
                   {canEdit && (
                     <div className="flex gap-2">
                       <input
@@ -486,7 +520,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               {/* Task Info */}
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <h3 className="text-sm font-semibold text-gray-900">Task Details</h3>
-                
+
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Assigned To</p>
                   <div className="flex items-center gap-2">
@@ -519,12 +553,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   <p className="text-xs text-gray-600 mb-1">Priority</p>
                   <div className="flex items-center gap-2">
                     <Flag className="w-4 h-4 text-gray-600" />
-                    <span className={`text-sm font-medium capitalize ${
-                      task.priority === 'critical' ? 'text-red-600' :
+                    <span className={`text-sm font-medium capitalize ${task.priority === 'critical' ? 'text-red-600' :
                       task.priority === 'high' ? 'text-orange-600' :
-                      task.priority === 'medium' ? 'text-yellow-600' :
-                      'text-gray-600'
-                    }`}>
+                        task.priority === 'medium' ? 'text-yellow-600' :
+                          'text-gray-600'
+                      }`}>
                       {task.priority}
                     </span>
                   </div>

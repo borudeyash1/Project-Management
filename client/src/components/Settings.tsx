@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
+import { useDock } from '../context/DockContext';
 import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
 import LanguageSelector from './LanguageSelector';
@@ -164,6 +165,7 @@ interface SettingsData {
 
 const Settings: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { preferences, updatePreferences: updateThemePreferences } = useTheme();
   const { t, i18n } = useTranslation();
   const [settingsData, setSettingsData] = useState<SettingsData | null>(null);
@@ -519,9 +521,8 @@ const Settings: React.FC = () => {
               </div>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.account.twoFactorEnabled ? 'bg-accent' : 'bg-gray-300'
-              }`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.account.twoFactorEnabled ? 'bg-accent' : 'bg-gray-300'
+                }`}
               onClick={() => {
                 const newValue = !settingsData?.account.twoFactorEnabled;
                 setSettingsData(prev => prev ? {
@@ -532,9 +533,8 @@ const Settings: React.FC = () => {
               }}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settingsData?.account.twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.account.twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
               />
             </button>
           </div>
@@ -547,9 +547,8 @@ const Settings: React.FC = () => {
               </div>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.account.loginNotifications ? 'bg-accent' : 'bg-gray-300'
-              }`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.account.loginNotifications ? 'bg-accent' : 'bg-gray-300'
+                }`}
               onClick={() => {
                 const newValue = !settingsData?.account.loginNotifications;
                 setSettingsData(prev => prev ? {
@@ -560,9 +559,8 @@ const Settings: React.FC = () => {
               }}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settingsData?.account.loginNotifications ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.account.loginNotifications ? 'translate-x-6' : 'translate-x-1'
+                  }`}
               />
             </button>
           </div>
@@ -625,9 +623,8 @@ const Settings: React.FC = () => {
             <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.emailNotifications')}</h3>
           </div>
           <button
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settingsData?.notifications.email.enabled ? 'bg-accent' : 'bg-gray-300'
-            }`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.notifications.email.enabled ? 'bg-accent' : 'bg-gray-300'
+              }`}
             onClick={() => {
               const newValue = !settingsData?.notifications.email.enabled;
               setSettingsData(prev => prev ? {
@@ -644,9 +641,8 @@ const Settings: React.FC = () => {
             }}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                settingsData?.notifications.email.enabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.notifications.email.enabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
             />
           </button>
         </div>
@@ -656,9 +652,8 @@ const Settings: React.FC = () => {
               <div key={key} className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
                 <button
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    value ? 'bg-accent' : 'bg-gray-300'
-                  }`}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
+                    }`}
                   onClick={() => {
                     const newValue = !value;
                     setSettingsData(prev => prev ? {
@@ -675,9 +670,8 @@ const Settings: React.FC = () => {
                   }}
                 >
                   <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                      value ? 'translate-x-5' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
+                      }`}
                   />
                 </button>
               </div>
@@ -694,9 +688,8 @@ const Settings: React.FC = () => {
             <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.pushNotifications')}</h3>
           </div>
           <button
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settingsData?.notifications.push.enabled ? 'bg-accent' : 'bg-gray-300'
-            }`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.notifications.push.enabled ? 'bg-accent' : 'bg-gray-300'
+              }`}
             onClick={() => {
               const newValue = !settingsData?.notifications.push.enabled;
               setSettingsData(prev => prev ? {
@@ -713,9 +706,8 @@ const Settings: React.FC = () => {
             }}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                settingsData?.notifications.push.enabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.notifications.push.enabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
             />
           </button>
         </div>
@@ -725,9 +717,8 @@ const Settings: React.FC = () => {
               <div key={key} className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
                 <button
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    value ? 'bg-accent' : 'bg-gray-300'
-                  }`}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
+                    }`}
                   onClick={() => {
                     const newValue = !value;
                     setSettingsData(prev => prev ? {
@@ -744,9 +735,8 @@ const Settings: React.FC = () => {
                   }}
                 >
                   <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                      value ? 'translate-x-5' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
+                      }`}
                   />
                 </button>
               </div>
@@ -763,9 +753,8 @@ const Settings: React.FC = () => {
             <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.desktopNotifications')}</h3>
           </div>
           <button
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settingsData?.notifications.desktop.enabled ? 'bg-accent' : 'bg-gray-300'
-            }`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.notifications.desktop.enabled ? 'bg-accent' : 'bg-gray-300'
+              }`}
             onClick={() => {
               const newValue = !settingsData?.notifications.desktop.enabled;
               setSettingsData(prev => prev ? {
@@ -782,9 +771,8 @@ const Settings: React.FC = () => {
             }}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                settingsData?.notifications.desktop.enabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.notifications.desktop.enabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
             />
           </button>
         </div>
@@ -794,9 +782,8 @@ const Settings: React.FC = () => {
               <div key={key} className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
                 <button
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    value ? 'bg-accent' : 'bg-gray-300'
-                  }`}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
+                    }`}
                   onClick={() => {
                     const newValue = !value;
                     setSettingsData(prev => prev ? {
@@ -813,9 +800,8 @@ const Settings: React.FC = () => {
                   }}
                 >
                   <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                      value ? 'translate-x-5' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
+                      }`}
                   />
                 </button>
               </div>
@@ -835,11 +821,10 @@ const Settings: React.FC = () => {
           {['light', 'dark', 'system'].map((theme) => (
             <button
               key={theme}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                preferences.theme === theme
-                  ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
-                  : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
-              }`}
+              className={`px-4 py-2 rounded-lg border transition-colors ${preferences.theme === theme
+                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
+                : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
+                }`}
               onClick={async () => {
                 try {
                   await updateThemePreferences({ theme: theme as 'light' | 'dark' | 'system' });
@@ -881,11 +866,10 @@ const Settings: React.FC = () => {
           {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].map((color) => (
             <button
               key={color}
-              className={`w-10 h-10 rounded-full border-2 transition-all ${
-                preferences.accentColor === color 
-                  ? 'border-gray-900 dark:border-white scale-110 ring-2 ring-offset-2 ring-gray-900 dark:ring-white' 
-                  : 'border-gray-300 dark:border-gray-600 hover:scale-105'
-              }`}
+              className={`w-10 h-10 rounded-full border-2 transition-all ${preferences.accentColor === color
+                ? 'border-gray-900 dark:border-white scale-110 ring-2 ring-offset-2 ring-gray-900 dark:ring-white'
+                : 'border-gray-300 dark:border-gray-600 hover:scale-105'
+                }`}
               style={{ backgroundColor: color }}
               onClick={async () => {
                 try {
@@ -927,11 +911,10 @@ const Settings: React.FC = () => {
           {['small', 'medium', 'large'].map((size) => (
             <button
               key={size}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                preferences.fontSize === size
-                  ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
-                  : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
-              }`}
+              className={`px-4 py-2 rounded-lg border transition-colors ${preferences.fontSize === size
+                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
+                : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
+                }`}
               onClick={async () => {
                 try {
                   await updateThemePreferences({ fontSize: size as 'small' | 'medium' | 'large' });
@@ -970,11 +953,10 @@ const Settings: React.FC = () => {
           {['compact', 'comfortable', 'spacious'].map((density) => (
             <button
               key={density}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                preferences.density === density
-                  ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
-                  : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
-              }`}
+              className={`px-4 py-2 rounded-lg border transition-colors ${preferences.density === density
+                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
+                : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
+                }`}
               onClick={async () => {
                 try {
                   await updateThemePreferences({ density: density as 'compact' | 'comfortable' | 'spacious' });
@@ -1016,9 +998,8 @@ const Settings: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.animationsDesc')}</p>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.animations ? 'bg-accent' : 'bg-gray-300'
-              }`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preferences.animations ? 'bg-accent' : 'bg-gray-300'
+                }`}
               onClick={async () => {
                 try {
                   await updateThemePreferences({ animations: !preferences.animations });
@@ -1028,9 +1009,8 @@ const Settings: React.FC = () => {
               }}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  preferences.animations ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${preferences.animations ? 'translate-x-6' : 'translate-x-1'
+                  }`}
               />
             </button>
           </div>
@@ -1040,9 +1020,8 @@ const Settings: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.reducedMotionDesc')}</p>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.reducedMotion ? 'bg-accent' : 'bg-gray-300'
-              }`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preferences.reducedMotion ? 'bg-accent' : 'bg-gray-300'
+                }`}
               onClick={async () => {
                 try {
                   await updateThemePreferences({ reducedMotion: !preferences.reducedMotion });
@@ -1052,9 +1031,8 @@ const Settings: React.FC = () => {
               }}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  preferences.reducedMotion ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${preferences.reducedMotion ? 'translate-x-6' : 'translate-x-1'
+                  }`}
               />
             </button>
           </div>
@@ -1151,11 +1129,10 @@ const Settings: React.FC = () => {
               </div>
               <div className="text-right">
                 <p className="font-medium">${invoice.amount}</p>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+                <span className={`px-2 py-1 text-xs rounded-full ${invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
                   invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
+                    'bg-red-100 text-red-800'
+                  }`}>
                   {invoice.status}
                 </span>
               </div>
@@ -1202,9 +1179,8 @@ const Settings: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.autoBackupDesc')}</p>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settingsData?.data.autoBackup ? 'bg-accent' : 'bg-gray-300'
-              }`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.data.autoBackup ? 'bg-accent' : 'bg-gray-300'
+                }`}
               onClick={() => {
                 const newValue = !settingsData?.data.autoBackup;
                 setSettingsData(prev => prev ? {
@@ -1215,9 +1191,8 @@ const Settings: React.FC = () => {
               }}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settingsData?.data.autoBackup ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.data.autoBackup ? 'translate-x-6' : 'translate-x-1'
+                  }`}
               />
             </button>
           </div>
@@ -1271,14 +1246,20 @@ const Settings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-4 sm:p-6">
-        <div className="bg-white border border-border rounded-xl p-8">
+      <div
+        className="p-4 sm:p-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '80px' : undefined,
+          paddingRight: dockPosition === 'right' ? '80px' : undefined
+        }}
+      >
+        <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl p-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
+            <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
             <div className="space-y-4">
-              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
             </div>
           </div>
         </div>
@@ -1287,7 +1268,13 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6">
+    <div
+      className="p-4 sm:p-6 transition-all duration-300"
+      style={{
+        paddingLeft: dockPosition === 'left' ? '80px' : undefined,
+        paddingRight: dockPosition === 'right' ? '80px' : undefined
+      }}
+    >
       <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-border dark:border-gray-600">
@@ -1304,11 +1291,10 @@ const Settings: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-accent text-accent-dark dark:text-accent-light'
-                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                  }`}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                    ? 'border-accent text-accent-dark dark:text-accent-light'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}

@@ -38,7 +38,7 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDateClick,
         {calendarDays.map((day, index) => {
           const isCurrentMonth = isSameMonth(day, monthStart);
           const isTodayDate = isToday(day);
-          const dayEvents = events.filter(event => 
+          const dayEvents = events.filter(event =>
             event.date && isSameDay(parseISO(event.date), day)
           );
 
@@ -75,11 +75,11 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDateClick,
                     }}
                     className={`
                       text-xs px-1.5 py-0.5 rounded truncate cursor-pointer hover:opacity-80
-                      ${event.color === 'blue' ? 'bg-blue-500/20 text-blue-300 border-l-2 border-blue-500' : ''}
-                      ${event.color === 'green' ? 'bg-green-500/20 text-green-300 border-l-2 border-green-500' : ''}
-                      ${event.color === 'purple' ? 'bg-purple-500/20 text-purple-300 border-l-2 border-purple-500' : ''}
-                      ${event.color === 'orange' ? 'bg-orange-500/20 text-orange-300 border-l-2 border-orange-500' : ''}
-                      ${!event.color ? 'bg-gray-500/20 text-gray-300 border-l-2 border-gray-500' : ''}
+                      ${event.color === 'blue' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-900 dark:text-blue-100 border-l-2 border-blue-600 dark:border-blue-500' : ''}
+                      ${event.color === 'green' ? 'bg-green-100 dark:bg-green-500/20 text-green-900 dark:text-green-100 border-l-2 border-green-600 dark:border-green-500' : ''}
+                      ${event.color === 'purple' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-900 dark:text-purple-100 border-l-2 border-purple-600 dark:border-purple-500' : ''}
+                      ${event.color === 'orange' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-900 dark:text-orange-100 border-l-2 border-orange-600 dark:border-orange-500' : ''}
+                      ${!event.color ? 'bg-gray-200 dark:bg-gray-500/20 text-gray-900 dark:text-gray-100 border-l-2 border-gray-600 dark:border-gray-500' : ''}
                     `}
                   >
                     {event.startTime && <span className="mr-1 opacity-70">{event.startTime.split(' ')[0]}</span>}

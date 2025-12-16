@@ -336,7 +336,7 @@ export const getProject = async (req: AuthenticatedRequest, res: Response): Prom
       _id: id,
       isActive: true,
       $or: [
-        { owner: userId },
+        { createdBy: userId },
         { 'teamMembers.user': userId }
       ]
     })
@@ -376,10 +376,12 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     const project = await Project.findOne({
       _id: id,
       isActive: true,
-      $or: [
-        { owner: userId },
-        { 'teamMembers.user': userId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
-      ]
+      teamMembers: {
+        $elemMatch: {
+          user: userId,
+          role: { $in: ['owner', 'manager'] }
+        }
+      }
     });
 
     if (!project) {
@@ -477,7 +479,12 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response): P
 
     const project = await Project.findOne({
       _id: id,
-      owner: userId
+      teamMembers: {
+        $elemMatch: {
+          user: userId,
+          role: 'owner'
+        }
+      }
     });
 
     if (!project) {
@@ -699,10 +706,12 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
     const project = await Project.findOne({
       _id: id,
       isActive: true,
-      $or: [
-        { owner: currentUserId },
-        { 'teamMembers.user': currentUserId, 'teamMembers.role': { $in: ['owner', 'manager'] } }
-      ]
+      teamMembers: {
+        $elemMatch: {
+          user: currentUserId,
+          role: { $in: ['owner', 'manager'] }
+        }
+      }
     });
 
     if (!project) {
@@ -774,23 +783,23 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
     console.log('🔍 [UPDATE MEMBER ROLE] Searching for member in teamMembers array...');
     console.log('🔍 [UPDATE MEMBER ROLE] Team members count:', (project as any).teamMembers?.length);
     console.log('🔍 [UPDATE MEMBER ROLE] Looking for memberId:', memberId);
-    
+
     // Find and update member role
     const member = ((project as any).teamMembers || []).find((member: any) => {
       const memberUserId = member.user.toString();
       console.log('🔍 [UPDATE MEMBER ROLE] Checking member.user:', memberUserId, 'against:', memberId);
       return memberUserId === memberId;
     });
-    
+
     console.log('🔍 [UPDATE MEMBER ROLE] Member found:', member ? 'YES' : 'NO');
     if (member) {
       console.log('🔍 [UPDATE MEMBER ROLE] Current role:', member.role);
       console.log('🔍 [UPDATE MEMBER ROLE] New role:', role);
     }
-    
+
     if (!member) {
       console.error('❌ [UPDATE MEMBER ROLE] Member not found in project');
-      console.error('❌ [UPDATE MEMBER ROLE] Available member IDs:', 
+      console.error('❌ [UPDATE MEMBER ROLE] Available member IDs:',
         ((project as any).teamMembers || []).map((m: any) => m.user.toString())
       );
       res.status(404).json({
@@ -859,10 +868,10 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
 
     member.role = role;
     member.permissions = permissions;
-    
+
     // Mark the teamMembers array as modified so Mongoose saves it
     (project as any).markModified('teamMembers');
-    
+
     await project.save();
 
     await project.populate({
@@ -1113,8 +1122,8 @@ export const approveRequest = async (req: AuthenticatedRequest, res: Response): 
 
     // Check if user is project manager or workspace owner
     const isManager = project.teamMembers.some(
-      (member: any) => 
-        member.user.toString() === user._id.toString() && 
+      (member: any) =>
+        member.user.toString() === user._id.toString() &&
         (member.role === 'manager' || member.role === 'owner')
     );
 
@@ -1183,8 +1192,8 @@ export const rejectRequest = async (req: AuthenticatedRequest, res: Response): P
 
     // Check if user is project manager or workspace owner
     const isManager = project.teamMembers.some(
-      (member: any) => 
-        member.user.toString() === user._id.toString() && 
+      (member: any) =>
+        member.user.toString() === user._id.toString() &&
         (member.role === 'manager' || member.role === 'owner')
     );
 

@@ -24,7 +24,7 @@
 }
 
 .dark .loading-container-fullscreen {
-  background-color: rgba(15, 23, 42, 0.95);
+  background-color: #0f0f0f;
 }
 
 /* Loader Animation */
@@ -44,8 +44,8 @@
   width: 30px;
   border-radius: 50%;
   background: linear-gradient(135deg, #44a0d1 0%, #fcdd05 100%);
-  animation: loading-bounce 0.5s ease-in-out infinite alternate, 
-             loading-gradient 2s ease-in-out infinite;
+  animation: loading-bounce 0.5s ease-in-out infinite alternate,
+    loading-gradient 2s ease-in-out infinite;
   box-shadow: 0 4px 8px rgba(68, 160, 209, 0.3);
 }
 
@@ -101,16 +101,16 @@
 @keyframes loading-step {
   0% {
     box-shadow: 0 10px 0 rgba(0, 0, 0, 0),
-            0 10px 0 #e5e7eb,
-            -35px 50px 0 #e5e7eb,
-            -70px 90px 0 #e5e7eb;
+      0 10px 0 #e5e7eb,
+      -35px 50px 0 #e5e7eb,
+      -70px 90px 0 #e5e7eb;
   }
 
   100% {
     box-shadow: 0 10px 0 #e5e7eb,
-            -35px 50px 0 #e5e7eb,
-            -70px 90px 0 #e5e7eb,
-            -70px 90px 0 rgba(0, 0, 0, 0);
+      -35px 50px 0 #e5e7eb,
+      -70px 90px 0 #e5e7eb,
+      -70px 90px 0 rgba(0, 0, 0, 0);
   }
 }
 
@@ -121,16 +121,16 @@
 @keyframes loading-step-dark {
   0% {
     box-shadow: 0 10px 0 rgba(0, 0, 0, 0),
-            0 10px 0 #334155,
-            -35px 50px 0 #334155,
-            -70px 90px 0 #334155;
+      0 10px 0 #334155,
+      -35px 50px 0 #334155,
+      -70px 90px 0 #334155;
   }
 
   100% {
     box-shadow: 0 10px 0 #334155,
-            -35px 50px 0 #334155,
-            -70px 90px 0 #334155,
-            -70px 90px 0 rgba(0, 0, 0, 0);
+      -35px 50px 0 #334155,
+      -70px 90px 0 #334155,
+      -70px 90px 0 rgba(0, 0, 0, 0);
   }
 }
 
@@ -138,28 +138,31 @@
   0% {
     background: linear-gradient(135deg, #44a0d1 0%, #fcdd05 100%);
   }
-  
+
   25% {
     background: linear-gradient(135deg, #fcdd05 0%, #44a0d1 100%);
   }
-  
+
   50% {
     background: linear-gradient(135deg, #44a0d1 0%, #fcdd05 100%);
   }
-  
+
   75% {
     background: linear-gradient(135deg, #fcdd05 0%, #44a0d1 100%);
   }
-  
+
   100% {
     background: linear-gradient(135deg, #44a0d1 0%, #fcdd05 100%);
   }
 }
 
 @keyframes loading-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }

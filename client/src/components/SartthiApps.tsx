@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Calendar, Shield, Monitor, Download } from 'lucide-react';
+import { Mail, Calendar, Shield, Monitor, Download, Clock, Folder as FolderIcon, FileText, ChevronRight } from 'lucide-react';
 import api from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import SharedNavbar from './SharedNavbar';
@@ -25,9 +25,75 @@ const SartthiApps: React.FC = () => {
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Widget Data State
+  const [emails, setEmails] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [vaultFiles, setVaultFiles] = useState<any[]>([]);
+  const [widgetsLoading, setWidgetsLoading] = useState(true);
+
   useEffect(() => {
     fetchReleases();
+    fetchWidgetData();
   }, []);
+
+  const fetchWidgetData = async () => {
+    try {
+      setWidgetsLoading(true);
+
+      // Fetch Mail
+      try {
+        const mailRes = await api.get('/sartthi/mail/messages', { params: { folder: 'inbox' } });
+        if (mailRes.data?.emails) {
+          setEmails(mailRes.data.emails.slice(0, 4));
+        }
+      } catch (e) {
+        console.error("Failed to fetch mails", e);
+      }
+
+      // Fetch Calendar
+      try {
+        const calRes = await api.get('/sartthi/calendar/events');
+        if (calRes.data?.events) {
+          // Filter for upcoming events and sort
+          const upcoming = calRes.data.events
+            .map((e: any) => ({
+              ...e,
+              startTime: new Date(e.startTime),
+              endTime: new Date(e.endTime)
+            }))
+            .sort((a: any, b: any) => a.startTime.getTime() - b.startTime.getTime())
+            .slice(0, 4);
+          setEvents(upcoming);
+        }
+      } catch (e) {
+        console.error("Failed to fetch events", e);
+      }
+
+      // Fetch Vault
+      try {
+        // Vault might be at /vault/files based on server.ts
+        const vaultRes = await api.get('/vault/files');
+        if (vaultRes.data) {
+          // Filter for folders first, then files
+          const files = vaultRes.data
+            .sort((a: any, b: any) => {
+              if (a.type === 'folder' && b.type !== 'folder') return -1;
+              if (a.type !== 'folder' && b.type === 'folder') return 1;
+              return 0;
+            })
+            .slice(0, 5);
+          setVaultFiles(files);
+        }
+      } catch (e) {
+        console.error("Failed to fetch vault files", e);
+      }
+
+    } catch (error) {
+      console.error('Error fetching widget data:', error);
+    } finally {
+      setWidgetsLoading(false);
+    }
+  };
 
   const fetchReleases = async () => {
     try {
@@ -72,39 +138,6 @@ const SartthiApps: React.FC = () => {
     return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
   };
 
-  const apps = [
-    {
-      id: 'mail',
-      name: 'Sartthi Mail',
-      description: 'Experience a connected workspace where your emails, calendar, and tasks work in harmony.',
-      icon: Mail,
-      link: '/mail',
-      color: 'from-blue-500 to-cyan-500',
-      features: ['Unified Inbox', 'Smart Filtering', 'Secure Encryption'],
-      status: 'active'
-    },
-    {
-      id: 'calendar',
-      name: 'Sartthi Calendar',
-      description: 'Automated tasks sync directly to your Google Calendar for seamless scheduling.',
-      icon: Calendar,
-      link: '/calendar',
-      color: 'from-purple-500 to-pink-500',
-      features: ['Two-way Sync', 'Smart Scheduling', 'Team Availability'],
-      status: 'active'
-    },
-    {
-      id: 'vault',
-      name: 'Sartthi Vault',
-      description: 'Your private, secure workspace in Google Drive with enterprise-grade security.',
-      icon: Shield,
-      link: '/vault',
-      color: 'from-green-500 to-emerald-500',
-      features: ['Zero-Knowledge Encryption', 'Google Drive Integration', 'Secure Sharing'],
-      status: 'active'
-    }
-  ];
-
   const latestWindowsRelease = releases.find(r => r.platform === 'windows' && r.isLatest);
   const olderReleases = releases.filter(r => !r.isLatest && r.platform === 'windows');
 
@@ -112,64 +145,178 @@ const SartthiApps: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-white to-white relative overflow-hidden">
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#44a0d1]/10 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#fcdd05]/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      
+
       <SharedNavbar />
-      
+
       <div className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-amber-100 text-amber-700">
               <Monitor className="w-4 h-4" />
-              Our Ecosystem
+              Integrated Ecosystem
             </span>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Our <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Apps</span>
+              Sartthi <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Suite</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed font-medium">
-              A complete suite of tools designed to boost your productivity.
+              Your productivity hub. Access Mail, Calendar, and Vault in one place.
             </p>
           </div>
 
-          {/* Blob Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {apps.map((app, index) => {
-              const blobColors = ['blob-blue', 'blob-purple', 'blob-green'];
-              const blobClass = blobColors[index % blobColors.length];
-              
-              return (
-                <div key={app.id} className="blob-card group hover:-translate-y-2 transition-transform duration-300">
-                  <div className={`blob ${blobClass}`}></div>
-                  <div className="blob-card-bg"></div>
-                  <div className="blob-card-content">
-                    <div className={`w-16 h-16 bg-gradient-to-br ${app.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <app.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{app.name}</h3>
-                    <p className="text-gray-700 leading-relaxed mb-6">
-                      {app.description}
-                    </p>
-                    <ul className="space-y-3 mb-8">
-                      {app.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-gray-700 font-medium">
-                          <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="w-full py-3 rounded-xl font-semibold transition-all duration-200 mt-auto bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-lg text-center cursor-not-allowed">
-                      Coming Soon
-                    </div>
+          {/* Widgets Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+            {/* Mail Widget */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 flex flex-col h-[500px]">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-100 rounded-xl text-blue-600 shadow-sm">
+                    <Mail size={24} />
                   </div>
+                  <h3 className="text-xl font-bold text-gray-900">Sartthi Mail</h3>
                 </div>
-              );
-            })}
+                {emails.length > 0 && <span className="text-xs font-semibold bg-blue-50 text-blue-600 px-3 py-1 rounded-full border border-blue-100">Recent</span>}
+              </div>
+
+              <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                {widgetsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => <div key={i} className="h-20 bg-gray-100/50 rounded-xl animate-pulse" />)}
+                  </div>
+                ) : emails.length > 0 ? (
+                  emails.map((email: any) => (
+                    <div key={email.id} className="p-4 rounded-xl bg-white border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all group cursor-pointer">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-semibold text-gray-900 text-sm truncate">{email.sender || email.from}</span>
+                        <span className="text-xs text-gray-400 whitespace-nowrap bg-gray-50 px-2 py-0.5 rounded-full">{new Date(email.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <h4 className="font-medium text-gray-800 text-sm mb-1 truncate group-hover:text-blue-600 transition-colors">{email.subject}</h4>
+                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{email.preview || email.body}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                      <Mail size={32} className="opacity-20" />
+                    </div>
+                    <p>No recent emails</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <Link to="/mail" className="flex items-center justify-center w-full py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20 gap-2 group">
+                  Open Sartthi Mail
+                  <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Calendar Widget */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 flex flex-col h-[500px]">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-purple-100 rounded-xl text-purple-600 shadow-sm">
+                    <Calendar size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Sartthi Calendar</h3>
+                </div>
+                {events.length > 0 && <span className="text-xs font-semibold bg-purple-50 text-purple-600 px-3 py-1 rounded-full border border-purple-100">Upcoming</span>}
+              </div>
+
+              <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                {widgetsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => <div key={i} className="h-20 bg-gray-100/50 rounded-xl animate-pulse" />)}
+                  </div>
+                ) : events.length > 0 ? (
+                  events.map((event: any) => (
+                    <div key={event.id} className="flex gap-4 p-4 rounded-xl bg-white border border-gray-100 hover:border-purple-200 hover:shadow-md transition-all group">
+                      <div className="flex flex-col items-center justify-center min-w-[60px] border-r border-gray-100 pr-4">
+                        <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">{event.startTime.toLocaleString('default', { month: 'short' })}</span>
+                        <span className="text-2xl font-bold text-gray-800">{event.startTime.getDate()}</span>
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <h4 className="font-semibold text-gray-900 text-sm mb-1 truncate group-hover:text-purple-600 transition-colors">{event.title}</h4>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 w-fit px-2 py-1 rounded-md">
+                          <Clock size={12} />
+                          {event.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
+                          {event.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                      <Calendar size={32} className="opacity-20" />
+                    </div>
+                    <p>No upcoming events</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <Link to="/calendar" className="flex items-center justify-center w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-purple-500/20 gap-2 group">
+                  Open Sartthi Calendar
+                  <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Vault Widget */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 flex flex-col h-[500px]">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-green-100 rounded-xl text-green-600 shadow-sm">
+                    <Shield size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Sartthi Vault</h3>
+                </div>
+                <span className="text-xs font-semibold bg-green-50 text-green-600 px-3 py-1 rounded-full border border-green-100">Secure</span>
+              </div>
+
+              <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                {widgetsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => <div key={i} className="h-16 bg-gray-100/50 rounded-xl animate-pulse" />)}
+                  </div>
+                ) : vaultFiles.length > 0 ? (
+                  vaultFiles.map((file: any) => (
+                    <div key={file.id} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 hover:border-green-200 hover:shadow-md transition-all cursor-pointer group">
+                      <div className={`p-2.5 rounded-lg transition-colors ${file.type === 'folder' ? 'bg-amber-100 text-amber-600 group-hover:bg-amber-200' : 'bg-blue-100 text-blue-600 group-hover:bg-blue-200'}`}>
+                        {file.type === 'folder' ? <FolderIcon size={18} fill="currentColor" /> : <FileText size={18} />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-800 text-sm truncate group-hover:text-green-700 transition-colors">{file.name}</h4>
+                        <span className="text-xs text-gray-500">{file.size ? file.size : 'Folder'}</span>
+                      </div>
+                      <ChevronRight size={14} className="text-gray-300 group-hover:text-green-500 transition-colors" />
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                      <Shield size={32} className="opacity-20" />
+                    </div>
+                    <p>Vault is empty</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <Link to="/vault" className="flex items-center justify-center w-full py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-green-500/20 gap-2 group">
+                  Open Sartthi Vault
+                  <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Desktop App Section */}
           <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl overflow-hidden shadow-2xl">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-[#44a0d1]/20 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
-            
+
             <div className="relative z-10 p-8 md:p-12 flex flex-col lg:flex-row items-start gap-12">
               <div className="flex-1 text-center md:text-left w-full">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#44a0d1]/20 text-[#44a0d1] mb-6 border border-[#44a0d1]/30">

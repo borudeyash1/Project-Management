@@ -4,22 +4,22 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // High-Density Dark Mode Theme
-        'app-bg': '#191919',
-        'sidebar-bg': '#202020',
-        'card-bg': '#202020',
-        'hover-bg': '#262626',
-        'border-subtle': '#2C2C2C',
-        'border-light': '#333333',
-        'text-primary': '#E3E3E3',
-        'text-muted': '#9CA3AF',
-        'text-light': '#D1D5DB',
-        'text-lighter': '#6B7280',
-        'accent-blue': '#2563EB',
-        'accent-red': '#EF4444',
+        'app-bg': 'var(--app-bg)',
+        'sidebar-bg': 'var(--sidebar-bg)',
+        'card-bg': 'var(--card-bg)',
+        'hover-bg': 'var(--hover-bg)',
+        'border-subtle': 'var(--border-subtle)',
+        'border-light': 'var(--border-light)',
+        'text-primary': 'var(--text-primary)',
+        'text-muted': 'var(--text-muted)',
+        'text-light': 'var(--text-light)',
+        'text-lighter': 'var(--text-lighter)',
+        'accent-blue': 'var(--accent-blue)',
+        'accent-red': 'var(--accent-red)',
       },
       fontSize: {
         '2xs': '0.625rem', // 10px

@@ -22,6 +22,6 @@ export const getAppUrl = (app: 'mail' | 'calendar' | 'vault') => {
         case 'calendar':
             return 'http://localhost:3002';
         case 'vault':
-            return 'http://localhost:3004';
+            return 'http://localhost:3003';
     }
 };

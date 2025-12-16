@@ -12,6 +12,8 @@ import {
 import { GripVertical, Lock, Unlock } from 'lucide-react';
 import { ProgressiveBlur } from './progressive-blur';
 
+import { useDock } from '../../context/DockContext';
+
 interface DockProps {
   children: React.ReactNode;
   direction?: 'middle' | 'left' | 'right';
@@ -20,11 +22,10 @@ interface DockProps {
 
 type DockPosition = 'top' | 'bottom' | 'left' | 'right';
 
-const DOCK_POSITION_KEY = 'userDockPosition';
 const DOCK_LOCK_KEY = 'userDockLocked';
-const DOCK_EDGE_GAP = 12;
-const DOCK_TOP_OFFSET = 48;
-const DOCK_BOTTOM_OFFSET = 50;
+const DOCK_EDGE_GAP = 8; // Increased to 8 to match global px-2 padding
+const DOCK_TOP_OFFSET = 8;
+const DOCK_BOTTOM_OFFSET = 8;
 const MotionDockWrapper = motion.div as React.ComponentType<any>;
 
 interface DockIconProps {
@@ -43,21 +44,15 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
   const y = useMotionValue(0);
   const dockRef = useRef<HTMLDivElement>(null);
   const [dockSize, setDockSize] = useState({ width: 0, height: 0 });
-  const bodyPaddingRef = useRef<{ top: string; bottom: string; left: string; right: string } | null>(null);
-  const [dockPosition, setDockPosition] = useState<DockPosition>(() => {
-    if (typeof window === 'undefined') return 'bottom';
-    const stored = window.localStorage.getItem(DOCK_POSITION_KEY) as DockPosition | null;
-    return stored ?? 'bottom';
-  });
+
+  const { dockPosition, setDockPosition, isMobile } = useDock();
+
   const [isLocked, setIsLocked] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return window.localStorage.getItem(DOCK_LOCK_KEY) === 'true';
   });
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(DOCK_POSITION_KEY, dockPosition);
-  }, [dockPosition]);
+  // Dock position persistence handled by DockContext now
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -113,6 +108,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
   );
 
   const isVertical = dockPosition === 'left' || dockPosition === 'right';
+  const isTopOrBottom = dockPosition === 'top' || dockPosition === 'bottom';
   const blurPosition = dockPosition === 'top' ? 'top' : dockPosition === 'bottom' ? 'bottom' : null;
   const controlPositionStyles = useMemo(() => {
     if (isVertical) {
@@ -128,26 +124,32 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       x,
       y
     } as any as React.CSSProperties;
+
     if (dockPosition === 'top') {
       return {
         ...base,
-        top: DOCK_TOP_OFFSET,
-        left: '50%',
-        marginLeft: dockSize.width ? `${-dockSize.width / 2}px` : undefined
+        top: 0,
+        left: 0,
+        right: 0,
+        width: '100%', // Full width
+        margin: 0
       };
     }
     if (dockPosition === 'bottom') {
       return {
         ...base,
-        bottom: DOCK_BOTTOM_OFFSET,
-        left: '50%',
-        marginLeft: dockSize.width ? `${-dockSize.width / 2}px` : undefined
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: '100%', // Full width
+        margin: 0
       };
     }
+
     if (dockPosition === 'left') {
-      return { ...base, left: DOCK_EDGE_GAP, top: '15%', bottom: '15%' };
+      return { ...base, left: DOCK_EDGE_GAP + 6, top: '160px', bottom: 'auto' }; // Start below header
     }
-    return { ...base, right: DOCK_EDGE_GAP, top: '15%', bottom: '15%' };
+    return { ...base, right: DOCK_EDGE_GAP + 6, top: '160px', bottom: 'auto' }; // Start below header
   }, [dockPosition, dockSize.width, isLocked, x, y]);
 
   useEffect(() => {
@@ -162,51 +164,25 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
     return () => observer.disconnect();
   }, []);
 
-  const safeOffset = useMemo(() => {
-    const measured = dockSize.width ? dockSize.width + DOCK_EDGE_GAP * 2 : 96;
-    return `${Math.max(measured, 96)}px`;
-  }, [dockSize.width]);
+  // Removed body padding logic to allow full-width headers
+  // The layout spacing is now handled by the parent container in AppLayout
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
-    const body = document.body;
-    if (!bodyPaddingRef.current) {
-      bodyPaddingRef.current = {
-        top: body.style.paddingTop,
-        bottom: body.style.paddingBottom,
-        left: body.style.paddingLeft,
-        right: body.style.paddingRight
-      };
-    }
-
-    const base = bodyPaddingRef.current;
-    const isSideDock = dockPosition === 'left' || dockPosition === 'right';
-    body.style.paddingTop = base?.top || '';
-    body.style.paddingBottom = base?.bottom || '';
-    body.style.paddingLeft = dockPosition === 'left' ? safeOffset : base?.left || '';
-    body.style.paddingRight = dockPosition === 'right' ? safeOffset : base?.right || '';
-    if (!isSideDock) {
-      body.style.paddingLeft = base?.left || '';
-      body.style.paddingRight = base?.right || '';
-    }
-  }, [dockPosition, safeOffset]);
-
-  useEffect(() => {
-    return () => {
-      if (typeof document === 'undefined' || !bodyPaddingRef.current) return;
-      const body = document.body;
-      const base = bodyPaddingRef.current;
-      body.style.paddingTop = base.top;
-      body.style.paddingBottom = base.bottom;
-      body.style.paddingLeft = base.left;
-      body.style.paddingRight = base.right;
-    };
+    if (!dockRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      setDockSize({ width, height });
+    });
+    observer.observe(dockRef.current);
+    return () => observer.disconnect();
   }, []);
 
   return (
     <>
       {/* Progressive Blur Background */}
-      {blurPosition && dockPosition !== 'top' && (
+      {blurPosition && !isTopOrBottom && (
         <div
           className={`fixed ${blurPosition === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 h-40 pointer-events-none z-40`}
         >
@@ -217,9 +193,9 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       {/* Dock Container */}
       <MotionDockWrapper
         className={`fixed z-50 ${className}`}
-        drag={!isLocked}
+        drag={!isLocked && !isMobile}
         dragControls={dragControls}
-        dragListener={!isLocked}
+        dragListener={!isLocked && !isMobile}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
         style={anchorStyle as any}
@@ -228,28 +204,31 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       >
         <div
           ref={dockRef}
+          className={`${isTopOrBottom ? 'bg-white dark:bg-gray-800 shadow-none' : ''}`}
           style={{
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+            background: (isTopOrBottom || isVertical) ? 'transparent' : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
             position: 'relative',
             display: 'flex',
             alignItems: isVertical ? 'flex-start' : 'center',
-            justifyContent: 'flex-start',
+            justifyContent: isTopOrBottom ? 'center' : 'flex-start',
             flexDirection: isVertical ? 'column' : 'row',
-            gap: isVertical ? '0.75rem' : '0.75rem',
-            padding: isVertical ? '5rem 1.15rem 1.5rem 1.15rem' : '0.85rem 1.5rem 0.85rem 3.5rem',
-            borderRadius: isVertical ? '1.5rem' : '1rem',
-            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+            gap: isVertical ? '0.5rem' : '0.5rem',
+            padding: isTopOrBottom ? '0 1rem' : (isVertical ? '5rem 0.25rem 1.5rem 0.25rem' : '0.85rem 1.5rem 0.85rem 3.5rem'),
+            borderRadius: isTopOrBottom ? '0' : '1rem',
+            boxShadow: (isTopOrBottom || isVertical) ? 'none' : '0 10px 15px -3px rgb(0 0 0 / 0.1)',
             overflow: 'hidden',
-            minWidth: isVertical ? '80px' : undefined,
+            minWidth: isVertical ? '60px' : undefined,
+            width: isTopOrBottom ? '100%' : undefined,
+            height: isTopOrBottom ? '48px' : undefined,
             maxHeight: isVertical ? '70vh' : undefined,
             pointerEvents: 'auto',
-            cursor: isLocked ? 'default' : 'grab'
+            cursor: (isLocked || isTopOrBottom) ? 'default' : 'grab'
           }}
         >
           <div
             className="absolute gap-2 z-20 pointer-events-auto"
             style={{
-              display: 'flex',
+              display: (isTopOrBottom || isVertical) ? 'none' : 'flex',
               alignItems: 'center',
               ...controlPositionStyles
             }}
@@ -263,20 +242,25 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
               {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
             </button>
           </div>
-          {/* Glass Effect Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-700/40 dark:via-gray-800/20 dark:to-transparent backdrop-blur-2xl" />
 
-          {/* Border Gradient */}
-          <div
-            className="absolute inset-0 rounded-2xl border border-white/30 dark:border-gray-600/30"
-            style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-              WebkitMaskComposite: 'xor',
-              maskComposite: 'exclude',
-              padding: '1px'
-            }}
-          />
+          {/* Glass Effect Overlay - Hide for Top/Bottom Navbar and Vertical Docks */}
+          {!isTopOrBottom && !isVertical && (
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-700/40 dark:via-gray-800/20 dark:to-transparent backdrop-blur-2xl" />
+          )}
+
+          {/* Border Gradient - Hide for Top/Bottom Navbar */}
+          {!isTopOrBottom && (
+            <div
+              className="absolute inset-0 rounded-2xl border border-white/30 dark:border-gray-600/30"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'xor',
+                maskComposite: 'exclude',
+                padding: '1px'
+              }}
+            />
+          )}
 
           {/* Content */}
           <div
@@ -284,26 +268,31 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
               position: 'relative',
               zIndex: 10,
               display: 'flex',
-              alignItems: isVertical ? 'flex-start' : 'flex-end',
-              justifyContent: isVertical ? 'flex-start' : 'center',
+              alignItems: isVertical ? 'flex-start' : 'center',
+              justifyContent: isTopOrBottom ? (isMobile ? 'flex-start' : 'center') : 'flex-start', // Start align on mobile for scroll
               flexDirection: isVertical ? 'column' : 'row',
+              flexWrap: 'nowrap',
               gap: '0.75rem',
               overflowX: isVertical ? 'hidden' : 'auto',
               overflowY: isVertical ? 'auto' : 'hidden',
               scrollbarWidth: 'none',
               width: '100%',
-              maxHeight: '100%'
+              maxWidth: '100%',
+              maxHeight: '100%',
+              paddingLeft: isMobile ? '1rem' : '0',
+              paddingRight: isMobile ? '1rem' : '0',
             }}
             className="scrollbar-hide"
           >
             {React.Children.map(children, (child) => {
               if (React.isValidElement(child)) {
-                return React.cloneElement(child, { mouseX, orientation: isVertical ? 'vertical' : 'horizontal' } as any);
+                return React.cloneElement(child, { mouseX, dockPosition } as any);
               }
               return child;
             })}
           </div>
 
+          {/* Bottom Glow */}
           {/* Bottom Glow */}
           {dockPosition === 'bottom' && (
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-t from-blue-500/20 to-transparent blur-xl" />
@@ -320,14 +309,15 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
 // Memoize to prevent re-animation on navigation
 export const Dock = React.memo(DockComponent);
 
-export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }> = ({
+export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number>; dockPosition?: DockPosition }> = ({
   children,
   className = '',
   onClick,
   active = false,
   tooltip,
   mouseX: parentMouseX,
-  orientation = 'horizontal'
+  orientation = 'horizontal',
+  dockPosition = 'bottom' // Default if not passed
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const defaultMouseX = useMotionValue(Infinity);
@@ -341,8 +331,14 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   // Keep width constant, base size
   const width = 56;
 
+  // Retrieve isMobile from context (via parent passing or duplicate hook usage? - Context is cleaner)
+  // Since this component is outside the Provider in some usages possibly? No, always inside.
+  // Actually, simpler to just pass isMobile as prop or use hook if we are sure it's inside provider.
+  // We'll use the hook.
+  const { isMobile } = useDock();
+
   const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.1, 1]);
-  const scale = useSpring(scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
+  const scale = useSpring(isMobile ? 1 : scaleSync, { mass: 0.1, stiffness: 150, damping: 12 });
 
   // Removed split-apart animation - icons stay in place
   const marginLeft = useMotionValue(0);
@@ -351,19 +347,35 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
   const handleMouseEnter = () => {
     if (ref.current && tooltip) {
       const rect = ref.current.getBoundingClientRect();
-      setTooltipPos({
-        x: orientation === 'vertical' 
-           ? rect.right + 12 
-           : rect.left + rect.width / 2,
-        y: orientation === 'vertical'
-           ? rect.top + rect.height / 2
-           : rect.top - 12
-      });
+      let x = 0;
+      let y = 0;
+
+      switch (dockPosition) {
+        case 'top':
+          x = rect.left + rect.width / 2;
+          y = rect.bottom + 8; // 8px below the icon
+          break;
+        case 'left':
+          x = rect.right + 8; // 8px to the right of the icon
+          y = rect.top + rect.height / 2;
+          break;
+        case 'right':
+          x = rect.left - 8; // 8px to the left of the icon
+          y = rect.top + rect.height / 2;
+          break;
+        case 'bottom':
+        default:
+          x = rect.left + rect.width / 2;
+          y = rect.top - 8; // 8px above the icon
+          break;
+      }
+
+      setTooltipPos({ x, y });
     }
   };
 
   return (
-    <div 
+    <div
       className="group relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setTooltipPos(null)}
@@ -379,23 +391,33 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
       >
         {/* Tooltip Portal */}
         {tooltip && tooltipPos && createPortal(
-          <div 
+          <div
             className="fixed px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg shadow-2xl z-[9999] pointer-events-none whitespace-nowrap animate-fadeIn"
             style={{
               left: tooltipPos.x,
               top: tooltipPos.y,
-              transform: orientation === 'vertical' ? 'translateY(-50%)' : 'translateX(-50%) translateY(-100%)'
+              transform:
+                dockPosition === 'left'
+                  ? 'translateY(-50%)'
+                  : dockPosition === 'right'
+                    ? 'translateX(-100%) translateY(-50%)'
+                    : dockPosition === 'top'
+                      ? 'translateX(-50%)'
+                      : 'translateX(-50%) translateY(-100%)'
             }}
           >
             {tooltip}
             {/* Arrow */}
-            <div 
-               className={`absolute w-3 h-3 bg-black transform rotate-45 ${
-                 orientation === 'vertical' 
-                   ? 'left-[-4px] top-1/2 -translate-y-1/2' 
-                   : 'bottom-[-4px] left-1/2 -translate-x-1/2'
-               }`}
-             />
+            <div
+              className={`absolute w-3 h-3 bg-black transform rotate-45 ${dockPosition === 'left'
+                ? 'left-[-4px] top-1/2 -translate-y-1/2'
+                : dockPosition === 'right'
+                  ? 'right-[-4px] top-1/2 -translate-y-1/2'
+                  : dockPosition === 'top'
+                    ? 'top-[-4px] left-1/2 -translate-x-1/2'
+                    : 'bottom-[-4px] left-1/2 -translate-x-1/2'
+                }`}
+            />
           </div>,
           document.body
         )}
@@ -403,8 +425,8 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number> }
         <button
           onClick={onClick}
           className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${active
-            ? 'bg-accent text-gray-900 shadow-lg'
-            : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-700 hover:bg-white/80 dark:hover:bg-gray-700/80 backdrop-blur-md'
+            ? 'bg-accent text-white shadow-lg'
+            : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-200 hover:bg-white/80 dark:hover:bg-gray-700/80 backdrop-blur-md'
             } ${className}`}
           aria-label={tooltip}
         >

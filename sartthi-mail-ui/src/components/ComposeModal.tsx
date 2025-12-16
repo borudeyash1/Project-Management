@@ -1,6 +1,10 @@
+
 import { useState } from 'react';
 import './ComposeModal.css';
 import { useToast } from '../context/ToastContext';
+import VaultPicker from './VaultPicker';
+
+
 
 interface ComposeModalProps {
   isOpen: boolean;
@@ -32,6 +36,21 @@ function ComposeModal({ isOpen, onClose, onSend, replyTo }: ComposeModalProps) {
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
   const [sending, setSending] = useState(false);
+  const [showVaultPicker, setShowVaultPicker] = useState(false);
+
+  // Try to get current user email from localStorage as fallback
+  const getUserEmail = () => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) return JSON.parse(userStr).email;
+    } catch (e) { }
+    return undefined;
+  };
+
+  const handleVaultSelect = (files: any[]) => {
+    const fileLinks = files.map(f => `< p > Shared from Sartthi Vault: <a href="${f.webViewLink}">${f.name}</a></p > `).join('');
+    setBody(prev => prev + '\n\n' + fileLinks);
+  };
 
   if (!isOpen) return null;
 
@@ -154,6 +173,15 @@ function ComposeModal({ isOpen, onClose, onSend, replyTo }: ComposeModalProps) {
                 <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
               </svg>
             </button>
+            <button
+              className="icon-btn-small"
+              title="Attach from Sartthi Vault"
+              onClick={() => setShowVaultPicker(true)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
             <button className="icon-btn-small" title="Insert emoji">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
@@ -168,6 +196,12 @@ function ComposeModal({ isOpen, onClose, onSend, replyTo }: ComposeModalProps) {
           </div>
         </div>
       </div>
+      <VaultPicker
+        isOpen={showVaultPicker}
+        onClose={() => setShowVaultPicker(false)}
+        onSelect={handleVaultSelect}
+        userEmail={getUserEmail()}
+      />
     </div>
   );
 }

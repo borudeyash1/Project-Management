@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { 
-  format, startOfWeek, endOfWeek, addWeeks, subWeeks, 
+import {
+  format, startOfWeek, endOfWeek, addWeeks, subWeeks,
   addDays, isSameDay, parseISO, isToday, startOfMonth, endOfMonth, addMonths, subMonths,
   startOfYear, endOfYear
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Menu, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import EventCard from './EventCard';
 import ContextSidebar from './ContextSidebar';
 import QuickEventModal from './QuickEventModal';
@@ -15,6 +15,7 @@ import YearView from './YearView';
 import EventDetailPopover from './EventDetailPopover';
 import { calendarApi, CalendarEvent } from '../services/calendarApi';
 import { useToast } from '../context/ToastContext';
+import ProfileMenu from './ProfileMenu/ProfileMenu';
 
 interface WeekGridProps {
   user?: any;
@@ -28,23 +29,60 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentView, setCurrentView] = useState<CalendarViewType>('week');
-  
+
   // View Settings
   const [workHoursOnly, setWorkHoursOnly] = useState(false);
   const [dimPastEvents, setDimPastEvents] = useState(false);
-  
+
   // Modal State
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [modalInitialDate, setModalInitialDate] = useState<Date | undefined>(undefined);
   const [modalInitialTime, setModalInitialTime] = useState<string | undefined>(undefined);
 
+  // Calendar List State
+  const [myCalendars, setMyCalendars] = useState([
+    { id: 'primary', label: 'Yash Borude', color: 'bg-blue-500', checked: true },
+    { id: 'birthdays', label: 'Birthdays', color: 'bg-green-500', checked: true },
+    { id: 'tasks', label: 'Tasks', color: 'bg-purple-500', checked: true },
+  ]);
+
+  const [otherCalendars, setOtherCalendars] = useState([
+    { id: 'holidays', label: 'Holidays in India', color: 'bg-orange-500', checked: true },
+    { id: 'travel', label: 'Travel Schedule', color: 'bg-gray-500', checked: true },
+  ]);
+
+  const handleToggleCalendar = (id: string, isOther: boolean = false) => {
+    if (isOther) {
+      setOtherCalendars(prev => prev.map(c => c.id === id ? { ...c, checked: !c.checked } : c));
+    } else {
+      setMyCalendars(prev => prev.map(c => c.id === id ? { ...c, checked: !c.checked } : c));
+    }
+  };
+
+  // Filter events based on active calendars
+  const getBaseColor = (twColor: string) => twColor.replace('bg-', '').replace('-500', '');
+
+  const visibleEvents = events.filter(event => {
+    // match event.color against checked calendars
+    const eventColor = event.color || 'blue'; // Default to blue
+
+    // Find which calendar this color belongs to
+    const myCal = myCalendars.find(c => getBaseColor(c.color) === eventColor);
+    if (myCal) return myCal.checked;
+
+    const otherCal = otherCalendars.find(c => getBaseColor(c.color) === eventColor);
+    if (otherCal) return otherCal.checked;
+
+    return true; // If color doesn't match any calendar, show it (e.g. unknown categories)
+  });
+
   // Fetch events when date range changes
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
       let start, end;
-      
+
       if (currentView === 'month') {
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
@@ -136,15 +174,15 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
     const start = startOfWeek(currentDate, { weekStartsOn: 1 });
     switch (currentView) {
       case 'day': return [currentDate];
-      case 'week': 
+      case 'week':
       default: return Array.from({ length: 7 }, (_, i) => addDays(start, i));
     }
   };
 
   const visibleDays = getVisibleDays();
-  
+
   // Generate hours based on workHoursOnly setting
-  const hours = workHoursOnly 
+  const hours = workHoursOnly
     ? Array.from({ length: 11 }, (_, i) => i + 8) // 8 AM to 6 PM
     : Array.from({ length: 24 }, (_, i) => i);
 
@@ -163,7 +201,7 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
     if (isNaN(h) || isNaN(m)) return 0;
     if (period === 'PM' && h !== 12) h += 12;
     if (period === 'AM' && h === 12) h = 0;
-    
+
     // Adjust for work hours view
     let minutes = h * 60 + m;
     if (workHoursOnly) {
@@ -172,13 +210,123 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
     return minutes;
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    console.log('Drag ended:', event);
+  // Resize Logic
+  const [resizingEvent, setResizingEvent] = useState<{ id: string, startY: number, originalHeight: number, originalEndTime: string } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!resizingEvent) return;
+
+      const deltaY = e.clientY - resizingEvent.startY;
+      // const minutesDelta = Math.round(deltaY / 60 * 60); 
+      // const snappedMinutes = Math.round(minutesDelta / 15) * 15;
+
+      // Visual feedback logic would go here
+    };
+
+    const handleMouseUp = async (e: MouseEvent) => {
+      if (!resizingEvent) return;
+
+      const deltaY = e.clientY - resizingEvent.startY;
+      const minutesDelta = Math.round(deltaY / 60 * 60); // 60px = 60min assuming 60px/hr
+      const snappedMinutes = Math.round(minutesDelta / 15) * 15;
+
+      if (snappedMinutes !== 0) {
+        const event = events.find(e => e.id === resizingEvent.id);
+        if (event) {
+          const endMinutes = timeToMinutes(resizingEvent.originalEndTime) + snappedMinutes;
+          // Convert back to HH:mm
+          const h = Math.floor(endMinutes / 60);
+          const m = endMinutes % 60;
+
+          // Basic formatting (simplified, assumes same day)
+          const newEndTime = `${h > 12 ? h - 12 : (h === 0 || h === 24 ? 12 : h)}:${m.toString().padStart(2, '0')} ${h >= 12 && h < 24 ? 'PM' : 'AM'}`;
+
+          // Update Event
+          try {
+            const updatedEvent = { ...event, endTime: newEndTime };
+            // Optimistic update
+            setEvents(prev => prev.map(e => e.id === event.id ? updatedEvent : e));
+            await calendarApi.updateEvent(event.id, { endTime: newEndTime });
+          } catch (err) {
+            toast.error("Failed to resize event");
+            fetchEvents(); // Revert
+          }
+        }
+      }
+
+      setResizingEvent(null);
+      document.body.style.cursor = 'default';
+    };
+
+    if (resizingEvent) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'ns-resize';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [resizingEvent, events]);
+
+  const handleResizeStart = (e: React.MouseEvent, event: CalendarEvent, height: number) => {
+    e.stopPropagation(); // Prevent drag from firing
+    setResizingEvent({
+      id: event.id,
+      startY: e.clientY,
+      originalHeight: height,
+      originalEndTime: event.endTime
+    });
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, delta } = event;
+    if (!delta.y) return;
+
+    const eventId = active.id.toString().replace('event-', '');
+    const targetEvent = events.find(e => e.id === eventId);
+
+    // Calculate 1px = 1min
+    const minutesDelta = Math.round(delta.y); // Direct mapping if 60px = 1 hr (60min)
+    const snappedMinutes = Math.round(minutesDelta / 15) * 15;
+
+    if (targetEvent && snappedMinutes !== 0) {
+      const oldStart = timeToMinutes(targetEvent.startTime);
+      const oldEnd = timeToMinutes(targetEvent.endTime);
+
+      const newStartMins = oldStart + snappedMinutes;
+      const newEndMins = oldEnd + snappedMinutes;
+
+      // Helpers to format back to string
+      const formatTime = (totalMins: number) => {
+        let h = Math.floor(totalMins / 60);
+        const m = totalMins % 60;
+        const period = h >= 12 && h < 24 ? 'PM' : 'AM';
+        if (h > 12) h -= 12;
+        if (h === 0) h = 12;
+        if (h === 24) h = 12; // Handle midnight wrap if needed
+        return `${h}:${m.toString().padStart(2, '0')} ${period}`;
+      };
+
+      const newStartTime = formatTime(newStartMins);
+      const newEndTime = formatTime(newEndMins);
+
+      try {
+        const updated = { ...targetEvent, startTime: newStartTime, endTime: newEndTime };
+        setEvents(prev => prev.map(e => e.id === eventId ? updated : e));
+        await calendarApi.updateEvent(eventId, { startTime: newStartTime, endTime: newEndTime });
+      } catch (err) {
+        toast.error("Failed to move event");
+        fetchEvents();
+      }
+    }
   };
 
   const handleGridClick = (day: Date, hour: number) => {
     setModalInitialDate(day);
-    setModalInitialTime(`${hour.toString().padStart(2, '0')}:00`);
+    setModalInitialTime(`${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${'00'} ${hour >= 12 ? 'PM' : 'AM'}`);
     setShowEventModal(true);
   };
 
@@ -204,36 +352,42 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-blue"></div>
             </div>
           )}
-          
+
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle bg-sidebar-bg/50 backdrop-blur-md">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle bg-sidebar-bg/50 backdrop-blur-md relative z-50">
             <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold flex items-center gap-2 min-w-[200px]">
-                <CalendarIcon className="text-accent-blue" />
-                {format(currentDate, 'MMMM yyyy')}
-              </h1>
+              <div className="flex items-center gap-3">
+                <img src="/logo.png" alt="Sartthi Calendar" className="h-6" />
+                <span className="text-[18px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                  Calendar
+                </span>
+                <span className="text-xl text-text-muted mx-2">|</span>
+                <h1 className="text-xl font-bold text-text-primary min-w-[160px]">
+                  {format(currentDate, 'MMMM yyyy')}
+                </h1>
+              </div>
               <div className="flex items-center bg-card-bg rounded-lg border border-border-subtle p-1">
-                <button 
+                <button
                   onClick={() => handleNavigate('prev')}
                   className="p-1 hover:bg-hover-bg rounded text-text-muted hover:text-text-primary transition-colors"
                 >
                   <ChevronLeft size={20} />
                 </button>
-                <button 
+                <button
                   onClick={() => setCurrentDate(new Date())}
                   className="px-3 py-1 text-sm font-medium text-text-primary hover:bg-hover-bg rounded transition-colors"
                 >
                   Today
                 </button>
-                <button 
+                <button
                   onClick={() => handleNavigate('next')}
                   className="p-1 hover:bg-hover-bg rounded text-text-muted hover:text-text-primary transition-colors"
                 >
                   <ChevronRight size={20} />
                 </button>
               </div>
-              <ViewSwitcher 
-                currentView={currentView} 
+              <ViewSwitcher
+                currentView={currentView}
                 onViewChange={setCurrentView}
                 workHoursOnly={workHoursOnly}
                 setWorkHoursOnly={setWorkHoursOnly}
@@ -241,9 +395,9 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
                 setDimPastEvents={setDimPastEvents}
               />
             </div>
-            
+
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => {
                   setModalInitialDate(new Date());
                   setModalInitialTime(format(new Date(), 'HH:mm'));
@@ -256,23 +410,12 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
 
               {/* User Profile */}
               {user && (
-                <div className="flex items-center gap-3 pl-4 border-l border-border-subtle">
-                  <div className="text-right hidden md:block">
-                    <div className="text-sm font-medium text-text-primary">{user.name}</div>
-                    <div className="text-xs text-text-muted">{user.email}</div>
-                  </div>
-                  {user.picture || user.avatar ? (
-                    <img 
-                      src={user.picture || user.avatar} 
-                      alt={user.name} 
-                      className="w-9 h-9 rounded-full border border-border-subtle object-cover"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
-                      {user.name ? user.name[0].toUpperCase() : 'U'}
-                    </div>
-                  )}
-                </div>
+                <ProfileMenu
+                  user={{
+                    fullName: user.name || user.fullName || 'User',
+                    email: user.email
+                  }}
+                />
               )}
 
               {/* Sidebar Toggle */}
@@ -287,9 +430,9 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
 
           {/* View Content */}
           {currentView === 'month' ? (
-            <MonthView 
-              currentDate={currentDate} 
-              events={events} 
+            <MonthView
+              currentDate={currentDate}
+              events={visibleEvents}
               onDateClick={(date) => {
                 setCurrentDate(date);
                 setCurrentView('day');
@@ -297,7 +440,7 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
               onEventClick={setSelectedEvent}
             />
           ) : currentView === 'year' ? (
-            <YearView 
+            <YearView
               currentDate={currentDate}
               onMonthClick={(date) => {
                 setCurrentDate(date);
@@ -315,9 +458,8 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
                   return (
                     <div
                       key={day.toISOString()}
-                      className={`flex-1 py-3 text-center border-r border-border-subtle last:border-r-0 ${
-                        isTodayDate ? 'bg-accent-blue/5' : ''
-                      }`}
+                      className={`flex-1 py-3 text-center border-r border-border-subtle last:border-r-0 ${isTodayDate ? 'bg-accent-blue/5' : ''
+                        }`}
                     >
                       <div className={`text-xs font-semibold ${isTodayDate ? 'text-accent-blue' : 'text-text-muted'}`}>
                         {format(day, 'EEE').toUpperCase()}
@@ -349,8 +491,8 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
 
                   {/* Day Columns */}
                   {visibleDays.map((day) => (
-                    <div 
-                      key={day.toISOString()} 
+                    <div
+                      key={day.toISOString()}
                       className="flex-1 relative border-r border-border-subtle last:border-r-0 min-w-[120px]"
                     >
                       {/* Hour Cells */}
@@ -363,39 +505,32 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
                       ))}
 
                       {/* Events */}
-                      {events
+                      {visibleEvents
                         .filter((event) => event.date && event.startTime && event.endTime && isSameDay(parseISO(event.date), day))
                         .map((event) => {
                           const startMinutes = timeToMinutes(event.startTime);
                           const endMinutes = timeToMinutes(event.endTime);
                           const height = Math.max(endMinutes - startMinutes, 30);
-                          
+
                           // Skip rendering if event is outside work hours when filter is active
-                          if (workHoursOnly && (startMinutes < 0 || startMinutes > (18-8)*60)) {
-                             // Optional: could render a small indicator
+                          if (workHoursOnly && (startMinutes < 0 || startMinutes > (18 - 8) * 60)) {
+                            // Optional: could render a small indicator
                           }
 
                           const isPast = new Date(`${event.date}T${event.startTime}`) < new Date();
-                          const opacityClass = dimPastEvents && isPast ? 'opacity-50' : '';
+                          // const opacityClass = dimPastEvents && isPast ? 'opacity-50' : '';
 
                           return (
-                            <div
+                            <EventCard
                               key={event.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedEvent(event);
-                              }}
-                              className={`absolute w-[95%] left-[2.5%] z-10 cursor-pointer transition-transform hover:scale-[1.02] ${opacityClass}`}
-                              style={{ top: `${startMinutes}px`, height: `${height}px` }}
-                            >
-                              <EventCard
-                                title={event.title}
-                                time={`${event.startTime} - ${event.endTime}`}
-                                color={event.color || 'blue'}
-                                top={0}
-                                height={height}
-                              />
-                            </div>
+                              id={event.id}
+                              title={event.title}
+                              time={`${event.startTime} - ${event.endTime}`}
+                              color={event.color || 'blue'}
+                              top={startMinutes}
+                              height={height}
+                              onResizeStart={(e) => handleResizeStart(e, event, height)}
+                            />
                           );
                         })}
 
@@ -427,8 +562,6 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
               // Populate modal with event data for editing
               setModalInitialDate(new Date(event.date));
               setModalInitialTime(event.startTime);
-              // You might need to update QuickEventModal to handle "Edit Mode" or pre-fill data
-              // For now, we'll just open the create modal as a placeholder or "Duplicate" style
               setShowEventModal(true);
             }}
             onDelete={async (eventId) => {
@@ -446,12 +579,15 @@ const WeekGrid: React.FC<WeekGridProps> = ({ user }) => {
 
         {/* Context Sidebar (Only for Mini Calendar now) */}
         {isSidebarOpen && (
-          <ContextSidebar 
+          <ContextSidebar
             selectedEvent={null} // No longer used for details
             onClose={() => setIsSidebarOpen(false)}
             currentDate={currentDate}
             onDateChange={setCurrentDate}
-            events={events}
+            events={visibleEvents}
+            myCalendars={myCalendars}
+            otherCalendars={otherCalendars}
+            onToggleCalendar={handleToggleCalendar}
           />
         )}
       </div>

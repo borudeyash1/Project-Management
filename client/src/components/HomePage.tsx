@@ -11,6 +11,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { PlanStatus } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useDock } from '../context/DockContext';
 import { useTheme } from '../context/ThemeContext';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +22,8 @@ import ExpandedStatCard from './dashboard/ExpandedStatCard';
 import ContentBanner from './ContentBanner';
 import { useTranslation } from 'react-i18next';
 import AIChatbot from './AIChatbot';
+import DashboardSkeleton from './dashboard/DashboardSkeleton';
+import SartthiAppsWidget from './dashboard/SartthiAppsWidget';
 
 interface QuickTask {
   _id: string;
@@ -94,6 +97,7 @@ interface RecentFile {
 
 const HomePage: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { userPlan, canUseAI } = useFeatureAccess();
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
@@ -323,13 +327,17 @@ const HomePage: React.FC = () => {
     }
   };
 
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full py-20">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading your dashboard...</p>
-        </div>
+      <div
+        className="h-full transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
+        <DashboardSkeleton />
       </div>
     );
   }
@@ -355,26 +363,35 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Content Banner */}
-      <ContentBanner route="/" />
+    <div className={`h-full min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div
+        className="p-4 sm:p-6 space-y-8 max-w-[1600px] mx-auto transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
+        <ContentBanner route="/home" />
 
-      {/* Header */}
-      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
-        <div className="flex items-center justify-between">
+        {/* Welcome Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {t('dashboard.welcomeBack', { name: state.userProfile?.fullName })}
-            </h1>
-            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              {t('dashboard.todayOverview')}
-            </p>
+            <h1 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Welcome Back</h1>
+            <p className={`mt-1 text-base ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Here's what's happening in your workspace today.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}>
+              <Search className="w-5 h-5" />
+            </button>
+            <button className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}>
+              <Bell className="w-5 h-5" />
+            </button>
           </div>
         </div>
-      </div>
 
-      <div className="p-6 max-w-[1600px] mx-auto">
-        {/* Top Row - Stats Overview */}
+        {/* Sartthi Suite Apps */}
+        <SartthiAppsWidget isDarkMode={isDarkMode} />
+
         {/* Top Row - Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div
@@ -731,8 +748,8 @@ const HomePage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => setIsAIModalOpen(true)}
-                  className={`w-full rounded-lg px-4 py-2 text-sm font-medium drop-shadow-sm transition-colors border ${isDarkMode 
-                    ? 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-white border-opacity-20' 
+                  className={`w-full rounded-lg px-4 py-2 text-sm font-medium drop-shadow-sm transition-colors border ${isDarkMode
+                    ? 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-white border-opacity-20'
                     : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200'}`}
                 >
                   {t('dashboard.askAI')}
@@ -741,9 +758,9 @@ const HomePage: React.FC = () => {
             )}
 
             {/* AI Chatbot Modal */}
-            <AIChatbot 
-              isOpen={isAIModalOpen} 
-              onClose={() => setIsAIModalOpen(false)} 
+            <AIChatbot
+              isOpen={isAIModalOpen}
+              onClose={() => setIsAIModalOpen(false)}
             />
 
             {/* Calendar Widget */}

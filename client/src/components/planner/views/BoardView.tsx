@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import TaskCard from '../TaskCard';
 import TaskDetailModal from '../TaskDetailModal';
 import { usePlanner } from '../../../context/PlannerContext';
+import { useDock } from '../../../context/DockContext';
 import { Task } from '../../../context/PlannerContext';
 import QuickAddModal from '../QuickAddModal';
 import BoardViewSkeleton from '../skeletons/BoardViewSkeleton';
@@ -14,12 +15,13 @@ interface BoardViewProps {
 
 const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   const { columns, addTask, moveTask, tasks, loading } = usePlanner();
+  const { dockPosition } = useDock();
   const { t } = useTranslation();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [draggedOverColumn, setDraggedOverColumn] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskCreate, setShowTaskCreate] = useState(false);
-  const [taskCreateStatus, setTaskCreateStatus] = useState<string>('todo');
+  const [taskCreateStatus, setTaskCreateStatus] = useState<string>('pending');
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
@@ -66,7 +68,13 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
 
   const filteredTasks = (columnId: string) => {
     return tasks
-      .filter(task => task.status === columnId)
+      .filter(task => {
+        // Handle legacy statuses mapping to new columns
+        if (columnId === 'pending') return task.status === 'pending' || task.status === 'todo';
+        if (columnId === 'review') return task.status === 'review' || task.status === 'in-review';
+        if (columnId === 'completed') return task.status === 'completed' || task.status === 'done';
+        return task.status === columnId;
+      })
       .filter(task =>
         !searchQuery ||
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,7 +87,7 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   }
 
   return (
-    <div className="h-full overflow-x-auto p-6">
+    <div className={`h-full overflow-x-auto p-6 ${dockPosition === 'left' ? 'pl-24' : ''} ${dockPosition === 'right' ? 'pr-24' : ''}`}>
       <div className="flex gap-4 h-full min-w-max">
         {columns.map(column => (
           <div

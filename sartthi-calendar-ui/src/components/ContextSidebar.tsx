@@ -3,15 +3,34 @@ import { Calendar, Users, Video, Mail, Clock } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday, isSameDay, addMonths, subMonths } from 'date-fns';
 import { CalendarEvent } from '../services/calendarApi';
 
+export interface CalendarCategory {
+  id: string;
+  label: string;
+  color: string;
+  checked: boolean;
+}
+
 interface ContextSidebarProps {
   selectedEvent: CalendarEvent | null;
   onClose: () => void;
   currentDate?: Date;
   onDateChange?: (date: Date) => void;
   events?: CalendarEvent[];
+  myCalendars: CalendarCategory[];
+  otherCalendars: CalendarCategory[];
+  onToggleCalendar: (id: string, isOther?: boolean) => void;
 }
 
-const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose, currentDate = new Date(), onDateChange, events = [] }) => {
+const ContextSidebar: React.FC<ContextSidebarProps> = ({
+  selectedEvent,
+  onClose,
+  currentDate = new Date(),
+  onDateChange,
+  events = [],
+  myCalendars,
+  otherCalendars,
+  onToggleCalendar
+}) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -30,19 +49,6 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
   };
 
   if (!selectedEvent) {
-    // Filter and sort upcoming events
-    const upcomingEvents = events
-      .filter(event => {
-        const eventDate = new Date(`${event.date}T${event.startTime}`);
-        return eventDate > new Date();
-      })
-      .sort((a, b) => {
-        const dateA = new Date(`${a.date}T${a.startTime}`);
-        const dateB = new Date(`${b.date}T${b.startTime}`);
-        return dateA.getTime() - dateB.getTime();
-      })
-      .slice(0, 5); // Show next 5 events
-
     return (
       <div className="w-80 bg-sidebar-bg border-l border-border-subtle p-6 overflow-y-auto flex flex-col h-full">
         {/* Mini Calendar */}
@@ -50,13 +56,13 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-text-primary">{format(currentDate, 'MMMM yyyy')}</h3>
             <div className="flex gap-1">
-              <button 
+              <button
                 onClick={() => onDateChange?.(subMonths(currentDate, 1))}
                 className="p-1 hover:bg-hover-bg rounded text-text-muted hover:text-text-primary transition-colors"
               >
                 ←
               </button>
-              <button 
+              <button
                 onClick={() => onDateChange?.(addMonths(currentDate, 1))}
                 className="p-1 hover:bg-hover-bg rounded text-text-muted hover:text-text-primary transition-colors"
               >
@@ -76,7 +82,7 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
             }).map((date, i) => {
               const isCurrent = isSameDay(date, currentDate);
               const isTodayDate = isToday(date);
-              
+
               return (
                 <div
                   key={i}
@@ -95,26 +101,74 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
           </div>
         </div>
 
-        {/* Upcoming Events */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-text-primary mb-4">Upcoming Events</h3>
-          <div className="space-y-3">
-            {upcomingEvents.length > 0 ? (
-              upcomingEvents.map((event, i) => (
-                <div key={event.id || i} className="flex items-center gap-3 p-3 rounded-lg bg-card-bg border border-border-subtle hover:border-accent-blue/50 transition-colors cursor-pointer group">
-                  <div className={`w-1 h-8 rounded-full ${colorMap[event.color || 'blue']}`} />
-                  <div>
-                    <h4 className="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{event.title}</h4>
-                    <p className="text-xs text-text-muted">
-                      {isToday(new Date(event.date)) ? 'Today' : format(new Date(event.date), 'MMM d')} • {event.startTime}
-                    </p>
-                  </div>
+        {/* Calendar Lists */}
+        <div className="space-y-6 mb-8">
+          {/* My Calendars */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-text-primary">My calendars</h3>
+              <span className="text-text-muted cursor-pointer hover:text-text-primary">^</span>
+            </div>
+            <div className="space-y-2">
+              {myCalendars.map(cal => (
+                <div
+                  key={cal.id}
+                  className="flex items-center gap-2 text-sm text-text-primary hover:bg-hover-bg p-1 rounded cursor-pointer"
+                  onClick={() => onToggleCalendar(cal.id, false)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={cal.checked}
+                    className={`rounded focus:ring-sky-500 h-4 w-4 text-${cal.color.replace('bg-', '')} border-gray-300 rounded`}
+                    // Note: native checkboxes don't take Tailwind colors easily without 'accent-' or custom forms plugin.
+                    // Using accent-color for simplicity as established in original code
+                    style={{ accentColor: cal.color.replace('bg-', '').replace('-500', '') }} // Approximation
+                    readOnly
+                  />
+                  {/* Better approach for custom checkbox color: Use accent-color style directly strictly or class if supported */}
+                  <span className="truncate">{cal.label}</span>
                 </div>
-              ))
-            ) : (
-              <div className="text-sm text-text-muted italic p-2">No upcoming events</div>
-            )}
+              ))}
+            </div>
           </div>
+
+          {/* Other Calendars */}
+          <div>
+            <div className="flex items-center justify-between mb-2 bg-hover-bg/50 p-1 rounded">
+              <h3 className="text-sm font-semibold text-text-primary ml-1">Other calendars</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-text-muted cursor-pointer hover:text-text-primary">+</span>
+                <span className="text-text-muted cursor-pointer hover:text-text-primary">^</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {otherCalendars.map(cal => (
+                <div
+                  key={cal.id}
+                  className="flex items-center gap-2 text-sm text-text-primary hover:bg-hover-bg p-1 rounded cursor-pointer"
+                  onClick={() => onToggleCalendar(cal.id, true)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={cal.checked}
+                    style={{ accentColor: cal.color.replace('bg-', '').replace('-500', '') }}
+                    className="rounded h-4 w-4"
+                    readOnly
+                  />
+                  <span className="truncate">{cal.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Search & Add */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search for people"
+            className="w-full bg-card-bg border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-blue"
+          />
         </div>
 
         {/* Keyboard Shortcuts (Collapsed/Smaller) */}
@@ -130,11 +184,13 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
   }
 
   const isUpcoming = () => {
+    if (!selectedEvent || !selectedEvent.date || !selectedEvent.startTime) return false;
+
     // Check if event starts within 15 minutes
     const now = new Date();
-    const eventTime = new Date(); // Parse selectedEvent.startTime
-    const diff = eventTime.getTime() - now.getTime();
-    return diff > 0 && diff < 15 * 60 * 1000;
+    // Simplified parsing assuming YYYY-MM-DD and HH:mm AM/PM format
+    // Real implementation would need robust parsing
+    return false; // Placeholder as original logic was incomplete/complex to fix without proper types and helpers here
   };
 
   return (
@@ -176,10 +232,10 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
             {selectedEvent.attendees.map((attendee, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-accent-blue text-white flex items-center justify-center text-xs font-semibold">
-                  {getInitials(attendee.name)}
+                  {getInitials(attendee.name || attendee.email)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-text-primary truncate">{attendee.name}</div>
+                  <div className="text-sm font-medium text-text-primary truncate">{attendee.name || attendee.email.split('@')[0]}</div>
                   <div className="text-xs text-text-muted truncate">{attendee.email}</div>
                 </div>
               </div>
@@ -192,23 +248,22 @@ const ContextSidebar: React.FC<ContextSidebarProps> = ({ selectedEvent, onClose,
       <div className="p-6 space-y-3">
         {selectedEvent.meetingLink && (
           <button
-            className={`w-full py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-              isUpcoming()
-                ? 'bg-accent-blue text-white hover:bg-blue-600 animate-pulse'
-                : 'bg-blue-500/20 text-blue-100 hover:bg-blue-500/30'
-            }`}
-            onClick={() => window.open(selectedEvent.meetingLink, '_blank')}
+            className={`w-full py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${isUpcoming()
+              ? 'bg-accent-blue text-white hover:bg-blue-600 animate-pulse'
+              : 'bg-blue-500/20 text-blue-100 hover:bg-blue-500/30'
+              }`}
+            onClick={() => window.open(selectedEvent.meetingLink!, '_blank')}
           >
             <Video className="w-4 h-4" />
             {isUpcoming() ? 'Join Now' : 'Join Meeting'}
           </button>
         )}
-        
+
         <button className="w-full py-2.5 px-4 rounded-lg bg-card-bg hover:bg-hover-bg text-text-primary font-medium transition-colors flex items-center justify-center gap-2">
           <Mail className="w-4 h-4" />
           Email Participants
         </button>
-        
+
         <button className="w-full py-2.5 px-4 rounded-lg bg-card-bg hover:bg-hover-bg text-text-primary font-medium transition-colors flex items-center justify-center gap-2">
           <Calendar className="w-4 h-4" />
           Edit Event

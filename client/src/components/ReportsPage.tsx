@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  BarChart3, TrendingUp, Download, Filter, Calendar, 
+import {
+  BarChart3, TrendingUp, Download, Filter, Calendar,
   Users, Target, Clock, DollarSign, PieChart, LineChart,
   FileText, Share2, Eye, MoreVertical, RefreshCw,
   Bot, Crown, Star, Zap, AlertCircle, CheckCircle,
   ArrowUp, ArrowDown, Minus, Plus, Search, Printer
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import CreateReportModal from './CreateReportModal';
 import ScheduleReportModal from './ScheduleReportModal';
@@ -66,6 +67,7 @@ interface TimeTrackingData {
 
 const ReportsPage: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { canUseAdvancedAnalytics, canExportReports, canUseAI } = useFeatureAccess();
   const [reports, setReports] = useState<ReportData[]>([]);
   const [projectMetrics, setProjectMetrics] = useState<ProjectMetrics[]>([]);
@@ -216,31 +218,41 @@ const ReportsPage: React.FC = () => {
     ];
 
     const mockTimeTrackingData: TimeTrackingData[] = [
-      { date: '2024-03-14', hours: 8.5, billableHours: 7.5, projects: [
-        { name: 'E-commerce Platform', hours: 5, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 2.5, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-15', hours: 8, billableHours: 7, projects: [
-        { name: 'E-commerce Platform', hours: 6, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 1.5, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 0.5, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-16', hours: 7.5, billableHours: 6.5, projects: [
-        { name: 'E-commerce Platform', hours: 4, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-17', hours: 8.2, billableHours: 7.8, projects: [
-        { name: 'E-commerce Platform', hours: 5.5, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 1.2, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-18', hours: 8, billableHours: 7.2, projects: [
-        { name: 'E-commerce Platform', hours: 4.5, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
-      ]}
+      {
+        date: '2024-03-14', hours: 8.5, billableHours: 7.5, projects: [
+          { name: 'E-commerce Platform', hours: 5, color: 'bg-accent' },
+          { name: 'Mobile App', hours: 2.5, color: 'bg-green-500' },
+          { name: 'Dashboard Redesign', hours: 1, color: 'bg-purple-500' }
+        ]
+      },
+      {
+        date: '2024-03-15', hours: 8, billableHours: 7, projects: [
+          { name: 'E-commerce Platform', hours: 6, color: 'bg-accent' },
+          { name: 'Mobile App', hours: 1.5, color: 'bg-green-500' },
+          { name: 'Dashboard Redesign', hours: 0.5, color: 'bg-purple-500' }
+        ]
+      },
+      {
+        date: '2024-03-16', hours: 7.5, billableHours: 6.5, projects: [
+          { name: 'E-commerce Platform', hours: 4, color: 'bg-accent' },
+          { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
+          { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
+        ]
+      },
+      {
+        date: '2024-03-17', hours: 8.2, billableHours: 7.8, projects: [
+          { name: 'E-commerce Platform', hours: 5.5, color: 'bg-accent' },
+          { name: 'Mobile App', hours: 1.2, color: 'bg-green-500' },
+          { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
+        ]
+      },
+      {
+        date: '2024-03-18', hours: 8, billableHours: 7.2, projects: [
+          { name: 'E-commerce Platform', hours: 4.5, color: 'bg-accent' },
+          { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
+          { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
+        ]
+      }
     ];
 
     setReports(mockReports);
@@ -273,7 +285,7 @@ const ReportsPage: React.FC = () => {
 
   const generateAIReport = async () => {
     if (!canUseAI()) return;
-    
+
     setIsGenerating(true);
     // Simulate AI report generation
     setTimeout(() => {
@@ -307,7 +319,7 @@ const ReportsPage: React.FC = () => {
 
   const exportReport = (report: ReportData) => {
     if (!canExportReports()) return;
-    
+
     // Simulate export functionality
     const dataStr = JSON.stringify(report.data, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -320,7 +332,7 @@ const ReportsPage: React.FC = () => {
   };
 
   const getFilteredReports = () => {
-    return reports.filter(report => 
+    return reports.filter(report =>
       reportType === 'all' || report.type === reportType
     );
   };
@@ -365,7 +377,7 @@ const ReportsPage: React.FC = () => {
   // Quick Actions
   const handleExportAllData = () => {
     const workbook = XLSX.utils.book_new();
-    
+
     // Reports sheet
     const reportsData = reports.map(r => ({
       Name: r.name,
@@ -376,7 +388,7 @@ const ReportsPage: React.FC = () => {
     }));
     const reportsSheet = XLSX.utils.json_to_sheet(reportsData);
     XLSX.utils.book_append_sheet(workbook, reportsSheet, 'Reports');
-    
+
     // Projects sheet
     const projectsData = projectMetrics.map(p => ({
       Name: p.name,
@@ -390,7 +402,7 @@ const ReportsPage: React.FC = () => {
     }));
     const projectsSheet = XLSX.utils.json_to_sheet(projectsData);
     XLSX.utils.book_append_sheet(workbook, projectsSheet, 'Projects');
-    
+
     // Team sheet
     const teamData = teamPerformance.map(m => ({
       Name: m.name,
@@ -404,7 +416,7 @@ const ReportsPage: React.FC = () => {
     }));
     const teamSheet = XLSX.utils.json_to_sheet(teamData);
     XLSX.utils.book_append_sheet(workbook, teamSheet, 'Team Performance');
-    
+
     // Time tracking sheet
     const timeData = timeTrackingData.map(t => ({
       Date: t.date,
@@ -413,7 +425,7 @@ const ReportsPage: React.FC = () => {
     }));
     const timeSheet = XLSX.utils.json_to_sheet(timeData);
     XLSX.utils.book_append_sheet(workbook, timeSheet, 'Time Tracking');
-    
+
     // Download
     XLSX.writeFile(workbook, `reports_export_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
@@ -421,7 +433,7 @@ const ReportsPage: React.FC = () => {
   const handleShareDashboard = () => {
     const shareUrl = `${window.location.origin}/reports/shared/${Date.now()}`;
     navigator.clipboard.writeText(shareUrl);
-    
+
     // Show toast notification (you can implement a toast system)
     alert('Dashboard link copied to clipboard!\n' + shareUrl);
   };
@@ -467,7 +479,13 @@ const ReportsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-6">
+      <div
+        className="p-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
@@ -582,7 +600,7 @@ const ReportsPage: React.FC = () => {
                       <div className={`p-2 rounded-lg ${getReportColor(report.type)}`}>
                         {getReportIcon(report.type)}
                       </div>
-                      
+
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-medium text-gray-900 dark:text-gray-100">{report.name}</h3>
@@ -595,9 +613,9 @@ const ReportsPage: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{report.description}</p>
-                        
+
                         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <span>Created {report.createdAt.toLocaleDateString()}</span>
                           <span>Updated {report.updatedAt.toLocaleDateString()}</span>
@@ -610,7 +628,7 @@ const ReportsPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedReport(report)}
@@ -728,21 +746,21 @@ const ReportsPage: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
               <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h3>
               <div className="space-y-2">
-                <button 
+                <button
                   onClick={handleExportAllData}
                   className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors"
                 >
                   <Download className="w-4 h-4 inline mr-2" />
                   Export All Data
                 </button>
-                <button 
+                <button
                   onClick={handleShareDashboard}
                   className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors"
                 >
                   <Share2 className="w-4 h-4 inline mr-2" />
                   Share Dashboard
                 </button>
-                <button 
+                <button
                   onClick={() => setShowScheduleModal(true)}
                   className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors"
                 >
@@ -778,15 +796,15 @@ const ReportsPage: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6">
               <div className="bg-gradient-to-r from-accent/10 to-blue-100 rounded-lg p-6 mb-4">
                 <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Report Preview</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  This report contains {Object.keys(selectedReport.data).length} data points. 
+                  This report contains {Object.keys(selectedReport.data).length} data points.
                   Download as PDF for a formatted view or export as JSON for raw data.
                 </p>
-                
+
                 {/* Data Summary */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
                   {selectedReport.data.insights ? (
@@ -822,7 +840,7 @@ const ReportsPage: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Raw JSON (collapsible) */}
               <details className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-100">
@@ -833,7 +851,7 @@ const ReportsPage: React.FC = () => {
                 </pre>
               </details>
             </div>
-            
+
             <div className="p-6 border-t border-gray-300 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedReport(null)}

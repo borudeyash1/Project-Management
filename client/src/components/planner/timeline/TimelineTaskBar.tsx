@@ -25,6 +25,9 @@ const TimelineTaskBar: React.FC<TimelineTaskBarProps> = ({ task, timelineStart, 
     if (!task.startDate) return null;
 
     const startDate = new Date(task.startDate);
+
+    // Safety check for invalid dates
+    if (isNaN(startDate.getTime())) return null;
     const leftPosition = dateToPixel(startDate, timelineStart);
     const width = durationToPixels(task.duration);
 

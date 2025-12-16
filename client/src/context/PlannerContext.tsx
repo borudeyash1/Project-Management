@@ -122,10 +122,10 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [loading, setLoading] = useState(false);
   const [dataVersion, setDataVersion] = useState(0);
   const [columns] = useState<Column[]>([
-    { id: 'todo', name: 'planner.board.todo', color: 'bg-gray-500', order: 1 },
+    { id: 'pending', name: 'planner.board.todo', color: 'bg-gray-500', order: 1 },
     { id: 'in-progress', name: 'planner.board.inProgress', color: 'bg-blue-500', order: 2 },
-    { id: 'in-review', name: 'planner.board.review', color: 'bg-yellow-500', order: 3 },
-    { id: 'done', name: 'planner.board.done', color: 'bg-green-500', order: 4 }
+    { id: 'review', name: 'planner.board.review', color: 'bg-yellow-500', order: 3 },
+    { id: 'completed', name: 'planner.board.done', color: 'bg-green-500', order: 4 }
   ]);
 
   const fetchData = async () => {

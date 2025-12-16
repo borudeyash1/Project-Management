@@ -73,6 +73,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
             title,
             description,
             reporter: state.userProfile._id,
+            status: defaultStatus || 'pending',
             priority,
             dueDate: dueDate ? new Date(`${dueDate}T${dueTime || '23:59'}`) : undefined,
             startDate: startDate ? new Date(startDate) : undefined,
@@ -196,8 +197,8 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
                   key={type.id}
                   onClick={() => setActiveType(type.id as ItemType)}
                   className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${activeType === type.id
-                      ? `border-${type.color}-500 bg-${type.color}-50 dark:bg-${type.color}-900/20`
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? `border-${type.color}-500 bg-${type.color}-50 dark:bg-${type.color}-900/20`
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                 >
                   <Icon className={`w-5 h-5 ${activeType === type.id ? `text-${type.color}-600 dark:text-${type.color}-400` : 'text-gray-600 dark:text-gray-400'}`} />

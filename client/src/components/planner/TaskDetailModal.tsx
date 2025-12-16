@@ -227,10 +227,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
-                    <option value="todo">{t('planner.bulkActions.moveToTodo')}</option>
+                    <option value="pending">{t('planner.bulkActions.moveToTodo')}</option>
                     <option value="in-progress">{t('planner.bulkActions.moveToInProgress')}</option>
                     <option value="review">Review</option>
-                    <option value="done">{t('planner.bulkActions.moveToDone')}</option>
+                    <option value="completed">{t('planner.bulkActions.moveToDone')}</option>
                   </select>
                 ) : (
                   <span className="inline-block px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg">

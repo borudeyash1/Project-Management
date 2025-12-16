@@ -7,6 +7,7 @@ import UserDisplay from './UserDisplay';
 import { AnimatedThemeToggler } from './ui/animated-theme-toggler';
 import { SparklesText } from './ui/sparkles-text';
 import { useTheme } from '../context/ThemeContext';
+import { useDock } from '../context/DockContext';
 import {
   Search,
   Bell,
@@ -28,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 const Header: React.FC = () => {
   const { state, dispatch } = useApp();
   const { preferences, applyTheme } = useTheme();
+  const { dockPosition } = useDock();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
@@ -85,7 +87,10 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-50">
+    <header
+      className={`h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6 sticky z-40 transition-all duration-200`}
+      style={{ top: dockPosition === 'top' ? '52px' : '0' }}
+    >
       <div className="flex items-center gap-3">
         <button
           className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 md:hidden"
@@ -98,55 +103,55 @@ const Header: React.FC = () => {
         <div className="flex items-center">
           <img src="/2.png" alt="Sartthi Logo" className="h-6 w-auto m-2" />
         </div>
-
-        {/* Workspace Mode Switcher */}
-        <WorkspaceModeSwitcher />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Workspace Mode Switcher (Desktop Only) */}
+        <div className="hidden md:block">
+          <WorkspaceModeSwitcher />
+        </div>
+
         {/* Search */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 dark:text-gray-400" />
-            <input
-              type="text"
-              className="w-64 rounded-lg border border-border dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
-              placeholder={t('forms.searchPlaceholder')}
-            />
-          </div>
+        <div className="relative hidden md:block">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder={t('actions.search')}
+            className="pl-9 pr-4 py-1.5 bg-slate-100 dark:bg-gray-700 border-none rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-64 transition-all"
+          />
         </div>
 
         {/* Notifications */}
         <button
-          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 relative"
+          className="p-2 text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 relative hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           onClick={toggleNotifications}
         >
-          <Bell className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
-            3
-          </span>
+          <Bell className="w-5 h-5" />
+          {state.notifications?.some(n => !n.read) && (
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
+          )}
         </button>
 
         {/* Settings */}
         <button
-          className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700"
-          onClick={() => navigate('/settings')}
+          className="p-2 text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          onClick={() => navigate('/admin/settings')}
         >
-          <Settings className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+          <Settings className="w-5 h-5" />
         </button>
 
-        {/* Language Switcher */}
+        {/* Global/Language Switcher */}
         <div className="relative">
           <button
-            className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700"
+            className="p-2 text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             onClick={() => setShowLanguageMenu(!showLanguageMenu)}
           >
-            <Globe className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+            <Globe className="w-5 h-5" />
           </button>
 
           {showLanguageMenu && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-              <div className="p-2">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-xl z-50 py-1">
+              <div className="max-h-60 overflow-y-auto">
                 {[
                   { code: 'en', name: 'English', flag: '🇬🇧' },
                   { code: 'ja', name: '日本語', flag: '🇯🇵' },
@@ -165,9 +170,8 @@ const Header: React.FC = () => {
                 ].map((lang) => (
                   <button
                     key={lang.code}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
-                      i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
+                      }`}
                     onClick={() => changeLanguage(lang.code)}
                   >
                     <span className="text-lg">{lang.flag}</span>
@@ -206,7 +210,7 @@ const Header: React.FC = () => {
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border dark:border-gray-600">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h3>
-                <button 
+                <button
                   onClick={toggleUserMenu}
                   className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
@@ -242,50 +246,45 @@ const Header: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => applyTheme('light')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
-                      preferences.theme === 'light'
-                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'light'
+                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
-                    {preferences.theme === 'light' && (
-                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
-                    )}
-                    <Sun className="w-4 h-4 mb-1.5 relative z-10" />
-                    <span className="text-[11px] font-semibold relative z-10">Light</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Bright</span>
+                    <Sun className={`w-5 h-5 mb-1.5 ${preferences.theme === 'light' ? 'fill-current' : ''}`} />
+                    <span className="text-xs font-medium">Light</span>
                   </button>
                   <button
                     onClick={() => applyTheme('dark')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
-                      preferences.theme === 'dark'
-                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'dark'
+                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
-                    {preferences.theme === 'dark' && (
-                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
-                    )}
-                    <Moon className="w-4 h-4 mb-1.5 relative z-10" />
-                    <span className="text-[11px] font-semibold relative z-10">Dark</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Easy</span>
+                    <Moon className={`w-5 h-5 mb-1.5 ${preferences.theme === 'dark' ? 'fill-current' : ''}`} />
+                    <span className="text-xs font-medium">Dark</span>
                   </button>
                   <button
                     onClick={() => applyTheme('system')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
-                      preferences.theme === 'system'
-                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'system'
+                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
-                    {preferences.theme === 'system' && (
-                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
-                    )}
-                    <Monitor className="w-4 h-4 mb-1.5 relative z-10" />
-                    <span className="text-[11px] font-semibold relative z-10">System</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Auto</span>
+                    <Monitor className="w-5 h-5 mb-1.5" />
+                    <span className="text-xs font-medium">System</span>
                   </button>
                 </div>
+              </div>
+
+              <div className="p-2 border-t border-border dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
             </div>
           )}

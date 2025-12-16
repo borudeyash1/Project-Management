@@ -231,6 +231,32 @@ export const createFolder = async (userId: string, folderName: string, parentFol
     }
 };
 
+// Add permission to file
+export const addPermission = async (userId: string, fileId: string, email: string, role: 'reader' | 'writer' = 'reader') => {
+    console.log(`🔐 [DRIVE] Adding permission: ${role} for ${email} on file ${fileId}`);
+
+    const drive = await getDriveClient(userId);
+
+    try {
+        const response = await drive.permissions.create({
+            fileId,
+            requestBody: {
+                role,
+                type: 'user',
+                emailAddress: email
+            },
+            fields: 'id',
+        });
+
+        console.log(`🔐 [DRIVE] Permission added: ${response.data.id}`);
+        return response.data;
+    } catch (error: any) {
+        console.error('🔐 [DRIVE] Add permission error:', error.message);
+        // Don't throw if user already has permission or if email is invalid for Drive
+        return null;
+    }
+};
+
 // Helper functions
 const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';

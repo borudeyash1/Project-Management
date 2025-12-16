@@ -32,19 +32,19 @@
 /* Dark Mode Variables */
 .dark {
   /* Primary Accent Color - Brighter for dark mode */
-  --accent-color: #3B82F6;
-  --accent-hover: #2563EB;
-  --accent-light: #60A5FA;
+  --accent-color: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-light: #818cf8;
 
-  /* Background Colors - Dark Mode */
-  --bg-color: #0F172A;
-  --surface-color: #1E293B;
-  --border-color: #334155;
+  /* Background Colors - Dark Mode (Sartthi Mail) */
+  --bg-color: #0f0f0f;
+  --surface-color: #18181b;
+  --border-color: #27272a;
 
-  /* Text Colors - Dark Mode with High Contrast */
-  --text-color: #F1F5F9;
-  --text-secondary: #E2E8F0;
-  --text-muted: #94A3B8;
+  /* Text Colors - Dark Mode */
+  --text-color: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #606060;
 
   /* Status Colors - Adjusted for dark mode */
   --success-color: #10B981;
@@ -130,8 +130,8 @@ a:hover {
 /* Fix for light backgrounds in dark mode */
 .dark .bg-gray-50,
 .dark .bg-gray-100 {
-  background-color: #1E293B !important;
-  color: #F1F5F9 !important;
+  background-color: #18181b !important;
+  color: #ffffff !important;
 }
 
 /* Fix for very light text colors */

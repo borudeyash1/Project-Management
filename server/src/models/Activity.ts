@@ -62,4 +62,7 @@ const ActivitySchema: Schema = new Schema(
 ActivitySchema.index({ user: 1, createdAt: -1 });
 ActivitySchema.index({ type: 1 });
 
+// TTL Index: Automatically delete documents after 24 hours (86400 seconds)
+ActivitySchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
+
 export default mongoose.model<IActivity>('Activity', ActivitySchema);

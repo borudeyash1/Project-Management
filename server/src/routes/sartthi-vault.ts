@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import multer from 'multer';
 import { authenticate } from '../middleware/auth';
+import User from '../models/User';
 import {
     listFiles,
     uploadFile,
@@ -36,6 +37,31 @@ router.get('/files', authenticate, async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('List files error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+                console.log(`[VAULT] Cleared invalid tokens for user ${userId}`);
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to list files',
@@ -43,6 +69,7 @@ router.get('/files', authenticate, async (req: Request, res: Response) => {
         });
     }
 });
+
 
 /**
  * POST /api/vault/upload
@@ -71,6 +98,30 @@ router.post('/upload', authenticate, upload.single('file'), async (req: Request,
         });
     } catch (error: any) {
         console.error('Upload error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to upload file',
@@ -111,6 +162,30 @@ router.get('/download/:fileId', authenticate, async (req: Request, res: Response
         fileStream.pipe(res);
     } catch (error: any) {
         console.error('Download error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to download file',
@@ -151,6 +226,30 @@ router.get('/view/:fileId', authenticate, async (req: Request, res: Response) =>
         fileStream.pipe(res);
     } catch (error: any) {
         console.error('View error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to view file',
@@ -184,6 +283,30 @@ router.delete('/files/:fileId', authenticate, async (req: Request, res: Response
         });
     } catch (error: any) {
         console.error('Delete error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to delete file',
@@ -227,6 +350,30 @@ router.patch('/files/:fileId', authenticate, async (req: Request, res: Response)
         });
     } catch (error: any) {
         console.error('Rename error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to rename file',
@@ -261,6 +408,30 @@ router.post('/folders', authenticate, async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Create folder error:', error);
+
+        // Handle expired/invalid google refresh token
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('invalid_client') || error.message.includes('Vault module not connected'))) {
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: {
+                        'modules.vault.refreshToken': 1,
+                        'modules.vault.rootFolderId': 1
+                    }
+                });
+            } catch (dbError) {
+                console.error('Failed to clear invalid tokens:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Vault connection expired. Please reconnect.',
+                code: 'AUTH_EXPIRED',
+                error: error.message
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to create folder',

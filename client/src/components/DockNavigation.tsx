@@ -21,6 +21,7 @@ import {
   FileEdit
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
+import { useDock } from '../context/DockContext';
 import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { getAppUrl } from '../utils/appUrls';
@@ -37,6 +38,7 @@ interface NavItem {
 
 const DockNavigation: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -189,6 +191,7 @@ const DockNavigation: React.FC = () => {
                 onClick={() => handleItemClick(item)}
                 active={active}
                 tooltip={isEnglish ? t(item.translationKey) : `${t(item.translationKey)} (${item.label})`}
+                dockPosition={dockPosition}
               >
                 <Icon className="w-5 h-5" />
               </DockIcon>

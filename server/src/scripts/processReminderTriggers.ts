@@ -5,6 +5,7 @@ import { ReminderTrigger } from '../models/ReminderTrigger';
 import { Reminder } from '../models/Reminder';
 import User from '../models/User';
 import { sendEmail } from '../services/emailService';
+import { sendEmailViaGmail } from '../services/gmailService';
 
 dotenv.config();
 
@@ -42,7 +43,7 @@ const run = async () => {
       continue;
     }
 
-    const users = await User.find({ _id: { $in: userIdStrings } }).select('email fullName');
+    const users = await User.find({ _id: { $in: userIdStrings } }).select('email fullName modules');
     if (!users || users.length === 0) {
       log(`Skipping trigger ${trigger._id}: users not found.`);
       await trigger.deleteOne();
@@ -80,16 +81,34 @@ const run = async () => {
     });
 
     try {
-      await sendEmail({
-        to: emailRecipients,
-        subject: reminderTitle,
-        html: `
+      const emailHtml = `
           <h2>${reminderTitle}</h2>
           <p>${trigger.payload?.description || 'Reminder from Sartthi'}</p>
           <p><strong>Entity:</strong> ${trigger.entityType}</p>
           <p><strong>Due:</strong> ${trigger.triggerTime.toLocaleString()}</p>
-        `,
-      });
+      `;
+
+      // Check if primary user has Sartthi Mail connected
+      if (primaryUser.modules?.mail?.isEnabled && primaryUser.modules?.mail?.refreshToken) {
+        try {
+          await sendEmailViaGmail(primaryUser._id.toString(), emailRecipients, reminderTitle, emailHtml);
+        } catch (gmailError) {
+          console.error(logPrefix, `Gmail send failed, falling back to SMTP for trigger ${trigger._id}`, gmailError);
+          // Fallback to SMTP
+          await sendEmail({
+            to: emailRecipients,
+            subject: reminderTitle,
+            html: emailHtml,
+          });
+        }
+      } else {
+        // Default to SMTP
+        await sendEmail({
+          to: emailRecipients,
+          subject: reminderTitle,
+          html: emailHtml,
+        });
+      }
     } catch (error) {
       console.error(logPrefix, `Failed to send reminder email for trigger ${trigger._id}:`, error);
     }
