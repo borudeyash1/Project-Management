@@ -13,7 +13,7 @@ interface QuickAddModalProps {
 
 type ItemType = 'task' | 'reminder' | 'milestone' | 'event';
 
-const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, defaultTime }) => {
+const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, defaultTime, defaultStatus }) => {
   const { state, dispatch } = useApp();
   const { fetchData } = usePlanner();
   const [activeType, setActiveType] = useState<ItemType>('task');

@@ -29,7 +29,6 @@ import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import StickyNote from './StickyNote';
 import AIChatbot from './AIChatbot';
-import { useDock } from '../context/DockContext';
 
 interface NavItem {
   id: string;
@@ -45,11 +44,10 @@ const DockNavigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { dockPosition } = useDock();
   const [showWorkspaces, setShowWorkspaces] = useState(false);
   const [showInfoCard, setShowInfoCard] = useState<'mail' | 'calendar' | 'vault' | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  
+
   // Check if user owns any workspace
   const isWorkspaceOwner = useMemo(() => {
     const ownsWorkspace = state.workspaces.some(w => {
@@ -367,7 +365,7 @@ const DockNavigation: React.FC = () => {
           }}
         />
       )}
-      
+
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </>

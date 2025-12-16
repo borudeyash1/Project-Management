@@ -46,9 +46,20 @@ class ApiService {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { params?: any } = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    let url = `${this.baseURL}${endpoint}`;
+
+    if (options.params) {
+      const params = new URLSearchParams();
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value));
+        }
+      });
+      const separator = url.includes('?') ? '&' : '?';
+      url += `${separator}${params.toString()}`;
+    }
 
     const config: RequestInit = {
       credentials: 'include', // Send cookies with request
@@ -662,36 +673,41 @@ class ApiService {
     return data;
   }
 
-  async get<T = any>(endpoint: string): Promise<ApiResponse<T>> {
+  async get<T = any>(endpoint: string, options?: RequestInit & { params?: any }): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'GET',
+      ...options
     });
   }
 
-  async post<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T = any>(endpoint: string, data?: any, options?: RequestInit & { params?: any }): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
+      ...options
     });
   }
 
-  async put<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T = any>(endpoint: string, data?: any, options?: RequestInit & { params?: any }): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
+      ...options
     });
   }
 
-  async delete<T = any>(endpoint: string): Promise<ApiResponse<T>> {
+  async delete<T = any>(endpoint: string, options?: RequestInit & { params?: any }): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'DELETE',
+      ...options
     });
   }
 
-  async patch<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async patch<T = any>(endpoint: string, data?: any, options?: RequestInit & { params?: any }): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
+      ...options
     });
   }
 }

@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+import api from './api';
 
 export interface ReportsSummary {
     tasksCompletedThisWeek: number;
@@ -14,11 +12,7 @@ export interface ReportsSummary {
 
 export const getReportsSummary = async (): Promise<ReportsSummary> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/reports/summary`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+        const response = await api.get('/reports/summary');
         return response.data;
     } catch (error) {
         console.error('Error fetching reports summary:', error);

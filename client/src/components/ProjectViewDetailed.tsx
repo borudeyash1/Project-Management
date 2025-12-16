@@ -2365,6 +2365,7 @@ const ProjectViewDetailed: React.FC = () => {
             isProjectManager={isProjectManager || isWorkspaceOwner}
             requests={requests}
             tasks={projectTasks}
+            teamMembers={(activeProject as any)?.teamMembers || activeProject?.team || []}
             onCreateRequest={handleCreateRequest}
             onApproveRequest={handleApproveRequest}
             onRejectRequest={handleRejectRequest}
