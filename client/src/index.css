@@ -145,23 +145,26 @@ a:hover {
   color: #F1F5F9 !important;
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Scrollbar Hiding - Prevent Content Shift */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-color);
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+  width: 0;
+  height: 0;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
+/* Utility class for scrollbar hiding */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Selection Color */

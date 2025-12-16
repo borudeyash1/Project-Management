@@ -18,7 +18,8 @@ import {
   User,
   Shield,
   Mail,
-  FileEdit
+  FileEdit,
+  MessageCircle
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { apiService } from '../services/api';
@@ -26,6 +27,8 @@ import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/des
 import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import StickyNote from './StickyNote';
+import AIChatbot from './AIChatbot';
+import { useDock } from '../context/DockContext';
 
 interface NavItem {
   id: string;
@@ -40,8 +43,11 @@ const DockNavigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { dockPosition } = useDock();
   const [showWorkspaces, setShowWorkspaces] = useState(false);
   const [showInfoCard, setShowInfoCard] = useState<'mail' | 'calendar' | 'vault' | null>(null);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  
   // Check if user owns any workspace
   const isWorkspaceOwner = useMemo(() => {
     const ownsWorkspace = state.workspaces.some(w => {
@@ -158,6 +164,9 @@ const DockNavigation: React.FC = () => {
   const handleCloseStickyNote = (id: string) => {
     setActiveStickyNotes(prev => prev.filter(noteId => noteId !== id));
   };
+
+  // Check if dock is in vertical mode (left/right)
+  const isVerticalDock = dockPosition === 'left' || dockPosition === 'right';
 
   return (
     <>
@@ -355,6 +364,9 @@ const DockNavigation: React.FC = () => {
           }}
         />
       )}
+      
+      {/* AI Chatbot Modal */}
+      <AIChatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </>
   );
 };

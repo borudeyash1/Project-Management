@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { X, Send, Bot, User, Loader2, Sparkles, Target, Clock, TrendingUp, BookOpen } from 'lucide-react';
+import { X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { aiService } from '../services/aiService';
 
 interface Message {
@@ -86,16 +86,12 @@ ${t('aiStudio.welcome.question')}`,
     setIsLoading(true);
 
     try {
-      // Use AI service to get response
       const userContext = {
         profile: state.userProfile,
         projects: state.projects,
         tasks: state.tasks,
         workspaces: state.workspaces
       };
-
-      console.log('[AIChatbot] Sending language:', i18n.language);
-      console.log('[AIChatbot] Message:', message);
 
       const aiResponse = await aiService.getAIResponse(message, userContext, i18n.language);
       
@@ -113,7 +109,7 @@ ${t('aiStudio.welcome.question')}`,
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: t('messages.tryAgain'), // Or a specific error message
+        content: t('messages.tryAgain'),
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -140,7 +136,6 @@ ${t('aiStudio.welcome.question')}`,
   const renderMarkdown = (text: string) => {
     const lines = text.split('\n');
     return lines.map((line, index) => {
-      // Handle bold text **text**
       const parts = line.split(/(\*\*.*?\*\*)/g);
       const renderedLine = parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
@@ -149,12 +144,10 @@ ${t('aiStudio.welcome.question')}`,
         return part;
       });
 
-      // Handle bullet points
       if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
         return <div key={index} className="ml-2">{renderedLine}</div>;
       }
 
-      // Handle emoji bullets (✨, 📝, etc.)
       if (/^[✨📝📊🏷️🚀🎯💡🔴🟡🟢⚠️]/.test(line.trim())) {
         return <div key={index} className="ml-2">{renderedLine}</div>;
       }
@@ -166,156 +159,190 @@ ${t('aiStudio.welcome.question')}`,
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={onClose} />
       
-      <div className={`relative flex flex-col h-full max-w-4xl mx-auto shadow-xl ${
-        isDarkMode ? 'bg-gray-900' : 'bg-white'
+      <div className={`relative w-full max-w-2xl shadow-2xl rounded-2xl overflow-hidden ${
+        isDarkMode ? 'bg-zinc-800' : 'bg-white'
       }`}>
         {/* Header */}
-        <div className={`flex items-center justify-between p-4 border-b ${
-          isDarkMode ? 'border-gray-700' : 'border-gray-300'
-        } bg-accent`}>
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-gray-900">{t('aiStudio.title')}</h3>
-                <span className="px-2 py-0.5 text-[10px] font-bold bg-gray-900 text-white rounded-full uppercase tracking-wider">
-                  {t('aiStudio.badge')}
-                </span>
+        <div className={`px-6 py-4 border-b ${
+          isDarkMode ? 'border-zinc-700 bg-zinc-800' : 'border-gray-200 bg-white'
+        }`}>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <p className="text-sm text-gray-800">{t('aiStudio.poweredBy')}</p>
+              <div>
+                <h2 className={`text-lg font-semibold ${
+                  isDarkMode ? 'text-white' : 'text-zinc-800'
+                }`}>
+                  {t('aiStudio.title')}
+                </h2>
+                <p className={`text-xs ${
+                  isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
+                }`}>
+                  {t('aiStudio.poweredBy')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-sm">
+                Online
+              </div>
+              <button
+                onClick={onClose}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isDarkMode 
+                    ? 'hover:bg-zinc-700 text-zinc-400 hover:text-white' 
+                    : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-900 hover:text-gray-700 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
         </div>
 
-        {/* Messages */}
-        <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${
-          isDarkMode ? 'bg-gray-900' : 'bg-white'
+        {/* Messages Container */}
+        <div className={`h-[500px] flex flex-col ${
+          isDarkMode ? 'bg-zinc-900' : 'bg-gray-50'
         }`}>
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`flex max-w-xs lg:max-w-md ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  message.type === 'user' 
-                    ? 'bg-accent text-gray-900 ml-2' 
-                    : isDarkMode ? 'bg-gray-800 text-gray-300 mr-2' : 'bg-gray-200 text-gray-700 mr-2'
+          {/* Messages */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`flex items-end gap-2 max-w-[75%] ${
+                  message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
                 }`}>
-                  {message.type === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                </div>
-                
-                <div className={`rounded-lg px-4 py-2 ${
-                  message.type === 'user'
-                    ? 'bg-accent text-gray-900'
-                    : isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-gray-100 text-gray-900'
-                }`}>
-                  <div className="text-sm">
-                    {message.type === 'ai' ? renderMarkdown(message.content) : message.content}
-                  </div>
-                  <p className={`text-xs mt-1 ${
-                    message.type === 'user' 
-                      ? 'text-gray-800' 
-                      : isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  {/* Avatar */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    message.type === 'user'
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-md'
+                      : isDarkMode 
+                        ? 'bg-zinc-700' 
+                        : 'bg-white border-2 border-gray-200'
                   }`}>
-                    {formatTime(message.timestamp)}
-                  </p>
+                    {message.type === 'user' ? (
+                      <User className="w-4 h-4 text-white" />
+                    ) : (
+                      <Bot className={`w-4 h-4 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                    )}
+                  </div>
+
+                  {/* Message Bubble */}
+                  <div className={`rounded-2xl px-4 py-2.5 shadow-sm ${
+                    message.type === 'user'
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+                      : isDarkMode 
+                        ? 'bg-zinc-800 text-white border border-zinc-700' 
+                        : 'bg-white text-zinc-800 border border-gray-200'
+                  }`}>
+                    <div className="text-sm leading-relaxed">
+                      {message.type === 'ai' ? renderMarkdown(message.content) : message.content}
+                    </div>
+                    <p className={`text-[10px] mt-1.5 ${
+                      message.type === 'user' 
+                        ? 'text-blue-100' 
+                        : isDarkMode ? 'text-zinc-500' : 'text-gray-400'
+                    }`}>
+                      {formatTime(message.timestamp)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="flex max-w-xs lg:max-w-md">
-                <div className={`w-8 h-8 rounded-full mr-2 flex items-center justify-center ${
-                  isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700'
-                }`}>
-                  <Bot className="w-4 h-4" />
-                </div>
-                <div className={`rounded-lg px-4 py-2 ${
-                  isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-                }`}>
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className={`w-4 h-4 animate-spin ${
-                      isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`} />
-                    <span className={`text-sm ${
-                      isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>{t('aiStudio.thinking')}</span>
+            ))}
+            
+            {/* Loading Indicator */}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex items-end gap-2 max-w-[75%]">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    isDarkMode ? 'bg-zinc-700' : 'bg-white border-2 border-gray-200'
+                  }`}>
+                    <Bot className={`w-4 h-4 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                  </div>
+                  <div className={`rounded-2xl px-4 py-2.5 shadow-sm ${
+                    isDarkMode ? 'bg-zinc-800 border border-zinc-700' : 'bg-white border border-gray-200'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <Loader2 className={`w-4 h-4 animate-spin ${
+                        isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                      }`} />
+                      <span className={`text-sm ${
+                        isDarkMode ? 'text-zinc-300' : 'text-zinc-600'
+                      }`}>
+                        {t('aiStudio.thinking')}
+                      </span>
+                    </div>
                   </div>
                 </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Suggestions */}
+          {messages.length > 0 && messages[messages.length - 1].suggestions && (
+            <div className={`px-4 py-3 border-t ${
+              isDarkMode ? 'border-zinc-700 bg-zinc-800' : 'border-gray-200 bg-white'
+            }`}>
+              <p className={`text-xs mb-2 font-medium ${
+                isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
+              }`}>
+                {t('aiStudio.suggestions')}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {messages[messages.length - 1].suggestions?.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className={`px-3 py-1.5 text-xs rounded-full transition-all duration-200 ${
+                      isDarkMode 
+                        ? 'bg-zinc-700 hover:bg-zinc-600 text-zinc-200 border border-zinc-600' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200'
+                    }`}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
               </div>
             </div>
           )}
-          
-          <div ref={messagesEndRef} />
-        </div>
 
-        {/* Suggestions */}
-        {messages.length > 0 && messages[messages.length - 1].suggestions && (
-          <div className={`p-4 border-t ${
-            isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-gray-50'
+          {/* Input Area */}
+          <form onSubmit={handleSubmit} className={`px-4 py-3 border-t ${
+            isDarkMode ? 'border-zinc-700 bg-zinc-800' : 'border-gray-200 bg-white'
           }`}>
-            <p className={`text-sm mb-2 ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>{t('aiStudio.suggestions')}</p>
-            <div className="flex flex-wrap gap-2">
-              {messages[messages.length - 1].suggestions?.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className={`px-3 py-1 text-xs border rounded-full transition-colors ${
-                    isDarkMode 
-                      ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600' 
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {suggestion}
-                </button>
-              ))}
+            <div className="flex gap-2">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder={t('aiStudio.placeholder')}
+                className={`flex-1 px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  isDarkMode 
+                    ? 'bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400' 
+                    : 'bg-white border-gray-300 text-zinc-900 placeholder-gray-400'
+                }`}
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={!inputMessage.trim() || isLoading}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              >
+                <Send className="w-4 h-4" />
+              </button>
             </div>
-          </div>
-        )}
-
-        {/* Input */}
-        <form onSubmit={handleSubmit} className={`p-4 border-t ${
-          isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
-        }`}>
-          <div className="flex space-x-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder={t('aiStudio.placeholder')}
-              className={`flex-1 rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
-              }`}
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={!inputMessage.trim() || isLoading}
-              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

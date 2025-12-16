@@ -133,26 +133,62 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   // For top/bottom: Dock is fixed at viewport edges
   if (!isHorizontalDock) {
     return (
-      <div className="min-h-screen bg-bg dark:bg-gray-900">
-        {/* Dock Fixed at Top */}
+      <div className="h-screen bg-bg dark:bg-gray-900 flex flex-col">
+        {/* Dock Header - Fixed at Top */}
         {isTopDock && (
-          <div className="fixed top-0 left-0 right-0 z-[100]">
-            <DockNavigation />
+          <div className="flex-shrink-0 z-[100] flex justify-between items-center py-3 px-6 bg-bg dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            {/* AI Button on left for top */}
+            <div className="flex-1 flex justify-start">
+              <ChatbotButton />
+            </div>
+            
+            {/* Centered Dock */}
+            <div className="flex-shrink-0">
+              <DockNavigation />
+            </div>
+            
+            {/* Empty space on right */}
+            <div className="flex-1"></div>
           </div>
         )}
 
-        {/* Main Content Area (Header + Content) with padding for dock */}
-        <div className={`min-h-screen ${isTopDock ? 'pt-16' : ''} ${isBottomDock ? 'pb-16' : ''}`}>
+        {/* Main Content Area - Scrollable Section */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <Header />
-          <main className="bg-bg dark:bg-gray-900">
-            {children}
+          <main 
+            className="flex-1 overflow-y-auto bg-bg dark:bg-gray-900"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            } as React.CSSProperties}
+          >
+            <style>{`
+              main::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            <div className={isBottomDock ? 'pb-24' : isTopDock ? 'pt-6' : ''}>
+              {children}
+            </div>
           </main>
         </div>
 
-        {/* Dock Fixed at Bottom */}
+        {/* Dock Footer - Fixed at Bottom */}
         {isBottomDock && (
-          <div className="fixed bottom-0 left-0 right-0 z-[100]">
-            <DockNavigation />
+          <div className="flex-shrink-0 z-[100] flex justify-between items-center py-3 px-6 bg-bg dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            {/* Empty space on left */}
+            <div className="flex-1"></div>
+            
+            {/* Centered Dock */}
+            <div className="flex-shrink-0">
+              <DockNavigation />
+            </div>
+            
+            {/* AI Button on right */}
+            <div className="flex-1 flex justify-end">
+              <ChatbotButton />
+            </div>
           </div>
         )}
 
@@ -160,7 +196,6 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
         <ToastContainer />
         <NotificationsPanel />
         <TaskDrawer />
-        <ChatbotButton />
       </div>
     );
   }
@@ -178,7 +213,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
       {/* Main Content Area (Header + Content) - Takes remaining space */}
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
-        <main className="flex-1 bg-bg dark:bg-gray-900 overflow-auto">
+        <main className={`flex-1 bg-bg dark:bg-gray-900 overflow-auto ${dockPosition === 'left' ? 'pl-4' : dockPosition === 'right' ? 'pr-4' : ''}`}>
           {children}
         </main>
       </div>

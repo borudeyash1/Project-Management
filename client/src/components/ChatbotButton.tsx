@@ -1,14 +1,34 @@
 import React, { useState } from 'react';
 import { MessageCircle, X, Bot } from 'lucide-react';
 import AIChatbot from './AIChatbot';
+import { useDock } from '../context/DockContext';
 
 const ChatbotButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { dockPosition } = useDock();
+
+  // Determine position based on dock
+  const getPositionClasses = () => {
+    if (dockPosition === 'left') {
+      return 'bottom-6 right-6'; // Bottom right when dock is left
+    } else if (dockPosition === 'right') {
+      return 'bottom-6 left-6'; // Bottom left when dock is right
+    } else if (dockPosition === 'top') {
+      return 'bottom-6 right-6'; // Bottom right when dock is top
+    } else {
+      return 'bottom-6 right-6'; // Default bottom right for bottom dock (will be in dock footer)
+    }
+  };
+
+  // Hide button when dock is at bottom (it's in the dock footer)
+  const shouldShowButton = dockPosition !== 'bottom';
+
+  if (!shouldShowButton) return <AIChatbot isOpen={isOpen} onClose={() => setIsOpen(false)} />;
 
   return (
     <>
       {/* Floating Chatbot Button */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className={`fixed ${getPositionClasses()} z-40`}>
         <button
           onClick={() => setIsOpen(true)}
           className="group relative w-14 h-14 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300"

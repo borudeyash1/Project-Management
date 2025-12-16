@@ -85,7 +85,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-50">
+    <header className="w-full h-14 bg-white dark:bg-gray-800 border-b border-border dark:border-gray-600 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-50">
       <div className="flex items-center gap-3">
         <button
           className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 md:hidden"
@@ -136,9 +136,9 @@ const Header: React.FC = () => {
         </button>
 
         {/* Language Switcher */}
-        <div className="relative">
+        <div className="relative flex items-center">
           <button
-            className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700"
+            className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 flex items-center justify-center"
             onClick={() => setShowLanguageMenu(!showLanguageMenu)}
           >
             <Globe className="w-4 h-4 text-gray-700 dark:text-gray-300" />
@@ -180,9 +180,9 @@ const Header: React.FC = () => {
         </div>
 
         {/* User Menu */}
-        <div className="relative" ref={userMenuRef}>
+        <div className="relative flex items-center" ref={userMenuRef}>
           <button
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors"
             onClick={toggleUserMenu}
           >
             <div className="pointer-events-none">

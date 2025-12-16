@@ -24,7 +24,7 @@ const DOCK_POSITION_KEY = 'userDockPosition';
 const DOCK_LOCK_KEY = 'userDockLocked';
 const DOCK_EDGE_GAP = 12;
 const DOCK_TOP_OFFSET = 48;
-const DOCK_BOTTOM_OFFSET = 50;
+const DOCK_BOTTOM_OFFSET = 12; // Reduced from 50 to 12
 const MotionDockWrapper = motion.div as React.ComponentType<any>;
 
 interface DockIconProps {
@@ -74,7 +74,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
         return 'right-6 top-1/2 -translate-y-1/2';
       case 'bottom':
       default:
-        return 'bottom-6 left-1/2 -translate-x-1/2';
+        return 'bottom-3 left-1/2 -translate-x-1/2'; // Changed from bottom-6 to bottom-3
     }
   }, [dockPosition]);
 
@@ -205,7 +205,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
 
   return (
     <>
-      {/* Progressive Blur Background */}
+      {/* Progressive Blur Background - Only for fixed positioning */}
       {blurPosition && dockPosition !== 'top' && (
         <div
           className={`fixed ${blurPosition === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 h-40 pointer-events-none z-40`}
@@ -214,15 +214,15 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
         </div>
       )}
 
-      {/* Dock Container */}
+      {/* Dock Container - Use relative positioning for top/bottom dock in flex layout */}
       <MotionDockWrapper
-        className={`fixed z-50 ${className}`}
+        className={`${dockPosition === 'bottom' || dockPosition === 'top' ? 'relative' : 'fixed'} z-50 ${className}`}
         drag={!isLocked}
         dragControls={dragControls}
         dragListener={!isLocked}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
-        style={anchorStyle as any}
+        style={(dockPosition === 'bottom' || dockPosition === 'top') ? { x, y } as any : anchorStyle as any}
         onMouseMove={(e: React.MouseEvent) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
       >
