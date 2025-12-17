@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Building, Home, ChevronDown, Users, Settings, Crown } from 'lucide-react';
+import { Building, Home, ChevronDown, Users, Crown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
+import './WorkspaceModeSwitcher.css';
 
 interface WorkspaceModeSwitcherProps {
   className?: string;
@@ -13,19 +15,16 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
 
   const handleModeChange = (mode: string, workspaceId?: string) => {
     dispatch({ type: 'SET_MODE', payload: mode });
     if (workspaceId) {
       dispatch({ type: 'SET_WORKSPACE', payload: workspaceId });
       
-      // Navigate to workspace view
       const workspace = state.workspaces.find(w => w._id === workspaceId);
       if (workspace) {
-        // Navigate to workspace overview
         navigate(`/workspace/${workspaceId}/overview`);
-        
-        // Show success message
         dispatch({ 
           type: 'ADD_TOAST', 
           payload: { 
@@ -35,9 +34,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
         });
       }
     } else if (mode === 'Personal') {
-      // Navigate to personal mode
       navigate('/home');
-      
       dispatch({ 
         type: 'ADD_TOAST', 
         payload: { 
@@ -70,122 +67,119 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
   const CurrentIcon = currentMode.icon;
 
   return (
-    <div className={`relative ${className}`}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-      >
-        <CurrentIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{currentMode.label}</span>
-        <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+    <>
+      <div className={`workspace-switcher-menu ${className}`}>
+        <div className="workspace-switcher-item">
+          <div 
+            className={`workspace-switcher-link ${isDarkMode ? 'dark' : 'light'}`}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+          >
+            <CurrentIcon className="workspace-icon" />
+            <span className="workspace-label">{currentMode.label}</span>
+            <svg className="workspace-arrow" viewBox="0 0 360 360">
+              <g>
+                <path d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393 c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393 s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path>
+              </g>
+            </svg>
+          </div>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-300 rounded-lg shadow-lg z-50">
-          <div className="p-2">
+          <div 
+            className={`workspace-switcher-submenu ${isDarkMode ? 'dark' : 'light'}`}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+          >
             {/* Personal Mode */}
-            <button
-              onClick={() => handleModeChange('Personal')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                state.mode === 'Personal' 
-                  ? 'bg-blue-50 text-blue-700' 
-                  : 'hover:bg-gray-50 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              <Home className="w-4 h-4" />
-              <div>
-                <div className="font-medium">{t('switcher.personalMode')}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('switcher.individualWorkspace')}</div>
+            <div className="workspace-submenu-item">
+              <div
+                onClick={() => handleModeChange('Personal')}
+                className={`workspace-submenu-link ${state.mode === 'Personal' ? 'active' : ''}`}
+              >
+                <Home className="workspace-submenu-icon" />
+                <div className="workspace-submenu-content">
+                  <div className="workspace-submenu-title">{t('switcher.personalMode')}</div>
+                  <div className="workspace-submenu-desc">{t('switcher.individualWorkspace')}</div>
+                </div>
+                {state.mode === 'Personal' && (
+                  <div className="workspace-active-dot" />
+                )}
               </div>
-              {state.mode === 'Personal' && (
-                <div className="ml-auto w-2 h-2 bg-accent rounded-full" />
-              )}
-            </button>
+            </div>
 
             {/* Divider */}
-            <div className="my-2 border-t border-gray-200" />
+            <div className="workspace-divider">
+              <span className="workspace-divider-text">{t('switcher.workspaces')}</span>
+            </div>
 
-            {/* Workspace Modes */}
-            <div className="space-y-1">
-              <div className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                {t('switcher.workspaces')}
-              </div>
-              {state.workspaces.map(workspace => (
-                <button
-                  key={workspace._id}
+            {/* Workspaces */}
+            {state.workspaces.map(workspace => (
+              <div key={workspace._id} className="workspace-submenu-item">
+                <div
                   onClick={() => handleModeChange('Workspace', workspace._id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                    state.mode === 'Workspace' && state.currentWorkspace === workspace._id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'hover:bg-gray-50 text-gray-700 dark:text-gray-300'
+                  className={`workspace-submenu-link ${
+                    state.mode === 'Workspace' && state.currentWorkspace === workspace._id ? 'active' : ''
                   }`}
                 >
-                  <Building className="w-4 h-4" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{workspace.name}</span>
+                  <Building className="workspace-submenu-icon" />
+                  <div className="workspace-submenu-content">
+                    <div className="workspace-submenu-title">
+                      {workspace.name}
                       {workspace.owner === state.userProfile._id && (
-                        <Crown className="w-3 h-3 text-yellow-500" />
+                        <Crown className="workspace-crown-icon" />
                       )}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="workspace-submenu-desc">
                       {t('switcher.members', { count: workspace.memberCount })} • {workspace.type}
                     </div>
                   </div>
                   {state.mode === 'Workspace' && state.currentWorkspace === workspace._id && (
-                    <div className="ml-auto w-2 h-2 bg-accent rounded-full" />
+                    <div className="workspace-active-dot" />
                   )}
-                </button>
-              ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Quick Actions Divider */}
+            <div className="workspace-divider">
+              <span className="workspace-divider-text">{t('switcher.quickActions')}</span>
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                {t('switcher.quickActions')}
+            <div className="workspace-submenu-item">
+              <div
+                onClick={() => {
+                  dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' });
+                  setIsOpen(false);
+                }}
+                className="workspace-submenu-link"
+              >
+                <Building className="workspace-submenu-icon" />
+                <div className="workspace-submenu-content">
+                  <div className="workspace-submenu-title">{t('switcher.createWorkspace')}</div>
+                  <div className="workspace-submenu-desc">{t('switcher.createWorkspaceDesc')}</div>
+                </div>
               </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => {
-                    dispatch({ type: 'TOGGLE_MODAL', payload: 'createWorkspace' });
-                    setIsOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 dark:text-gray-300 transition-colors"
-                >
-                  <Building className="w-4 h-4" />
-                  <div>
-                    <div className="font-medium">{t('switcher.createWorkspace')}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">{t('switcher.createWorkspaceDesc')}</div>
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    // Navigate to workspace discovery using React Router
-                    navigate('/workspace');
-                    setIsOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-gray-50 text-gray-700 dark:text-gray-300 transition-colors"
-                >
-                  <Users className="w-4 h-4" />
-                  <div>
-                    <div className="font-medium">{t('switcher.discoverWorkspaces')}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">{t('switcher.discoverWorkspacesDesc')}</div>
-                  </div>
-                </button>
+            </div>
+
+            <div className="workspace-submenu-item">
+              <div
+                onClick={() => {
+                  navigate('/workspace');
+                  setIsOpen(false);
+                }}
+                className="workspace-submenu-link"
+              >
+                <Users className="workspace-submenu-icon" />
+                <div className="workspace-submenu-content">
+                  <div className="workspace-submenu-title">{t('switcher.discoverWorkspaces')}</div>
+                  <div className="workspace-submenu-desc">{t('switcher.discoverWorkspacesDesc')}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

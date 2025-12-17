@@ -552,3 +552,72 @@ export const getProjectTimeData = async (req: Request, res: Response): Promise<v
     });
   }
 };
+
+// Get all tracker data (comprehensive endpoint for dashboard)
+export const getTrackerData = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).user.id;
+    
+    // Get time entries for current week
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1); // Monday
+    weekStart.setHours(0, 0, 0, 0);
+    
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6); // Sunday
+    weekEnd.setHours(23, 59, 59, 999);
+
+    // Fetch time entries
+    const timeEntries = await TimeEntry.find({
+      userId,
+      startTime: { $gte: weekStart, $lte: weekEnd }
+    })
+      .populate('projectId', 'name color')
+      .populate('taskId', 'title')
+      .sort({ startTime: -1 });
+
+    // Transform time entries to match frontend interface
+    const transformedEntries = timeEntries.map((entry: any) => ({
+      _id: entry._id.toString(),
+      userId: entry.userId.toString(),
+      userName: (req as any).user.fullName || (req as any).user.username || 'User',
+      taskId: entry.taskId?._id?.toString(),
+      taskTitle: entry.taskId?.title,
+      projectId: entry.projectId?._id?.toString(),
+      projectName: entry.projectId?.name,
+      startTime: entry.startTime,
+      endTime: entry.endTime,
+      duration: entry.duration, // in minutes
+      billable: entry.billable || false,
+      notes: entry.description,
+      status: entry.isRunning ? 'running' : 'stopped',
+      createdAt: entry.createdAt,
+      updatedAt: entry.updatedAt
+    }));
+
+    // For now, return empty arrays for other data types
+    // These can be populated from other models as they're implemented
+    const responseData = {
+      timeEntries: transformedEntries,
+      activityEvents: [],
+      issues: [],
+      progressSnapshots: [],
+      worklogs: [],
+      slaRules: [],
+      alerts: []
+    };
+
+    res.status(200).json({
+      success: true,
+      data: responseData
+    });
+  } catch (error) {
+    console.error('Error fetching tracker data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch tracker data',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+

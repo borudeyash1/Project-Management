@@ -239,7 +239,13 @@
     "describeProject": "Describe your project",
     "estimatedBudget": "Estimated Budget",
     "currency": "Currency",
-    "addTag": "Add Tag"
+    "addTag": "Add Tag",
+    "priority": "Priority",
+    "status": "Status",
+    "urgent": "Urgent",
+    "high": "High",
+    "low": "Low",
+    "adjustFilters": "Adjust your filters to see more projects"
   },
   "tasks": {
     "title": "Tasks",
@@ -2475,10 +2481,11 @@
     "addTask": "Add Task",
     "activeTasks": "{{count}} active tasks",
     "board": {
-      "toDo": "To Do",
+      "todo": "To Do",
       "inProgress": "In Progress",
       "review": "Review",
-      "done": "Done"
+      "done": "Done",
+      "backlog": "Backlog"
     },
     "sections": {
       "overdue": "Overdue",

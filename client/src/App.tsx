@@ -107,8 +107,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <LoadingAnimation fullScreen message="Authenticating..." />;
   }
 
-  // Check if user is authenticated
-  const isAuthenticated = !!state.userProfile._id;
+  // Check if user is authenticated - add null check
+  const isAuthenticated = state.userProfile && !!state.userProfile._id;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -177,7 +177,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
 
         {/* Dock Footer - Fixed at Bottom */}
         {isBottomDock && (
-          <div className="flex-shrink-0 z-[100] flex justify-between items-center py-3 px-6 bg-bg dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex-shrink-0 z-[100] flex justify-between items-center py-3 px-6 bg-bg dark:bg-gray-900">
             {/* Empty space on left */}
             <div className="flex-1"></div>
             

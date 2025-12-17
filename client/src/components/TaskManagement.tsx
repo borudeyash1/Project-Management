@@ -29,6 +29,9 @@ import TaskTimelineView from './TaskTimelineView';
 import KanbanBoard from './KanbanBoard';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
+import { apiService } from '../services/api';
+import { useRefreshData } from '../hooks/useRefreshData';
+import { useCallback } from 'react';
 
 interface Task {
   _id: string;
@@ -205,13 +208,65 @@ const TaskManagement: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [loading, setLoading] = useState(true);
 
-  // Initialize tasks state with mock data
+  // Fetch tasks from API
+  const fetchTasks = useCallback(async () => {
+    try {
+      setLoading(true);
+      console.log('📋 [TASKS] Fetching tasks...');
+      
+      // Fetch tasks from API
+      const response = await apiService.get('/tasks');
+      const tasksData = response.data || response || [];
+      
+      // Filter out tasks with invalid/missing data to prevent errors
+      const validTasks = tasksData.filter((task: any) => {
+        // Must have basic required fields
+        if (!task._id || !task.title) return false;
+        
+        // If assignee exists, it must have required fields
+        if (task.assignee && !task.assignee._id) return false;
+        
+        // If project exists, it must have ALL required fields
+        if (task.project) {
+          if (!task.project._id || !task.project.name || !task.project.color) {
+            return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      console.log('✅ [TASKS] Tasks loaded:', validTasks.length, '(filtered from', tasksData.length, ')');
+      setTasks(validTasks);
+      dispatch({ type: 'SET_TASKS', payload: validTasks });
+      
+      // Set default columns if not already set
+      if (columns.length === 0) {
+        const defaultColumns: Column[] = [
+          { _id: 'todo', name: 'To Do', color: '#6B7280', position: 0 },
+          { _id: 'in-progress', name: 'In Progress', color: '#3B82F6', position: 1 },
+          { _id: 'review', name: 'Review', color: '#F59E0B', position: 2 },
+          { _id: 'done', name: 'Done', color: '#10B981', position: 3 }
+        ];
+        setColumns(defaultColumns);
+      }
+    } catch (error) {
+      console.error('❌ [TASKS] Error fetching tasks:', error);
+      setTasks([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, columns.length]);
+
+  // Initialize tasks on mount
   useEffect(() => {
-    setTasks(mockTasks);
-    setColumns(mockColumns);
-    dispatch({ type: 'SET_TASKS', payload: mockTasks as any });
-  }, []);
+    fetchTasks();
+  }, [fetchTasks]);
+
+  // Enable refresh button
+  useRefreshData(fetchTasks, [fetchTasks]);
 
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {
@@ -657,7 +712,6 @@ const TaskManagement: React.FC = () => {
             <option value="pending">{t('common.pending')}</option>
             <option value="in-progress">{t('common.inProgress')}</option>
             <option value="completed">{t('common.completed')}</option>
-            <option value="blocked">{t('tasks.blocked')}</option>
           </select>
           <select
             value={filterProject}
@@ -708,85 +762,111 @@ const TaskManagement: React.FC = () => {
               )}
               {tasks
                 .filter((task: Task) => task.status === status)
-                .map((task: Task) => (
-                  <div
-                    key={task._id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, task)}
-                    onDragEnd={handleDragEnd}
-                    onClick={() => {
-                      setSelectedTask(task);
-                      setShowTaskModal(true);
-                    }}
-                    className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-300 hover:scale-105"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{task.title}</h4>
-                      <div className="flex items-center gap-1">
-                        {getPriorityIcon(task.priority)}
-                      </div>
-                    </div>
+                .map((task: Task) => {
+                  // Status-based colors
+                  const getStatusColor = () => {
+                    switch (status) {
+                      case 'pending':
+                      case 'todo':
+                        return '#FF69B4'; // Pink for pending
+                      case 'in-progress':
+                        return '#60A5FA'; // Blue for in progress
+                      case 'review':
+                        return '#FBBF24'; // Yellow for review
+                      case 'done':
+                      case 'completed':
+                        return '#4ADE80'; // Green for done
+                      default:
+                        return '#FF69B4';
+                    }
+                  };
 
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{task.description}</p>
-
-                    <div className="flex items-center gap-2 mb-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: task.project.color }}
-                      />
-                      <span className="text-xs text-gray-600 dark:text-gray-400">{task.project.name}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <img
-                          src={task.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${task.assignee.name}&background=random`}
-                          alt={task.assignee.name}
-                          className="w-6 h-6 rounded-full"
-                        />
-                        <span className="text-xs text-gray-600 dark:text-gray-400">{task.assignee.name}</span>
-                      </div>
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
-                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
-                      </span>
-                    </div>
-
-                    {task.milestones.length > 0 && (
-                      <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                          <span>{t('projects.milestones')}</span>
-                          <span>
-                            {task.milestones.filter((m: Milestone) => m.status === 'completed').length}/
-                            {task.milestones.length}
-                          </span>
+                  return (
+                    <div
+                      key={task._id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, task)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setShowTaskModal(true);
+                      }}
+                      className="relative cursor-pointer transition-all duration-300 hover:-translate-x-1.5 hover:-translate-y-1.5"
+                      style={{
+                        transform: 'translate(-6px, -6px)',
+                        background: getStatusColor(),
+                        border: '3px solid #000000',
+                        boxShadow: '12px 12px 0 #000000',
+                        borderRadius: '8px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      {/* Card Header */}
+                      <div 
+                        className="w-full px-3 py-2 bg-white border-b-[3px] border-black"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-black text-sm text-black truncate flex-1">{task.title}</h4>
+                          <div className="flex items-center gap-1 ml-2">
+                            {getPriorityIcon(task.priority)}
+                          </div>
                         </div>
-                        <div className="w-full bg-gray-300 rounded-full h-1">
-                          <div
-                            className="bg-accent h-1 rounded-full"
-                            style={{
-                              width: `${(task.milestones.length > 0 ? (task.milestones.filter((m: Milestone) => m.status === 'completed').length / task.milestones.length) * 100 : 0)}%`
-                            }}
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="p-3 space-y-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                        {/* Description */}
+                        {task.description && (
+                          <p className="text-xs font-semibold text-black line-clamp-2">{task.description}</p>
+                        )}
+
+                        {/* Project Badge - Only show if project exists */}
+                        {task.project && task.project.name && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-black bg-white px-2 py-1 rounded border-2 border-black">
+                              {task.project.name}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Assignee */}
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={task.assignee?.avatarUrl || `https://ui-avatars.com/api/?name=${task.assignee?.name || 'U'}&background=random`}
+                            alt={task.assignee?.name || 'User'}
+                            className="w-6 h-6 rounded-full border-2 border-black"
                           />
+                          <span className="text-xs font-bold text-black">{task.assignee?.name || 'Unassigned'}</span>
                         </div>
-                      </div>
-                    )}
 
-                    {task.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {task.tags.slice(0, 2).map((tag: string) => (
-                          <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 dark:text-gray-400 text-xs rounded-full">
-                            {tag}
-                          </span>
-                        ))}
-                        {task.tags.length > 2 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 dark:text-gray-400 text-xs rounded-full">
-                            +{task.tags.length - 2}
-                          </span>
+                        {/* Due Date */}
+                        {task.dueDate && (
+                          <div className="flex items-center gap-1 text-xs font-bold text-black">
+                            <span>📅</span>
+                            <span>{new Date(task.dueDate).toLocaleDateString()}</span>
+                          </div>
+                        )}
+
+                        {/* Tags - Only show if exists */}
+                        {(task.tags?.length || 0) > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {(task.tags || []).slice(0, 3).map((tag: string) => (
+                              <span key={tag} className="px-2 py-1 bg-white text-black text-xs font-bold border-2 border-black rounded">
+                                #{tag}
+                              </span>
+                            ))}
+                            {(task.tags?.length || 0) > 3 && (
+                              <span className="px-2 py-1 bg-white text-black text-xs font-bold border-2 border-black rounded">
+                                +{(task.tags?.length || 0) - 3}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               {tasks.filter((task: Task) => task.status === status).length === 0 && !draggedOverColumn && (
                 <div className="text-center text-gray-600 dark:text-gray-400 text-sm py-8">
                   <div className="w-12 h-12 mx-auto mb-2 bg-gray-300 rounded-full flex items-center justify-center">
@@ -893,34 +973,45 @@ const TaskManagement: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('reports.projectMetrics')}</h3>
           <div className="space-y-3">
-            {projects.map(project => {
-              const count = tasks.filter(t => t.projectId === project._id).length;
-              const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
+            {(() => {
+              // Extract unique projects from tasks
+              const projectsMap = new Map();
+              tasks.forEach(task => {
+                if (task.project && task.project._id) {
+                  projectsMap.set(task.project._id, task.project);
+                }
+              });
+              const projects = Array.from(projectsMap.values());
+              
+              return projects.map(project => {
+                const count = tasks.filter(t => t.project?._id === project._id).length;
+                const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
 
-              return (
-                <div key={project._id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: project.color }}
-                    />
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 bg-gray-300 rounded-full h-2">
+                return (
+                  <div key={project._id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                       <div
-                        className="h-2 rounded-full"
-                        style={{
-                          width: `${percentage}%`,
-                          backgroundColor: project.color
-                        }}
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: project.color || '#6B7280' }}
                       />
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
                     </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 w-8 text-right">{count}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 bg-gray-300 rounded-full h-2">
+                        <div
+                          className="h-2 rounded-full"
+                          style={{
+                            width: `${percentage}%`,
+                            backgroundColor: project.color || '#6B7280'
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400 w-8 text-right">{count}</span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
         </div>
       </div>
@@ -969,10 +1060,10 @@ const TaskManagement: React.FC = () => {
               <tr key={task._id} className="hover:bg-gray-50 dark:bg-gray-700">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: task.project.color }} />
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: task.project?.color || '#6B7280' }} />
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</div>
-                      <div className="text-xs text-gray-500">{task.project.name}</div>
+                      <div className="text-xs text-gray-500">{task.project?.name || 'No Project'}</div>
                     </div>
                   </div>
                 </td>
@@ -990,11 +1081,11 @@ const TaskManagement: React.FC = () => {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src={task.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${task.assignee.name}&background=random`}
-                      alt={task.assignee.name}
+                      src={task.assignee?.avatarUrl || `https://ui-avatars.com/api/?name=${task.assignee?.name || 'User'}&background=random`}
+                      alt={task.assignee?.name || 'User'}
                       className="w-6 h-6 rounded-full"
                     />
-                    <span className="text-sm text-gray-700">{task.assignee.name}</span>
+                    <span className="text-sm text-gray-700">{task.assignee?.name || 'Unassigned'}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
@@ -1085,9 +1176,10 @@ const TaskManagement: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
+              {/* Project color indicator with fallback */}
               <div
                 className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: selectedTask.project.color }}
+                style={{ backgroundColor: selectedTask.project?.color || '#6B7280' }}
               />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{selectedTask.title}</h2>
             </div>
@@ -1843,12 +1935,8 @@ const TaskManagement: React.FC = () => {
   const views = [
     { id: 'taskboard', label: t('tasks.views.board'), icon: LayoutGrid, description: t('tasks.views.descriptions.board') },
     { id: 'tasklist', label: t('tasks.views.list'), icon: List, description: t('tasks.views.descriptions.list') },
-    { id: 'timeline', label: t('tasks.views.timeline'), icon: CalendarIcon, description: t('tasks.views.descriptions.timeline') },
-    { id: 'tasktimeline', label: t('tasks.views.taskTimeline'), icon: Clock, description: t('tasks.views.descriptions.taskTimeline') },
     { id: 'taskcalendar', label: t('tasks.views.calendar'), icon: CalendarIcon, description: t('tasks.views.descriptions.calendar') },
     { id: 'taskanalytics', label: t('reports.analytics'), icon: BarChart3, description: t('tasks.views.descriptions.analytics') },
-    { id: 'kanban', label: t('tasks.views.kanban'), icon: LayoutGrid, description: t('tasks.views.descriptions.kanban') },
-    { id: 'templates', label: t('tasks.templates'), icon: FileText, description: t('tasks.views.descriptions.templates') }
   ];
 
   const renderContent = () => {
@@ -1955,7 +2043,16 @@ const TaskManagement: React.FC = () => {
         }}
       >
         <div className="p-6">
-          {renderContent()}
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <RefreshCw className="w-8 h-8 animate-spin text-accent mx-auto mb-2" />
+                <p className="text-gray-600 dark:text-gray-400">Loading tasks...</p>
+              </div>
+            </div>
+          ) : (
+            renderContent()
+          )}
         </div>
       </div>
 

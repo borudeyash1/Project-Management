@@ -3,14 +3,16 @@ import { usePlanner } from '../../../context/PlannerContext';
 import { TimelineTask, TimelineResource, DEFAULT_TASK_DURATION } from '../../../types/timeline';
 import TimelineView from '../timeline/TimelineView';
 import TaskDetailModal from '../TaskDetailModal';
+import QuickAddModal from '../QuickAddModal';
 
 interface TimelineViewWrapperProps {
   searchQuery: string;
 }
 
 const TimelineViewWrapper: React.FC<TimelineViewWrapperProps> = ({ searchQuery }) => {
-  const { tasks, updateTask, addTask } = usePlanner();
+  const { tasks, updateTask } = usePlanner();
   const [selectedTask, setSelectedTask] = React.useState<any>(null);
+  const [showTaskCreate, setShowTaskCreate] = React.useState(false);
 
   // Convert planner tasks to timeline tasks
   const timelineTasks: TimelineTask[] = React.useMemo(() => {
@@ -86,7 +88,7 @@ const TimelineViewWrapper: React.FC<TimelineViewWrapperProps> = ({ searchQuery }
   };
 
   const handleAddTask = () => {
-    addTask('todo');
+    setShowTaskCreate(true);
   };
 
   return (
@@ -105,6 +107,13 @@ const TimelineViewWrapper: React.FC<TimelineViewWrapperProps> = ({ searchQuery }
         <TaskDetailModal
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
+        />
+      )}
+
+      {showTaskCreate && (
+        <QuickAddModal
+          onClose={() => setShowTaskCreate(false)}
+          defaultStatus="pending"
         />
       )}
     </>

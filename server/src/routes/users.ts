@@ -18,6 +18,28 @@ import { validateRequest } from '../middleware/validation';
 
 const router = express.Router();
 
+// TEMPORARY DEBUG ENDPOINT - Remove in production
+router.get('/debug/list', async (req, res) => {
+  try {
+    const User = require('../models/User').default;
+    const users = await User.find({}).select('email username fullName isActive isEmailVerified createdAt').limit(50);
+    res.json({
+      success: true,
+      count: users.length,
+      users: users.map((u: any) => ({
+        email: u.email,
+        username: u.username,
+        fullName: u.fullName,
+        isActive: u.isActive,
+        isEmailVerified: u.isEmailVerified,
+        createdAt: u.createdAt
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to list users', error: String(error) });
+  }
+});
+
 // All routes require authentication
 router.use(authenticate);
 

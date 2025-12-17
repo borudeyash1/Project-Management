@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  ChevronDown, ChevronUp, Edit2, Trash2, CheckSquare, Square,
-  User, Calendar, Flag, Tag, MoreVertical, Filter, Download, Plus
+  ChevronDown, ChevronUp, Edit2, Trash2,
+  User, Calendar, Flag, Tag, Filter, Plus
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
-import apiService from '../../../services/api';
 
 interface ListViewProps {
   searchQuery: string;
@@ -17,38 +16,8 @@ type SortDirection = 'asc' | 'desc';
 type GroupBy = 'none' | 'status' | 'priority' | 'assignee' | 'project';
 
 const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
-  const { updateTask, deleteTask, bulkUpdateTasks } = usePlanner();
+  const { tasks, updateTask, deleteTask, bulkUpdateTasks, loading } = usePlanner();
   const { t } = useTranslation();
-
-  // Fetch data directly
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const timestamp = new Date().getTime();
-        const response = await apiService.get(`/planner/data?_t=${timestamp}`);
-        if (response && response.success) {
-          const normalizedTasks = (response.data.tasks || []).map((task: any) => ({
-            ...task,
-            subtasks: task.subtasks || [],
-            tags: task.tags || [],
-            comments: task.comments || [],
-            attachments: task.attachments || [],
-            assignees: task.assignee ? [task.assignee] : [],
-            estimatedTime: task.estimatedHours || task.estimatedTime || 0
-          }));
-          setTasks(normalizedTasks);
-        }
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTasks();
-  }, []);
 
   const [sortField, setSortField] = useState<SortField>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -227,11 +196,6 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
               </div>
             )}
           </div>
-
-          <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg">
-            <Download className="w-4 h-4" />
-            {t('planner.export')}
-          </button>
         </div>
       </div>
 
@@ -250,12 +214,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                 <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
                   <tr>
                     <th className="w-12 px-4 py-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedTasks.length === sortedTasks.length && sortedTasks.length > 0}
-                        onChange={handleSelectAll}
-                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                      />
+                      {/* Checkbox column for task completion */}
                     </th>
                     <th
                       className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -305,7 +264,6 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       {t('planner.list.columns.tags')}
                     </th>
-                    <th className="w-12 px-4 py-3"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -317,9 +275,12 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                       <td className="px-4 py-3">
                         <input
                           type="checkbox"
-                          checked={selectedTasks.includes(task._id)}
-                          onChange={() => handleSelectTask(task._id)}
-                          className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                          checked={task.status === 'done' || task.status === 'completed'}
+                          onChange={() => {
+                            const newStatus = (task.status === 'done' || task.status === 'completed') ? 'pending' : 'done';
+                            updateTask(task._id, { status: newStatus });
+                          }}
+                          className="w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent"
                         />
                       </td>
                       <td
@@ -340,16 +301,9 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                             autoFocus
                           />
                         ) : (
-                          <div className="flex items-center gap-2">
-                            {task.status === 'done' ? (
-                              <CheckSquare className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <Square className="w-4 h-4 text-gray-600" />
-                            )}
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {task.title}
-                            </span>
-                          </div>
+                          <span className={`text-sm font-medium ${task.status === 'done' || task.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white'}`}>
+                            {task.title}
+                          </span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -408,11 +362,6 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                             <span className="text-xs text-gray-600">+{task.tags.length - 2}</span>
                           )}
                         </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button className="p-1 text-gray-600 hover:text-gray-600 dark:hover:text-gray-700 rounded">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
                       </td>
                     </tr>
                   ))}

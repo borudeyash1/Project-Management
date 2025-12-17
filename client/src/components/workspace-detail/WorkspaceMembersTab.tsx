@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar, UserCheck, UserX, AlertCircle, Loader2 } from 'lucide-react';
 import api from '../../services/api';
 import RemoveMemberModal from '../RemoveMemberModal';
+import { useRefreshData } from '../../hooks/useRefreshData';
 
 interface Member {
   _id: string;
@@ -194,6 +195,29 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
     };
 
     loadJoinRequests();
+  }, [workspaceId, canManageMembers]);
+
+  // Enable refresh button
+  useRefreshData(() => {
+    if (canManageMembers && workspaceId) {
+      const loadJoinRequests = async () => {
+        try {
+          const requests = await api.getJoinRequests(workspaceId);
+          const transformedRequests: JoinRequest[] = requests.map((req: any) => ({
+            id: req._id,
+            name: req.user?.fullName || req.user?.email || 'Unknown User',
+            email: req.user?.email || '',
+            message: req.message,
+            requestedAt: new Date(req.createdAt),
+            status: 'pending'
+          }));
+          setJoinRequests(transformedRequests);
+        } catch (error) {
+          console.error('Failed to load join requests:', error);
+        }
+      };
+      loadJoinRequests();
+    }
   }, [workspaceId, canManageMembers]);
 
   const handleInviteMember = async (overrideEmail?: string, overrideName?: string, targetUserId?: string) => {

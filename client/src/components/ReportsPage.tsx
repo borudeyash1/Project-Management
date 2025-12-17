@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useRefreshData } from '../hooks/useRefreshData';
 import CreateReportModal from './CreateReportModal';
 import ScheduleReportModal from './ScheduleReportModal';
 import { downloadReportPDF, printReportPDF } from '../utils/pdfGenerator';
@@ -80,8 +81,7 @@ const ReportsPage: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Fetch actual data
-  useEffect(() => {
-    const fetchReportsData = async () => {
+  const fetchReportsData = async () => {
       try {
         const [reportsRes, projectsRes, teamRes, timeRes] = await Promise.all([
           apiService.get('/reports'),
@@ -128,8 +128,12 @@ const ReportsPage: React.FC = () => {
       }
     };
 
+  useEffect(() => {
     fetchReportsData();
   }, []);
+
+  // Enable refresh button for this page
+  useRefreshData(fetchReportsData, []);
 
   const getReportIcon = (type: string) => {
     switch (type) {

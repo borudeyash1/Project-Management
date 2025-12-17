@@ -206,8 +206,21 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
-    await apiService.put(`/tasks/${taskId}`, updates);
-    await fetchData();
+    // Update local state immediately for instant UI feedback
+    const updatedTasks = tasks.map(t =>
+      t._id === taskId ? { ...t, ...updates } : t
+    );
+    globalTasks = updatedTasks;
+    setTasks([...updatedTasks]);
+    
+    // Then sync with server
+    try {
+      await apiService.put(`/tasks/${taskId}`, updates);
+    } catch (error) {
+      console.error('Error updating task:', error);
+      // Revert on error
+      await fetchData();
+    }
   };
 
   const deleteTask = async (taskId: string) => {
@@ -216,12 +229,21 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const moveTask = async (taskId: string, newStatus: string) => {
-    await apiService.put(`/tasks/${taskId}`, { status: newStatus });
+    // Update local state immediately for instant UI feedback
     const updatedTasks = tasks.map(task =>
       task._id === taskId ? { ...task, status: newStatus } : task
     );
     globalTasks = updatedTasks;
     setTasks([...updatedTasks]);
+    
+    // Then sync with server
+    try {
+      await apiService.put(`/tasks/${taskId}`, { status: newStatus });
+    } catch (error) {
+      console.error('Error moving task:', error);
+      // Revert on error
+      await fetchData();
+    }
   };
 
   const bulkUpdateTasks = async (taskIds: string[], updates: Partial<Task>) => {
@@ -244,8 +266,22 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
       const updatedSubtasks = task.subtasks.map(st =>
         st._id === subtaskId ? { ...st, completed: !st.completed } : st
       );
-      await apiService.put(`/tasks/${taskId}`, { subtasks: updatedSubtasks });
-      await fetchData();
+      
+      // Update local state immediately for instant UI feedback
+      const updatedTasks = tasks.map(t =>
+        t._id === taskId ? { ...t, subtasks: updatedSubtasks } : t
+      );
+      globalTasks = updatedTasks;
+      setTasks([...updatedTasks]);
+      
+      // Then sync with server
+      try {
+        await apiService.put(`/tasks/${taskId}`, { subtasks: updatedSubtasks });
+      } catch (error) {
+        console.error('Error toggling subtask:', error);
+        // Revert on error
+        await fetchData();
+      }
     }
   };
 

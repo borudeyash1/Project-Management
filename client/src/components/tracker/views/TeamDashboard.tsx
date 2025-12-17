@@ -128,8 +128,29 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
             </h3>
             <div className="space-y-4">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, idx) => {
-                const hours = 6 + Math.random() * 4;
+                // Calculate actual hours for each day from time entries
+                const today = new Date();
+                const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // Convert to Monday = 0
+                
+                // Calculate the date for this day of the week
+                const targetDate = new Date(today);
+                targetDate.setDate(today.getDate() - daysFromMonday + idx);
+                targetDate.setHours(0, 0, 0, 0);
+                
+                const nextDay = new Date(targetDate);
+                nextDay.setDate(targetDate.getDate() + 1);
+                
+                // Filter time entries for this specific day
+                const dayEntries = timeEntries.filter(entry => {
+                  const entryDate = new Date(entry.startTime);
+                  return entryDate >= targetDate && entryDate < nextDay;
+                });
+                
+                // Calculate total hours for the day
+                const hours = dayEntries.reduce((sum, entry) => sum + (entry.duration / 60), 0);
                 const percent = (hours / 8) * 100;
+                
                 return (
                   <div key={day}>
                     <div className="flex items-center justify-between mb-1">
@@ -145,7 +166,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ searchQuery }) => {
                         className={`h-2 rounded-full ${
                           percent > 90 ? 'bg-green-500' : percent > 70 ? 'bg-yellow-500' : 'bg-red-500'
                         }`}
-                        style={{ width: `${percent}%` }}
+                        style={{ width: `${Math.min(percent, 100)}%` }}
                       />
                     </div>
                   </div>

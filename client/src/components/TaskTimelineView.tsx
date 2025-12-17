@@ -48,7 +48,9 @@ const TaskTimelineView: React.FC<TaskTimelineViewProps> = ({
                 task.status === 'in-progress' ? 'in-progress' :
                     task.status === 'completed' ? 'done' : 'todo',
             priority: task.priority === 'critical' ? 'urgent' : task.priority,
-            startDate: task.startDate ? task.startDate.toISOString() : null,
+            startDate: task.startDate 
+                ? (typeof task.startDate === 'string' ? task.startDate : task.startDate.toISOString())
+                : null,
             duration: task.estimatedHours
                 ? task.estimatedHours * 60 * 60 * 1000
                 : DEFAULT_TASK_DURATION,

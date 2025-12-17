@@ -6,6 +6,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
 import { Task } from '../../../context/PlannerContext';
+import { useApp } from '../../../context/AppContext';
 
 interface MyWorkViewProps {
   searchQuery: string;
@@ -13,6 +14,7 @@ interface MyWorkViewProps {
 
 const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
   const { tasks, updateTask } = usePlanner();
+  const { state } = useApp();
   const { t, i18n } = useTranslation();
   const [expandedSections, setExpandedSections] = useState({
     overdue: true,
@@ -22,12 +24,17 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
   });
   const [activeTimer, setActiveTimer] = useState<string | null>(null);
 
-  // Filter my tasks (assigned to current user)
-  const myTasks = tasks.filter(task =>
-    task.status !== 'done' &&
-    (!searchQuery ||
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const currentUserId = state.userProfile?._id;
+
+  // Show all non-completed tasks (assignee feature not implemented yet)
+  const myTasks = tasks.filter(task => {
+    return (
+      task.status !== 'done' &&
+      task.status !== 'completed' &&
+      (!searchQuery ||
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  });
 
   // Categorize tasks
   const now = new Date();

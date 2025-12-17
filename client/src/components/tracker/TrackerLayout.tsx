@@ -6,6 +6,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useDock } from '../../context/DockContext';
 import { useTracker } from '../../context/TrackerContext';
+import { useRefreshData } from '../../hooks/useRefreshData';
 import ActivityFeed from './views/ActivityFeed';
 import TimesheetView from './views/TimesheetView';
 import TeamDashboard from './views/TeamDashboard';
@@ -17,13 +18,16 @@ import SLAMonitor from './views/SLAMonitor';
 type ViewType = 'activity' | 'timesheet' | 'dashboard' | 'issues' | 'worklog' | 'reports' | 'sla';
 
 const TrackerLayout: React.FC = () => {
-  const { activeTimer, startTimer, stopTimer, teamMetrics, alerts } = useTracker();
+  const { activeTimer, startTimer, stopTimer, teamMetrics, alerts, fetchData } = useTracker();
   const { dockPosition } = useDock();
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [timerDuration, setTimerDuration] = useState(0);
+
+  // Enable refresh button
+  useRefreshData(fetchData, [fetchData]);
 
   // Update timer duration every second
   useEffect(() => {

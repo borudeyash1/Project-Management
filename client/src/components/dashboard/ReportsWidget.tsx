@@ -19,6 +19,7 @@ const ReportsWidget: React.FC = () => {
     const { t } = useTranslation();
     const [metrics, setMetrics] = useState<ReportMetric[]>([]);
     const [loading, setLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
         loadReports();
@@ -27,6 +28,7 @@ const ReportsWidget: React.FC = () => {
     const loadReports = async () => {
         try {
             setLoading(true);
+            setHasError(false);
             const data = await getReportsSummary();
 
             setMetrics([
@@ -59,13 +61,7 @@ const ReportsWidget: React.FC = () => {
             ]);
         } catch (error) {
             console.error('Failed to load reports:', error);
-            // Set default metrics on error
-            setMetrics([
-                { label: t('widgets.tasksCompleted'), value: 0, icon: CheckCircle, color: 'text-green-600' },
-                { label: t('widgets.projectsOnTrack'), value: '0/0', icon: Target, color: 'text-blue-600' },
-                { label: t('widgets.atRisk'), value: 0, icon: AlertTriangle, color: 'text-red-600' },
-                { label: t('widgets.productivity'), value: '0%', icon: TrendingUp, color: 'text-purple-600' }
-            ]);
+            setHasError(true);
         } finally {
             setLoading(false);
         }
@@ -77,6 +73,40 @@ const ReportsWidget: React.FC = () => {
                 <div className="flex items-center justify-center h-32">
                     <div className="w-6 h-6 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
                 </div>
+            </div>
+        );
+    }
+
+    // Show empty state when no data
+    if (hasError || metrics.length === 0) {
+        return (
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {t('widgets.weeklyReports')}
+                    </h2>
+                    <BarChart3 className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                </div>
+
+                {/* Empty State */}
+                <div className="flex flex-col items-center justify-center py-8">
+                    <BarChart3 className={`w-12 h-12 mb-3 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+                    <p className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        No Reports Available
+                    </p>
+                    <p className={`text-xs text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        Start working on tasks and projects to see your weekly progress here
+                    </p>
+                </div>
+
+                {/* View Full Report Button */}
+                <button
+                    onClick={() => navigate('/reports')}
+                    className="w-full py-2 px-4 bg-accent text-gray-900 rounded-lg hover:bg-accent/90 transition-colors text-sm font-medium"
+                >
+                    {t('widgets.viewFullReport')}
+                </button>
             </div>
         );
     }

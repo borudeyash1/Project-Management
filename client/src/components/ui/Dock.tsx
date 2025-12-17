@@ -25,7 +25,7 @@ type DockPosition = 'top' | 'bottom' | 'left' | 'right';
 const DOCK_LOCK_KEY = 'userDockLocked';
 const DOCK_EDGE_GAP = 8; // Increased to 8 to match global px-2 padding
 const DOCK_TOP_OFFSET = 8;
-const DOCK_BOTTOM_OFFSET = 8;
+const DOCK_BOTTOM_OFFSET = 0; // Changed from 8 to 0 to sit flush at bottom
 const MotionDockWrapper = motion.div as React.ComponentType<any>;
 
 interface DockIconProps {
@@ -69,7 +69,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
         return 'right-6 top-1/2 -translate-y-1/2';
       case 'bottom':
       default:
-        return 'bottom-6 left-1/2 -translate-x-1/2';
+        return 'bottom-0 left-1/2 -translate-x-1/2'; // Changed from bottom-6 to bottom-0
     }
   }, [dockPosition]);
 
@@ -219,7 +219,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
             overflow: 'hidden',
             minWidth: isVertical ? '60px' : undefined,
             width: isTopOrBottom ? '100%' : undefined,
-            height: isTopOrBottom ? '48px' : undefined,
+            height: isTopOrBottom ? '60px' : undefined, // Increased from 48px to 60px
             maxHeight: isVertical ? '70vh' : undefined,
             pointerEvents: 'auto',
             cursor: (isLocked || isTopOrBottom) ? 'default' : 'grab'

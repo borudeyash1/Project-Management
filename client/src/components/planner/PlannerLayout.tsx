@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useDock } from '../../context/DockContext';
 import { useTranslation } from 'react-i18next';
+import { useRefreshData } from '../../hooks/useRefreshData';
+import { usePlanner } from '../../context/PlannerContext';
 import {
   LayoutGrid, List, Calendar, Clock, Inbox, BarChart3,
   Settings, Plus, Search, Filter, Command, Bell
@@ -22,6 +24,7 @@ const PlannerLayout: React.FC = () => {
   const { state, dispatch } = useApp();
   const { dockPosition } = useDock();
   const { t } = useTranslation();
+  const { fetchData } = usePlanner();
   const [currentView, setCurrentView] = useState<ViewType>('board');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -34,6 +37,9 @@ const PlannerLayout: React.FC = () => {
   }>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Enable refresh button
+  useRefreshData(fetchData, [fetchData]);
 
   const views = [
     { id: 'board', label: t('planner.views.board'), icon: LayoutGrid },
@@ -123,57 +129,6 @@ const PlannerLayout: React.FC = () => {
                 );
               })}
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Search */}
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-600" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('planner.searchPlaceholder')}
-                className="w-64 pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-            </div>
-
-            {/* Filter */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              <Filter className="w-4 h-4" />
-            </button>
-
-            {/* Notifications */}
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 relative"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
-                3
-              </span>
-            </button>
-
-            {/* Command Palette */}
-            <button
-              onClick={() => setShowCommandPalette(true)}
-              className="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              <Command className="w-4 h-4" />
-              <span className="text-xs">⌘K</span>
-            </button>
-
-            {/* Quick Add */}
-            <button
-              onClick={() => setShowTaskCreate(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{t('planner.addTask')}</span>
-            </button>
           </div>
         </div>
       </div>

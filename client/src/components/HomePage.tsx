@@ -12,6 +12,7 @@ import { useApp } from '../context/AppContext';
 import { PlanStatus } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
+import { useRefreshData } from '../hooks/useRefreshData';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/homeService';
@@ -261,6 +262,9 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
+
+  // Enable refresh button for this page
+  useRefreshData(loadDashboardData, [loadDashboardData]);
 
   const handleAddQuickTask = async () => {
     if (!newTaskTitle.trim()) return;
@@ -545,105 +549,109 @@ const HomePage: React.FC = () => {
             <PlanStatus />
 
             {/* Quick Actions */}
-            {quickTasks.length > 0 || showQuickAdd ? (
-              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
-                </div>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
+                <button
+                  onClick={() => setShowQuickAdd(!showQuickAdd)}
+                  className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                >
+                  <Plus className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                </button>
+              </div>
 
-                {/* Quick Add Task */}
-                {showQuickAdd && (
-                  <div className={`mb-4 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-                    <div className="flex gap-2 mb-3">
-                      <button
-                        onClick={() => setNewTaskType('task')}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'task'
-                          ? 'bg-accent text-white'
-                          : isDarkMode
-                            ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                      >
-                        <CheckSquare className="w-4 h-4" />
-                        {t('tasks.title')}
-                      </button>
-                      <button
-                        onClick={() => setNewTaskType('note')}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'note'
-                          ? 'bg-accent text-white'
-                          : isDarkMode
-                            ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                      >
-                        <Type className="w-4 h-4" />
-                        {t('common.note', { defaultValue: 'Note' })}
-                      </button>
-                      <button
-                        onClick={() => setNewTaskType('checklist')}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'checklist'
-                          ? 'bg-accent text-white'
-                          : isDarkMode
-                            ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                      >
-                        <List className="w-4 h-4" />
-                        {t('tasks.checklist')}
-                      </button>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newTaskTitle}
-                        onChange={(e) => setNewTaskTitle(e.target.value)}
-                        placeholder={`What ${newTaskType === 'note' ? 'note' : newTaskType === 'checklist' ? 'checklist' : 'task'} needs to be added?`}
-                        className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDarkMode
-                          ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                          }`}
-                        onKeyPress={(e) => e.key === 'Enter' && handleAddQuickTask()}
-                      />
-                      <button
-                        onClick={handleAddQuickTask}
-                        className="px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90"
-                      >
-                        Add
-                      </button>
-                    </div>
+              {/* Quick Add Task */}
+              {showQuickAdd && (
+                <div className={`mb-4 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      onClick={() => setNewTaskType('task')}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'task'
+                        ? 'bg-accent text-white'
+                        : isDarkMode
+                          ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                    >
+                      <CheckSquare className="w-4 h-4" />
+                      {t('tasks.title')}
+                    </button>
+                    <button
+                      onClick={() => setNewTaskType('note')}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'note'
+                        ? 'bg-accent text-white'
+                        : isDarkMode
+                          ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                    >
+                      <Type className="w-4 h-4" />
+                      {t('common.note', { defaultValue: 'Note' })}
+                    </button>
+                    <button
+                      onClick={() => setNewTaskType('checklist')}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'checklist'
+                        ? 'bg-accent text-white'
+                        : isDarkMode
+                          ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                    >
+                      <List className="w-4 h-4" />
+                      {t('tasks.checklist')}
+                    </button>
                   </div>
-                )}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newTaskTitle}
+                      onChange={(e) => setNewTaskTitle(e.target.value)}
+                      placeholder={`What ${newTaskType === 'note' ? 'note' : newTaskType === 'checklist' ? 'checklist' : 'task'} needs to be added?`}
+                      className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDarkMode
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        }`}
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddQuickTask()}
+                    />
+                    <button
+                      onClick={handleAddQuickTask}
+                      className="px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
 
-                {/* Quick Tasks */}
-                {quickTasks.length > 0 ? (
-                  <div className="space-y-2">
-                    {quickTasks.slice(0, 5).map(task => (
-                      <div
-                        key={task._id}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+              {/* Quick Tasks or Empty State */}
+              {quickTasks.length > 0 ? (
+                <div className="space-y-2">
+                  {quickTasks.slice(0, 5).map(task => (
+                    <div
+                      key={task._id}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                        }`}
+                    >
+                      <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {getTaskTypeIcon(task.type)}
+                      </div>
+                      <button
+                        onClick={() => toggleTaskCompletion(task._id)}
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${task.completed
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : isDarkMode
+                            ? 'border-gray-500'
+                            : 'border-gray-300'
                           }`}
                       >
-                        <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {getTaskTypeIcon(task.type)}
-                        </div>
-                        <button
-                          onClick={() => toggleTaskCompletion(task._id)}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center ${task.completed
-                            ? 'bg-green-500 border-green-500 text-white'
-                            : isDarkMode
-                              ? 'border-gray-500'
-                              : 'border-gray-300'
-                            }`}
-                        >
-                          {task.completed && <CheckCircle className="w-3 h-3" />}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm truncate ${task.completed
-                            ? isDarkMode
-                              ? 'line-through text-gray-500'
-                              : 'line-through text-gray-500'
-                            : isDarkMode
+                        {task.completed && <CheckCircle className="w-3 h-3" />}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm truncate ${task.completed
+                          ? isDarkMode
+                            ? 'line-through text-gray-500'
+                            : 'line-through text-gray-500'
+                          : isDarkMode
                               ? 'text-gray-200'
                               : 'text-gray-900'
                             }`}>
@@ -673,7 +681,6 @@ const HomePage: React.FC = () => {
                   </div>
                 )}
               </div>
-            ) : null}
 
             {/* Recent Activity */}
             {recentActivity.length > 0 && (

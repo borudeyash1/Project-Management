@@ -110,9 +110,6 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
                     {filteredTasks(column.id).length}
                   </span>
                 </div>
-                <button className="p-1 text-gray-600 hover:text-gray-900 dark:hover:text-gray-200 rounded">
-                  <MoreVertical className="w-4 h-4" />
-                </button>
               </div>
               {column.wip && (
                 <div className="text-xs text-gray-600 dark:text-gray-400">

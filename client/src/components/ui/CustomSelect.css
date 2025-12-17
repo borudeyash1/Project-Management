@@ -1,0 +1,194 @@
+/* Base select styles */
+.custom-select {
+  width: fit-content;
+  cursor: pointer;
+  position: relative;
+  transition: 300ms;
+  overflow: hidden;
+}
+
+/* Theme colors */
+.custom-select.dark-theme {
+  color: white;
+}
+
+.custom-select.light-theme {
+  color: #1f2937;
+}
+
+/* Selected display */
+.custom-select .selected {
+  padding: 10px 15px;
+  margin-bottom: 3px;
+  border-radius: 8px;
+  position: relative;
+  z-index: 100000;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 150px;
+  gap: 12px;
+  transition: all 300ms;
+}
+
+.custom-select.dark-theme .selected {
+  background-color: #374151;
+  border: 2px solid #4b5563;
+}
+
+.custom-select.light-theme .selected {
+  background-color: white;
+  border: 2px solid #d1d5db;
+}
+
+.custom-select:hover .selected {
+  border-color: #ffd700;
+}
+
+/* Arrow icon */
+.custom-select .arrow {
+  position: relative;
+  right: 0px;
+  height: 16px;
+  transform: rotate(-90deg);
+  width: 25px;
+  z-index: 100000;
+  transition: 300ms;
+  flex-shrink: 0;
+}
+
+.custom-select.dark-theme .arrow {
+  fill: white;
+}
+
+.custom-select.light-theme .arrow {
+  fill: #1f2937;
+}
+
+/* Options container */
+.custom-select .options {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 6px;
+  position: absolute;
+  top: -100px;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: 300ms;
+  z-index: 100001;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.custom-select.dark-theme .options {
+  background-color: #374151;
+  border: 2px solid #4b5563;
+}
+
+.custom-select.light-theme .options {
+  background-color: white;
+  border: 2px solid #d1d5db;
+}
+
+/* Show options on hover */
+.custom-select:hover > .options {
+  opacity: 1;
+  top: calc(100% + 4px);
+}
+
+.custom-select:hover > .selected .arrow {
+  transform: rotate(0deg);
+}
+
+/* Individual option */
+.custom-select .option {
+  border-radius: 6px;
+  padding: 10px 12px;
+  transition: 300ms;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-select.dark-theme .option {
+  background-color: transparent;
+  color: white;
+}
+
+.custom-select.light-theme .option {
+  background-color: transparent;
+  color: #1f2937;
+}
+
+.custom-select.dark-theme .option:hover {
+  background-color: #4b5563;
+  color: #ffd700;
+}
+
+.custom-select.light-theme .option:hover {
+  background-color: #f3f4f6;
+  color: #ffd700;
+}
+
+/* Hide radio inputs */
+.custom-select .options input[type="radio"] {
+  display: none;
+}
+
+/* Label styling */
+.custom-select .options label {
+  display: inline-block;
+  cursor: pointer;
+  width: 100%;
+}
+
+.custom-select .options label::before {
+  content: attr(data-txt);
+}
+
+/* Hide checked option from dropdown */
+.custom-select .options input[type="radio"]:checked + label {
+  display: none;
+}
+
+/* Display selected value using CSS :has() selector */
+.custom-select:has(.options input[type="radio"]:checked) .selected::before {
+  content: attr(data-default);
+  margin-right: auto;
+}
+
+/* Dynamic content based on which option is selected */
+.custom-select .options div:nth-child(1):has(input:checked) ~ * .selected::before,
+.custom-select:has(.options div:nth-child(1) input:checked) .selected::before {
+  content: attr(data-option-0);
+}
+
+.custom-select .options div:nth-child(2):has(input:checked) ~ * .selected::before,
+.custom-select:has(.options div:nth-child(2) input:checked) .selected::before {
+  content: attr(data-option-1);
+}
+
+.custom-select .options div:nth-child(3):has(input:checked) ~ * .selected::before,
+.custom-select:has(.options div:nth-child(3) input:checked) .selected::before {
+  content: attr(data-option-2);
+}
+
+.custom-select .options div:nth-child(4):has(input:checked) ~ * .selected::before,
+.custom-select:has(.options div:nth-child(4) input:checked) .selected::before {
+  content: attr(data-option-3);
+}
+
+.custom-select .options div:nth-child(5):has(input:checked) ~ * .selected::before,
+.custom-select:has(.options div:nth-child(5) input:checked) .selected::before {
+  content: attr(data-option-4);
+}
+
+.custom-select .options div:nth-child(6):has(input:checked) ~ * .selected::before,
+.custom-select:has(.options div:nth-child(6) input:checked) .selected::before {
+  content: attr(data-option-5);
+}

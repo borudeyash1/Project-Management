@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, Flag, User, Tag, CheckSquare, MessageSquare, Paperclip, Trash2 } from 'lucide-react';
+import { X, Calendar, Clock, Flag, CheckSquare, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../context/PlannerContext';
 import { Task } from '../../context/PlannerContext';
@@ -9,13 +9,16 @@ interface TaskDetailModalProps {
   onClose: () => void;
 }
 
-const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
-  const { updateTask, deleteTask, addSubtask, toggleSubtask, addComment } = usePlanner();
+const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, onClose }) => {
+  const { tasks, updateTask, deleteTask, addSubtask, toggleSubtask } = usePlanner();
   const { t } = useTranslation();
+  
+  // Get the live task from context to ensure real-time updates
+  const task = tasks.find(t => t._id === initialTask._id) || initialTask;
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [newSubtask, setNewSubtask] = useState('');
-  const [newComment, setNewComment] = useState('');
 
   const handleSave = () => {
     updateTask(task._id, editedTask);
@@ -33,16 +36,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
     if (newSubtask.trim()) {
       addSubtask(task._id, { title: newSubtask, completed: false });
       setNewSubtask('');
-    }
-  };
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      addComment(task._id, {
-        author: 'Current User',
-        content: newComment
-      });
-      setNewComment('');
     }
   };
 
@@ -175,43 +168,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                   </div>
                 </div>
               </div>
-
-              {/* Comments */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  <MessageSquare className="w-4 h-4 inline mr-1" />
-                  {t('planner.taskDetail.comments')} ({task.comments.length})
-                </label>
-                <div className="space-y-3 mb-3">
-                  {task.comments.map(comment => (
-                    <div key={comment._id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm text-gray-900 dark:text-white">{comment.author}</span>
-                        <span className="text-xs text-gray-600 dark:text-gray-200">
-                          {new Date(comment.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-200">{comment.content}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                    placeholder={t('planner.taskDetail.addComment')}
-                    className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                  <button
-                    onClick={handleAddComment}
-                    className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
-                  >
-                    {t('planner.taskDetail.commentBtn')}
-                  </button>
-                </div>
-              </div>
             </div>
 
             {/* Sidebar */}
@@ -303,59 +259,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
                     {task.estimatedTime ? `${task.estimatedTime} ${t('planner.taskDetail.hours')}` : t('planner.taskDetail.notSet')}
                   </span>
                 )}
-              </div>
-
-              {/* Assignees */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  <User className="w-4 h-4 inline mr-1" />
-                  {t('planner.taskModal.fields.assignees')}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {task.assignees.map(assignee => (
-                    <span
-                      key={typeof assignee === 'object' ? assignee._id : assignee}
-                      className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded-lg"
-                    >
-                      {typeof assignee === 'object' ? (assignee.fullName || assignee.username || assignee.email || 'Unknown') : assignee}
-                    </span>
-                  ))}
-                  {task.assignees.length === 0 && (
-                    <span className="text-sm text-gray-600">{t('planner.taskDetail.noAssignees')}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Tags */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  <Tag className="w-4 h-4 inline mr-1" />
-                  {t('planner.taskModal.fields.tags')}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {task.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="inline-block px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {task.tags.length === 0 && (
-                    <span className="text-sm text-gray-600">{t('planner.taskDetail.noTags')}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Attachments */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                  <Paperclip className="w-4 h-4 inline mr-1" />
-                  {t('planner.taskDetail.attachments')}
-                </label>
-                <span className="text-sm text-gray-600 dark:text-gray-200">
-                  {task.attachments.length} {t('planner.taskDetail.files')}
-                </span>
               </div>
             </div>
           </div>

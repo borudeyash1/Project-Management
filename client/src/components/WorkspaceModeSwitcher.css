@@ -1,0 +1,281 @@
+/* Workspace Switcher Menu */
+.workspace-switcher-menu {
+  font-size: 14px;
+  line-height: 1.6;
+  width: fit-content;
+  display: flex;
+  list-style: none;
+}
+
+/* Main Link/Button */
+.workspace-switcher-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+  border: 2px solid;
+  min-width: 160px;
+  max-width: 220px;
+}
+
+.workspace-switcher-link.dark {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: white;
+}
+
+.workspace-switcher-link.light {
+  background-color: white;
+  border-color: #d1d5db;
+  color: #1f2937;
+}
+
+/* Animated background on hover */
+.workspace-switcher-link::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffd700;
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Icon and Label */
+.workspace-icon {
+  width: 16px;
+  height: 16px;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  flex-shrink: 0;
+}
+
+.workspace-label {
+  font-weight: 600;
+  font-size: 14px;
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Arrow SVG */
+.workspace-arrow {
+  width: 14px;
+  height: 14px;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  flex-shrink: 0;
+}
+
+.workspace-switcher-link.dark .workspace-arrow {
+  fill: white;
+}
+
+.workspace-switcher-link.light .workspace-arrow {
+  fill: #1f2937;
+}
+
+/* Item Container */
+.workspace-switcher-item {
+  position: relative;
+}
+
+/* Submenu Container */
+.workspace-switcher-submenu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: absolute;
+  top: 100%;
+  border-radius: 0 0 10px 10px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+  border: 2px solid;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-12px);
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 100001;
+  pointer-events: none;
+  list-style: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.workspace-switcher-submenu.dark {
+  background-color: #374151;
+  border-color: #ffd700;
+}
+
+.workspace-switcher-submenu.light {
+  background-color: white;
+  border-color: #ffd700;
+}
+
+/* Show submenu on hover */
+.workspace-switcher-item:hover .workspace-switcher-submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  border-top: transparent;
+}
+
+.workspace-switcher-item:hover .workspace-switcher-link {
+  border-radius: 10px 10px 0 0;
+  border-color: #ffd700;
+}
+
+.workspace-switcher-item:hover .workspace-switcher-link::after {
+  transform: scaleX(1);
+  transform-origin: right;
+}
+
+.workspace-switcher-item:hover .workspace-switcher-link .workspace-arrow {
+  transform: rotate(-180deg);
+}
+
+.workspace-switcher-item:hover .workspace-switcher-link .workspace-label,
+.workspace-switcher-item:hover .workspace-switcher-link .workspace-icon {
+  color: #1f2937;
+}
+
+.workspace-switcher-item:hover .workspace-switcher-link.dark .workspace-arrow {
+  fill: #1f2937;
+}
+
+/* Submenu Item */
+.workspace-submenu-item {
+  width: 100%;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.workspace-submenu-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.workspace-switcher-submenu.dark .workspace-submenu-link {
+  color: white;
+}
+
+.workspace-switcher-submenu.light .workspace-submenu-link {
+  color: #1f2937;
+}
+
+/* Animated background for submenu items */
+.workspace-submenu-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scaleX(0);
+  width: 100%;
+  height: 100%;
+  background-color: #ffd700;
+  z-index: -1;
+  transform-origin: left;
+  transition: transform 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.workspace-submenu-link:hover::before {
+  transform: scaleX(1);
+  transform-origin: right;
+}
+
+.workspace-submenu-link:hover {
+  color: #1f2937 !important;
+}
+
+.workspace-submenu-link:hover .workspace-submenu-icon {
+  color: #1f2937 !important;
+}
+
+/* Active state */
+.workspace-submenu-link.active {
+  background-color: rgba(255, 215, 0, 0.1);
+}
+
+/* Submenu Icon */
+.workspace-submenu-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Submenu Content */
+.workspace-submenu-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workspace-submenu-title {
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.workspace-submenu-desc {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Crown Icon */
+.workspace-crown-icon {
+  width: 14px;
+  height: 14px;
+  color: #ffd700;
+  flex-shrink: 0;
+}
+
+/* Active Dot */
+.workspace-active-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ffd700;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Divider */
+.workspace-divider {
+  padding: 8px 16px;
+  border-top: 1px solid;
+}
+
+.workspace-switcher-submenu.dark .workspace-divider {
+  border-color: #4b5563;
+}
+
+.workspace-switcher-submenu.light .workspace-divider {
+  border-color: #e5e7eb;
+}
+
+.workspace-divider-text {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+}

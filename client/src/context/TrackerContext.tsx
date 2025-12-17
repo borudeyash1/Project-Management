@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import apiService from '../services/api';
 
 // ==================== CORE DATA MODELS ====================
 
@@ -207,6 +208,9 @@ interface TrackerContextType {
   // Progress Snapshots
   captureSnapshot: (taskId: string) => void;
   getTaskSnapshots: (taskId: string) => ProgressSnapshot[];
+
+  // Data Management
+  fetchData: () => Promise<void>;
 }
 
 const TrackerContext = createContext<TrackerContextType | undefined>(undefined);
@@ -235,57 +239,40 @@ export const TrackerProvider: React.FC<TrackerProviderProps> = ({ children }) =>
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [activeTimer, setActiveTimer] = useState<TimeEntry | null>(null);
 
-  // Initialize with sample data
-  useEffect(() => {
-    initializeSampleData();
+  // Fetch data from API
+  const fetchData = useCallback(async () => {
+    try {
+      console.log('🔄 [TrackerContext] Fetching tracker data...');
+      const response = await apiService.get('/tracker/data');
+      
+      if (response && response.success) {
+        const data = response.data;
+        setTimeEntries(data.timeEntries || []);
+        setActivityEvents(data.activityEvents || []);
+        setIssues(data.issues || []);
+        setProgressSnapshots(data.progressSnapshots || []);
+        setWorklogs(data.worklogs || []);
+        setSlaRules(data.slaRules || []);
+        setAlerts(data.alerts || []);
+        console.log('✅ [TrackerContext] Data loaded successfully');
+      }
+    } catch (error) {
+      console.error('❌ [TrackerContext] Error fetching data:', error);
+      // Initialize with empty data on error
+      setTimeEntries([]);
+      setActivityEvents([]);
+      setIssues([]);
+      setProgressSnapshots([]);
+      setWorklogs([]);
+      setSlaRules([]);
+      setAlerts([]);
+    }
   }, []);
 
-  const initializeSampleData = () => {
-    // Sample SLA Rules
-    const sampleRules: SLARule[] = [
-      {
-        _id: '1',
-        name: 'Deadline Breach Alert',
-        type: 'deadline_breach',
-        threshold: 24,
-        unit: 'hours',
-        enabled: true,
-        alertChannels: ['in_app', 'email']
-      },
-      {
-        _id: '2',
-        name: 'Overtime Warning',
-        type: 'overtime_hours',
-        threshold: 40,
-        unit: 'hours',
-        enabled: true,
-        alertChannels: ['in_app']
-      }
-    ];
-    setSlaRules(sampleRules);
-
-    // Sample Issues
-    const sampleIssues: Issue[] = [
-      {
-        _id: '1',
-        title: 'API timeout on production',
-        description: 'Users experiencing 504 errors on checkout',
-        severity: 'critical',
-        status: 'in_progress',
-        linkedTaskId: 'task-1',
-        linkedTaskTitle: 'Fix payment gateway',
-        reporter: 'user-1',
-        reporterName: 'John Doe',
-        assignee: 'user-2',
-        assigneeName: 'Jane Smith',
-        slaDeadline: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        slaBreached: false,
-        createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-        updatedAt: new Date()
-      }
-    ];
-    setIssues(sampleIssues);
-  };
+  // Initialize data on mount
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // ==================== TIME TRACKING ====================
 
@@ -775,7 +762,8 @@ export const TrackerProvider: React.FC<TrackerProviderProps> = ({ children }) =>
     getBillableRatio,
     getCycleTime,
     captureSnapshot,
-    getTaskSnapshots
+    getTaskSnapshots,
+    fetchData
   };
 
   return (

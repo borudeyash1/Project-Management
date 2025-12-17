@@ -549,12 +549,27 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password }: LoginRequest = req.body;
 
+    console.log('🔍 [LOGIN] Attempting login for:', email);
+
+    // Debug: Check total users in database
+    const totalUsers = await User.countDocuments();
+    console.log('📊 [LOGIN] Total users in database:', totalUsers);
+
     // Find user by email or username
     const user = await User.findOne({
       $or: [{ email }, { username: email }],
     });
 
     if (!user) {
+      console.log('❌ [LOGIN] User not found:', email);
+      
+      // Debug: Check if any user with similar email exists
+      const similarUsers = await User.find({ email: { $regex: email.split('@')[0], $options: 'i' } }).select('email username');
+      console.log('🔍 [LOGIN] Similar users found:', similarUsers.length);
+      if (similarUsers.length > 0) {
+        console.log('📧 [LOGIN] Similar emails:', similarUsers.map(u => u.email));
+      }
+      
       res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -562,8 +577,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    console.log('✅ [LOGIN] User found:', user.email);
+    console.log('🔍 [LOGIN] User isActive:', user.isActive);
+    console.log('🔍 [LOGIN] User isEmailVerified:', user.isEmailVerified);
+
     // Check if user is active
     if (!user.isActive) {
+      console.log('❌ [LOGIN] User account is deactivated');
       res.status(401).json({
         success: false,
         message: "Account has been deactivated",
@@ -572,8 +592,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Verify password
+    console.log('🔍 [LOGIN] Comparing password...');
     const isPasswordValid = await user.comparePassword(password);
+    console.log('🔍 [LOGIN] Password valid:', isPasswordValid);
+    
     if (!isPasswordValid) {
+      console.log('❌ [LOGIN] Invalid password for user:', email);
       res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -581,8 +605,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    console.log('✅ [LOGIN] Password verified successfully');
+
     // Check if email is verified
     if (!user.isEmailVerified) {
+      console.log('⚠️ [LOGIN] Email not verified, sending verification OTP');
       res.status(403).json({
         success: false,
         message: "Please verify your email address with the OTP sent to your inbox.",
@@ -595,7 +622,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // For verified users, send OTP for login verification
-    console.log('🔍 [DEBUG] Login - User is verified, sending OTP for login verification');
+    console.log('🔍 [LOGIN] User is verified, sending OTP for login verification');
     const loginOtp = generateOTP();
     user.loginOtp = loginOtp;
     user.loginOtpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
@@ -614,8 +641,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         subject: emailSubject,
         html: emailHtml,
       });
+      console.log('✅ [LOGIN] OTP email sent successfully');
     } catch (emailError) {
-      console.error('❌ [DEBUG] Failed to send login OTP email:', emailError);
+      console.error('❌ [LOGIN] Failed to send login OTP email:', emailError);
     }
 
     res.status(200).json({
@@ -625,7 +653,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     });
     return;
   } catch (error: any) {
-    console.error("Login error:", error);
+    console.error("❌ [LOGIN] Login error:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error during login",

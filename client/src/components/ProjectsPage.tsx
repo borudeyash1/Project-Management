@@ -10,6 +10,7 @@ import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext';
 import { WorkspaceCreationRestriction } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useRefreshData } from '../hooks/useRefreshData';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -142,6 +143,9 @@ const ProjectsPage: React.FC = () => {
   useEffect(() => {
     loadProjects();
   }, [loadProjects]);
+
+  // Enable refresh button for this page
+  useRefreshData(loadProjects, [loadProjects]);
 
   // Filter and search projects
   useEffect(() => {
@@ -705,7 +709,7 @@ const ProjectsPage: React.FC = () => {
         )}
 
         {/* Empty State */}
-        {filteredProjects.length === 0 && (
+        {!loading && !error && filteredProjects.length === 0 && (
           <div className="text-center py-12">
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
               }`}>

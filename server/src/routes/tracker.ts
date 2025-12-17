@@ -10,7 +10,8 @@ import {
   updateTimeEntry,
   deleteTimeEntry,
   getTimeStats,
-  getProjectTimeData
+  getProjectTimeData,
+  getTrackerData
 } from '../controllers/trackerController';
 
 const router = express.Router();
@@ -33,5 +34,8 @@ router.delete('/entries/:id', deleteTimeEntry);
 // Stats routes
 router.get('/stats', getTimeStats);
 router.get('/projects/:projectId/time', getProjectTimeData);
+
+// Comprehensive data endpoint
+router.get('/data', getTrackerData);
 
 export default router;

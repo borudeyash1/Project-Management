@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
 import LanguageSelector from './LanguageSelector';
 import ConnectedAccounts from './ConnectedAccounts';
+import { useRefreshData } from '../hooks/useRefreshData';
 
 interface SettingsData {
   account: {
@@ -176,22 +177,6 @@ const Settings: React.FC = () => {
   const [deleteReason, setDeleteReason] = useState('');
   const [showExportData, setShowExportData] = useState(false);
   const [exportFormat, setExportFormat] = useState('json');
-
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  // Apply font size to document
-  useEffect(() => {
-    if (preferences.fontSize) {
-      const fontSizeMap = {
-        small: '14px',
-        medium: '16px',
-        large: '18px'
-      };
-      document.documentElement.style.fontSize = fontSizeMap[preferences.fontSize];
-    }
-  }, [preferences.fontSize]);
 
   const fetchSettings = async () => {
     try {
@@ -355,6 +340,13 @@ const Settings: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  // Enable refresh button
+  useRefreshData(fetchSettings, []);
 
   const handleSaveSettings = async (section: string, data: any) => {
     try {

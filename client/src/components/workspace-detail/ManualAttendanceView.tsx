@@ -74,15 +74,37 @@ const ManualAttendanceView: React.FC<ManualAttendanceViewProps> = ({ workspaceId
       // Add members (excluding owner)
       workspaceMembers.forEach((member: any) => {
         const userData = member.user || member;
-        if (userData && userData._id && userData._id !== ownerId) {
-          allMembers.push({
-            _id: userData._id,
-            fullName: userData.fullName || userData.username || 'Unknown',
-            email: userData.email || '',
-            avatarUrl: userData.avatarUrl,
-            role: member.role || 'member'
-          });
+        
+        // Skip if user data is missing or user doesn't exist
+        if (!userData || !userData._id) {
+          console.warn('⚠️ [LOAD MEMBERS] Skipping member with missing user data:', member);
+          return;
         }
+        
+        // Skip if this is the owner (to avoid duplication)
+        if (userData._id === ownerId) {
+          return;
+        }
+        
+        // Skip if user doesn't have basic required fields (indicates deleted/invalid user)
+        if (!userData.email && !userData.fullName && !userData.username) {
+          console.warn('⚠️ [LOAD MEMBERS] Skipping user with no identifying information:', userData._id);
+          return;
+        }
+        
+        // Better name fallback: fullName > username > email > 'Unknown User'
+        const displayName = userData.fullName || 
+                           userData.username || 
+                           userData.email?.split('@')[0] || 
+                           'Unknown User';
+        
+        allMembers.push({
+          _id: userData._id,
+          fullName: displayName,
+          email: userData.email || '',
+          avatarUrl: userData.avatarUrl,
+          role: member.role || 'member'
+        });
       });
 
       console.log('📋 [LOAD MEMBERS] All members (excluding owner):', allMembers);
@@ -176,14 +198,20 @@ const ManualAttendanceView: React.FC<ManualAttendanceViewProps> = ({ workspaceId
       // Save each member's attendance (skip not-marked)
       const savePromises = Object.entries(editingRecords)
         .filter(([_, status]) => status !== 'not-marked')
-        .map(([userId, status]) => {
+        .map(async ([userId, status]) => {
           console.log('💾 [SAVE ATTENDANCE] Saving:', { userId, status, dateStr });
-          return apiService.post(`/workspace-attendance/workspace/${workspaceId}/mark-manual`, {
-            userId,
-            date: dateStr,
-            status,
-            slotName: 'Manual Entry'
-          });
+          try {
+            const response = await apiService.post(`/workspace-attendance/workspace/${workspaceId}/mark-manual`, {
+              userId,
+              date: dateStr,
+              status,
+              slotName: 'Manual Entry'
+            });
+            return { success: true, userId, response };
+          } catch (error) {
+            console.error('Failed to save for user:', userId, error);
+            return { success: false, userId, error };
+          }
         });
 
       console.log('💾 [SAVE ATTENDANCE] Total promises:', savePromises.length);
@@ -191,21 +219,39 @@ const ManualAttendanceView: React.FC<ManualAttendanceViewProps> = ({ workspaceId
       const results = await Promise.all(savePromises);
       console.log('💾 [SAVE ATTENDANCE] Results:', results);
 
+      // Check if all succeeded
+      const allSucceeded = results.every(r => r.success);
+      const someSucceeded = results.some(r => r.success);
+
       // Trigger refresh to reload data
       setRefreshKey(prev => prev + 1);
       
       setIsEditMode(false);
       setEditingRecords({});
 
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Attendance saved successfully',
-          duration: 2000
-        }
-      });
+      if (allSucceeded) {
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'success',
+            message: 'Attendance saved successfully',
+            duration: 2000
+          }
+        });
+      } else if (someSucceeded) {
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'warning',
+            message: 'Some attendance records saved, but some failed',
+            duration: 3000
+          }
+        });
+      } else {
+        throw new Error('All attendance saves failed');
+      }
     } catch (error: any) {
       console.error('Failed to save attendance:', error);
       dispatch({
