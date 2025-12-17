@@ -18,6 +18,7 @@ import { getDashboardData } from '../services/homeService';
 import { apiService } from '../services/api';
 import CalendarWidget from './dashboard/CalendarWidget';
 import ReportsWidget from './dashboard/ReportsWidget';
+import PendingTasksWidget from './dashboard/PendingTasksWidget';
 import ExpandedStatCard from './dashboard/ExpandedStatCard';
 import ContentBanner from './ContentBanner';
 import { useTranslation } from 'react-i18next';
@@ -162,14 +163,42 @@ const HomePage: React.FC = () => {
           // Ensure _id is preserved from the API response
           const projectData = project as any;
           const projectId = projectData._id || projectData.id;
+          
+          console.log('🔍 [DASHBOARD] Raw project data:', projectData);
+          console.log('🔍 [DASHBOARD] Project team:', projectData.team);
+          
+          // Extract team members with proper null checks
+          let teamMembers: any[] = [];
+          if (Array.isArray(projectData.team)) {
+            teamMembers = projectData.team
+              .filter((member: any) => {
+                const isValid = member && member._id;
+                console.log('🔍 [DASHBOARD] Filtering member:', member, 'Valid:', isValid);
+                return isValid;
+              })
+              .map((member: any) => {
+                const mapped = {
+                  _id: member._id,
+                  name: member.name || 'Unknown User',
+                  email: member.email || '',
+                  avatar: member.avatar || member.avatarUrl,
+                  role: member.role || 'member'
+                };
+                console.log('✅ [DASHBOARD] Mapped member:', mapped);
+                return mapped;
+              });
+          }
+          
+          console.log('✅ [DASHBOARD] Final team members for project', projectData.name, ':', teamMembers);
+          
           return {
             _id: projectId,
             name: projectData.name,
             description: projectData.description,
             progress: projectData.progress || 0,
             dueDate: projectData.dueDate || projectData.endDate ? new Date(projectData.dueDate || projectData.endDate) : undefined,
-            team: Array.isArray(projectData.team) ? projectData.team.length : (projectData.team?.length || 0),
-            teamMembers: Array.isArray(projectData.team) ? projectData.team : [],
+            team: teamMembers.length,
+            teamMembers: teamMembers,
             color: 'bg-blue-500',
             status: (projectData.status || 'active') as Project['status'],
           };
@@ -779,46 +808,8 @@ const HomePage: React.FC = () => {
               onClose={() => setIsAIModalOpen(false)} 
             />
 
-            {/* Upcoming Deadlines */}
-            {deadlines.length > 0 && (
-              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.upcomingTasks')}</h2>
-                  <button
-                    onClick={() => navigate('/tasks')}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    {t('buttons.viewAll')}
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {deadlines.slice(0, 5).map(deadline => (
-                    <div key={deadline._id} className={`p-3 rounded-lg border ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'
-                      } transition-colors`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {deadline.title}
-                          </p>
-                          <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                            {deadline.project}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(deadline.priority)}`}>
-                            {t('tasks.' + deadline.priority.toLowerCase())}
-                          </span>
-                          <span className={`text-xs ${deadline.daysLeft <= 2 ? 'text-red-500 font-medium' : isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                            {t('tasks.daysLeft', { count: deadline.daysLeft })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Pending Tasks Widget */}
+            <PendingTasksWidget />
 
             {/* Recent Files */}
             {recentFiles.length > 0 && (

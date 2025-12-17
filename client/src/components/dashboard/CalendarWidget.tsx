@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useApp } from '../../context/AppContext';
 import api from '../../services/api';
 import { useTranslation } from 'react-i18next';
 
@@ -12,11 +13,13 @@ interface CalendarEvent {
 
 const CalendarWidget: React.FC = () => {
     const { isDarkMode } = useTheme();
+    const { state } = useApp();
     const { t, i18n } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [loading, setLoading] = useState(false);
+    const currentUserId = state.userProfile?._id;
 
     const daysInMonth = new Date(
         currentDate.getFullYear(),
@@ -48,22 +51,76 @@ const CalendarWidget: React.FC = () => {
     const loadEvents = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/sartthi/calendar/events');
+            const allEvents: CalendarEvent[] = [];
 
-            if (response.data?.events) {
-                const mappedEvents: CalendarEvent[] = response.data.events.map((event: any) => {
-                    const dateObj = new Date(event.startTime);
-                    const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-                    return {
-                        date: dateStr,
-                        title: event.title,
-                        type: 'meeting' // Default type
-                    };
-                });
-                setEvents(mappedEvents);
+            // Fetch calendar events from Sartthi
+            try {
+                const calendarResponse = await api.get('/sartthi/calendar/events');
+                if (calendarResponse.data?.events) {
+                    const mappedEvents: CalendarEvent[] = calendarResponse.data.events.map((event: any) => {
+                        const dateObj = new Date(event.startTime);
+                        const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+                        return {
+                            date: dateStr,
+                            title: event.title,
+                            type: 'meeting'
+                        };
+                    });
+                    allEvents.push(...mappedEvents);
+                    console.log('📅 Calendar events loaded:', mappedEvents.length);
+                }
+            } catch (error) {
+                console.error('Failed to load calendar events:', error);
             }
+
+            // Fetch tasks with due dates
+            try {
+                const tasksResponse = await api.get('/home/dashboard');
+                console.log('📊 Dashboard response:', tasksResponse.data);
+                
+                // The API returns data directly, not nested in data.data
+                const responseData = tasksResponse.data?.data || tasksResponse.data;
+                
+                if (responseData?.quickTasks) {
+                    const quickTasks = responseData.quickTasks;
+                    console.log('📋 Quick tasks found:', quickTasks.length);
+                    console.log('📋 Quick tasks data:', quickTasks);
+                    
+                    const taskEvents: CalendarEvent[] = quickTasks
+                        .filter((task: any) => {
+                            const hasDueDate = !!task.dueDate;
+                            if (hasDueDate) {
+                                console.log('✅ Task with due date:', task.title, task.dueDate);
+                            } else {
+                                console.log('❌ Task without due date:', task.title);
+                            }
+                            return hasDueDate;
+                        })
+                        .map((task: any) => {
+                            const dateObj = new Date(task.dueDate);
+                            const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+                            console.log('📅 Adding task to calendar:', task.title, 'on', dateStr);
+                            return {
+                                date: dateStr,
+                                title: task.title,
+                                type: task.completed ? 'task' : 'deadline'
+                            };
+                        });
+                    
+                    allEvents.push(...taskEvents);
+                    console.log('📌 Total task events added:', taskEvents.length);
+                } else {
+                    console.warn('⚠️ No quickTasks found in response');
+                    console.log('⚠️ Response data:', responseData);
+                }
+            } catch (error) {
+                console.error('❌ Failed to load tasks:', error);
+            }
+
+            console.log('🎯 Total events for calendar:', allEvents.length);
+            setEvents(allEvents);
         } catch (error) {
-            console.error('Failed to load calendar events:', error);
+            console.error('Failed to load calendar data:', error);
         } finally {
             setLoading(false);
         }

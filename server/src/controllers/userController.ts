@@ -487,3 +487,60 @@ export const updatePreferences = async (req: AuthenticatedRequest, res: Response
   }
 };
 
+// Get user by ID with bio and activity
+export const getUserById = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+
+    // Find user by ID
+    const user = await User.findById(userId).select('-password -faceScanData');
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    // Get recent activity for this user
+    const Activity = require('../models/Activity').default;
+    const recentActivity = await Activity.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    // Prepare response
+    const userData = {
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      designation: (user as any).designation,
+      department: (user as any).department,
+      location: (user as any).location,
+      bio: (user as any).about || '', // 'about' field is the bio
+      phone: (user as any).phone,
+      recentActivity: recentActivity.map((activity: any) => ({
+        _id: activity._id,
+        type: activity.type,
+        title: activity.title,
+        description: activity.description,
+        timestamp: activity.createdAt
+      }))
+    };
+
+    res.status(200).json({
+      success: true,
+      data: userData
+    });
+  } catch (error: any) {
+    console.error('Error fetching user by ID:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch user profile'
+    });
+  }
+};
+

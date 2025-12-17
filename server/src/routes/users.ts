@@ -10,7 +10,8 @@ import {
   saveFaceScan,
   verifyFace,
   getPreferences,
-  updatePreferences
+  updatePreferences,
+  getUserById
 } from '../controllers/userController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -68,5 +69,8 @@ router.post('/avatar', uploadAvatar);
 // Preferences routes
 router.get('/preferences', getPreferences);
 router.put('/preferences', validateRequest, updatePreferences);
+
+// Get user by ID (for viewing other users' profiles)
+router.get('/:userId', getUserById);
 
 export default router;

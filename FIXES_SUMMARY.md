@@ -64,34 +64,48 @@ workspaceMembers.forEach((member: any) => {
 
 ---
 
-### 3. Workspace & Project Inbox Fix
+### 3. Workspace Inbox Fix
 **Status**: ✅ Complete
 
-**Issue**: Inbox not fetching users/threads
+**Issue**: Inbox not fetching users/threads properly
 
-**Root Cause**: 
-- API response structure mismatch
-- Backend returns `{ success: true, data: [...] }`
+**Root Causes**: 
+- API response structure mismatch (backend returns `{ success: true, data: [...] }`)
 - Frontend was expecting `response.data` to be the array directly
-- Should access `response.data.data` instead
+- **Workspace owner was not included in the inbox threads**
 
-**Fix Applied**:
-- Updated data extraction in `WorkspaceInbox.tsx`
-- Added fallback handling: `response.data?.data || response.data || []`
-- Fixed in 4 locations:
-  1. Initial threads loading
-  2. Messages loading
-  3. Thread refresh after marking as read
-  4. Send message response
+**Fixes Applied**:
+
+**Frontend** (`WorkspaceInbox.tsx`):
+- Updated data extraction: `response.data?.data || response.data || []`
+- Fixed in 4 locations (threads, messages, refresh, send)
+
+**Backend** (`inboxController.ts`):
+- **Added workspace owner to threads list**
+- Now includes owner in inbox so members can message the owner
+- Fetches owner details and last messages
+- Calculates unread counts from owner
 
 **Changes**:
 ```typescript
-// Before
-const data = (response.data as any[]) || [];
-
-// After  
+// Frontend - Data extraction
 const data = response.data?.data || response.data || [];
+
+// Backend - Include workspace owner
+if (workspace.owner && ownerId !== currentUserId) {
+  const ownerUser = await User.findById(ownerId);
+  threads.push({
+    userId: ownerId,
+    name: ownerUser.fullName || 'Workspace Owner',
+    avatarUrl: ownerUser.avatarUrl,
+    lastMessage: lastMessage?.content || '',
+    lastMessageTime: lastMessage?.createdAt || null,
+    unreadCount,
+  });
+}
 ```
+
+**Note**: There is NO project inbox - only workspace inbox exists.
 
 ---
 

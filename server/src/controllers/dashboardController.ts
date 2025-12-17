@@ -92,6 +92,37 @@ export const getDashboardData = async (
     const dashboardProjects = (projects || []).map((project) => {
       const rawTeam = (project as any).teamMembers || (project as any).members || [];
 
+      console.log('🔍 [DASHBOARD] Project:', project.name, 'Raw team:', rawTeam);
+
+      const mappedTeam = Array.isArray(rawTeam)
+        ? rawTeam
+            .map((member: any) => {
+              console.log('🔍 [DASHBOARD] Processing member:', member);
+              
+              // Handle both populated and unpopulated user references
+              const userData = member.user || member;
+              
+              if (!userData) {
+                console.log('⚠️ [DASHBOARD] No user data for member');
+                return null;
+              }
+
+              const mapped = {
+                _id: userData._id?.toString() || userData.toString(),
+                name: userData.fullName || userData.name || userData.email || 'Unknown User',
+                email: userData.email || '',
+                avatar: userData.avatarUrl || userData.avatar,
+                role: member.role || 'member'
+              };
+              
+              console.log('✅ [DASHBOARD] Mapped team member:', mapped);
+              return mapped;
+            })
+            .filter(Boolean)
+        : [];
+
+      console.log('✅ [DASHBOARD] Final team for project', project.name, ':', mappedTeam);
+
       return {
         _id: project._id,
         name: project.name,
@@ -100,9 +131,7 @@ export const getDashboardData = async (
         status: project.status ?? 'active',
         startDate: project.startDate,
         endDate: (project as any).dueDate,
-        team: Array.isArray(rawTeam)
-          ? rawTeam.map(mapUserSummary).filter(Boolean)
-          : [],
+        team: mappedTeam,
         tags: project.tags || [],
       };
     });

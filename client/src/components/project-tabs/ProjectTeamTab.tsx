@@ -95,6 +95,15 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
 
   // Helper function to extract user data from team member
   const getUserData = (member: TeamMember) => {
+    if (!member || !member.user) {
+      return {
+        _id: '',
+        name: 'Unknown User',
+        email: '',
+        avatarUrl: ''
+      };
+    }
+    
     if (typeof member.user === 'string') {
       return {
         _id: member.user,
@@ -103,6 +112,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         avatarUrl: ''
       };
     }
+    
     return {
       _id: member.user._id,
       name: member.user.fullName || member.user.name || 'Unknown User',
@@ -120,13 +130,15 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
       try {
         const response = await apiService.get(`/messages/workspace/${workspaceId}/members`);
         if (response.data.success && response.data.data) {
-          // Map the response to WorkspaceMember format
-          const members = response.data.data.map((m: any) => ({
-            _id: m._id || m.user?._id,
-            name: m.fullName || m.name || 'Unknown',
-            email: m.email || '',
-            role: m.role || 'member'
-          }));
+          // Map the response to WorkspaceMember format with null checks
+          const members = response.data.data
+            .filter((m: any) => m && (m._id || m.user?._id)) // Filter out null/invalid entries
+            .map((m: any) => ({
+              _id: m._id || m.user?._id || '',
+              name: m.fullName || m.name || 'Unknown',
+              email: m.email || '',
+              role: m.role || 'member'
+            }));
           
           console.log('✅ [PROJECT TEAM] Loaded workspace members:', members.length);
           setWorkspaceMembers(members);
@@ -137,9 +149,9 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         const workspace = state.workspaces.find(w => w._id === workspaceId);
         if (workspace?.members) {
           const contextMembers = workspace.members
-            .filter((m: any) => m.status === 'active')
+            .filter((m: any) => m && m.status === 'active' && (m.user || m._id)) // Filter out null entries
             .map((m: any) => ({
-              _id: m.user._id || m.user,
+              _id: (typeof m.user === 'object' ? m.user?._id : m.user) || m._id || '',
               name: m.user?.fullName || m.user?.name || 'Unknown',
               email: m.user?.email || '',
               role: m.role || 'member'

@@ -13,7 +13,10 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
 
     console.log('🔍 [INBOX] Getting threads for workspace:', workspaceId, 'User:', currentUserId);
 
-    const workspace = await Workspace.findById(workspaceId).populate('members.user', 'fullName email username avatarUrl');
+    const workspace = await Workspace.findById(workspaceId)
+      .populate('members.user', 'fullName email username avatarUrl')
+      .populate('owner', 'fullName email username avatarUrl');
+    
     if (!workspace || workspace.isActive === false) {
       res.status(404).json({ success: false, message: 'Workspace not found' });
       return;
@@ -33,13 +36,96 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
 
     const threads: any[] = [];
 
+    console.log('📋 [INBOX] Workspace owner:', workspace.owner);
+    console.log('📋 [INBOX] Workspace members count:', workspace.members?.length || 0);
+
+    // Add workspace owner to threads if not current user
+    if (workspace.owner) {
+      const ownerId = typeof workspace.owner === 'object' 
+        ? (workspace.owner as any)._id.toString() 
+        : workspace.owner.toString();
+      
+      console.log('👤 [INBOX] Owner ID:', ownerId, 'Current User:', currentUserId);
+      
+      if (ownerId !== currentUserId) {
+        // Use populated owner if available, otherwise fetch
+        let ownerUser;
+        if (typeof workspace.owner === 'object' && (workspace.owner as any).fullName) {
+          ownerUser = workspace.owner;
+          console.log('✅ [INBOX] Using populated owner data');
+        } else {
+          ownerUser = await User.findById(ownerId).select('fullName email username avatarUrl');
+          console.log('🔍 [INBOX] Fetched owner from database');
+        }
+        
+        if (ownerUser) {
+          const displayName = (ownerUser as any).fullName || (ownerUser as any).username || (ownerUser as any).email || 'Workspace Owner';
+          
+          // Last message with owner
+          const lastMessage = await Message.findOne({
+            workspace: workspaceId,
+            $or: [
+              { sender: currentUserId, recipient: ownerId },
+              { sender: ownerId, recipient: currentUserId },
+            ],
+          })
+            .sort({ createdAt: -1 })
+            .lean();
+
+          // Unread count from owner
+          const unreadCount = await Message.countDocuments({
+            workspace: workspaceId,
+            sender: ownerId,
+            recipient: currentUserId,
+            readBy: { $ne: currentUserId },
+          });
+
+          threads.push({
+            userId: ownerId,
+            name: displayName,
+            avatarUrl: (ownerUser as any).avatarUrl,
+            lastMessage: lastMessage?.content || '',
+            lastMessageTime: lastMessage?.createdAt || null,
+            unreadCount,
+          });
+          
+          console.log('✅ [INBOX] Added owner to threads:', displayName);
+        } else {
+          console.log('⚠️ [INBOX] Owner user not found');
+        }
+      } else {
+        console.log('ℹ️ [INBOX] Current user is the owner, skipping');
+      }
+    } else {
+      console.log('⚠️ [INBOX] No workspace owner found');
+    }
+
     // Get all active members except current user
+    console.log('👥 [INBOX] Processing workspace members...');
+    let memberCount = 0;
+    
     for (const m of workspace.members as any[]) {
-      if (m.status !== 'active') continue; // Only active members
+      if (m.status !== 'active') {
+        console.log('⏭️ [INBOX] Skipping inactive member');
+        continue;
+      }
       
       const otherUser = m.user;
-      const otherUserId = typeof otherUser === 'string' ? otherUser : otherUser._id.toString();
-      if (otherUserId === currentUserId) continue;
+      if (!otherUser) {
+        console.log('⚠️ [INBOX] Member has no user data, skipping');
+        continue;
+      }
+      
+      const otherUserId = typeof otherUser === 'string' ? otherUser : otherUser._id?.toString();
+      if (!otherUserId) {
+        console.log('⚠️ [INBOX] Could not get user ID, skipping');
+        continue;
+      }
+      
+      if (otherUserId === currentUserId) {
+        console.log('⏭️ [INBOX] Skipping current user');
+        continue;
+      }
 
       const displayName =
         typeof otherUser === 'string'
@@ -74,7 +160,12 @@ export const getWorkspaceThreads: RequestHandler = async (req, res) => {
         lastMessageTime: lastMessage?.createdAt || null,
         unreadCount,
       });
+      
+      memberCount++;
+      console.log(`✅ [INBOX] Added member ${memberCount}:`, displayName);
     }
+
+    console.log(`✅ [INBOX] Total threads: ${threads.length} (Owner: ${workspace.owner ? 1 : 0}, Members: ${memberCount})`);
 
     console.log('✅ [INBOX] Found', threads.length, 'threads');
 
