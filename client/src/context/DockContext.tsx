@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type DockPosition = 'top' | 'bottom' | 'left' | 'right';
 
 interface DockContextType {
   dockPosition: DockPosition;
   setDockPosition: (position: DockPosition) => void;
+  isMobile: boolean;
 }
 
 const DockContext = createContext<DockContextType | undefined>(undefined);
@@ -21,40 +22,38 @@ interface DockProviderProps {
   children: ReactNode;
 }
 
-const DOCK_POSITION_KEY = 'userDockPosition';
-
 export const DockProvider: React.FC<DockProviderProps> = ({ children }) => {
-  // Initialize from localStorage
-  const [dockPosition, setDockPositionState] = useState<DockPosition>(() => {
+  const [dockPosition, setDockPosition] = useState<DockPosition>(() => {
     if (typeof window === 'undefined') return 'bottom';
-    const stored = window.localStorage.getItem(DOCK_POSITION_KEY) as DockPosition | null;
+    const stored = window.localStorage.getItem('userDockPosition') as DockPosition | null;
     return stored ?? 'bottom';
   });
 
-  // Listen for localStorage changes (when Dock component updates position)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const stored = window.localStorage.getItem(DOCK_POSITION_KEY) as DockPosition | null;
-      if (stored && stored !== dockPosition) {
-        setDockPositionState(stored);
-      }
-    };
+  const [isMobile, setIsMobile] = useState(false);
 
-    // Poll for changes every 100ms (since localStorage events don't fire in same window)
-    const interval = setInterval(handleStorageChange, 100);
-
-    return () => clearInterval(interval);
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('userDockPosition', dockPosition);
   }, [dockPosition]);
 
-  const setDockPosition = (position: DockPosition) => {
-    setDockPositionState(position);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(DOCK_POSITION_KEY, position);
-    }
-  };
+  // Handle Resize for Mobile View
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Force 'bottom' on mobile, otherwise use user preference
+  const effectiveDockPosition = isMobile ? 'bottom' : dockPosition;
 
   return (
-    <DockContext.Provider value={{ dockPosition, setDockPosition }}>
+    <DockContext.Provider value={{ dockPosition: effectiveDockPosition, setDockPosition, isMobile }}>
       {children}
     </DockContext.Provider>
   );

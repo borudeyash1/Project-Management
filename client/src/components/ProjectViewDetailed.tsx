@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  ChevronDown, ChevronRight, Users, Calendar, Clock, Target, 
+import {
+  ChevronDown, ChevronRight, Users, Calendar, Clock, Target,
   BarChart3, MessageSquare, Settings, Plus, Filter, Search,
   Edit, Trash2, Eye, CheckCircle, AlertCircle, Star, Flag, UserPlus,
   TrendingUp, Activity, FileText, Image, Link, Download,
@@ -25,6 +25,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTheme } from '../context/ThemeContext';
+import { useDock } from '../context/DockContext';
 import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
 
@@ -203,6 +204,7 @@ const ProjectViewDetailed: React.FC = () => {
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
   const { isDarkMode } = useTheme();
+  const { dockPosition } = useDock();
   const { t } = useTranslation();  // ← ADD THIS LINE
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -235,7 +237,7 @@ const ProjectViewDetailed: React.FC = () => {
   const [taskFilter, setTaskFilter] = useState<'all' | 'my' | 'overdue' | 'review'>('all');
   const [requests, setRequests] = useState<any[]>([]); // Workload/deadline requests
   const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment (loaded from backend)
-  
+
   // Project Settings State
   const [officeLatitude, setOfficeLatitude] = useState('');
   const [officeLongitude, setOfficeLongitude] = useState('');
@@ -246,21 +248,21 @@ const ProjectViewDetailed: React.FC = () => {
   const project = state.projects.find(p => p._id === projectId);
   const workspace = state.workspaces.find(w => w._id === project?.workspace);
   const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
-  
+
   // Check if user is project manager - handle both populated and unpopulated user field
   const isProjectManager = React.useMemo(() => {
     if (!project?.teamMembers) return false;
-    
+
     return project.teamMembers.some((m: any) => {
       const memberUserId = typeof m.user === 'object' ? m.user._id : m.user;
       const isCurrentUser = memberUserId === state.userProfile._id;
       const hasManagerRole = m.role === 'project-manager' || m.role === 'manager';
       const hasManagerPermissions = m.permissions?.canManageMembers || m.permissions?.canManageProject;
-      
+
       return isCurrentUser && (hasManagerRole || hasManagerPermissions);
     });
   }, [project?.teamMembers, state.userProfile._id]);
-  
+
   const currentUserRole = isWorkspaceOwner ? 'owner' : isProjectManager ? 'manager' : 'employee';
   const currentTestUserId = state.userProfile._id;
 
@@ -285,7 +287,7 @@ const ProjectViewDetailed: React.FC = () => {
   useEffect(() => {
     const loadProjectFromAPI = async () => {
       if (!projectId) return;
-      
+
       // If project already in state, use it
       if (state.projects.length > 0) {
         const project = state.projects.find(p => p._id === projectId);
@@ -302,22 +304,22 @@ const ProjectViewDetailed: React.FC = () => {
           return;
         }
       }
-      
+
       // If not in state (page refresh), fetch from API
       try {
         console.log('📥 [PROJECT LOAD] Fetching project from API:', projectId);
         const response = await apiService.get(`/projects/${projectId}`);
-        
+
         if (response.data.success) {
           const fetchedProject = response.data.data;
           console.log('✅ [PROJECT LOAD] Project fetched:', fetchedProject.name);
-          
+
           // Add to app state
           dispatch({
             type: 'ADD_PROJECT',
             payload: fetchedProject
           });
-          
+
           // Set as active project
           const enrichedProject = {
             ...fetchedProject,
@@ -328,7 +330,7 @@ const ProjectViewDetailed: React.FC = () => {
             milestones: fetchedProject.milestones || []
           };
           setActiveProject(enrichedProject as any);
-          
+
           // Also fetch workspace if not in state
           if (fetchedProject.workspace && state.workspaces.length === 0) {
             console.log('📥 [WORKSPACE LOAD] Fetching workspace:', fetchedProject.workspace);
@@ -359,7 +361,7 @@ const ProjectViewDetailed: React.FC = () => {
         });
       }
     };
-    
+
     loadProjectFromAPI();
   }, [projectId, state.projects.length]);
 
@@ -414,24 +416,6 @@ const ProjectViewDetailed: React.FC = () => {
 
     loadTasks();
   }, [activeProject?._id, (activeProject as any)?.team]);
-
-  // Load requests for active project from backend
-  useEffect(() => {
-    const loadRequests = async () => {
-      if (!activeProject?._id) return;
-      try {
-        console.log('📥 [LOAD REQUESTS] Loading requests for project:', activeProject._id);
-        const response = await apiService.get(`/projects/${activeProject._id}/requests`);
-        console.log('✅ [LOAD REQUESTS] Loaded requests:', response.data.data?.length || 0);
-        setRequests(response.data.data || []);
-      } catch (error) {
-        console.error('❌ [LOAD REQUESTS] Failed to load requests:', error);
-        setRequests([]);
-      }
-    };
-
-    loadRequests();
-  }, [activeProject?._id]);
 
   // Set projects from state
   useEffect(() => {
@@ -604,7 +588,7 @@ const ProjectViewDetailed: React.FC = () => {
     if (!activeProject?._id) return;
     try {
       console.log('📝 [CREATE TASK] Creating task:', task);
-      
+
       const payload = {
         title: task.title,
         description: task.description,
@@ -627,7 +611,7 @@ const ProjectViewDetailed: React.FC = () => {
       console.log('📤 [CREATE TASK] Payload:', payload);
       const createdBackendTask = await apiService.createTask(payload);
       console.log('✅ [CREATE TASK] Task created:', createdBackendTask);
-      
+
       const uiTask = mapBackendTaskToUi(createdBackendTask, (activeProject as any)?.teamMembers || (activeProject as any)?.team || []);
       setProjectTasks([...projectTasks, uiTask]);
 
@@ -744,17 +728,15 @@ const ProjectViewDetailed: React.FC = () => {
   const handleCreateRequest = async (request: any) => {
     try {
       console.log('📤 [CREATE REQUEST] Submitting request:', request);
-      
+
       // Call API to create request
-      const response = await apiService.post(`/projects/${projectId}/requests`, request);
-      
+      const response = await apiService.post(`/projects/${activeProject?._id}/requests`, request);
+
       console.log('✅ [CREATE REQUEST] Response:', response.data);
-      
-      // Add to local state only if we got valid data
-      if (response.data && response.data.data) {
-        setRequests([...requests, response.data.data]);
-      }
-      
+
+      // Add to local state
+      setRequests([...requests, response.data.data]);
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -781,11 +763,11 @@ const ProjectViewDetailed: React.FC = () => {
   const handleApproveRequest = async (requestId: string) => {
     try {
       console.log('✅ [APPROVE REQUEST] Approving request:', requestId);
-      
+
       await apiService.put(`/projects/${activeProject?._id}/requests/${requestId}/approve`);
-      
+
       setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'approved' } : r));
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -812,11 +794,11 @@ const ProjectViewDetailed: React.FC = () => {
   const handleRejectRequest = async (requestId: string, reason: string) => {
     try {
       console.log('❌ [REJECT REQUEST] Rejecting request:', requestId);
-      
+
       await apiService.put(`/projects/${activeProject?._id}/requests/${requestId}/reject`, { reason });
-      
+
       setRequests(requests.map(r => r._id === requestId ? { ...r, status: 'rejected', rejectionReason: reason } : r));
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -843,11 +825,11 @@ const ProjectViewDetailed: React.FC = () => {
   const handleManualReassign = async (taskId: string, newAssigneeId: string) => {
     try {
       console.log('👥 [MANUAL REASSIGN] Reassigning task:', taskId, 'to:', newAssigneeId);
-      
+
       await apiService.put(`/tasks/${taskId}/reassign`, { assignedTo: newAssigneeId });
-      
+
       // Task list will refresh on next component mount
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -874,11 +856,11 @@ const ProjectViewDetailed: React.FC = () => {
   const handleManualDeadlineChange = async (taskId: string, newDeadline: string) => {
     try {
       console.log('⏰ [MANUAL DEADLINE] Changing deadline for task:', taskId, 'to:', newDeadline);
-      
+
       await apiService.put(`/tasks/${taskId}`, { dueDate: newDeadline });
-      
+
       // Task list will refresh on next component mount
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -926,7 +908,7 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   const renderProjectHeader = () => (
-    <div className="bg-white border-b border-gray-300 px-6 py-4">
+    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} border-b px-6 py-4`}>
       {/* Role Selector for Testing */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -934,7 +916,7 @@ const ProjectViewDetailed: React.FC = () => {
             <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: activeProject?.color }} />
             <button
               onClick={() => setShowProjectSelector(!showProjectSelector)}
-              className="flex items-center gap-2 text-lg font-semibold text-gray-900 hover:text-accent-dark"
+              className={`flex items-center gap-2 text-lg font-semibold ${isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-900 hover:text-accent-dark'}`}
             >
               {activeProject?.name}
               <ChevronDown className="w-4 h-4" />
@@ -947,7 +929,7 @@ const ProjectViewDetailed: React.FC = () => {
             {activeProject?.priority}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {(currentUserRole === 'owner' || currentUserRole === 'manager') && (
             <button
@@ -965,27 +947,27 @@ const ProjectViewDetailed: React.FC = () => {
       {showProjectSelector && (
         <>
           {/* Backdrop to close on click outside */}
-          <div 
-            className="fixed inset-0 z-10" 
+          <div
+            className="fixed inset-0 z-10"
             onClick={() => setShowProjectSelector(false)}
           />
-          <div className="absolute top-16 left-6 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-20">
+          <div className={`absolute top-16 left-6 w-80 rounded-lg shadow-lg z-20 border ${isDarkMode ? '!bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">Switch Project</h3>
+                <h3 className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Switch Project</h3>
                 <button
                   onClick={() => setShowProjectSelector(false)}
-                  className="p-1 hover:bg-gray-100 rounded-lg"
+                  className={`p-1 rounded-lg ${isDarkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-600'}`}
                 >
-                  <X className="w-4 h-4 text-gray-600" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex items-center gap-2 mb-3">
-                <Search className="w-4 h-4 text-gray-600" />
+                <Search className={`w-4 h-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
                 <input
                   type="text"
                   placeholder="Search projects..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                  className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-300' : 'border-gray-300'}`}
                 />
               </div>
               <div className="space-y-1 max-h-96 overflow-y-auto">
@@ -996,16 +978,17 @@ const ProjectViewDetailed: React.FC = () => {
                       setActiveProject(project);
                       setShowProjectSelector(false);
                     }}
-                    className={`w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-gray-50 ${
-                      activeProject?._id === project._id ? 'bg-blue-50 border border-blue-200' : ''
-                    }`}
+                    className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-colors ${activeProject?._id === project._id
+                      ? (isDarkMode ? 'bg-blue-900/50 border border-blue-700' : 'bg-blue-50 border border-blue-200')
+                      : (isDarkMode ? 'hover:bg-gray-700 border border-transparent' : 'hover:bg-gray-50 border border-transparent')
+                      }`}
                   >
-                    <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: project.color }} />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{project.name}</h4>
-                      <p className="text-sm text-gray-600">{project.description}</p>
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0`} style={{ backgroundColor: project.color }} />
+                    <div className="flex-1 min-w-0">
+                      <h4 className={`font-medium truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h4>
+                      <p className={`text-sm truncate ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{project.description}</p>
                     </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${getStatusColor(project.status)}`}>
                       {project.status}
                     </span>
                   </button>
@@ -1021,8 +1004,8 @@ const ProjectViewDetailed: React.FC = () => {
   const renderTabNavigation = () => {
     // Check if current user is workspace owner or project manager
     const isWorkspaceOwner = activeProject?.createdBy === state.userProfile?._id;
-    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id || 
-                            (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
+    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id ||
+      (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
     const canManageTeam = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
 
     const allTabs = [
@@ -1051,13 +1034,12 @@ const ProjectViewDetailed: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id as any)}
-                className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium transition-colors whitespace-nowrap ${
-                  activeView === tab.id
-                    ? 'border-accent-dark text-accent-dark'
-                    : isDarkMode
+                className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium transition-colors whitespace-nowrap ${activeView === tab.id
+                  ? 'border-accent-dark text-accent-dark'
+                  : isDarkMode
                     ? 'border-transparent text-gray-600 hover:text-gray-700'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 {tab.label}
@@ -1070,23 +1052,23 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   const renderProjectOverview = () => (
-  <div className="space-y-6">
-    {/* Project Stats */}
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
-        {/* ... */}
+    <div className="space-y-6">
+      {/* Project Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          {/* ... */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Progress</p>
-              <p className="text-2xl font-bold text-gray-900">{activeProject?.progress}%</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Progress</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.progress}%</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <Target className="w-6 h-6 text-accent-dark" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
+              <Target className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />
             </div>
           </div>
           <div className="mt-4">
-            <div className="w-full bg-gray-300 rounded-full h-2">
-              <div 
+            <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
+              <div
                 className="bg-accent h-2 rounded-full transition-all duration-300"
                 style={{ width: `${activeProject?.progress}%` }}
               />
@@ -1094,47 +1076,47 @@ const ProjectViewDetailed: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Budget</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(activeProject?.budget || 0)}</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Budget</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-600" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'}`}>
+              <DollarSign className={`w-6 h-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Spent: {formatCurrency(activeProject?.spent || 0)}
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Team Members</p>
-              <p className="text-2xl font-bold text-gray-900">{activeProject?.team?.length || 0}</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Members</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.team?.length || 0}</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'}`}>
+              <Users className={`w-6 h-6 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {activeProject?.team?.filter(m => m.status === 'active').length || 0} active
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Tasks</p>
-              <p className="text-2xl font-bold text-gray-900">{activeProject?.tasks?.length || 0}</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Tasks</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.tasks?.length || 0}</p>
             </div>
-            <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-orange-600" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-orange-900/30' : 'bg-orange-200'}`}>
+              <CheckCircle className={`w-6 h-6 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {activeProject?.tasks?.filter(t => t.status === 'completed').length || 0} completed
           </p>
         </div>
@@ -1144,27 +1126,27 @@ const ProjectViewDetailed: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Description */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Description</h3>
-            <p className="text-gray-700">{activeProject?.description}</p>
+          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Description</h3>
+            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{activeProject?.description}</p>
           </div>
 
           {/* Timeline */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Timeline</h3>
+          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Timeline</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Start Date</p>
-                  <p className="text-sm text-gray-600">{formatDate(activeProject?.startDate || new Date())}</p>
+                  <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Start Date</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{formatDate(activeProject?.startDate || new Date())}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">End Date</p>
-                  <p className="text-sm text-gray-600">{formatDate(activeProject?.endDate || new Date())}</p>
+                  <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>End Date</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{formatDate(activeProject?.endDate || new Date())}</p>
                 </div>
               </div>
-              <div className="w-full bg-gray-300 rounded-full h-2">
-                <div 
+              <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
+                <div
                   className="bg-accent h-2 rounded-full transition-all duration-300"
                   style={{ width: `${activeProject?.progress}%` }}
                 />
@@ -1173,34 +1155,34 @@ const ProjectViewDetailed: React.FC = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Activity</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-accent-dark" />
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
+                  <CheckCircle className={`w-4 h-4 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">Task "User Authentication" was completed</p>
-                  <p className="text-xs text-gray-600">2 hours ago by John Doe</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Task "User Authentication" was completed</p>
+                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>2 hours ago by John Doe</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-green-600" />
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'}`}>
+                  <Plus className={`w-4 h-4 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">New task "Payment Integration" was created</p>
-                  <p className="text-xs text-gray-600">4 hours ago by Jane Smith</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>New task "Payment Integration" was created</p>
+                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>4 hours ago by Jane Smith</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Users className="w-4 h-4 text-purple-600" />
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'}`}>
+                  <Users className={`w-4 h-4 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">New team member "Bob Wilson" was added</p>
-                  <p className="text-xs text-gray-600">1 day ago by John Doe</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>New team member "Bob Wilson" was added</p>
+                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>1 day ago by John Doe</p>
                 </div>
               </div>
             </div>
@@ -1209,21 +1191,21 @@ const ProjectViewDetailed: React.FC = () => {
 
         <div className="space-y-6">
           {/* Client Information */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Client</h3>
+          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Client</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <Building className="w-5 h-5 text-gray-600" />
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
+                <Building className={`w-5 h-5 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">
-                  {typeof activeProject?.client === 'string' 
-                    ? activeProject?.client 
+                <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {typeof activeProject?.client === 'string'
+                    ? activeProject?.client
                     : activeProject?.client?.name || 'No Client'}
                 </h4>
-                <p className="text-sm text-gray-600">
-                  {typeof activeProject?.client === 'object' && activeProject?.client?.email 
-                    ? activeProject?.client?.email 
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {typeof activeProject?.client === 'object' && activeProject?.client?.email
+                    ? activeProject?.client?.email
                     : ''}
                 </p>
               </div>
@@ -1231,52 +1213,52 @@ const ProjectViewDetailed: React.FC = () => {
           </div>
 
           {/* Project Tags */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
+          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tags</h3>
             <div className="flex flex-wrap gap-2">
               {activeProject?.tags && activeProject.tags.length > 0 ? (
                 activeProject.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                    className={`px-2 py-1 text-xs rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700'}`}
                   >
                     {tag}
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-600">No tags</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No tags</p>
               )}
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h3>
             <div className="space-y-2">
               <button
                 onClick={() => setShowCreateTask(true)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-lg"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg ${isDarkMode ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
               >
                 <Plus className="w-4 h-4" />
                 Create Task
               </button>
               <button
                 onClick={() => setShowTeamManagement(true)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-lg"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg ${isDarkMode ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
               >
                 <Users className="w-4 h-4" />
                 Manage Team
               </button>
               <button
                 onClick={() => setShowAnalytics(true)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-lg"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg ${isDarkMode ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
               >
                 <BarChart3 className="w-4 h-4" />
                 View Analytics
               </button>
               <button
                 onClick={() => setShowManageProject(true)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-lg"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg ${isDarkMode ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
               >
                 <Settings className="w-4 h-4" />
                 Project Settings
@@ -1295,7 +1277,7 @@ const ProjectViewDetailed: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowInviteMemberModal(true)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${isDarkMode ? 'border-gray-600 text-gray-700 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
           >
             <UserPlus className="w-4 h-4" />
             Invite Member
@@ -1312,50 +1294,51 @@ const ProjectViewDetailed: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {activeProject?.team.map((member) => (
-          <div key={member._id} className="bg-white p-6 rounded-lg border border-gray-200">
+          <div key={member._id} className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-gray-600" />
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
+                <User className={`w-6 h-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-gray-900">{member.name}</h4>
-                <p className="text-sm text-gray-600">{member.email}</p>
+                <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{member.name}</h4>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{member.email}</p>
               </div>
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-              }`}>
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${member.status === 'active'
+                ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800')
+                : (isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800')
+                }`}>
                 {member.status}
               </span>
             </div>
-            
+
             <div className="space-y-2 mb-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Role</span>
-                <span className="font-medium text-gray-900 capitalize">{member.role}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Role</span>
+                <span className={`font-medium capitalize ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{member.role}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Workload</span>
-                <span className="font-medium text-gray-900">{member.workload}%</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Workload</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{member.workload}%</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Tasks</span>
-                <span className="font-medium text-gray-900">{member.tasksCompleted}/{member.tasksAssigned}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Tasks</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{member.tasksCompleted}/{member.tasksAssigned}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Rating</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Rating</span>
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-yellow-600 fill-current" />
-                  <span className="font-medium text-gray-900">{member.rating}</span>
+                  <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{member.rating}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+              <button className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 border rounded-lg ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
                 <MessageSquare className="w-4 h-4" />
                 Chat
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+              <button className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 border rounded-lg ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
                 <Eye className="w-4 h-4" />
                 View
               </button>
@@ -1367,52 +1350,52 @@ const ProjectViewDetailed: React.FC = () => {
   );
 
   const renderSidebar = () => (
-    <div className="w-80 bg-white border-l border-gray-300 min-h-screen">
+    <div className={`w-full lg:w-80 border-t lg:border-t-0 lg:border-l min-h-screen ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
       <div className="p-6">
         <div className="space-y-6">
           {/* Project Information */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.sidebar.projectInfo')}</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('project.sidebar.projectInfo')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.status')}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.status')}</span>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(activeProject?.status || '')}`}>
                   {activeProject?.status}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.priority')}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.priority')}</span>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(activeProject?.priority || '')}`}>
                   {activeProject?.priority}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.progress')}</span>
-                <span className="font-medium text-gray-900">{activeProject?.progress}%</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.progress')}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.progress}%</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.budget')}</span>
-                <span className="font-medium text-gray-900">{formatCurrency(activeProject?.budget || 0)}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.budget')}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.spent')}</span>
-                <span className="font-medium text-gray-900">{formatCurrency(activeProject?.spent || 0)}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.spent')}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.spent || 0)}</span>
               </div>
             </div>
           </div>
 
           {/* Team Members */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.sidebar.teamMembers')}</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('project.sidebar.teamMembers')}</h3>
             <div className="space-y-3">
               {activeProject?.team?.slice(0, 5).map((member) => (
                 <div key={member._id} className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-gray-600" />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
+                    <User className={`w-4 h-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{member.name}</p>
-                    <p className="text-xs text-gray-600 capitalize">{member.role}</p>
+                    <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{member.name}</p>
+                    <p className={`text-xs capitalize ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{member.role}</p>
                   </div>
                   <button className="text-accent-dark hover:text-blue-700">
                     <MessageSquare className="w-4 h-4" />
@@ -1420,7 +1403,7 @@ const ProjectViewDetailed: React.FC = () => {
                 </div>
               ))}
               {activeProject && activeProject.team && activeProject.team.length > 5 && (
-                <p className="text-sm text-gray-600 text-center">
+                <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   {t('project.sidebar.moreMembers', { count: activeProject.team.length - 5 })}
                 </p>
               )}
@@ -1429,26 +1412,26 @@ const ProjectViewDetailed: React.FC = () => {
 
           {/* Quick Stats */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.sidebar.quickStats')}</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('project.sidebar.quickStats')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.totalTasks')}</span>
-                <span className="font-medium text-gray-900">{activeProject?.tasks?.length || 0}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.totalTasks')}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.tasks?.length || 0}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.completed')}</span>
-                <span className="font-medium text-gray-900">
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.completed')}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   {activeProject?.tasks?.filter(t => t.status === 'completed').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.inProgress')}</span>
-                <span className="font-medium text-gray-900">
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.inProgress')}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   {activeProject?.tasks?.filter(t => t.status === 'in-progress').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('project.sidebar.overdue')}</span>
+                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.overdue')}</span>
                 <span className="font-medium text-red-600">
                   {activeProject?.tasks?.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed').length || 0}
                 </span>
@@ -1475,75 +1458,79 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Task Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Total Tasks</p>
-          <p className="text-2xl font-bold text-gray-900">{activeProject?.tasks.length || 0}</p>
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Tasks</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.tasks.length || 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">In Progress</p>
-          <p className="text-2xl font-bold text-accent-dark">
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>In Progress</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`}>
             {activeProject?.tasks.filter(t => t.status === 'in-progress').length || 0}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Completed</p>
-          <p className="text-2xl font-bold text-green-600">
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Completed</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
             {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Blocked</p>
-          <p className="text-2xl font-bold text-red-600">
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Blocked</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
             {activeProject?.tasks.filter(t => t.status === 'blocked').length || 0}
           </p>
         </div>
       </div>
 
       {/* Task List */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
+      <div className={`rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center gap-4 flex-wrap">
-            <button 
+            <button
               onClick={() => setTaskFilter('all')}
-              className={`px-3 py-1 text-sm font-medium rounded-lg ${
-                taskFilter === 'all' ? 'text-accent-dark bg-blue-50' : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-1 text-sm font-medium rounded-lg ${taskFilter === 'all'
+                ? (isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50')
+                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50')
+                }`}
             >
               All Tasks ({activeProject?.tasks.length || 0})
             </button>
-            <button 
+            <button
               onClick={() => setTaskFilter('my')}
-              className={`px-3 py-1 text-sm font-medium rounded-lg ${
-                taskFilter === 'my' ? 'text-accent-dark bg-blue-50' : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-1 text-sm font-medium rounded-lg ${taskFilter === 'my'
+                ? (isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50')
+                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50')
+                }`}
             >
               My Tasks ({activeProject?.tasks.filter(t => t.assignee?._id === state.userProfile?._id).length || 0})
             </button>
-            <button 
+            <button
               onClick={() => setTaskFilter('overdue')}
-              className={`px-3 py-1 text-sm font-medium rounded-lg ${
-                taskFilter === 'overdue' ? 'text-accent-dark bg-blue-50' : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-1 text-sm font-medium rounded-lg ${taskFilter === 'overdue'
+                ? (isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50')
+                : (isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50')
+                }`}
             >
               Overdue ({activeProject?.tasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== 'completed').length || 0})
             </button>
             {(currentUserRole === 'manager' || currentUserRole === 'owner') && (
-              <button 
+              <button
                 onClick={() => setTaskFilter('review')}
-                className={`px-3 py-1 text-sm font-medium rounded-lg ${
-                  taskFilter === 'review' ? 'text-purple-600 bg-purple-50' : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-1 text-sm font-medium rounded-lg ${taskFilter === 'review'
+                  ? (isDarkMode ? 'text-purple-400 bg-purple-900/30' : 'text-purple-600 bg-purple-50')
+                  : (isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50')
+                  }`}
               >
                 Needs Review ({activeProject?.tasks.filter(t => t.status === 'review').length || 0})
               </button>
             )}
           </div>
         </div>
-        
-        <div className="divide-y divide-gray-200">
+
+        <div className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
           {(() => {
             let filteredTasks = activeProject?.tasks || [];
-            
+
             if (taskFilter === 'my') {
               filteredTasks = filteredTasks.filter(t => t.assignee?._id === state.userProfile?._id || t.createdBy === state.userProfile?._id);
             } else if (taskFilter === 'overdue') {
@@ -1551,120 +1538,117 @@ const ProjectViewDetailed: React.FC = () => {
             } else if (taskFilter === 'review') {
               filteredTasks = filteredTasks.filter(t => t.status === 'review');
             }
-            
+
             return filteredTasks.length === 0 ? (
-              <div className="p-12 text-center text-gray-600">
-                <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+              <div className={`p-12 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <CheckCircle className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
                 <p className="font-medium">No tasks found</p>
                 <p className="text-sm mt-1">{taskFilter === 'all' ? 'Create your first task to get started' : 'No tasks match this filter'}</p>
               </div>
             ) : (
               filteredTasks.map((task) => (
-              <div 
-                key={task._id} 
-                className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                  task.status === 'completed' ? 'opacity-60' : ''
-                }`}
-                onClick={() => {
-                  setSelectedTask(task);
-                  if (task.status === 'review' && currentUserRole === 'manager') {
-                    setShowTaskReview(true);
-                  } else {
-                    setShowTaskDetail(true);
-                  }
-                }}
-              >
-                <div className="flex items-start gap-4">
-                  <input 
-                    type="checkbox" 
-                    className="mt-1 rounded" 
-                    checked={task.status === 'completed'}
-                    onClick={(e) => e.stopPropagation()}
-                    readOnly
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h4 className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
-                        {task.title}
-                      </h4>
-                      {task.taskType && (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
-                          {task.taskType === 'bug' ? '🐛' : task.taskType === 'feature' ? '✨' : task.taskType === 'improvement' ? '🔧' : task.taskType === 'research' ? '🔍' : task.taskType === 'documentation' ? '📝' : '📋'} {task.taskType}
+                <div
+                  key={task._id}
+                  className={`p-4 cursor-pointer transition-colors ${task.status === 'completed' ? 'opacity-60' : ''
+                    } ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
+                  onClick={() => {
+                    setSelectedTask(task);
+                    if (task.status === 'review' && currentUserRole === 'manager') {
+                      setShowTaskReview(true);
+                    } else {
+                      setShowTaskDetail(true);
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <input
+                      type="checkbox"
+                      className="mt-1 rounded"
+                      checked={task.status === 'completed'}
+                      onClick={(e) => e.stopPropagation()}
+                      readOnly
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h4 className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
+                          {task.title}
+                        </h4>
+                        {task.taskType && (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-100 text-indigo-800'}`}>
+                            {task.taskType === 'bug' ? '🐛' : task.taskType === 'feature' ? '✨' : task.taskType === 'improvement' ? '🔧' : task.taskType === 'research' ? '🔍' : task.taskType === 'documentation' ? '📝' : '📋'} {task.taskType}
+                          </span>
+                        )}
+                        {task.category && (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${isDarkMode ? 'bg-cyan-900/30 text-cyan-400' : 'bg-cyan-100 text-cyan-800'}`}>
+                            {task.category === 'design' ? '🎨' : task.category === 'testing' ? '🧪' : task.category === 'deployment' ? '🚀' : task.category === 'meeting' ? '👥' : task.category === 'review' ? '👀' : '💻'} {task.category}
+                          </span>
+                        )}
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${task.priority === 'critical' ? (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-800') :
+                          task.priority === 'high' ? (isDarkMode ? 'bg-orange-900/30 text-orange-400' : 'bg-orange-200 text-orange-800') :
+                            task.priority === 'medium' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-800') :
+                              (isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800')
+                          }`}>
+                          {task.priority}
                         </span>
-                      )}
-                      {task.category && (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-cyan-100 text-cyan-800">
-                          {task.category === 'design' ? '🎨' : task.category === 'testing' ? '🧪' : task.category === 'deployment' ? '🚀' : task.category === 'meeting' ? '👥' : task.category === 'review' ? '👀' : '💻'} {task.category}
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${task.status === 'completed' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800') :
+                          task.status === 'in-progress' ? (isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-800') :
+                            task.status === 'review' ? (isDarkMode ? 'bg-purple-900/30 text-purple-400' : 'bg-purple-100 text-purple-800') :
+                              task.status === 'blocked' ? (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-800') :
+                                (isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800')
+                          }`}>
+                          {task.status}
                         </span>
-                      )}
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        task.priority === 'critical' ? 'bg-red-100 text-red-800' :
-                        task.priority === 'high' ? 'bg-orange-200 text-orange-800' :
-                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {task.priority}
-                      </span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        task.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                        task.status === 'review' ? 'bg-purple-100 text-purple-800' :
-                        task.status === 'blocked' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {task.status}
-                      </span>
-                      {task.status === 'review' && (currentUserRole === 'manager' || currentUserRole === 'owner') && (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 animate-pulse">
-                          Needs Review
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        {task.assignee?.name || 'Unassigned'}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {formatDate(task.dueDate)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {task.estimatedHours}h estimated
-                      </span>
-                      {task.progress > 0 && (
+                        {task.status === 'review' && (currentUserRole === 'manager' || currentUserRole === 'owner') && (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full animate-pulse ${isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-800'}`}>
+                            Needs Review
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{task.description}</p>
+                      <div className={`flex items-center gap-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         <span className="flex items-center gap-1">
-                          <Target className="w-4 h-4" />
-                          {task.progress}% done
+                          <User className="w-4 h-4" />
+                          {task.assignee?.name || 'Unassigned'}
                         </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {formatDate(task.dueDate)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {task.estimatedHours}h estimated
+                        </span>
+                        {task.progress > 0 && (
+                          <span className="flex items-center gap-1">
+                            <Target className="w-4 h-4" />
+                            {task.progress}% done
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => {
+                          setSelectedTask(task);
+                          setShowTaskDetail(true);
+                        }}
+                        className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {currentUserRole === 'manager' && (
+                        <button
+                          onClick={() => handleDeleteTask(task._id)}
+                          className={`p-2 rounded-lg ${isDarkMode ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:bg-red-50'}`}
+                          title="Delete Task"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setShowTaskDetail(true);
-                      }}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    {currentUserRole === 'manager' && (
-                      <button 
-                        onClick={() => handleDeleteTask(task._id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                        title="Delete Task"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
                   </div>
                 </div>
-              </div>
               ))
             );
           })()}
@@ -1678,24 +1662,24 @@ const ProjectViewDetailed: React.FC = () => {
       <div className="flex items-center justify-between">
         <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Timeline</h3>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+          <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
             Day
           </button>
-          <button className="px-3 py-1 text-sm font-medium text-accent-dark bg-blue-50 rounded-lg">
+          <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50'}`}>
             Week
           </button>
-          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+          <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
             Month
           </button>
         </div>
       </div>
 
       {/* Timeline */}
-      <div className="bg-white rounded-lg border border-gray-300 p-6">
+      <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
         <div className="space-y-6">
           {!activeProject?.timeline || activeProject?.timeline.length === 0 ? (
-            <div className="p-12 text-center text-gray-600">
-              <Activity className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+            <div className={`p-12 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <Activity className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
               <p className="font-medium">No activity yet</p>
               <p className="text-sm mt-1">Activity will appear here as work progresses</p>
             </div>
@@ -1703,28 +1687,27 @@ const ProjectViewDetailed: React.FC = () => {
             activeProject?.timeline.map((event, index) => (
               <div key={event._id} className="flex gap-4">
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    event.type === 'task' ? 'bg-blue-100' :
-                    event.type === 'milestone' ? 'bg-green-100' :
-                    event.type === 'comment' ? 'bg-purple-100' :
-                    'bg-gray-100'
-                  }`}>
-                    {event.type === 'task' && <CheckCircle className="w-5 h-5 text-accent-dark" />}
-                    {event.type === 'milestone' && <Flag className="w-5 h-5 text-green-600" />}
-                    {event.type === 'comment' && <MessageSquare className="w-5 h-5 text-purple-600" />}
-                    {event.type === 'status-change' && <Activity className="w-5 h-5 text-gray-600" />}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${event.type === 'task' ? (isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100') :
+                    event.type === 'milestone' ? (isDarkMode ? 'bg-green-900/30' : 'bg-green-100') :
+                      event.type === 'comment' ? (isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100') :
+                        (isDarkMode ? 'bg-gray-700' : 'bg-gray-100')
+                    }`}>
+                    {event.type === 'task' && <CheckCircle className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />}
+                    {event.type === 'milestone' && <Flag className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />}
+                    {event.type === 'comment' && <MessageSquare className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />}
+                    {event.type === 'status-change' && <Activity className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />}
                   </div>
                   {index < (activeProject?.timeline.length || 0) - 1 && (
-                    <div className="w-0.5 h-full bg-gray-300 mt-2" />
+                    <div className={`w-0.5 h-full mt-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`} />
                   )}
                 </div>
                 <div className="flex-1 pb-6">
                   <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-medium text-gray-900">{event.title}</h4>
-                    <span className="text-sm text-gray-600">{formatDate(event.date)}</span>
+                    <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{event.title}</h4>
+                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{formatDate(event.date)}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">{event.description}</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{event.description}</p>
+                  <div className={`flex items-center gap-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     <User className="w-4 h-4" />
                     <span>{event.user?.name || 'System'}</span>
                   </div>
@@ -1736,27 +1719,26 @@ const ProjectViewDetailed: React.FC = () => {
       </div>
 
       {/* Milestones */}
-      <div className="bg-white rounded-lg border border-gray-300 p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Milestones</h4>
+      <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
+        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Milestones</h4>
         <div className="space-y-4">
           {!activeProject?.milestones || activeProject?.milestones.length === 0 ? (
-            <p className="text-center text-gray-600 py-8">No milestones defined</p>
+            <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No milestones defined</p>
           ) : (
             activeProject?.milestones.map((milestone) => (
-              <div key={milestone._id} className="flex items-center justify-between p-4 border border-gray-300 rounded-lg">
+              <div key={milestone._id} className={`flex items-center justify-between p-4 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
                 <div className="flex-1">
-                  <h5 className="font-medium text-gray-900">{milestone.title}</h5>
-                  <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                  <h5 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{milestone.title}</h5>
+                  <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{milestone.description}</p>
+                  <div className={`flex items-center gap-4 mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     <span>Due: {formatDate(milestone.dueDate)}</span>
                     <span>{milestone.progress}% complete</span>
                   </div>
                 </div>
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                  milestone.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
+                <span className={`px-3 py-1 text-sm font-medium rounded-full ${milestone.status === 'completed' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800') :
+                  milestone.status === 'in-progress' ? (isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-800') :
+                    (isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800')
+                  }`}>
                   {milestone.status}
                 </span>
               </div>
@@ -1772,7 +1754,7 @@ const ProjectViewDetailed: React.FC = () => {
       <div className="flex items-center justify-between">
         <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Documents</h3>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+          <button className={`flex items-center gap-2 px-4 py-2 border rounded-lg ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
             <Upload className="w-4 h-4" />
             Upload
           </button>
@@ -1785,19 +1767,19 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Document Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Total Files</p>
-          <p className="text-2xl font-bold text-gray-900">{activeProject?.documents.length || 0}</p>
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Files</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.documents.length || 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Storage Used</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Storage Used</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {((activeProject?.documents.reduce((acc, doc) => acc + (doc.size || 0), 0) || 0) / 1024 / 1024).toFixed(2)} MB
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Recent Uploads</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Recent Uploads</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {activeProject?.documents.filter(d => {
               const dayAgo = new Date();
               dayAgo.setDate(dayAgo.getDate() - 1);
@@ -1808,19 +1790,19 @@ const ProjectViewDetailed: React.FC = () => {
       </div>
 
       {/* Documents Grid */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
+      <div className={`rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center gap-4">
-            <button className="px-3 py-1 text-sm font-medium text-accent-dark bg-blue-50 rounded-lg">
+            <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50'}`}>
               All Files
             </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+            <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}>
               Images
             </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+            <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}>
               Documents
             </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">
+            <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}>
               Recent
             </button>
           </div>
@@ -1828,39 +1810,39 @@ const ProjectViewDetailed: React.FC = () => {
 
         <div className="p-6">
           {activeProject?.documents.length === 0 ? (
-            <div className="p-12 text-center text-gray-600">
-              <FileText className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+            <div className={`p-12 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <FileText className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
               <p className="font-medium">No documents yet</p>
               <p className="text-sm mt-1">Upload files to share with your team</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeProject?.documents.map((doc) => (
-                <div key={doc._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={doc._id} className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${isDarkMode ? 'border-gray-600 bg-gray-900' : 'border-gray-300 bg-white'}`}>
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        {doc.type === 'folder' && <FileText className="w-5 h-5 text-accent-dark" />}
-                        {doc.type === 'file' && <File className="w-5 h-5 text-accent-dark" />}
-                        {doc.type === 'image' && <Image className="w-5 h-5 text-accent-dark" />}
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
+                        {doc.type === 'folder' && <FileText className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />}
+                        {doc.type === 'file' && <File className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />}
+                        {doc.type === 'image' && <Image className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />}
                       </div>
                       <div className="flex-1">
-                        <h5 className="font-medium text-gray-900 text-sm">{doc.name}</h5>
-                        <p className="text-xs text-gray-600">
+                        <h5 className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{doc.name}</h5>
+                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                           {doc.size ? `${(doc.size / 1024).toFixed(2)} KB` : 'Folder'}
                         </p>
                       </div>
                     </div>
-                    <button className="p-1 text-gray-600 hover:text-gray-600">
+                    <button className={`p-1 ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'}`}>
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="text-xs text-gray-600">
+                  <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     <p>Uploaded by {doc.uploadedBy?.name || 'Unknown'}</p>
                     <p>{formatDate(doc.uploadedAt)}</p>
                   </div>
                   <div className="mt-3 flex items-center gap-2">
-                    <button className="flex-1 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                    <button className={`flex-1 px-3 py-1.5 text-sm border rounded ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
                       <Download className="w-3 h-3 inline mr-1" />
                       Download
                     </button>
@@ -1921,7 +1903,7 @@ const ProjectViewDetailed: React.FC = () => {
             <DollarSign className="w-5 h-5 text-purple-600" />
           </div>
           <p className="text-3xl font-bold text-gray-900">
-            {activeProject?.budget && activeProject?.spent 
+            {activeProject?.budget && activeProject?.spent
               ? Math.round((activeProject.spent / activeProject.budget) * 100)
               : 0}%
           </p>
@@ -1935,7 +1917,7 @@ const ProjectViewDetailed: React.FC = () => {
             <Users className="w-5 h-5 text-orange-600" />
           </div>
           <p className="text-3xl font-bold text-gray-900">
-            {activeProject?.team.length 
+            {activeProject?.team.length
               ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
               : 0}%
           </p>
@@ -1960,14 +1942,13 @@ const ProjectViewDetailed: React.FC = () => {
                     <span className="font-medium text-gray-900">{count} ({percentage}%)</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full ${
-                        status === 'completed' ? 'bg-green-600' :
+                    <div
+                      className={`h-2 rounded-full ${status === 'completed' ? 'bg-green-600' :
                         status === 'in-progress' ? 'bg-accent' :
-                        status === 'blocked' ? 'bg-red-600' :
-                        status === 'review' ? 'bg-purple-600' :
-                        'bg-gray-400'
-                      }`}
+                          status === 'blocked' ? 'bg-red-600' :
+                            status === 'review' ? 'bg-purple-600' :
+                              'bg-gray-400'
+                        }`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -1990,12 +1971,12 @@ const ProjectViewDetailed: React.FC = () => {
                   </span>
                 </div>
                 <div className="w-full bg-gray-300 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-accent h-2 rounded-full"
-                    style={{ 
-                      width: `${member.tasksAssigned > 0 
+                    style={{
+                      width: `${member.tasksAssigned > 0
                         ? Math.round((member.tasksCompleted / member.tasksAssigned) * 100)
-                        : 0}%` 
+                        : 0}%`
                     }}
                   />
                 </div>
@@ -2024,12 +2005,12 @@ const ProjectViewDetailed: React.FC = () => {
             </div>
             <div className="pt-4 border-t border-gray-200">
               <div className="w-full bg-gray-300 rounded-full h-3">
-                <div 
+                <div
                   className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
-                  style={{ 
-                    width: `${activeProject?.budget && activeProject?.spent 
+                  style={{
+                    width: `${activeProject?.budget && activeProject?.spent
                       ? Math.min(Math.round((activeProject.spent / activeProject.budget) * 100), 100)
-                      : 0}%` 
+                      : 0}%`
                   }}
                 />
               </div>
@@ -2090,14 +2071,14 @@ const ProjectViewDetailed: React.FC = () => {
     }
 
     const isWorkspaceOwner = activeProject?.createdBy === state.userProfile?._id;
-    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id || 
-                            (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
+    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id ||
+      (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
     const canEdit = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
 
     switch (activeView) {
       case 'overview':
         return renderProjectOverview();
-      
+
       case 'info':
         return (
           <ProjectInfoTab
@@ -2117,7 +2098,7 @@ const ProjectViewDetailed: React.FC = () => {
             }}
           />
         );
-      
+
       case 'team':
         return (
           <ProjectTeamTab
@@ -2132,22 +2113,22 @@ const ProjectViewDetailed: React.FC = () => {
                 console.log('🔄 [ADD MEMBER] Sending request:', { memberId, role, projectId: activeProject?._id });
                 const response = await apiService.post(`/projects/${activeProject?._id}/members`, { userId: memberId, role });
                 console.log('✅ [ADD MEMBER] Response received:', response.data);
-                
+
                 if (response.data.success) {
                   const updatedProject = response.data.data;
                   console.log('📊 [ADD MEMBER] Updated project team members:', updatedProject.teamMembers);
                   console.log('👤 [ADD MEMBER] Last member:', updatedProject.teamMembers[updatedProject.teamMembers.length - 1]);
-                  
+
                   // Force immediate refresh by creating new object with new array reference
                   const refreshedProject = {
                     ...updatedProject,
                     teamMembers: [...updatedProject.teamMembers] // New array reference forces React re-render
                   };
-                  
+
                   setActiveProject(refreshedProject);
                   dispatch({ type: 'UPDATE_PROJECT', payload: { projectId: activeProject?._id || '', updates: { teamMembers: refreshedProject.teamMembers } } });
                   dispatch({ type: 'ADD_TOAST', payload: { id: Date.now().toString(), type: 'success', message: `Member added successfully!`, duration: 3000 } });
-                  
+
                   console.log('🔄 [ADD MEMBER] State updated, refreshing UI with', refreshedProject.teamMembers.length, 'members');
                 }
               } catch (error) {
@@ -2160,41 +2141,41 @@ const ProjectViewDetailed: React.FC = () => {
               try {
                 console.log('🗑️ [REMOVE MEMBER] Removing member:', memberId, 'from project:', activeProject?._id);
                 console.log('🗑️ [REMOVE MEMBER] Current user ID:', state.userProfile._id);
-                
+
                 // Call API to remove member from database
                 const response = await apiService.delete(`/projects/${activeProject?._id}/members/${memberId}`);
                 console.log('✅ [REMOVE MEMBER] Response:', response.data);
-                
+
                 if (response.data.success) {
                   // Check if removed user is current user
                   if (memberId === state.userProfile._id) {
                     console.log('⚠️ [REMOVE MEMBER] Current user was removed from project, redirecting...');
-                    dispatch({ 
-                      type: 'ADD_TOAST', 
-                      payload: { 
-                        id: Date.now().toString(), 
-                        type: 'info', 
-                        message: 'You have been removed from this project', 
-                        duration: 4000 
-                      } 
+                    dispatch({
+                      type: 'ADD_TOAST',
+                      payload: {
+                        id: Date.now().toString(),
+                        type: 'info',
+                        message: 'You have been removed from this project',
+                        duration: 4000
+                      }
                     });
-                    
+
                     // Clear active project
                     setActiveProject(null);
-                    
+
                     // Redirect to workspace
                     navigate('/workspace');
                     return;
                   }
-                  
+
                   const updatedProject = response.data.data;
-                  
+
                   // Force immediate refresh with new object reference
                   const refreshedProject = {
                     ...updatedProject,
                     teamMembers: [...updatedProject.teamMembers]
                   };
-                  
+
                   setActiveProject(refreshedProject);
                   dispatch({
                     type: 'UPDATE_PROJECT',
@@ -2203,29 +2184,29 @@ const ProjectViewDetailed: React.FC = () => {
                       updates: { teamMembers: refreshedProject.teamMembers }
                     }
                   });
-                  dispatch({ 
-                    type: 'ADD_TOAST', 
-                    payload: { 
-                      id: Date.now().toString(), 
-                      type: 'success', 
-                      message: 'Member removed successfully', 
-                      duration: 3000 
-                    } 
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'success',
+                      message: 'Member removed successfully',
+                      duration: 3000
+                    }
                   });
-                  
+
                   console.log('🔄 [REMOVE MEMBER] State updated, team now has', refreshedProject.teamMembers.length, 'members');
                 }
               } catch (error) {
                 console.error('❌ [REMOVE MEMBER] Failed:', error);
                 console.error('❌ [REMOVE MEMBER] Error details:', (error as any).response?.data);
-                dispatch({ 
-                  type: 'ADD_TOAST', 
-                  payload: { 
-                    id: Date.now().toString(), 
-                    type: 'error', 
-                    message: 'Failed to remove team member', 
-                    duration: 4000 
-                  } 
+                dispatch({
+                  type: 'ADD_TOAST',
+                  payload: {
+                    id: Date.now().toString(),
+                    type: 'error',
+                    message: 'Failed to remove team member',
+                    duration: 4000
+                  }
                 });
               }
             }}
@@ -2247,43 +2228,43 @@ const ProjectViewDetailed: React.FC = () => {
                 console.log('🔄 [UPDATE ROLE] Project ID:', activeProject?._id);
                 console.log('🔄 [UPDATE ROLE] API URL:', `/projects/${activeProject?._id}/members/${memberId}/role`);
                 console.log('🔄 [UPDATE ROLE] Request body:', { role: newRole });
-                
+
                 const response = await apiService.put(`/projects/${activeProject?._id}/members/${memberId}/role`, { role: newRole });
                 console.log('✅ [UPDATE ROLE] Response received:', response.data);
                 console.log('✅ [UPDATE ROLE] Response success:', response.data.success);
                 console.log('✅ [UPDATE ROLE] Updated project:', response.data.data);
-                
+
                 if (response.data.success) {
                   const updatedProject = response.data.data;
                   console.log('✅ [UPDATE ROLE] Team members count:', updatedProject.teamMembers?.length);
-                  
+
                   // Force immediate refresh with new object reference
                   const refreshedProject = {
                     ...updatedProject,
                     teamMembers: [...updatedProject.teamMembers]
                   };
-                  
+
                   console.log('🔄 [UPDATE ROLE] Setting active project with refreshed data');
                   setActiveProject(refreshedProject);
-                  dispatch({ 
-                    type: 'UPDATE_PROJECT', 
-                    payload: { 
-                      projectId: activeProject?._id || '', 
-                      updates: { teamMembers: refreshedProject.teamMembers } 
-                    } 
+                  dispatch({
+                    type: 'UPDATE_PROJECT',
+                    payload: {
+                      projectId: activeProject?._id || '',
+                      updates: { teamMembers: refreshedProject.teamMembers }
+                    }
                   });
-                  dispatch({ 
-                    type: 'ADD_TOAST', 
-                    payload: { 
-                      id: Date.now().toString(), 
-                      type: 'success', 
-                      message: `Member role updated to: ${newRole}`, 
-                      duration: 3000 
-                    } 
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      id: Date.now().toString(),
+                      type: 'success',
+                      message: `Member role updated to: ${newRole}`,
+                      duration: 3000
+                    }
                   });
-                  
+
                   console.log('🔄 [UPDATE ROLE] State updated, UI should refresh now');
-                  
+
                   // Force reload project from server to ensure sync
                   console.log('🔄 [UPDATE ROLE] Force reloading project from server...');
                   const reloadResponse = await apiService.get(`/projects/${activeProject?._id}`);
@@ -2300,20 +2281,20 @@ const ProjectViewDetailed: React.FC = () => {
                 console.error('❌ [UPDATE ROLE] Failed:', error);
                 console.error('❌ [UPDATE ROLE] Error response:', (error as any).response?.data);
                 console.error('❌ [UPDATE ROLE] Error status:', (error as any).response?.status);
-                dispatch({ 
-                  type: 'ADD_TOAST', 
-                  payload: { 
-                    id: Date.now().toString(), 
-                    type: 'error', 
-                    message: 'Failed to update member role', 
-                    duration: 4000 
-                  } 
+                dispatch({
+                  type: 'ADD_TOAST',
+                  payload: {
+                    id: Date.now().toString(),
+                    type: 'error',
+                    message: 'Failed to update member role',
+                    duration: 4000
+                  }
                 });
               }
             }}
           />
         );
-      
+
       case 'tasks':
         // PM/Owner sees task assignment interface, employees see their tasks
         if (currentUserRole === 'owner' || currentUserRole === 'manager' || isProjectManager) {
@@ -2339,10 +2320,10 @@ const ProjectViewDetailed: React.FC = () => {
             onUpdateTask={handleUpdateTask}
           />
         );
-      
+
       case 'attendance': {
         const isManagerView = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
-        
+
         // Map teamMembers to the format expected by attendance component
         const teamForAttendance = ((activeProject as any)?.teamMembers || []).map((tm: any) => {
           const user = typeof tm.user === 'object' ? tm.user : { _id: tm.user, fullName: 'Unknown', email: '' };
@@ -2353,7 +2334,7 @@ const ProjectViewDetailed: React.FC = () => {
             role: tm.role || 'member'
           };
         });
-        
+
         if (isManagerView) {
           return (
             <ProjectAttendanceManagerTab
@@ -2368,13 +2349,13 @@ const ProjectViewDetailed: React.FC = () => {
           />
         );
       }
-      
+
       case 'timeline':
         return renderTimelineView();
-      
+
       case 'progress':
         return <ProjectProgressTab project={activeProject} />;
-      
+
       case 'workload':
         // Show Requests tab for employees and PM
         return (
@@ -2384,7 +2365,7 @@ const ProjectViewDetailed: React.FC = () => {
             isProjectManager={isProjectManager || isWorkspaceOwner}
             requests={requests}
             tasks={projectTasks}
-            teamMembers={project?.teamMembers || []}
+            teamMembers={(activeProject as any)?.teamMembers || activeProject?.team || []}
             onCreateRequest={handleCreateRequest}
             onApproveRequest={handleApproveRequest}
             onRejectRequest={handleRejectRequest}
@@ -2392,16 +2373,16 @@ const ProjectViewDetailed: React.FC = () => {
             onManualDeadlineChange={handleManualDeadlineChange}
           />
         );
-      
+
       case 'reports':
         return renderAnalyticsView(); // Reuse analytics for reports
-      
+
       case 'documents':
         return renderDocumentsView();
-      
+
       case 'inbox':
         return <WorkspaceInbox />;
-      
+
       case 'settings':
         return (
           <div className="space-y-6">
@@ -2411,7 +2392,7 @@ const ProjectViewDetailed: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Manage project status and completion progress
               </p>
-              
+
               <div className="space-y-4">
                 {/* Status Dropdown */}
                 <div>
@@ -2441,7 +2422,7 @@ const ProjectViewDetailed: React.FC = () => {
                     {projectStatus === 'archived' && 'Project is archived and inactive'}
                   </p>
                 </div>
-              
+
                 {/* Progress Slider */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -2452,7 +2433,7 @@ const ProjectViewDetailed: React.FC = () => {
                       {projectProgress}%
                     </span>
                   </div>
-                  
+
                   <input
                     type="range"
                     min="0"
@@ -2472,7 +2453,7 @@ const ProjectViewDetailed: React.FC = () => {
                       background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${projectProgress}%, #e5e7eb ${projectProgress}%, #e5e7eb 100%)`
                     }}
                   />
-                  
+
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                     <span>0%</span>
                     <span>25%</span>
@@ -2481,41 +2462,40 @@ const ProjectViewDetailed: React.FC = () => {
                     <span>100%</span>
                   </div>
                 </div>
-                
+
                 {/* Status Indicator */}
                 <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className={`w-3 h-3 rounded-full ${
-                    projectProgress === 0 ? 'bg-gray-400' :
+                  <div className={`w-3 h-3 rounded-full ${projectProgress === 0 ? 'bg-gray-400' :
                     projectProgress < 25 ? 'bg-red-500' :
-                    projectProgress < 50 ? 'bg-orange-500' :
-                    projectProgress < 75 ? 'bg-yellow-500' :
-                    projectProgress < 100 ? 'bg-blue-500' :
-                    'bg-green-500'
-                  }`} />
+                      projectProgress < 50 ? 'bg-orange-500' :
+                        projectProgress < 75 ? 'bg-yellow-500' :
+                          projectProgress < 100 ? 'bg-blue-500' :
+                            'bg-green-500'
+                    }`} />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {projectProgress === 0 ? 'Not Started' :
-                     projectProgress < 25 ? 'Just Started' :
-                     projectProgress < 50 ? 'In Progress' :
-                     projectProgress < 75 ? 'More Than Half' :
-                     projectProgress < 100 ? 'Almost Complete' :
-                     'Completed'}
+                      projectProgress < 25 ? 'Just Started' :
+                        projectProgress < 50 ? 'In Progress' :
+                          projectProgress < 75 ? 'More Than Half' :
+                            projectProgress < 100 ? 'Almost Complete' :
+                              'Completed'}
                   </span>
                 </div>
-                
+
                 <button
                   onClick={async () => {
                     try {
                       console.log('💾 [SAVE PROJECT] Saving project status:', projectStatus);
                       console.log('💾 [SAVE PROJECT] Saving project progress:', projectProgress);
                       console.log('💾 [SAVE PROJECT] Project ID:', activeProject?._id);
-                      
+
                       const response = await apiService.put(`/projects/${activeProject?._id}`, {
                         status: projectStatus,
                         progress: projectProgress
                       });
-                      
+
                       console.log('✅ [SAVE PROJECT] Response:', response.data);
-                      
+
                       // Update local project state
                       if (activeProject) {
                         setActiveProject({
@@ -2524,7 +2504,7 @@ const ProjectViewDetailed: React.FC = () => {
                           progress: projectProgress
                         });
                       }
-                      
+
                       dispatch({
                         type: 'ADD_TOAST',
                         payload: {
@@ -2588,7 +2568,7 @@ const ProjectViewDetailed: React.FC = () => {
                     type="button"
                     onClick={() => {
                       console.log('📍 [LOCATION] Requesting location permission...');
-                      
+
                       if (!navigator.geolocation) {
                         console.error('❌ [LOCATION] Geolocation not supported');
                         dispatch({
@@ -2602,7 +2582,7 @@ const ProjectViewDetailed: React.FC = () => {
                         });
                         return;
                       }
-                      
+
                       dispatch({
                         type: 'ADD_TOAST',
                         payload: {
@@ -2612,19 +2592,19 @@ const ProjectViewDetailed: React.FC = () => {
                           duration: 2000
                         }
                       });
-                      
+
                       // Request with high accuracy and timeout
                       navigator.geolocation.getCurrentPosition(
                         (pos) => {
                           console.log('✅ [LOCATION] Location detected:', pos.coords);
                           const lat = pos.coords.latitude.toFixed(6);
                           const lng = pos.coords.longitude.toFixed(6);
-                          
+
                           setOfficeLatitude(lat);
                           setOfficeLongitude(lng);
-                          
+
                           console.log('✅ [LOCATION] Set latitude:', lat, 'longitude:', lng);
-                          
+
                           dispatch({
                             type: 'ADD_TOAST',
                             payload: {
@@ -2639,10 +2619,10 @@ const ProjectViewDetailed: React.FC = () => {
                           console.error('❌ [LOCATION] Error:', error);
                           console.error('❌ [LOCATION] Error code:', error.code);
                           console.error('❌ [LOCATION] Error message:', error.message);
-                          
+
                           let errorMessage = 'Unable to detect location. ';
-                          
-                          switch(error.code) {
+
+                          switch (error.code) {
                             case error.PERMISSION_DENIED:
                               errorMessage += 'Please allow location permission in your browser settings.';
                               break;
@@ -2655,7 +2635,7 @@ const ProjectViewDetailed: React.FC = () => {
                             default:
                               errorMessage += 'An unknown error occurred.';
                           }
-                          
+
                           dispatch({
                             type: 'ADD_TOAST',
                             payload: {
@@ -2692,26 +2672,26 @@ const ProjectViewDetailed: React.FC = () => {
                         });
                         return;
                       }
-                      
+
                       try {
                         console.log('💾 [SAVE LOCATION] Saving office location...');
                         console.log('💾 [SAVE LOCATION] Latitude:', officeLatitude);
                         console.log('💾 [SAVE LOCATION] Longitude:', officeLongitude);
                         console.log('💾 [SAVE LOCATION] Project ID:', activeProject?._id);
-                        
+
                         const locationData = {
                           officeLocation: {
                             latitude: parseFloat(officeLatitude),
                             longitude: parseFloat(officeLongitude)
                           }
                         };
-                        
+
                         console.log('💾 [SAVE LOCATION] Request data:', locationData);
-                        
+
                         const response = await apiService.put(`/projects/${activeProject?._id}`, locationData);
-                        
+
                         console.log('✅ [SAVE LOCATION] Response:', response.data);
-                        
+
                         dispatch({
                           type: 'ADD_TOAST',
                           payload: {
@@ -2742,7 +2722,7 @@ const ProjectViewDetailed: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
+
               {officeLatitude && officeLongitude && (
                 <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <p className="text-sm text-blue-800 dark:text-blue-300">
@@ -2761,7 +2741,7 @@ const ProjectViewDetailed: React.FC = () => {
             </div>
           </div>
         );
-      
+
       default:
         return renderProjectOverview();
     }
@@ -2775,9 +2755,9 @@ const ProjectViewDetailed: React.FC = () => {
       reviewComments: comments,
       completedAt: new Date()
     };
-    
+
     handleUpdateTask(taskId, updates);
-    
+
     dispatch({
       type: 'ADD_TOAST',
       payload: {
@@ -2794,9 +2774,9 @@ const ProjectViewDetailed: React.FC = () => {
       status: 'in-progress',
       reviewComments: `Rejected: ${reason}`
     };
-    
+
     handleUpdateTask(taskId, updates);
-    
+
     dispatch({
       type: 'ADD_TOAST',
       payload: {
@@ -2839,23 +2819,29 @@ const ProjectViewDetailed: React.FC = () => {
     }
 
     setShowAddMemberModal(false);
-    dispatch({ 
-      type: 'ADD_TOAST', 
-      payload: { 
-        type: 'success', 
-        message: `Member added to project with role: ${role}` 
-      } 
+    dispatch({
+      type: 'ADD_TOAST',
+      payload: {
+        type: 'success',
+        message: `Member added to project with role: ${role}`
+      }
     });
   };
 
   return (
-    <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       {renderProjectHeader()}
-      
-      <div className="flex flex-1 overflow-hidden">
+
+      <div
+        className="flex flex-1 flex-col lg:flex-row overflow-hidden transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         {/* Main Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-6">
+        <div className="flex-1 overflow-y-auto w-full">
+          <div className="p-4 md:p-6">
             {renderMainContent()}
           </div>
         </div>
@@ -2879,12 +2865,12 @@ const ProjectViewDetailed: React.FC = () => {
         onClose={() => setShowInviteMemberModal(false)}
         onInvite={(email, role, message) => {
           // Handle invite logic here
-          dispatch({ 
-            type: 'ADD_TOAST', 
-            payload: { 
-              type: 'success', 
-              message: `Invitation sent to ${email} with role: ${role}` 
-            } 
+          dispatch({
+            type: 'ADD_TOAST',
+            payload: {
+              type: 'success',
+              message: `Invitation sent to ${email} with role: ${role}`
+            }
           });
           setShowInviteMemberModal(false);
         }}
@@ -2911,6 +2897,7 @@ const ProjectViewDetailed: React.FC = () => {
         onDeleteTask={handleDeleteTask}
         currentUserRole={currentUserRole}
         currentUserId={currentTestUserId}
+        workspaceId={(activeProject as any)?.workspace}
       />
 
       {/* Task Review Modal */}

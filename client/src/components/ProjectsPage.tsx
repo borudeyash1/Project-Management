@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  Plus, Search, Filter, Calendar, Clock, Target, Users, 
+import {
+  Plus, Search, Filter, Calendar, Clock, Target, Users,
   TrendingUp, BarChart3, MoreVertical, Edit, Trash2,
   Eye, Star, Flag, Tag, MessageSquare, FileText,
   Grid, List, SortAsc, SortDesc, Archive, Play, Pause,
   CheckCircle, AlertCircle, Zap, Bot, Crown
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import { WorkspaceCreationRestriction } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,7 @@ interface Project {
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { canCreateProject } = useFeatureAccess();
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
@@ -94,7 +96,7 @@ const ProjectsPage: React.FC = () => {
       const filters: ProjectFilters = {};
       if (selectedStatus !== 'all') filters.status = selectedStatus;
       const response = await getProjects(activeWorkspaceId, filters);
-        const normalized = response.map((project: ApiProject) => {
+      const normalized = response.map((project: ApiProject) => {
         const rawOwner = (project as any).createdBy || (project as any).owner || {};
         const rawTeam = (project as any).teamMembers || (project as any).team || [];
         const start = project.startDate || (project as any).startDate || new Date().toISOString();
@@ -112,10 +114,10 @@ const ProjectsPage: React.FC = () => {
           budget: (project as any).budget || { estimated: 0, actual: 0, currency: 'USD' },
           team: Array.isArray(rawTeam)
             ? rawTeam.map((member: any) => ({
-                _id: member.user?._id || member._id,
-                name: member.user?.fullName || member.name || 'Member',
-                avatar: member.user?.avatarUrl || member.avatar,
-              }))
+              _id: member.user?._id || member._id,
+              name: member.user?.fullName || member.name || 'Member',
+              avatar: member.user?.avatarUrl || member.avatar,
+            }))
             : [],
           tags: project.tags || [],
           owner: {
@@ -320,7 +322,7 @@ const ProjectsPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             {canCreateProject() ? (
-              <button 
+              <button
                 onClick={() => setShowCreateModal(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
               >
@@ -336,7 +338,13 @@ const ProjectsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-6">
+      <div
+        className="p-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         {/* Filters and Search */}
         <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4 mb-6`}>
           <div className="flex flex-col lg:flex-row gap-4">
@@ -348,11 +356,10 @@ const ProjectsPage: React.FC = () => {
                 placeholder={t('projects.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
               />
             </div>
 
@@ -361,11 +368,10 @@ const ProjectsPage: React.FC = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
+                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white'
+                  : 'bg-white border-gray-300 text-gray-900'
+                  }`}
               >
                 <option value="all">{t('projects.allStatus')}</option>
                 <option value="planning">{t('projects.planning')}</option>
@@ -378,11 +384,10 @@ const ProjectsPage: React.FC = () => {
               <select
                 value={selectedPriority}
                 onChange={(e) => setSelectedPriority(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
+                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white'
+                  : 'bg-white border-gray-300 text-gray-900'
+                  }`}
               >
                 <option value="all">{t('projects.allPriority')}</option>
                 <option value="urgent">{t('projects.urgent')}</option>
@@ -398,11 +403,10 @@ const ProjectsPage: React.FC = () => {
                   setSortBy(field as any);
                   setSortOrder(order as any);
                 }}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
+                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white'
+                  : 'bg-white border-gray-300 text-gray-900'
+                  }`}
               >
                 <option value="name-asc">{t('sort.nameAsc')}</option>
                 <option value="name-desc">{t('sort.nameDesc')}</option>
@@ -539,24 +543,22 @@ const ProjectsPage: React.FC = () => {
 
                 {/* Actions */}
                 <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-700 flex-wrap">
-                  <button 
+                  <button
                     onClick={() => handleViewProject(project._id)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
-                      isDarkMode
-                        ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
-                        : 'text-gray-600 border-gray-300 hover:bg-gray-50'
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
+                      ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
+                      : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+                      }`}
                   >
                     <Eye className="w-4 h-4" />
                     {t('common.view')}
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleEditProject(project._id)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
-                      isDarkMode
-                        ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
-                        : 'text-gray-600 border-gray-300 hover:bg-gray-50'
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
+                      ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
+                      : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+                      }`}
                   >
                     <Edit className="w-4 h-4" />
                     {t('common.edit')}
@@ -565,11 +567,10 @@ const ProjectsPage: React.FC = () => {
                     <button
                       onClick={() => handleUpdateProjectStatus(project._id, 'completed')}
                       disabled={processingProjectId === project._id}
-                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
-                        isDarkMode
-                          ? 'text-green-700 border-green-600 hover:bg-green-900/40'
-                          : 'text-green-600 border-green-300 hover:bg-green-50'
-                      } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
+                        ? 'text-green-700 border-green-600 hover:bg-green-900/40'
+                        : 'text-green-600 border-green-300 hover:bg-green-50'
+                        } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <CheckCircle className="w-4 h-4" />
                       {t('common.complete')}
@@ -578,11 +579,10 @@ const ProjectsPage: React.FC = () => {
                   <button
                     onClick={() => handleDeleteProject(project._id)}
                     disabled={processingProjectId === project._id}
-                    className={`flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${
-                      isDarkMode
-                        ? 'text-red-700 border-red-600 hover:bg-red-900/40'
-                        : 'text-red-600 border-red-300 hover:bg-red-50'
-                    } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
+                      ? 'text-red-700 border-red-600 hover:bg-red-900/40'
+                      : 'text-red-600 border-red-300 hover:bg-red-50'
+                      } ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <Trash2 className="w-4 h-4" />
                     {t('common.delete')}
@@ -707,9 +707,8 @@ const ProjectsPage: React.FC = () => {
         {/* Empty State */}
         {filteredProjects.length === 0 && (
           <div className="text-center py-12">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-              isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-            }`}>
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+              }`}>
               <Target className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             </div>
             <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.noProjects')}</h3>
@@ -719,7 +718,7 @@ const ProjectsPage: React.FC = () => {
                 : t('projects.createFirst')}
             </p>
             {canCreateProject() && (
-              <button 
+              <button
                 onClick={() => setShowCreateModal(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
               >

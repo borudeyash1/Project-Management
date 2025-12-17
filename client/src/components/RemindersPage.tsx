@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle, 
+import {
+  Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle,
   Star, Flag, Tag, MessageSquare, FileText, Users,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
   Target, TrendingUp, BarChart3, List, Download, Volume2, Repeat
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import ReminderModal from './ReminderModal';
 import { useReminderNotifications, useReminderSnooze, downloadICalendar } from '../hooks/useReminderNotifications';
@@ -61,6 +63,7 @@ interface CalendarEvent {
 
 const RemindersPage: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { canUseAI } = useFeatureAccess();
   const { t, i18n } = useTranslation();
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -263,18 +266,18 @@ const RemindersPage: React.FC = () => {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('en-US', {
       weekday: 'short',
-      month: 'short', 
-      day: 'numeric' 
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -288,7 +291,7 @@ const RemindersPage: React.FC = () => {
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(r => 
+      filtered = filtered.filter(r =>
         r.title.toLowerCase().includes(query) ||
         r.description?.toLowerCase().includes(query) ||
         r.tags.some(tag => tag.toLowerCase().includes(query)) ||
@@ -329,8 +332,8 @@ const RemindersPage: React.FC = () => {
   const handleSaveReminder = (reminderData: Partial<Reminder>) => {
     if (selectedReminder) {
       // Update existing
-      setReminders(reminders.map(r => 
-        r._id === selectedReminder._id 
+      setReminders(reminders.map(r =>
+        r._id === selectedReminder._id
           ? { ...r, ...reminderData, updatedAt: new Date() }
           : r
       ));
@@ -360,7 +363,7 @@ const RemindersPage: React.FC = () => {
 
   const handleSnooze = (reminderId: string, minutes: number) => {
     snoozeReminder(reminderId, minutes, (id, snoozedUntil) => {
-      setReminders(reminders.map(r => 
+      setReminders(reminders.map(r =>
         r._id === id ? { ...r, snoozedUntil } : r
       ));
     });
@@ -369,13 +372,13 @@ const RemindersPage: React.FC = () => {
 
   const handleExport = (type: 'all' | 'pending' | 'completed') => {
     let remindersToExport = reminders;
-    
+
     if (type === 'pending') {
       remindersToExport = reminders.filter(r => !r.completed);
     } else if (type === 'completed') {
       remindersToExport = reminders.filter(r => r.completed);
     }
-    
+
     downloadICalendar(remindersToExport, `reminders-${type}.ics`);
     setShowExportMenu(false);
   };
@@ -439,7 +442,7 @@ const RemindersPage: React.FC = () => {
                 {t('reminders.notificationsOn')}
               </span>
             )}
-            
+
             {/* Export Button */}
             <div className="relative">
               <button
@@ -472,7 +475,7 @@ const RemindersPage: React.FC = () => {
                 </div>
               )}
             </div>
-            
+
             <button
               onClick={() => {
                 setSelectedReminder(null);
@@ -487,79 +490,86 @@ const RemindersPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-6">
+      <div
+        className="p-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
+        {/* Search and Filters */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder={t('reminders.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="flex items-center gap-3">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+              >
+                <option value="all">{t('common.allStatus')}</option>
+                <option value="pending">{t('common.pending')}</option>
+                <option value="completed">{t('common.completed')}</option>
+                <option value="overdue">{t('reminders.overdue')}</option>
+              </select>
+
+              <select
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+              >
+                <option value="all">{t('common.allPriority')}</option>
+                <option value="urgent">{t('common.urgent')}</option>
+                <option value="high">{t('common.high')}</option>
+                <option value="medium">{t('common.medium')}</option>
+                <option value="low">{t('common.low')}</option>
+              </select>
+            </div>
+
+            {/* View Toggle */}
+            <div className="flex items-center border border-gray-300 rounded-lg ml-auto">
+              {[
+                { id: 'list', label: t('reminders.views.list'), icon: List },
+                { id: 'calendar', label: t('reminders.views.calendar'), icon: Calendar },
+                { id: 'kanban', label: t('reminders.views.kanban'), icon: Target }
+              ].map(mode => {
+                const Icon = mode.icon;
+                return (
+                  <button
+                    key={mode.id}
+                    onClick={() => setViewMode(mode.id as any)}
+                    className={`flex items-center gap-2 px-3 py-2 text-sm font-medium ${viewMode === mode.id
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100'
+                      }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {mode.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Search and Filters */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
-              <div className="flex flex-col lg:flex-row gap-4">
-                {/* Search */}
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder={t('reminders.searchPlaceholder')}
-                      value={searchQuery}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                
-                {/* Filters */}
-                <div className="flex items-center gap-3">
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  >
-                    <option value="all">{t('common.allStatus')}</option>
-                    <option value="pending">{t('common.pending')}</option>
-                    <option value="completed">{t('common.completed')}</option>
-                    <option value="overdue">{t('reminders.overdue')}</option>
-                  </select>
 
-                  <select
-                    value={filterPriority}
-                    onChange={(e) => setFilterPriority(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  >
-                    <option value="all">{t('common.allPriority')}</option>
-                    <option value="urgent">{t('common.urgent')}</option>
-                    <option value="high">{t('common.high')}</option>
-                    <option value="medium">{t('common.medium')}</option>
-                    <option value="low">{t('common.low')}</option>
-                  </select>
-                </div>
-
-                {/* View Toggle */}
-                <div className="flex items-center border border-gray-300 rounded-lg ml-auto">
-                  {[
-                    { id: 'list', label: t('reminders.views.list'), icon: List },
-                    { id: 'calendar', label: t('reminders.views.calendar'), icon: Calendar },
-                    { id: 'kanban', label: t('reminders.views.kanban'), icon: Target }
-                  ].map(mode => {
-                    const Icon = mode.icon;
-                    return (
-                      <button
-                        key={mode.id}
-                        onClick={() => setViewMode(mode.id as any)}
-                        className={`flex items-center gap-2 px-3 py-2 text-sm font-medium ${
-                          viewMode === mode.id
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {mode.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
 
             {/* Content Area */}
             {viewMode === 'list' && (
@@ -573,15 +583,14 @@ const RemindersPage: React.FC = () => {
                       <div className="flex items-start gap-3">
                         <button
                           onClick={() => toggleReminderCompletion(reminder._id)}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
-                            reminder.completed
-                              ? 'bg-green-500 border-green-500 text-white'
-                              : 'border-gray-300'
-                          }`}
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${reminder.completed
+                            ? 'bg-green-500 border-green-500 text-white'
+                            : 'border-gray-300'
+                            }`}
                         >
                           {reminder.completed && <CheckCircle className="w-3 h-3" />}
                         </button>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="flex items-center gap-2">
@@ -599,11 +608,11 @@ const RemindersPage: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          
+
                           {reminder.description && (
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{reminder.description}</p>
                           )}
-                          
+
                           <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                             <span>{formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}</span>
                             {reminder.project && (
@@ -617,7 +626,7 @@ const RemindersPage: React.FC = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         <button className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400">
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -665,21 +674,20 @@ const RemindersPage: React.FC = () => {
                       {day}
                     </div>
                   ))}
-                  
+
                   {/* Day Cells */}
                   {weekDays.map((day, index) => {
                     const dayReminders = getRemindersForDate(day);
                     const dayEvents = getEventsForDate(day);
                     const isToday = day.toDateString() === new Date().toDateString();
                     const isSelected = day.toDateString() === selectedDate.toDateString();
-                    
+
                     return (
                       <div
                         key={index}
                         onClick={() => setSelectedDate(day)}
-                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-700 ${
-                          isToday ? 'bg-blue-50 border-blue-200' : ''
-                        } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-700 ${isToday ? 'bg-blue-50 border-blue-200' : ''
+                          } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900 dark:text-gray-100'}`}>
@@ -691,15 +699,14 @@ const RemindersPage: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         {/* Reminders */}
                         <div className="space-y-1">
                           {dayReminders.slice(0, 2).map(reminder => (
                             <div
                               key={reminder._id}
-                              className={`text-xs p-1 rounded truncate ${
-                                reminder.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                              }`}
+                              className={`text-xs p-1 rounded truncate ${reminder.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}
                             >
                               {reminder.title}
                             </div>
@@ -772,15 +779,15 @@ const RemindersPage: React.FC = () => {
           <div className="space-y-6">
             {/* AI Assistant */}
             {canUseAI() && (
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
+              <div className="bg-white dark:bg-gray-800 border border-purple-200 dark:border-gray-700 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-5 h-5" />
-                  <h3 className="font-semibold">{t('dashboard.aiAssistant')}</h3>
+                  <Bot className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.aiAssistant')}</h3>
                 </div>
-                <p className="text-sm text-purple-100 mb-3">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                   {t('dashboard.aiDescription')}
                 </p>
-                <button className="w-full bg-white dark:bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+                <button className="w-full bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
                   {t('dashboard.askAI')}
                 </button>
               </div>
@@ -830,11 +837,10 @@ const RemindersPage: React.FC = () => {
                   .slice(0, 5)
                   .map(reminder => (
                     <div key={reminder._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-700">
-                      <div className={`w-2 h-2 rounded-full ${
-                        reminder.priority === 'urgent' ? 'bg-red-500' :
+                      <div className={`w-2 h-2 rounded-full ${reminder.priority === 'urgent' ? 'bg-red-500' :
                         reminder.priority === 'high' ? 'bg-orange-500' :
-                        reminder.priority === 'medium' ? 'bg-yellow-500' : 'bg-gray-500'
-                      }`} />
+                          reminder.priority === 'medium' ? 'bg-yellow-500' : 'bg-gray-500'
+                        }`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{reminder.title}</p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">

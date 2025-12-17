@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import './InboxPage.css';
 import ComposeModal from '../components/ComposeModal';
 import { useToast } from '../context/ToastContext';
-import { useTheme } from '../context/ThemeContext';
 import { detectEmailSource } from '../services/emailDetector';
 import { parseLinkedInEmail } from '../services/emailParsers/linkedinParser';
 import { parseGitHubEmail } from '../services/emailParsers/githubParser';
@@ -11,6 +10,8 @@ import GitHubPreview from '../components/EmailPreviews/GitHubPreview';
 import GenericPreview from '../components/EmailPreviews/GenericPreview';
 import EmailSkeleton from '../components/EmailPreviews/EmailSkeleton';
 import ProfileSettings from '../components/ProfileSettings/ProfileSettings';
+
+import ContextMenu from '../components/ContextMenu';
 
 interface InboxPageProps {
   user: {
@@ -50,6 +51,14 @@ function InboxPage({ user }: InboxPageProps) {
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [replyTo, setReplyTo] = useState<any>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Context Menu State
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    email: Email | null;
+  }>({ visible: false, x: 0, y: 0, email: null });
 
   // UI State for enhancements
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -140,6 +149,52 @@ function InboxPage({ user }: InboxPageProps) {
     }
   };
 
+  const handleArchive = async (emailId: string) => {
+    try {
+      await fetch('/api/mail/archive', {
+        method: 'POST',
+        credentials: 'include',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ messageId: emailId })
+      });
+
+      setEmails(emails.filter(e => e.id !== emailId));
+      if (selectedEmail?.id === emailId) {
+        setSelectedEmail(null);
+      }
+      toast.success('Email archived');
+    } catch (error) {
+      console.error('Archive email error:', error);
+      toast.error('Failed to archive email');
+    }
+  };
+
+  const handleMarkAsRead = async (emailId: string, read: boolean) => {
+    try {
+      await fetch('/api/mail/mark-read', {
+        method: 'POST',
+        credentials: 'include',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ messageId: emailId, read })
+      });
+
+      setEmails(emails.map(e => e.id === emailId ? { ...e, isRead: read } : e));
+    } catch (error) {
+      console.error('Mark read error:', error);
+      toast.error('Failed to update email status');
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, email: Email) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      email
+    });
+  };
+
   const handleReply = (email: Email) => {
     setReplyTo({
       messageId: email.id,
@@ -154,28 +209,28 @@ function InboxPage({ user }: InboxPageProps) {
   const categorizeEmail = (email: any): Email['category'] => {
     const from = email.from.toLowerCase();
     const subject = email.subject.toLowerCase();
-    
-    if (from.includes('linkedin') || from.includes('facebook') || from.includes('twitter') || 
-        from.includes('instagram') || from.includes('reddit') || subject.includes('connection request')) {
+
+    if (from.includes('linkedin') || from.includes('facebook') || from.includes('twitter') ||
+      from.includes('instagram') || from.includes('reddit') || subject.includes('connection request')) {
       return 'social';
     }
-    
+
     if (subject.includes('sale') || subject.includes('discount') || subject.includes('offer') ||
-        subject.includes('deal') || subject.includes('promo') || subject.includes('% off') ||
-        from.includes('marketing') || from.includes('newsletter')) {
+      subject.includes('deal') || subject.includes('promo') || subject.includes('% off') ||
+      from.includes('marketing') || from.includes('newsletter')) {
       return 'promotions';
     }
-    
+
     if (subject.includes('notification') || subject.includes('alert') || subject.includes('update') ||
-        subject.includes('reminder') || from.includes('noreply') || from.includes('no-reply')) {
+      subject.includes('reminder') || from.includes('noreply') || from.includes('no-reply')) {
       return 'updates';
     }
-    
+
     if (from.includes('forum') || from.includes('community') || from.includes('discussion') ||
-        subject.includes('[forum]') || subject.includes('thread')) {
+      subject.includes('[forum]') || subject.includes('thread')) {
       return 'forums';
     }
-    
+
     return 'primary';
   };
 
@@ -212,14 +267,19 @@ function InboxPage({ user }: InboxPageProps) {
         setLoading(true);
         const labels = getLabelsForView(activeView);
         const labelsParam = labels.length > 0 ? `?labels=${labels.join(',')}` : '';
-        
+
         const response = await fetch(`/api/mail/messages${labelsParam}`, {
           credentials: 'include',
           headers: getAuthHeaders()
         });
         const data = await response.json();
-        
+
+        console.log('[InboxPage] Fetch response:', data);
+
         if (data.success) {
+          if (!data.data || data.data.length === 0) {
+            console.log('[InboxPage] No messages returned from API');
+          }
           const realEmails = data.data.map((msg: any) => ({
             id: msg.id,
             from: msg.from.replace(/<.*>/, '').trim(),
@@ -234,7 +294,23 @@ function InboxPage({ user }: InboxPageProps) {
             category: categorizeEmail(msg),
             threadId: msg.threadId
           }));
+          console.log('[InboxPage] Parsed emails:', realEmails.length);
           setEmails(realEmails);
+        } else {
+          console.error('[InboxPage] API returned success: false', data.message);
+
+          // Handle invalid_grant explicitly
+          if (data.error && (data.error === 'invalid_grant' || data.error.includes('invalid_grant'))) {
+            console.log('[InboxPage] Invalid grant detected. Clearing token and prompting relogin.');
+            toast.error('Session expired. Please reconnect your account.');
+            // localStorage.removeItem('accessToken');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+            return;
+          }
+
+          toast.error(data.message || 'Failed to fetch emails');
         }
       } catch (error) {
         console.error('Failed to fetch emails', error);
@@ -261,7 +337,7 @@ function InboxPage({ user }: InboxPageProps) {
           credentials: 'include',
           headers: getAuthHeaders()
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           setEmailContent(data.data);
@@ -302,7 +378,7 @@ function InboxPage({ user }: InboxPageProps) {
       // Calculate new width: mouse X position minus sidebar width
       const sidebarWidth = isSidebarCollapsed ? 80 : 280;
       const newWidth = e.clientX - sidebarWidth;
-      
+
       // Min width 300px, Max width 800px
       if (newWidth >= 300 && newWidth <= 800) {
         setListWidth(newWidth);
@@ -364,7 +440,7 @@ function InboxPage({ user }: InboxPageProps) {
     }
 
     if (searchQuery) {
-      filtered = filtered.filter(e => 
+      filtered = filtered.filter(e =>
         e.from.toLowerCase().includes(searchQuery.toLowerCase()) ||
         e.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
         e.preview.toLowerCase().includes(searchQuery.toLowerCase())
@@ -414,23 +490,33 @@ function InboxPage({ user }: InboxPageProps) {
       />
 
       {/* Sidebar */}
-      <div 
-        className="inbox-sidebar" 
-        style={{ 
-          width: isSidebarCollapsed ? '80px' : '280px', 
+      <div
+        className="inbox-sidebar"
+        style={{
+          width: isSidebarCollapsed ? '80px' : '280px',
           transition: 'width 0.3s ease',
           padding: isSidebarCollapsed ? '1rem 0.5rem' : '1.5rem',
           flexShrink: 0
         }}
       >
         <div className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', alignItems: isSidebarCollapsed ? 'center' : 'stretch' }}>
-          <div className="logo" style={{ justifyContent: isSidebarCollapsed ? 'center' : 'flex-start' }}>
-            <div className="logo-icon">📧</div>
-            {!isSidebarCollapsed && <h1>Sartthi Mail</h1>}
+          <div className="logo" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: isSidebarCollapsed ? 'center' : 'flex-start',
+            justifyContent: 'center',
+            gap: '4px'
+          }}>
+            <img src="/logo.png" alt="Sartthi Mail" style={{ height: '24px' }} />
+            {!isSidebarCollapsed && (
+              <h1 className="ml-1 text-[18px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500" style={{ lineHeight: '1.2' }}>
+                Mail
+              </h1>
+            )}
           </div>
-          
-          <button 
-            className="btn-compose" 
+
+          <button
+            className="btn-compose"
             onClick={() => { setReplyTo(null); setIsComposeOpen(true); }}
             title={isSidebarCollapsed ? "Compose" : ""}
             style={{ padding: isSidebarCollapsed ? '0.875rem' : '0.875rem' }}
@@ -482,14 +568,14 @@ function InboxPage({ user }: InboxPageProps) {
 
         <div className="sidebar-footer">
           {/* Collapse Toggle */}
-          <button 
+          <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            style={{ 
-              width: '100%', 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#a0a0a0', 
-              cursor: 'pointer', 
+            style={{
+              width: '100%',
+              background: 'transparent',
+              border: 'none',
+              color: '#a0a0a0',
+              cursor: 'pointer',
               padding: '0.5rem',
               display: 'flex',
               justifyContent: 'center',
@@ -511,9 +597,9 @@ function InboxPage({ user }: InboxPageProps) {
             )}
           </button>
 
-          <div 
-            className="user-profile" 
-            style={{ 
+          <div
+            className="user-profile"
+            style={{
               justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
               cursor: 'pointer'
             }}
@@ -534,10 +620,10 @@ function InboxPage({ user }: InboxPageProps) {
       </div>
 
       {/* Email List */}
-      <div 
-        className="email-list" 
-        style={{ 
-          width: `${listWidth}px`, 
+      <div
+        className="email-list"
+        style={{
+          width: `${listWidth}px`,
           flexShrink: 0,
           position: 'relative'
         }}
@@ -565,7 +651,7 @@ function InboxPage({ user }: InboxPageProps) {
               style={{ width: '100%', minWidth: '0' }}
             />
           </div>
-          
+
           <div className="filter-group">
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} className="filter-select">
               <option value="date">Date</option>
@@ -596,51 +682,52 @@ function InboxPage({ user }: InboxPageProps) {
             </div>
           ) : (
             filteredEmails.map((email) => (
-            <div
-              key={email.id}
-              className={`email-item ${!email.isRead ? 'unread' : ''} ${selectedEmail?.id === email.id ? 'selected' : ''}`}
-              onClick={() => setSelectedEmail(email)}
-            >
-              <div className="email-checkbox">
-                <input type="checkbox" onClick={(e) => e.stopPropagation()} />
-              </div>
-              <button 
-                className={`email-star ${email.isStarred ? 'starred' : ''}`} 
-                onClick={(e) => { e.stopPropagation(); handleStarEmail(email.id, !email.isStarred); }}
+              <div
+                key={email.id}
+                className={`email-item ${!email.isRead ? 'unread' : ''} ${selectedEmail?.id === email.id ? 'selected' : ''}`}
+                onClick={() => setSelectedEmail(email)}
+                onContextMenu={(e) => handleContextMenu(e, email)}
               >
-                ⭐
-              </button>
-              <div className="email-content">
-                <div className="email-header">
-                  <span className="email-from">{email.from}</span>
-                  <span className="email-time">{email.time}</span>
+                <div className="email-checkbox">
+                  <input type="checkbox" onClick={(e) => e.stopPropagation()} />
                 </div>
-                <div className="email-subject">{email.subject}</div>
-                <div className="email-preview">{email.preview}</div>
+                <button
+                  className={`email-star ${email.isStarred ? 'starred' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); handleStarEmail(email.id, !email.isStarred); }}
+                >
+                  ⭐
+                </button>
+                <div className="email-content">
+                  <div className="email-header">
+                    <span className="email-from">{email.from}</span>
+                    <span className="email-time">{email.time}</span>
+                  </div>
+                  <div className="email-subject">{email.subject}</div>
+                  <div className="email-preview">{email.preview}</div>
+                </div>
+                {email.hasAttachment && (
+                  <div className="email-attachment">📎</div>
+                )}
               </div>
-              {email.hasAttachment && (
-                <div className="email-attachment">📎</div>
-              )}
-            </div>
-          )))}</div>
+            )))}</div>
 
-          {/* Resize Handle */}
-          <div
-            ref={resizeRef}
-            onMouseDown={() => setIsResizing(true)}
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: '4px',
-              height: '100%',
-              cursor: 'col-resize',
-              zIndex: 10,
-              background: isResizing ? '#6366f1' : 'transparent',
-              transition: 'background 0.2s'
-            }}
-            className="resize-handle hover:bg-indigo-500/50"
-          />
+        {/* Resize Handle */}
+        <div
+          ref={resizeRef}
+          onMouseDown={() => setIsResizing(true)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '4px',
+            height: '100%',
+            cursor: 'col-resize',
+            zIndex: 10,
+            background: isResizing ? '#6366f1' : 'transparent',
+            transition: 'background 0.2s'
+          }}
+          className="resize-handle hover:bg-indigo-500/50"
+        />
       </div>
 
       {/* Email Detail */}
@@ -673,7 +760,7 @@ function InboxPage({ user }: InboxPageProps) {
                 <div style={{ width: '100%', padding: '1rem' }}>
                   {(() => {
                     const source = detectEmailSource(selectedEmail.from, selectedEmail.subject);
-                    
+
                     switch (source) {
                       case 'linkedin':
                         const linkedinData = parseLinkedInEmail(
@@ -688,7 +775,7 @@ function InboxPage({ user }: InboxPageProps) {
                             emailDate={emailContent.date}
                           />
                         );
-                      
+
                       case 'github':
                         const githubData = parseGitHubEmail(
                           emailContent.body.html,
@@ -702,7 +789,7 @@ function InboxPage({ user }: InboxPageProps) {
                             emailDate={emailContent.date}
                           />
                         );
-                      
+
                       default:
                         return (
                           <GenericPreview
@@ -737,19 +824,66 @@ function InboxPage({ user }: InboxPageProps) {
       </div>
 
       {/* Profile Settings Modal */}
-      <ProfileSettings 
+      <ProfileSettings
         user={user}
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
       />
 
-      {/* Compose Modal */}
-      {isComposeOpen && (
-        <ComposeModal 
-          onClose={() => setIsComposeOpen(false)}
-          replyTo={replyTo}
+      {/* Context Menu */}
+      {contextMenu.visible && contextMenu.email && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu({ ...contextMenu, visible: false })}
+          actions={[
+            {
+              label: 'Reply',
+              icon: <span>↩️</span>,
+              onClick: () => handleReply(contextMenu.email!)
+            },
+            {
+              label: 'Reply all',
+              icon: <span>🔁</span>,
+              onClick: () => handleReply(contextMenu.email!) // To be enhanced
+            },
+            {
+              label: 'Forward',
+              icon: <span>➡️</span>,
+              onClick: () => handleReply(contextMenu.email!) // To be enhanced
+            },
+            { divider: true, label: '', onClick: () => { } },
+            {
+              label: 'Archive',
+              icon: <span>📥</span>,
+              onClick: () => handleArchive(contextMenu.email!.id)
+            },
+            {
+              label: 'Delete',
+              icon: <span>🗑️</span>,
+              onClick: () => handleDeleteEmail(contextMenu.email!.id),
+              danger: true
+            },
+            { divider: true, label: '', onClick: () => { } },
+            {
+              label: contextMenu.email!.isRead ? 'Mark as unread' : 'Mark as read',
+              icon: <span>{contextMenu.email!.isRead ? '✉️' : '📩'}</span>,
+              onClick: () => handleMarkAsRead(contextMenu.email!.id, !contextMenu.email!.isRead)
+            },
+            {
+              label: 'Snooze',
+              icon: <span>⏰</span>,
+              onClick: () => toast.info('Snooze feature coming soon!')
+            },
+            {
+              label: 'Add to Tasks',
+              icon: <span>✅</span>,
+              onClick: () => toast.success('Added to Tasks')
+            }
+          ]}
         />
       )}
+
     </div>
   );
 }

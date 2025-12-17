@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useDock } from '../../context/DockContext';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutGrid, List, Calendar, Clock, Inbox, BarChart3,
@@ -19,6 +20,7 @@ type ViewType = 'board' | 'list' | 'timeline' | 'calendar' | 'mywork';
 
 const PlannerLayout: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('board');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
@@ -88,7 +90,13 @@ const PlannerLayout: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div
+      className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 transition-all duration-300"
+      style={{
+        paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+        paddingRight: dockPosition === 'right' ? '100px' : undefined
+      }}
+    >
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -104,8 +112,8 @@ const PlannerLayout: React.FC = () => {
                     key={view.id}
                     onClick={() => setCurrentView(view.id as ViewType)}
                     className={`px-3 py-2 text-sm font-medium flex items-center gap-2 ${currentView === view.id
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700'
-                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                       }`}
                     title={view.label}
                   >

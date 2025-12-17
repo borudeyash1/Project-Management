@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import { getCalendarEvents } from '../../services/calendarService';
+import api from '../../services/api';
 import { useTranslation } from 'react-i18next';
 
 interface CalendarEvent {
@@ -48,9 +48,20 @@ const CalendarWidget: React.FC = () => {
     const loadEvents = async () => {
         try {
             setLoading(true);
-            const monthStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-            const data = await getCalendarEvents(monthStr);
-            setEvents(data);
+            const response = await api.get('/sartthi/calendar/events');
+
+            if (response.data?.events) {
+                const mappedEvents: CalendarEvent[] = response.data.events.map((event: any) => {
+                    const dateObj = new Date(event.startTime);
+                    const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+                    return {
+                        date: dateStr,
+                        title: event.title,
+                        type: 'meeting' // Default type
+                    };
+                });
+                setEvents(mappedEvents);
+            }
         } catch (error) {
             console.error('Failed to load calendar events:', error);
         } finally {
@@ -108,14 +119,14 @@ const CalendarWidget: React.FC = () => {
                         setSelectedDate(date);
                     }}
                     className={`aspect-square flex flex-col items-center justify-center rounded-lg text-sm transition-all relative ${today
-                            ? 'bg-blue-600 text-white font-bold'
-                            : hasEvents
-                                ? isDarkMode
-                                    ? 'bg-gray-700 text-white hover:bg-gray-600'
-                                    : 'bg-blue-50 text-gray-900 hover:bg-blue-100'
-                                : isDarkMode
-                                    ? 'text-gray-300 hover:bg-gray-700'
-                                    : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-600 text-white font-bold'
+                        : hasEvents
+                            ? isDarkMode
+                                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                : 'bg-blue-50 text-gray-900 hover:bg-blue-100'
+                            : isDarkMode
+                                ? 'text-gray-300 hover:bg-gray-700'
+                                : 'text-gray-700 hover:bg-gray-100'
                         }`}
                 >
                     {day}
@@ -134,7 +145,7 @@ const CalendarWidget: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {t('widgets.calendar')}
+                    Calendar powered by Sartthi
                 </h2>
                 <CalendarIcon className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
             </div>

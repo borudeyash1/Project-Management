@@ -29,8 +29,8 @@ export const getDriveClient = async (userId: string) => {
     return google.drive({ version: 'v3', auth });
 };
 
-export const listFiles = async (userId: string, folderId?: string) => {
-    console.log(`📁 [DRIVE] Listing files for user: ${userId}, folder: ${folderId || 'Sartthi Vault'}`);
+export const listFiles = async (userId: string, folderId?: string, view?: string) => {
+    console.log(`📁 [DRIVE] Listing files for user: ${userId}, folder: ${folderId || 'Sartthi Vault'}, view: ${view}`);
 
     const user = await User.findById(userId);
     if (!user) {
@@ -52,11 +52,34 @@ export const listFiles = async (userId: string, folderId?: string) => {
     // This ensures we only access files explicitly stored in Sartthi Vault
     const targetFolderId = folderId || sartthiVaultFolder;
 
+    let query = '';
+    let orderBy = 'folder,name';
+
+    switch (view) {
+        case 'trash':
+            // STRICTLY scoped to target folder
+            query = `'${targetFolderId}' in parents and trashed=true`;
+            break;
+        case 'starred':
+            // STRICTLY scoped to target folder
+            query = `'${targetFolderId}' in parents and starred=true and trashed=false`;
+            break;
+        case 'recent':
+            // STRICTLY scoped to target folder, just sorted differently
+            query = `'${targetFolderId}' in parents and trashed=false`;
+            orderBy = 'modifiedTime desc';
+            break;
+        default:
+            // Default view (Home)
+            query = `'${targetFolderId}' in parents and trashed=false`;
+            break;
+    }
+
     try {
         const response = await drive.files.list({
-            q: `'${targetFolderId}' in parents and trashed=false`,
+            q: query,
             fields: 'files(id, name, mimeType, size, modifiedTime, thumbnailLink, webViewLink, webContentLink, iconLink)',
-            orderBy: 'folder,name',
+            orderBy: orderBy,
             pageSize: 1000,
         });
 
@@ -228,6 +251,32 @@ export const createFolder = async (userId: string, folderName: string, parentFol
     } catch (error: any) {
         console.error('📁 [DRIVE] Create folder error:', error.message);
         throw error;
+    }
+};
+
+// Add permission to file
+export const addPermission = async (userId: string, fileId: string, email: string, role: 'reader' | 'writer' = 'reader') => {
+    console.log(`🔐 [DRIVE] Adding permission: ${role} for ${email} on file ${fileId}`);
+
+    const drive = await getDriveClient(userId);
+
+    try {
+        const response = await drive.permissions.create({
+            fileId,
+            requestBody: {
+                role,
+                type: 'user',
+                emailAddress: email
+            },
+            fields: 'id',
+        });
+
+        console.log(`🔐 [DRIVE] Permission added: ${response.data.id}`);
+        return response.data;
+    } catch (error: any) {
+        console.error('🔐 [DRIVE] Add permission error:', error.message);
+        // Don't throw if user already has permission or if email is invalid for Drive
+        return null;
     }
 };
 

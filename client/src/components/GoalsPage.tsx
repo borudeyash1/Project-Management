@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Target, Plus, Search, Filter, MoreVertical, Edit, Trash2, 
+import {
+  Target, Plus, Search, Filter, MoreVertical, Edit, Trash2,
   Eye, CheckCircle, Clock, AlertCircle, Star, Flag, Calendar,
   TrendingUp, BarChart3, Users, Zap, Bot, Crown, Award,
   ArrowUp, ArrowDown, Minus, Play, Pause, Square, RotateCcw,
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import AddGoalModal from './goals/AddGoalModal';
 import { goalService, Goal, GoalStats } from '../services/goalService';
@@ -15,6 +16,7 @@ import { goalService, Goal, GoalStats } from '../services/goalService';
 const GoalsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { canUseAI, canCreateGoals, canManageGoals } = useFeatureAccess();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalStats, setGoalStats] = useState<GoalStats | null>(null);
@@ -98,8 +100,8 @@ const GoalsPage: React.FC = () => {
 
   const formatDate = (date: Date | string) => {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString(i18n.language === 'ja' ? 'ja-JP' : 'en-US', { 
-      month: 'short', 
+    return d.toLocaleDateString(i18n.language === 'ja' ? 'ja-JP' : 'en-US', {
+      month: 'short',
       day: 'numeric',
       year: 'numeric'
     });
@@ -117,7 +119,7 @@ const GoalsPage: React.FC = () => {
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter((goal: Goal) => 
+      filtered = filtered.filter((goal: Goal) =>
         goal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         goal.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         goal.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -163,8 +165,14 @@ const GoalsPage: React.FC = () => {
   const filteredGoals = getFilteredGoals();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-700 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div
+      className="min-h-screen bg-gray-50 dark:bg-gray-700 p-6 transition-all duration-300"
+      style={{
+        paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+        paddingRight: dockPosition === 'right' ? '100px' : undefined
+      }}
+    >
+      <div className="w-full">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -503,7 +511,7 @@ const GoalsPage: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Progress */}
               <div>
@@ -529,11 +537,10 @@ const GoalsPage: React.FC = () => {
                   <div className="space-y-3">
                     {selectedGoal.milestones.map(milestone => (
                       <div key={milestone._id} className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
-                          milestone.completed
-                            ? 'bg-green-500 border-green-500 text-white'
-                            : 'border-gray-300'
-                        }`}>
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${milestone.completed
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : 'border-gray-300'
+                          }`}>
                           {milestone.completed && <CheckCircle className="w-3 h-3" />}
                         </div>
                         <div className="flex-1">

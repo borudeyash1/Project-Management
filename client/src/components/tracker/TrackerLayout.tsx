@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Activity, Clock, FileText, Users, AlertTriangle, BarChart3, 
+import {
+  Activity, Clock, FileText, Users, AlertTriangle, BarChart3,
   Settings, Play, Pause, StopCircle, Search, Bell, Filter
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useDock } from '../../context/DockContext';
 import { useTracker } from '../../context/TrackerContext';
 import ActivityFeed from './views/ActivityFeed';
 import TimesheetView from './views/TimesheetView';
@@ -17,6 +18,7 @@ type ViewType = 'activity' | 'timesheet' | 'dashboard' | 'issues' | 'worklog' | 
 
 const TrackerLayout: React.FC = () => {
   const { activeTimer, startTimer, stopTimer, teamMetrics, alerts } = useTracker();
+  const { dockPosition } = useDock();
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,7 +99,7 @@ const TrackerLayout: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Timer Controls */}
               <div className="flex gap-2 ml-2">
                 {!activeTimer ? (
@@ -126,7 +128,13 @@ const TrackerLayout: React.FC = () => {
       </div>
 
       {/* Navigation & Toolbar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-3">
+      <div
+        className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-3 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         <div className="flex items-center justify-between">
           {/* Navigation Tabs */}
           <div className="flex items-center gap-2">
@@ -136,11 +144,10 @@ const TrackerLayout: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => setCurrentView(item.id)}
-                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    currentView === item.id
-                      ? 'bg-blue-100 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${currentView === item.id
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-sm font-medium">{item.label}</span>
@@ -168,11 +175,10 @@ const TrackerLayout: React.FC = () => {
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-lg transition-colors ${
-                showFilters
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+              className={`p-2 rounded-lg transition-colors ${showFilters
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
             >
               <Filter className="w-4 h-4" />
             </button>
@@ -230,7 +236,13 @@ const TrackerLayout: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
+      <div
+        className="flex-1 overflow-hidden transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
+          paddingRight: dockPosition === 'right' ? '100px' : undefined
+        }}
+      >
         {currentView === 'dashboard' && <TeamDashboard searchQuery={searchQuery} />}
         {currentView === 'activity' && <ActivityFeed searchQuery={searchQuery} />}
         {currentView === 'timesheet' && <TimesheetView searchQuery={searchQuery} />}

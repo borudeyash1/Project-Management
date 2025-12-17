@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Grid, List, Search, ChevronRight, Home, Upload as UploadIcon, Clock } from 'lucide-react';
+import { Grid, List, Search, ChevronRight, Home, Upload as UploadIcon, Clock, CloudOff } from 'lucide-react';
 import AssetCard from './AssetCard';
 import AssetRow from './AssetRow';
 import FileContextMenu from './FileContextMenu';
@@ -37,20 +37,41 @@ const VaultPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentFolderId, setCurrentFolderId] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch files from API
   useEffect(() => {
     loadFiles();
-  }, [currentFolderId]);
+  }, [currentFolderId, activeView]);
+
+  // Handle view changes
+  useEffect(() => {
+    setCurrentFolderId(undefined);
+    const viewNames: Record<string, string> = {
+      home: 'My Vault',
+      recent: 'Recent',
+      starred: 'Starred',
+      trash: 'Trash'
+    };
+    setBreadcrumbs([{ id: 'root', name: viewNames[activeView] || 'Files' }]);
+  }, [activeView]);
 
   const loadFiles = async () => {
     try {
       setIsLoading(true);
-      const files = await vaultApi.listFiles(currentFolderId);
-      setAssets(files);
-    } catch (error) {
+      setError(null);
+      const files = await vaultApi.listFiles(currentFolderId, activeView);
+      // Deduplicate files to prevent key collisions
+      const uniqueFiles = Array.from(new Map(files.map(item => [item.id, item])).values());
+      setAssets(uniqueFiles);
+    } catch (error: any) {
       console.error('Failed to load files:', error);
-      toast.error('Failed to load files');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load files';
+      setError(errorMessage);
+      // Don't show toast for connection errors as we show a full page error state
+      if (!errorMessage.includes('Vault connection expired') && !errorMessage.includes('Vault module not connected')) {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -120,11 +141,10 @@ const VaultPage: React.FC = () => {
               <React.Fragment key={crumb.id}>
                 <button
                   onClick={() => handleBreadcrumbClick(index)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
-                    index === breadcrumbs.length - 1
-                      ? 'bg-white/10 text-white font-medium shadow-sm'
-                      : 'text-text-muted hover:text-white hover:bg-white/5'
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${index === breadcrumbs.length - 1
+                    ? 'bg-white/10 text-white font-medium shadow-sm'
+                    : 'text-text-muted hover:text-white hover:bg-white/5'
+                    }`}
                 >
                   {index === 0 && <Home className="w-4 h-4" />}
                   {crumb.name}
@@ -156,27 +176,25 @@ const VaultPage: React.FC = () => {
             <div className="flex bg-sidebar-bg/80 backdrop-blur-xl rounded-xl p-1 border border-white/10">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-accent-blue text-white shadow-lg shadow-blue-500/20'
-                    : 'text-text-muted hover:text-white hover:bg-white/5'
-                }`}
+                className={`p-2 rounded-lg transition-all ${viewMode === 'grid'
+                  ? 'bg-accent-blue text-white shadow-lg shadow-blue-500/20'
+                  : 'text-text-muted hover:text-white hover:bg-white/5'
+                  }`}
               >
                 <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'list'
-                    ? 'bg-accent-blue text-white shadow-lg shadow-blue-500/20'
-                    : 'text-text-muted hover:text-text-primary hover:bg-white/5'
-                }`}
+                className={`p-2 rounded-lg transition-all ${viewMode === 'list'
+                  ? 'bg-accent-blue text-white shadow-lg shadow-blue-500/20'
+                  : 'text-text-muted hover:text-text-primary hover:bg-white/5'
+                  }`}
               >
                 <List className="w-4 h-4" />
               </button>
             </div>
 
-            <button 
+            <button
               onClick={() => setShowUploadModal(true)}
               className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-accent-blue to-blue-600 text-white rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all font-medium transform hover:-translate-y-0.5"
             >
@@ -191,121 +209,145 @@ const VaultPage: React.FC = () => {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-[60vh]">
               <div className="relative w-16 h-16 mb-4">
-                <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-gray-200 dark:border-white/10 rounded-full"></div>
                 <div className="absolute inset-0 border-4 border-t-accent-blue rounded-full animate-spin"></div>
               </div>
               <p className="text-text-muted animate-pulse">Accessing secure vault...</p>
             </div>
           ) : (
             <div className="space-y-8">
-              {/* Recent Files Section */}
-              {!currentFolderId && !searchQuery && recentFiles.length > 0 && activeView === 'home' && (
-                <section>
-                  <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-accent-blue" />
-                    Recent Activity
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {recentFiles.map((file) => (
-                      <div 
-                        key={file.id}
-                        onClick={() => handleAssetClick(file.id)}
-                        onDoubleClick={() => handleAssetDoubleClick(file)}
-                        className="group bg-card-bg/50 backdrop-blur-sm p-4 rounded-2xl border border-white/5 hover:border-accent-blue/30 hover:bg-card-bg transition-all cursor-pointer relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-br from-accent-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="p-2 rounded-lg bg-white/5 text-accent-blue group-hover:scale-110 transition-transform">
-                              <div className="font-bold text-xs uppercase">{file.extension || 'FILE'}</div>
+              {/* Error State - Vault Not Connected */}
+              {error && (error.includes('Vault connection expired') || error.includes('Vault module not connected')) ? (
+                <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
+                    <CloudOff className="w-10 h-10 text-red-500" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">Vault Connection Expired</h2>
+                  <p className="text-text-muted max-w-md mb-8">
+                    Your connection to Google Drive has expired or is invalid. Please reconnect to access your files.
+                  </p>
+                  <button
+                    onClick={() => {
+                      const token = localStorage.getItem('accessToken');
+                      window.location.href = `http://localhost:5000/api/auth/sartthi/connect-vault?token=${token}`;
+                    }}
+                    className="px-8 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white rounded-xl font-medium shadow-lg shadow-red-500/20 transition-all transform hover:-translate-y-0.5"
+                  >
+                    Reconnect Google Drive
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Recent Files Section */}
+                  {!currentFolderId && !searchQuery && recentFiles.length > 0 && activeView === 'home' && (
+                    <section>
+                      <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-accent-blue" />
+                        Recent Activity
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {recentFiles.map((file) => (
+                          <div
+                            key={file.id}
+                            onClick={() => handleAssetClick(file.id)}
+                            onDoubleClick={() => handleAssetDoubleClick(file)}
+                            className="group bg-card-bg/50 backdrop-blur-sm p-4 rounded-2xl border border-white/5 hover:border-accent-blue/30 hover:bg-card-bg transition-all cursor-pointer relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-br from-accent-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="relative z-10">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="p-2 rounded-lg bg-white/5 text-accent-blue group-hover:scale-110 transition-transform">
+                                  <div className="font-bold text-xs uppercase">{file.extension || 'FILE'}</div>
+                                </div>
+                                {file.size && <span className="text-xs text-text-muted font-medium">{file.size}</span>}
+                              </div>
+                              <h3 className="font-medium text-white truncate mb-1" title={file.name}>{file.name}</h3>
+                              <p className="text-xs text-text-muted">Edited {file.modifiedDate}</p>
                             </div>
-                            {file.size && <span className="text-xs text-text-muted font-medium">{file.size}</span>}
                           </div>
-                          <h3 className="font-medium text-white truncate mb-1" title={file.name}>{file.name}</h3>
-                          <p className="text-xs text-text-muted">Edited {file.modifiedDate}</p>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* All Files Section */}
+                  <section>
+                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="w-1.5 h-6 bg-accent-blue rounded-full" />
+                      {currentFolderId ? 'Folder Contents' : 'All Files'}
+                    </h2>
+
+                    {viewMode === 'grid' ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+                        {filteredAssets.map((asset) => (
+                          <FileContextMenu
+                            key={asset.id}
+                            onRename={() => console.log('Rename', asset.name)}
+                            onMove={() => console.log('Move', asset.name)}
+                            onGetLink={() => console.log('Get link', asset.name)}
+                            onDelete={() => console.log('Delete', asset.name)}
+                          >
+                            <div className="relative">
+                              <AssetCard
+                                name={asset.name}
+                                type={asset.type}
+                                extension={asset.extension}
+                                thumbnail={asset.type === 'image' ? vaultApi.getFileViewUrl(asset.id) : asset.thumbnail}
+                                isSelected={selectedAssets.has(asset.id)}
+                                onClick={() => handleAssetClick(asset.id)}
+                                onDoubleClick={() => handleAssetDoubleClick(asset)}
+                              />
+                            </div>
+                          </FileContextMenu>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-card-bg/30 backdrop-blur-md rounded-2xl border border-white/5 overflow-hidden">
+                        <div className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 text-xs font-semibold text-text-muted uppercase tracking-wider">
+                          <div className="col-span-6">Name</div>
+                          <div className="col-span-2">Size</div>
+                          <div className="col-span-3">Modified</div>
+                          <div className="col-span-1"></div>
+                        </div>
+                        <div className="divide-y divide-white/5">
+                          {filteredAssets.map((asset) => (
+                            <FileContextMenu
+                              key={asset.id}
+                              onRename={() => console.log('Rename', asset.name)}
+                              onMove={() => console.log('Move', asset.name)}
+                              onGetLink={() => console.log('Get link', asset.name)}
+                              onDelete={() => console.log('Delete', asset.name)}
+                            >
+                              <div>
+                                <AssetRow
+                                  name={asset.name}
+                                  type={asset.type}
+                                  extension={asset.extension}
+                                  size={asset.size || '-'}
+                                  modifiedDate={asset.modifiedDate || '-'}
+                                  isSelected={selectedAssets.has(asset.id)}
+                                  onClick={() => handleAssetClick(asset.id)}
+                                  onDoubleClick={() => handleAssetDoubleClick(asset)}
+                                />
+                              </div>
+                            </FileContextMenu>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </section>
-              )}
+                    )}
 
-              {/* All Files Section */}
-              <section>
-                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-accent-blue rounded-full" />
-                  {currentFolderId ? 'Folder Contents' : 'All Files'}
-                </h2>
-                
-                {viewMode === 'grid' ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-                    {filteredAssets.map((asset) => (
-                      <FileContextMenu
-                        key={asset.id}
-                        onRename={() => console.log('Rename', asset.name)}
-                        onMove={() => console.log('Move', asset.name)}
-                        onGetLink={() => console.log('Get link', asset.name)}
-                        onDelete={() => console.log('Delete', asset.name)}
-                      >
-                        <div className="relative">
-                          <AssetCard
-                            name={asset.name}
-                            type={asset.type}
-                            extension={asset.extension}
-                            thumbnail={asset.thumbnail}
-                            isSelected={selectedAssets.has(asset.id)}
-                            onClick={() => handleAssetClick(asset.id)}
-                            onDoubleClick={() => handleAssetDoubleClick(asset)}
-                          />
+                    {filteredAssets.length === 0 && (
+                      <div className="flex flex-col items-center justify-center h-64 text-text-muted">
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                          <Search className="w-8 h-8 opacity-50" />
                         </div>
-                      </FileContextMenu>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-card-bg/30 backdrop-blur-md rounded-2xl border border-white/5 overflow-hidden">
-                    <div className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 text-xs font-semibold text-text-muted uppercase tracking-wider">
-                      <div className="col-span-6">Name</div>
-                      <div className="col-span-2">Size</div>
-                      <div className="col-span-3">Modified</div>
-                      <div className="col-span-1"></div>
-                    </div>
-                    <div className="divide-y divide-white/5">
-                      {filteredAssets.map((asset) => (
-                        <FileContextMenu
-                          key={asset.id}
-                          onRename={() => console.log('Rename', asset.name)}
-                          onMove={() => console.log('Move', asset.name)}
-                          onGetLink={() => console.log('Get link', asset.name)}
-                          onDelete={() => console.log('Delete', asset.name)}
-                        >
-                          <div>
-                            <AssetRow
-                              name={asset.name}
-                              type={asset.type}
-                              extension={asset.extension}
-                              size={asset.size || '-'}
-                              modifiedDate={asset.modifiedDate || '-'}
-                              isSelected={selectedAssets.has(asset.id)}
-                              onClick={() => handleAssetClick(asset.id)}
-                              onDoubleClick={() => handleAssetDoubleClick(asset)}
-                            />
-                          </div>
-                        </FileContextMenu>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {filteredAssets.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-64 text-text-muted">
-                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                      <Search className="w-8 h-8 opacity-50" />
-                    </div>
-                    <p className="text-lg font-medium text-white">No files found</p>
-                    <p className="text-sm mt-2 opacity-60">Try adjusting your search or upload new files</p>
-                  </div>
-                )}
-              </section>
+                        <p className="text-lg font-medium text-white">No files found</p>
+                        <p className="text-sm mt-2 opacity-60">Try adjusting your search or upload new files</p>
+                      </div>
+                    )}
+                  </section>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -370,12 +412,30 @@ const VaultPage: React.FC = () => {
           onClose={() => setShowUploadModal(false)}
           onUpload={async (files) => {
             try {
+              const newUploadedFiles: Asset[] = [];
               for (const file of files) {
-                await vaultApi.uploadFile(file, currentFolderId);
+                const response = await vaultApi.uploadFile(file, currentFolderId);
+                if (response.data) {
+                  newUploadedFiles.push(response.data);
+                }
               }
+
+              // Optimistic update
+              if (newUploadedFiles.length > 0) {
+                setAssets(prev => {
+                  const combined = [...prev, ...newUploadedFiles];
+                  // Deduplicate just in case
+                  return Array.from(new Map(combined.map(item => [item.id, item])).values());
+                });
+              }
+
               setShowUploadModal(false);
-              loadFiles();
               toast.success('Files uploaded successfully');
+
+              // Background refresh to ensure consistency
+              const serverFiles = await vaultApi.listFiles(currentFolderId);
+              setAssets(Array.from(new Map(serverFiles.map(item => [item.id, item])).values()));
+
             } catch (error) {
               console.error('Upload failed:', error);
               toast.error('Failed to upload files');

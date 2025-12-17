@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { authenticate } from '../middleware/auth';
 import { listEmails, getGmailClient, getEmailContent } from '../services/gmailService';
+import User from '../models/User';
 
 const router = express.Router();
 
@@ -28,6 +29,28 @@ router.get('/messages', authenticate, async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Fetch Emails Error:', error);
+
+        if (error.message && (error.message.includes('invalid_grant') || error.message.includes('Mail module not connected'))) {
+            // Update user to remove invalid refresh token
+            // This ensures frontend sees user as 'not connected' next time
+            try {
+                const userId = (req as any).user._id;
+                await User.findByIdAndUpdate(userId, {
+                    $unset: { 'modules.mail.refreshToken': 1 }
+                });
+                console.log(`[Mail] Removed invalid refresh token for user ${userId}`);
+            } catch (dbError) {
+                console.error('[Mail] Failed to remove invalid refresh token:', dbError);
+            }
+
+            res.status(401).json({
+                success: false,
+                message: 'Mail session expired or disconnected',
+                error: 'invalid_grant'
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             message: 'Failed to fetch emails',

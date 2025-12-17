@@ -9,6 +9,7 @@ interface VaultLayoutProps {
 
 interface UserData {
   email: string;
+  fullName: string;
   profilePicture?: string;
 }
 
@@ -23,7 +24,7 @@ const VaultLayout: React.FC<VaultLayoutProps> = ({ children, activeView, onViewC
         const headers: any = {
           'Content-Type': 'application/json',
         };
-        
+
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
@@ -36,6 +37,7 @@ const VaultLayout: React.FC<VaultLayoutProps> = ({ children, activeView, onViewC
           const data = await response.json();
           setUserData({
             email: data.data.email,
+            fullName: data.data.fullName || data.data.name || 'User',
             profilePicture: data.data.profilePicture
           });
         }
@@ -49,13 +51,16 @@ const VaultLayout: React.FC<VaultLayoutProps> = ({ children, activeView, onViewC
 
   return (
     <div className="flex h-screen bg-app-bg text-text-primary overflow-hidden font-inter">
-      <Sidebar 
-        activeView={activeView} 
+      <Sidebar
+        activeView={activeView}
         onViewChange={onViewChange}
         usedGB={12.4} // Mock data for now, can be passed from parent
         totalGB={15}
-        userEmail={userData?.email}
-        userPhoto={userData?.profilePicture}
+        user={userData ? {
+          fullName: userData.fullName,
+          email: userData.email,
+          photo: userData.profilePicture
+        } : undefined}
       />
       <main className="flex-1 flex flex-col min-w-0 relative bg-gradient-to-br from-app-bg to-app-bg/95">
         {children}

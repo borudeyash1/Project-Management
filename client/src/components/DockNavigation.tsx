@@ -22,13 +22,13 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
+import { useDock } from '../context/DockContext';
 import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import StickyNote from './StickyNote';
 import AIChatbot from './AIChatbot';
-import { useDock } from '../context/DockContext';
 
 interface NavItem {
   id: string;
@@ -40,14 +40,14 @@ interface NavItem {
 
 const DockNavigation: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { dockPosition } = useDock();
   const [showWorkspaces, setShowWorkspaces] = useState(false);
   const [showInfoCard, setShowInfoCard] = useState<'mail' | 'calendar' | 'vault' | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  
+
   // Check if user owns any workspace
   const isWorkspaceOwner = useMemo(() => {
     const ownsWorkspace = state.workspaces.some(w => {
@@ -199,6 +199,7 @@ const DockNavigation: React.FC = () => {
                 onClick={() => handleItemClick(item)}
                 active={active}
                 tooltip={isEnglish ? t(item.translationKey) : `${t(item.translationKey)} (${item.label})`}
+                dockPosition={dockPosition}
               >
                 <Icon className="w-5 h-5" />
               </DockIcon>
@@ -365,7 +366,7 @@ const DockNavigation: React.FC = () => {
           }}
         />
       )}
-      
+
       {/* AI Chatbot Modal */}
       <AIChatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </>

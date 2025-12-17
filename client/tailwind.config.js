@@ -1,6 +1,7 @@
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
+const colors = require('tailwindcss/colors');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -11,6 +12,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Enforce Neutral/Zinc Grays for Deep Black Theme
+        gray: {
+          ...colors.zinc,
+          800: '#18181b', // Surface
+          900: '#0f0f0f', // Main BG
+          950: '#050505',
+        },
+        slate: colors.zinc, // Kill the blue tint
+
         // Existing colors
         primary: 'var(--accent-color)',
         'primary-700': 'var(--accent-color)',

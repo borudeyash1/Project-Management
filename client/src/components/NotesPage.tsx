@@ -7,6 +7,7 @@ import Header from './Header';
 import DockNavigation from './DockNavigation';
 import { apiService } from '../services/api';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
 
 interface Note {
   _id: string;
@@ -18,6 +19,7 @@ interface Note {
 
 const NotesPage: React.FC = () => {
   const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -138,7 +140,7 @@ const NotesPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <Header />
 
@@ -152,8 +154,8 @@ const NotesPage: React.FC = () => {
                 <FileText className="w-6 h-6 text-gray-900" />
               </div>
               <div>
-                <h1 className="text-3xl font-black text-gray-900">{t('notes.title')}</h1>
-                <p className="text-gray-600">{t('notes.subtitle')}</p>
+                <h1 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('notes.title')}</h1>
+                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('notes.subtitle')}</p>
               </div>
             </div>
           </div>
@@ -161,7 +163,7 @@ const NotesPage: React.FC = () => {
           {/* Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Notes List Sidebar */}
-            <div className="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-200 p-4 max-h-[calc(100vh-250px)] overflow-y-auto">
+            <div className={`lg:col-span-1 rounded-xl shadow-sm border p-4 max-h-[calc(100vh-250px)] overflow-y-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
               <button
                 onClick={() => {
                   setSelectedNote(null);
@@ -189,11 +191,11 @@ const NotesPage: React.FC = () => {
                       onClick={() => handleSelectNote(note)}
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedNote?._id === note._id
                         ? 'bg-[#FFD700]/20 border-2 border-[#FFD700]'
-                        : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                        : `${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
                         }`}
                     >
-                      <h3 className="font-bold text-gray-900 truncate">{note.title || 'Untitled'}</h3>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <h3 className={`font-bold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{note.title || 'Untitled'}</h3>
+                      <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         {new Date(note.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -203,9 +205,9 @@ const NotesPage: React.FC = () => {
             </div>
 
             {/* Editor */}
-            <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className={`lg:col-span-3 rounded-xl shadow-sm border p-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
               {/* Toolbar */}
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+              <div className={`flex items-center justify-between mb-6 pb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
@@ -233,7 +235,7 @@ const NotesPage: React.FC = () => {
                   {selectedNote && (
                     <button
                       onClick={() => handleDeleteNote(selectedNote._id)}
-                      className="flex items-center gap-2 text-red-600 hover:text-red-700 px-4 py-2 rounded-lg font-semibold transition-colors"
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
                     >
                       <Trash2 size={18} />
                       {t('common.delete')}
@@ -255,7 +257,7 @@ const NotesPage: React.FC = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('notes.noteTitlePlaceholder')}
-                className="w-full text-3xl font-bold text-gray-900 bg-transparent border-none outline-none mb-4 placeholder-gray-400"
+                className={`w-full text-3xl font-bold bg-transparent border-none outline-none mb-4 placeholder-gray-400 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
               />
 
               {/* Content Textarea */}
@@ -263,7 +265,7 @@ const NotesPage: React.FC = () => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={t('notes.noteContentPlaceholder')}
-                className="w-full h-[calc(100vh-450px)] text-gray-700 bg-transparent border-none outline-none resize-none placeholder-gray-400 leading-relaxed"
+                className={`w-full h-[calc(100vh-450px)] bg-transparent border-none outline-none resize-none placeholder-gray-400 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
               />
             </div>
           </div>
@@ -273,11 +275,11 @@ const NotesPage: React.FC = () => {
       {/* AI Modal */}
       {showAIModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8">
-            <h2 className="text-2xl font-black text-gray-900 mb-4">
+          <div className={`rounded-2xl shadow-2xl max-w-2xl w-full p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {aiAction === 'generate' ? 'Generate Note with AI' : 'Refine Note with AI'}
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {aiAction === 'generate'
                 ? 'Tell the AI what you want to write about, and it will generate a detailed note for you.'
                 : 'Tell the AI how you want to improve your note (e.g., "make it more concise", "add more details", "fix grammar").'}
@@ -296,7 +298,7 @@ const NotesPage: React.FC = () => {
                   ? 'e.g., "Write a comprehensive guide on project management best practices"'
                   : 'e.g., "Make it more concise and professional"'
               }
-              className="w-full h-32 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#FFD700] focus:outline-none resize-none"
+              className={`w-full h-32 px-4 py-3 border-2 rounded-xl focus:border-[#FFD700] focus:outline-none resize-none ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-200 text-gray-900'}`}
             />
 
             <p className="text-xs text-gray-500 mt-2">
@@ -327,7 +329,7 @@ const NotesPage: React.FC = () => {
                   setAiPrompt('');
                 }}
                 disabled={isGenerating}
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`px-6 py-3 border-2 rounded-xl font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
               >
                 {t('common.cancel')}
               </button>

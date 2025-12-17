@@ -105,6 +105,18 @@ const TimelineView: React.FC<TimelineViewProps> = ({
             // Convert to date and snap to interval
             const newStartDate = calculateDropDate(dropX, timelineStart, 0);
 
+            // Prevent crash if calculation resulted in Invalid Date
+            if (isNaN(newStartDate.getTime())) {
+                console.error('Timeline drag failed: Invalid date calculated', {
+                    dropX,
+                    timelineStart,
+                    originalStartDate: dragData.originalStartDate,
+                    task: activeTask.title
+                });
+                setActiveTask(null);
+                return;
+            }
+
             // Update task
             onTaskUpdate(activeTask.id, {
                 startDate: newStartDate.toISOString(),

@@ -1,8 +1,10 @@
 import { Response } from 'express';
 import VaultDocument from '../models/VaultDocument';
 import Workspace from '../models/Workspace';
+import User from '../models/User';
 import mongoose from 'mongoose';
 import { AuthenticatedRequest } from '../types';
+import { uploadFile, addPermission } from '../services/driveService';
 
 // Helper to format bytes
 function formatBytes(bytes: number, decimals = 2) {
@@ -242,6 +244,12 @@ export const uploadDocumentToWorkspace = async (req: AuthenticatedRequest, res: 
             return res.status(403).json({ message: 'Not a workspace member' });
         }
 
+        // Check if user has Vault connected
+        const uploader = await User.findById(userId);
+        if (!uploader?.modules?.vault?.isEnabled) {
+            return res.status(400).json({ message: 'Please connect Sartthi Vault first' });
+        }
+
         // Determine file type from mimetype
         let type = 'file';
         if (file.mimetype.startsWith('image/')) type = 'image';
@@ -249,31 +257,51 @@ export const uploadDocumentToWorkspace = async (req: AuthenticatedRequest, res: 
         else if (file.mimetype.startsWith('audio/')) type = 'audio';
         else if (file.mimetype === 'application/pdf' || file.mimetype.includes('document')) type = 'document';
 
-        // Create document
+        // 1. Upload to Google Drive
+        const driveFile = await uploadFile(userId.toString(), file, workspace.vaultFolderId?.toString());
+
+        // 2. Share with Workspace Members
+        // Get all active members with emails
+        const membersToShareWith = await Workspace.findById(workspaceId).populate('members.user', 'email');
+        const allowedUsers: string[] = [];
+
+        if (membersToShareWith && membersToShareWith.members) {
+            // Process in parallel but handle errors gracefully
+            await Promise.all(membersToShareWith.members.map(async (member: any) => {
+                if (member.status === 'active' && member.user?.email && member.user._id.toString() !== userId.toString()) {
+                    await addPermission(userId.toString(), driveFile.id!, member.user.email, 'reader');
+                    allowedUsers.push(member.user._id.toString());
+                }
+            }));
+        }
+
+        // 3. Create Database Record
         const document = new VaultDocument({
             name: file.originalname,
             type,
             size: file.size,
             formattedSize: formatBytes(file.size),
-            url: `/uploads/${file.filename}`, // Serve from local uploads
-            thumbnailUrl: null, // TODO: Generate thumbnail for images
+            url: driveFile.webViewLink,
+            thumbnailUrl: driveFile.thumbnailLink || null,
+            driveId: driveFile.id, // Store Drive ID
             workspaceId: new mongoose.Types.ObjectId(workspaceId),
             uploadedBy: new mongoose.Types.ObjectId(userId as string),
             parentFolder: workspace.vaultFolderId,
             metadata: {
                 mimetype: file.mimetype,
-                originalName: file.originalname
+                originalName: file.originalname,
+                driveLink: driveFile.webViewLink
             },
             permissions: {
                 visibility: 'workspace',
-                allowedUsers: []
+                allowedUsers: allowedUsers
             }
         });
 
         await document.save();
 
         return res.status(201).json({
-            message: 'Document uploaded successfully',
+            message: 'Document uploaded and shared successfully',
             document
         });
     } catch (error: any) {

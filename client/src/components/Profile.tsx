@@ -6,6 +6,7 @@ import {
   Download, Trash2, Plus, Minus, Star, Award, Trophy, Target, Zap, BarChart3
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import apiService from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
@@ -162,6 +163,7 @@ interface ProfileData {
 
 const Profile: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -798,11 +800,10 @@ const Profile: React.FC = () => {
             {['light', 'dark', 'system'].map((theme) => (
               <button
                 key={theme}
-                className={`px-4 py-2 rounded-lg border transition-colors ${
-                  currentTheme === theme
-                    ? 'bg-accent text-gray-900 dark:text-gray-100 border-accent-dark'
-                    : 'bg-white dark:bg-gray-800 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600'
-                }`}
+                className={`px-4 py-2 rounded-lg border transition-colors ${currentTheme === theme
+                  ? 'bg-accent text-gray-900 dark:text-gray-100 border-accent-dark'
+                  : 'bg-white dark:bg-gray-800 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600'
+                  }`}
                 onClick={() => {
                   if (profileData) {
                     setProfileData({
@@ -830,45 +831,43 @@ const Profile: React.FC = () => {
           <h3 className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">{t('settings.notifications')}</h3>
           <div className="space-y-3">
             {Object.entries(notifications).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
-                <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{key.charAt(0).toUpperCase() + key.slice(1)} Notifications</span>
-              </div>
-              <button
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  value ? 'bg-accent' : 'bg-gray-300'
-                }`}
-                onClick={() => {
-                  const newValue = !value;
-                  if (profileData) {
-                    setProfileData({
-                      ...profileData,
-                      preferences: {
-                        ...profileData.preferences,
-                        notifications: {
-                          ...notifications,
-                          [key]: newValue
+              <div key={key} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+                  <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{key.charAt(0).toUpperCase() + key.slice(1)} Notifications</span>
+                </div>
+                <button
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
+                    }`}
+                  onClick={() => {
+                    const newValue = !value;
+                    if (profileData) {
+                      setProfileData({
+                        ...profileData,
+                        preferences: {
+                          ...profileData.preferences,
+                          notifications: {
+                            ...notifications,
+                            [key]: newValue
+                          }
                         }
-                      }
+                      });
+                    }
+                    handleSavePreferences('notifications', {
+                      ...notifications,
+                      [key]: newValue
                     });
-                  }
-                  handleSavePreferences('notifications', {
-                    ...notifications,
-                    [key]: newValue
-                  });
-                }}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-gray-800 transition-transform ${
-                    value ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          ))}
+                  }}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-gray-800 transition-transform ${value ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                  />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
         {/* Privacy Preferences */}
         <div className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
@@ -896,48 +895,46 @@ const Profile: React.FC = () => {
                     profileVisibility: e.target.value as 'public' | 'private' | 'workspace'
                   });
                 }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-            >
-              <option value="public">Public</option>
-              <option value="workspace">Workspace Only</option>
-              <option value="private">Private</option>
-            </select>
-          </div>
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+              >
+                <option value="public">Public</option>
+                <option value="workspace">Workspace Only</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
             <div className="space-y-3">
               {Object.entries(privacy).filter(([key]) => key !== 'profileVisibility').map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.' + key)}</span>
-                <button
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    value ? 'bg-accent' : 'bg-gray-300'
-                  }`}
-                  onClick={() => {
-                    const newValue = !value;
-                    if (profileData) {
-                      setProfileData({
-                        ...profileData,
-                        preferences: {
-                          ...profileData.preferences,
-                          privacy: {
-                            ...privacy,
-                            [key]: newValue
+                <div key={key} className="flex items-center justify-between">
+                  <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.' + key)}</span>
+                  <button
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
+                      }`}
+                    onClick={() => {
+                      const newValue = !value;
+                      if (profileData) {
+                        setProfileData({
+                          ...profileData,
+                          preferences: {
+                            ...profileData.preferences,
+                            privacy: {
+                              ...privacy,
+                              [key]: newValue
+                            }
                           }
-                        }
+                        });
+                      }
+                      handleSavePreferences('privacy', {
+                        ...privacy,
+                        [key]: newValue
                       });
-                    }
-                    handleSavePreferences('privacy', {
-                      ...privacy,
-                      [key]: newValue
-                    });
-                  }}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-gray-800 transition-transform ${
-                      value ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
+                    }}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-gray-800 transition-transform ${value ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                    />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -1092,7 +1089,13 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6">
+    <div
+      className="p-4 sm:p-6 transition-all duration-300"
+      style={{
+        paddingLeft: dockPosition === 'left' ? '80px' : undefined,
+        paddingRight: dockPosition === 'right' ? '80px' : undefined
+      }}
+    >
       <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-border dark:border-gray-600">
@@ -1109,11 +1112,10 @@ const Profile: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-accent text-accent-dark dark:text-accent-light'
-                      : 'border-transparent text-gray-600 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                  }`}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                    ? 'border-accent text-accent-dark dark:text-accent-light'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}

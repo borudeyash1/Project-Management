@@ -99,7 +99,8 @@ const initialState: AppState = {
   mode: 'Personal',
   clients: [],
   projects: [],
-  tasks: []
+  tasks: [],
+  notifications: []
 };
 
 // Action types
@@ -158,40 +159,40 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'REMOVE_TOAST':
       return { ...state, toasts: state.toasts.filter((_, index) => index !== action.payload) };
     case 'TOGGLE_MODAL':
-      return { 
-        ...state, 
-        modals: { 
-          ...state.modals, 
-          [action.payload]: !state.modals[action.payload] 
-        } 
+      return {
+        ...state,
+        modals: {
+          ...state.modals,
+          [action.payload]: !state.modals[action.payload]
+        }
       };
     case 'TOGGLE_TASK_DRAWER':
-      return { 
-        ...state, 
-        taskDrawer: { 
-          ...state.taskDrawer, 
-          isOpen: action.payload 
-        } 
+      return {
+        ...state,
+        taskDrawer: {
+          ...state.taskDrawer,
+          isOpen: action.payload
+        }
       };
     case 'SET_TASK_DRAWER_TITLE':
-      return { 
-        ...state, 
-        taskDrawer: { 
-          ...state.taskDrawer, 
-          title: action.payload 
-        } 
+      return {
+        ...state,
+        taskDrawer: {
+          ...state.taskDrawer,
+          title: action.payload
+        }
       };
     case 'TOGGLE_QUICK_ADD':
       return { ...state, quickAddMenu: !state.quickAddMenu };
     case 'TOGGLE_USER_MENU':
       return { ...state, userMenu: !state.userMenu };
     case 'TOGGLE_SIDEBAR':
-      return { 
-        ...state, 
-        sidebar: { 
-          ...state.sidebar, 
-          collapsed: !state.sidebar.collapsed 
-        } 
+      return {
+        ...state,
+        sidebar: {
+          ...state.sidebar,
+          collapsed: !state.sidebar.collapsed
+        }
       };
     case 'ADD_PROJECT': {
       // Simply add project to global state; clients are managed per workspace via Client.workspaceId
@@ -360,7 +361,7 @@ export function AppProvider({ children }: AppProviderProps) {
       type
     };
     dispatch({ type: 'ADD_TOAST', payload: toast });
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
       const index = state.toasts.findIndex(t => t.id === toast.id);

@@ -599,6 +599,7 @@ export interface AppState {
   clients: Client[];
   projects: Project[];
   tasks: Task[];
+  notifications: Notification[];
 }
 
 export interface Client {

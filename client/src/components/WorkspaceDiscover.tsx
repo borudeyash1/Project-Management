@@ -4,6 +4,7 @@ import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, Ch
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import CreateAIWorkspaceModal from './CreateAIWorkspaceModal';
 import { PlanStatus } from './FeatureRestriction';
@@ -36,6 +37,7 @@ const WorkspaceDiscover: React.FC = () => {
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
   const { state, dispatch } = useApp();
+  const { dockPosition } = useDock();
   const navigate = useNavigate();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [filteredWorkspaces, setFilteredWorkspaces] = useState<Workspace[]>([]);
@@ -63,12 +65,12 @@ const WorkspaceDiscover: React.FC = () => {
     const loadWorkspaces = async () => {
       try {
         console.log('[WorkspaceDiscover] Starting to load workspaces...');
-        
+
         // Load discover workspaces for display
         const apiWorkspaces = await api.getDiscoverWorkspaces();
         console.log('[WorkspaceDiscover] API returned workspaces:', apiWorkspaces);
         console.log('[WorkspaceDiscover] Number of workspaces:', apiWorkspaces?.length || 0);
-        
+
         const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
           _id: ws._id,
           name: ws.name,
@@ -154,11 +156,11 @@ const WorkspaceDiscover: React.FC = () => {
     setRequestingWorkspaceId(workspaceId);
     try {
       await api.sendJoinRequest(workspaceId);
-      
+
       // Refresh workspaces to update membership status
       const userWorkspaces = await api.getWorkspaces();
       dispatch({ type: 'SET_WORKSPACES', payload: userWorkspaces });
-      
+
       // Reload discover workspaces to get updated join request status
       const apiWorkspaces = await api.getDiscoverWorkspaces();
       const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
@@ -179,7 +181,7 @@ const WorkspaceDiscover: React.FC = () => {
       }));
       setWorkspaces(normalized);
       setFilteredWorkspaces(normalized);
-      
+
       // Show success message
       dispatch({
         type: 'ADD_TOAST',
@@ -210,7 +212,7 @@ const WorkspaceDiscover: React.FC = () => {
     setCancellingWorkspaceId(workspaceId);
     try {
       await api.cancelJoinRequest(workspaceId);
-      
+
       // Reload discover workspaces to get updated join request status
       const apiWorkspaces = await api.getDiscoverWorkspaces();
       const normalized: Workspace[] = (apiWorkspaces || []).map((ws: any) => ({
@@ -231,7 +233,7 @@ const WorkspaceDiscover: React.FC = () => {
       }));
       setWorkspaces(normalized);
       setFilteredWorkspaces(normalized);
-      
+
       // Show success message
       dispatch({
         type: 'ADD_TOAST',
@@ -281,8 +283,8 @@ const WorkspaceDiscover: React.FC = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="bg-white dark:bg-gray-800 border border-border rounded-xl">
+    <div className="h-full bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 border-b border-border">
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -302,11 +304,10 @@ const WorkspaceDiscover: React.FC = () => {
               </button>
               <button
                 onClick={() => setShowAICreateModal(true)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${
-                  isDarkMode 
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700' 
-                    : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
-                }`}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${isDarkMode
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
+                  : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
+                  }`}
               >
                 <Bot className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
                 <span>{t('workspace.aiPoweredWorkspace')}</span>
@@ -316,12 +317,24 @@ const WorkspaceDiscover: React.FC = () => {
         </div>
 
         {/* Plan Status */}
-        <div className="p-6 border-b border-border">
+        <div
+          className="p-6 border-b border-border transition-all duration-300"
+          style={{
+            paddingLeft: dockPosition === 'left' ? '80px' : undefined,
+            paddingRight: dockPosition === 'right' ? '80px' : undefined
+          }}
+        >
           <PlanStatus />
         </div>
 
         {/* Search and Filters */}
-        <div className="p-6 border-b border-border">
+        <div
+          className="p-6 border-b border-border transition-all duration-300"
+          style={{
+            paddingLeft: dockPosition === 'left' ? '80px' : undefined,
+            paddingRight: dockPosition === 'right' ? '80px' : undefined
+          }}
+        >
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
@@ -384,8 +397,16 @@ const WorkspaceDiscover: React.FC = () => {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Workspaces Grid */}
+      {/* Workspaces Grid */}
+      <div
+        className="transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '80px' : undefined,
+          paddingRight: dockPosition === 'right' ? '80px' : undefined
+        }}
+      >
         <div className="p-6">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -427,7 +448,7 @@ const WorkspaceDiscover: React.FC = () => {
                         <span className="text-xs text-gray-600 dark:text-gray-400">{workspace.region}</span>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
@@ -465,11 +486,10 @@ const WorkspaceDiscover: React.FC = () => {
                     <button
                       onClick={() => handleCancelJoinRequest(workspace._id)}
                       disabled={cancellingWorkspaceId === workspace._id}
-                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
-                        cancellingWorkspaceId === workspace._id
-                          ? 'bg-red-500 text-white cursor-not-allowed'
-                          : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-md active:scale-95'
-                      }`}
+                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${cancellingWorkspaceId === workspace._id
+                        ? 'bg-red-500 text-white cursor-not-allowed'
+                        : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-md active:scale-95'
+                        }`}
                     >
                       {cancellingWorkspaceId === workspace._id ? (
                         <>
@@ -488,11 +508,10 @@ const WorkspaceDiscover: React.FC = () => {
                     <button
                       onClick={() => handleJoinRequest(workspace._id)}
                       disabled={requestingWorkspaceId === workspace._id}
-                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
-                        requestingWorkspaceId === workspace._id
-                          ? 'bg-blue-500 text-white cursor-not-allowed'
-                          : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover hover:shadow-md active:scale-95'
-                      }`}
+                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${requestingWorkspaceId === workspace._id
+                        ? 'bg-blue-500 text-white cursor-not-allowed'
+                        : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover hover:shadow-md active:scale-95'
+                        }`}
                     >
                       {requestingWorkspaceId === workspace._id ? (
                         <>

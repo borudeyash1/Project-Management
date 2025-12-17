@@ -62,39 +62,52 @@ export const listEmails = async (userId: string, labelIds: string[] = ['INBOX'],
         const messages = response.data.messages || [];
         console.log(`📧 [GMAIL] Found ${messages.length} messages to fetch`);
 
-        // Use batch request to fetch all message details in one API call
-        const fullMessages = await Promise.all(messages.map(async (msg) => {
-            try {
-                const detail = await gmail.users.messages.get({
-                    userId: 'me',
-                    id: msg.id!,
-                    format: 'metadata',  // Changed from 'full' to 'metadata' for faster response
-                    metadataHeaders: ['Subject', 'From', 'Date']  // Only fetch needed headers
-                });
+        // Use batch request to fetch message details in chunks to avoid rate limits
+        const fullMessages = [];
+        const chunkSize = 10; // Process 10 messages at a time
 
-                const payload = detail.data.payload;
-                const headers = payload?.headers;
+        for (let i = 0; i < messages.length; i += chunkSize) {
+            const chunk = messages.slice(i, i + chunkSize);
+            console.log(`📧 [GMAIL] Fetching batch ${i / chunkSize + 1}/${Math.ceil(messages.length / chunkSize)}`);
 
-                const subject = headers?.find(h => h.name === 'Subject')?.value || '(No Subject)';
-                const from = headers?.find(h => h.name === 'From')?.value || 'Unknown';
-                const date = headers?.find(h => h.name === 'Date')?.value || '';
-                const snippet = detail.data.snippet;
+            const chunkResults = await Promise.all(chunk.map(async (msg) => {
+                try {
+                    const detail = await gmail.users.messages.get({
+                        userId: 'me',
+                        id: msg.id!,
+                        format: 'metadata',
+                        metadataHeaders: ['Subject', 'From', 'Date']
+                    });
 
-                return {
-                    id: msg.id,
-                    threadId: msg.threadId,
-                    subject,
-                    from,
-                    date,
-                    snippet,
-                    isRead: !detail.data.labelIds?.includes('UNREAD'),
-                    labels: detail.data.labelIds
-                };
-            } catch (err) {
-                console.error(`📧 [GMAIL] Failed to fetch message ${msg.id}`, err);
-                return null;
-            }
-        }));
+                    const payload = detail.data.payload;
+                    const headers = payload?.headers;
+
+                    const subject = headers?.find(h => h.name === 'Subject')?.value || '(No Subject)';
+                    const from = headers?.find(h => h.name === 'From')?.value || 'Unknown';
+                    const date = headers?.find(h => h.name === 'Date')?.value || '';
+                    const snippet = detail.data.snippet;
+
+                    return {
+                        id: msg.id,
+                        threadId: msg.threadId,
+                        subject,
+                        from,
+                        date,
+                        snippet,
+                        isRead: !detail.data.labelIds?.includes('UNREAD'),
+                        labels: detail.data.labelIds
+                    };
+                } catch (err) {
+                    console.error(`📧 [GMAIL] Failed to fetch message ${msg.id}`, err);
+                    return null;
+                }
+            }));
+
+            fullMessages.push(...chunkResults);
+
+            // Optional: Small delay between batches if needed
+            // await new Promise(resolve => setTimeout(resolve, 100));
+        }
 
         console.log(`📧 [GMAIL] Successfully fetched ${fullMessages.filter(m => m !== null).length} messages`);
         return fullMessages.filter(m => m !== null);
@@ -208,6 +221,45 @@ export const getEmailContent = async (userId: string, messageId: string) => {
         };
     } catch (error: any) {
         console.error('📧 [GMAIL] Failed to fetch email content:', error.message);
+        throw error;
+    }
+};
+// Send email using Gmail API
+export const sendEmailViaGmail = async (userId: string, to: string[], subject: string, htmlBody: string) => {
+    console.log(`📧 [GMAIL] Sending email via Gmail API for user ${userId} to ${to.join(', ')}`);
+
+    const gmail = await getGmailClient(userId);
+
+    const messageParts = [
+        `To: ${to.join(', ')}`,
+        'Content-Type: text/html; charset=utf-8',
+        'MIME-Version: 1.0',
+        `Subject: ${subject}`,
+        '',
+        htmlBody
+    ];
+
+    const message = messageParts.join('\n');
+
+    // Base64url encode the message
+    const encodedMessage = Buffer.from(message)
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+    try {
+        const response = await gmail.users.messages.send({
+            userId: 'me',
+            requestBody: {
+                raw: encodedMessage
+            }
+        });
+
+        console.log(`📧 [GMAIL] Email sent successfully! ID: ${response.data.id}`);
+        return response.data;
+    } catch (error: any) {
+        console.error('📧 [GMAIL] Failed to send email:', error.message);
         throw error;
     }
 };
