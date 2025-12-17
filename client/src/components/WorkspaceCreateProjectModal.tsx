@@ -39,11 +39,13 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
   const currentWorkspace = state.workspaces.find((w) => w._id === workspaceId);
   const workspaceMembers = (currentWorkspace?.members || []).map((member: any) => {
     const user = member.user;
-    const id = typeof user === 'string' ? user : user._id;
+    if (!user) return { id: `unknown-${Math.random()}`, name: 'Unknown User' };
+    
+    const id = typeof user === 'string' ? user : (user._id || `unknown-${Math.random()}`);
     const name =
       typeof user === 'string'
         ? user
-        : user.fullName || user.username || user.email || String(user._id);
+        : user.fullName || user.username || user.email || 'Unknown User';
     return { id, name };
   });
 

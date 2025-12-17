@@ -58,19 +58,35 @@ const ManualAttendanceView: React.FC<ManualAttendanceViewProps> = ({ workspaceId
         return;
       }
 
-      // Get members from workspace, excluding the owner
+      console.log('📋 [LOAD MEMBERS] Workspace:', workspace);
+      console.log('📋 [LOAD MEMBERS] Workspace members:', workspace.members);
+      console.log('📋 [LOAD MEMBERS] Workspace owner:', workspace.owner);
+
+      // Get all members from workspace (excluding owner to avoid duplication)
       const workspaceMembers = workspace.members || [];
-      const filteredMembers = workspaceMembers
-        .filter((member: any) => member.user._id !== workspace.owner)
-        .map((member: any) => ({
-          _id: member.user._id,
-          fullName: member.user.fullName,
-          email: member.user.email,
-          avatarUrl: member.user.avatarUrl,
-          role: member.role
-        }));
-      
-      setMembers(filteredMembers);
+      const allMembers: WorkspaceMember[] = [];
+
+      // Get owner ID for comparison
+      const ownerId = typeof workspace.owner === 'object' 
+        ? (workspace.owner as any)._id 
+        : workspace.owner;
+
+      // Add members (excluding owner)
+      workspaceMembers.forEach((member: any) => {
+        const userData = member.user || member;
+        if (userData && userData._id && userData._id !== ownerId) {
+          allMembers.push({
+            _id: userData._id,
+            fullName: userData.fullName || userData.username || 'Unknown',
+            email: userData.email || '',
+            avatarUrl: userData.avatarUrl,
+            role: member.role || 'member'
+          });
+        }
+      });
+
+      console.log('📋 [LOAD MEMBERS] All members (excluding owner):', allMembers);
+      setMembers(allMembers);
     } catch (error) {
       console.error('Failed to load members:', error);
       setMembers([]);

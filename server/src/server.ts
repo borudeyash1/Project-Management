@@ -46,6 +46,7 @@ import sartthiRoutes from "./routes/sartthiRoutes";
 import notesRoutes from "./routes/notes";
 import milestoneRoutes from "./routes/milestones";
 import analyticsRoutes from "./routes/analytics";
+import faceEnrollmentRoutes from "./routes/faceEnrollment";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 
@@ -127,6 +128,7 @@ app.use("/api/mail", sartthiMailRoutes);
 app.use("/api/calendar", sartthiCalendarRoutes);
 app.use("/api/vault", sartthiVaultRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/users", faceEnrollmentRoutes);
 app.use("/api/auth/sartthi", sartthiAuthRoutes);
 app.use("/api/auth/sartthi", disconnectModulesRoutes); // ADD THIS LINE
 app.use("/api/workspaces", workspaceRoutes);

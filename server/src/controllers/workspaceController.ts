@@ -670,6 +670,14 @@ export const sendWorkspaceInvite: RequestHandler = async (req, res) => {
       status: 'pending'
     });
 
+    // Delete any existing workspace invite notifications for this user from this workspace
+    // This ensures only the latest invitation is shown
+    await Notification.deleteMany({
+      type: 'workspace',
+      userId: targetUser._id.toString(),
+      relatedId: workspace._id.toString()
+    });
+
     // Create notification for the invitee
     await Notification.create({
       type: 'workspace',
@@ -678,7 +686,11 @@ export const sendWorkspaceInvite: RequestHandler = async (req, res) => {
         message ||
         `${currentUser.fullName || 'Workspace owner'} invited you to join workspace "${workspace.name}"`,
       userId: targetUser._id.toString(),
-      relatedId: workspace._id.toString()
+      relatedId: workspace._id.toString(),
+      metadata: {
+        workspaceId: workspace._id.toString(),
+        invitationId: (invitation._id as any).toString()
+      }
     });
 
     // Sartthi Integration: Send Email Invitation
@@ -957,13 +969,26 @@ export const sendJoinRequest: RequestHandler = async (req, res) => {
     });
     console.log('✅ [JOIN REQUEST] Join request created:', joinRequest._id);
 
+    // Delete any existing join request notifications for this workspace from this user
+    // This ensures only the latest join request notification is shown
+    await Notification.deleteMany({
+      type: 'workspace',
+      userId: workspace.owner,
+      relatedId: workspace._id.toString(),
+      title: { $regex: 'join request', $options: 'i' }
+    });
+
     // Create notification for workspace owner
     await Notification.create({
       type: 'workspace',
       title: `New join request for ${workspace.name}`,
       message: `${authReq.user!.fullName || 'A user'} has requested to join your workspace "${workspace.name}"`,
       userId: workspace.owner,
-      relatedId: workspace._id.toString()
+      relatedId: workspace._id.toString(),
+      metadata: {
+        workspaceId: workspace._id.toString(),
+        joinRequestId: (joinRequest._id as any).toString()
+      }
     });
 
     const response: ApiResponse = {
@@ -1069,13 +1094,25 @@ export const approveJoinRequest: RequestHandler = async (req, res) => {
     // Add user to workspace
     await workspace.addMember(joinRequest.user, 'member');
 
+    // Delete any existing notifications about this join request
+    await Notification.deleteMany({
+      type: 'workspace',
+      userId: joinRequest.user,
+      relatedId: workspace._id.toString(),
+      title: { $regex: 'join request', $options: 'i' }
+    });
+
     // Create notification for the user
     await Notification.create({
       type: 'workspace',
       title: `Join request approved`,
       message: `Your request to join "${workspace.name}" has been approved`,
       userId: joinRequest.user,
-      relatedId: workspace._id.toString()
+      relatedId: workspace._id.toString(),
+      metadata: {
+        workspaceId: workspace._id.toString(),
+        status: 'approved'
+      }
     });
 
     const response: ApiResponse = {
@@ -1129,13 +1166,25 @@ export const rejectJoinRequest: RequestHandler = async (req, res) => {
     joinRequest.status = 'rejected';
     await joinRequest.save();
 
+    // Delete any existing notifications about this join request
+    await Notification.deleteMany({
+      type: 'workspace',
+      userId: joinRequest.user,
+      relatedId: workspace._id.toString(),
+      title: { $regex: 'join request', $options: 'i' }
+    });
+
     // Create notification for the user
     await Notification.create({
       type: 'workspace',
       title: `Join request rejected`,
       message: `Your request to join "${workspace.name}" has been rejected`,
       userId: joinRequest.user,
-      relatedId: workspace._id.toString()
+      relatedId: workspace._id.toString(),
+      metadata: {
+        workspaceId: workspace._id.toString(),
+        status: 'rejected'
+      }
     });
 
     const response: ApiResponse = {

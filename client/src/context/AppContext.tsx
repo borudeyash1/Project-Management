@@ -315,7 +315,7 @@ export function AppProvider({ children }: AppProviderProps) {
         if (workspaces.length > 0) {
           dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
           dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
-          dispatch({ type: 'SET_MODE', payload: 'Workspace' });
+          // Stay in Personal mode by default - user can switch manually
         } else {
           console.log('[AppProvider] No workspaces found for user');
           dispatch({ type: 'SET_WORKSPACES', payload: [] });
@@ -332,7 +332,7 @@ export function AppProvider({ children }: AppProviderProps) {
           if (workspaces.length > 0) {
             dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
             dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
-            dispatch({ type: 'SET_MODE', payload: 'Workspace' });
+            // Stay in Personal mode by default - user can switch manually
           } else {
             dispatch({ type: 'SET_WORKSPACES', payload: [] });
           }

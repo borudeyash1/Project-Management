@@ -640,6 +640,15 @@ export interface INotification extends Document {
   read: boolean;
   userId: string;
   relatedId?: string;
+  metadata?: {
+    workspaceId?: string;
+    invitationId?: string;
+    joinRequestId?: string;
+    taskId?: string;
+    projectId?: string;
+    status?: string;
+    [key: string]: any;
+  };
   createdAt: Date;
 }
 

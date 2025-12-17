@@ -53,6 +53,7 @@ export const getDashboardData = async (
         ],
         isActive: { $ne: false },
       })
+        .populate('teamMembers.user', 'fullName email avatarUrl designation')
         .sort({ updatedAt: -1 })
         .limit(15)
         .lean(),

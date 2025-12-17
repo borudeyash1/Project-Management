@@ -18,6 +18,7 @@ import PlannerLayout from './components/planner/PlannerLayout';
 import Dashboard from './components/Dashboard';
 import TrackerLayout from './components/tracker/TrackerLayout';
 import RemindersPage from './components/RemindersPage';
+import NotificationsPage from './components/NotificationsPage';
 import ReportsPage from './components/ReportsPage';
 import TeamPage from './components/TeamPage';
 import GoalsPage from './components/GoalsPage';
@@ -202,28 +203,33 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   // For left/right: Dock is alongside, content shifts automatically
   return (
-    <div className="min-h-screen bg-bg dark:bg-gray-900 flex">
-      {/* Dock at Left */}
-      {dockPosition === 'left' && (
-        <div className="flex-shrink-0">
-          <DockNavigation />
-        </div>
-      )}
+    <div className="min-h-screen bg-bg dark:bg-gray-900 flex flex-col">
+      {/* Header spans full width */}
+      <Header />
+      
+      {/* Dock and Content Row */}
+      <div className="flex-1 flex">
+        {/* Dock at Left */}
+        {dockPosition === 'left' && (
+          <div className="flex-shrink-0">
+            <DockNavigation />
+          </div>
+        )}
 
-      {/* Main Content Area (Header + Content) - Takes remaining space */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        <main className={`flex-1 bg-bg dark:bg-gray-900 overflow-auto ${dockPosition === 'left' ? 'pl-4' : dockPosition === 'right' ? 'pr-4' : ''}`}>
-          {children}
-        </main>
+        {/* Main Content Area - Takes remaining space */}
+        <div className="flex-1 min-w-0">
+          <main className={`h-full bg-bg dark:bg-gray-900 overflow-auto ${dockPosition === 'left' ? 'pl-4' : dockPosition === 'right' ? 'pr-4' : ''}`}>
+            {children}
+          </main>
+        </div>
+
+        {/* Dock at Right */}
+        {dockPosition === 'right' && (
+          <div className="flex-shrink-0">
+            <DockNavigation />
+          </div>
+        )}
       </div>
-
-      {/* Dock at Right */}
-      {dockPosition === 'right' && (
-        <div className="flex-shrink-0">
-          <DockNavigation />
-        </div>
-      )}
 
       {/* Fixed Components */}
       <ToastContainer />
@@ -375,6 +381,14 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <Settings />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/notifications" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <NotificationsPage />
             </AppLayout>
           </ProtectedRoute>
         } />

@@ -12,6 +12,7 @@ import CreateReportModal from './CreateReportModal';
 import ScheduleReportModal from './ScheduleReportModal';
 import { downloadReportPDF, printReportPDF } from '../utils/pdfGenerator';
 import * as XLSX from 'xlsx';
+import { apiService } from '../services/api';
 
 interface ReportData {
   _id: string;
@@ -78,175 +79,56 @@ const ReportsPage: React.FC = () => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Mock data - replace with actual API calls
+  // Fetch actual data
   useEffect(() => {
-    const mockReports: ReportData[] = [
-      {
-        _id: '1',
-        name: 'Q1 Productivity Report',
-        type: 'productivity',
-        description: 'Team productivity metrics for Q1 2024',
-        data: {
-          totalTasks: 150,
-          completedTasks: 120,
-          averageCompletionTime: 2.5,
-          teamEfficiency: 85
-        },
-        createdAt: new Date('2024-03-01'),
-        updatedAt: new Date('2024-03-15'),
-        isPublic: false,
-        tags: ['productivity', 'q1', 'team']
-      },
-      {
-        _id: '2',
-        name: 'Time Tracking Analysis',
-        type: 'time',
-        description: 'Detailed time tracking analysis for March 2024',
-        data: {
-          totalHours: 320,
-          billableHours: 280,
-          averageDailyHours: 8.2,
-          topProjects: ['E-commerce Platform', 'Mobile App', 'Dashboard Redesign']
-        },
-        createdAt: new Date('2024-03-20'),
-        updatedAt: new Date('2024-03-20'),
-        isPublic: true,
-        tags: ['time', 'tracking', 'march']
-      },
-      {
-        _id: '3',
-        name: 'Team Performance Review',
-        type: 'team',
-        description: 'Individual and team performance metrics',
-        data: {
-          teamSize: 8,
-          averageRating: 4.2,
-          topPerformers: ['John Doe', 'Jane Smith'],
-          improvementAreas: ['Communication', 'Deadline Management']
-        },
-        createdAt: new Date('2024-03-10'),
-        updatedAt: new Date('2024-03-10'),
-        isPublic: false,
-        tags: ['team', 'performance', 'review']
+    const fetchReportsData = async () => {
+      try {
+        const [reportsRes, projectsRes, teamRes, timeRes] = await Promise.all([
+          apiService.get('/reports'),
+          apiService.get('/reports/analytics/projects'),
+          apiService.get('/reports/analytics/team'),
+          apiService.get('/reports/analytics/time')
+        ]);
+
+        if (reportsRes) {
+          setReports((reportsRes as any).data || []);
+        }
+
+        if (projectsRes) {
+          const projectsData = (projectsRes as any).data || [];
+          setProjectMetrics(projectsData.map((p: any) => ({
+            ...p,
+            startDate: new Date(p.startDate),
+            endDate: new Date(p.endDate)
+          })));
+        }
+
+        if (teamRes) {
+          const teamData = (teamRes as any).data || [];
+          setTeamPerformance(teamData.map((t: any) => ({
+            ...t,
+            lastActive: new Date(t.lastActive)
+          })));
+        }
+
+        if (timeRes) {
+          const timeData = (timeRes as any).data?.dailyData || [];
+          // Transform time data to match expected format if needed
+          setTimeTrackingData(timeData.map((t: any) => ({
+             date: t.date,
+             hours: t.hours,
+             billableHours: t.billableHours,
+             projects: [] // Detailed project breakdown per day might require more complex queries
+          })));
+        }
+
+      } catch (error) {
+        console.error('Failed to fetch reports data:', error);
+        // Fallback to empty states or show error
       }
-    ];
+    };
 
-    const mockProjectMetrics: ProjectMetrics[] = [
-      {
-        _id: 'p1',
-        name: 'E-commerce Platform',
-        totalTasks: 45,
-        completedTasks: 32,
-        progress: 71,
-        budget: 50000,
-        spent: 35000,
-        teamSize: 5,
-        startDate: new Date('2024-01-15'),
-        endDate: new Date('2024-04-15'),
-        status: 'active'
-      },
-      {
-        _id: 'p2',
-        name: 'Mobile App',
-        totalTasks: 28,
-        completedTasks: 28,
-        progress: 100,
-        budget: 30000,
-        spent: 28500,
-        teamSize: 3,
-        startDate: new Date('2024-02-01'),
-        endDate: new Date('2024-03-31'),
-        status: 'completed'
-      },
-      {
-        _id: 'p3',
-        name: 'Dashboard Redesign',
-        totalTasks: 18,
-        completedTasks: 12,
-        progress: 67,
-        budget: 20000,
-        spent: 12000,
-        teamSize: 4,
-        startDate: new Date('2024-03-01'),
-        endDate: new Date('2024-05-01'),
-        status: 'active'
-      }
-    ];
-
-    const mockTeamPerformance: TeamPerformance[] = [
-      {
-        _id: 'u1',
-        name: 'John Doe',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
-        role: 'Senior Developer',
-        tasksCompleted: 25,
-        totalTasks: 28,
-        completionRate: 89,
-        averageRating: 4.5,
-        hoursWorked: 160,
-        productivityScore: 92,
-        lastActive: new Date('2024-03-20')
-      },
-      {
-        _id: 'u2',
-        name: 'Jane Smith',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
-        role: 'UI/UX Designer',
-        tasksCompleted: 22,
-        totalTasks: 25,
-        completionRate: 88,
-        averageRating: 4.3,
-        hoursWorked: 155,
-        productivityScore: 89,
-        lastActive: new Date('2024-03-20')
-      },
-      {
-        _id: 'u3',
-        name: 'Bob Wilson',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face',
-        role: 'Project Manager',
-        tasksCompleted: 18,
-        totalTasks: 20,
-        completionRate: 90,
-        averageRating: 4.7,
-        hoursWorked: 165,
-        productivityScore: 95,
-        lastActive: new Date('2024-03-19')
-      }
-    ];
-
-    const mockTimeTrackingData: TimeTrackingData[] = [
-      { date: '2024-03-14', hours: 8.5, billableHours: 7.5, projects: [
-        { name: 'E-commerce Platform', hours: 5, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 2.5, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-15', hours: 8, billableHours: 7, projects: [
-        { name: 'E-commerce Platform', hours: 6, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 1.5, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 0.5, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-16', hours: 7.5, billableHours: 6.5, projects: [
-        { name: 'E-commerce Platform', hours: 4, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-17', hours: 8.2, billableHours: 7.8, projects: [
-        { name: 'E-commerce Platform', hours: 5.5, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 1.2, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
-      ]},
-      { date: '2024-03-18', hours: 8, billableHours: 7.2, projects: [
-        { name: 'E-commerce Platform', hours: 4.5, color: 'bg-accent' },
-        { name: 'Mobile App', hours: 2, color: 'bg-green-500' },
-        { name: 'Dashboard Redesign', hours: 1.5, color: 'bg-purple-500' }
-      ]}
-    ];
-
-    setReports(mockReports);
-    setProjectMetrics(mockProjectMetrics);
-    setTeamPerformance(mockTeamPerformance);
-    setTimeTrackingData(mockTimeTrackingData);
+    fetchReportsData();
   }, []);
 
   const getReportIcon = (type: string) => {

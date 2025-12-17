@@ -15,6 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/homeService';
+import { apiService } from '../services/api';
 import CalendarWidget from './dashboard/CalendarWidget';
 import ReportsWidget from './dashboard/ReportsWidget';
 import ExpandedStatCard from './dashboard/ExpandedStatCard';
@@ -61,6 +62,13 @@ interface Project {
   progress: number;
   status: 'active' | 'on-hold' | 'completed';
   team: number;
+  teamMembers?: {
+    _id: string;
+    name: string;
+    avatar?: string;
+    email?: string;
+    role?: string;
+  }[];
   dueDate?: Date;
   color: string;
 }
@@ -160,7 +168,8 @@ const HomePage: React.FC = () => {
             description: projectData.description,
             progress: projectData.progress || 0,
             dueDate: projectData.dueDate || projectData.endDate ? new Date(projectData.dueDate || projectData.endDate) : undefined,
-            team: Array.isArray(projectData.teamMembers) ? projectData.teamMembers.length : (projectData.team?.length || 0),
+            team: Array.isArray(projectData.team) ? projectData.team.length : (projectData.team?.length || 0),
+            teamMembers: Array.isArray(projectData.team) ? projectData.team : [],
             color: 'bg-blue-500',
             status: (projectData.status || 'active') as Project['status'],
           };
@@ -224,21 +233,69 @@ const HomePage: React.FC = () => {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  const handleAddQuickTask = () => {
+  const handleAddQuickTask = async () => {
     if (!newTaskTitle.trim()) return;
 
-    const newTask: QuickTask = {
-      _id: Date.now().toString(),
-      title: newTaskTitle,
-      type: newTaskType,
-      priority: 'medium',
-      completed: false
-    };
+    try {
+      // Minimal payload - only what's required
+      const payload: any = {
+        title: newTaskTitle,
+      };
+      
+      // Only add workspace if user is in a workspace
+      if (state.currentWorkspace) {
+        payload.workspace = state.currentWorkspace;
+      }
 
-    setQuickTasks([newTask, ...quickTasks]);
-    setNewTaskTitle('');
-    setNewTaskType('task');
-    setShowQuickAdd(false);
+      console.log('📝 [QUICK ACTION] Creating task:', payload);
+      const createdTask = await apiService.createTask(payload);
+      console.log('✅ [QUICK ACTION] Task created:', createdTask);
+
+      // Add to local state
+      const newTask: QuickTask = {
+        _id: createdTask._id,
+        title: createdTask.title,
+        type: newTaskType,
+        priority: 'medium',
+        completed: false,
+      };
+
+      setQuickTasks([newTask, ...quickTasks]);
+      setNewTaskTitle('');
+      setNewTaskType('task');
+      setShowQuickAdd(false);
+
+      // Show success message
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Task created successfully!',
+          duration: 3000,
+        },
+      });
+      
+      // Reload dashboard data to sync
+      loadDashboardData();
+    } catch (error: any) {
+      console.error('❌ [QUICK ACTION] Failed to create task:', error);
+      console.error('❌ [QUICK ACTION] Error message:', error.message);
+      console.error('❌ [QUICK ACTION] Error stack:', error.stack);
+      
+      // Extract more detailed error message
+      const errorMessage = error.message || 'Failed to create task. Please try again.';
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: errorMessage,
+          duration: 5000,
+        },
+      });
+    }
   };
 
   const markNotificationAsRead = (notificationId: string) => {
@@ -463,13 +520,7 @@ const HomePage: React.FC = () => {
               <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
-                  <button
-                    onClick={() => setShowQuickAdd(!showQuickAdd)}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg hover:opacity-90 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    {t('tasks.newTask')}
-                  </button>
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
                 </div>
 
                 {/* Quick Add Task */}
@@ -658,6 +709,76 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
+            {/* Upcoming Deadlines - Moved to Right Column */}
+
+            {/* Projects Overview */}
+            {projects.length > 0 && (
+              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h2>
+                  <button
+                    onClick={() => navigate('/projects')}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    {t('buttons.viewAll')}
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {projects.slice(0, 3).map(project => {
+                    if (!project._id) {
+                      console.warn('Project missing _id:', project);
+                      return null;
+                    }
+                    return (
+                      <div key={project._id} className={`p-4 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                        }`}>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${project.color}`} />
+                          <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h3>
+                        </div>
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                          {t('projects.' + project.status.toLowerCase().replace(' ', ''))}
+                        </span>
+                      </div>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3 line-clamp-2`}>{project.description}</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('projects.progress')}</span>
+                          <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.progress}%</span>
+                        </div>
+                        <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                          <div
+                            className="bg-accent h-2 rounded-full transition-all"
+                            style={{ width: `${project.progress}%` }}
+                          />
+                        </div>
+                        <div className={`flex items-center justify-between text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                          <span>{t('projects.teamMembers', { count: project.team })}</span>
+                          {project.dueDate && (
+                            <span>{t('projects.due', { date: new Date(project.dueDate).toLocaleDateString() })}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* AI Assistant */}
+            {/* AI Assistant Card Removed - Redundant with global chatbot */}
+
+            {/* AI Chatbot Modal */}
+            <AIChatbot 
+              isOpen={isAIModalOpen} 
+              onClose={() => setIsAIModalOpen(false)} 
+            />
+
             {/* Upcoming Deadlines */}
             {deadlines.length > 0 && (
               <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
@@ -699,103 +820,38 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
-            {/* Projects Overview */}
-            {projects.length > 0 && (
+            {/* Recent Files */}
+            {recentFiles.length > 0 && (
               <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h2>
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Files</h2>
                   <button
-                    onClick={() => navigate('/projects')}
+                    onClick={() => navigate('/files')}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     {t('buttons.viewAll')}
                   </button>
                 </div>
-                <div className="space-y-4">
-                  {projects.slice(0, 3).map(project => {
-                    if (!project._id) {
-                      console.warn('Project missing _id:', project);
-                      return null;
-                    }
-                    return (
-                      <div key={project._id} className={`p-4 border rounded-lg hover:shadow-sm transition-shadow cursor-pointer ${isDarkMode ? 'border-gray-700 hover:border-gray-600' : 'border-gray-200 hover:border-gray-300'
-                        }`} onClick={() => {
-                          console.log('Navigating to project:', project._id);
-                          navigate(`/project/${project._id}/overview`);
-                        }}>
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${project.color}`} />
-                          <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h3>
-                        </div>
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                          {t('projects.' + project.status.toLowerCase().replace(' ', ''))}
-                        </span>
+                <div className="space-y-3">
+                  {recentFiles.slice(0, 5).map(file => (
+                    <div key={file._id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer">
+                      <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                        {getFileIcon(file.type)}
                       </div>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3 line-clamp-2`}>{project.description}</p>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('projects.progress')}</span>
-                          <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.progress}%</span>
-                        </div>
-                        <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                          <div
-                            className="bg-accent h-2 rounded-full transition-all"
-                            style={{ width: `${project.progress}%` }}
-                          />
-                        </div>
-                        <div className={`flex items-center justify-between text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                          <span>{t('projects.teamMembers', { count: project.team })}</span>
-                          {project.dueDate && (
-                            <span>{t('projects.due', { date: new Date(project.dueDate).toLocaleDateString() })}</span>
-                          )}
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {file.name}
+                        </p>
+                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {file.size} • {new Date(file.uploadedAt).toLocaleDateString()}
+                        </p>
                       </div>
+                      <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} opacity-0 group-hover:opacity-100 transition-opacity`} />
                     </div>
-                    );
-                  })}
+                  ))}
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* AI Assistant */}
-            {canUseAI() && (
-              <div className={`rounded-lg p-6 shadow-lg ${isDarkMode
-                ? 'bg-gradient-to-br from-purple-600 to-pink-600'
-                : 'bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-50'
-                }`}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-white bg-opacity-20 backdrop-blur-sm' : 'bg-accent/20'
-                    }`}>
-                    <Bot className={`w-5 h-5 ${isDarkMode ? 'text-white' : 'text-yellow-700'}`} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.aiAssistant')}</h3>
-                    <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{t('dashboard.aiSuggestions')}</p>
-                  </div>
-                </div>
-                <p className={`text-sm mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                  {t('dashboard.aiDescription')}
-                </p>
-                <button
-                  onClick={() => setIsAIModalOpen(true)}
-                  className={`w-full rounded-lg px-4 py-2 text-sm font-medium drop-shadow-sm transition-colors border ${isDarkMode 
-                    ? 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-white border-opacity-20' 
-                    : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200'}`}
-                >
-                  {t('dashboard.askAI')}
-                </button>
-              </div>
-            )}
-
-            {/* AI Chatbot Modal */}
-            <AIChatbot 
-              isOpen={isAIModalOpen} 
-              onClose={() => setIsAIModalOpen(false)} 
-            />
 
             {/* Calendar Widget */}
             <CalendarWidget />
@@ -812,7 +868,12 @@ const HomePage: React.FC = () => {
           data={{
             tasks: quickTasks.filter(t => !t.completed),
             projects: projects,
-            teamMembers: projects.flatMap(p => Array(p.team).fill({ role: 'Member' })), // Mock team data for now
+            teamMembers: Array.from(
+              new Map(
+                projects.flatMap(p => p.teamMembers || [])
+                  .map(member => [member._id, member])
+              ).values()
+            ),
             avgProgress: Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))
           }}
         />

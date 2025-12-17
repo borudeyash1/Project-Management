@@ -199,7 +199,7 @@ const CalendarWidget: React.FC = () => {
                             ))
                         ) : (
                             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                {t('widgets.noEvents')}
+                                No tasks for this date
                             </p>
                         )}
                     </div>

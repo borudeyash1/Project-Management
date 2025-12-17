@@ -9,6 +9,7 @@ import { useApp } from '../context/AppContext';
 import apiService from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
+import FaceEnrollmentSection from './profile/FaceEnrollmentSection';
 
 interface ProfileData {
   fullName: string;
@@ -768,6 +769,13 @@ const Profile: React.FC = () => {
           {t('profile.changePassword')}
         </button>
       </div>
+
+      {/* Face Recognition Section */}
+      <FaceEnrollmentSection
+        userId={state.userProfile._id}
+        faceData={(state.userProfile as any).faceData}
+        onUpdate={fetchProfileData}
+      />
     </div>
   );
 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, Clock, Target, Users, TrendingUp } from 'lucide-react';
+import { X, Clock, Target, Users, TrendingUp, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Task {
     _id: string;
@@ -28,6 +29,7 @@ interface ExpandedStatCardProps {
 
 const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data }) => {
     const { isDarkMode } = useTheme();
+    const navigate = useNavigate();
 
     const renderContent = () => {
         switch (type) {
@@ -167,23 +169,47 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                 data.teamMembers.map((member: any, index: number) => (
                                     <div
                                         key={index}
-                                        className={`p-4 rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-gray-50'
+                                        className={`p-4 rounded-lg border flex items-center justify-between ${isDarkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'
-                                                }`}>
-                                                <Users className="w-5 h-5" />
-                                            </div>
+                                            {member.avatar ? (
+                                                <img 
+                                                    src={member.avatar} 
+                                                    alt={member.name} 
+                                                    className="w-10 h-10 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'
+                                                    }`}>
+                                                    <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                                        {member.name ? member.name.charAt(0).toUpperCase() : 'U'}
+                                                    </span>
+                                                </div>
+                                            )}
                                             <div>
                                                 <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                                     {member.name || `Member ${index + 1}`}
                                                 </p>
                                                 <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                    {member.role || 'Team Member'}
+                                                    {member.email || member.role || 'Team Member'}
                                                 </p>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/messages');
+                                                onClose();
+                                            }}
+                                            className={`p-2 rounded-lg transition-colors ${
+                                                isDarkMode 
+                                                ? 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30' 
+                                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                            }`}
+                                            title="Chat with member"
+                                        >
+                                            <MessageSquare className="w-4 h-4" />
+                                        </button>
                                     </div>
                                 ))
                             ) : (

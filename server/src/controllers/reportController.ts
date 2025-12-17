@@ -1,4 +1,7 @@
 import { Request, Response } from 'express';
+import Project from '../models/Project';
+import Task from '../models/Task';
+import User from '../models/User';
 import { Report } from '../models/Report';
 import { TimeEntry } from '../models/TimeEntry';
 import { Goal } from '../models/Goal';
@@ -215,35 +218,41 @@ export const getProjectMetrics = async (req: Request, res: Response): Promise<vo
   try {
     const userId = (req as any).user.id;
 
-    // Mock data for now - in a real implementation, you'd query actual project data
-    const projectMetrics = [
-      {
-        _id: 'p1',
-        name: 'E-commerce Platform',
-        totalTasks: 45,
-        completedTasks: 32,
-        progress: 71,
-        budget: 50000,
-        spent: 35000,
-        teamSize: 5,
-        startDate: new Date('2024-01-15'),
-        endDate: new Date('2024-04-15'),
-        status: 'active'
-      },
-      {
-        _id: 'p2',
-        name: 'Mobile App',
-        totalTasks: 28,
-        completedTasks: 28,
-        progress: 100,
-        budget: 30000,
-        spent: 28500,
-        teamSize: 3,
-        startDate: new Date('2024-02-01'),
-        endDate: new Date('2024-03-31'),
-        status: 'completed'
-      }
-    ];
+    // Fetch projects where the user is a member, owner, or creator
+    const projects = await Project.find({
+      $or: [
+        { owner: userId },
+        { createdBy: userId },
+        { 'members.user': userId },
+        { 'teamMembers.user': userId }
+      ]
+    }).lean();
+
+    const projectMetrics = await Promise.all(projects.map(async (project: any) => {
+      const projectId = project._id;
+      
+      // Get task counts
+      const totalTasks = await Task.countDocuments({ project: projectId });
+      const completedTasks = await Task.countDocuments({ project: projectId, status: 'done' });
+      
+      // Calculate team size
+      const members = project.members || project.teamMembers || [];
+      const teamSize = Array.isArray(members) ? members.length : 0;
+      
+      return {
+        _id: projectId,
+        name: project.name,
+        totalTasks,
+        completedTasks,
+        progress: project.progress || (totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0),
+        budget: project.budget || 0,
+        spent: 0, // In a real app, this would come from expenses/time logs
+        teamSize,
+        startDate: project.startDate || project.createdAt,
+        endDate: project.dueDate || project.endDate,
+        status: project.status || 'active'
+      };
+    }));
 
     res.status(200).json({
       success: true,
@@ -264,35 +273,53 @@ export const getTeamPerformance = async (req: Request, res: Response): Promise<v
   try {
     const userId = (req as any).user.id;
 
-    // Mock data for now - in a real implementation, you'd query actual team data
-    const teamPerformance = [
-      {
-        _id: 'u1',
-        name: 'John Doe',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
-        role: 'Senior Developer',
-        tasksCompleted: 25,
-        totalTasks: 28,
-        completionRate: 89,
-        averageRating: 4.5,
-        hoursWorked: 160,
-        productivityScore: 92,
-        lastActive: new Date('2024-03-20')
-      },
-      {
-        _id: 'u2',
-        name: 'Jane Smith',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
-        role: 'UI/UX Designer',
-        tasksCompleted: 22,
-        totalTasks: 25,
-        completionRate: 88,
-        averageRating: 4.3,
-        hoursWorked: 155,
-        productivityScore: 89,
-        lastActive: new Date('2024-03-20')
-      }
-    ];
+    // Get projects to find team members
+    const projects = await Project.find({
+      $or: [
+        { owner: userId },
+        { createdBy: userId },
+        { 'members.user': userId },
+        { 'teamMembers.user': userId }
+      ]
+    }).populate('members.user teamMembers.user', 'fullName email avatarUrl lastActive').lean();
+
+    // Aggregate unique users
+    const uniqueUsersMap = new Map<string, any>();
+    
+    projects.forEach((project: any) => {
+      const members = project.members || project.teamMembers || [];
+      members.forEach((member: any) => {
+        const user = member.user;
+        if (user && user._id) {
+          uniqueUsersMap.set(user._id.toString(), user);
+        }
+      });
+    });
+
+    const uniqueUsers = Array.from(uniqueUsersMap.values());
+
+    const teamPerformance = await Promise.all(uniqueUsers.map(async (user: any) => {
+      const tasks = await Task.find({ assignee: user._id });
+      const totalTasks = tasks.length;
+      const completedTasks = tasks.filter(t => t.status === 'done').length;
+      
+      // Calculate simplified productivity score
+      const productivityScore = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      
+      return {
+        _id: user._id,
+        name: user.fullName || user.email,
+        avatar: user.avatarUrl,
+        role: user.role || 'Member', // Assuming role exists on user or we default
+        tasksCompleted: completedTasks,
+        totalTasks: totalTasks,
+        completionRate: productivityScore,
+        averageRating: 0, // Placeholder
+        hoursWorked: 0, // Placeholder needs time tracking integration
+        productivityScore: productivityScore, // Simplified
+        lastActive: user.lastActive || new Date()
+      };
+    }));
 
     res.status(200).json({
       success: true,

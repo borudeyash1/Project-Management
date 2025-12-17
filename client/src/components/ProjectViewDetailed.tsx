@@ -2420,7 +2420,13 @@ const ProjectViewDetailed: React.FC = () => {
                   </label>
                   <select
                     value={projectStatus}
-                    onChange={(e) => setProjectStatus(e.target.value as any)}
+                    onChange={(e) => {
+                      const newStatus = e.target.value as any;
+                      setProjectStatus(newStatus);
+                      if (newStatus === 'completed') {
+                        setProjectProgress(100);
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
                   >
                     <option value="active">Active</option>
@@ -2452,7 +2458,15 @@ const ProjectViewDetailed: React.FC = () => {
                     min="0"
                     max="100"
                     value={projectProgress}
-                    onChange={(e) => setProjectProgress(Number(e.target.value))}
+                    onChange={(e) => {
+                      const newProgress = Number(e.target.value);
+                      setProjectProgress(newProgress);
+                      if (newProgress === 100) {
+                        setProjectStatus('completed');
+                      } else if (projectStatus === 'completed' && newProgress < 100) {
+                        setProjectStatus('active');
+                      }
+                    }}
                     className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-accent"
                     style={{
                       background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${projectProgress}%, #e5e7eb ${projectProgress}%, #e5e7eb 100%)`

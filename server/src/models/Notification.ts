@@ -30,6 +30,10 @@ const notificationSchema = new Schema<INotification>(
     relatedId: {
       type: String,
     },
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: {},
+    },
   },
   {
     timestamps: { createdAt: 'createdAt', updatedAt: false },

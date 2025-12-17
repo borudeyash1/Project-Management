@@ -95,7 +95,7 @@ interface PlannerContextType {
   dataVersion: number;
   fetchData: () => Promise<void>;
   addTask: (columnId: string) => void;
-  createTask: (taskData: Partial<Task>) => void;
+  createTask: (taskData: Partial<Task>) => Promise<void>;
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   moveTask: (taskId: string, newStatus: string) => Promise<void>;
@@ -193,8 +193,16 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
     console.log('Add task to column:', columnId);
   };
 
-  const createTask = (taskData: Partial<Task>) => {
-    console.log('Create task:', taskData);
+  const createTask = async (taskData: Partial<Task>) => {
+    try {
+      console.log('📝 [PlannerContext] Creating task:', taskData);
+      await apiService.post('/tasks', taskData);
+      await fetchData(); // Refresh data after creating
+      console.log('✅ [PlannerContext] Task created successfully');
+    } catch (error) {
+      console.error('❌ [PlannerContext] Failed to create task:', error);
+      throw error;
+    }
   };
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {

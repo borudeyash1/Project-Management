@@ -49,7 +49,8 @@ const WorkspaceInbox: React.FC = () => {
       setIsLoadingThreads(true);
       try {
         const response = await apiService.get<any>(`/inbox/workspace/${currentWorkspaceId}/threads`);
-        const data = (response.data as any[]) || [];
+        // Backend returns { success: true, data: [...] }, so access response.data.data
+        const data = response.data?.data || response.data || [];
         setThreads(
           (data || []).map((t: any) => ({
             userId: t.userId,
@@ -80,7 +81,7 @@ const WorkspaceInbox: React.FC = () => {
       setIsLoadingMessages(true);
       try {
         const messagesResp = await apiService.get<any>(`/inbox/workspace/${currentWorkspaceId}/messages/${selectedUserId}`);
-        const data = (messagesResp.data as any[]) || [];
+        const data = messagesResp.data?.data || messagesResp.data || [];
         setMessages(data as InboxMessage[]);
 
         // Mark all as read for current user
@@ -88,7 +89,7 @@ const WorkspaceInbox: React.FC = () => {
 
         // Refresh threads so unread counts update
         const threadsResp = await apiService.get<any>(`/inbox/workspace/${currentWorkspaceId}/threads`);
-        const updatedThreads = (threadsResp.data as any[]) || [];
+        const updatedThreads = threadsResp.data?.data || threadsResp.data || [];
         setThreads(
           (updatedThreads || []).map((t: any) => ({
             userId: t.userId,
@@ -142,7 +143,7 @@ const WorkspaceInbox: React.FC = () => {
         `/inbox/workspace/${currentWorkspaceId}/messages/${selectedUserId}`,
         { content },
       );
-      const created = response.data as InboxMessage;
+      const created = response.data?.data || response.data;
 
       setMessages((prev) => [
         ...prev,

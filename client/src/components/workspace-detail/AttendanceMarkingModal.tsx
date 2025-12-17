@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, MapPin, Camera, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { faceRecognitionService } from '../../utils/faceRecognition';
 
 interface AttendanceMarkingModalProps {
   slot: {
@@ -120,18 +121,45 @@ const AttendanceMarkingModal: React.FC<AttendanceMarkingModalProps> = ({
     }
   };
 
-  const captureFace = () => {
+  const captureFace = async () => {
     if (!videoRef.current) return;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    
-    if (ctx) {
+    try {
+      // Initialize face recognition service
+      await faceRecognitionService.initialize();
+
+      // Capture image from video
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        setError('Failed to capture image');
+        setStep('error');
+        return;
+      }
+
       ctx.drawImage(videoRef.current, 0, 0);
-      const imageData = canvas.toDataURL('image/jpeg', 0.8);
-      setFaceImage(imageData);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      // Detect face
+      const detection = await faceRecognitionService.detectFace(imageData);
+      if (!detection) {
+        setError('No face detected. Please position your face clearly in the frame.');
+        return;
+      }
+
+      // Check liveness (anti-spoofing)
+      const livenessResult = await faceRecognitionService.checkLiveness(imageData);
+      if (!livenessResult.isLive || livenessResult.confidence < 0.7) {
+        setError('Liveness verification failed. Please ensure you are a real person and not using a photo.');
+        return;
+      }
+
+      // Convert to base64
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      setFaceImage(imageDataUrl);
       
       // Stop camera
       if (stream) {
@@ -139,7 +167,10 @@ const AttendanceMarkingModal: React.FC<AttendanceMarkingModalProps> = ({
       }
       
       // Submit attendance
-      submitAttendance(location, imageData);
+      submitAttendance(location, imageDataUrl);
+    } catch (err: any) {
+      setError(err.message || 'Failed to capture face');
+      setStep('error');
     }
   };
 

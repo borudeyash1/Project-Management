@@ -31,9 +31,29 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch notifications count
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const notifications = await apiService.getNotifications();
+        const unread = notifications.filter(n => !n.read).length;
+        setUnreadCount(unread);
+      } catch (error) {
+        console.error('Failed to load notifications:', error);
+      }
+    };
+
+    loadNotifications();
+    
+    // Refresh count every 30 seconds
+    const interval = setInterval(loadNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -57,6 +77,11 @@ const Header: React.FC = () => {
 
   const toggleNotifications = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: 'notifications' });
+    // Refresh count when opening notifications
+    apiService.getNotifications().then(notifications => {
+      const unread = notifications.filter(n => !n.read).length;
+      setUnreadCount(unread);
+    });
   };
 
   const changeLanguage = (lng: string) => {
@@ -104,27 +129,17 @@ const Header: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Search */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 dark:text-gray-400" />
-            <input
-              type="text"
-              className="w-64 rounded-lg border border-border dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
-              placeholder={t('forms.searchPlaceholder')}
-            />
-          </div>
-        </div>
-
         {/* Notifications */}
         <button
           className="p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 relative"
           onClick={toggleNotifications}
         >
           <Bell className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
-            3
-          </span>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-medium">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </button>
 
         {/* Settings */}
