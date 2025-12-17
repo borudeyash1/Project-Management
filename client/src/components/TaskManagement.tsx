@@ -343,15 +343,36 @@ const TaskManagement: React.FC = () => {
     );
   };
 
-  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
-    setTasks((prevTasks: Task[]) =>
-      prevTasks.map((task: Task) =>
-        task._id === taskId
-          ? { ...task, ...updates }
-          : task
-      )
-    );
-  };
+  const handleTaskUpdate = async (taskId: string, updates: Partial<Task>) => {
+  // Optimistic update - update UI immediately
+  setTasks((prevTasks: Task[]) =>
+    prevTasks.map((task: Task) =>
+      task._id === taskId
+        ? { ...task, ...updates }
+        : task
+    )
+  );
+
+  // Persist to database
+  try {
+    // Convert updates to API-compatible format
+    const apiUpdates: any = { ...updates };
+    if (apiUpdates.project && typeof apiUpdates.project === 'object') {
+      apiUpdates.project = apiUpdates.project._id;
+    }
+    if (apiUpdates.assignee && typeof apiUpdates.assignee === 'object') {
+      apiUpdates.assignee = apiUpdates.assignee._id;
+    }
+    
+    await apiService.updateTask(taskId, apiUpdates);
+  } catch (error) {
+    console.error('Failed to update task:', error);
+    // Optionally: revert the optimistic update or show error toast
+    setToastMessage('Failed to update task');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  }
+};
 
   const handleTaskCreate = (taskData: Partial<Task>) => {
     const newTask: Task = {
@@ -585,7 +606,6 @@ const TaskManagement: React.FC = () => {
       case 'pending': return 'bg-gray-100 text-gray-800';
       case 'in-progress': return 'bg-blue-100 text-blue-800';
       case 'completed': return 'bg-green-100 text-green-800';
-      case 'blocked': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -601,6 +621,7 @@ const TaskManagement: React.FC = () => {
   };
 
   const getPriorityIcon = (priority: string) => {
+  const icon = (() => {
     switch (priority) {
       case 'low': return <Circle className="w-3 h-3" />;
       case 'medium': return <Square className="w-3 h-3" />;
@@ -608,7 +629,10 @@ const TaskManagement: React.FC = () => {
       case 'critical': return <AlertCircle className="w-3 h-3" />;
       default: return <Circle className="w-3 h-3" />;
     }
-  };
+  })();
+  
+  return <span className="pointer-events-none">{icon}</span>;
+};
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
@@ -646,7 +670,7 @@ const TaskManagement: React.FC = () => {
       setTasks((prevTasks: Task[]) =>
         prevTasks.map((task: Task) =>
           task._id === draggedTask._id
-            ? { ...task, status: status as 'pending' | 'in-progress' | 'completed' | 'blocked', updatedAt: new Date() }
+            ? { ...task, status: status as 'pending' | 'in-progress' | 'completed', updatedAt: new Date() }
             : task
         )
       );
@@ -733,8 +757,8 @@ const TaskManagement: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {['pending', 'in-progress', 'completed', 'blocked'].map(status => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {['pending', 'in-progress', 'completed'].map(status => (
           <div
             key={status}
             className={`bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-h-[500px] transition-all duration-200 ${draggedOverColumn === status
@@ -937,7 +961,7 @@ const TaskManagement: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('reports.taskCompletion')}</h3>
           <div className="space-y-3">
-            {['pending', 'in-progress', 'completed', 'blocked'].map(status => {
+            {['pending', 'in-progress', 'completed'].map(status => {
               const count = tasks.filter(t => t.status === status).length;
               const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
 
@@ -1171,31 +1195,47 @@ const TaskManagement: React.FC = () => {
   const renderTaskModal = () => {
     if (!selectedTask) return null;
 
+    const handleSubtaskToggle = (subtaskId: string) => {
+      const updatedSubtasks = (selectedTask.subtasks || []).map(st =>
+        st._id === subtaskId
+          ? { ...st, status: st.status === 'completed' ? 'pending' : 'completed' as 'pending' | 'in-progress' | 'completed' }
+          : st
+      );
+      
+      // Update the task in the tasks array
+      handleTaskUpdate(selectedTask._id, { subtasks: updatedSubtasks });
+      
+      // Update selectedTask to reflect changes immediately
+      setSelectedTask({
+        ...selectedTask,
+        subtasks: updatedSubtasks
+      });
+    };
+
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] overflow-y-auto py-8">
-        <div className="bg-white dark:bg-gray-800 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              {/* Project color indicator with fallback */}
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: selectedTask.project?.color || '#6B7280' }}
-              />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{selectedTask.title}</h2>
-            </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{selectedTask.title}</h2>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => startTimeTracking(selectedTask._id)}
-                className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors"
+                onClick={() => {
+                  setShowTaskModal(false);
+                  if (window.confirm(t('planner.taskDetail.deleteConfirm'))) {
+                    handleTaskDelete(selectedTask._id);
+                    setToastMessage(t('tasks.deleteSuccess'));
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                  }
+                }}
+                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
               >
-                <Timer className="w-4 h-4" />
-              </button>
-              <button className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors">
-                <Share2 className="w-4 h-4" />
+                <Trash2 className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1203,168 +1243,78 @@ const TaskManagement: React.FC = () => {
           </div>
 
           <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Description */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('tasks.sections.description')}</h4>
-                <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{selectedTask.description}</p>
-              </div>
-
-              {/* Milestones */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('tasks.sections.milestones')}</h4>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {selectedTask.milestones.filter(m => m.status === 'completed').length}/{selectedTask.milestones.length}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {selectedTask.milestones.map(milestone => (
-                    <div key={milestone._id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <input
-                        type="checkbox"
-                        checked={milestone.status === 'completed'}
-                        className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{milestone.title}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{milestone.description}</p>
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(milestone.status)}`}>
-                        {milestone.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{selectedTask.description || 'No description'}</p>
               </div>
 
               {/* Subtasks */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('tasks.sections.subtasks')}</h4>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {selectedTask.subtasks.filter(s => s.status === 'completed').length}/{selectedTask.subtasks.length}
+              {(selectedTask.subtasks || []).length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('tasks.sections.subtasks')}</h4>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      {(selectedTask.subtasks || []).filter(s => s.status === 'completed').length}/{(selectedTask.subtasks || []).length}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {(selectedTask.subtasks || []).map(subtask => (
+                      <div key={subtask._id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <input
+                          type="checkbox"
+                          checked={subtask.status === 'completed'}
+                          onChange={() => handleSubtaskToggle(subtask._id)}
+                          className="w-4 h-4 text-accent-dark rounded focus:ring-accent cursor-pointer"
+                        />
+                        <div className="flex-1">
+                          <p className={`text-sm font-medium ${subtask.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                            {subtask.title}
+                          </p>
+                          {subtask.description && (
+                            <p className="text-xs text-gray-600 dark:text-gray-400">{subtask.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {selectedTask.subtasks.map(subtask => (
-                    <div key={subtask._id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <input
-                        type="checkbox"
-                        checked={subtask.status === 'completed'}
-                        className="w-4 h-4 text-accent-dark rounded focus:ring-accent"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{subtask.title}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{subtask.description}</p>
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(subtask.status)}`}>
-                        {subtask.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Attachments */}
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('tasks.sections.attachments')}</h4>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('forms.dragDropFile')}</p>
-                </div>
-                <div className="space-y-2 mt-4">
-                  {selectedTask.attachments.map(attachment => (
-                    <div key={attachment._id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      {attachment.type === 'file' ? (
-                        <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      ) : (
-                        <Link className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{attachment.name}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {attachment.type === 'file' && attachment.size
-                            ? `${(attachment.size / 1024 / 1024).toFixed(2)} MB`
-                            : 'Link'
-                          }
-                        </p>
-                      </div>
-                      <button className="text-accent-dark hover:text-blue-800">
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Comments */}
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('tasks.sections.comments')}</h4>
-                <div className="space-y-4 mb-4">
-                  {selectedTask.comments.map(comment => (
-                    <div key={comment._id} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <img
-                        src={comment.author.avatarUrl || `https://ui-avatars.com/api/?name=${comment.author.name}&background=random`}
-                        alt={comment.author.name}
-                        className="w-8 h-8 rounded-full"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{comment.author.name}</span>
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
-                            {new Date(comment.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700">{comment.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder={t('tasks.actions.addComment') + "..."}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
-                  />
-                  <button className="px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover">
-                    {t('tasks.actions.addComment')}
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
 
-            <div className="space-y-6">
-              {/* Sidebar Info */}
+            {/* Sidebar */}
+            <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-700">{t('common.status')}:</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('common.status')}:</span>
                   <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(selectedTask.status)}`}>
-                    {t(`common.${selectedTask.status.replace('-', '')}`)}
+                    {selectedTask.status}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium text-gray-700">{t('tasks.priority')}:</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('tasks.priority')}:</span>
                   <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getPriorityColor(selectedTask.priority)}`}>
                     {selectedTask.priority}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium text-gray-700">{t('tasks.assignee')}:</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('tasks.assignee')}:</span>
                   <div className="flex items-center gap-2 mt-1">
                     <img
-                      src={selectedTask.assignee.avatarUrl || `https://ui-avatars.com/api/?name=${selectedTask.assignee.name}&background=random`}
-                      alt={selectedTask.assignee.name}
+                      src={selectedTask.assignee?.avatarUrl || `https://ui-avatars.com/api/?name=${selectedTask.assignee?.name || 'Unassigned'}&background=random`}
+                      alt={selectedTask.assignee?.name || 'Unassigned'}
                       className="w-6 h-6 rounded-full"
                     />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{selectedTask.assignee.name}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{selectedTask.assignee?.name || 'Unassigned'}</span>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium text-gray-700">{t('tasks.dueDate')}:</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('tasks.dueDate')}:</span>
                   <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
                     <CalendarIcon className="w-4 h-4" />
                     {selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString(i18n.language) : '-'}
@@ -1372,63 +1322,17 @@ const TaskManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium text-gray-700">{t('tasks.timeTracking')}:</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('tasks.timeTracking')}:</span>
                   <div className="mt-1 space-y-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">{t('tasks.estimatedTime')}:</span>
-                      <span className="font-medium">{selectedTask.estimatedHours}h</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{selectedTask.estimatedHours || 0}h</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">{t('tasks.actualTime')}:</span>
-                      <span className="font-medium">{selectedTask.actualHours}h</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{selectedTask.actualHours || 0}h</span>
                     </div>
                   </div>
-                </div>
-
-                <div>
-                  <span className="text-sm font-medium text-gray-700">{t('tasks.sections.tags')}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedTask.tags.map((tag, index) => (
-                      <span key={index} className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('tasks.sections.actions')}</h4>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => {
-                      setShowTaskModal(false);
-                      setShowEditTask(true);
-                    }}
-                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 text-gray-700"
-                  >
-                    <Edit className="w-4 h-4" />
-                    {t('tasks.actions.editTask')}
-                  </button>
-                  <button className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 text-gray-700">
-                    <Copy className="w-4 h-4" />
-                    {t('tasks.actions.duplicateTask')}
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (window.confirm(t('planner.taskDetail.deleteConfirm'))) {
-                        handleTaskDelete(selectedTask._id);
-                        setShowTaskModal(false);
-                        setToastMessage(t('tasks.deleteSuccess'));
-                        setShowToast(true);
-                        setTimeout(() => setShowToast(false), 3000);
-                      }
-                    }}
-                    className="w-full px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-                  >
-                    {t('tasks.deleteTask')}
-                  </button>
                 </div>
               </div>
             </div>

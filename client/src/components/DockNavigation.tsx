@@ -76,8 +76,6 @@ const DockNavigation: React.FC = () => {
       { id: 'notes', label: 'Notes', translationKey: 'navigation.notes', icon: FileEdit, path: '/notes' },
       { id: 'projects', label: 'Projects', translationKey: 'navigation.projects', icon: FolderOpen, path: '/projects' },
       { id: 'planner', label: 'Planner', translationKey: 'planner.title', icon: Calendar, path: '/planner' },
-      { id: 'tracker', label: 'Tracker', translationKey: 'tracker.title', icon: Clock, path: '/tracker' },
-      { id: 'tasks', label: 'Tasks', translationKey: 'navigation.tasks', icon: FileText, path: '/tasks' },
       { id: 'notifications', label: 'Notifications', translationKey: 'navigation.notifications', icon: Bell, path: '/notifications' },
       { id: 'reminders', label: 'Reminders', translationKey: 'navigation.reminders', icon: Bell, path: '/reminders' },
       { id: 'workspace', label: 'Workspace', translationKey: 'workspace.title', icon: Building, path: '/workspace' },

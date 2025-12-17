@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, Flag, CheckSquare, Trash2 } from 'lucide-react';
+import { X, Calendar, Clock, Flag, CheckSquare, Trash2, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../context/PlannerContext';
 import { Task } from '../../context/PlannerContext';
@@ -257,6 +257,28 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, on
                 ) : (
                   <span className="text-sm text-gray-600 dark:text-gray-200">
                     {task.estimatedTime ? `${task.estimatedTime} ${t('planner.taskDetail.hours')}` : t('planner.taskDetail.notSet')}
+                  </span>
+                )}
+              </div>
+
+              {/* Actual Time */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
+                  <Timer className="w-4 h-4 inline mr-1" />
+                  Actual Time
+                </label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={editedTask.actualHours || 0}
+                    onChange={(e) => setEditedTask({ ...editedTask, actualHours: parseFloat(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                ) : (
+                  <span className="text-sm text-gray-600 dark:text-gray-200">
+                    {task.actualHours ? `${task.actualHours} ${t('planner.taskDetail.hours')}` : t('planner.taskDetail.notSet')}
                   </span>
                 )}
               </div>
