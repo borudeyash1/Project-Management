@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import BoardView from './views/BoardView';
 import ListView from './views/ListView';
-import TimelineView from './views/TimelineView';
+import GanttView from './views/GanttView';
 import CalendarView from './views/CalendarView';
 import MyWorkView from './views/MyWorkView';
 import QuickAddDrawer from './QuickAddDrawer';
@@ -18,7 +18,7 @@ import CommandPalette from './CommandPalette';
 import NotificationCenter from './NotificationCenter';
 import QuickAddModal from './QuickAddModal';
 
-type ViewType = 'board' | 'list' | 'timeline' | 'calendar' | 'mywork';
+type ViewType = 'board' | 'list' | 'gantt' | 'calendar' | 'mywork';
 
 const PlannerLayout: React.FC = () => {
   const { state, dispatch } = useApp();
@@ -44,7 +44,7 @@ const PlannerLayout: React.FC = () => {
   const views = [
     { id: 'board', label: t('planner.views.board'), icon: LayoutGrid },
     { id: 'list', label: t('planner.views.list'), icon: List },
-    { id: 'timeline', label: t('planner.views.timeline'), icon: BarChart3 },
+    { id: 'gantt', label: 'Gantt', icon: BarChart3 },
     { id: 'calendar', label: t('planner.views.calendar'), icon: Calendar },
     { id: 'mywork', label: t('planner.views.myWork'), icon: Inbox }
   ];
@@ -84,8 +84,8 @@ const PlannerLayout: React.FC = () => {
         return <BoardView searchQuery={searchQuery} />;
       case 'list':
         return <ListView searchQuery={searchQuery} />;
-      case 'timeline':
-        return <TimelineView searchQuery={searchQuery} />;
+      case 'gantt':
+        return <GanttView searchQuery={searchQuery} />;
       case 'calendar':
         return <CalendarView searchQuery={searchQuery} onDateClick={handleCalendarDateClick} />;
       case 'mywork':

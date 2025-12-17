@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  CheckCircle, Circle, Clock, Flag, Play, Pause, Plus,
+  CheckCircle, Circle, Clock, Flag, Plus,
   ChevronDown, ChevronRight, Calendar, User, AlertCircle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
     thisWeek: true,
     later: false
   });
-  const [activeTimer, setActiveTimer] = useState<string | null>(null);
+
 
   const currentUserId = state.userProfile?._id;
 
@@ -82,13 +82,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
     }
   };
 
-  const handleStartTimer = (taskId: string) => {
-    if (activeTimer === taskId) {
-      setActiveTimer(null);
-    } else {
-      setActiveTimer(taskId);
-    }
-  };
+
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -159,22 +153,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={() => handleStartTimer(task._id)}
-          className={`p-2 rounded-lg border ${activeTimer === task._id
-              ? 'bg-blue-100 border-blue-300 text-blue-700'
-              : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-            }`}
-          title={activeTimer === task._id ? t('planner.myWork.stopTimer') : t('planner.myWork.startTimer')}
-        >
-          {activeTimer === task._id ? (
-            <Pause className="w-4 h-4" />
-          ) : (
-            <Play className="w-4 h-4" />
-          )}
-        </button>
-      </div>
+
     </div>
   );
 
