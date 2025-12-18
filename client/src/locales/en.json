@@ -3072,5 +3072,61 @@
   "buttons": {
     "export": "Export",
     "saveChanges": "Save Changes"
+  },
+  "navigation": {
+    "reminders": "Reminders",
+    "notifications": "Notifications"
+  },
+  "goals": {
+    "status": {
+      "not_started": "Not Started",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "paused": "Paused",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "personal": "Personal",
+      "team": "Team",
+      "project": "Project",
+      "company": "Company"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "category": {
+      "productivity": "Productivity",
+      "learning": "Learning",
+      "health": "Health",
+      "financial": "Financial",
+      "career": "Career",
+      "other": "Other"
+    },
+    "title": "Goals",
+    "subtitle": "Track and achieve your goals",
+    "newGoal": "New Goal",
+    "totalGoals": "Total Goals",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "allTypes": "All Types",
+    "allStatus": "All Status",
+    "allCategories": "All Categories",
+    "goalsCount": "{{count}} Goals",
+    "noGoalsYet": "No goals yet",
+    "createFirstGoal": "Create your first goal to get started",
+    "noMatchingGoals": "No matching goals",
+    "tryDifferentFilters": "Try different filters",
+    "due": "Due: {{date}}",
+    "start": "Start: {{date}}",
+    "milestones": "Milestones",
+    "tags": "Tags",
+    "createdByLabel": "Created By",
+    "categoryLabel": "Category",
+    "startDate": "Start Date",
+    "targetDate": "Target Date",
+    "searchPlaceholder": "Search goals..."
   }
 }

@@ -11,6 +11,7 @@ import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import AddGoalModal from './goals/AddGoalModal';
+import GoalCard from './goals/GoalCard';
 import { goalService, Goal, GoalStats } from '../services/goalService';
 
 const GoalsPage: React.FC = () => {
@@ -293,25 +294,6 @@ const GoalsPage: React.FC = () => {
                   <option value="career">{t('goals.category.career')}</option>
                   <option value="other">{t('goals.category.other')}</option>
                 </select>
-
-                <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
-                  {[
-                    { id: 'grid', icon: Grid },
-                    { id: 'list', icon: List },
-                    { id: 'timeline', icon: Calendar }
-                  ].map(mode => {
-                    const Icon = mode.icon;
-                    return (
-                      <button
-                        key={mode.id}
-                        onClick={() => setViewMode(mode.id as any)}
-                        className={`p-2 rounded ${viewMode === mode.id ? 'bg-purple-100 text-purple-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-gray-700'}`}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
             </div>
           </div>
@@ -351,93 +333,20 @@ const GoalsPage: React.FC = () => {
             </div>
           ) : (
             <div className="p-4">
-              {viewMode === 'grid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredGoals.map(goal => (
-                    <div key={goal._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => setSelectedGoal(goal)}>
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="font-medium text-gray-900 dark:text-gray-100 flex-1">{goal.title}</h3>
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(goal.status)}`}>
-                          {t(`goals.status.${goal.status}`)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{goal.description}</p>
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(goal.type)}`}>
-                          {t(`goals.type.${goal.type}`)}
-                        </span>
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(goal.priority)}`}>
-                          {t(`goals.priority.${goal.priority}`)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        {t('goals.due', { date: formatDate(goal.targetDate) })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {viewMode === 'list' && (
-                <div className="divide-y divide-gray-200">
-                  {filteredGoals.map(goal => (
-                    <div key={goal._id} className="p-4 hover:bg-gray-50 dark:bg-gray-700 cursor-pointer" onClick={() => setSelectedGoal(goal)}>
-                      <div className="flex items-start gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-medium text-gray-900 dark:text-gray-100">{goal.title}</h3>
-                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(goal.type)}`}>
-                              {t(`goals.type.${goal.type}`)}
-                            </span>
-                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(goal.priority)}`}>
-                              {t(`goals.priority.${goal.priority}`)}
-                            </span>
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(goal.status)}`}>
-                              {getStatusIcon(goal.status)}
-                              {t(`goals.status.${goal.status}`)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{goal.description}</p>
-                          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                            <span>{t('goals.due', { date: formatDate(goal.targetDate) })}</span>
-                            <span>{goal.milestones.filter(m => m.completed).length}/{goal.milestones.length} {t('goals.milestones')}</span>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {viewMode === 'timeline' && (
-                <div className="space-y-4">
-                  {filteredGoals.map(goal => (
-                    <div key={goal._id} className="flex items-start gap-4 cursor-pointer" onClick={() => setSelectedGoal(goal)}>
-                      <div className="flex-shrink-0">
-                        <div className={`w-4 h-4 rounded-full ${goal.status === 'completed' ? 'bg-green-500' : 'bg-purple-500'}`} />
-                      </div>
-                      <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-medium text-gray-900 dark:text-gray-100">{goal.title}</h3>
-                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(goal.type)}`}>
-                            {t(`goals.type.${goal.type}`)}
-                          </span>
-                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(goal.priority)}`}>
-                            {t(`goals.priority.${goal.priority}`)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{goal.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                          <span>{t('goals.start', { date: formatDate(goal.startDate) })}</span>
-                          <span>→</span>
-                          <span>{t('goals.due', { date: formatDate(goal.targetDate) })}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredGoals.map(goal => (
+                  <GoalCard
+                    key={goal._id}
+                    goal={goal}
+                    onClick={() => setSelectedGoal(goal)}
+                    formatDate={formatDate}
+                    getStatusColor={getStatusColor}
+                    getTypeColor={getTypeColor}
+                    getPriorityColor={getPriorityColor}
+                    t={t}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
