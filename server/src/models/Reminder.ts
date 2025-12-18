@@ -27,6 +27,9 @@ export interface IReminder extends Document {
   tags: string[];
   recurring?: IRecurring;
   notifications: INotification[];
+  location?: string;
+  meetingLink?: string;
+  notes?: string;
   expiresAt?: Date;
   isActive: boolean;
   createdAt: Date;
@@ -121,6 +124,21 @@ const reminderSchema = new Schema<IReminder>({
   }],
   recurring: recurringSchema,
   notifications: [notificationSchema],
+  location: {
+    type: String,
+    trim: true,
+    maxlength: 500
+  },
+  meetingLink: {
+    type: String,
+    trim: true,
+    maxlength: 1000
+  },
+  notes: {
+    type: String,
+    trim: true,
+    maxlength: 2000
+  },
   expiresAt: {
     type: Date,
     default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)

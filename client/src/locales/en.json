@@ -76,7 +76,9 @@
     "sat": "Sat",
     "progress": "Progress",
     "critical": "Critical",
-    "complete": "Complete"
+    "complete": "Complete",
+    "priority": "Priority",
+    "projects": "Projects"
   },
   "navigation": {
     "home": "Home",
@@ -3021,5 +3023,54 @@
     "disconnectSuccess": "Account disconnected successfully",
     "connectSuccess": "Account connected successfully",
     "connectionError": "Failed to connect account. Please try again."
+  },
+  "reminders": {
+    "title": "Reminders",
+    "subtitle": "Manage your reminders and notifications",
+    "addReminder": "Add Reminder",
+    "createReminder": "Create Reminder",
+    "editReminder": "Edit Reminder",
+    "enterTitle": "Enter reminder title",
+    "type": "Type",
+    "personal": "Personal",
+    "dueDateTime": "Due Date & Time",
+    "addDescription": "Add description",
+    "addTag": "Add tag",
+    "push": "Push",
+    "sms": "SMS",
+    "minutesBefore": "minutes before",
+    "addNotification": "Add Notification",
+    "recurring": "Recurring",
+    "interval": "Interval",
+    "showAdvancedOptions": "Show Advanced Options",
+    "hideAdvancedOptions": "Hide Advanced Options",
+    "addLocation": "Add location",
+    "meetingLink": "Meeting Link",
+    "enterMeetingLink": "Enter meeting link",
+    "notes": "Notes",
+    "addNotes": "Add notes",
+    "quickStats": "Quick Stats",
+    "overdue": "Overdue",
+    "exportAll": "Export All",
+    "exportPending": "Export Pending",
+    "exportCompleted": "Export Completed",
+    "enableNotifications": "Enable Notifications",
+    "notificationsOn": "Notifications On",
+    "searchPlaceholder": "Search reminders...",
+    "views": {
+      "list": "List",
+      "calendar": "Calendar",
+      "kanban": "Kanban"
+    },
+    "noReminders": "No reminders found",
+    "noRemindersDesc": "Create your first reminder to get started",
+    "upcomingDeadlines": "Upcoming Deadlines",
+    "noUpcomingDeadlines": "No upcoming deadlines",
+    "completedToday": "Completed Today",
+    "thisWeek": "This Week"
+  },
+  "buttons": {
+    "export": "Export",
+    "saveChanges": "Save Changes"
   }
 }

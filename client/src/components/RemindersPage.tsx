@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Plus, Calendar, Clock, Bell, AlertCircle, CheckCircle,
   Star, Flag, Tag, MessageSquare, FileText, Users,
-  ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
+  ChevronLeft, ChevronRight, Filter, Search,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
   Target, TrendingUp, BarChart3, List, Download, Volume2, Repeat
 } from 'lucide-react';
@@ -12,7 +12,10 @@ import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import ReminderModal from './ReminderModal';
-import { useReminderNotifications, useReminderSnooze, downloadICalendar } from '../hooks/useReminderNotifications';
+import { useReminderNotifications, useReminderSnooze } from '../hooks/useReminderNotifications';
+import reminderService from '../services/reminderService';
+import { exportRemindersToPDF } from '../utils/pdfExport';
+import ReminderCard from './reminders/ReminderCard';
 
 interface Reminder {
   _id: string;
@@ -78,6 +81,10 @@ const RemindersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSnoozeMenu, setShowSnoozeMenu] = useState<string | null>(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [teamMembers, setTeamMembers] = useState<Array<{ _id: string; name: string; avatar?: string }>>([]);
+  const [projects, setProjects] = useState<Array<{ _id: string; name: string; color: string }>>([]);
 
   // Notification system
   const { permission, requestPermission } = useReminderNotifications(reminders, {
@@ -96,153 +103,68 @@ const RemindersPage: React.FC = () => {
     }
   }, [permission, requestPermission]);
 
-  // Mock data - replace with actual API calls
+  // Fetch reminders from API
   useEffect(() => {
-    const mockReminders: Reminder[] = [
-      {
-        _id: '1',
-        title: 'Design review meeting',
-        description: 'Review the new UI designs with the team',
-        type: 'meeting',
-        priority: 'high',
-        dueDate: new Date('2024-03-25T10:00:00'),
-        completed: false,
-        project: {
-          _id: 'p1',
-          name: 'E-commerce Platform',
-          color: 'bg-accent'
-        },
-        assignee: {
-          _id: 'u1',
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-        },
-        tags: ['design', 'meeting'],
-        notifications: [
-          { type: 'email', minutesBefore: 30, sent: false },
-          { type: 'push', minutesBefore: 15, sent: false }
-        ],
-        createdAt: new Date('2024-03-20'),
-        updatedAt: new Date('2024-03-20')
-      },
-      {
-        _id: '2',
-        title: 'Submit project proposal',
-        description: 'Finalize and submit the Q2 project proposal',
-        type: 'deadline',
-        priority: 'urgent',
-        dueDate: new Date('2024-03-22T17:00:00'),
-        completed: false,
-        project: {
-          _id: 'p2',
-          name: 'Mobile App',
-          color: 'bg-green-500'
-        },
-        assignee: {
-          _id: 'u2',
-          name: 'Jane Smith',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
-        },
-        tags: ['deadline', 'proposal'],
-        notifications: [
-          { type: 'email', minutesBefore: 60, sent: false },
-          { type: 'push', minutesBefore: 30, sent: false }
-        ],
-        createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
-      },
-      {
-        _id: '3',
-        title: 'Code review for authentication',
-        description: 'Review the JWT authentication implementation',
-        type: 'task',
-        priority: 'medium',
-        dueDate: new Date('2024-03-26T14:00:00'),
-        completed: true,
-        completedAt: new Date('2024-03-25T15:30:00'),
-        project: {
-          _id: 'p1',
-          name: 'E-commerce Platform',
-          color: 'bg-accent'
-        },
-        assignee: {
-          _id: 'u3',
-          name: 'Bob Wilson',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
-        },
-        tags: ['code', 'review'],
-        notifications: [
-          { type: 'email', minutesBefore: 30, sent: true }
-        ],
-        createdAt: new Date('2024-03-18'),
-        updatedAt: new Date('2024-03-25')
-      },
-      {
-        _id: '4',
-        title: 'Team standup',
-        description: 'Daily team standup meeting',
-        type: 'meeting',
-        priority: 'low',
-        dueDate: new Date('2024-03-27T09:00:00'),
-        completed: false,
-        recurring: {
-          frequency: 'daily',
-          interval: 1,
-          endDate: new Date('2024-12-31')
-        },
-        project: {
-          _id: 'p1',
-          name: 'E-commerce Platform',
-          color: 'bg-accent'
-        },
-        tags: ['standup', 'daily'],
-        notifications: [
-          { type: 'push', minutesBefore: 15, sent: false }
-        ],
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-03-20')
+    const fetchReminders = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const workspaceId = state.currentWorkspace; // currentWorkspace is already a string ID
+        
+        // Fetch reminders
+        const fetchedReminders = await reminderService.getReminders(workspaceId);
+        setReminders(fetchedReminders);
+        
+        // Fetch team members from workspace
+        if (workspaceId) {
+          try {
+            const workspace = state.workspaces.find(w => w._id === workspaceId);
+            if (workspace?.members) {
+              const members = workspace.members.map((member: any) => ({
+                _id: member.user?._id || member._id,
+                name: member.user?.fullName || member.name || 'Unknown',
+                avatar: member.user?.avatar || member.avatar
+              }));
+              setTeamMembers(members);
+            }
+          } catch (err) {
+            console.error('Failed to fetch team members:', err);
+          }
+        }
+        
+        // Fetch projects
+        if (state.projects && state.projects.length > 0) {
+          const projectList = state.projects.map((project: any) => ({
+            _id: project._id,
+            name: project.name,
+            color: project.color || 'bg-blue-500'
+          }));
+          setProjects(projectList);
+        }
+        
+        // Convert reminders to calendar events
+        const calendarEvents: CalendarEvent[] = fetchedReminders.map(reminder => ({
+          _id: reminder._id,
+          title: reminder.title,
+          start: new Date(reminder.dueDate),
+          end: new Date(reminder.dueDate),
+          type: reminder.type as any,
+          priority: reminder.priority,
+          project: reminder.project?.name,
+          color: reminder.project?.color || 'bg-blue-500',
+          allDay: false
+        }));
+        setEvents(calendarEvents);
+      } catch (err: any) {
+        console.error('Failed to fetch reminders:', err);
+        setError(err.message || 'Failed to load reminders');
+      } finally {
+        setLoading(false);
       }
-    ];
+    };
 
-    const mockEvents: CalendarEvent[] = [
-      {
-        _id: 'e1',
-        title: 'Design review meeting',
-        start: new Date('2024-03-25T10:00:00'),
-        end: new Date('2024-03-25T12:00:00'),
-        type: 'meeting',
-        priority: 'high',
-        project: 'E-commerce Platform',
-        color: 'bg-accent',
-        allDay: false
-      },
-      {
-        _id: 'e2',
-        title: 'Project deadline',
-        start: new Date('2024-03-22T17:00:00'),
-        end: new Date('2024-03-22T17:00:00'),
-        type: 'deadline',
-        priority: 'urgent',
-        project: 'Mobile App',
-        color: 'bg-red-500',
-        allDay: false
-      },
-      {
-        _id: 'e3',
-        title: 'Sprint Planning',
-        start: new Date('2024-03-26T09:00:00'),
-        end: new Date('2024-03-26T11:00:00'),
-        type: 'meeting',
-        priority: 'medium',
-        project: 'E-commerce Platform',
-        color: 'bg-purple-500',
-        allDay: false
-      }
-    ];
-
-    setReminders(mockReminders);
-    setEvents(mockEvents);
-  }, []);
+    fetchReminders();
+  }, [state.currentWorkspace, state.workspaces, state.projects]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -265,16 +187,18 @@ const RemindersPage: React.FC = () => {
     }
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
+  const formatTime = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
     });
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric'
@@ -316,37 +240,65 @@ const RemindersPage: React.FC = () => {
     return filtered.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
   };
 
-  const toggleReminderCompletion = (reminderId: string) => {
-    setReminders(reminders.map(reminder => {
-      if (reminder._id === reminderId) {
-        return {
-          ...reminder,
-          completed: !reminder.completed,
-          completedAt: !reminder.completed ? new Date() : undefined
-        };
-      }
-      return reminder;
-    }));
+  const toggleReminderCompletion = async (reminderId: string) => {
+    try {
+      // Find the reminder to get current completion status
+      const reminder = reminders.find(r => r._id === reminderId);
+      if (!reminder) return;
+
+      // Call API to toggle completion
+      await reminderService.toggleCompletion(reminderId);
+
+      // Update local state
+      setReminders(reminders.map(r => {
+        if (r._id === reminderId) {
+          return {
+            ...r,
+            completed: !r.completed,
+            completedAt: !r.completed ? new Date() : undefined
+          };
+        }
+        return r;
+      }));
+    } catch (err: any) {
+      console.error('Failed to toggle reminder completion:', err);
+      alert('Failed to update reminder status. Please try again.');
+    }
   };
 
-  const handleSaveReminder = (reminderData: Partial<Reminder>) => {
-    if (selectedReminder) {
-      // Update existing
-      setReminders(reminders.map(r =>
-        r._id === selectedReminder._id
-          ? { ...r, ...reminderData, updatedAt: new Date() }
-          : r
-      ));
-    } else {
-      // Create new
-      const newReminder: Reminder = {
-        ...reminderData as Reminder,
-        _id: `reminder_${Date.now()}`,
-        completed: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
+  const handleSaveReminder = async (reminderData: Partial<Reminder>) => {
+    try {
+      // Transform the data to match backend schema
+      const transformedData: any = {
+        ...reminderData,
+        // Transform notifications from minutesBefore to time
+        notifications: reminderData.notifications?.map(notif => ({
+          type: notif.type,
+          time: new Date(new Date(reminderData.dueDate!).getTime() - (notif.minutesBefore || 0) * 60 * 1000),
+          sent: notif.sent || false
+        })),
+        // Transform assignee to assignedTo (backend field name)
+        assignedTo: reminderData.assignee?._id,
+        // Transform project to just the ID
+        project: reminderData.project?._id,
+        // Remove frontend-only fields
+        assignee: undefined
       };
-      setReminders([...reminders, newReminder]);
+
+      if (selectedReminder) {
+        // Update existing
+        const updated = await reminderService.updateReminder(selectedReminder._id, transformedData);
+        setReminders(reminders.map(r =>
+          r._id === selectedReminder._id ? updated : r
+        ));
+      } else {
+        // Create new
+        const newReminder = await reminderService.createReminder(transformedData);
+        setReminders([...reminders, newReminder]);
+      }
+    } catch (err: any) {
+      console.error('Failed to save reminder:', err);
+      alert('Failed to save reminder. Please try again.');
     }
   };
 
@@ -355,9 +307,15 @@ const RemindersPage: React.FC = () => {
     setShowAddModal(true);
   };
 
-  const handleDeleteReminder = (reminderId: string) => {
+  const handleDeleteReminder = async (reminderId: string) => {
     if (window.confirm('Are you sure you want to delete this reminder?')) {
-      setReminders(reminders.filter(r => r._id !== reminderId));
+      try {
+        await reminderService.deleteReminder(reminderId);
+        setReminders(reminders.filter(r => r._id !== reminderId));
+      } catch (err: any) {
+        console.error('Failed to delete reminder:', err);
+        alert('Failed to delete reminder. Please try again.');
+      }
     }
   };
 
@@ -379,7 +337,7 @@ const RemindersPage: React.FC = () => {
       remindersToExport = reminders.filter(r => r.completed);
     }
 
-    downloadICalendar(remindersToExport, `reminders-${type}.ics`);
+    exportRemindersToPDF(remindersToExport, `reminders-${type}.pdf`);
     setShowExportMenu(false);
   };
 
@@ -573,67 +531,41 @@ const RemindersPage: React.FC = () => {
 
             {/* Content Area */}
             {viewMode === 'list' && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('reminders.title')}</h2>
-                </div>
-                <div className="divide-y divide-gray-200">
-                  {filteredReminders.map(reminder => (
-                    <div key={reminder._id} className="p-4 hover:bg-gray-50 dark:bg-gray-700">
-                      <div className="flex items-start gap-3">
-                        <button
-                          onClick={() => toggleReminderCompletion(reminder._id)}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${reminder.completed
-                            ? 'bg-green-500 border-green-500 text-white'
-                            : 'border-gray-300'
-                            }`}
-                        >
-                          {reminder.completed && <CheckCircle className="w-3 h-3" />}
-                        </button>
-
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="flex items-center gap-2">
-                              {getTypeIcon(reminder.type)}
-                              <h3 className={`font-medium ${reminder.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
-                                {reminder.title}
-                              </h3>
-                            </div>
-                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(reminder.priority)}`}>
-                              {reminder.priority}
-                            </span>
-                            {isOverdue(reminder.dueDate, reminder.completed) && (
-                              <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium text-red-600 bg-red-100">
-                                {t('reminders.overdue')}
-                              </span>
-                            )}
-                          </div>
-
-                          {reminder.description && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{reminder.description}</p>
-                          )}
-
-                          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                            <span>{formatDate(reminder.dueDate)} at {formatTime(reminder.dueDate)}</span>
-                            {reminder.project && (
-                              <div className="flex items-center gap-1">
-                                <div className={`w-2 h-2 rounded-full ${reminder.project.color}`} />
-                                <span>{reminder.project.name}</span>
-                              </div>
-                            )}
-                            {reminder.recurring && (
-                              <span className="text-accent-dark">Recurring</span>
-                            )}
-                          </div>
-                        </div>
-
-                        <button className="text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('reminders.title')}</h2>
+                
+                {filteredReminders.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredReminders.map(reminder => (
+                      <ReminderCard
+                        key={reminder._id}
+                        reminder={reminder}
+                        onToggleComplete={toggleReminderCompletion}
+                        onClick={() => handleEditReminder(reminder)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 px-4">
+                    <Bell className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                      {t('reminders.noReminders')}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+                      {t('reminders.noRemindersDesc')}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSelectedReminder(null);
+                        setShowAddModal(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {t('reminders.addReminder')}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -867,16 +799,8 @@ const RemindersPage: React.FC = () => {
             setShowAddModal(false);
             setSelectedReminder(null);
           }}
-          projects={state.projects?.map(p => ({
-            _id: p._id,
-            name: p.name,
-            color: (p as any).color || '#3B82F6'
-          })) || []}
-          teamMembers={[
-            { _id: 'u1', name: 'John Doe', avatar: '' },
-            { _id: 'u2', name: 'Jane Smith', avatar: '' },
-            { _id: 'u3', name: 'Bob Wilson', avatar: '' }
-          ]}
+          projects={projects}
+          teamMembers={teamMembers}
         />
       )}
     </div>
