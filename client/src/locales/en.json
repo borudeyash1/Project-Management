@@ -1315,8 +1315,13 @@
       "noMessages": "No messages yet",
       "typeMessage": "Type a message...",
       "title": "Inbox",
-      "subtitle": "Team messages and communications",
-      "loading": "Loading messages..."
+      "subtitle": "Team messages and notifications",
+      "loading": "Loading messages...",
+      "loadingConversations": "Loading conversations...",
+      "noMembers": "No team members to chat with",
+      "conversationDefault": "Conversation",
+      "loadingMessages": "Loading messages...",
+      "selectChat": "Select a conversation to start chatting"
     },
     "manage": {
       "title": "Manage Workspaces",
