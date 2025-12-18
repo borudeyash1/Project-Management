@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Notification from '../models/Notification';
-import { JoinRequest } from '../models/JoinRequest';
+import JoinRequest from '../models/JoinRequest';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -36,10 +36,10 @@ async function migrateJoinRequestNotifications() {
       try {
         // Try to find the corresponding join request
         // We'll look for a join request with matching workspace and status pending
-        const joinRequest = await JoinRequest.findOne({
+        const joinRequest = (await JoinRequest.findOne({
           workspace: notification.relatedId,
           status: 'pending'
-        }).sort({ createdAt: -1 }); // Get the most recent one
+        }).sort({ createdAt: -1 })) as any; // Cast to any to avoid type issues
 
         if (joinRequest) {
           // Update notification with metadata
