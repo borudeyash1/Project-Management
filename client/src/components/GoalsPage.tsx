@@ -37,9 +37,18 @@ const GoalsPage: React.FC = () => {
         goalService.getGoals(),
         goalService.getGoalStats()
       ]);
-      if (goalsResponse && goalsResponse.data) {
+      
+      // goalsResponse is already { data: Goal[], count: number }
+      if (goalsResponse && Array.isArray(goalsResponse.data)) {
         setGoals(goalsResponse.data);
+      } else if (Array.isArray(goalsResponse)) {
+        // Fallback if response structure is different
+        setGoals(goalsResponse);
+      } else {
+        console.error('Unexpected goals response structure:', goalsResponse);
+        setGoals([]);
       }
+      
       if (statsData) {
         setGoalStats(statsData);
       }
@@ -198,7 +207,7 @@ const GoalsPage: React.FC = () => {
 
           {/* Stats */}
           {goalStats && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -224,15 +233,6 @@ const GoalsPage: React.FC = () => {
                     <p className="text-2xl font-bold text-blue-600">{goalStats.inProgressGoals}</p>
                   </div>
                   <TrendingUp className="w-8 h-8 text-blue-500" />
-                </div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('goals.avgProgress')}</p>
-                    <p className="text-2xl font-bold text-orange-600">{Math.round(goalStats.averageProgress)}%</p>
-                  </div>
-                  <BarChart3 className="w-8 h-8 text-orange-500" />
                 </div>
               </div>
             </div>
@@ -370,20 +370,8 @@ const GoalsPage: React.FC = () => {
                           {t(`goals.priority.${goal.priority}`)}
                         </span>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">{t('goals.progress')}</span>
-                          <span className="font-medium">{goal.progress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all"
-                            style={{ width: `${goal.progress}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {t('goals.due', { date: formatDate(goal.targetDate) })}
-                        </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        {t('goals.due', { date: formatDate(goal.targetDate) })}
                       </div>
                     </div>
                   ))}
@@ -415,15 +403,7 @@ const GoalsPage: React.FC = () => {
                             <span>{goal.milestones.filter(m => m.completed).length}/{goal.milestones.length} {t('goals.milestones')}</span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{goal.progress}%</div>
-                          <div className="w-24 bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                              style={{ width: `${goal.progress}%` }}
-                            />
-                          </div>
-                        </div>
+
                       </div>
                     </div>
                   ))}
@@ -448,17 +428,10 @@ const GoalsPage: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{goal.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <span>{t('goals.start', { date: formatDate(goal.startDate) })}</span>
                           <span>→</span>
                           <span>{t('goals.due', { date: formatDate(goal.targetDate) })}</span>
-                          <span className="ml-auto">{goal.progress}% {t('goals.complete')}</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                            style={{ width: `${goal.progress}%` }}
-                          />
                         </div>
                       </div>
                     </div>
@@ -513,23 +486,6 @@ const GoalsPage: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Progress */}
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">{t('goals.progress')}</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{t('goals.overallProgress')}</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{selectedGoal.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all"
-                      style={{ width: `${selectedGoal.progress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Milestones */}
               {selectedGoal.milestones && selectedGoal.milestones.length > 0 && (
                 <div>

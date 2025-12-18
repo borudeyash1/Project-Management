@@ -16,6 +16,7 @@ import { useReminderNotifications, useReminderSnooze } from '../hooks/useReminde
 import reminderService from '../services/reminderService';
 import { exportRemindersToPDF } from '../utils/pdfExport';
 import ReminderCard from './reminders/ReminderCard';
+import CustomSelect from './ui/CustomSelect';
 
 interface Reminder {
   _id: string;
@@ -474,28 +475,30 @@ const RemindersPage: React.FC = () => {
 
             {/* Filters */}
             <div className="flex items-center gap-3">
-              <select
+              <CustomSelect
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="all">{t('common.allStatus')}</option>
-                <option value="pending">{t('common.pending')}</option>
-                <option value="completed">{t('common.completed')}</option>
-                <option value="overdue">{t('reminders.overdue')}</option>
-              </select>
+                onChange={(value) => setFilterStatus(value as any)}
+                placeholder={t('common.allStatus')}
+                options={[
+                  { id: 'all', label: t('common.allStatus'), value: 'all' },
+                  { id: 'pending', label: t('common.pending'), value: 'pending' },
+                  { id: 'completed', label: t('common.completed'), value: 'completed' },
+                  { id: 'overdue', label: t('reminders.overdue'), value: 'overdue' }
+                ]}
+              />
 
-              <select
+              <CustomSelect
                 value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="all">{t('common.allPriority')}</option>
-                <option value="urgent">{t('common.urgent')}</option>
-                <option value="high">{t('common.high')}</option>
-                <option value="medium">{t('common.medium')}</option>
-                <option value="low">{t('common.low')}</option>
-              </select>
+                onChange={(value) => setFilterPriority(value as any)}
+                placeholder={t('common.allPriority')}
+                options={[
+                  { id: 'all', label: t('common.allPriority'), value: 'all' },
+                  { id: 'urgent', label: t('common.urgent'), value: 'urgent' },
+                  { id: 'high', label: t('common.high'), value: 'high' },
+                  { id: 'medium', label: t('common.medium'), value: 'medium' },
+                  { id: 'low', label: t('common.low'), value: 'low' }
+                ]}
+              />
             </div>
 
             {/* View Toggle */}

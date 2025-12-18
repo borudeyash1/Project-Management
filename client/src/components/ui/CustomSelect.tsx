@@ -1,65 +1,66 @@
-import React from 'react';
-import './CustomSelect.css';
-
-// Custom dropdown component with theme support
+import React, { useState } from 'react';
 
 interface SelectOption {
-  value: string;
+  id: string;
   label: string;
+  value: string;
 }
 
 interface CustomSelectProps {
+  options: SelectOption[];
   value: string;
   onChange: (value: string) => void;
-  options: SelectOption[];
   placeholder?: string;
-  isDarkMode?: boolean;
 }
 
-const CustomSelect: React.FC<CustomSelectProps> = ({
-  value,
-  onChange,
-  options,
-  placeholder = 'All',
-  isDarkMode = false
-}) => {
-  // Create data attributes for each option
-  const dataAttributes: Record<string, string> = {
-    'data-default': placeholder
-  };
+const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, placeholder = 'Select' }) => {
+  const [isOpen, setIsOpen] = useState(false);
   
-  options.forEach((opt, index) => {
-    dataAttributes[`data-option-${index}`] = opt.label;
-  });
+  const selectedOption = options.find(opt => opt.value === value);
+  const displayText = selectedOption ? selectedOption.label : placeholder;
+
+  const handleOptionClick = (optionValue: string) => {
+    onChange(optionValue);
+    setIsOpen(false);
+  };
 
   return (
-    <div className={`custom-select ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-      <div className="selected" {...dataAttributes}>
+    <div 
+      className="custom-select relative w-fit cursor-pointer"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      {/* Selected Display */}
+      <div className="selected flex items-center justify-between gap-3 px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm min-w-[150px]">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{displayText}</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="1em"
           viewBox="0 0 512 512"
-          className="arrow"
+          className={`arrow w-4 h-4 fill-gray-700 dark:fill-gray-300 transition-transform duration-300 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
         >
           <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
         </svg>
       </div>
-      <div className="options">
-        {options.map((option, index) => (
-          <div key={option.value} title={option.label}>
-            <input
-              id={`option-${index}-${option.value}`}
-              name={`select-${Math.random()}`}
-              type="radio"
-              checked={value === option.value}
-              onChange={() => onChange(option.value)}
-            />
-            <label
-              className="option"
-              htmlFor={`option-${index}-${option.value}`}
-              data-txt={option.label}
-            ></label>
-          </div>
+
+      {/* Options Dropdown */}
+      <div 
+        className={`options absolute left-0 right-0 mt-1 flex flex-col gap-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50 transition-all duration-300 ${
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+        }`}
+      >
+        {options.map((option) => (
+          <button
+            key={option.id}
+            onClick={() => handleOptionClick(option.value)}
+            className={`option text-left px-4 py-2 rounded-md text-sm transition-colors ${
+              value === option.value
+                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 font-semibold'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {option.label}
+          </button>
         ))}
       </div>
     </div>
