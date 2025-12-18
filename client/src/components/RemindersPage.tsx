@@ -535,7 +535,7 @@ const RemindersPage: React.FC = () => {
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('reminders.title')}</h2>
                 
                 {filteredReminders.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1">
                     {filteredReminders.map(reminder => (
                       <ReminderCard
                         key={reminder._id}
