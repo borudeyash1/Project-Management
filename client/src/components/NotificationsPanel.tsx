@@ -111,11 +111,21 @@ const NotificationsPanel: React.FC = () => {
     await Promise.all(ids.map((id) => apiService.markNotificationRead(id).catch(() => undefined)));
   };
 
-  const deleteNotification = (notificationId: string) => {
+  const deleteNotification = async (notificationId: string) => {
     setNotifications(notifications.filter(notif => notif._id !== notificationId));
+    // Mark as read on backend
+    try {
+      await apiService.markNotificationRead(notificationId);
+    } catch (error) {
+      console.error('Failed to delete notification', error);
+    }
   };
 
-  const clearAll = () => {
+  const clearAll = async () => {
+    // Mark all as read on backend first
+    const ids = notifications.map((n) => n._id);
+    await Promise.all(ids.map((id) => apiService.markNotificationRead(id).catch(() => undefined)));
+    // Then clear local state
     setNotifications([]);
   };
 

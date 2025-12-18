@@ -22,7 +22,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    type: 'team' as 'personal' | 'team' | 'enterprise',
+    type: 'team' as 'team' | 'enterprise',
     logo: '',
     organizationName: '',
     contactEmail: '',
@@ -246,7 +246,6 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
               onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             >
-              <option value="personal">{t('workspace.personal')}</option>
               <option value="team">{t('workspace.team')}</option>
               <option value="enterprise">{t('workspace.enterprise')}</option>
             </select>

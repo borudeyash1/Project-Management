@@ -84,7 +84,7 @@ const CreateAIWorkspaceModal: React.FC<CreateAIWorkspaceModalProps> = ({ isOpen,
     'Mailchimp', 'Zapier', 'Webhooks', 'REST API'
   ];
 
-  const mapWorkspaceType = (aiType: string): 'personal' | 'team' | 'enterprise' => {
+  const mapWorkspaceType = (aiType: string): 'team' | 'enterprise' => {
     switch (aiType) {
       case 'startup':
       case 'agency':

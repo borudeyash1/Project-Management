@@ -15,7 +15,7 @@ const workspaceSchema = new Schema<IWorkspace>({
   },
   type: {
     type: String,
-    enum: ['personal', 'team', 'enterprise'],
+    enum: ['team', 'enterprise'],
     default: 'team'
   },
   region: {

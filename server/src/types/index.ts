@@ -21,6 +21,7 @@ export interface IUser extends Document {
   department?: string;
   location?: string;
   about?: string;
+  dateOfBirth?: Date;
   avatarUrl?: string;
   faceData?: {
     images: string[];
@@ -289,7 +290,7 @@ export interface IWorkspace extends Document {
   _id: string;
   name: string;
   description?: string;
-  type: 'personal' | 'team' | 'enterprise';
+  type: 'team' | 'enterprise';
   region?: string;
   owner: string;
   members: Array<{

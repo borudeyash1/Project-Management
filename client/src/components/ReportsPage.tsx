@@ -13,12 +13,12 @@ import CreateReportModal from './CreateReportModal';
 import ScheduleReportModal from './ScheduleReportModal';
 import { downloadReportPDF, printReportPDF } from '../utils/pdfGenerator';
 import * as XLSX from 'xlsx';
-import { apiService } from '../services/api';
+import { reportService, Report, CreateReportData } from '../services/reportService';
 
 interface ReportData {
   _id: string;
   name: string;
-  type: 'productivity' | 'time' | 'team' | 'financial' | 'project';
+  type: 'productivity' | 'time' | 'team' | 'financial' | 'project' | 'custom';
   description: string;
   data: any;
   createdAt: Date;
@@ -84,18 +84,18 @@ const ReportsPage: React.FC = () => {
   const fetchReportsData = async () => {
       try {
         const [reportsRes, projectsRes, teamRes, timeRes] = await Promise.all([
-          apiService.get('/reports'),
-          apiService.get('/reports/analytics/projects'),
-          apiService.get('/reports/analytics/team'),
-          apiService.get('/reports/analytics/time')
+          reportService.getReports(reportType === 'all' ? undefined : reportType),
+          reportService.getProjectAnalytics(),
+          reportService.getTeamAnalytics(),
+          reportService.getTimeAnalytics(30)
         ]);
 
         if (reportsRes) {
-          setReports((reportsRes as any).data || []);
+          setReports(reportsRes.data || []);
         }
 
         if (projectsRes) {
-          const projectsData = (projectsRes as any).data || [];
+          const projectsData = projectsRes.data || [];
           setProjectMetrics(projectsData.map((p: any) => ({
             ...p,
             startDate: new Date(p.startDate),
@@ -104,7 +104,7 @@ const ReportsPage: React.FC = () => {
         }
 
         if (teamRes) {
-          const teamData = (teamRes as any).data || [];
+          const teamData = teamRes.data || [];
           setTeamPerformance(teamData.map((t: any) => ({
             ...t,
             lastActive: new Date(t.lastActive)
@@ -112,19 +112,27 @@ const ReportsPage: React.FC = () => {
         }
 
         if (timeRes) {
-          const timeData = (timeRes as any).data?.dailyData || [];
-          // Transform time data to match expected format if needed
+          const timeData = timeRes.data?.dailyData || [];
           setTimeTrackingData(timeData.map((t: any) => ({
              date: t.date,
              hours: t.hours,
              billableHours: t.billableHours,
-             projects: [] // Detailed project breakdown per day might require more complex queries
+             projects: t.projects || []
           })));
         }
 
       } catch (error) {
         console.error('Failed to fetch reports data:', error);
-        // Fallback to empty states or show error
+        // Show error toast or notification
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: 'Failed to load reports data',
+            duration: 3000
+          }
+        });
       }
     };
 
@@ -228,24 +236,44 @@ const ReportsPage: React.FC = () => {
   };
 
   // New Report Creation
-  const handleCreateReport = (reportData: any) => {
-    const newReport: ReportData = {
-      _id: Date.now().toString(),
-      name: reportData.name,
-      type: reportData.type,
-      description: reportData.description,
-      data: {
-        dateRange: reportData.dateRange,
-        generatedAt: new Date(),
-        // Add actual data based on report type
-        summary: 'Report data will be populated based on selected criteria'
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isPublic: false,
-      tags: reportData.tags
-    };
-    setReports([newReport, ...reports]);
+  const handleCreateReport = async (reportData: any) => {
+    try {
+      const createData: CreateReportData = {
+        name: reportData.name,
+        description: reportData.description,
+        type: reportData.type,
+        dateRange: {
+          startDate: new Date(reportData.dateRange.startDate),
+          endDate: new Date(reportData.dateRange.endDate)
+        },
+        tags: reportData.tags || [],
+        isPublic: false
+      };
+
+      const newReport = await reportService.createReport(createData);
+      setReports([newReport as any, ...reports]);
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'Report created successfully',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('Failed to create report:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to create report',
+          duration: 3000
+        }
+      });
+    }
   };
 
   // Quick Actions

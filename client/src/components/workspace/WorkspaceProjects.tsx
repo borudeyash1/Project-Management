@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
 import { getProjects as getWorkspaceProjects, createProject as createWorkspaceProject } from '../../services/projectService';
+import apiService from '../../services/api';
 import {
   Search,
   Filter,
@@ -35,6 +36,8 @@ const WorkspaceProjects: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
   const [projectToDelete, setProjectToDelete] = useState<any>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -57,6 +60,21 @@ const WorkspaceProjects: React.FC = () => {
     };
 
     loadWorkspaceProjects();
+  }, [state.currentWorkspace, dispatch]);
+
+  // Load clients for the current workspace so they're available in the project modal
+  useEffect(() => {
+    const loadWorkspaceClients = async () => {
+      if (!state.currentWorkspace) return;
+      try {
+        const clients = await apiService.getClients(state.currentWorkspace);
+        dispatch({ type: 'SET_CLIENTS', payload: clients });
+      } catch (error) {
+        console.error('Failed to load workspace clients', error);
+      }
+    };
+
+    loadWorkspaceClients();
   }, [state.currentWorkspace, dispatch]);
 
   const filteredProjects = workspaceProjects.filter(project => {
@@ -114,7 +132,7 @@ const WorkspaceProjects: React.FC = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
 
@@ -262,16 +280,6 @@ const WorkspaceProjects: React.FC = () => {
                     {project.description}
                   </p>
                 </div>
-                {isOwner && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
-                )}
               </div>
 
               <div className="flex items-center gap-2 mb-3">
@@ -328,6 +336,32 @@ const WorkspaceProjects: React.FC = () => {
                   {project.tags.length > 3 && (
                     <span className="text-xs text-gray-600">+{project.tags.length - 3}</span>
                   )}
+                </div>
+              )}
+
+              {/* Edit and Delete Buttons */}
+              {isOwner && (
+                <div className="flex items-center gap-2 mt-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProject(project);
+                      setShowEditModal(true);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProject(project);
+                    }}
+                    className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                 </div>
               )}
             </div>
@@ -408,14 +442,29 @@ const WorkspaceProjects: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     {isOwner && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedProject(project);
+                            setShowEditModal(true);
+                          }}
+                          className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProject(project);
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -471,10 +520,13 @@ const WorkspaceProjects: React.FC = () => {
             const created = await createWorkspaceProject({
               name: projectData.name,
               description: projectData.description,
+              clientId: projectData.clientId,
+              projectManager: projectData.projectManagerId,
               status: projectData.status,
               priority: projectData.priority,
               startDate: projectData.startDate,
               dueDate: projectData.endDate,
+              budget: projectData.budget,
               tags: projectData.tags,
               workspaceId: state.currentWorkspace,
             } as any);
@@ -505,6 +557,128 @@ const WorkspaceProjects: React.FC = () => {
         }}
         workspaceId={state.currentWorkspace || ''}
       />
+
+      {/* Edit Project Modal */}
+      {showEditModal && selectedProject && (
+        <WorkspaceCreateProjectModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedProject(null);
+          }}
+          initialData={{
+            name: selectedProject.name,
+            description: selectedProject.description,
+            clientId: typeof selectedProject.client === 'string' ? selectedProject.client : selectedProject.client?._id || '',
+            projectManagerId: typeof selectedProject.projectManager === 'string' ? selectedProject.projectManager : selectedProject.projectManager?._id || '',
+            status: selectedProject.status,
+            priority: selectedProject.priority,
+            startDate: selectedProject.startDate ? new Date(selectedProject.startDate).toISOString().split('T')[0] : '',
+            endDate: selectedProject.dueDate ? new Date(selectedProject.dueDate).toISOString().split('T')[0] : '',
+            budget: selectedProject.budget?.toString() || '',
+            tags: selectedProject.tags || [],
+          }}
+          projectId={selectedProject._id}
+          onSubmit={async (projectData) => {
+            try {
+              const response = await fetch(`/api/projects/${selectedProject._id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify({
+                  name: projectData.name,
+                  description: projectData.description,
+                  clientId: projectData.clientId,
+                  projectManager: projectData.projectManagerId,
+                  status: projectData.status,
+                  priority: projectData.priority,
+                  startDate: projectData.startDate,
+                  dueDate: projectData.endDate,
+                  budget: projectData.budget,
+                  tags: projectData.tags,
+                })
+              });
+
+              const data = await response.json();
+
+              if (!response.ok) {
+                throw new Error(data.message || 'Failed to update project');
+              }
+
+              dispatch({
+                type: 'UPDATE_PROJECT',
+                payload: { projectId: selectedProject._id, updates: data.data },
+              });
+
+              dispatch({
+                type: 'ADD_TOAST',
+                payload: {
+                  type: 'success',
+                  message: `Project "${projectData.name}" updated successfully`,
+                },
+              });
+
+              setShowEditModal(false);
+              setSelectedProject(null);
+            } catch (error: any) {
+              console.error('Failed to update project', error);
+              dispatch({
+                type: 'ADD_TOAST',
+                payload: {
+                  type: 'error',
+                  message: error?.message || 'Failed to update project',
+                },
+              });
+            }
+          }}
+          workspaceId={state.currentWorkspace || ''}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && projectToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Delete Project
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Are you sure you want to delete <strong>{projectToDelete.name}</strong>? This action cannot be undone.
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              Type <strong>DELETE</strong> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type 'DELETE' to confirm"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
+            />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setProjectToDelete(null);
+                  setDeleteConfirmText('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={deleteConfirmText.toUpperCase() !== 'DELETE'}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Delete Project
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

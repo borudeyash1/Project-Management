@@ -184,7 +184,7 @@ export interface Workspace {
   _id: string;
   name: string;
   description?: string;
-  type: 'personal' | 'team' | 'enterprise';
+  type: 'team' | 'enterprise';
   region?: string;
   owner: string;
   members: WorkspaceMember[];

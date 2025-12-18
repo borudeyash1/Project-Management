@@ -12,7 +12,7 @@ import { getMailService } from '../services/sartthi/mailService';
 // Create project
 export const createProject = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { name, description, workspaceId, startDate, dueDate, priority, category, tier } = req.body;
+    const { name, description, workspaceId, startDate, dueDate, priority, category, tier, client, clientId, budget, tags, status } = req.body;
     const user = req.user!;
     const plan = (user.subscription?.plan || 'free') as keyof typeof SUBSCRIPTION_LIMITS;
     const planLimits = SUBSCRIPTION_LIMITS[plan];
@@ -139,9 +139,13 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       tier: tier || plan,
       createdBy: user._id,
       teamMembers: teamMembersArray,
+      client: client || clientId || undefined,
       startDate: startDate ? new Date(startDate) : undefined,
       dueDate: dueDate ? new Date(dueDate) : undefined,
       priority: priority || 'medium',
+      status: status || 'planning',
+      budget: budget ? parseFloat(budget) : undefined,
+      tags: tags || [],
       category
     });
 
@@ -392,8 +396,67 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
-    // Update project
-    Object.assign(project, updateData);
+    // Update project - exclude fields that need special handling
+    const { clientId, projectManager, budget, tags, ...safeUpdateData } = updateData;
+    Object.assign(project, safeUpdateData);
+
+    // Handle clientId explicitly
+    if (updateData.clientId !== undefined) {
+      project.client = updateData.clientId || undefined;
+    }
+
+    // Handle projectManager explicitly
+    if (updateData.projectManager !== undefined) {
+      const userId = req.user!._id;
+      // Find existing manager in teamMembers
+      const teamMembers = (project as any).teamMembers || [];
+      const existingManagerIndex = teamMembers.findIndex((m: any) => m.role === 'manager');
+      
+      if (updateData.projectManager && updateData.projectManager !== userId.toString()) {
+        // Add or update manager
+        if (existingManagerIndex !== -1) {
+          // Update existing manager
+          teamMembers[existingManagerIndex].user = updateData.projectManager;
+        } else {
+          // Add new manager
+          teamMembers.push({
+            user: updateData.projectManager,
+            role: 'manager',
+            permissions: {
+              canEdit: true,
+              canDelete: false,
+              canManageMembers: true,
+              canViewReports: true
+            },
+            joinedAt: new Date()
+          });
+        }
+      } else if (!updateData.projectManager && existingManagerIndex !== -1) {
+        // Remove manager if projectManager is empty
+        teamMembers.splice(existingManagerIndex, 1);
+      }
+      (project as any).teamMembers = teamMembers;
+    }
+
+    // Handle budget
+    if (updateData.budget !== undefined) {
+      if (typeof updateData.budget === 'number') {
+        project.budget = {
+          estimated: updateData.budget,
+          actual: 0,
+          currency: 'USD'
+        };
+      } else if (typeof updateData.budget === 'object') {
+        project.budget = updateData.budget;
+      } else {
+        project.budget = undefined;
+      }
+    }
+
+    // Handle tags
+    if (updateData.tags !== undefined) {
+      project.tags = Array.isArray(updateData.tags) ? updateData.tags : [];
+    }
 
     // Convert date strings to Date objects if provided
     if (updateData.startDate) {

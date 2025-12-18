@@ -123,12 +123,22 @@ export const getWorkspaceClients: RequestHandler = async (req, res) => {
 export const updateClient: RequestHandler = async (req, res) => {
   try {
     const { user } = req as AuthenticatedRequest;
-    const userId = user!._id;
+    
+    if (!user || !user._id) {
+      console.error('Update client error: User not authenticated');
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+    
+    const userId = user._id;
     const { id } = req.params;
     const updates = req.body as any;
 
+    console.log('Updating client:', id, 'by user:', userId);
+
     const client = await Client.findById(id);
     if (!client) {
+      console.error('Client not found:', id);
       res.status(404).json({ success: false, message: 'Client not found' });
       return;
     }
@@ -142,12 +152,15 @@ export const updateClient: RequestHandler = async (req, res) => {
     }).select('_id');
 
     if (!workspace) {
+      console.error('Access denied for user:', userId, 'to workspace:', client.workspaceId);
       res.status(403).json({ success: false, message: 'Access denied' });
       return;
     }
 
     Object.assign(client, updates);
     await client.save();
+
+    console.log('Client updated successfully:', client._id);
 
     const response: ApiResponse = {
       success: true,
@@ -158,7 +171,7 @@ export const updateClient: RequestHandler = async (req, res) => {
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Update client error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, DollarSign, Users, Tag, Briefcase } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
@@ -8,13 +8,28 @@ interface WorkspaceCreateProjectModalProps {
   onClose: () => void;
   onSubmit: (projectData: any) => void;
   workspaceId: string;
+  initialData?: {
+    name: string;
+    description: string;
+    clientId?: string;
+    projectManagerId?: string;
+    status: string;
+    priority: string;
+    startDate: string;
+    endDate: string;
+    budget?: string;
+    tags?: string[];
+  };
+  projectId?: string;
 }
 
 const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  workspaceId
+  workspaceId,
+  initialData,
+  projectId
 }) => {
   const { isDarkMode } = useTheme();
   const { state } = useApp();
@@ -31,6 +46,24 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
     budget: '',
     tags: ''
   });
+
+  // Populate form when initialData is provided
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        clientId: initialData.clientId || '',
+        projectManagerId: initialData.projectManagerId || '',
+        status: initialData.status || 'planning',
+        priority: initialData.priority || 'medium',
+        startDate: initialData.startDate || '',
+        endDate: initialData.endDate || '',
+        budget: initialData.budget || '',
+        tags: Array.isArray(initialData.tags) ? initialData.tags.join(', ') : ''
+      });
+    }
+  }, [initialData]);
 
   // Real clients for this workspace from global state
   const workspaceClients = state.clients.filter((client) => client.workspaceId === workspaceId);
@@ -104,10 +137,10 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
         <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div>
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Create New Project
+              {projectId ? 'Edit Project' : 'Create New Project'}
             </h2>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-              Add a new project to your workspace
+              {projectId ? 'Update project information' : 'Add a new project to your workspace'}
             </p>
           </div>
           <button
@@ -362,7 +395,7 @@ const WorkspaceCreateProjectModal: React.FC<WorkspaceCreateProjectModalProps> = 
             onClick={handleSubmit}
             className="px-4 py-2 bg-accent text-gray-900 rounded-lg font-medium hover:bg-accent-hover"
           >
-            Create Project
+            {projectId ? 'Update Project' : 'Create Project'}
           </button>
         </div>
       </div>

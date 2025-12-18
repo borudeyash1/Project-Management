@@ -18,6 +18,7 @@ import {
   getSentInvitations,
   getReceivedInvitations,
   cancelWorkspaceInvite,
+  cancelInvitation,
   sendJoinRequest,
   getJoinRequests,
   approveJoinRequest,
@@ -53,6 +54,7 @@ router.post('/:id/reject-invite', rejectWorkspaceInvite);
 router.get('/invitations/received', getReceivedInvitations);
 router.get('/:id/invitations', getSentInvitations);
 router.delete('/:id/invitations/:invitationId', cancelWorkspaceInvite);
+router.delete('/:id/invitations/:invitationId/cancel', cancelInvitation);
 
 // Join request routes
 router.post('/:id/join-request', sendJoinRequest);

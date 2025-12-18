@@ -72,10 +72,10 @@ const Auth: React.FC = () => {
 
         if (!workspaces || workspaces.length === 0) {
           const fallbackWorkspace: Workspace = {
-            _id: `personal-${user._id}`,
-            name: "Personal Workspace",
+            _id: `team-${user._id}`,
+            name: "My Workspace",
             description: "Automatically created workspace for your projects",
-            type: "personal",
+            type: "team",
             region: "global",
             owner: user._id,
             members: [

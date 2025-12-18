@@ -16,7 +16,7 @@ interface Workspace {
   _id: string;
   name: string;
   description?: string;
-  type: 'personal' | 'team' | 'enterprise';
+  type: 'team' | 'enterprise';
   region?: string;
   memberCount: number;
   owner: {
@@ -371,7 +371,6 @@ const WorkspaceDiscover: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
                   <option value="all">All Types</option>
-                  <option value="personal">Personal</option>
                   <option value="team">Team</option>
                   <option value="enterprise">Enterprise</option>
                 </select>

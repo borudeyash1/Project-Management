@@ -166,6 +166,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response): P
       department,
       location,
       about,
+      dateOfBirth,
       profile
     } = req.body;
 
@@ -179,6 +180,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response): P
     if (department) user.department = department;
     if (location) user.location = location;
     if (about) user.about = about;
+    if (dateOfBirth) user.dateOfBirth = new Date(dateOfBirth);
 
     // Update profile object (nested fields)
     if (profile) {

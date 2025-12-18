@@ -852,7 +852,68 @@ export const getSentInvitations: RequestHandler = async (req, res) => {
   }
 };
 
-// Get received invitations for current user
+// Cancel a sent invitation (for workspace owner/admin)
+export const cancelInvitation: RequestHandler = async (req, res) => {
+  try {
+    const { id, invitationId } = req.params;
+    const authReq = req as AuthenticatedRequest;
+    const currentUserId = authReq.user!._id;
+
+    // Verify user has access to this workspace
+    const workspace = await Workspace.findOne({
+      _id: id,
+      $or: [
+        { owner: currentUserId },
+        { 'members.user': currentUserId, 'members.role': { $in: ['owner', 'admin'] } }
+      ]
+    });
+
+    if (!workspace) {
+      res.status(404).json({
+        success: false,
+        message: 'Workspace not found or access denied'
+      });
+      return;
+    }
+
+    // Find and delete the invitation
+    const invitation = await WorkspaceInvitation.findOne({
+      _id: invitationId,
+      workspace: id,
+      status: 'pending'
+    });
+
+    if (!invitation) {
+      res.status(404).json({
+        success: false,
+        message: 'Invitation not found or already processed'
+      });
+      return;
+    }
+
+    // Delete the invitation
+    await WorkspaceInvitation.findByIdAndDelete(invitationId);
+
+    // Also delete the associated notification
+    await Notification.deleteMany({
+      type: 'workspace',
+      relatedId: workspace._id.toString(),
+      'metadata.invitationId': invitationId
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Invitation cancelled successfully'
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Cancel invitation error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+//Get received invitations for current user
 export const getReceivedInvitations: RequestHandler = async (req, res) => {
   try {
     const authReq = req as AuthenticatedRequest;

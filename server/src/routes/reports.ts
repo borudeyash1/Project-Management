@@ -3,15 +3,10 @@ import { authenticate } from '../middleware/auth';
 import {
   getReports,
   createReport,
-  getReport,
-  updateReport,
-  deleteReport,
-  exportReport,
-  getProjectMetrics,
-  getTeamPerformance,
-  getTimeTrackingData,
-  getProductivityStats,
-  generateAIReport
+  getProjectAnalytics,
+  getTeamAnalytics,
+  getTimeAnalytics,
+  deleteReport
 } from '../controllers/reportController';
 
 const router = express.Router();
@@ -19,19 +14,14 @@ const router = express.Router();
 // All routes require authentication
 router.use(authenticate);
 
-// Report routes
+// Report CRUD
 router.get('/', getReports);
 router.post('/', createReport);
-router.post('/ai', generateAIReport);
-router.get('/:id', getReport);
-router.put('/:id', updateReport);
 router.delete('/:id', deleteReport);
-router.get('/:id/export', exportReport);
 
-// Analytics routes
-router.get('/analytics/projects', getProjectMetrics);
-router.get('/analytics/team', getTeamPerformance);
-router.get('/analytics/time', getTimeTrackingData);
-router.get('/analytics/productivity', getProductivityStats);
+// Analytics endpoints
+router.get('/analytics/projects', getProjectAnalytics);
+router.get('/analytics/team', getTeamAnalytics);
+router.get('/analytics/time', getTimeAnalytics);
 
 export default router;

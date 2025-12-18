@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Mail, Phone, MapPin, Building, User, Briefcase } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -6,12 +6,25 @@ interface AddClientModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (clientData: any) => void;
+  initialData?: {
+    name: string;
+    email: string;
+    phone?: string;
+    company?: string;
+    address?: string;
+    contactPerson?: string;
+    website?: string;
+    notes?: string;
+  };
+  clientId?: string;
 }
 
 const AddClientModal: React.FC<AddClientModalProps> = ({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  initialData,
+  clientId
 }) => {
   const { isDarkMode } = useTheme();
   
@@ -25,6 +38,22 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
     website: '',
     notes: ''
   });
+
+  // Populate form when initialData is provided
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name || '',
+        email: initialData.email || '',
+        phone: initialData.phone || '',
+        company: initialData.company || '',
+        address: initialData.address || '',
+        contactPerson: initialData.contactPerson || '',
+        website: initialData.website || '',
+        notes: initialData.notes || ''
+      });
+    }
+  }, [initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -79,10 +108,10 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
         <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div>
             <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Add New Client
+              {clientId ? 'Edit Client' : 'Add New Client'}
             </h2>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-              Add a new client to your workspace
+              {clientId ? 'Update client information' : 'Add a new client to your workspace'}
             </p>
           </div>
           <button
@@ -277,7 +306,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
             onClick={handleSubmit}
             className="px-4 py-2 bg-accent text-gray-900 rounded-lg font-medium hover:bg-accent-hover"
           >
-            Add Client
+            {clientId ? 'Update Client' : 'Add Client'}
           </button>
         </div>
       </div>

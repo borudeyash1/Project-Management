@@ -62,6 +62,9 @@ const userSchema = new Schema<IUser>({
     trim: true,
     maxlength: [500, 'About cannot exceed 500 characters']
   },
+  dateOfBirth: {
+    type: Date
+  },
   faceScanImage: {
     type: String,
     trim: true

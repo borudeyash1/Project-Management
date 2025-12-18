@@ -29,6 +29,8 @@ interface ClientView {
   company?: string;
   address?: string;
   contactPerson?: string;
+  website?: string;
+  notes?: string;
   projectCount: number;
   totalRevenue: number;
   status: 'active' | 'inactive';
@@ -44,6 +46,9 @@ const WorkspaceClients: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<ClientView | null>(null);
   const [showClientProjects, setShowClientProjects] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   const workspaceId = routeWorkspaceId || state.currentWorkspace;
   const currentWorkspace = state.workspaces.find((w) => w._id === workspaceId);
@@ -92,6 +97,8 @@ const WorkspaceClients: React.FC = () => {
       company: client.company,
       address: client.address,
       contactPerson: client.contactPerson,
+      website: client.website,
+      notes: client.notes,
       projectCount,
       totalRevenue: client.totalRevenue ?? 0,
       status: client.status,
@@ -178,11 +185,6 @@ const WorkspaceClients: React.FC = () => {
                   </span>
                 </div>
               </div>
-              {isOwner && (
-                <button className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700">
-                  <MoreVertical className="w-4 h-4" />
-                </button>
-              )}
             </div>
 
             <div className="space-y-2 mb-4">
@@ -230,11 +232,24 @@ const WorkspaceClients: React.FC = () => {
 
             {isOwner && (
               <div className="flex items-center gap-2 mt-4">
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <button 
+                  onClick={() => {
+                    setSelectedClient(client);
+                    setShowEditModal(true);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
                   <Edit className="w-3 h-3" />
                   {t('workspace.clients.edit')}
                 </button>
-                <button className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
+                <button 
+                  onClick={() => {
+                    setSelectedClient(client);
+                    setShowDeleteModal(true);
+                    setDeleteConfirmText('');
+                  }}
+                  className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                >
                   <Trash2 className="w-3 h-3" />
                 </button>
               </div>
@@ -383,6 +398,130 @@ const WorkspaceClients: React.FC = () => {
                     ))
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Client Modal */}
+      {showEditModal && selectedClient && (
+        <AddClientModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedClient(null);
+          }}
+          clientId={selectedClient._id}
+          initialData={{
+            name: selectedClient.name,
+            email: selectedClient.email,
+            phone: selectedClient.phone || '',
+            company: selectedClient.company || '',
+            address: selectedClient.address || '',
+            contactPerson: selectedClient.contactPerson || '',
+            website: selectedClient.website || '',
+            notes: selectedClient.notes || '',
+          }}
+          onSubmit={async (clientData) => {
+            try {
+              const updated = await apiService.updateClient(selectedClient._id, clientData);
+              dispatch({ type: 'UPDATE_CLIENT', payload: { clientId: selectedClient._id, updates: updated } });
+              dispatch({
+                type: 'ADD_TOAST',
+                payload: {
+                  type: 'success',
+                  message: `Client "${clientData.name}" updated successfully`,
+                },
+              });
+              setShowEditModal(false);
+              setSelectedClient(null);
+            } catch (error: any) {
+              console.error('Failed to update client', error);
+              dispatch({
+                type: 'ADD_TOAST',
+                payload: {
+                  type: 'error',
+                  message: error?.message || 'Failed to update client',
+                },
+              });
+            }
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedClient && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Delete Client
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Are you sure you want to delete <strong>{selectedClient.name}</strong>? This action cannot be undone.
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              Type <strong>delete</strong> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type 'delete' to confirm"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
+            />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSelectedClient(null);
+                  setDeleteConfirmText('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (deleteConfirmText.toLowerCase() !== 'delete') {
+                    dispatch({
+                      type: 'ADD_TOAST',
+                      payload: {
+                        type: 'error',
+                        message: 'Please type "delete" to confirm',
+                      },
+                    });
+                    return;
+                  }
+
+                  try {
+                    await apiService.deleteClient(selectedClient._id);
+                    dispatch({ type: 'DELETE_CLIENT', payload: selectedClient._id });
+                    dispatch({
+                      type: 'ADD_TOAST',
+                      payload: {
+                        type: 'success',
+                        message: `Client "${selectedClient.name}" deleted successfully`,
+                      },
+                    });
+                    setShowDeleteModal(false);
+                    setSelectedClient(null);
+                    setDeleteConfirmText('');
+                  } catch (error: any) {
+                    console.error('Failed to delete client', error);
+                    dispatch({
+                      type: 'ADD_TOAST',
+                      payload: {
+                        type: 'error',
+                        message: error?.message || 'Failed to delete client',
+                      },
+                    });
+                  }
+                }}
+                disabled={deleteConfirmText.toLowerCase() !== 'delete'}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Delete Client
+              </button>
             </div>
           </div>
         </div>
