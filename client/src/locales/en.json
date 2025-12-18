@@ -3074,8 +3074,17 @@
     "saveChanges": "Save Changes"
   },
   "navigation": {
+    "home": "Home",
+    "projects": "Projects",
+    "notes": "Notes",
     "reminders": "Reminders",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile",
+    "sartthiMail": "Sartthi Mail",
+    "sartthiCalendar": "Sartthi Calendar",
+    "sartthiVault": "Sartthi Vault"
   },
   "goals": {
     "status": {
