@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Info, FileText, BadgeDollarSign, Grid, Globe, ChevronDown, Menu, X, Sparkles, LogIn, UserPlus, Palette, Languages } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { getAppUrl } from '../utils/appUrls';
 
 const SharedNavbar: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -49,10 +50,10 @@ const SharedNavbar: React.FC = () => {
   ];
 
   const products = [
-    { name: 'Sartthi Mail', icon: '📧', path: '/mail', description: 'Professional email' },
-    { name: 'Calendar', icon: '📅', path: '/calendar', description: 'Smart scheduling' },
-    { name: 'Vault', icon: '🔒', path: '/vault', description: 'Secure storage' },
-    { name: 'Desktop', icon: '💻', path: '/desktop', description: 'Native app' },
+    { name: 'Sartthi Mail', icon: '📧', url: getAppUrl('mail'), description: 'Professional email', external: true },
+    { name: 'Calendar', icon: '📅', url: getAppUrl('calendar'), description: 'Smart scheduling', external: true },
+    { name: 'Vault', icon: '🔒', url: getAppUrl('vault'), description: 'Secure storage', external: true },
+    { name: 'Desktop', icon: '💻', path: '/desktop', description: 'Native app', external: false },
   ];
 
   const isActive = (path: string) => {
@@ -127,18 +128,35 @@ const SharedNavbar: React.FC = () => {
               {showProductsMenu && (
                 <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn">
                   {products.map((product) => (
-                    <Link
-                      key={product.path}
-                      to={product.path}
-                      className="flex items-start gap-4 px-4 py-3 hover:bg-yellow-50 transition-colors duration-200"
-                      onClick={() => setShowProductsMenu(false)}
-                    >
-                      <span className="text-3xl">{product.icon}</span>
-                      <div>
-                        <div className="font-semibold text-gray-900">{product.name}</div>
-                        <div className="text-sm text-gray-600">{product.description}</div>
-                      </div>
-                    </Link>
+                    product.external ? (
+                      <a
+                        key={product.url}
+                        href={product.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-start gap-4 px-4 py-3 hover:bg-yellow-50 transition-colors duration-200"
+                        onClick={() => setShowProductsMenu(false)}
+                      >
+                        <span className="text-3xl">{product.icon}</span>
+                        <div>
+                          <div className="font-semibold text-gray-900">{product.name}</div>
+                          <div className="text-sm text-gray-600">{product.description}</div>
+                        </div>
+                      </a>
+                    ) : (
+                      <Link
+                        key={product.path}
+                        to={product.path!}
+                        className="flex items-start gap-4 px-4 py-3 hover:bg-yellow-50 transition-colors duration-200"
+                        onClick={() => setShowProductsMenu(false)}
+                      >
+                        <span className="text-3xl">{product.icon}</span>
+                        <div>
+                          <div className="font-semibold text-gray-900">{product.name}</div>
+                          <div className="text-sm text-gray-600">{product.description}</div>
+                        </div>
+                      </Link>
+                    )
                   ))}
                 </div>
               )}
