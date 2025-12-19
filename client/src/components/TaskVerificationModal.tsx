@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { X, Star, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import GlassmorphicCard from './ui/GlassmorphicCard';
 
 interface RatingDimension {
   key: string;
@@ -21,10 +23,11 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
   onVerify,
   taskTitle
 }) => {
+  const { isDarkMode } = useTheme();
   const [verifyText, setVerifyText] = useState('');
   const [showRatings, setShowRatings] = useState(false);
   const [comments, setComments] = useState('');
-  
+
   const [ratings, setRatings] = useState<RatingDimension[]>([
     {
       key: 'timeliness',
@@ -101,7 +104,7 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
       alert('Please rate all dimensions before submitting');
       return;
     }
-    
+
     onVerify(ratings, comments);
     handleClose();
   };
@@ -120,8 +123,8 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <GlassmorphicCard className="w-full max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
@@ -240,7 +243,7 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Star Rating */}
                     <div className="flex items-center gap-2">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -250,11 +253,10 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
                           className="focus:outline-none transition-transform hover:scale-110"
                         >
                           <Star
-                            className={`w-8 h-8 ${
-                              star <= dimension.rating
+                            className={`w-8 h-8 ${star <= dimension.rating
                                 ? 'fill-yellow-400 text-yellow-400'
                                 : 'text-gray-300 dark:text-gray-600'
-                            }`}
+                              }`}
                           />
                         </button>
                       ))}
@@ -314,7 +316,7 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
             </div>
           </div>
         )}
-      </div>
+      </GlassmorphicCard>
     </div>
   );
 };

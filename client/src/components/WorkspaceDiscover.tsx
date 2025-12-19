@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle, Loader2, Clock, X } from 'lucide-react';
+import { Search, Filter, Users, Building2, Plus, Eye, EyeOff, Bot, Zap, Lock, CheckCircle, Loader2, Clock, X, Compass, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
@@ -11,6 +11,8 @@ import { PlanStatus } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import api from '../services/api';
 import { SubscriptionPlanData } from '../services/api';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import GlassmorphicCard from './ui/GlassmorphicCard';
 
 interface Workspace {
   _id: string;
@@ -283,58 +285,60 @@ const WorkspaceDiscover: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 border-b border-border">
-        {/* Header */}
-        <div className="p-6 border-b border-border">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('workspace.discoverWorkspaces')}</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                {t('workspace.findWorkspaces')}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                {t('workspace.customWorkspace')}
-              </button>
-              <button
-                onClick={() => setShowAICreateModal(true)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${isDarkMode
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
-                  : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
-                  }`}
-              >
-                <Bot className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
-                <span>{t('workspace.aiPoweredWorkspace')}</span>
-              </button>
-            </div>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
+
+      {/* Header */}
+      <div
+        className="pt-6 px-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
+          paddingRight: dockPosition === 'right' ? '100px' : '24px'
+        }}
+      >
+        <GlassmorphicPageHeader
+          title={t('workspace.discoverWorkspaces')}
+          subtitle={t('workspace.findWorkspaces')}
+          icon={Compass}
+          decorativeGradients={{
+            topRight: 'rgba(59, 130, 246, 0.2)',
+            bottomLeft: 'rgba(147, 51, 234, 0.2)'
+          }}
+        />
+
+        {/* Action Bar */}
+        <GlassmorphicCard className="p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <Globe className="w-4 h-4" />
+            <span>Discover public workspaces or join by invitation</span>
           </div>
-        </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              {t('workspace.customWorkspace')}
+            </button>
+            <button
+              onClick={() => setShowAICreateModal(true)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${isDarkMode
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
+                : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
+                }`}
+            >
+              <Bot className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
+              <span>{t('workspace.aiPoweredWorkspace')}</span>
+            </button>
+          </div>
+        </GlassmorphicCard>
 
         {/* Plan Status */}
-        <div
-          className="p-6 border-b border-border transition-all duration-300"
-          style={{
-            paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-            paddingRight: dockPosition === 'right' ? '80px' : undefined
-          }}
-        >
+        <div className="mb-6">
           <PlanStatus />
         </div>
 
         {/* Search and Filters */}
-        <div
-          className="p-6 border-b border-border transition-all duration-300"
-          style={{
-            paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-            paddingRight: dockPosition === 'right' ? '80px' : undefined
-          }}
-        >
+        <GlassmorphicCard className="p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
@@ -344,14 +348,20 @@ const WorkspaceDiscover: React.FC = () => {
                 placeholder={t('workspace.searchWorkspaces')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                    ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-500'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                  }`}
               />
             </div>
 
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors"
+              className={`inline-flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${isDarkMode
+                  ? 'border-gray-600 hover:bg-gray-700 text-gray-300'
+                  : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                }`}
             >
               <Filter className="w-4 h-4" />
               {t('workspace.filters')}
@@ -368,7 +378,10 @@ const WorkspaceDiscover: React.FC = () => {
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                      ? 'bg-gray-800/50 border-gray-700 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                 >
                   <option value="all">All Types</option>
                   <option value="team">Team</option>
@@ -382,7 +395,10 @@ const WorkspaceDiscover: React.FC = () => {
                 <select
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                      ? 'bg-gray-800/50 border-gray-700 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                 >
                   <option value="all">All Regions</option>
                   <option value="North America">North America</option>
@@ -395,49 +411,41 @@ const WorkspaceDiscover: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
-      </div>
+        </GlassmorphicCard>
 
-      {/* Workspaces Grid */}
-      <div
-        className="transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-          paddingRight: dockPosition === 'right' ? '80px' : undefined
-        }}
-      >
-        <div className="p-6">
+        {/* Workspaces Grid */}
+        <div className="mb-12">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 animate-pulse">
-                  <div className="h-4 bg-gray-400 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-400 rounded mb-4"></div>
-                  <div className="h-3 bg-gray-400 rounded w-2/3"></div>
-                </div>
+                <GlassmorphicCard key={index} className="p-6 animate-pulse">
+                  <div className="h-4 bg-gray-400/20 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-400/20 rounded mb-4"></div>
+                  <div className="h-3 bg-gray-400/20 rounded w-2/3"></div>
+                </GlassmorphicCard>
               ))}
             </div>
           ) : filteredWorkspaces.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredWorkspaces.map((workspace) => (
-                <div key={workspace._id} className="bg-white dark:bg-gray-800 border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
+                <GlassmorphicCard key={workspace._id} className="p-6 hover:shadow-lg transition-all duration-300 group">
                   {/* Workspace Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{workspace.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-accent transition-colors">{workspace.name}</h3>
                         {workspace.settings.isPublic ? (
                           <Eye className="w-4 h-4 text-green-600" />
                         ) : (
                           <EyeOff className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{workspace.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{workspace.description}</p>
                     </div>
                   </div>
 
                   {/* Workspace Info */}
-                  <div className="space-y-3 mb-4">
+                  <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-2">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(workspace.type)}`}>
                         {getTypeIcon(workspace.type)}
@@ -448,7 +456,7 @@ const WorkspaceDiscover: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
                         <span>{workspace.memberCount} members</span>
@@ -459,79 +467,81 @@ const WorkspaceDiscover: React.FC = () => {
                           alt={workspace.owner.fullName}
                           className="w-4 h-4 rounded-full"
                         />
-                        <span>by {workspace.owner.fullName}</span>
+                        <span>{workspace.owner.fullName}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Smart Action Button */}
-                  {isUserOwner(workspace) ? (
-                    <button
-                      onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      Manage Workspace
-                    </button>
-                  ) : isUserMember(workspace._id) ? (
-                    <button
-                      onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
-                      className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      Visit Workspace
-                    </button>
-                  ) : workspace.hasPendingJoinRequest ? (
-                    <button
-                      onClick={() => handleCancelJoinRequest(workspace._id)}
-                      disabled={cancellingWorkspaceId === workspace._id}
-                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${cancellingWorkspaceId === workspace._id
-                        ? 'bg-red-500 text-white cursor-not-allowed'
-                        : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-md active:scale-95'
-                        }`}
-                    >
-                      {cancellingWorkspaceId === workspace._id ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Cancelling...
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="w-4 h-4" />
-                          Pending
-                          <X className="w-4 h-4 ml-auto" />
-                        </>
-                      )}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleJoinRequest(workspace._id)}
-                      disabled={requestingWorkspaceId === workspace._id}
-                      className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${requestingWorkspaceId === workspace._id
-                        ? 'bg-blue-500 text-white cursor-not-allowed'
-                        : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover hover:shadow-md active:scale-95'
-                        }`}
-                    >
-                      {requestingWorkspaceId === workspace._id ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Sending Request...
-                        </>
-                      ) : (
-                        'Send Join Request'
-                      )}
-                    </button>
-                  )}
-                </div>
+                  <div className="mt-auto">
+                    {isUserOwner(workspace) ? (
+                      <button
+                        onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Manage Workspace
+                      </button>
+                    ) : isUserMember(workspace._id) ? (
+                      <button
+                        onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
+                        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Visit Workspace
+                      </button>
+                    ) : workspace.hasPendingJoinRequest ? (
+                      <button
+                        onClick={() => handleCancelJoinRequest(workspace._id)}
+                        disabled={cancellingWorkspaceId === workspace._id}
+                        className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${cancellingWorkspaceId === workspace._id
+                          ? 'bg-red-500 text-white cursor-not-allowed'
+                          : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-md active:scale-95 shadow-lg shadow-orange-500/20'
+                          }`}
+                      >
+                        {cancellingWorkspaceId === workspace._id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Cancelling...
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-4 h-4" />
+                            Pending
+                            <X className="w-4 h-4 ml-auto" />
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleJoinRequest(workspace._id)}
+                        disabled={requestingWorkspaceId === workspace._id}
+                        className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${requestingWorkspaceId === workspace._id
+                          ? 'bg-blue-500 text-white cursor-not-allowed'
+                          : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover hover:shadow-md active:scale-95 shadow-lg shadow-accent/20'
+                          }`}
+                      >
+                        {requestingWorkspaceId === workspace._id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          'Send Join Request'
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </GlassmorphicCard>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="text-gray-600 dark:text-gray-400 mb-4">
-                <Building2 className="w-12 h-12 mx-auto" />
+            <GlassmorphicCard className="p-12 text-center">
+              <div className="text-gray-400 dark:text-gray-600 mb-4">
+                <Building2 className="w-16 h-16 mx-auto opacity-50" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('workspace.noWorkspacesFound')}</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">{t('workspace.noWorkspacesFound')}</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {t('workspace.tryAdjustingFilters')}
               </p>
               <button
@@ -540,11 +550,11 @@ const WorkspaceDiscover: React.FC = () => {
                   setSelectedType('all');
                   setSelectedRegion('all');
                 }}
-                className="text-accent-dark hover:text-blue-700 font-medium"
+                className="text-accent dark:text-accent-light hover:underline font-medium"
               >
                 {t('workspace.clearAllFilters')}
               </button>
-            </div>
+            </GlassmorphicCard>
           )}
         </div>
       </div>

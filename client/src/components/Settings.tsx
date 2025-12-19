@@ -16,6 +16,8 @@ import apiService from '../services/api';
 import LanguageSelector from './LanguageSelector';
 import ConnectedAccounts from './ConnectedAccounts';
 import { useRefreshData } from '../hooks/useRefreshData';
+import GlassmorphicCard from './ui/GlassmorphicCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface SettingsData {
   account: {
@@ -167,7 +169,7 @@ interface SettingsData {
 const Settings: React.FC = () => {
   const { state, dispatch } = useApp();
   const { dockPosition } = useDock();
-  const { preferences, updatePreferences: updateThemePreferences } = useTheme();
+  const { isDarkMode, preferences, updatePreferences: updateThemePreferences } = useTheme();
   const { t, i18n } = useTranslation();
   const [settingsData, setSettingsData] = useState<SettingsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -345,6 +347,53 @@ const Settings: React.FC = () => {
     fetchSettings();
   }, []);
 
+  // Handle OAuth redirect success/error
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get('success');
+    const error = params.get('error');
+    const service = params.get('service');
+
+    if (success === 'account_connected' && service) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: t('connectedAccounts.connectionSuccess', { service: service.charAt(0).toUpperCase() + service.slice(1) }),
+          duration: 5000
+        }
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Refresh settings to show new connection
+      fetchSettings();
+    } else if (success === 'account_updated' && service) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: t('connectedAccounts.accountUpdated', { service: service.charAt(0).toUpperCase() + service.slice(1) }),
+          duration: 5000
+        }
+      });
+      window.history.replaceState({}, document.title, window.location.pathname);
+      fetchSettings();
+    } else if (error) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: t('connectedAccounts.connectionError', { error }),
+          duration: 5000
+        }
+      });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   // Enable refresh button
   useRefreshData(fetchSettings, []);
 
@@ -462,7 +511,7 @@ const Settings: React.FC = () => {
 
   const tabs = [
     { id: 'account', label: t('settings.account'), icon: User },
-    { id: 'notifications', label: t('settings.notifications'), icon: Bell },
+
     { id: 'appearance', label: t('settings.appearance'), icon: Palette },
     { id: 'billing', label: t('settings.billing'), icon: CreditCard }
     // Data & Export tab removed - not fully implemented
@@ -471,18 +520,18 @@ const Settings: React.FC = () => {
   const renderAccount = () => (
     <div className="space-y-6">
       {/* Connected Accounts Section */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <GlassmorphicCard className="p-4">
         <ConnectedAccounts />
-      </div>
+      </GlassmorphicCard>
 
       {/* Account Information */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accountInfo')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.username')}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">{settingsData?.account.username}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{settingsData?.account.username}</p>
             </div>
             <button className="text-accent-dark hover:text-blue-700">
               <Edit className="w-4 h-4" />
@@ -491,29 +540,29 @@ const Settings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.email')}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">{settingsData?.account.email}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{settingsData?.account.email}</p>
             </div>
             <button className="text-accent-dark hover:text-blue-700">
               <Edit className="w-4 h-4" />
             </button>
           </div>
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Security Settings */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.security')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+              <Shield className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.twoFactor')}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.twoFactorDesc')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.twoFactorDesc')}</p>
               </div>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.account.twoFactorEnabled ? 'bg-accent' : 'bg-gray-300'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.account.twoFactorEnabled ? 'bg-accent' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               onClick={() => {
                 const newValue = !settingsData?.account.twoFactorEnabled;
@@ -532,14 +581,14 @@ const Settings: React.FC = () => {
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.loginNotifications')}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.loginNotificationsDesc')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.loginNotificationsDesc')}</p>
               </div>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.account.loginNotifications ? 'bg-accent' : 'bg-gray-300'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.account.loginNotifications ? 'bg-accent' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               onClick={() => {
                 const newValue = !settingsData?.account.loginNotifications;
@@ -557,14 +606,14 @@ const Settings: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Session Management */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.sessionManagement')}</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.sessionTimeout')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.sessionTimeout')}</label>
             <input
               type="number"
               value={settingsData?.account.sessionTimeout}
@@ -576,22 +625,22 @@ const Settings: React.FC = () => {
                 } : null);
                 handleSaveSettings('account', { ...settingsData?.account, sessionTimeout: newValue });
               }}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               min="5"
               max="480"
             />
           </div>
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Danger Zone */}
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="font-medium text-red-900 mb-4">{t('settings.dangerZone')}</h3>
+      <GlassmorphicCard className="p-4 border-red-200 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/10">
+        <h3 className="font-medium text-red-900 dark:text-red-400 mb-4">{t('settings.dangerZone')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-red-900">{t('settings.deleteAccount')}</p>
-              <p className="text-sm text-red-700">{t('settings.deleteAccountDesc')}</p>
+              <p className="font-medium text-red-900 dark:text-red-400">{t('settings.deleteAccount')}</p>
+              <p className="text-sm text-red-700 dark:text-red-300">{t('settings.deleteAccountDesc')}</p>
             </div>
             <button
               onClick={() => setShowDeleteAccount(true)}
@@ -601,221 +650,24 @@ const Settings: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </GlassmorphicCard>
     </div>
   );
 
-  const renderNotifications = () => (
-    <div className="space-y-6">
-      {/* Email Notifications */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.emailNotifications')}</h3>
-          </div>
-          <button
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.notifications.email.enabled ? 'bg-accent' : 'bg-gray-300'
-              }`}
-            onClick={() => {
-              const newValue = !settingsData?.notifications.email.enabled;
-              setSettingsData(prev => prev ? {
-                ...prev,
-                notifications: {
-                  ...prev.notifications,
-                  email: { ...prev.notifications.email, enabled: newValue }
-                }
-              } : null);
-              handleSaveSettings('notifications', {
-                ...settingsData?.notifications,
-                email: { ...settingsData?.notifications.email, enabled: newValue }
-              });
-            }}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.notifications.email.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-            />
-          </button>
-        </div>
-        {settingsData?.notifications.email.enabled && (
-          <div className="space-y-3">
-            {Object.entries(settingsData.notifications.email).filter(([key]) => key !== 'enabled').map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
-                <button
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
-                    }`}
-                  onClick={() => {
-                    const newValue = !value;
-                    setSettingsData(prev => prev ? {
-                      ...prev,
-                      notifications: {
-                        ...prev.notifications,
-                        email: { ...prev.notifications.email, [key]: newValue }
-                      }
-                    } : null);
-                    handleSaveSettings('notifications', {
-                      ...settingsData?.notifications,
-                      email: { ...settingsData?.notifications.email, [key]: newValue }
-                    });
-                  }}
-                >
-                  <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
-                      }`}
-                  />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Push Notifications */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.pushNotifications')}</h3>
-          </div>
-          <button
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.notifications.push.enabled ? 'bg-accent' : 'bg-gray-300'
-              }`}
-            onClick={() => {
-              const newValue = !settingsData?.notifications.push.enabled;
-              setSettingsData(prev => prev ? {
-                ...prev,
-                notifications: {
-                  ...prev.notifications,
-                  push: { ...prev.notifications.push, enabled: newValue }
-                }
-              } : null);
-              handleSaveSettings('notifications', {
-                ...settingsData?.notifications,
-                push: { ...settingsData?.notifications.push, enabled: newValue }
-              });
-            }}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.notifications.push.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-            />
-          </button>
-        </div>
-        {settingsData?.notifications.push.enabled && (
-          <div className="space-y-3">
-            {Object.entries(settingsData.notifications.push).filter(([key]) => key !== 'enabled').map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
-                <button
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
-                    }`}
-                  onClick={() => {
-                    const newValue = !value;
-                    setSettingsData(prev => prev ? {
-                      ...prev,
-                      notifications: {
-                        ...prev.notifications,
-                        push: { ...prev.notifications.push, [key]: newValue }
-                      }
-                    } : null);
-                    handleSaveSettings('notifications', {
-                      ...settingsData?.notifications,
-                      push: { ...settingsData?.notifications.push, [key]: newValue }
-                    });
-                  }}
-                >
-                  <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
-                      }`}
-                  />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Desktop Notifications */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-200" />
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('settings.desktopNotifications')}</h3>
-          </div>
-          <button
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.notifications.desktop.enabled ? 'bg-accent' : 'bg-gray-300'
-              }`}
-            onClick={() => {
-              const newValue = !settingsData?.notifications.desktop.enabled;
-              setSettingsData(prev => prev ? {
-                ...prev,
-                notifications: {
-                  ...prev.notifications,
-                  desktop: { ...prev.notifications.desktop, enabled: newValue }
-                }
-              } : null);
-              handleSaveSettings('notifications', {
-                ...settingsData?.notifications,
-                desktop: { ...settingsData?.notifications.desktop, enabled: newValue }
-              });
-            }}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settingsData?.notifications.desktop.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-            />
-          </button>
-        </div>
-        {settingsData?.notifications.desktop.enabled && (
-          <div className="space-y-3">
-            {Object.entries(settingsData.notifications.desktop).filter(([key]) => key !== 'enabled').map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t(`settings.${key}`)}</span>
-                <button
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
-                    }`}
-                  onClick={() => {
-                    const newValue = !value;
-                    setSettingsData(prev => prev ? {
-                      ...prev,
-                      notifications: {
-                        ...prev.notifications,
-                        desktop: { ...prev.notifications.desktop, [key]: newValue }
-                      }
-                    } : null);
-                    handleSaveSettings('notifications', {
-                      ...settingsData?.notifications,
-                      desktop: { ...settingsData?.notifications.desktop, [key]: newValue }
-                    });
-                  }}
-                >
-                  <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
-                      }`}
-                  />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  /* Notifications Section Removed as per request */
 
   const renderAppearance = () => (
     <div className="space-y-6">
       {/* Theme */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.theme')}</h3>
         <div className="flex gap-3">
           {['light', 'dark', 'system'].map((theme) => (
             <button
               key={theme}
               className={`px-4 py-2 rounded-lg border transition-colors ${preferences.theme === theme
-                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
-                : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
+                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2 dark:ring-offset-gray-800'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               onClick={async () => {
                 try {
@@ -849,17 +701,17 @@ const Settings: React.FC = () => {
             </button>
           ))}
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Accent Color */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accentColor')}</h3>
         <div className="flex gap-3 flex-wrap">
           {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].map((color) => (
             <button
               key={color}
               className={`w-10 h-10 rounded-full border-2 transition-all ${preferences.accentColor === color
-                ? 'border-gray-900 dark:border-white scale-110 ring-2 ring-offset-2 ring-gray-900 dark:ring-white'
+                ? 'border-gray-900 dark:border-white scale-110 ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800'
                 : 'border-gray-300 dark:border-gray-600 hover:scale-105'
                 }`}
               style={{ backgroundColor: color }}
@@ -891,21 +743,22 @@ const Settings: React.FC = () => {
             />
           ))}
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Language Selector */}
       <LanguageSelector />
 
       {/* Font Size */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Font Size */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.fontSize')}</h3>
         <div className="flex gap-3">
           {['small', 'medium', 'large'].map((size) => (
             <button
               key={size}
               className={`px-4 py-2 rounded-lg border transition-colors ${preferences.fontSize === size
-                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
-                : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
+                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2 dark:ring-offset-gray-800'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               onClick={async () => {
                 try {
@@ -936,18 +789,19 @@ const Settings: React.FC = () => {
             </button>
           ))}
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Density */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Density */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.density')}</h3>
         <div className="flex gap-3">
           {['compact', 'comfortable', 'spacious'].map((density) => (
             <button
               key={density}
               className={`px-4 py-2 rounded-lg border transition-colors ${preferences.density === density
-                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2'
-                : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500'
+                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2 dark:ring-offset-gray-800'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               onClick={async () => {
                 try {
@@ -978,19 +832,20 @@ const Settings: React.FC = () => {
             </button>
           ))}
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Accessibility */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Accessibility */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accessibility')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.animations')}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.animationsDesc')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.animationsDesc')}</p>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preferences.animations ? 'bg-accent' : 'bg-gray-300'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preferences.animations ? 'bg-accent' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               onClick={async () => {
                 try {
@@ -1009,10 +864,10 @@ const Settings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.reducedMotion')}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.reducedMotionDesc')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.reducedMotionDesc')}</p>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preferences.reducedMotion ? 'bg-accent' : 'bg-gray-300'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${preferences.reducedMotion ? 'bg-accent' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               onClick={async () => {
                 try {
@@ -1029,36 +884,38 @@ const Settings: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </GlassmorphicCard>
     </div>
   );
 
   const renderBilling = () => (
     <div className="space-y-6">
       {/* Current Plan */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Current Plan */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.currentPlan')}</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} Plan</p>
-            <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.nextBilling', { date: new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString() })}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.nextBilling', { date: new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString() })}</p>
           </div>
           <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
             {t('settings.upgradePlan')}
           </button>
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Usage */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Usage */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.usage')}</h3>
         <div className="space-y-4">
           <div>
-            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
               <span>{t('settings.projects')}</span>
               <span>{settingsData?.billing.usage.projects} / {settingsData?.billing.usage.maxProjects}</span>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-2">
+            <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-accent h-2 rounded-full"
                 style={{ width: `${(settingsData?.billing.usage.projects || 0) / (settingsData?.billing.usage.maxProjects || 1) * 100}%` }}
@@ -1066,11 +923,11 @@ const Settings: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
               <span>{t('settings.storage')}</span>
               <span>{settingsData?.billing.usage.storage} GB / {settingsData?.billing.usage.maxStorage} GB</span>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-2">
+            <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-green-600 h-2 rounded-full"
                 style={{ width: `${(settingsData?.billing.usage.storage || 0) / (settingsData?.billing.usage.maxStorage || 1) * 100}%` }}
@@ -1078,11 +935,11 @@ const Settings: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-700 mb-1">
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
               <span>{t('workspace.teamMembers')}</span>
               <span>{settingsData?.billing.usage.teamMembers} / {settingsData?.billing.usage.maxTeamMembers}</span>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-2">
+            <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-purple-600 h-2 rounded-full"
                 style={{ width: `${(settingsData?.billing.usage.teamMembers || 0) / (settingsData?.billing.usage.maxTeamMembers || 1) * 100}%` }}
@@ -1090,47 +947,55 @@ const Settings: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Payment Method */}
       <div className="p-4 bg-gray-50 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-4">{t('settings.paymentMethod')}</h3>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CreditCard className="w-5 h-5 text-gray-600" />
-            <div>
-              <p className="font-medium">{settingsData?.billing.paymentMethod.brand} •••• {settingsData?.billing.paymentMethod.last4}</p>
-              <p className="text-sm text-gray-600">{t('settings.expires', { date: '12/25' })}</p>
+        {/* Payment Method */}
+        <GlassmorphicCard className="p-4">
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.paymentMethod')}</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{settingsData?.billing.paymentMethod.brand} •••• {settingsData?.billing.paymentMethod.last4}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.expires', { date: '12/25' })}</p>
+              </div>
             </div>
+            <button className="text-accent-dark hover:text-blue-700">
+              <Edit className="w-4 h-4" />
+            </button>
           </div>
-          <button className="text-accent-dark hover:text-blue-700">
-            <Edit className="w-4 h-4" />
-          </button>
-        </div>
+        </GlassmorphicCard>
       </div>
 
       {/* Invoices */}
       <div className="p-4 bg-gray-50 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-4">{t('settings.recentInvoices')}</h3>
-        <div className="space-y-3">
-          {settingsData?.billing.invoices.map((invoice) => (
-            <div key={invoice.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-              <div>
-                <p className="font-medium">{invoice.id}</p>
-                <p className="text-sm text-gray-600">{new Date(invoice.date).toLocaleDateString()}</p>
+        {/* Invoices */}
+        <GlassmorphicCard className="p-4">
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.recentInvoices')}</h3>
+          <div className="space-y-3">
+            {settingsData?.billing.invoices.map((invoice) => (
+              <div key={invoice.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.id}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{new Date(invoice.date).toLocaleDateString()}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">${invoice.amount}</p>
+                  <span className={`px-2 py-1 text-xs rounded-full ${invoice.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                    invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                      'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    }`}>
+                    {invoice.status}
+                  </span>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="font-medium">${invoice.amount}</p>
-                <span className={`px-2 py-1 text-xs rounded-full ${invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
-                  invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                  {invoice.status}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </GlassmorphicCard>
       </div>
     </div>
   );
@@ -1138,14 +1003,15 @@ const Settings: React.FC = () => {
   const renderData = () => (
     <div className="space-y-6">
       {/* Data Export */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Data Export */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.exportData')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{t('settings.exportDataDesc')}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t('settings.exportDataDesc')}</p>
         <div className="flex gap-3">
           <select
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="json">JSON</option>
             <option value="csv">CSV</option>
@@ -1159,19 +1025,20 @@ const Settings: React.FC = () => {
             {t('settings.exportData')}
           </button>
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Auto Backup */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Auto Backup */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.autoBackup')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.autoBackup')}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-200">{t('settings.autoBackupDesc')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.autoBackupDesc')}</p>
             </div>
             <button
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.data.autoBackup ? 'bg-accent' : 'bg-gray-300'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settingsData?.data.autoBackup ? 'bg-accent' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               onClick={() => {
                 const newValue = !settingsData?.data.autoBackup;
@@ -1190,7 +1057,7 @@ const Settings: React.FC = () => {
           </div>
           {settingsData?.data.autoBackup && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.backupFrequency')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.backupFrequency')}</label>
               <select
                 value={settingsData.data.backupFrequency}
                 onChange={(e) => {
@@ -1200,7 +1067,7 @@ const Settings: React.FC = () => {
                   } : null);
                   handleSaveSettings('data', { ...settingsData?.data, backupFrequency: e.target.value as 'daily' | 'weekly' | 'monthly' });
                 }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -1209,13 +1076,14 @@ const Settings: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      </GlassmorphicCard>
 
       {/* Data Location */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {/* Data Location */}
+      <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.dataLocation')}</h3>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">{t('settings.primaryDataCenter')}</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.primaryDataCenter')}</label>
           <select
             value={settingsData?.data.dataLocation}
             onChange={(e) => {
@@ -1225,14 +1093,14 @@ const Settings: React.FC = () => {
               } : null);
               handleSaveSettings('data', { ...settingsData?.data, dataLocation: e.target.value as 'us' | 'eu' | 'asia' });
             }}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
             <option value="us">United States</option>
             <option value="eu">Europe</option>
             <option value="asia">Asia Pacific</option>
           </select>
         </div>
-      </div>
+      </GlassmorphicCard>
     </div>
   );
 
@@ -1261,49 +1129,46 @@ const Settings: React.FC = () => {
 
   return (
     <div
-      className="p-4 sm:p-6 transition-all duration-300"
+      className={`p-4 sm:p-6 transition-all duration-300 min-h-screen bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-gray-50 via-blue-50/30 to-purple-50/20'}`}
       style={{
         paddingLeft: dockPosition === 'left' ? '80px' : undefined,
         paddingRight: dockPosition === 'right' ? '80px' : undefined
       }}
     >
-      <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
-        {/* Header */}
-        <div className="p-6 border-b border-border dark:border-gray-600">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('settings.title')}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{t('settings.subtitle')}</p>
-        </div>
+      <GlassmorphicPageHeader
+        title={t('settings.title')}
+        subtitle={t('settings.subtitle')}
+        icon={SettingsIcon}
+      />
 
-        {/* Tabs */}
-        <div className="border-b border-border dark:border-gray-600">
-          <nav className="flex space-x-8 px-6 overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
-                    ? 'border-accent text-accent-dark dark:text-accent-light'
-                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+      {/* Tabs */}
+      <GlassmorphicCard className="mb-6">
+        <nav className="flex space-x-8 overflow-x-auto">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                  ? 'border-accent text-accent-dark dark:text-accent-light'
+                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      </GlassmorphicCard>
 
-        {/* Content */}
-        <div className="p-6">
-          {activeTab === 'account' && renderAccount()}
-          {activeTab === 'notifications' && renderNotifications()}
-          {activeTab === 'appearance' && renderAppearance()}
-          {activeTab === 'billing' && renderBilling()}
-          {activeTab === 'data' && renderData()}
-        </div>
+      {/* Content */}
+      <div className="space-y-6">
+        {activeTab === 'account' && renderAccount()}
+        {activeTab === 'appearance' && renderAppearance()}
+        {activeTab === 'billing' && renderBilling()}
+        {activeTab === 'data' && renderData()}
       </div>
 
       {/* Delete Account Modal */}

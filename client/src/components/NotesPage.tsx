@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useRefreshData } from '../hooks/useRefreshData';
 import { useApp } from '../context/AppContext';
+import { useDock } from '../context/DockContext'; import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface Note {
   _id: string;
@@ -21,8 +22,9 @@ interface Note {
 
 const NotesPage: React.FC = () => {
   const { t } = useTranslation();
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, preferences } = useTheme();
   const { dispatch } = useApp();
+  const { dockPosition } = useDock();
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -67,7 +69,7 @@ const NotesPage: React.FC = () => {
       setTitle(createdNote.title);
       setContent(createdNote.content);
       setIsCreatingNew(false);
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -101,7 +103,7 @@ const NotesPage: React.FC = () => {
       );
       setNotes(updatedNotes);
       setSelectedNote(updatedNote);
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -132,7 +134,7 @@ const NotesPage: React.FC = () => {
         setIsCreatingNew(false);
       }
       setDeleteConfirmId(null);
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -197,173 +199,208 @@ const NotesPage: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
       {/* Header */}
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 pt-16 pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-xl flex items-center justify-center">
-                <FileText className="w-6 h-6 text-gray-900" />
-              </div>
-              <div>
-                <h1 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('notes.title')}</h1>
-                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('notes.subtitle')}</p>
-              </div>
-            </div>
-          </div>
+      <main className="flex-1">
+        <div
+          className="p-6 transition-all duration-300"
+          style={{
+            paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
+            paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
+          }}
+        >
+          {/* Glassmorphic Page Header */}
+          <GlassmorphicPageHeader
+            icon={FileText}
+            title={t('notes.title')}
+            subtitle={t('notes.subtitle')}
+          />
 
           {/* Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Notes List Sidebar */}
-            <div className={`lg:col-span-1 rounded-xl shadow-sm border p-4 max-h-[calc(100vh-250px)] overflow-y-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-              <button
-                onClick={() => {
-                  setSelectedNote(null);
-                  setTitle('');
-                  setContent('');
-                  setIsCreatingNew(true);
-                }}
-                className="w-full flex items-center gap-2 bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-4 py-3 rounded-lg font-bold transition-colors mb-4"
-              >
-                <Plus size={20} />
-                {t('notes.newNote')}
-              </button>
+          {isLoading ? (
+            /* Loading Skeleton */
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse">
+              {/* Sidebar Skeleton */}
+              <div className={`lg:col-span-1 rounded-2xl border p-6 h-[calc(100vh-300px)] ${isDarkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white/80 border-gray-200/50'
+                }`}>
+                <div className="h-12 bg-gradient-to-r from-yellow-200 to-amber-200 dark:from-yellow-900/30 dark:to-amber-900/30 rounded-xl mb-4" />
+                <div className="space-y-3">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className={`h-16 rounded-xl ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`} />
+                  ))}
+                </div>
+              </div>
 
-              <div className="space-y-2">
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="w-8 h-8 border-4 border-[#FFD700] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                    <p className="text-gray-500 text-sm">{t('common.loading')}</p>
-                  </div>
-                ) : notes.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-8">{t('notes.noNotes')}</p>
-                ) : (
-                  notes.map(note => (
-                    <div
-                      key={note._id}
-                      onClick={() => handleSelectNote(note)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedNote?._id === note._id
-                        ? 'bg-[#FFD700]/20 border-2 border-[#FFD700]'
-                        : `${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
-                        }`}
-                    >
-                      <h3 className={`font-bold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{note.title || 'Untitled'}</h3>
-                      <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {new Date(note.updatedAt).toLocaleDateString()}
-                      </p>
+              {/* Editor Skeleton */}
+              <div className={`lg:col-span-3 rounded-2xl border p-6 h-[calc(100vh-300px)] ${isDarkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white/80 border-gray-200/50'
+                }`}>
+                <div className="flex gap-3 mb-6">
+                  <div className="h-10 w-40 bg-gradient-to-r from-purple-200 to-purple-300 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl" />
+                  <div className="h-10 w-40 bg-gradient-to-r from-blue-200 to-blue-300 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl" />
+                </div>
+                <div className={`h-12 rounded-xl mb-4 ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`} />
+                <div className={`h-64 rounded-xl ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`} />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Notes List Sidebar */}
+              <div className={`lg:col-span-1 rounded-2xl border p-6 max-h-[calc(100vh-300px)] overflow-y-auto custom-scrollbar ${isDarkMode
+                ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+                }`}>
+                <button
+                  onClick={() => {
+                    setSelectedNote(null);
+                    setTitle('');
+                    setContent('');
+                    setIsCreatingNew(true);
+                  }}
+                  style={{
+                    background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
+                  }}
+                  className="w-full flex items-center justify-center gap-2 hover:opacity-90 text-white px-4 py-3 rounded-xl font-bold transition-all shadow-lg mb-4"
+                >
+                  <Plus size={20} />
+                  {t('notes.newNote')}
+                </button>
+
+                <div className="space-y-2">
+                  {notes.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                        }`}>
+                        <FileText className={`w-8 h-8 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                      </div>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{t('notes.noNotes')}</p>
                     </div>
-                  ))
+                  ) : (
+                    notes.map(note => (
+                      <div
+                        key={note._id}
+                        onClick={() => handleSelectNote(note)}
+                        className={`p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.02] ${selectedNote?._id === note._id
+                          ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700] shadow-lg'
+                          : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
+                          }`}
+                      >
+                        <h3 className={`font-bold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {note.title || 'Untitled'}
+                        </h3>
+                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {new Date(note.updatedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Editor */}
+              <div className={`lg:col-span-3 rounded-2xl border p-8 ${isDarkMode
+                ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+                }`}>
+                {selectedNote || title || content || isCreatingNew ? (
+                  <>
+                    {/* Toolbar */}
+                    <div className={`flex flex-wrap items-center justify-between gap-4 mb-6 pb-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          onClick={() => {
+                            setAiAction('generate');
+                            setShowAIModal(true);
+                          }}
+                          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-purple-500/30"
+                        >
+                          <Sparkles size={18} />
+                          <span>Ask AI to Write</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAiAction('refine');
+                            setShowAIModal(true);
+                          }}
+                          disabled={!content}
+                          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Wand2 size={18} />
+                          <span>Refine with AI</span>
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {selectedNote && (
+                          <button
+                            onClick={() => setDeleteConfirmId(selectedNote._id)}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all ${isDarkMode
+                              ? 'text-red-400 hover:bg-red-900/20'
+                              : 'text-red-600 hover:bg-red-50'
+                              }`}
+                          >
+                            <Trash2 size={18} />
+                            {t('common.delete')}
+                          </button>
+                        )}
+                        <button
+                          onClick={selectedNote ? handleSaveNote : handleCreateNote}
+                          className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-yellow-500/30"
+                        >
+                          <Save size={18} />
+                          {selectedNote ? t('common.save') : t('common.create')}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Title Input */}
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder={t('notes.noteTitlePlaceholder')}
+                      className={`w-full text-3xl font-bold bg-transparent border-none outline-none mb-6 placeholder-gray-400 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                    />
+
+                    {/* Content Textarea */}
+                    <textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder={t('notes.noteContentPlaceholder')}
+                      className={`w-full h-[calc(100vh-500px)] bg-transparent border-none outline-none resize-none placeholder-gray-400 leading-relaxed text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                    />
+                  </>
+                ) : (
+                  /* Empty State */
+                  <div className="flex flex-col items-center justify-center h-[calc(100vh-400px)]">
+                    <div className={`w-32 h-32 rounded-full flex items-center justify-center mb-6 ${isDarkMode ? 'bg-gradient-to-br from-gray-700 to-gray-600' : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                      }`}>
+                      <FileText className={`w-16 h-16 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    </div>
+                    <h3 className={`text-3xl font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      No Note Selected
+                    </h3>
+                    <p className={`text-center mb-8 max-w-md text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Select an existing note from the sidebar or create a new one to get started
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSelectedNote(null);
+                        setTitle('');
+                        setContent('');
+                        setIsCreatingNew(true);
+                      }}
+                      className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-yellow-500/30 hover:scale-105"
+                    >
+                      <Plus size={24} />
+                      Create New Note
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
-
-            {/* Editor */}
-            <div className={`lg:col-span-3 rounded-xl shadow-sm border p-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-              {selectedNote || title || content || isCreatingNew ? (
-                <>
-                  {/* Toolbar */}
-                  <div className={`flex items-center justify-between mb-6 pb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => {
-                          setAiAction('generate');
-                          setShowAIModal(true);
-                        }}
-                        style={{
-                          background: 'linear-gradient(to right, #9333ea, #7e22ce)',
-                          color: 'white'
-                        }}
-                        className="flex items-center gap-2 hover:opacity-90 px-4 py-2 rounded-lg font-semibold transition-all shadow-md"
-                      >
-                        <Sparkles size={18} />
-                        <span>Ask AI to Write</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setAiAction('refine');
-                          setShowAIModal(true);
-                        }}
-                        disabled={!content}
-                        style={{
-                          background: content ? 'linear-gradient(to right, #2563eb, #1d4ed8)' : '#9ca3af',
-                          color: 'white'
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Wand2 size={18} />
-                        <span>Refine with AI</span>
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {selectedNote && (
-                        <button
-                          onClick={() => setDeleteConfirmId(selectedNote._id)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
-                        >
-                          <Trash2 size={18} />
-                          {t('common.delete')}
-                        </button>
-                      )}
-                      <button
-                        onClick={selectedNote ? handleSaveNote : handleCreateNote}
-                        className="flex items-center gap-2 bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-4 py-2 rounded-lg font-semibold transition-colors"
-                      >
-                        <Save size={18} />
-                        {selectedNote ? t('common.save') : t('common.create')}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Title Input */}
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder={t('notes.noteTitlePlaceholder')}
-                    className={`w-full text-3xl font-bold bg-transparent border-none outline-none mb-4 placeholder-gray-400 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-                  />
-
-                  {/* Content Textarea */}
-                  <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder={t('notes.noteContentPlaceholder')}
-                    className={`w-full h-[calc(100vh-450px)] bg-transparent border-none outline-none resize-none placeholder-gray-400 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
-                  />
-                </>
-              ) : (
-                /* Empty State */
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-350px)]">
-                  <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                    <FileText className={`w-12 h-12 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                  </div>
-                  <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    No Note Selected
-                  </h3>
-                  <p className={`text-center mb-6 max-w-md ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Select an existing note from the sidebar or create a new one to get started
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSelectedNote(null);
-                      setTitle('');
-                      setContent('');
-                      setIsCreatingNew(true);
-                    }}
-                    className="flex items-center gap-2 bg-[#FFD700] hover:bg-[#E6C200] text-gray-900 px-6 py-3 rounded-lg font-bold transition-colors"
-                  >
-                    <Plus size={20} />
-                    Create New Note
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
         </div>
       </main>
 

@@ -11,6 +11,7 @@ import apiService from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import FaceEnrollmentSection from './profile/FaceEnrollmentSection';
+import GlassmorphicCard from './ui/GlassmorphicCard';
 
 interface ProfileData {
   fullName: string;
@@ -401,8 +402,61 @@ const Profile: React.FC = () => {
   const handleSaveField = async (field: string, value: string) => {
     try {
       setSaving(true);
-      await apiService.updateProfile({ [field]: value });
-      setProfileData(prev => prev ? { ...prev, [field]: value } : null);
+
+      // Check if this is a nested profile field
+      if (field.startsWith('profile.')) {
+        const profileField = field.replace('profile.', '');
+        const profileUpdate: any = { profile: {} };
+
+        // Handle nested goals field
+        if (profileField === 'goals.careerAspirations') {
+          profileUpdate.profile.goals = {
+            ...profileData?.profile?.goals,
+            careerAspirations: value
+          };
+        } else if (profileField === 'skills') {
+          // Parse skills from JSON string
+          try {
+            profileUpdate.profile.skills = JSON.parse(value);
+          } catch {
+            profileUpdate.profile.skills = value;
+          }
+        } else if (profileField === 'experience') {
+          // Handle experience dropdown
+          profileUpdate.profile.experience = value;
+        } else {
+          // Handle other profile fields (jobTitle, company, industry)
+          profileUpdate.profile[profileField] = value;
+        }
+
+        await apiService.updateProfile(profileUpdate);
+
+        // Update local state
+        setProfileData(prev => {
+          if (!prev) return null;
+          const newProfile = { ...prev.profile };
+
+          if (profileField === 'goals.careerAspirations') {
+            if (!newProfile.goals) newProfile.goals = {};
+            newProfile.goals.careerAspirations = value;
+          } else if (profileField === 'skills') {
+            try {
+              newProfile.skills = JSON.parse(value);
+            } catch {
+              (newProfile as any).skills = value;
+            }
+          } else {
+            (newProfile as any)[profileField] = value;
+          }
+
+          return { ...prev, profile: newProfile };
+        });
+      } else {
+        // Handle basic fields (fullName, contactNumber, department, location, dateOfBirth, etc.)
+        await apiService.updateProfile({ [field]: value });
+        setProfileData(prev => prev ? { ...prev, [field]: value } : null);
+      }
+
       setEditingField(null);
       dispatch({
         type: 'ADD_TOAST',
@@ -594,11 +648,9 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: 'personal', label: t('profile.personalInfo'), icon: User },
-    { id: 'preferences', label: t('profile.preferences'), icon: Settings },
+    { id: 'professional', label: 'Professional Profile', icon: Target },
     { id: 'addresses', label: t('profile.addresses'), icon: MapPin },
-    { id: 'payments', label: t('profile.payments'), icon: CreditCard },
-    { id: 'achievements', label: t('profile.achievements'), icon: Award },
-    { id: 'activity', label: t('profile.activity'), icon: BarChart3 }
+    { id: 'payments', label: t('profile.payments'), icon: CreditCard }
   ];
 
   const renderPersonalInfo = () => (
@@ -1071,6 +1123,150 @@ const Profile: React.FC = () => {
     </div>
   );
 
+  const renderProfessionalProfile = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Professional Profile</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Your professional summary</p>
+      </div>
+
+      <GlassmorphicCard className="p-6">
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Job Title</label>
+            <div className="flex items-center justify-between">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {profileData?.profile?.jobTitle || 'Not set'}
+              </p>
+              <button
+                onClick={() => {
+                  setEditingField('profile.jobTitle');
+                  setEditValue(profileData?.profile?.jobTitle || '');
+                }}
+                className="text-accent-dark hover:text-blue-700"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Company</label>
+            <div className="flex items-center justify-between">
+              <p className="text-gray-900 dark:text-gray-100">
+                {profileData?.profile?.company || 'Not set'}
+              </p>
+              <button
+                onClick={() => {
+                  setEditingField('profile.company');
+                  setEditValue(profileData?.profile?.company || '');
+                }}
+                className="text-accent-dark hover:text-blue-700"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </GlassmorphicCard>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <GlassmorphicCard className="p-6">
+          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">Industry</label>
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">
+              {profileData?.profile?.industry || 'Not set'}
+            </p>
+            <button
+              onClick={() => {
+                setEditingField('profile.industry');
+                setEditValue(profileData?.profile?.industry || '');
+              }}
+              className="text-accent-dark hover:text-blue-700"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+          </div>
+        </GlassmorphicCard>
+
+        <GlassmorphicCard className="p-6">
+          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">Experience</label>
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {profileData?.profile?.experience === 'mid' ? '3-5 years' :
+                profileData?.profile?.experience === 'senior' ? '6-10 years' :
+                  profileData?.profile?.experience === 'junior' ? '1-3 years' :
+                    profileData?.profile?.experience || 'Not set'}
+            </p>
+            <button
+              onClick={() => {
+                setEditingField('profile.experience');
+                setEditValue(profileData?.profile?.experience || '');
+              }}
+              className="text-accent-dark hover:text-blue-700"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+          </div>
+        </GlassmorphicCard>
+      </div>
+
+      <GlassmorphicCard className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Skills</h4>
+          <button
+            onClick={() => {
+              setEditingField('profile.skills');
+              setEditValue(JSON.stringify(profileData?.profile?.skills || []));
+            }}
+            className="text-accent-dark hover:text-blue-700"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {(profileData?.profile?.skills || []).map((skill: any, index: number) => {
+            const skillName = typeof skill === 'string' ? skill : skill.name || 'Unknown Skill';
+            return (
+              <span
+                key={index}
+                className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+              >
+                {skillName}
+              </span>
+            );
+          })}
+          {(!profileData?.profile?.skills || profileData.profile.skills.length === 0) && (
+            <p className="text-gray-500 dark:text-gray-400 text-sm">No skills added yet</p>
+          )}
+        </div>
+      </GlassmorphicCard>
+
+      <GlassmorphicCard className="p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700/50">
+        <div className="flex items-center gap-2 mb-4">
+          <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300">Career Goals</h4>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <p className="text-gray-700 dark:text-gray-300 flex-1">
+            {profileData?.profile?.goals?.careerAspirations || 'Set your career goals in profile'}
+          </p>
+          <button
+            onClick={() => {
+              setEditingField('profile.goals.careerAspirations');
+              setEditValue(profileData?.profile?.goals?.careerAspirations || '');
+            }}
+            className="text-accent-dark hover:text-blue-700 ml-4"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+        </div>
+      </GlassmorphicCard>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="p-4 sm:p-6">
@@ -1128,11 +1324,9 @@ const Profile: React.FC = () => {
         {/* Content */}
         <div className="p-6">
           {activeTab === 'personal' && renderPersonalInfo()}
-          {activeTab === 'preferences' && renderPreferences()}
+          {activeTab === 'professional' && renderProfessionalProfile()}
           {activeTab === 'addresses' && renderAddresses()}
           {activeTab === 'payments' && renderPaymentMethods()}
-          {activeTab === 'achievements' && renderAchievements()}
-          {activeTab === 'activity' && renderActivity()}
         </div>
       </div>
 
@@ -1141,13 +1335,37 @@ const Profile: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold mb-4">{t('common.edit')} {t('profile.' + editingField)}</h3>
-            <input
-              type={editingField === 'email' ? 'email' : editingField === 'contactNumber' ? 'tel' : editingField === 'dateOfBirth' ? 'date' : 'text'}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4"
-              placeholder={`Enter ${editingField}`}
-            />
+            {editingField === 'profile.experience' ? (
+              <select
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="">Select experience</option>
+                <option value="entry">0-1 years</option>
+                <option value="junior">1-3 years</option>
+                <option value="mid">3-5 years</option>
+                <option value="senior">6-10 years</option>
+                <option value="lead">10-15 years</option>
+                <option value="executive">15+ years</option>
+              </select>
+            ) : editingField === 'profile.goals.careerAspirations' || editingField === 'about' ? (
+              <textarea
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                rows={4}
+                placeholder={`Enter ${editingField}`}
+              />
+            ) : (
+              <input
+                type={editingField === 'email' ? 'email' : editingField === 'contactNumber' ? 'tel' : editingField === 'dateOfBirth' ? 'date' : 'text'}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder={`Enter ${editingField}`}
+              />
+            )}
             <div className="flex gap-3">
               <button
                 onClick={() => handleSaveField(editingField, editValue)}

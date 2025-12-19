@@ -1,301 +1,669 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Calendar, Database, ArrowRight, Monitor, Download } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Mail, Calendar as CalendarIcon, HardDrive, ArrowRight, Loader, CheckCircle2, Lock, X, ExternalLink, Clock, User, Folder, File, Maximize2, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../context/ThemeContext';
+import { apiService } from '../../services/api';
+import SartthiAppGuide from './SartthiAppGuide';
 import { useApp } from '../../context/AppContext';
-import api from '../../services/api';
 
-interface AppCardProps {
-    name: string;
-    description: string;
-    icon: React.ElementType;
-    color: string;
-    data?: any;
-    isConnected: boolean;
-    onConnect: () => void;
-    onOpen: () => void;
-    isDarkMode: boolean;
-    isDownload?: boolean;
+interface EmailData {
+    account: { email: string; name: string; avatar?: string } | null;
+    emails: Array<{
+        id: string;
+        from: string;
+        subject: string;
+        snippet: string;
+        isUnread: boolean;
+        date?: string;
+    }>;
 }
 
-const AppCard: React.FC<AppCardProps> = ({
-    name, description, icon: Icon, color, data, isConnected, onConnect, onOpen, isDarkMode, isDownload
-}) => {
-    return (
-        <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group
-      ${isDarkMode
-                ? 'bg-gray-800 border-gray-700 hover:bg-gray-750 hover:border-gray-600'
-                : 'bg-white border-gray-200 hover:shadow-lg hover:-translate-y-1'
-            }`}
-        >
-            <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity`}>
-                <Icon size={100} className={color} />
-            </div>
+interface CalendarData {
+    account: { email: string; name: string; avatar?: string } | null;
+    events: Array<{
+        id: string;
+        title: string;
+        start: string;
+        end: string;
+        description?: string;
+        location?: string;
+    }>;
+}
 
-            <div className="p-6 relative z-10 flex flex-col h-full">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} ${color}`}>
-                        <Icon size={24} />
+interface VaultData {
+    account: { email: string; name: string; avatar?: string } | null;
+    storage: { used: number; total: number };
+    recentFiles: Array<{
+        id: string;
+        name: string;
+        mimeType: string;
+        modifiedTime?: string;
+        size?: number;
+    }>;
+}
+
+const AppCard: React.FC<{
+    icon: React.ElementType;
+    title: string;
+    description: string;
+    isConnected: boolean;
+    data?: React.ReactNode;
+    onConnect: () => void;
+    onExpand: () => void;
+    color: string;
+    link: string;
+    loading?: boolean;
+}> = ({ icon: Icon, title, description, isConnected, data, onConnect, onExpand, color, link, loading }) => {
+    const { isDarkMode } = useTheme();
+
+    const handleOpenApp = () => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            const separator = link.includes('?') ? '&' : '?';
+            const authUrl = `${link}${separator}token=${token}`;
+            window.open(authUrl, '_blank');
+        } else {
+            window.open(link, '_blank');
+        }
+    };
+
+    return (
+        <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${isDarkMode
+            ? 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
+            : 'bg-white border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-md'
+            }`}>
+            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${color} opacity-[0.03] rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110`} />
+
+            <div className="p-5 flex flex-col h-full">
+                <div className="flex items-start justify-between mb-4">
+                    <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'} group-hover:scale-105 transition-transform duration-300`}>
+                        <Icon className={`w-6 h-6 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} />
                     </div>
-                    <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{name}</h3>
+                    {isConnected ? (
+                        <span className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Connected
+                        </span>
+                    ) : (
+                        <span className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-1 rounded-full bg-gray-500/10 text-gray-500">
+                            <Lock className="w-3 h-3" />
+                            Not Connected
+                        </span>
+                    )}
                 </div>
 
-                {isConnected ? (
-                    <div className="flex-1 space-y-3">
-                        {/* Content when connected */}
-                        {data ? (
-                            <div className="space-y-2">
-                                {data.map((item: any, i: number) => (
-                                    <div key={i} className={`text-sm p-2 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'} flex justify-between items-center`}>
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{item.label}</span>
-                                        <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.value}</span>
-                                    </div>
-                                ))}
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {title}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2">
+                    {description}
+                </p>
+
+
+                <div className="mt-auto">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-4">
+                            <Loader className="w-5 h-5 animate-spin text-gray-400" />
+                        </div>
+                    ) : (
+                        <>
+                            {isConnected && (
+                                <div className="space-y-3 mb-4">
+                                    {data}
+                                </div>
+                            )}
+                            {!isConnected && (
+                                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                                        Connect your Sartthi account to access {title}
+                                    </p>
+                                </div>
+                            )}
+                            <div className="flex gap-2">
+                                {isConnected && (
+                                    <button
+                                        onClick={onExpand}
+                                        className={`flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border transition-all ${isDarkMode
+                                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <Maximize2 className="w-4 h-4" />
+                                        View Details
+                                    </button>
+                                )}
+                                <button
+                                    onClick={isConnected ? handleOpenApp : onConnect}
+                                    className={`flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg transition-all ${isConnected
+                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                        : 'bg-orange-600 text-white hover:bg-orange-700'
+                                        }`}
+                                >
+                                    {isConnected ? (
+                                        <>
+                                            Open {title.split(' ')[1]} <ExternalLink className="w-4 h-4" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Connect Account <ArrowRight className="w-4 h-4" />
+                                        </>
+                                    )}
+                                </button>
                             </div>
-                        ) : (
-                            <div className="flex items-center justify-center p-4">
-                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-current opacity-50"></div>
-                            </div>
-                        )}
-                        <button
-                            onClick={onOpen}
-                            className={`w-full mt-4 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors
-                  ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'}`}
-                        >
-                            Open {name} <ArrowRight size={16} />
-                        </button>
-                    </div>
-                ) : (
-                    <div className="flex-1 flex flex-col justify-between">
-                        <p className={`text-sm mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {description}
-                        </p>
-                        {isDownload ? (
-                            <button
-                                onClick={onConnect}
-                                className={`w-full py-2.5 rounded-lg text-sm font-semibold text-white shadow-md transition-all
-                 bg-gradient-to-r ${color === 'text-violet-500' ? 'from-violet-500 to-violet-600' : 'from-blue-500 to-blue-600'} 
-                 hover:opacity-90 active:scale-95 flex items-center justify-center gap-2`}
-                            >
-                                <Download size={16} /> Download
-                            </button>
-                        ) : (
-                            <button
-                                onClick={onConnect}
-                                className={`w-full py-2.5 rounded-lg text-sm font-semibold text-white shadow-md transition-all
-                  bg-gradient-to-r ${color === 'text-blue-500' ? 'from-blue-500 to-blue-600' :
-                                        color === 'text-indigo-500' ? 'from-indigo-500 to-indigo-600' :
-                                            color === 'text-emerald-500' ? 'from-emerald-500 to-emerald-600' :
-                                                'from-gray-500 to-gray-600'} 
-                  hover:opacity-90 active:scale-95`}
-                            >
-                                Open {name}
-                            </button>
-                        )}
-                    </div>
-                )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
-const SartthiAppsWidget: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+const DetailModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    icon: React.ElementType;
+    color: string;
+    children: React.ReactNode;
+}> = ({ isOpen, onClose, title, icon: Icon, color, children }) => {
+    const { isDarkMode } = useTheme();
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div
+                className={`relative w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+                    } shadow-2xl`}
+            >
+                {/* Header */}
+                <div className={`sticky top-0 z-10 px-6 py-4 border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                    }`}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={`p-3 rounded-xl bg-gradient-to-br ${color}`}>
+                                <Icon className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    {title}
+                                </h2>
+                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Detailed view
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className={`p-2 rounded-lg transition-colors ${isDarkMode
+                                ? 'hover:bg-gray-700 text-gray-400 hover:text-white'
+                                : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="overflow-y-auto max-h-[calc(90vh-100px)] p-6">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SartthiAppsWidget: React.FC = () => {
+    const { t } = useTranslation();
+    const { isDarkMode } = useTheme();
     const { state } = useApp();
-    const navigate = useNavigate();
 
-    const [mailStats, setMailStats] = useState<any>(null);
-    const [calendarStats, setCalendarStats] = useState<any>(null);
-    const [vaultStats, setVaultStats] = useState<any>(null);
-    const [latestRelease, setLatestRelease] = useState<any>(null);
+    const [mailData, setMailData] = useState<EmailData | null>(null);
+    const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
+    const [vaultData, setVaultData] = useState<VaultData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [showGuide, setShowGuide] = useState<'mail' | 'calendar' | 'vault' | null>(null);
+    const [expandedView, setExpandedView] = useState<'mail' | 'calendar' | 'vault' | null>(null);
 
-    // We assume these are always "connected" for the integrated ecosystem view
-    const isMailConnected = true;
-    const isCalendarConnected = true;
-    const isVaultConnected = true;
+    const isMailConnected =
+        state.userProfile?.modules?.mail?.isEnabled ||
+        !!state.userProfile?.connectedAccounts?.mail?.activeAccountId ||
+        !!mailData?.account;
+    const isCalendarConnected =
+        state.userProfile?.modules?.calendar?.isEnabled ||
+        !!state.userProfile?.connectedAccounts?.calendar?.activeAccountId ||
+        !!calendarData?.account;
+    const isVaultConnected =
+        state.userProfile?.modules?.vault?.isEnabled ||
+        !!state.userProfile?.connectedAccounts?.vault?.activeAccountId ||
+        !!vaultData?.account;
 
     useEffect(() => {
-        // Fetch Mail Stats
-        if (isMailConnected) {
-            api.get('/sartthi/mail/messages', { params: { folder: 'inbox' } })
-                .then(res => {
-                    // Try to finding emails in standard response wrappers or direct property
-                    const emails = res.data?.emails || (Array.isArray(res.data) ? res.data : []) || [];
+        fetchData();
+    }, []);
 
-                    const unread = Array.isArray(emails) ? emails.filter((e: any) => e.isUnread).length : 0;
-                    setMailStats([
-                        { label: 'Unread', value: unread.toString() },
-                        { label: 'Total', value: emails?.length?.toString() || '0' }
-                    ]);
-                })
-                .catch(err => {
-                    console.error('Failed to fetch mail stats', err);
-                    setMailStats([
-                        { label: 'Unread', value: '-' },
-                        { label: 'Total', value: '-' }
-                    ]);
-                });
-        }
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [mail, calendar, vault] = await Promise.all([
+                apiService.get('/sartthi-data/mail/recent?limit=10'),
+                apiService.get('/sartthi-data/calendar/upcoming?days=30'),
+                apiService.get('/sartthi-data/vault/summary')
+            ]);
 
-        // Fetch Calendar Stats
-        if (isCalendarConnected) {
-            api.get('/sartthi/calendar/events')
-                .then(res => {
-                    // Similar safe access for events
-                    const events = res.data?.events || (Array.isArray(res.data) ? res.data : []) || [];
-
-                    if (!Array.isArray(events)) {
-                        throw new Error("Invalid events format");
-                    }
-
-                    const today = new Date();
-                    const todayEvents = events.filter((e: any) => {
-                        const eventDate = new Date(e.startTime);
-                        return eventDate.getDate() === today.getDate() &&
-                            eventDate.getMonth() === today.getMonth() &&
-                            eventDate.getFullYear() === today.getFullYear();
-                    });
-
-                    // Find next event
-                    const nextEvent = events
-                        .filter((e: any) => new Date(e.startTime) > new Date())
-                        .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())[0];
-
-                    setCalendarStats([
-                        { label: 'Today', value: `${todayEvents.length} Meetings` },
-                        { label: 'Next', value: nextEvent ? new Date(nextEvent.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'None' }
-                    ]);
-                })
-                .catch(err => {
-                    console.error('Failed to fetch calendar stats', err);
-                    setCalendarStats([
-                        { label: 'Today', value: '-' },
-                        { label: 'Next', value: '-' }
-                    ]);
-                });
-        }
-
-        // Fetch Vault Stats
-        if (isVaultConnected) {
-            api.get('/vault/files')
-                .then(res => {
-                    // Vault files might be directly in res.data or res.data.data
-                    const files = (Array.isArray(res.data) ? res.data : res.data?.data) || [];
-
-                    setVaultStats([
-                        { label: 'Files', value: files.length.toString() },
-                        { label: 'Recent', value: files.length > 0 && files[0]?.name ? files[0].name : 'None' }
-                    ]);
-                })
-                .catch(() => {
-                    setVaultStats([
-                        { label: 'Used', value: '45%' },
-                        { label: 'Recent', value: 'Project_Specs.pdf' }
-                    ]);
-                });
-        }
-
-        // Fetch Desktop Release
-        api.get('/releases')
-            .then(response => {
-                const data = response?.data || [];
-                if (response?.success && Array.isArray(data)) {
-                    const sortedReleases = data.sort((a: any, b: any) => {
-                        if (a.isLatest && !b.isLatest) return -1;
-                        if (!a.isLatest && b.isLatest) return 1;
-                        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-                    });
-                    const latest = sortedReleases.find((r: any) => r.platform === 'windows' && r.isLatest);
-                    setLatestRelease(latest);
-                }
-            })
-            .catch(err => console.error('Failed to fetch releases', err));
-
-    }, [isMailConnected, isCalendarConnected, isVaultConnected]);
-
-    const handleOpenApp = (appId: string) => {
-        // Redirect to separate UI applications running on different ports
-        // Assuming local dev ecosystem ports
-        if (appId === 'mail') {
-            window.location.href = 'http://localhost:3001';
-        } else if (appId === 'calendar') {
-            window.location.href = 'http://localhost:3002';
-        } else if (appId === 'vault') {
-            window.location.href = 'http://localhost:3003';
+            if (mail.success) setMailData(mail.data);
+            if (calendar.success) setCalendarData(calendar.data);
+            if (vault.success) setVaultData(vault.data);
+        } catch (error) {
+            console.error('Failed to fetch Sartthi data:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleConnect = (type: string) => {
-        if (type === 'desktop') {
-            if (latestRelease?.downloadUrl) {
-                const baseUrl = process.env.REACT_APP_API_URL || '/api';
-                const cleanBaseUrl = baseUrl.replace(/\/api\/?$/, '');
-                const filename = latestRelease.downloadUrl.split('/').pop() || '';
-                const downloadEndpoint = `${cleanBaseUrl}/api/releases/download/${filename}`;
-                window.open(downloadEndpoint, '_self');
-            } else {
-                alert('Download not available at the moment.');
-            }
-            return;
-        }
-        handleOpenApp(type);
+    const handleConnect = (service: 'mail' | 'calendar' | 'vault') => {
+        setShowGuide(service);
     };
 
-    const apps = [
-        {
-            id: 'mail',
-            name: 'Sartthi Mail',
-            description: 'Secure, intelligent email communications designed for enterprise teams.',
-            icon: Mail,
-            color: 'text-blue-500',
-            isConnected: isMailConnected,
-            data: mailStats
-        },
-        {
-            id: 'calendar',
-            name: 'Sartthi Calendar',
-            description: 'Smart scheduling and meeting management integration.',
-            icon: Calendar,
-            color: 'text-indigo-500',
-            isConnected: isCalendarConnected,
-            data: calendarStats
-        },
-        {
-            id: 'vault',
-            name: 'Sartthi Vault',
-            description: 'Encrypted document storage and file management.',
-            icon: Database,
-            color: 'text-emerald-500',
-            isConnected: isVaultConnected,
-            data: vaultStats
-        },
-        {
-            id: 'desktop',
-            name: 'Sartthi Desktop',
-            description: 'Access your full workspace environment securely from any device.',
-            icon: Monitor,
-            color: 'text-violet-500',
-            isConnected: false,
-            isDownload: true,
-            data: null
-        }
-    ];
+    const handleOpenEmail = (emailId: string) => {
+        const token = localStorage.getItem('accessToken');
+        const url = `http://localhost:3001?token=${token}&emailId=${emailId}`;
+        window.open(url, '_blank');
+    };
+
+    const handleOpenEvent = (eventId: string) => {
+        const token = localStorage.getItem('accessToken');
+        const url = `http://localhost:3002?token=${token}&eventId=${eventId}`;
+        window.open(url, '_blank');
+    };
+
+    const handleOpenFile = (fileId: string) => {
+        const token = localStorage.getItem('accessToken');
+        const url = `http://localhost:3003?token=${token}&fileId=${fileId}`;
+        window.open(url, '_blank');
+    };
+
+    const formatBytes = (bytes: number) => {
+        if (!bytes) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return date.toLocaleDateString();
+    };
+
+    const mailContent = mailData?.account ? (
+        <>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                {mailData.account.name} ({mailData.account.email})
+            </div>
+            {mailData.emails.length > 0 ? (
+                mailData.emails.slice(0, 3).map((email, idx) => (
+                    <div key={idx} className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} truncate`}>
+                        <span className={email.isUnread ? 'font-semibold' : ''}>{email.subject || 'No Subject'}</span>
+                    </div>
+                ))
+            ) : (
+                <div className="text-xs text-gray-400">No recent emails</div>
+            )}
+        </>
+    ) : null;
+
+    const calendarContent = calendarData?.account ? (
+        <>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                {calendarData.account.name}
+            </div>
+            {calendarData.events.length > 0 ? (
+                calendarData.events.slice(0, 3).map((event, idx) => (
+                    <div key={idx} className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <div className="font-medium truncate">{event.title}</div>
+                        <div className="text-gray-400">{formatDate(event.start)}</div>
+                    </div>
+                ))
+            ) : (
+                <div className="text-xs text-gray-400">No upcoming events</div>
+            )}
+        </>
+    ) : null;
+
+    const vaultContent = vaultData?.account ? (
+        <>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                {vaultData.account.name}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-300">
+                Storage: {formatBytes(vaultData.storage.used)} / {formatBytes(vaultData.storage.total)}
+            </div>
+            {vaultData.recentFiles.length > 0 && (
+                <div className="text-xs text-gray-400">
+                    {vaultData.recentFiles.length} recent file{vaultData.recentFiles.length !== 1 ? 's' : ''}
+                </div>
+            )}
+        </>
+    ) : null;
 
     return (
         <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Sartthi Suite</h2>
-                <span className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Integrated Ecosystem</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <AppCard
+                    icon={Mail}
+                    title="Sartthi Mail"
+                    description="Secure, intelligent email platform for seamless communication."
+                    isConnected={!!mailData?.account}
+                    data={mailContent}
+                    onConnect={() => handleConnect('mail')}
+                    onExpand={() => setExpandedView('mail')}
+                    color="from-blue-500 to-cyan-500"
+                    link="http://localhost:3001"
+                    loading={loading}
+                />
+
+                <AppCard
+                    icon={CalendarIcon}
+                    title="Sartthi Calendar"
+                    description="Schedule meetings and manage your time efficiently."
+                    isConnected={!!calendarData?.account}
+                    data={calendarContent}
+                    onConnect={() => handleConnect('calendar')}
+                    onExpand={() => setExpandedView('calendar')}
+                    color="from-purple-500 to-pink-500"
+                    link="http://localhost:3002"
+                    loading={loading}
+                />
+
+                <AppCard
+                    icon={HardDrive}
+                    title="Sartthi Vault"
+                    description="Secure cloud storage for all your project files and assets."
+                    isConnected={!!vaultData?.account}
+                    data={vaultContent}
+                    onConnect={() => handleConnect('vault')}
+                    onExpand={() => setExpandedView('vault')}
+                    color="from-green-500 to-emerald-500"
+                    link="http://localhost:3003"
+                    loading={loading}
+                />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {apps.map(app => (
-                    <AppCard
-                        key={app.id}
-                        {...app}
-                        onConnect={() => handleConnect(app.id)}
-                        onOpen={() => handleOpenApp(app.id)}
-                        isDarkMode={isDarkMode}
-                    />
-                ))}
-            </div>
+
+            {/* Mail Detail Modal */}
+            <DetailModal
+                isOpen={expandedView === 'mail'}
+                onClose={() => setExpandedView(null)}
+                title="Sartthi Mail"
+                icon={Mail}
+                color="from-blue-500 to-cyan-500"
+            >
+                {mailData?.account && (
+                    <div className="space-y-4">
+                        <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50'}`}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                                    {mailData.account.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        {mailData.account.name}
+                                    </p>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        {mailData.account.email}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Recent Emails ({mailData.emails.length})
+                            </h3>
+                            <div className="space-y-2">
+                                {mailData.emails.map((email) => (
+                                    <div
+                                        key={email.id}
+                                        onClick={() => handleOpenEmail(email.id)}
+                                        className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
+                                            ? 'bg-gray-700/30 border-gray-600 hover:border-blue-500'
+                                            : 'bg-white border-gray-200 hover:border-blue-500 hover:shadow-md'
+                                            }`}
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                                    <p className={`text-sm font-medium truncate ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        {email.from}
+                                                    </p>
+                                                </div>
+                                                <p className={`font-semibold mb-1 ${email.isUnread
+                                                    ? isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    : isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                    }`}>
+                                                    {email.subject || 'No Subject'}
+                                                </p>
+                                                <p className={`text-sm line-clamp-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    {email.snippet}
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col items-end gap-2">
+                                                {email.isUnread && (
+                                                    <span className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded-full">
+                                                        New
+                                                    </span>
+                                                )}
+                                                {email.date && (
+                                                    <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                        {formatDate(email.date)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </DetailModal>
+
+            {/* Calendar Detail Modal */}
+            <DetailModal
+                isOpen={expandedView === 'calendar'}
+                onClose={() => setExpandedView(null)}
+                title="Sartthi Calendar"
+                icon={CalendarIcon}
+                color="from-purple-500 to-pink-500"
+            >
+                {calendarData?.account && (
+                    <div className="space-y-4">
+                        <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50'}`}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
+                                    {calendarData.account.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        {calendarData.account.name}
+                                    </p>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        {calendarData.account.email}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Upcoming Events ({calendarData.events.length})
+                            </h3>
+                            <div className="space-y-2">
+                                {calendarData.events.map((event) => (
+                                    <div
+                                        key={event.id}
+                                        onClick={() => handleOpenEvent(event.id)}
+                                        className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
+                                            ? 'bg-gray-700/30 border-gray-600 hover:border-purple-500'
+                                            : 'bg-white border-gray-200 hover:border-purple-500 hover:shadow-md'
+                                            }`}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
+                                                <CalendarIcon className="w-5 h-5 text-white" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`font-semibold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    {event.title}
+                                                </p>
+                                                {event.description && (
+                                                    <p className={`text-sm mb-2 line-clamp-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                        {event.description}
+                                                    </p>
+                                                )}
+                                                <div className="flex flex-wrap gap-3 text-sm">
+                                                    <div className="flex items-center gap-1">
+                                                        <Clock className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                                                            {new Date(event.start).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    {event.location && (
+                                                        <div className="flex items-center gap-1">
+                                                            <MapPin className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                                                            <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                                                                {event.location}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </DetailModal>
+
+            {/* Vault Detail Modal */}
+            <DetailModal
+                isOpen={expandedView === 'vault'}
+                onClose={() => setExpandedView(null)}
+                title="Sartthi Vault"
+                icon={HardDrive}
+                color="from-green-500 to-emerald-500"
+            >
+                {vaultData?.account && (
+                    <div className="space-y-4">
+                        <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50'}`}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-lg">
+                                        {vaultData.account.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            {vaultData.account.name}
+                                        </p>
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            {vaultData.account.email}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        {formatBytes(vaultData.storage.used)}
+                                    </p>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        of {formatBytes(vaultData.storage.total)}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className={`mt-3 h-2 rounded-full overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                                <div
+                                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                                    style={{ width: `${(vaultData.storage.used / vaultData.storage.total) * 100}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Recent Files ({vaultData.recentFiles.length})
+                            </h3>
+                            <div className="space-y-2">
+                                {vaultData.recentFiles.map((file) => (
+                                    <div
+                                        key={file.id}
+                                        onClick={() => handleOpenFile(file.id)}
+                                        className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
+                                            ? 'bg-gray-700/30 border-gray-600 hover:border-green-500'
+                                            : 'bg-white border-gray-200 hover:border-green-500 hover:shadow-md'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500">
+                                                <File className="w-5 h-5 text-white" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`font-semibold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    {file.name}
+                                                </p>
+                                                <div className="flex items-center gap-3 text-sm mt-1">
+                                                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                                                        {file.mimeType}
+                                                    </span>
+                                                    {file.size && (
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                                                            {formatBytes(file.size)}
+                                                        </span>
+                                                    )}
+                                                    {file.modifiedTime && (
+                                                        <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>
+                                                            {formatDate(file.modifiedTime)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </DetailModal>
+
+            {/* Tutorial Modals */}
+            <SartthiAppGuide
+                service="mail"
+                isOpen={showGuide === 'mail'}
+                onClose={() => setShowGuide(null)}
+            />
+            <SartthiAppGuide
+                service="calendar"
+                isOpen={showGuide === 'calendar'}
+                onClose={() => setShowGuide(null)}
+            />
+            <SartthiAppGuide
+                service="vault"
+                isOpen={showGuide === 'vault'}
+                onClose={() => setShowGuide(null)}
+            />
         </div>
     );
 };

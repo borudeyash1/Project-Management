@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import {
   CheckCircle,
@@ -13,13 +13,29 @@ import {
 } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
+import ProjectPageSkeleton from './ProjectPageSkeleton';
 
 const ProjectOverview: React.FC = () => {
   const { t } = useTranslation();
   const { state } = useApp();
   const { projectId } = useParams();
-  
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
   const project = state.projects.find(p => p._id === projectId);
+
+  // Simulate loading for smooth skeleton display
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  if (loading) {
+    return <ProjectPageSkeleton type="overview" />;
+  }
 
   if (!project) return null;
 
@@ -133,20 +149,18 @@ const ProjectOverview: React.FC = () => {
             <div className="space-y-3">
               {milestones.map((milestone: any, index: number) => (
                 <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className={`w-3 h-3 rounded-full ${
-                    milestone.status === 'completed' ? 'bg-green-500' :
+                  <div className={`w-3 h-3 rounded-full ${milestone.status === 'completed' ? 'bg-green-500' :
                     milestone.status === 'in-progress' ? 'bg-accent' :
-                    'bg-gray-300'
-                  }`} />
+                      'bg-gray-300'
+                    }`} />
                   <div className="flex-1">
                     <div className="font-medium text-gray-900 dark:text-gray-100">{milestone.name}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-200">{milestone.date}</div>
                   </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
+                  <span className={`px-2 py-1 text-xs rounded-full ${milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
                     milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light' :
-                    'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
-                  }`}>
+                      'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+                    }`}>
                     {milestone.status}
                   </span>
                 </div>
@@ -203,19 +217,31 @@ const ProjectOverview: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('project.overview.quickActions')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button
+            onClick={() => navigate(`/project/${projectId}/progress`)}
+            className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
             <CheckCircle className="w-6 h-6 text-accent-dark" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.addTask')}</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button
+            onClick={() => navigate(`/project/${projectId}/team`)}
+            className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
             <Users className="w-6 h-6 text-purple-600" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.addMember')}</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button
+            onClick={() => navigate(`/project/${projectId}/progress`)}
+            className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
             <Calendar className="w-6 h-6 text-green-600" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.schedule')}</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <button
+            onClick={() => navigate(`/project/${projectId}/reports`)}
+            className="flex flex-col items-center gap-2 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
             <TrendingUp className="w-6 h-6 text-orange-600" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('project.overview.viewReports')}</span>
           </button>

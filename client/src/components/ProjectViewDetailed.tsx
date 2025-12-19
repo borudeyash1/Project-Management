@@ -43,6 +43,8 @@ import EmployeeTasksTab from './project-tabs/EmployeeTasksTab';
 import WorkspaceInbox from './workspace/WorkspaceInbox';
 import ProjectAttendanceManagerTab from './project-tabs/ProjectAttendanceManagerTab';
 import ProjectAttendanceEmployeeTab from './project-tabs/ProjectAttendanceEmployeeTab';
+import GlassmorphicCard from './ui/GlassmorphicCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface Project {
   _id: string;
@@ -203,7 +205,7 @@ const ProjectViewDetailed: React.FC = () => {
   const navigate = useNavigate();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, preferences } = useTheme();
   const { dockPosition } = useDock();
   const { t } = useTranslation();  // ← ADD THIS LINE
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -445,48 +447,7 @@ const ProjectViewDetailed: React.FC = () => {
             email: 'contact@techcorp.com',
             avatar: ''
           },
-          team: [
-            {
-              _id: 'u1',
-              name: 'John Doe',
-              email: 'john@example.com',
-              role: 'manager',
-              status: 'active',
-              joinedAt: new Date('2024-01-01'),
-              permissions: {
-                canEditTasks: true,
-                canCreateTasks: true,
-                canDeleteTasks: true,
-                canManageTeam: true,
-                canViewAnalytics: true
-              },
-              workload: 80,
-              tasksAssigned: 12,
-              tasksCompleted: 8,
-              rating: 4.5,
-              lastActive: new Date()
-            },
-            {
-              _id: 'u2',
-              name: 'Jane Smith',
-              email: 'jane@example.com',
-              role: 'member',
-              status: 'active',
-              joinedAt: new Date('2024-01-15'),
-              permissions: {
-                canEditTasks: true,
-                canCreateTasks: true,
-                canDeleteTasks: false,
-                canManageTeam: false,
-                canViewAnalytics: false
-              },
-              workload: 60,
-              tasksAssigned: 8,
-              tasksCompleted: 6,
-              rating: 4.2,
-              lastActive: new Date()
-            }
-          ],
+          team: [],
           tasks: [],
           milestones: [],
           documents: [],
@@ -1053,73 +1014,95 @@ const ProjectViewDetailed: React.FC = () => {
 
   const renderProjectOverview = () => (
     <div className="space-y-6">
-      {/* Project Stats */}
+      {/* Project Stats - Glassmorphic Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          {/* ... */}
-          <div className="flex items-center justify-between">
+        {/* Progress Card */}
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Progress</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.progress}%</p>
+              <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.progress}%</p>
             </div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
-              <Target className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)` }}
+            >
+              <Target className="w-7 h-7 text-white" />
             </div>
           </div>
-          <div className="mt-4">
-            <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
+          <div className="mt-4 relative z-10">
+            <div className={`w-full rounded-full h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
               <div
-                className="bg-accent h-2 rounded-full transition-all duration-300"
-                style={{ width: `${activeProject?.progress}%` }}
+                className="h-3 rounded-full transition-all duration-500 shadow-lg"
+                style={{
+                  width: `${activeProject?.progress}%`,
+                  background: `linear-gradient(90deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
+                }}
               />
             </div>
+            <p className={`text-xs mt-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+              0 active
+            </p>
           </div>
-        </div>
+        </GlassmorphicCard>
 
-        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
+        {/* Budget Card */}
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Budget</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</p>
+              <p className={`text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent`}>
+                {formatCurrency(activeProject?.budget || 0)}
+              </p>
             </div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'}`}>
-              <DollarSign className={`w-6 h-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
+              <DollarSign className="w-7 h-7 text-white" />
             </div>
           </div>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Spent: {formatCurrency(activeProject?.spent || 0)}
+          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            Spent: <span className="font-semibold">{formatCurrency(activeProject?.spent || 0)}</span>
           </p>
-        </div>
+        </GlassmorphicCard>
 
-        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
+        {/* Team Members Card */}
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Members</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.team?.length || 0}</p>
+              <p className={`text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent`}>
+                {activeProject?.team?.length || 0}
+              </p>
             </div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'}`}>
-              <Users className={`w-6 h-6 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+              <Users className="w-7 h-7 text-white drop-shadow-lg" />
             </div>
           </div>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {activeProject?.team?.filter(m => m.status === 'active').length || 0} active
+          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <span className="font-semibold">{activeProject?.team?.filter(m => m.status === 'active').length || 0}</span> active
           </p>
-        </div>
+        </GlassmorphicCard>
 
-        <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
+        {/* Tasks Card */}
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Tasks</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.tasks?.length || 0}</p>
+              <p className={`text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent`}>
+                {activeProject?.tasks?.length || 0}
+              </p>
             </div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-orange-900/30' : 'bg-orange-200'}`}>
-              <CheckCircle className={`w-6 h-6 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg">
+              <CheckCircle className="w-7 h-7 text-white" />
             </div>
           </div>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {activeProject?.tasks?.filter(t => t.status === 'completed').length || 0} completed
+          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <span className="font-semibold">{activeProject?.tasks?.filter(t => t.status === 'completed').length || 0}</span> completed
           </p>
-        </div>
+        </GlassmorphicCard>
       </div>
 
       {/* Project Details */}
@@ -1267,7 +1250,7 @@ const ProjectViewDetailed: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 
   const renderTeamSection = () => (
@@ -1879,57 +1862,72 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-gray-600">Completion Rate</p>
-            <TrendingUp className="w-5 h-5 text-green-600" />
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
+          <div className="flex items-center justify-between mb-3 relative z-10">
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Completion Rate</p>
+            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg">
+              <TrendingUp className="w-5 h-5 text-white" />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{activeProject?.progress}%</p>
-          <p className="text-sm text-green-600 mt-1">+5% from last month</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-gray-600">Team Velocity</p>
-            <Activity className="w-5 h-5 text-accent-dark" />
+          <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent relative z-10">{activeProject?.progress}%</p>
+          <p className="text-sm text-green-600 mt-2 font-semibold relative z-10">+5% from last month</p>
+        </GlassmorphicCard>
+
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+          <div className="flex items-center justify-between mb-3 relative z-10">
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Velocity</p>
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">
+          <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative z-10">
             {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
           </p>
-          <p className="text-sm text-accent-dark mt-1">Tasks completed</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-gray-600">Budget Usage</p>
-            <DollarSign className="w-5 h-5 text-purple-600" />
+          <p className={`text-sm mt-2 font-semibold relative z-10 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>Tasks completed</p>
+        </GlassmorphicCard>
+
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
+          <div className="flex items-center justify-between mb-3 relative z-10">
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Budget Usage</p>
+            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
+              <DollarSign className="w-5 h-5 text-white" />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">
+          <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent relative z-10">
             {activeProject?.budget && activeProject?.spent
               ? Math.round((activeProject.spent / activeProject.budget) * 100)
               : 0}%
           </p>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {formatCurrency(activeProject?.spent || 0)} of {formatCurrency(activeProject?.budget || 0)}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-gray-600">Team Workload</p>
-            <Users className="w-5 h-5 text-orange-600" />
+        </GlassmorphicCard>
+
+        <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
+          <div className="flex items-center justify-between mb-3 relative z-10">
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Workload</p>
+            <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg">
+              <Users className="w-5 h-5 text-white" />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">
+          <p className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent relative z-10">
             {activeProject?.team.length
               ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
               : 0}%
           </p>
-          <p className="text-sm text-gray-600 mt-1">Average workload</p>
-        </div>
+          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Average workload</p>
+        </GlassmorphicCard>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Task Status Distribution */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h4 className="font-semibold text-gray-900 mb-4">Task Status Distribution</h4>
+        <GlassmorphicCard className="p-6">
+          <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Task Status Distribution</h4>
           <div className="space-y-3">
             {['pending', 'in-progress', 'review', 'completed', 'blocked'].map((status) => {
               const count = activeProject?.tasks.filter(t => t.status === status).length || 0;
@@ -1938,16 +1936,16 @@ const ProjectViewDetailed: React.FC = () => {
               return (
                 <div key={status}>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="capitalize text-gray-700">{status.replace('-', ' ')}</span>
-                    <span className="font-medium text-gray-900">{count} ({percentage}%)</span>
+                    <span className={`capitalize ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{status.replace('-', ' ')}</span>
+                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{count} ({percentage}%)</span>
                   </div>
-                  <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                     <div
-                      className={`h-2 rounded-full ${status === 'completed' ? 'bg-green-600' :
-                        status === 'in-progress' ? 'bg-accent' :
-                          status === 'blocked' ? 'bg-red-600' :
-                            status === 'review' ? 'bg-purple-600' :
-                              'bg-gray-400'
+                      className={`h-2 rounded-full ${status === 'completed' ? 'bg-gradient-to-r from-green-600 to-emerald-600' :
+                        status === 'in-progress' ? 'bg-gradient-to-r from-blue-600 to-purple-600' :
+                          status === 'blocked' ? 'bg-gradient-to-r from-red-600 to-pink-600' :
+                            status === 'review' ? 'bg-gradient-to-r from-purple-600 to-pink-600' :
+                              'bg-gradient-to-r from-gray-500 to-gray-600'
                         }`}
                       style={{ width: `${percentage}%` }}
                     />
@@ -1956,23 +1954,23 @@ const ProjectViewDetailed: React.FC = () => {
               );
             })}
           </div>
-        </div>
+        </GlassmorphicCard>
 
         {/* Team Performance */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h4 className="font-semibold text-gray-900 mb-4">Team Performance</h4>
+        <GlassmorphicCard className="p-6">
+          <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team Performance</h4>
           <div className="space-y-4">
             {activeProject?.team.map((member) => (
               <div key={member._id}>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-gray-700">{member.name}</span>
-                  <span className="font-medium text-gray-900">
+                  <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{member.name}</span>
+                  <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     {member.tasksCompleted}/{member.tasksAssigned} tasks
                   </span>
                 </div>
-                <div className="w-full bg-gray-300 rounded-full h-2">
+                <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                   <div
-                    className="bg-accent h-2 rounded-full"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full"
                     style={{
                       width: `${member.tasksAssigned > 0
                         ? Math.round((member.tasksCompleted / member.tasksAssigned) * 100)
@@ -1983,90 +1981,91 @@ const ProjectViewDetailed: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Budget Breakdown */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h4 className="font-semibold text-gray-900 mb-4">Budget Breakdown</h4>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">Total Budget</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(activeProject?.budget || 0)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">Spent</span>
-              <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">Remaining</span>
-              <span className="font-semibold text-green-600">
-                {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
-              </span>
-            </div>
-            <div className="pt-4 border-t border-gray-200">
-              <div className="w-full bg-gray-300 rounded-full h-3">
-                <div
-                  className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
-                  style={{
-                    width: `${activeProject?.budget && activeProject?.spent
-                      ? Math.min(Math.round((activeProject.spent / activeProject.budget) * 100), 100)
-                      : 0}%`
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h4 className="font-semibold text-gray-900 mb-4">Activity Summary</h4>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-accent-dark" />
-                <span className="text-sm font-medium text-gray-900">Tasks Created</span>
-              </div>
-              <span className="text-lg font-bold text-accent-dark">{activeProject?.tasks.length || 0}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-medium text-gray-900">Tasks Completed</span>
-              </div>
-              <span className="text-lg font-bold text-green-600">
-                {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-medium text-gray-900">Team Members</span>
-              </div>
-              <span className="text-lg font-bold text-purple-600">{activeProject?.team.length || 0}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <FileText className="w-5 h-5 text-orange-600" />
-                <span className="text-sm font-medium text-gray-900">Documents</span>
-              </div>
-              <span className="text-lg font-bold text-orange-600">{activeProject?.documents.length || 0}</span>
-            </div>
-          </div>
-        </div>
+        </GlassmorphicCard>
       </div>
+
+      {/* Budget Breakdown */}
+      <GlassmorphicCard className="p-6">
+        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Budget Breakdown</h4>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Total Budget</span>
+            <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Spent</span>
+            <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Remaining</span>
+            <span className="font-semibold text-green-600">
+              {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
+            </span>
+          </div>
+          <div className={`pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+            <div className={`w-full rounded-full h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+              <div
+                className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
+                style={{
+                  width: `${activeProject?.budget && activeProject?.spent
+                    ? Math.min(Math.round((activeProject.spent / activeProject.budget) * 100), 100)
+                    : 0}%`
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </GlassmorphicCard>
+
+      {/* Recent Activity */}
+      <GlassmorphicCard className="p-6">
+        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Activity Summary</h4>
+        <div className="space-y-3">
+          <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-blue-600" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tasks Created</span>
+            </div>
+            <span className="text-lg font-bold text-blue-600">{activeProject?.tasks.length || 0}</span>
+          </div>
+          <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-green-500/10' : 'bg-green-50'}`}>
+            <div className="flex items-center gap-3">
+              <Check className="w-5 h-5 text-green-600" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tasks Completed</span>
+            </div>
+            <span className="text-lg font-bold text-green-600">
+              {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
+            </span>
+          </div>
+          <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-purple-500/10' : 'bg-purple-50'}`}>
+            <div className="flex items-center gap-3">
+              <Users className="w-5 h-5 text-purple-600" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team Members</span>
+            </div>
+            <span className="text-lg font-bold text-purple-600">{activeProject?.team.length || 0}</span>
+          </div>
+          <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-50'}`}>
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-orange-600" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Documents</span>
+            </div>
+            <span className="text-lg font-bold text-orange-600">{activeProject?.documents.length || 0}</span>
+          </div>
+        </div>
+      </GlassmorphicCard>
     </div>
+
   );
 
   const renderMainContent = () => {
     // Debug: Check if activeProject exists
     if (!activeProject) {
       return (
-        <div className="bg-white rounded-lg border border-gray-300 p-12 text-center">
-          <AlertCircle className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Project Found</h3>
-          <p className="text-gray-600">Unable to load project data. Please try again.</p>
-        </div>
+        <GlassmorphicCard className="p-12 text-center">
+          <AlertCircle className="w-16 h-16 text-gray-600 dark:text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No Project Found</h3>
+          <p className="text-gray-600 dark:text-gray-400">Unable to load project data. Please try again.</p>
+        </GlassmorphicCard>
       );
     }
 
@@ -2387,7 +2386,7 @@ const ProjectViewDetailed: React.FC = () => {
         return (
           <div className="space-y-6">
             {/* Project Status */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+            <GlassmorphicCard className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Status</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Manage project status and completion progress
@@ -2533,10 +2532,10 @@ const ProjectViewDetailed: React.FC = () => {
                   Save Status & Progress
                 </button>
               </div>
-            </div>
+            </GlassmorphicCard>
 
             {/* Attendance Office Location */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+            <GlassmorphicCard className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Attendance Office Location</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Set your primary office location. This will be used as a reference for automatic attendance
@@ -2738,7 +2737,7 @@ const ProjectViewDetailed: React.FC = () => {
                   </a>
                 </div>
               )}
-            </div>
+            </GlassmorphicCard>
           </div>
         );
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface RemoveMemberModalProps {
   isOpen: boolean;
@@ -18,12 +19,13 @@ export default function RemoveMemberModal({
 }: RemoveMemberModalProps) {
   const [confirmText, setConfirmText] = useState('');
   const [isRemoving, setIsRemoving] = useState(false);
+  const { isDarkMode } = useTheme();
 
   if (!isOpen) return null;
 
   const handleConfirm = async () => {
     if (confirmText.toUpperCase() !== 'REMOVE') return;
-    
+
     setIsRemoving(true);
     try {
       await onConfirm();
@@ -43,19 +45,19 @@ export default function RemoveMemberModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+      <div className={`rounded-lg max-w-md w-full p-6 shadow-xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'}`}>
+              <AlertTriangle className={`w-5 h-5 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Remove Member</h3>
+            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Remove Member</h3>
           </div>
           <button
             onClick={handleClose}
             disabled={isRemoving}
-            className="text-gray-600 hover:text-gray-600 disabled:opacity-50"
+            className={`disabled:opacity-50 ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-600'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -63,13 +65,16 @@ export default function RemoveMemberModal({
 
         {/* Content */}
         <div className="mb-6">
-          <p className="text-gray-700 mb-4">
+          <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             You are about to remove <strong>{memberName}</strong> ({memberEmail}) from this workspace.
           </p>
-          
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-            <h4 className="font-medium text-yellow-800 mb-2">What will happen:</h4>
-            <ul className="text-sm text-yellow-700 space-y-1 list-disc list-inside">
+
+          <div className={`rounded-lg p-4 mb-4 border ${isDarkMode
+              ? 'bg-yellow-900/20 border-yellow-900/50'
+              : 'bg-yellow-50 border-yellow-200'
+            }`}>
+            <h4 className={`font-medium mb-2 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-800'}`}>What will happen:</h4>
+            <ul className={`text-sm space-y-1 list-disc list-inside ${isDarkMode ? 'text-yellow-300' : 'text-yellow-700'}`}>
               <li>Member will be removed from the workspace</li>
               <li>They will lose access to all workspace projects</li>
               <li>Their historical data (tasks, activities) will be preserved</li>
@@ -77,14 +82,17 @@ export default function RemoveMemberModal({
             </ul>
           </div>
 
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-            <p className="text-sm text-red-700 font-medium">
+          <div className={`rounded-lg p-4 mb-4 border ${isDarkMode
+              ? 'bg-red-900/20 border-red-900/50'
+              : 'bg-red-50 border-red-200'
+            }`}>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
               ⚠️ This action cannot be undone easily. The member will need to be re-invited to regain access.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Type <span className="font-bold text-red-600">REMOVE</span> to confirm:
             </label>
             <input
@@ -93,7 +101,10 @@ export default function RemoveMemberModal({
               onChange={(e) => setConfirmText(e.target.value)}
               disabled={isRemoving}
               placeholder="Type REMOVE"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
+                  : 'bg-white border-gray-300 text-gray-900'
+                }`}
               autoFocus
             />
             {confirmText && !isConfirmValid && (
@@ -109,7 +120,10 @@ export default function RemoveMemberModal({
           <button
             onClick={handleClose}
             disabled={isRemoving}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`flex-1 px-4 py-2 border rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
           >
             Cancel
           </button>

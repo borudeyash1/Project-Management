@@ -77,7 +77,7 @@ const DockNavigation: React.FC = () => {
       { id: 'projects', label: 'Projects', translationKey: 'navigation.projects', icon: FolderOpen, path: '/projects' },
       { id: 'planner', label: 'Planner', translationKey: 'planner.title', icon: Calendar, path: '/planner' },
       { id: 'notifications', label: 'Notifications', translationKey: 'navigation.notifications', icon: Bell, path: '/notifications' },
-      { id: 'reminders', label: 'Reminders', translationKey: 'navigation.reminders', icon: Bell, path: '/reminders' },
+      { id: 'reminders', label: 'Reminders', translationKey: 'navigation.reminders', icon: Clock, path: '/reminders' },
       { id: 'workspace', label: 'Workspace', translationKey: 'workspace.title', icon: Building, path: '/workspace' },
       { id: 'reports', label: 'Reports', translationKey: 'navigation.reports', icon: BarChart3, path: '/reports' },
       { id: 'goals', label: 'Goals', translationKey: 'dashboard.insights', icon: Target, path: '/goals' }
@@ -123,8 +123,10 @@ const DockNavigation: React.FC = () => {
   };
 
   const handleAppClick = (appName: 'mail' | 'calendar' | 'vault') => {
-    // Check if module is connected
-    const isConnected = state.userProfile.modules?.[appName]?.refreshToken;
+    // Check if module is connected (check both old and new structures)
+    const hasRefreshToken = state.userProfile.modules?.[appName]?.refreshToken;
+    const hasConnectedAccount = state.userProfile.connectedAccounts?.[appName]?.activeAccountId;
+    const isConnected = hasRefreshToken || hasConnectedAccount;
 
     if (!isConnected) {
       // Show info card
@@ -346,10 +348,6 @@ const DockNavigation: React.FC = () => {
         <AppInfoCard
           app={showInfoCard}
           onClose={() => setShowInfoCard(null)}
-          onConnect={() => {
-            const token = localStorage.getItem('accessToken');
-            window.location.href = `/api/auth/sartthi/connect-${showInfoCard}?token=${token}`;
-          }}
           onOpen={() => {
             const url = getAppUrl(showInfoCard);
             const token = localStorage.getItem('accessToken');

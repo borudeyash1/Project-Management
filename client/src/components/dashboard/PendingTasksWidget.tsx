@@ -34,14 +34,14 @@ const PendingTasksWidget: React.FC = () => {
         try {
             setLoading(true);
             const response = await api.get('/home/dashboard');
-            
+
             if (response.data?.data?.quickTasks) {
                 // Filter for pending tasks assigned to current user
                 const pending = response.data.data.quickTasks
                     .filter((task: any) => {
-                        const isAssignedToUser = task.assignee === currentUserId || 
-                                                task.assignee?._id === currentUserId ||
-                                                task.assignedTo === currentUserId;
+                        const isAssignedToUser = task.assignee === currentUserId ||
+                            task.assignee?._id === currentUserId ||
+                            task.assignedTo === currentUserId;
                         return !task.completed && isAssignedToUser && task.dueDate;
                     })
                     .map((task: any) => ({
@@ -51,7 +51,7 @@ const PendingTasksWidget: React.FC = () => {
                         priority: task.priority || 'medium',
                         project: task.project
                     }))
-                    .sort((a: PendingTask, b: PendingTask) => 
+                    .sort((a: PendingTask, b: PendingTask) =>
                         a.dueDate.getTime() - b.dueDate.getTime()
                     )
                     .slice(0, 5); // Show only top 5 urgent tasks
@@ -100,7 +100,7 @@ const PendingTasksWidget: React.FC = () => {
 
     if (loading) {
         return (
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col justify-center items-center`}>
                 <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Loading pending tasks...</p>
             </div>
         );
@@ -108,93 +108,96 @@ const PendingTasksWidget: React.FC = () => {
 
     if (pendingTasks.length === 0) {
         return (
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <h2 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
+                <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     Pending Tasks
                 </h2>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    No pending tasks. Great job! 🎉
-                </p>
+                <div className="flex-1 flex items-center justify-center">
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        No pending tasks. Great job! 🎉
+                    </p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-            <h2 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
+            <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Pending Tasks
             </h2>
-            
-            <div className="notifications-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {pendingTasks.map((task) => {
-                    const borderColor = getPriorityColor(task.priority);
-                    const isOverdue = task.dueDate.getTime() < new Date().getTime();
-                    
-                    return (
-                        <div
-                            key={task._id}
-                            className="alert"
-                            style={{
-                                backgroundColor: isDarkMode ? 'rgb(31 41 55)' : 'rgb(254 252 232)',
-                                borderLeftWidth: '4px',
-                                borderLeftColor: borderColor,
-                                borderRadius: '0.375rem',
-                                padding: '1rem',
-                                cursor: 'pointer'
-                            }}
-                            onClick={() => navigate(`/tasks/${task._id}`)}
-                        >
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <AlertCircle 
-                                        className="alert-svg" 
-                                        style={{ 
-                                            height: '1.25rem', 
-                                            width: '1.25rem', 
-                                            color: borderColor 
-                                        }} 
-                                    />
-                                </div>
-                                <div className="alert-prompt-wrap" style={{ marginLeft: '0.75rem', flex: 1 }}>
-                                    <p 
-                                        className="alert-prompt" 
-                                        style={{ 
-                                            fontWeight: 500,
-                                            color: isDarkMode ? 'rgb(209 213 219)' : 'rgb(202 138 4)',
-                                            marginBottom: '0.25rem'
-                                        }}
-                                    >
-                                        {task.title}
-                                    </p>
-                                    <div className="flex items-center gap-2 text-xs" style={{ 
-                                        color: isDarkMode ? 'rgb(156 163 175)' : 'rgb(161 98 7)' 
-                                    }}>
-                                        <Clock className="w-3 h-3" />
-                                        <span className={isOverdue ? 'font-semibold' : ''}>
-                                            {formatDeadline(task.dueDate)}
-                                        </span>
-                                        {task.project && (
-                                            <>
-                                                <span>•</span>
-                                                <span>{task.project.name}</span>
-                                            </>
-                                        )}
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                <div className="notifications-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {pendingTasks.map((task) => {
+                        const borderColor = getPriorityColor(task.priority);
+                        const isOverdue = task.dueDate.getTime() < new Date().getTime();
+
+                        return (
+                            <div
+                                key={task._id}
+                                className="alert"
+                                style={{
+                                    backgroundColor: isDarkMode ? 'rgb(31 41 55)' : 'rgb(254 252 232)',
+                                    borderLeftWidth: '4px',
+                                    borderLeftColor: borderColor,
+                                    borderRadius: '0.375rem',
+                                    padding: '1rem',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => navigate(`/tasks/${task._id}`)}
+                            >
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <AlertCircle
+                                            className="alert-svg"
+                                            style={{
+                                                height: '1.25rem',
+                                                width: '1.25rem',
+                                                color: borderColor
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="alert-prompt-wrap" style={{ marginLeft: '0.75rem', flex: 1 }}>
+                                        <p
+                                            className="alert-prompt"
+                                            style={{
+                                                fontWeight: 500,
+                                                color: isDarkMode ? 'rgb(209 213 219)' : 'rgb(202 138 4)',
+                                                marginBottom: '0.25rem'
+                                            }}
+                                        >
+                                            {task.title}
+                                        </p>
+                                        <div className="flex items-center gap-2 text-xs" style={{
+                                            color: isDarkMode ? 'rgb(156 163 175)' : 'rgb(161 98 7)'
+                                        }}>
+                                            <Clock className="w-3 h-3" />
+                                            <span className={isOverdue ? 'font-bold' : ''}>
+                                                {formatDeadline(task.dueDate)}
+                                            </span>
+                                            {task.project && (
+                                                <>
+                                                    <span>•</span>
+                                                    <span>{task.project.name}</span>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
 
             {pendingTasks.length >= 5 && (
                 <button
                     onClick={() => navigate('/tasks')}
-                    className={`mt-4 w-full text-sm font-medium py-2 px-4 rounded-lg transition-colors ${
-                        isDarkMode
-                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                    }`}
+                    className={`mt-4 w-full text-sm font-medium py-2 px-4 rounded-2xl transition-colors ${isDarkMode
+                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                        }`}
                 >
                     View All Tasks
                 </button>

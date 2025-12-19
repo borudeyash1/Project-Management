@@ -20,14 +20,25 @@ import {
   Sun,
   Moon,
   Monitor,
-  Home
+  Home,
+  FolderOpen,
+  Calendar as CalendarIcon,
+  Bell as BellIcon,
+  Building,
+  BarChart3,
+  Target,
+  FileEdit,
+  Mail,
+  Shield
 } from 'lucide-react';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { useTranslation } from 'react-i18next';
+import { useDock } from '../context/DockContext';
 
 const Header: React.FC = () => {
   const { state, dispatch } = useApp();
   const { preferences, applyTheme } = useTheme();
+  const { dockPosition } = useDock();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
@@ -49,7 +60,7 @@ const Header: React.FC = () => {
     };
 
     loadNotifications();
-    
+
     // Refresh count every 30 seconds
     const interval = setInterval(loadNotifications, 30000);
     return () => clearInterval(interval);
@@ -107,6 +118,30 @@ const Header: React.FC = () => {
     }
 
     navigate('/login');
+  };
+
+  // Mobile navigation items
+  const mobileNavItems = [
+    { id: 'home', label: 'Home', translationKey: 'navigation.home', icon: Home, path: '/home' },
+    { id: 'notes', label: 'Notes', translationKey: 'navigation.notes', icon: FileEdit, path: '/notes' },
+    { id: 'projects', label: 'Projects', translationKey: 'navigation.projects', icon: FolderOpen, path: '/projects' },
+    { id: 'planner', label: 'Planner', translationKey: 'planner.title', icon: CalendarIcon, path: '/planner' },
+    { id: 'notifications', label: 'Notifications', translationKey: 'navigation.notifications', icon: BellIcon, path: '/notifications' },
+    { id: 'reminders', label: 'Reminders', translationKey: 'navigation.reminders', icon: BellIcon, path: '/reminders' },
+    { id: 'workspace', label: 'Workspace', translationKey: 'workspace.title', icon: Building, path: '/workspace' },
+    { id: 'reports', label: 'Reports', translationKey: 'navigation.reports', icon: BarChart3, path: '/reports' },
+    { id: 'goals', label: 'Goals', translationKey: 'dashboard.insights', icon: Target, path: '/goals' },
+    { id: 'mail', label: 'Sartthi Mail', translationKey: 'navigation.sartthiMail', icon: Mail, path: 'https://mail.sartthi.com' },
+    { id: 'calendar', label: 'Sartthi Calendar', translationKey: 'navigation.sartthiCalendar', icon: CalendarIcon, path: 'https://calendar.sartthi.com' }
+  ];
+
+  const handleMobileNavClick = (path: string) => {
+    if (path.startsWith('http')) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+    }
+    dispatch({ type: 'TOGGLE_SIDEBAR' }); // Close menu after navigation
   };
 
   return (
@@ -205,9 +240,8 @@ const Header: React.FC = () => {
                 ].map((lang) => (
                   <button
                     key={lang.code}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${
-                      i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
+                      }`}
                     onClick={() => changeLanguage(lang.code)}
                   >
                     <span className="text-lg">{lang.flag}</span>
@@ -246,7 +280,7 @@ const Header: React.FC = () => {
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border dark:border-gray-600">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h3>
-                <button 
+                <button
                   onClick={toggleUserMenu}
                   className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
@@ -282,11 +316,10 @@ const Header: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => applyTheme('light')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
-                      preferences.theme === 'light'
-                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'light'
+                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
                     {preferences.theme === 'light' && (
                       <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
@@ -297,11 +330,10 @@ const Header: React.FC = () => {
                   </button>
                   <button
                     onClick={() => applyTheme('dark')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
-                      preferences.theme === 'dark'
-                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'dark'
+                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
                     {preferences.theme === 'dark' && (
                       <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
@@ -312,11 +344,10 @@ const Header: React.FC = () => {
                   </button>
                   <button
                     onClick={() => applyTheme('system')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${
-                      preferences.theme === 'system'
-                        ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'system'
+                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
                     {preferences.theme === 'system' && (
                       <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
@@ -347,6 +378,53 @@ const Header: React.FC = () => {
           }
         }
       `}</style>
+
+      {/* Mobile Navigation Menu */}
+      {!state.sidebar.collapsed && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/50 z-[60] md:hidden"
+            onClick={toggleSidebar}
+          />
+
+          {/* Mobile Menu - Compact Fit Content */}
+          <div className="fixed top-14 left-0 w-72 h-auto max-h-[calc(100vh-4rem)] bg-white dark:bg-gray-800 shadow-2xl z-[70] md:hidden overflow-y-auto transform transition-transform duration-300 ease-in-out rounded-br-2xl border-b border-r border-gray-200 dark:border-gray-700">
+            <div className="p-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">Navigation</h2>
+
+              {/* Navigation Items - Icon Grid with Small Labels */}
+              <div className="grid grid-cols-4 gap-3">
+                {mobileNavItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
+                  // Shorten specific labels for mobile grid if needed
+                  let label = t(item.translationKey);
+                  if (item.id === 'mail') label = 'Mail';
+                  if (item.id === 'calendar') label = 'Calendar';
+
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleMobileNavClick(item.path)}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all aspect-square ${isActive
+                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                      title={t(item.translationKey)}
+                    >
+                      <Icon className="w-5 h-5 mb-1" />
+                      <span className="text-[10px] leading-tight font-medium text-center truncate w-full">
+                        {label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 };

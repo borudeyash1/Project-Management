@@ -4,6 +4,7 @@ import Task from '../models/Task';
 import Project from '../models/Project';
 import { Reminder } from '../models/Reminder';
 import Activity from '../models/Activity';
+import Workspace from '../models/Workspace';
 
 const mapUserSummary = (user: any) => {
   if (!user) {
@@ -33,7 +34,7 @@ export const getDashboardData = async (
       return;
     }
 
-    const [tasks, projects, reminders, activities] = await Promise.all([
+    const [tasks, projects, reminders, activities, workspaces] = await Promise.all([
       Task.find({
         $or: [{ assignee: userId }, { reporter: userId }],
         isActive: { $ne: false },
@@ -48,10 +49,8 @@ export const getDashboardData = async (
         $or: [
           { createdBy: userId },
           { owner: userId },
-          { 'members.user': userId },
           { 'teamMembers.user': userId },
         ],
-        isActive: { $ne: false },
       })
         .populate('teamMembers.user', 'fullName email avatarUrl designation')
         .sort({ updatedAt: -1 })
@@ -67,7 +66,23 @@ export const getDashboardData = async (
         .sort({ createdAt: -1 })
         .limit(10)
         .lean(),
+      Workspace.find({
+        $or: [
+          { owner: userId },
+          { 'members.user': userId }
+        ]
+      })
+        .populate('members.user', 'fullName avatarUrl')
+        .limit(5)
+        .lean()
     ]);
+
+    const dashboardWorkspaces = (workspaces || []).map((w: any) => ({
+      _id: w._id,
+      name: w.name,
+      role: w.owner === userId.toString() ? 'Owner' : 'Member',
+      memberCount: w.members?.length || 0
+    }));
 
     const quickTasks = (tasks || []).slice(0, 8).map((task) => ({
       _id: task._id,
@@ -96,29 +111,29 @@ export const getDashboardData = async (
 
       const mappedTeam = Array.isArray(rawTeam)
         ? rawTeam
-            .map((member: any) => {
-              console.log('🔍 [DASHBOARD] Processing member:', member);
-              
-              // Handle both populated and unpopulated user references
-              const userData = member.user || member;
-              
-              if (!userData) {
-                console.log('⚠️ [DASHBOARD] No user data for member');
-                return null;
-              }
+          .map((member: any) => {
+            console.log('🔍 [DASHBOARD] Processing member:', member);
 
-              const mapped = {
-                _id: userData._id?.toString() || userData.toString(),
-                name: userData.fullName || userData.name || userData.email || 'Unknown User',
-                email: userData.email || '',
-                avatar: userData.avatarUrl || userData.avatar,
-                role: member.role || 'member'
-              };
-              
-              console.log('✅ [DASHBOARD] Mapped team member:', mapped);
-              return mapped;
-            })
-            .filter(Boolean)
+            // Handle both populated and unpopulated user references
+            const userData = member.user || member;
+
+            if (!userData) {
+              console.log('⚠️ [DASHBOARD] No user data for member');
+              return null;
+            }
+
+            const mapped = {
+              _id: userData._id?.toString() || userData.toString(),
+              name: userData.fullName || userData.name || userData.email || 'Unknown User',
+              email: userData.email || '',
+              avatar: userData.avatarUrl || userData.avatar,
+              role: member.role || 'member'
+            };
+
+            console.log('✅ [DASHBOARD] Mapped team member:', mapped);
+            return mapped;
+          })
+          .filter(Boolean)
         : [];
 
       console.log('✅ [DASHBOARD] Final team for project', project.name, ':', mappedTeam);
@@ -201,6 +216,7 @@ export const getDashboardData = async (
         deadlines,
         teamActivity,
         recentFiles,
+        workspaces: dashboardWorkspaces,
       },
     });
   } catch (error: any) {

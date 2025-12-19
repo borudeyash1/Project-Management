@@ -8,6 +8,7 @@ import {
   Save, X, Plus, Trash2, Check, Clock, Briefcase,
   FileText, Tag, DollarSign, Calendar, User, Files
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import WorkspaceEditTab from './workspace-detail/WorkspaceEditTab';
 import WorkspaceCollaborateTab from './workspace-detail/WorkspaceCollaborateTab';
 import WorkspaceMembersTab from './workspace-detail/WorkspaceMembersTab';
@@ -18,10 +19,11 @@ import WorkspaceAttendanceTab from './workspace-detail/WorkspaceAttendanceTab';
 
 const WorkspaceDetailView: React.FC = () => {
   const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const { state } = useApp();
   const navigate = useNavigate();
-  
+
   const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects' | 'documents' | 'attendance'>('edit');
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
@@ -40,7 +42,7 @@ const WorkspaceDetailView: React.FC = () => {
       window.removeEventListener('switchToProjectsTab', handleSwitchToProjects as EventListener);
     };
   }, []);
-  
+
   // Get workspace details
   const workspace = useMemo(() => {
     return state.workspaces.find(w => w._id === workspaceId);
@@ -74,23 +76,23 @@ const WorkspaceDetailView: React.FC = () => {
   ];
 
   return (
-    <div className="h-full bg-gray-50">
+    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 px-6 py-4">
+      <div className={`border-b px-6 py-4 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/manage-workspace')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
             </button>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+              <h1 className={`text-2xl font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 <Building className="w-6 h-6 text-accent-dark" />
                 {workspace.name}
               </h1>
-              <p className="text-gray-600 mt-1">{workspace.description || t('workspace.detail.noDescription')}</p>
+              <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{workspace.description || t('workspace.detail.noDescription')}</p>
             </div>
           </div>
         </div>
@@ -99,19 +101,18 @@ const WorkspaceDetailView: React.FC = () => {
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
           {/* Tabs */}
-          <div className="bg-white rounded-lg border border-gray-300 mb-6">
-            <div className="flex border-b border-gray-300 overflow-x-auto">
+          <div className={`rounded-lg border mb-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
+            <div className={`flex border-b overflow-x-auto ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors whitespace-nowrap ${
-                      activeTab === tab.id
+                    className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
                         ? 'text-accent-dark border-b-2 border-accent-dark'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                        : isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                     {tab.label}
@@ -127,8 +128,8 @@ const WorkspaceDetailView: React.FC = () => {
           {activeTab === 'members' && <WorkspaceMembersTab workspaceId={workspace._id} />}
           {activeTab === 'clients' && <WorkspaceClientsTab workspaceId={workspace._id} />}
           {activeTab === 'projects' && (
-            <WorkspaceProjectsTab 
-              workspaceId={workspace._id} 
+            <WorkspaceProjectsTab
+              workspaceId={workspace._id}
               selectedClientId={selectedClientId}
               onClearClientFilter={() => setSelectedClientId(null)}
             />

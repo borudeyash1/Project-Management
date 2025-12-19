@@ -3,13 +3,16 @@ import {
   Plus, Calendar, Clock, Target, Users, CheckCircle,
   AlertCircle, Star, Flag, Tag, MessageSquare, FileText,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
-  Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot, X, Bell
+  Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot, X, Bell,
+  Layout, List as ListIcon, BarChart2
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
+import GlassmorphicCard from './ui/GlassmorphicCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface Task {
   _id: string;
@@ -57,8 +60,10 @@ const PlannerPage: React.FC = () => {
   const { t } = useTranslation();
   const { canUseAI } = useFeatureAccess();
   const { isDarkMode } = useTheme();
+
+  const [activeTab, setActiveTab] = useState<'board' | 'list' | 'gantt' | 'calendar'>('calendar');
+  const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -381,34 +386,74 @@ const PlannerPage: React.FC = () => {
   const timeSlots = getTimeSlots();
 
   return (
-    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('planner.title')}</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('planner.description')}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* View Mode Toggle */}
-            <div className="flex items-center border border-gray-300 rounded-lg">
-              {[
-                { id: 'day', label: t('planner.day') },
-                { id: 'week', label: t('planner.week') },
-                { id: 'month', label: t('planner.month') }
-              ].map(mode => (
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
+      {/* Header & Controls */}
+      <div
+        className="pt-6 px-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
+          paddingRight: dockPosition === 'right' ? '100px' : '24px'
+        }}
+      >
+        <GlassmorphicPageHeader
+          title={t('planner.myWork')}
+          subtitle={t('planner.description')}
+          icon={Target}
+          className="w-full mb-8"
+          decorativeGradients={{
+            topRight: 'rgba(124, 58, 237, 0.2)',
+            bottomLeft: 'rgba(59, 130, 246, 0.2)'
+          }}
+        />
+
+        {/* Toolbar */}
+        <GlassmorphicCard className="p-4 mb-6 flex flex-col xl:flex-row items-center justify-between gap-4">
+          {/* View Tab Toggle */}
+          <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800/50 rounded-xl overflow-x-auto w-full xl:w-auto">
+            {[
+              { id: 'board', label: 'Board', icon: Layout },
+              { id: 'list', label: 'List', icon: ListIcon },
+              { id: 'gantt', label: 'Gantt', icon: BarChart2 },
+              { id: 'calendar', label: 'Calendar', icon: Calendar }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
                 <button
-                  key={mode.id}
-                  onClick={() => setViewMode(mode.id as any)}
-                  className={`px-3 py-2 text-sm font-medium ${viewMode === mode.id
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900'
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${activeTab === tab.id
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
                     }`}
                 >
-                  {mode.label}
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-3 w-full xl:w-auto justify-end">
+            {activeTab === 'calendar' && (
+              <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+                {[
+                  { id: 'day', label: t('planner.day') },
+                  { id: 'week', label: t('planner.week') },
+                  { id: 'month', label: t('planner.month') }
+                ].map((mode) => (
+                  <button
+                    key={mode.id}
+                    onClick={() => setCalendarView(mode.id as any)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${calendarView === mode.id
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      }`}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <button
               onClick={() => {
@@ -421,227 +466,427 @@ const PlannerPage: React.FC = () => {
                 });
                 setShowTaskModal(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover shadow-lg shadow-accent/20 transition-all font-medium"
             >
               <Plus className="w-4 h-4" />
               {t('planner.addTask')}
             </button>
           </div>
-        </div>
+        </GlassmorphicCard>
       </div>
 
       <div
-        className="p-6 transition-all duration-300"
+        className="px-6 pb-6 transition-all duration-300"
         style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
-          paddingRight: dockPosition === 'right' ? '100px' : undefined
+          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
+          paddingRight: dockPosition === 'right' ? '100px' : '24px'
         }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Calendar View */}
           <div className="lg:col-span-3">
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-              {/* Calendar Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
+            {activeTab === 'calendar' && (
+              <GlassmorphicCard className="p-6">
+                {/* Calendar Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => setCurrentDate(new Date(currentDate.getTime() - (calendarView === 'week' ? 7 : 1) * 24 * 60 * 60 * 1000))}
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {calendarView === 'week' && `${formatDate(weekDays[0])} - ${formatDate(weekDays[6])}`}
+                      {calendarView === 'day' && formatDate(currentDate)}
+                      {calendarView === 'month' && currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </h2>
+                    <button
+                      onClick={() => setCurrentDate(new Date(currentDate.getTime() + (calendarView === 'week' ? 7 : 1) * 24 * 60 * 60 * 1000))}
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                   <button
-                    onClick={() => setCurrentDate(new Date(currentDate.getTime() - (viewMode === 'week' ? 7 : 1) * 24 * 60 * 60 * 1000))}
-                    className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                    onClick={() => setCurrentDate(new Date())}
+                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {viewMode === 'week' && `${formatDate(weekDays[0])} - ${formatDate(weekDays[6])}`}
-                    {viewMode === 'day' && formatDate(currentDate)}
-                    {viewMode === 'month' && currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  </h2>
-                  <button
-                    onClick={() => setCurrentDate(new Date(currentDate.getTime() + (viewMode === 'week' ? 7 : 1) * 24 * 60 * 60 * 1000))}
-                    className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-                  >
-                    <ChevronRight className="w-4 h-4" />
+                    {t('planner.today')}
                   </button>
                 </div>
-                <button
-                  onClick={() => setCurrentDate(new Date())}
-                  className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  {t('planner.today')}
-                </button>
-              </div>
 
-              {/* Calendar Grid */}
-              {viewMode === 'week' && (
-                <div className="grid grid-cols-7 gap-1">
-                  {/* Day Headers */}
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
-                      {day}
-                    </div>
-                  ))}
-
-                  {/* Day Cells */}
-                  {weekDays.map((day, index) => {
-                    const dayTasks = getTasksForDate(day);
-                    const dayEvents = getEventsForDate(day);
-                    const isToday = day.toDateString() === new Date().toDateString();
-                    const isSelected = day.toDateString() === selectedDate.toDateString();
-
-                    return (
-                      <div
-                        key={index}
-                        onClick={() => handleDateClick(day)}
-                        className={`min-h-24 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${isToday ? 'bg-blue-50 border-blue-200' : ''
-                          } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className={`text-sm font-medium ${isToday ? 'text-accent-dark' : 'text-gray-900'}`}>
-                            {day.getDate()}
-                          </span>
-                          {dayTasks.length > 0 && (
-                            <span className="text-xs text-gray-600">{dayTasks.length}</span>
-                          )}
-                        </div>
-
-                        {/* Tasks */}
-                        <div className="space-y-1">
-                          {dayTasks.slice(0, 2).map(task => (
-                            <div
-                              key={task._id}
-                              className="text-xs p-1 rounded truncate"
-                              style={{ backgroundColor: task.project?.color + '20' }}
-                            >
-                              {task.title}
-                            </div>
-                          ))}
-                          {dayTasks.length > 2 && (
-                            <div className="text-xs text-gray-600">
-                              +{dayTasks.length - 2} more
-                            </div>
-                          )}
-                        </div>
+                {/* Calendar Grid */}
+                {calendarView === 'week' && (
+                  <div className="grid grid-cols-7 gap-1">
+                    {/* Day Headers */}
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                      <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {day}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
+                    ))}
 
-              {viewMode === 'day' && (
-                <div className="space-y-2">
-                  {timeSlots.map((time) => {
-                    const tasksAtTime = tasks.filter(task => {
-                      if (!task.dueDate) return false;
-                      const taskDate = new Date(task.dueDate);
-                      const taskTime = `${taskDate.getHours().toString().padStart(2, '0')}:${taskDate.getMinutes().toString().padStart(2, '0')}`;
-                      return taskDate.toDateString() === currentDate.toDateString() && taskTime === time;
-                    });
+                    {/* Day Cells */}
+                    {weekDays.map((day, index) => {
+                      const dayTasks = getTasksForDate(day);
+                      const isToday = day.toDateString() === new Date().toDateString();
+                      const isSelected = day.toDateString() === selectedDate.toDateString();
 
-                    return (
-                      <div key={time} className="flex gap-2 border-b border-gray-300 pb-2">
-                        <div className="w-16 text-sm text-gray-600 pt-1">{time}</div>
+                      return (
                         <div
-                          className="flex-1 min-h-12 border border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-50"
-                          onClick={() => handleDateClick(currentDate, time)}
+                          key={index}
+                          onClick={() => handleDateClick(day)}
+                          className={`min-h-32 p-2 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${isToday ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800' : ''
+                            } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                         >
-                          {tasksAtTime.map(task => (
-                            <div key={task._id} className="mb-1 p-2 bg-blue-50 border border-blue-200 rounded text-sm">
-                              <div className="font-medium">{task.title}</div>
-                              <div className="text-xs text-gray-600">{task.estimatedDuration}h · {task.priority}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-sm font-medium ${isToday ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'}`}>
+                              {day.getDate()}
+                            </span>
+                            {dayTasks.length > 0 && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded-full">{dayTasks.length}</span>
+                            )}
+                          </div>
 
-              {viewMode === 'month' && (
-                <div className="grid grid-cols-7 gap-1">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
-                      {day}
+                          {/* Tasks */}
+                          <div className="space-y-1">
+                            {dayTasks.slice(0, 3).map(task => (
+                              <div
+                                key={task._id}
+                                className={`text-[10px] p-1.5 rounded truncate transition-opacity hover:opacity-80 ${!task.project?.color?.includes('bg-') ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' : ''
+                                  }`}
+                                style={{
+                                  backgroundColor: (task.project?.color || 'bg-gray-200').replace('bg-', '') === 'accent' ? 'var(--accent-color)' : undefined
+                                }}
+                              >
+                                <span className={task.project?.color === 'bg-accent' ? 'text-gray-900' : ''}>{task.title}</span>
+                              </div>
+                            ))}
+                            {dayTasks.length > 3 && (
+                              <div className="text-[10px] text-gray-500 dark:text-gray-400 px-1">
+                                +{dayTasks.length - 3} more
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {calendarView === 'day' && (
+                  <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                    {timeSlots.map((time) => {
+                      const tasksAtTime = tasks.filter(task => {
+                        if (!task.dueDate) return false;
+                        const taskDate = new Date(task.dueDate);
+                        // Using explicit strict equality for the date string comparison
+                        if (taskDate.toDateString() !== currentDate.toDateString()) return false;
+
+                        const taskHour = taskDate.getHours().toString().padStart(2, '0');
+                        const taskMinute = taskDate.getMinutes() < 30 ? '00' : '30';
+                        const taskTime = `${taskHour}:${taskMinute}`;
+                        return taskTime === time;
+                      });
+
+                      return (
+                        <div key={time} className="flex gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
+                          <div className="w-16 text-sm text-gray-500 dark:text-gray-400 pt-1 font-mono">{time}</div>
+                          <div
+                            className="flex-1 min-h-[3rem] border border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                            onClick={() => handleDateClick(currentDate, time)}
+                          >
+                            {tasksAtTime.map(task => (
+                              <div key={task._id} className="mb-1 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded text-sm group relative">
+                                <div className="font-medium text-gray-900 dark:text-gray-100">{task.title}</div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                  <span>{task.estimatedDuration}h</span>
+                                  <span>•</span>
+                                  <span className={`capitalize ${getPriorityColor(task.priority)} px-1.5 rounded-sm bg-opacity-20`}>{task.priority}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {calendarView === 'month' && (
+                  <div className="grid grid-cols-7 gap-1">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                      <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {day}
+                      </div>
+                    ))}
+
+                    {monthDays.map((day, index) => {
+                      const dayTasks = getTasksForDate(day);
+                      const isToday = day.toDateString() === new Date().toDateString();
+                      const isCurrentMonth = day.getMonth() === currentDate.getMonth();
+                      const isSelected = day.toDateString() === selectedDate.toDateString();
+
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => handleDateClick(day)}
+                          className={`min-h-[100px] p-1 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${isToday ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800' : ''
+                            } ${isSelected ? 'ring-2 ring-blue-500' : ''} ${!isCurrentMonth ? 'opacity-40' : ''
+                            }`}
+                        >
+                          <div className={`text-xs font-medium mb-1 p-1 ${isToday ? 'text-accent-dark dark:text-accent-light bg-accent/10 rounded-full w-6 h-6 flex items-center justify-center' : 'text-gray-700 dark:text-gray-300 pl-1'
+                            }`}>
+                            {day.getDate()}
+                          </div>
+                          <div className="space-y-0.5">
+                            {dayTasks.slice(0, 3).map(task => (
+                              <div
+                                key={task._id}
+                                className="text-[10px] p-1 rounded truncate bg-blue-100/50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                              >
+                                {task.title}
+                              </div>
+                            ))}
+                            {dayTasks.length > 3 && (
+                              <div className="text-[10px] text-gray-500 dark:text-gray-400 pl-1">+{dayTasks.length - 3} more</div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </GlassmorphicCard>
+            )}
+
+            {activeTab === 'board' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 h-full overflow-x-auto pb-4">
+                {['pending', 'in-progress', 'completed', 'cancelled'].map((status) => (
+                  <div key={status} className="flex flex-col h-full min-w-[280px]">
+                    <div className="flex items-center justify-between mb-4 px-1">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 capitalize flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${status === 'pending' ? 'bg-yellow-400' :
+                          status === 'in-progress' ? 'bg-blue-500' :
+                            status === 'completed' ? 'bg-green-500' : 'bg-red-500'
+                          }`} />
+                        {status.replace('-', ' ')}
+                      </h3>
+                      <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
+                        {tasks.filter(t => t.status === status).length}
+                      </span>
                     </div>
-                  ))}
+                    <div className="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                      {tasks.filter(t => t.status === status).map(task => (
+                        <GlassmorphicCard key={task._id} className="p-3 cursor-grab active:cursor-grabbing hover:translate-y-[-2px] transition-transform">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold ${getPriorityColor(task.priority)}`}>
+                              {task.priority}
+                            </span>
+                            <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">{task.title}</h4>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-3">{task.description}</p>
 
-                  {monthDays.map((day, index) => {
-                    const dayTasks = getTasksForDate(day);
-                    const isToday = day.toDateString() === new Date().toDateString();
-                    const isCurrentMonth = day.getMonth() === currentDate.getMonth();
-                    const isSelected = day.toDateString() === selectedDate.toDateString();
-
-                    return (
-                      <div
-                        key={index}
-                        onClick={() => handleDateClick(day)}
-                        className={`min-h-20 p-1 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 ${isToday ? 'bg-blue-50 border-blue-200' : ''
-                          } ${isSelected ? 'ring-2 ring-blue-500' : ''} ${!isCurrentMonth ? 'opacity-40' : ''
-                          }`}
-                      >
-                        <div className="text-xs font-medium mb-1 ${
-                          isToday ? 'text-accent-dark' : isCurrentMonth ? 'text-gray-900' : 'text-gray-600'
-                        }">
-                          {day.getDate()}
-                        </div>
-                        <div className="space-y-0.5">
-                          {dayTasks.slice(0, 2).map(task => (
-                            <div
-                              key={task._id}
-                              className="text-[10px] p-0.5 rounded truncate bg-blue-100 text-blue-700"
-                            >
-                              {task.title}
+                          {task.tags && task.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {task.tags.map(tag => (
+                                <span key={tag} className="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded">#{tag}</span>
+                              ))}
                             </div>
-                          ))}
-                          {dayTasks.length > 2 && (
-                            <div className="text-[10px] text-gray-600">+{dayTasks.length - 2}</div>
                           )}
-                        </div>
-                      </div>
-                    );
-                  })}
+
+                          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                              <Calendar className="w-3 h-3" />
+                              {task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '-'}
+                            </div>
+                            {task.assignee && (
+                              <img src={task.assignee.avatar} alt={task.assignee.name} className="w-6 h-6 rounded-full border border-white dark:border-gray-700" />
+                            )}
+                          </div>
+                        </GlassmorphicCard>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'list' && (
+              <GlassmorphicCard className="overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Task</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priority</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Project</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {tasks.map((task) => (
+                        <tr key={task._id} className="hover:bg-gray-50/30 dark:hover:bg-gray-800/30 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => toggleTaskStatus(task._id)}
+                              className="flex items-center gap-2"
+                            >
+                              {task.status === 'completed' ? (
+                                <CheckCircle className="w-5 h-5 text-green-500" />
+                              ) : (
+                                <div className={`w-5 h-5 rounded-full border-2 ${task.priority === 'urgent' || task.priority === 'high' ? 'border-red-400' : 'border-gray-300 dark:border-gray-600'
+                                  }`} />
+                              )}
+                              <span className={`text-sm capitalize ${getStatusColor(task.status).replace('bg-', 'text-').split(' ')[0]}`}>{task.status}</span>
+                            </button>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">{task.description}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)} bg-opacity-20`}>
+                              {task.priority}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                            {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {task.project ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                {task.project.name}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div className="flex items-center gap-3">
+                              <button className="text-gray-400 hover:text-blue-600 transition-colors">
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button className="text-gray-400 hover:text-red-600 transition-colors">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-            </div>
+              </GlassmorphicCard>
+            )}
+
+            {activeTab === 'gantt' && (
+              <GlassmorphicCard className="p-6 overflow-hidden">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Timeline</h3>
+                  <div className="flex gap-2">
+                    <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><ChevronLeft className="w-4 h-4" /></button>
+                    <span className="text-sm font-medium">March 2024</span>
+                    <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><ChevronRight className="w-4 h-4" /></button>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <div className="min-w-[800px]">
+                    {/* Timeline Header */}
+                    <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4 pb-2">
+                      <div className="w-1/4 font-medium text-sm text-gray-500 dark:text-gray-400">Task</div>
+                      <div className="w-3/4 flex justify-between text-xs text-gray-400">
+                        {Array.from({ length: 14 }).map((_, i) => (
+                          <div key={i} className="flex-1 text-center border-l border-gray-100 dark:border-gray-800">{i + 20}</div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Timeline Rows */}
+                    <div className="space-y-4">
+                      {tasks.map((task, index) => (
+                        <div key={task._id} className="flex items-center gap-4 group">
+                          <div className="w-1/4">
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{task.title}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{task.estimatedDuration}h estimation</div>
+                          </div>
+                          <div className="w-3/4 h-8 bg-gray-50 dark:bg-gray-800/50 rounded-lg relative overflow-hidden">
+                            {task.dueDate && (
+                              <div
+                                className={`absolute top-1 bottom-1 rounded-md ${task.status === 'completed' ? 'bg-green-500/50' :
+                                  task.priority === 'urgent' ? 'bg-red-500/50' : 'bg-blue-500/50'
+                                  } opacity-80 backdrop-blur-sm border border-white/10`}
+                                style={{
+                                  left: `${(index * 15) % 60}%`,
+                                  width: `${Math.max(10, task.estimatedDuration ? task.estimatedDuration * 5 : 20)}%`
+                                }}
+                              >
+                                <div className="w-full h-full flex items-center px-2">
+                                  <span className="text-[10px] font-medium text-white truncate">{task.status}</span>
+                                </div>
+                              </div>
+                            )}
+                            {/* Grid lines */}
+                            <div className="absolute inset-0 flex">
+                              {Array.from({ length: 14 }).map((_, i) => (
+                                <div key={i} className="flex-1 border-r border-gray-200/20 dark:border-gray-700/20"></div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </GlassmorphicCard>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* AI Assistant */}
             {canUseAI() && (
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
+              <GlassmorphicCard className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
                 <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-5 h-5" />
-                  <h3 className="font-semibold">{t('planner.aiPlanner')}</h3>
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
+                    <Bot className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('planner.aiPlanner')}</h3>
                 </div>
-                <p className="text-sm text-purple-100 mb-3">
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-3`}>
                   {t('planner.aiSuggestion')}
                 </p>
-                <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors">
+                <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg px-3 py-2 text-sm font-medium transition-all shadow-lg shadow-purple-500/20">
                   {t('planner.askAI')}
                 </button>
-              </div>
+              </GlassmorphicCard>
             )}
 
             {/* Today's Tasks */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4`}>
+            <GlassmorphicCard className="p-4">
               <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('planner.todaysTasks')}</h3>
               <div className="space-y-2">
                 {getTasksForDate(new Date()).slice(0, 5).map(task => (
                   <div
                     key={task._id}
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50"
+                    className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
                   >
                     <button
                       onClick={() => toggleTaskStatus(task._id)}
                       className={`w-4 h-4 rounded border-2 flex items-center justify-center ${task.status === 'completed'
                         ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-gray-300'
+                        : isDarkMode ? 'border-gray-600' : 'border-gray-300'
                         }`}
                     >
                       {task.status === 'completed' && <CheckCircle className="w-3 h-3" />}
                     </button>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                      <p className={`text-sm ${task.status === 'completed' ? `line-through ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}` : isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                         {task.title}
                       </p>
                       <div className="flex items-center gap-1 mt-1">
@@ -649,41 +894,41 @@ const PlannerPage: React.FC = () => {
                           {task.priority}
                         </span>
                         {task.project && (
-                          <span className="text-xs text-gray-600">{task.project.name}</span>
+                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{task.project.name}</span>
                         )}
                       </div>
                     </div>
                   </div>
                 ))}
                 {getTasksForDate(new Date()).length === 0 && (
-                  <p className="text-sm text-gray-600 text-center py-4">{t('planner.noTasksToday')}</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-center py-4`}>{t('planner.noTasksToday')}</p>
                 )}
               </div>
-            </div>
+            </GlassmorphicCard>
 
             {/* Upcoming Events */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4`}>
+            <GlassmorphicCard className="p-4">
               <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('planner.upcomingEvents')}</h3>
               <div className="space-y-2">
                 {events.slice(0, 5).map(event => (
-                  <div key={event._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50">
+                  <div key={event._id} className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}>
                     <div className={`w-2 h-2 rounded-full ${event.color}`} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                      <p className="text-xs text-gray-600">
+                      <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{event.title}</p>
+                      <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         {formatDate(event.start)} at {formatTime(event.start)}
                       </p>
                     </div>
                   </div>
                 ))}
                 {events.length === 0 && (
-                  <p className="text-sm text-gray-600 text-center py-4">{t('planner.noUpcomingEvents')}</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-center py-4`}>{t('planner.noUpcomingEvents')}</p>
                 )}
               </div>
-            </div>
+            </GlassmorphicCard>
 
             {/* Quick Stats */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4`}>
+            <GlassmorphicCard className="p-4">
               <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-3`}>{t('planner.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -705,20 +950,20 @@ const PlannerPage: React.FC = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </GlassmorphicCard>
           </div>
         </div>
       </div>
 
       {/* Task Creation Modal */}
       {showTaskModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">{t('planner.createNewTask')}</h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <GlassmorphicCard className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className={`flex items-center justify-between p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('planner.createNewTask')}</h2>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="p-2 text-gray-600 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -727,23 +972,23 @@ const PlannerPage: React.FC = () => {
             <div className="p-6 space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.taskTitle')}</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('planner.taskTitle')}</label>
                 <input
                   type="text"
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
                   placeholder={t('planner.enterTaskTitle')}
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.taskDescription')}</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('planner.taskDescription')}</label>
                 <textarea
                   value={newTask.description}
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
                   rows={3}
                   placeholder={t('planner.addTaskDescription')}
                 />
@@ -752,21 +997,21 @@ const PlannerPage: React.FC = () => {
               {/* Date and Time */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.dueDate')}</label>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('planner.dueDate')}</label>
                   <input
                     type="date"
                     value={newTask.dueDate}
                     onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.time')}</label>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('planner.time')}</label>
                   <input
                     type="time"
                     value={newTask.dueTime}
                     onChange={(e) => setNewTask({ ...newTask, dueTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                 </div>
               </div>
@@ -774,11 +1019,11 @@ const PlannerPage: React.FC = () => {
               {/* Priority and Duration */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.priority')}</label>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('planner.priority')}</label>
                   <select
                     value={newTask.priority}
                     onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -787,28 +1032,28 @@ const PlannerPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('planner.duration')}</label>
+                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('planner.duration')}</label>
                   <input
                     type="number"
                     min="0.5"
                     step="0.5"
                     value={newTask.estimatedDuration}
                     onChange={(e) => setNewTask({ ...newTask, estimatedDuration: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                 </div>
               </div>
 
               {/* Reminder */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                   <Bell className="w-4 h-4 inline mr-1" />
                   {t('planner.reminder')}
                 </label>
                 <select
                   value={newTask.reminder}
                   onChange={(e) => setNewTask({ ...newTask, reminder: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                 >
                   <option value="15min">15 minutes before</option>
                   <option value="30min">30 minutes before</option>
@@ -819,32 +1064,32 @@ const PlannerPage: React.FC = () => {
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Tags</label>
                 <input
                   type="text"
                   placeholder="Enter tags separated by commas"
                   onChange={(e) => setNewTask({ ...newTask, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+            <div className={`flex items-center justify-end gap-3 p-6 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className={`px-4 py-2 border rounded-lg transition-colors ${isDarkMode ? 'text-gray-300 border-gray-600 hover:bg-gray-700' : 'text-gray-700 border-gray-300 hover:bg-gray-50'}`}
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateTask}
                 disabled={!newTask.title || !newTask.dueDate || !newTask.dueTime}
-                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-accent/20"
               >
                 Create Task
               </button>
             </div>
-          </div>
+          </GlassmorphicCard>
         </div>
       )}
     </div>

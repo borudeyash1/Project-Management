@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import CreateProjectModal from './CreateProjectModal';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import GlassmorphicCard from './ui/GlassmorphicCard';
 import {
   getProjects,
   createProject as createProjectApi,
@@ -76,12 +78,18 @@ const ProjectsPage: React.FC = () => {
   const [processingProjectId, setProcessingProjectId] = useState<string | null>(null);
 
   const activeWorkspaceId = useMemo(() => {
+    // If in Personal Mode, return 'personal' to load personal projects
+    if (state.mode === 'Personal') {
+      return 'personal';
+    }
+
+    // Otherwise, get the current workspace ID
     if ((state as any)?.currentWorkspaceId) {
       return (state as any).currentWorkspaceId;
     }
     const matchByName = state.workspaces?.find((ws) => ws.name === state.currentWorkspace);
     return matchByName?._id || state.workspaces?.[0]?._id;
-  }, [state.currentWorkspace, state.workspaces]);
+  }, [state.mode, state.currentWorkspace, state.workspaces]);
 
   const loadProjects = useCallback(async () => {
     try {
@@ -257,7 +265,10 @@ const ProjectsPage: React.FC = () => {
 
     try {
       setCreatingProject(true);
-      await createProjectApi({
+
+      // If in Personal Mode, don't send workspaceId (creates personal project)
+      // If in Workspace Mode, send the workspaceId
+      const projectPayload: any = {
         name: projectData.name,
         description: projectData.description,
         status: projectData.status,
@@ -266,8 +277,14 @@ const ProjectsPage: React.FC = () => {
         dueDate: projectData.endDate,
         budget: projectData.budget,
         tags: projectData.tags,
-        workspaceId: activeWorkspaceId,
-      } as any);
+      };
+
+      // Only add workspaceId if not in Personal Mode
+      if (activeWorkspaceId !== 'personal') {
+        projectPayload.workspaceId = activeWorkspaceId;
+      }
+
+      await createProjectApi(projectPayload);
       dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: t('messages.projectCreated') } });
       setShowCreateModal(false);
       await loadProjects();
@@ -308,49 +325,47 @@ const ProjectsPage: React.FC = () => {
   };
 
   const handleViewProject = (projectId: string) => {
-    navigate(`/project-view/${projectId}`);
+    navigate(`/project/${projectId}/overview`);
   };
 
   const handleEditProject = (projectId: string) => {
-    navigate(`/project-view/${projectId}`);
+    navigate(`/project/${projectId}/overview`);
   };
 
   return (
-    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('descriptions.projects')}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {canCreateProject() ? (
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                {t('projects.newProject')}
-              </button>
-            ) : (
-              <WorkspaceCreationRestriction>
-                <div />
-              </WorkspaceCreationRestriction>
-            )}
-          </div>
-        </div>
-      </div>
-
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-purple-50/20 to-pink-50/20'}`}>
       <div
         className="p-6 transition-all duration-300"
         style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
-          paddingRight: dockPosition === 'right' ? '100px' : undefined
+          paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
+          paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
         }}
       >
+        {/* Glassmorphic Page Header - Uses Accent Color */}
+        <GlassmorphicPageHeader
+          icon={Target}
+          title={t('projects.title')}
+          subtitle={t('descriptions.projects')}
+        />
+
+        {/* Action Button */}
+        <div className="flex justify-end mb-6">
+          {canCreateProject() ? (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <Plus className="w-5 h-5" />
+              {t('projects.newProject')}
+            </button>
+          ) : (
+            <WorkspaceCreationRestriction>
+              <div />
+            </WorkspaceCreationRestriction>
+          )}
+        </div>
         {/* Filters and Search */}
-        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-4 mb-6`}>
+        <GlassmorphicCard className="p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
@@ -438,7 +453,7 @@ const ProjectsPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </GlassmorphicCard>
 
         {/* Loading & Error States */}
         {loading ? (
@@ -458,24 +473,43 @@ const ProjectsPage: React.FC = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map(project => (
-              <div key={project._id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
+              <GlassmorphicCard
+                key={project._id}
+                hoverEffect={true}
+                className="p-6 group relative overflow-hidden"
+              >
+                {/* Gradient Overlay */}
+                <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br ${project.priority === 'urgent' ? 'from-red-500/10 to-orange-500/10' :
+                  project.priority === 'high' ? 'from-orange-500/10 to-yellow-500/10' :
+                    project.priority === 'medium' ? 'from-blue-500/10 to-purple-500/10' :
+                      'from-gray-500/10 to-slate-500/10'
+                  }`} />
                 {/* Project Header */}
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-4 relative z-10">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">{project.name}</h3>
+                    <h3 className={`text-xl font-bold mb-1 bg-gradient-to-r ${project.priority === 'urgent' ? 'from-red-600 to-orange-600' :
+                      project.priority === 'high' ? 'from-orange-600 to-yellow-600' :
+                        project.priority === 'medium' ? 'from-blue-600 to-purple-600' :
+                          'from-gray-600 to-slate-600'
+                      } bg-clip-text text-transparent`}>
+                      {project.name}
+                    </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{project.description}</p>
                   </div>
-                  <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
-                    <MoreVertical className="w-4 h-4" />
+                  <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 relative z-10">
+                    <MoreVertical className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {project.tags.slice(0, 3).map(tag => (
+                {/* Tags with Gradient Backgrounds */}
+                <div className="flex flex-wrap gap-2 mb-4 relative z-10">
+                  {project.tags.slice(0, 3).map((tag, idx) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${idx % 3 === 0 ? 'from-purple-100 to-pink-100 text-purple-700 dark:from-purple-900/30 dark:to-pink-900/30 dark:text-purple-300' :
+                        idx % 3 === 1 ? 'from-blue-100 to-cyan-100 text-blue-700 dark:from-blue-900/30 dark:to-cyan-900/30 dark:text-blue-300' :
+                          'from-green-100 to-emerald-100 text-green-700 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300'
+                        }`}
                     >
                       {tag}
                     </span>
@@ -485,15 +519,18 @@ const ProjectsPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Progress */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-600 dark:text-gray-400">{t('projects.progress')}</span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">{project.progress}%</span>
+                {/* Progress with Gradient */}
+                <div className="mb-4 relative z-10">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">{t('projects.progress')}</span>
+                    <span className="font-bold text-gray-900 dark:text-gray-100">{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div
-                      className={`h-2 rounded-full transition-all ${getProgressColor(project.progress)}`}
+                      className={`h-3 rounded-full transition-all duration-500 bg-gradient-to-r ${project.progress < 30 ? 'from-red-500 to-orange-500' :
+                        project.progress < 70 ? 'from-yellow-500 to-amber-500' :
+                          'from-green-500 to-emerald-500'
+                        } shadow-lg`}
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -546,7 +583,7 @@ const ProjectsPage: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-700 flex-wrap">
+                <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-700 flex-wrap relative z-10">
                   <button
                     onClick={() => handleViewProject(project._id)}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
@@ -592,7 +629,7 @@ const ProjectsPage: React.FC = () => {
                     {t('common.delete')}
                   </button>
                 </div>
-              </div>
+              </GlassmorphicCard>
             ))}
           </div>
         ) : (

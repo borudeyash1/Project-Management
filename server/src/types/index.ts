@@ -109,7 +109,7 @@ export interface IUser extends Document {
     animations: boolean;
     reducedMotion: boolean;
   };
-  // Sartthi Ecosystem Modules
+  // Sartthi Ecosystem Modules (DEPRECATED - use connectedAccounts)
   modules?: {
     mail?: {
       isEnabled: boolean;
@@ -129,6 +129,21 @@ export interface IUser extends Document {
       refreshToken?: string | null;
       connectedAt?: Date;
       lastSyncedAt?: Date;
+    };
+  };
+  // NEW: Multi-account support for Sartthi services
+  connectedAccounts?: {
+    mail?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    calendar?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    vault?: {
+      activeAccountId?: string;
+      accounts?: string[];
     };
   };
   // Enhanced profile information for AI-powered insights

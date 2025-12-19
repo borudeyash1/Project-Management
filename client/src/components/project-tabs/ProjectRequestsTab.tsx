@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, Users, Send, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import GlassmorphicCard from '../ui/GlassmorphicCard';
 
 interface Request {
   _id: string;
@@ -42,6 +44,17 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   onManualReassign,
   onManualDeadlineChange
 }) => {
+  const { isDarkMode } = useTheme();
+
+  // Helper classes for consistent styling
+  const inputClassName = `w-full px-3 py-2 border rounded-lg text-sm ${isDarkMode
+      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+    }`;
+
+  const labelClassName = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
+    }`;
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [requestType, setRequestType] = useState<'workload-redistribution' | 'deadline-extension'>('workload-redistribution');
   const [selectedTaskId, setSelectedTaskId] = useState('');
@@ -53,7 +66,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   const [verifyText, setVerifyText] = useState('');
   const [newAssignee, setNewAssignee] = useState('');
   const [newDeadline, setNewDeadline] = useState('');
-  
+
   // Manual management state
   const [manualReassignTaskId, setManualReassignTaskId] = useState('');
   const [manualReassignTo, setManualReassignTo] = useState('');
@@ -64,18 +77,18 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   const myTasks = tasks.filter(t => {
     // Must be assigned to current user
     if (t.assignedTo !== currentUserId) return false;
-    
+
     // Exclude completed tasks
     if (t.status === 'completed') return false;
-    
+
     // Exclude verified tasks (check multiple possible fields)
     if (t.verifiedBy) return false;
     if (t.isVerified) return false;
     if (t.verified) return false;
-    
+
     // Exclude finished tasks
     if (t.isFinished) return false;
-    
+
     return true;
   });
 
@@ -158,7 +171,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
 
     // Call approval with additional data
     onApproveRequest(request._id);
-    
+
     // Reset state
     setApprovingRequestId(null);
     setVerifyText('');
@@ -178,7 +191,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
       console.log('Reassigning task:', manualReassignTaskId, 'to:', manualReassignTo);
       alert('Task reassigned successfully!');
     }
-    
+
     // Reset
     setManualReassignTaskId('');
     setManualReassignTo('');
@@ -196,7 +209,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
       console.log('Updating deadline for task:', manualDeadlineTaskId, 'to:', manualNewDeadline);
       alert('Deadline updated successfully!');
     }
-    
+
     // Reset
     setManualDeadlineTaskId('');
     setManualNewDeadline('');
@@ -205,17 +218,20 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full flex items-center gap-1">
+        return <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700'
+          }`}>
           <AlertCircle className="w-3 h-3" />
           Pending
         </span>;
       case 'approved':
-        return <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full flex items-center gap-1">
+        return <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+          }`}>
           <CheckCircle className="w-3 h-3" />
           Approved
         </span>;
       case 'rejected':
-        return <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full flex items-center gap-1">
+        return <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700'
+          }`}>
           <XCircle className="w-3 h-3" />
           Rejected
         </span>;
@@ -229,11 +245,11 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
       {/* Employee View */}
       {!isProjectManager && (
         <>
-          <div className="bg-white rounded-lg border border-gray-300 p-6">
+          <GlassmorphicCard className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">My Requests</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>My Requests</h3>
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   Request workload redistribution or deadline extensions
                 </p>
               </div>
@@ -249,14 +265,14 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
             {/* My Requests List */}
             <div className="space-y-3">
               {myRequests.length === 0 ? (
-                <div className="text-center py-12 text-gray-600">
-                  <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <AlertCircle className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
                   <p className="font-medium">No requests yet</p>
                   <p className="text-sm mt-1">Create a request to manage your workload</p>
                 </div>
               ) : (
                 myRequests.map((request) => (
-                  <div key={request._id} className="border border-gray-300 rounded-lg p-4">
+                  <div key={request._id} className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-300'}`}>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -265,33 +281,33 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                           ) : (
                             <Clock className="w-4 h-4 text-orange-600" />
                           )}
-                          <h4 className="font-medium text-gray-900">
-                            {request.type === 'workload-redistribution' 
-                              ? 'Workload Redistribution' 
+                          <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            {request.type === 'workload-redistribution'
+                              ? 'Workload Redistribution'
                               : 'Deadline Extension'}
                           </h4>
                         </div>
-                        <p className="text-sm text-gray-600">Task: {request.taskName}</p>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Task: {request.taskName}</p>
                       </div>
                       {getStatusBadge(request.status)}
                     </div>
-                    <p className="text-sm text-gray-700 mb-2">
+                    <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                       <span className="font-medium">Reason:</span> {request.reason}
                     </p>
                     {request.type === 'deadline-extension' && request.requestedDeadline && (
-                      <p className="text-sm text-gray-600">
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         <span className="font-medium">Requested Deadline:</span>{' '}
                         {new Date(request.requestedDeadline).toLocaleDateString()}
                       </p>
                     )}
-                    <p className="text-xs text-gray-600 mt-2">
+                    <p className={`text-xs mt-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`}>
                       Requested on {new Date(request.requestedAt).toLocaleString()}
                     </p>
                   </div>
                 ))
               )}
             </div>
-          </div>
+          </GlassmorphicCard>
         </>
       )}
 
@@ -299,11 +315,11 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
       {isProjectManager && (
         <>
           {/* Manual Task Management Section */}
-          <div className="bg-white rounded-lg border border-gray-300 p-6 mb-6">
+          <GlassmorphicCard className="p-6 mb-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Manual Task Management</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Manual Task Management</h3>
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   Directly reassign tasks or change deadlines for your team
                 </p>
               </div>
@@ -311,20 +327,20 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Reassign Task */}
-              <div className="border border-gray-300 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <div className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-300'}`}>
+                <h4 className={`font-medium mb-3 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Users className="w-4 h-4 text-purple-600" />
                   Reassign Task
                 </h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={labelClassName}>
                       Select Task
                     </label>
-                    <select 
+                    <select
                       value={manualReassignTaskId}
                       onChange={(e) => setManualReassignTaskId(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                      className={inputClassName}
                     >
                       <option value="">Choose a task...</option>
                       {tasks.map((task) => (
@@ -335,18 +351,18 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={labelClassName}>
                       Reassign To
                     </label>
-                    <select 
+                    <select
                       value={manualReassignTo}
                       onChange={(e) => setManualReassignTo(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                      className={inputClassName}
                     >
                       <option value="">Select team member...</option>
                       {teamMembers.map((member: any) => {
                         const userId = typeof member.user === 'object' ? member.user._id : member.user;
-                        const userName = typeof member.user === 'object' 
+                        const userName = typeof member.user === 'object'
                           ? (member.user.fullName || member.user.email)
                           : member.user;
                         return (
@@ -357,7 +373,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                       })}
                     </select>
                   </div>
-                  <button 
+                  <button
                     onClick={handleManualReassign}
                     className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
                   >
@@ -368,20 +384,20 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               </div>
 
               {/* Change Deadline */}
-              <div className="border border-gray-300 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <div className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-300'}`}>
+                <h4 className={`font-medium mb-3 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Clock className="w-4 h-4 text-orange-600" />
                   Change Deadline
                 </h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={labelClassName}>
                       Select Task
                     </label>
-                    <select 
+                    <select
                       value={manualDeadlineTaskId}
                       onChange={(e) => setManualDeadlineTaskId(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                      className={inputClassName}
                     >
                       <option value="">Choose a task...</option>
                       {tasks.map((task) => (
@@ -392,17 +408,17 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={labelClassName}>
                       New Deadline
                     </label>
                     <input
                       type="date"
                       value={manualNewDeadline}
                       onChange={(e) => setManualNewDeadline(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                      className={inputClassName}
                     />
                   </div>
-                  <button 
+                  <button
                     onClick={handleManualDeadlineChange}
                     className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center justify-center gap-2"
                   >
@@ -412,220 +428,219 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                 </div>
               </div>
             </div>
-          </div>
+          </GlassmorphicCard>
 
           {/* Pending Requests Section */}
-          <div className="bg-white rounded-lg border border-gray-300 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Pending Requests</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Review and approve/reject employee requests ({pendingApprovals.length} pending)
-              </p>
-            </div>
-          </div>
-
-          {/* Pending Requests List */}
-          <div className="space-y-3">
-            {pendingApprovals.length === 0 ? (
-              <div className="text-center py-12 text-gray-600">
-                <CheckCircle className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p className="font-medium">No pending requests</p>
-                <p className="text-sm mt-1">All requests have been processed</p>
+          <GlassmorphicCard className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pending Requests</h3>
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Review and approve/reject employee requests ({pendingApprovals.length} pending)
+                </p>
               </div>
-            ) : (
-              pendingApprovals.map((request) => (
-                <div key={request._id} className="border border-gray-300 rounded-lg p-4 bg-yellow-50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        {request.type === 'workload-redistribution' ? (
-                          <Users className="w-4 h-4 text-purple-600" />
-                        ) : (
-                          <Clock className="w-4 h-4 text-orange-600" />
-                        )}
-                        <h4 className="font-medium text-gray-900">
-                          {request.type === 'workload-redistribution' 
-                            ? 'Workload Redistribution Request' 
-                            : 'Deadline Extension Request'}
-                        </h4>
-                      </div>
-                      <p className="text-sm text-gray-600">Task: {request.taskName}</p>
-                      <p className="text-sm text-gray-600">Task ID: {request.taskId}</p>
-                    </div>
-                    {getStatusBadge(request.status)}
-                  </div>
-                  <div className="bg-white rounded p-3 mb-3">
-                    <p className="text-sm text-gray-700">
-                      <span className="font-medium">Reason:</span> {request.reason}
-                    </p>
-                    {request.type === 'deadline-extension' && request.requestedDeadline && (
-                      <>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <span className="font-medium">Current Deadline:</span>{' '}
-                          {request.currentDeadline ? new Date(request.currentDeadline).toLocaleDateString() : 'N/A'}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          <span className="font-medium">Requested Deadline:</span>{' '}
-                          {new Date(request.requestedDeadline).toLocaleDateString()}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Requested by Employee on {new Date(request.requestedAt).toLocaleString()}
-                  </p>
+            </div>
 
-                  {approvingRequestId === request._id ? (
-                    <div className="space-y-3 bg-white rounded-lg p-4 border border-green-200">
-                      <h4 className="font-medium text-gray-900 mb-2">Approve Request</h4>
-                      
-                      {/* Workload Redistribution - Select New Assignee */}
-                      {request.type === 'workload-redistribution' && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Reassign Task To:
-                          </label>
-                          <select
-                            value={newAssignee}
-                            onChange={(e) => setNewAssignee(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                          >
-                            <option value="">Select team member...</option>
-                            {tasks.find(t => t._id === request.taskId)?.teamMembers?.map((member: any) => (
-                              <option key={member._id} value={member._id}>
-                                {member.name || member.fullName || member.email}
-                              </option>
-                            ))}
-                          </select>
+            {/* Pending Requests List */}
+            <div className="space-y-3">
+              {pendingApprovals.length === 0 ? (
+                <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <CheckCircle className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
+                  <p className="font-medium">No pending requests</p>
+                  <p className="text-sm mt-1">All requests have been processed</p>
+                </div>
+              ) : (
+                pendingApprovals.map((request) => (
+                  <div key={request._id} className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-yellow-900/10' : 'border-gray-300 bg-yellow-50'}`}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {request.type === 'workload-redistribution' ? (
+                            <Users className="w-4 h-4 text-purple-600" />
+                          ) : (
+                            <Clock className="w-4 h-4 text-orange-600" />
+                          )}
+                          <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            {request.type === 'workload-redistribution'
+                              ? 'Workload Redistribution Request'
+                              : 'Deadline Extension Request'}
+                          </h4>
                         </div>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Task: {request.taskName}</p>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Task ID: {request.taskId}</p>
+                      </div>
+                      {getStatusBadge(request.status)}
+                    </div>
+                    <div className={`rounded p-3 mb-3 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <span className="font-medium">Reason:</span> {request.reason}
+                      </p>
+                      {request.type === 'deadline-extension' && request.requestedDeadline && (
+                        <>
+                          <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <span className="font-medium">Current Deadline:</span>{' '}
+                            {request.currentDeadline ? new Date(request.currentDeadline).toLocaleDateString() : 'N/A'}
+                          </p>
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <span className="font-medium">Requested Deadline:</span>{' '}
+                            {new Date(request.requestedDeadline).toLocaleDateString()}
+                          </p>
+                        </>
                       )}
+                    </div>
+                    <p className={`text-xs mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`}>
+                      Requested by Employee on {new Date(request.requestedAt).toLocaleString()}
+                    </p>
 
-                      {/* Deadline Extension - Select New Deadline */}
-                      {request.type === 'deadline-extension' && (
+                    {approvingRequestId === request._id ? (
+                      <div className={`space-y-3 rounded-lg p-4 border ${isDarkMode ? 'bg-gray-800 border-green-900/50' : 'bg-white border-green-200'}`}>
+                        <h4 className={`font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Approve Request</h4>
+
+                        {/* Workload Redistribution - Select New Assignee */}
+                        {request.type === 'workload-redistribution' && (
+                          <div>
+                            <label className={labelClassName}>
+                              Reassign Task To:
+                            </label>
+                            <select
+                              value={newAssignee}
+                              onChange={(e) => setNewAssignee(e.target.value)}
+                              className={inputClassName}
+                            >
+                              <option value="">Select team member...</option>
+                              {tasks.find(t => t._id === request.taskId)?.teamMembers?.map((member: any) => (
+                                <option key={member._id} value={member._id}>
+                                  {member.name || member.fullName || member.email}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
+                        {/* Deadline Extension - Select New Deadline */}
+                        {request.type === 'deadline-extension' && (
+                          <div>
+                            <label className={labelClassName}>
+                              New Deadline (must be after {request.currentDeadline ? new Date(request.currentDeadline).toLocaleDateString() : 'current deadline'}):
+                            </label>
+                            <input
+                              type="date"
+                              value={newDeadline}
+                              onChange={(e) => setNewDeadline(e.target.value)}
+                              min={request.currentDeadline ? new Date(new Date(request.currentDeadline).getTime() + 86400000).toISOString().split('T')[0] : undefined}
+                              className={inputClassName}
+                            />
+                          </div>
+                        )}
+
+                        {/* VERIFY Input */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            New Deadline (must be after {request.currentDeadline ? new Date(request.currentDeadline).toLocaleDateString() : 'current deadline'}):
+                          <label className={labelClassName}>
+                            Type "VERIFY" to confirm approval:
                           </label>
                           <input
-                            type="date"
-                            value={newDeadline}
-                            onChange={(e) => setNewDeadline(e.target.value)}
-                            min={request.currentDeadline ? new Date(new Date(request.currentDeadline).getTime() + 86400000).toISOString().split('T')[0] : undefined}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            type="text"
+                            value={verifyText}
+                            onChange={(e) => setVerifyText(e.target.value)}
+                            placeholder="Type VERIFY"
+                            className={`${inputClassName} uppercase`}
                           />
                         </div>
-                      )}
 
-                      {/* VERIFY Input */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Type "VERIFY" to confirm approval:
-                        </label>
-                        <input
-                          type="text"
-                          value={verifyText}
-                          onChange={(e) => setVerifyText(e.target.value)}
-                          placeholder="Type VERIFY"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm uppercase"
+                        <div className="flex items-center gap-2 pt-2">
+                          <button
+                            onClick={() => handleApprove(request)}
+                            disabled={verifyText.toUpperCase() !== 'VERIFY'}
+                            className={`flex-1 px-4 py-2 rounded-lg text-white flex items-center justify-center gap-2 ${verifyText.toUpperCase() === 'VERIFY'
+                                ? 'bg-green-600 hover:bg-green-700'
+                                : 'bg-gray-400 cursor-not-allowed'
+                              }`}
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            Confirm Approval
+                          </button>
+                          <button
+                            onClick={() => {
+                              setApprovingRequestId(null);
+                              setVerifyText('');
+                              setNewAssignee('');
+                              setNewDeadline('');
+                            }}
+                            className={`flex-1 px-4 py-2 border rounded-lg ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : rejectingRequestId === request._id ? (
+                      <div className="space-y-2">
+                        <textarea
+                          value={rejectReason}
+                          onChange={(e) => setRejectReason(e.target.value)}
+                          placeholder="Provide a reason for rejection..."
+                          className={inputClassName}
+                          rows={2}
                         />
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleReject(request._id)}
+                            className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                          >
+                            Confirm Reject
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRejectingRequestId(null);
+                              setRejectReason('');
+                            }}
+                            className={`px-3 py-1.5 border rounded-lg text-sm ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-
-                      <div className="flex items-center gap-2 pt-2">
-                        <button
-                          onClick={() => handleApprove(request)}
-                          disabled={verifyText.toUpperCase() !== 'VERIFY'}
-                          className={`flex-1 px-4 py-2 rounded-lg text-white flex items-center justify-center gap-2 ${
-                            verifyText.toUpperCase() === 'VERIFY'
-                              ? 'bg-green-600 hover:bg-green-700'
-                              : 'bg-gray-400 cursor-not-allowed'
-                          }`}
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          Confirm Approval
-                        </button>
-                        <button
-                          onClick={() => {
-                            setApprovingRequestId(null);
-                            setVerifyText('');
-                            setNewAssignee('');
-                            setNewDeadline('');
-                          }}
-                          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : rejectingRequestId === request._id ? (
-                    <div className="space-y-2">
-                      <textarea
-                        value={rejectReason}
-                        onChange={(e) => setRejectReason(e.target.value)}
-                        placeholder="Provide a reason for rejection..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                        rows={2}
-                      />
+                    ) : (
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleReject(request._id)}
-                          className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                          onClick={() => setApprovingRequestId(request._id)}
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
                         >
-                          Confirm Reject
+                          <CheckCircle className="w-4 h-4" />
+                          Approve
                         </button>
                         <button
-                          onClick={() => {
-                            setRejectingRequestId(null);
-                            setRejectReason('');
-                          }}
-                          className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
+                          onClick={() => setRejectingRequestId(request._id)}
+                          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
                         >
-                          Cancel
+                          <XCircle className="w-4 h-4" />
+                          Reject
                         </button>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setApprovingRequestId(request._id)}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => setRejectingRequestId(request._id)}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        Reject
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-          </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </GlassmorphicCard>
         </>
       )}
 
       {/* Create Request Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Create New Request</h3>
+          <div className={`rounded-lg p-6 max-w-lg w-full mx-4 ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+            <h3 className="text-lg font-semibold mb-4">Create New Request</h3>
 
             <div className="space-y-4">
               {/* Request Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClassName}>
                   Request Type
                 </label>
                 <select
                   value={requestType}
                   onChange={(e) => setRequestType(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className={inputClassName}
                 >
                   <option value="workload-redistribution">Workload Redistribution</option>
                   <option value="deadline-extension">Deadline Extension</option>
@@ -634,13 +649,13 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
 
               {/* Select Task */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClassName}>
                   Select Task
                 </label>
                 <select
                   value={selectedTaskId}
                   onChange={(e) => setSelectedTaskId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className={inputClassName}
                 >
                   <option value="">Choose a task...</option>
                   {myTasks.map((task) => (
@@ -654,28 +669,28 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               {/* Requested Deadline (only for deadline extension) */}
               {requestType === 'deadline-extension' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={labelClassName}>
                     Requested New Deadline
                   </label>
                   <input
                     type="date"
                     value={requestedDeadline}
                     onChange={(e) => setRequestedDeadline(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className={inputClassName}
                   />
                 </div>
               )}
 
               {/* Reason */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClassName}>
                   Reason for Request
                 </label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className={inputClassName}
                   placeholder="Explain why you need this request..."
                 />
               </div>
@@ -695,7 +710,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                     setReason('');
                     setRequestedDeadline('');
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className={`flex-1 px-4 py-2 border rounded-lg ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                 >
                   Cancel
                 </button>

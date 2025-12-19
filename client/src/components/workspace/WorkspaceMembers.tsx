@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
+import GlassmorphicCard from '../ui/GlassmorphicCard';
 import {
   Search,
   UserPlus,
@@ -43,6 +45,7 @@ interface JoinRequest {
 const WorkspaceMembers: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { state } = useApp();
+  const { isDarkMode, preferences } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -211,9 +214,12 @@ const WorkspaceMembers: React.FC = () => {
         {isOwner && (
           <button
             onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+            style={{
+              background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
+            }}
+            className="flex items-center gap-2 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
           >
-            <UserPlus className="w-4 h-4" />
+            <UserPlus className="w-5 h-5" />
             {t('workspace.members.inviteMembers')}
           </button>
         )}
@@ -251,11 +257,13 @@ const WorkspaceMembers: React.FC = () => {
           const RoleIcon = roleBadge.icon;
 
           return (
-            <div
+            <GlassmorphicCard
               key={member._id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 hover:shadow-md transition-shadow"
+              hoverEffect={true}
+              className="p-5 group relative overflow-hidden"
             >
-              <div className="flex items-start justify-between mb-3">
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+              <div className="flex items-start justify-between mb-3 relative z-10">
                 <UserDisplay
                   name={member.name}
                   plan={member.subscription?.plan || 'free'}
@@ -265,16 +273,16 @@ const WorkspaceMembers: React.FC = () => {
                   showBadge={true}
                 />
                 {isOwner && member.role !== 'owner' && (
-                  <button className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-700">
+                  <button className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative z-10">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-600 dark:text-gray-200">{member.email}</span>
+                  <Mail className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{member.email}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -284,28 +292,28 @@ const WorkspaceMembers: React.FC = () => {
                       {roleBadge.label}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-600 dark:text-gray-200">
+                  <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     {member.position}
                   </span>
                 </div>
 
-                <div className="text-xs text-gray-600 dark:text-gray-200">
+                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   {t('workspace.members.joined')} {member.joinedAt.toLocaleDateString(i18n.language)}
                 </div>
               </div>
 
               {isOwner && member.role !== 'owner' && (
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 relative z-10">
+                  <button className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg transition-all ${isDarkMode ? 'text-gray-300 border border-gray-600 hover:bg-gray-700/50' : 'text-gray-700 border border-gray-300 hover:bg-gray-50'}`}>
                     <Edit className="w-3 h-3" />
                     {t('workspace.members.editRole')}
                   </button>
-                  <button className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
+                  <button className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               )}
-            </div>
+            </GlassmorphicCard>
           );
         })}
       </div>
@@ -353,13 +361,12 @@ const WorkspaceMembers: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        request.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : request.status === 'accepted'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                      }`}
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${request.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : request.status === 'accepted'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                        }`}
                     >
                       {request.status}
                     </span>
@@ -448,7 +455,7 @@ const WorkspaceMembers: React.FC = () => {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => setShowInviteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 {t('workspace.members.inviteModal.cancel')}
               </button>
@@ -463,28 +470,32 @@ const WorkspaceMembers: React.FC = () => {
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('workspace.members.stats.totalMembers')}</div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{members.length}</div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('workspace.members.stats.active')}</div>
-          <div className="text-2xl font-bold text-green-600">
+        <GlassmorphicCard hoverEffect={true} className="p-5 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+          <div className={`text-sm font-medium mb-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('workspace.members.stats.totalMembers')}</div>
+          <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative z-10">{members.length}</div>
+        </GlassmorphicCard>
+        <GlassmorphicCard hoverEffect={true} className="p-5 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
+          <div className={`text-sm font-medium mb-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('workspace.members.stats.active')}</div>
+          <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent relative z-10">
             {members.filter(m => m.status === 'active').length}
           </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('workspace.members.stats.admins')}</div>
-          <div className="text-2xl font-bold text-purple-600">
+        </GlassmorphicCard>
+        <GlassmorphicCard hoverEffect={true} className="p-5 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
+          <div className={`text-sm font-medium mb-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('workspace.members.stats.admins')}</div>
+          <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent relative z-10">
             {members.filter(m => m.role === 'admin').length}
           </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{t('workspace.members.stats.pendingRequests')}</div>
-          <div className="text-2xl font-bold text-orange-600">
+        </GlassmorphicCard>
+        <GlassmorphicCard hoverEffect={true} className="p-5 group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
+          <div className={`text-sm font-medium mb-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('workspace.members.stats.pendingRequests')}</div>
+          <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent relative z-10">
             {joinRequests.filter((req) => req.status === 'pending').length}
           </div>
-        </div>
+        </GlassmorphicCard>
       </div>
     </div>
   );

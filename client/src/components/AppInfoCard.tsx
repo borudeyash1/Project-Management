@@ -1,14 +1,13 @@
 import React from 'react';
-import { Mail, Calendar, Shield, X, ExternalLink } from 'lucide-react';
+import { Mail, Calendar, Shield, X } from 'lucide-react';
 
 interface AppInfoCardProps {
   app: 'mail' | 'calendar' | 'vault';
   onClose: () => void;
-  onConnect: () => void;
   onOpen: () => void;
 }
 
-const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect, onOpen }) => {
+const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onOpen }) => {
   const appConfig = {
     mail: {
       icon: <Mail className="w-12 h-12" />,
@@ -121,20 +120,13 @@ const AppInfoCard: React.FC<AppInfoCardProps> = ({ app, onClose, onConnect, onOp
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          {/* Action Button */}
+          <div className="pt-4">
             <button
               onClick={onOpen}
-              className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
+              className="w-full px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
             >
               Open App
-            </button>
-            <button
-              onClick={onConnect}
-              className={`flex-1 px-6 py-3 bg-gradient-to-r ${config.color} text-white rounded-xl font-medium hover:shadow-lg hover:shadow-${app === 'mail' ? 'blue' : app === 'calendar' ? 'purple' : 'green'}-500/25 transition-all flex items-center justify-center gap-2`}
-            >
-              Connect Now
-              <ExternalLink size={16} />
             </button>
           </div>
         </div>

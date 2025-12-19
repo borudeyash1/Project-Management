@@ -57,7 +57,7 @@ const emptyUser: User = {
 
 const initialState: AppState = {
   currentSection: '',
-  currentWorkspace: '',
+  currentWorkspace: localStorage.getItem('currentWorkspace') || '',
   currentProject: '',
   cwStep: 1,
   toasts: [],
@@ -96,7 +96,7 @@ const initialState: AppState = {
   },
   workspaces: [],
   pendingWorkspaceRequests: [],
-  mode: 'Personal',
+  mode: (localStorage.getItem('mode') as 'Personal' | 'Workspace') || 'Personal',
   clients: [],
   projects: [],
   tasks: [],
@@ -147,10 +147,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_SECTION':
       return { ...state, currentSection: action.payload };
     case 'SET_WORKSPACE':
-      return { ...state, currentWorkspace: action.payload };
-    case 'SET_PROJECT':
-      return { ...state, currentProject: action.payload };
+      // Persist to localStorage but DON'T change mode automatically
+      if (action.payload) {
+        localStorage.setItem('currentWorkspace', action.payload);
+      } else {
+        localStorage.removeItem('currentWorkspace');
+      }
+      return {
+        ...state,
+        currentWorkspace: action.payload
+      };
     case 'SET_MODE':
+      localStorage.setItem('mode', action.payload);
       return { ...state, mode: action.payload };
     case 'SET_CW_STEP':
       return { ...state, cwStep: action.payload };
@@ -315,8 +323,29 @@ export function AppProvider({ children }: AppProviderProps) {
 
         if (workspaces.length > 0) {
           dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
-          dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
-          // Stay in Personal mode by default - user can switch manually
+
+          // Restore saved workspace from localStorage if it exists and is valid
+          const savedWorkspaceId = localStorage.getItem('currentWorkspace');
+          const savedMode = localStorage.getItem('mode') as 'Personal' | 'Workspace' | null;
+
+          if (savedWorkspaceId && workspaces.some(w => w._id === savedWorkspaceId)) {
+            console.log('[AppProvider] Restoring saved workspace:', savedWorkspaceId);
+            // Set workspace but don't change mode - let the saved mode persist
+            localStorage.setItem('currentWorkspace', savedWorkspaceId);
+            dispatch({ type: 'SET_WORKSPACE', payload: savedWorkspaceId });
+
+            // Restore the saved mode, or default to Personal
+            if (savedMode) {
+              dispatch({ type: 'SET_MODE', payload: savedMode });
+            } else {
+              dispatch({ type: 'SET_MODE', payload: 'Personal' });
+            }
+          } else {
+            // Set first workspace as default but stay in Personal mode
+            localStorage.setItem('currentWorkspace', workspaces[0]._id);
+            dispatch({ type: 'SET_WORKSPACE', payload: workspaces[0]._id });
+            dispatch({ type: 'SET_MODE', payload: savedMode || 'Personal' });
+          }
         } else {
           console.log('[AppProvider] No workspaces found for user');
           dispatch({ type: 'SET_WORKSPACES', payload: [] });

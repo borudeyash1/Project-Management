@@ -17,6 +17,8 @@ import reminderService from '../services/reminderService';
 import { exportRemindersToPDF } from '../utils/pdfExport';
 import ReminderCard from './reminders/ReminderCard';
 import CustomSelect from './ui/CustomSelect';
+import GlassmorphicCard from './ui/GlassmorphicCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface Reminder {
   _id: string;
@@ -66,6 +68,7 @@ interface CalendarEvent {
 }
 
 const RemindersPage: React.FC = () => {
+  const { isDarkMode } = useTheme();
   const { state, dispatch } = useApp();
   const { dockPosition } = useDock();
   const { canUseAI } = useFeatureAccess();
@@ -111,11 +114,11 @@ const RemindersPage: React.FC = () => {
         setLoading(true);
         setError(null);
         const workspaceId = state.currentWorkspace; // currentWorkspace is already a string ID
-        
+
         // Fetch reminders
         const fetchedReminders = await reminderService.getReminders(workspaceId);
         setReminders(fetchedReminders);
-        
+
         // Fetch team members from workspace
         if (workspaceId) {
           try {
@@ -132,7 +135,7 @@ const RemindersPage: React.FC = () => {
             console.error('Failed to fetch team members:', err);
           }
         }
-        
+
         // Fetch projects
         if (state.projects && state.projects.length > 0) {
           const projectList = state.projects.map((project: any) => ({
@@ -142,7 +145,7 @@ const RemindersPage: React.FC = () => {
           }));
           setProjects(projectList);
         }
-        
+
         // Convert reminders to calendar events
         const calendarEvents: CalendarEvent[] = fetchedReminders.map(reminder => ({
           _id: reminder._id,
@@ -376,27 +379,39 @@ const RemindersPage: React.FC = () => {
   const filteredReminders = getFilteredReminders();
 
   return (
-    <div className="h-full bg-gray-50 dark:bg-gray-700">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('reminders.title')}</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('reminders.subtitle')}</p>
-          </div>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
+      {/* Header & Toolbar */}
+      <div
+        className="pt-6 px-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
+          paddingRight: dockPosition === 'right' ? '100px' : '24px'
+        }}
+      >
+        <GlassmorphicPageHeader
+          title={t('reminders.title')}
+          subtitle={t('reminders.subtitle')}
+          icon={Bell}
+          decorativeGradients={{
+            topRight: 'rgba(239, 68, 68, 0.2)',
+            bottomLeft: 'rgba(245, 158, 11, 0.2)'
+          }}
+        />
+
+        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* Notification Permission */}
             {permission === 'default' && (
               <button
                 onClick={requestPermission}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-accent-dark text-accent-dark rounded-lg hover:bg-blue-50"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-accent-dark text-accent-dark rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
                 <Bell className="w-4 h-4" />
                 {t('reminders.enableNotifications')}
               </button>
             )}
             {permission === 'granted' && (
-              <span className="inline-flex items-center gap-2 px-3 py-2 text-sm text-green-600 bg-green-50 rounded-lg">
+              <span className="inline-flex items-center gap-2 px-3 py-2 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <Bell className="w-4 h-4" />
                 {t('reminders.notificationsOn')}
               </span>
@@ -406,58 +421,58 @@ const RemindersPage: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <Download className="w-4 h-4" />
                 {t('buttons.export')}
               </button>
               {showExportMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-300 py-1 z-10">
+                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-300 dark:border-gray-700 py-1 z-10GlassmorphicCard">
                   <button
                     onClick={() => handleExport('all')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-700"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     {t('reminders.exportAll')}
                   </button>
                   <button
                     onClick={() => handleExport('pending')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-700"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     {t('reminders.exportPending')}
                   </button>
                   <button
                     onClick={() => handleExport('completed')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-700"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     {t('reminders.exportCompleted')}
                   </button>
                 </div>
               )}
             </div>
-
-            <button
-              onClick={() => {
-                setSelectedReminder(null);
-                setShowAddModal(true);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
-            >
-              <Plus className="w-4 h-4" />
-              {t('reminders.addReminder')}
-            </button>
           </div>
-        </div>
+
+          <button
+            onClick={() => {
+              setSelectedReminder(null);
+              setShowAddModal(true);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover shadow-lg shadow-accent/20 transition-all font-medium"
+          >
+            <Plus className="w-4 h-4" />
+            {t('reminders.addReminder')}
+          </button>
+        </GlassmorphicCard>
       </div>
 
       <div
-        className="p-6 transition-all duration-300"
+        className="px-6 pb-6 transition-all duration-300"
         style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
-          paddingRight: dockPosition === 'right' ? '100px' : undefined
+          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
+          paddingRight: dockPosition === 'right' ? '100px' : '24px'
         }}
       >
         {/* Search and Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4 mb-6">
+        <GlassmorphicCard className="p-4 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -468,7 +483,10 @@ const RemindersPage: React.FC = () => {
                   placeholder={t('reminders.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                    ? 'bg-gray-800/50 border-gray-600 text-white placeholder-gray-500'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                    }`}
                 />
               </div>
             </div>
@@ -502,7 +520,7 @@ const RemindersPage: React.FC = () => {
             </div>
 
             {/* View Toggle */}
-            <div className="flex items-center border border-gray-300 rounded-lg ml-auto">
+            <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg ml-auto bg-gray-50 dark:bg-gray-800/50">
               {[
                 { id: 'list', label: t('reminders.views.list'), icon: List },
                 { id: 'calendar', label: t('reminders.views.calendar'), icon: Calendar },
@@ -513,9 +531,9 @@ const RemindersPage: React.FC = () => {
                   <button
                     key={mode.id}
                     onClick={() => setViewMode(mode.id as any)}
-                    className={`flex items-center gap-2 px-3 py-2 text-sm font-medium ${viewMode === mode.id
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100'
+                    className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all ${viewMode === mode.id
+                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm rounded-md m-0.5'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                       }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -525,7 +543,7 @@ const RemindersPage: React.FC = () => {
               })}
             </div>
           </div>
-        </div>
+        </GlassmorphicCard>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
@@ -534,9 +552,9 @@ const RemindersPage: React.FC = () => {
 
             {/* Content Area */}
             {viewMode === 'list' && (
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+              <GlassmorphicCard className="p-6">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('reminders.title')}</h2>
-                
+
                 {filteredReminders.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1">
                     {filteredReminders.map(reminder => (
@@ -569,11 +587,11 @@ const RemindersPage: React.FC = () => {
                     </button>
                   </div>
                 )}
-              </div>
+              </GlassmorphicCard>
             )}
 
             {viewMode === 'calendar' && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-6">
+              <GlassmorphicCard className="p-6">
                 {/* Calendar Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
@@ -656,7 +674,7 @@ const RemindersPage: React.FC = () => {
                     );
                   })}
                 </div>
-              </div>
+              </GlassmorphicCard>
             )}
 
             {viewMode === 'kanban' && (
@@ -729,7 +747,8 @@ const RemindersPage: React.FC = () => {
             )}
 
             {/* Quick Stats */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+            {/* Quick Stats */}
+            <GlassmorphicCard className="p-4">
               <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('reminders.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -761,10 +780,11 @@ const RemindersPage: React.FC = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </GlassmorphicCard>
 
             {/* Upcoming Deadlines */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-4">
+            {/* Upcoming Deadlines */}
+            <GlassmorphicCard className="p-4">
               <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('reminders.upcomingDeadlines')}</h3>
               <div className="space-y-2">
                 {reminders
@@ -788,25 +808,27 @@ const RemindersPage: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400 text-center py-4">{t('reminders.noUpcomingDeadlines')}</p>
                 )}
               </div>
-            </div>
+            </GlassmorphicCard>
           </div>
         </div>
       </div>
 
       {/* Reminder Modal */}
-      {showAddModal && (
-        <ReminderModal
-          reminder={selectedReminder}
-          onSave={handleSaveReminder}
-          onClose={() => {
-            setShowAddModal(false);
-            setSelectedReminder(null);
-          }}
-          projects={projects}
-          teamMembers={teamMembers}
-        />
-      )}
-    </div>
+      {
+        showAddModal && (
+          <ReminderModal
+            reminder={selectedReminder}
+            onSave={handleSaveReminder}
+            onClose={() => {
+              setShowAddModal(false);
+              setSelectedReminder(null);
+            }}
+            projects={projects}
+            teamMembers={teamMembers}
+          />
+        )
+      }
+    </div >
   );
 };
 

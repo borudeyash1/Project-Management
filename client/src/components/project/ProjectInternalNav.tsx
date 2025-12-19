@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
@@ -30,6 +30,8 @@ const ProjectInternalNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { projectId } = useParams();
+  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
   const project = state.projects.find(p => p._id === projectId);
   const isProjectManager = project?.teamMembers?.some(
@@ -115,10 +117,33 @@ const ProjectInternalNav: React.FC = () => {
     return location.pathname === path || location.pathname.startsWith(path);
   };
 
+  // Update indicator position when active tab changes
+  useEffect(() => {
+    const activeTab = visibleTabs.find(tab => isActiveTab(tab.path));
+    if (activeTab && tabRefs.current[activeTab.id]) {
+      const element = tabRefs.current[activeTab.id];
+      if (element) {
+        setIndicatorStyle({
+          left: element.offsetLeft,
+          width: element.offsetWidth
+        });
+      }
+    }
+  }, [location.pathname, visibleTabs]);
+
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
       <div className="px-6">
-        <div className="flex items-center gap-1 overflow-x-auto">
+        <div className="relative flex items-center gap-1 overflow-x-auto">
+          {/* Smooth sliding indicator */}
+          <div
+            className="absolute bottom-0 h-0.5 bg-accent-dark dark:bg-accent-light transition-all duration-300 ease-out"
+            style={{
+              left: `${indicatorStyle.left}px`,
+              width: `${indicatorStyle.width}px`
+            }}
+          />
+
           {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const active = isActiveTab(tab.path);
@@ -126,12 +151,12 @@ const ProjectInternalNav: React.FC = () => {
             return (
               <button
                 key={tab.id}
+                ref={(el) => (tabRefs.current[tab.id] = el)}
                 onClick={() => navigate(tab.path)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  active
-                    ? 'border-accent-dark text-accent-dark dark:text-accent-light'
-                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
-                }`}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${active
+                    ? 'text-accent-dark dark:text-accent-light'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label}

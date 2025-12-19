@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     checkAuth();
-    
+
     // Check if returning from OAuth callback
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success') || urlParams.get('code')) {
@@ -30,7 +30,7 @@ function App() {
       // 1. Check for token in URL (SSO)
       const params = new URLSearchParams(window.location.search);
       let token = params.get('token');
-      
+
       if (token) {
         localStorage.setItem('accessToken', token);
         // Clean URL
@@ -101,26 +101,23 @@ function App() {
       {isCalendarConnected ? (
         <WeekGrid user={user} />
       ) : (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-           <h1>Connect Google Calendar</h1>
-           <p style={{ marginBottom: '1rem', color: '#999' }}>
-             {user?.modules?.calendar ? 'Checking connection status...' : 'Connect your Google Calendar to view events'}
-           </p>
-           <button onClick={() => {
-             const token = localStorage.getItem('accessToken');
-             const url = token 
-               ? `${API_URL}/api/auth/sartthi/connect-calendar?token=${encodeURIComponent(token)}`
-               : `${API_URL}/api/auth/sartthi/connect-calendar`;
-             window.location.href = url;
-           }} style={{ marginRight: '1rem' }}>
-             Connect with Google
-           </button>
-           <button onClick={() => {
-             setIsLoading(true);
-             checkAuth();
-           }} style={{ background: '#555', color: 'white', padding: '0.5rem 1rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-             Refresh Status
-           </button>
+        <div style={{ padding: '3rem 2rem', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+          <h1 style={{ marginBottom: '1rem' }}>Connect Google Calendar</h1>
+          <p style={{ marginBottom: '1.5rem', color: '#999', lineHeight: '1.6' }}>
+            Connect your Google Calendar account from the main Sartthi application to view and manage your events here.
+            You can connect multiple calendar accounts and switch between them easily.
+          </p>
+          <div style={{
+            background: 'rgba(99, 102, 241, 0.1)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            borderRadius: '8px',
+            padding: '1rem',
+            marginTop: '2rem'
+          }}>
+            <p style={{ fontSize: '0.9rem', color: '#999' }}>
+              💡 <strong>Tip:</strong> Go to the main Sartthi app → Home → Sartthi Ecosystem → Connect Calendar
+            </p>
+          </div>
         </div>
       )}
     </div>

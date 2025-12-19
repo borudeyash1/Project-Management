@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  BarChart3, PieChart, LineChart, TrendingUp, TrendingDown, 
+import {
+  BarChart3, PieChart, LineChart, TrendingUp, TrendingDown,
   Activity, Target, Users, Clock, CheckCircle, AlertCircle,
   Calendar, FileText, Download, Filter, Search, MoreVertical,
   Eye, Edit, Trash2, Plus, RefreshCw, Save, Share2,
@@ -12,10 +12,10 @@ import {
   Headphones, Camera, Mic, Volume2, VolumeX, MicOff,
   CameraOff, CalendarDays, CalendarCheck, CalendarX,
   CalendarPlus, CalendarMinus, CalendarRange, CalendarSearch,
-  CalendarClock, CalendarHeart, X, Check, ChevronRight, 
-  ChevronLeft, User, Star, Award, Trophy, Medal, Heart, 
-  Bookmark, Copy, Move, Archive, Play, Pause, Square, 
-  Circle, Triangle, Hexagon, Layers, Timer, UserCheck, 
+  CalendarClock, CalendarHeart, X, Check, ChevronRight,
+  ChevronLeft, User, Star, Award, Trophy, Medal, Heart,
+  Bookmark, Copy, Move, Archive, Play, Pause, Square,
+  Circle, Triangle, Hexagon, Layers, Timer, UserCheck,
   UserX, MessageSquare, MessageCircle, ThumbsUp, ThumbsDown,
   Send, Reply, Forward, Archive as ArchiveIcon, Trash,
   Undo, Redo, Copy as CopyIcon,
@@ -49,6 +49,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import GlassmorphicCard from './ui/GlassmorphicCard';
+import { useTheme } from '../context/ThemeContext';
 
 interface WorkloadRequest {
   _id: string;
@@ -153,6 +155,7 @@ interface WorkloadAnalytics {
 
 const WorkloadDeadlineManagement: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { isDarkMode } = useTheme();
   const { canUseAdvancedAnalytics, canManageTeam } = useFeatureAccess();
   const [activeTab, setActiveTab] = useState('workload-requests');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -493,34 +496,34 @@ const WorkloadDeadlineManagement: React.FC = () => {
                   <span className="text-sm text-gray-600">Task:</span>
                   <p className="text-sm font-medium text-gray-900">{request.taskTitle}</p>
                 </div>
-                
+
                 <div>
                   <span className="text-sm text-gray-600">Project:</span>
                   <p className="text-sm font-medium text-gray-900">{request.projectName}</p>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Current Workload:</span>
                   <span className="text-sm font-medium text-gray-900">{request.currentWorkload}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Requested Workload:</span>
                   <span className="text-sm font-medium text-gray-900">{request.requestedWorkload}</span>
                 </div>
-                
+
                 <div>
                   <span className="text-sm text-gray-600">Reason:</span>
                   <p className="text-sm text-gray-700 mt-1">{request.reason}</p>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Submitted:</span>
                   <span className="text-sm text-gray-600">
                     {new Date(request.submittedAt).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 {request.reviewedAt && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Reviewed:</span>
@@ -604,38 +607,38 @@ const WorkloadDeadlineManagement: React.FC = () => {
                   <span className="text-sm text-gray-600">Task:</span>
                   <p className="text-sm font-medium text-gray-900">{request.taskTitle}</p>
                 </div>
-                
+
                 <div>
                   <span className="text-sm text-gray-600">Project:</span>
                   <p className="text-sm font-medium text-gray-900">{request.projectName}</p>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Current Deadline:</span>
                   <span className="text-sm font-medium text-gray-900">
                     {new Date(request.currentDeadline).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Requested Deadline:</span>
                   <span className="text-sm font-medium text-gray-900">
                     {new Date(request.requestedDeadline).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 <div>
                   <span className="text-sm text-gray-600">Reason:</span>
                   <p className="text-sm text-gray-700 mt-1">{request.reason}</p>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Submitted:</span>
                   <span className="text-sm text-gray-600">
                     {new Date(request.submittedAt).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 {request.reviewedAt && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Reviewed:</span>
@@ -705,10 +708,9 @@ const WorkloadDeadlineManagement: React.FC = () => {
                 </div>
                 <div className="w-full bg-gray-300 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      employee.utilizationPercentage >= 90 ? 'bg-red-500' :
-                      employee.utilizationPercentage >= 75 ? 'bg-yellow-500' : 'bg-green-500'
-                    }`}
+                    className={`h-2 rounded-full transition-all duration-300 ${employee.utilizationPercentage >= 90 ? 'bg-red-500' :
+                        employee.utilizationPercentage >= 75 ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
                     style={{ width: `${employee.utilizationPercentage}%` }}
                   />
                 </div>
@@ -757,84 +759,92 @@ const WorkloadDeadlineManagement: React.FC = () => {
   const renderAnalyticsDashboard = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <GlassmorphicCard className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Requests</p>
-              <p className="text-2xl font-semibold text-gray-900">{workloadAnalytics.totalRequests}</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Requests</p>
+              <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{workloadAnalytics.totalRequests}</p>
             </div>
-            <FileText className="w-8 h-8 text-accent-dark" />
+            <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'}`}>
+              <FileText className="w-8 h-8 text-blue-600" />
+            </div>
           </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        </GlassmorphicCard>
+
+        <GlassmorphicCard className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Pending Requests</p>
-              <p className="text-2xl font-semibold text-gray-900">{workloadAnalytics.pendingRequests}</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pending Requests</p>
+              <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{workloadAnalytics.pendingRequests}</p>
             </div>
-            <Clock className="w-8 h-8 text-yellow-600" />
+            <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-yellow-900/30' : 'bg-yellow-50'}`}>
+              <Clock className="w-8 h-8 text-yellow-600" />
+            </div>
           </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        </GlassmorphicCard>
+
+        <GlassmorphicCard className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Approved Requests</p>
-              <p className="text-2xl font-semibold text-gray-900">{workloadAnalytics.approvedRequests}</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Approved Requests</p>
+              <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{workloadAnalytics.approvedRequests}</p>
             </div>
-            <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-green-900/30' : 'bg-green-50'}`}>
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
           </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        </GlassmorphicCard>
+
+        <GlassmorphicCard className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Avg Processing Time</p>
-              <p className="text-2xl font-semibold text-gray-900">{workloadAnalytics.averageProcessingTime}d</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Avg Processing Time</p>
+              <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{workloadAnalytics.averageProcessingTime}d</p>
             </div>
-            <Timer className="w-8 h-8 text-purple-600" />
+            <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50'}`}>
+              <Timer className="w-8 h-8 text-purple-600" />
+            </div>
           </div>
-        </div>
+        </GlassmorphicCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Requesters</h3>
+        <GlassmorphicCard className="p-6">
+          <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Top Requesters</h3>
           <div className="space-y-3">
             {workloadAnalytics.topRequesters.map((requester, index) => (
               <div key={requester.employeeId} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-accent-dark">{index + 1}</span>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
+                    <span className="text-sm font-medium text-blue-600">{index + 1}</span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900">{requester.employeeName}</span>
+                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{requester.employeeName}</span>
                 </div>
-                <span className="text-sm text-gray-600">{requester.requestCount} requests</span>
+                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{requester.requestCount} requests</span>
               </div>
             ))}
           </div>
-        </div>
+        </GlassmorphicCard>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Workload Distribution</h3>
+        <GlassmorphicCard className="p-6">
+          <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Workload Distribution</h3>
           <div className="space-y-3">
             {workloadAnalytics.workloadDistribution.map((item, index) => (
               <div key={index} className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">{item.range}</span>
+                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.range}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-20 bg-gray-300 rounded-full h-2">
+                  <div className={`w-20 rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
                     <div
                       className="bg-accent h-2 rounded-full"
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
-                  <span className="text-sm text-gray-600 w-12 text-right">{item.count}</span>
+                  <span className={`text-sm w-12 text-right ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.count}</span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </GlassmorphicCard>
       </div>
     </div>
   );
@@ -888,11 +898,10 @@ const WorkloadDeadlineManagement: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
                       ? 'border-accent text-accent-dark'
                       : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                    }`}
                   title={tab.description}
                 >
                   <Icon className="w-4 h-4" />
@@ -912,11 +921,10 @@ const WorkloadDeadlineManagement: React.FC = () => {
       {/* Message Toast */}
       {message && (
         <div className="fixed top-4 right-4 z-50">
-          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${
-            message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-            message.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-            'bg-blue-50 text-blue-800 border border-blue-200'
-          }`}>
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
+              message.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
+                'bg-blue-50 text-blue-800 border border-blue-200'
+            }`}>
             {message.type === 'success' && <CheckCircle className="w-5 h-5" />}
             {message.type === 'error' && <AlertCircle className="w-5 h-5" />}
             {message.type === 'info' && <Info className="w-5 h-5" />}

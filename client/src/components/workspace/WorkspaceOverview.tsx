@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
+import GlassmorphicCard from '../ui/GlassmorphicCard';
 import { getProjects as getWorkspaceProjects } from '../../services/projectService';
 import { apiService } from '../../services/api';
 import { format } from 'date-fns';
-import { 
-  FolderKanban, 
-  Users, 
-  TrendingUp, 
+import {
+  FolderKanban,
+  Users,
+  TrendingUp,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -37,6 +39,7 @@ const WorkspaceOverview: React.FC = () => {
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isDarkMode, preferences } = useTheme();
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats>({ present: 0, absent: 0, wfh: 0, total: 0 });
@@ -51,16 +54,16 @@ const WorkspaceOverview: React.FC = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       if (!state.currentWorkspace) return;
-      
+
       try {
         setLoadingAttendance(true);
         const today = format(new Date(), 'yyyy-MM-dd');
         const response = await apiService.get(`/workspace-attendance/workspace/${state.currentWorkspace}/date/${today}`);
-        
+
         const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
-        
+
         let present = 0, absent = 0, wfh = 0;
-        
+
         records.forEach((record: any) => {
           if (record.slots && record.slots.length > 0) {
             const status = record.slots[0].status;
@@ -69,7 +72,7 @@ const WorkspaceOverview: React.FC = () => {
             else if (status === 'absent') absent++;
           }
         });
-        
+
         setAttendanceStats({ present, absent, wfh, total: records.length });
       } catch (error) {
         console.error('Failed to fetch attendance:', error);
@@ -77,7 +80,7 @@ const WorkspaceOverview: React.FC = () => {
         setLoadingAttendance(false);
       }
     };
-    
+
     fetchAttendance();
   }, [state.currentWorkspace]);
 
@@ -100,18 +103,18 @@ const WorkspaceOverview: React.FC = () => {
   useEffect(() => {
     const loadWorkspaceProjects = async () => {
       if (!state.currentWorkspace) return;
-      
+
       try {
         console.log('[WorkspaceOverview] Fetching projects for workspace:', state.currentWorkspace);
         const projects = await getWorkspaceProjects(state.currentWorkspace);
         console.log('[WorkspaceOverview] Fetched projects:', projects.length);
-        
+
         // Transform projects to match state type (convert createdBy object to string)
         const transformedProjects = projects.map((project: any) => ({
           ...project,
           createdBy: typeof project.createdBy === 'object' ? project.createdBy._id : project.createdBy
         }));
-        
+
         // Update the projects in state
         dispatch({ type: 'SET_PROJECTS', payload: transformedProjects });
       } catch (error) {
@@ -129,7 +132,7 @@ const WorkspaceOverview: React.FC = () => {
   const completedProjects = workspaceProjects.filter(p => p.status === 'completed').length;
   const totalTasks = workspaceProjects.reduce((sum, p) => sum + p.totalTasksCount, 0);
   const completedTasks = workspaceProjects.reduce((sum, p) => sum + p.completedTasksCount, 0);
-  const avgProgress = workspaceProjects.length > 0 
+  const avgProgress = workspaceProjects.length > 0
     ? Math.round(workspaceProjects.reduce((sum, p) => sum + p.progress, 0) / workspaceProjects.length)
     : 0;
 
@@ -206,9 +209,12 @@ const WorkspaceOverview: React.FC = () => {
         {isOwner && (
           <button
             onClick={() => navigate(`/workspace/${state.currentWorkspace}/projects/new`)}
-            className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+            style={{
+              background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
+            }}
+            className="flex items-center gap-2 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             {t('workspace.overview.newProject')}
           </button>
         )}
@@ -221,31 +227,32 @@ const WorkspaceOverview: React.FC = () => {
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-200">{stat.label}</span>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <Icon className={`w-4 h-4 ${stat.color}`} />
+              <GlassmorphicCard key={index} hoverEffect={true} className="p-6 group relative overflow-hidden">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+                <div className="flex items-center justify-between mb-3 relative z-10">
+                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{stat.label}</span>
+                  <div className={`p-3 rounded-xl ${stat.bgColor} shadow-lg`}>
+                    <Icon className={`w-5 h-5 ${stat.color}`} />
                   </div>
                 </div>
-                <div className="flex items-end justify-between">
+                <div className="flex items-end justify-between relative z-10">
                   <div>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stat.value}</div>
-                    <div className="text-xs text-green-600 mt-1">{stat.change}</div>
+                    <div className={`text-3xl font-bold bg-gradient-to-r ${stat.color === 'text-accent-dark' ? 'from-blue-600 to-purple-600' : stat.color === 'text-green-600' ? 'from-green-600 to-emerald-600' : 'from-purple-600 to-pink-600'} bg-clip-text text-transparent`}>{stat.value}</div>
+                    <div className="text-xs text-green-600 mt-1 font-semibold">{stat.change}</div>
                   </div>
                   {/* Progress bar for some stats */}
                   {stat.key === 'activeProjects' && (
-                    <div className="w-16 h-2 bg-gray-300 rounded-full overflow-hidden">
-                      <div className="h-full bg-accent" style={{ width: '72%' }} />
+                    <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-full" style={{ width: '72%', background: `linear-gradient(90deg, ${preferences.accentColor}, ${preferences.accentColor}dd)` }} />
                     </div>
                   )}
                   {stat.key === 'utilization' && (
-                    <div className="w-16 h-2 bg-gray-300 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-600" style={{ width: avgProgress + '%' }} />
+                    <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-green-600 to-emerald-600" style={{ width: avgProgress + '%' }} />
                     </div>
                   )}
                 </div>
-              </div>
+              </GlassmorphicCard>
             );
           })}
         </div>
@@ -258,7 +265,7 @@ const WorkspaceOverview: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Today's Attendance</h3>
             <Clock className="w-5 h-5 text-gray-400" />
           </div>
-          
+
           {attendanceStats.total > 0 ? (
             <div className="grid grid-cols-4 gap-4">
               <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
@@ -428,15 +435,14 @@ const WorkspaceOverview: React.FC = () => {
                     {project.description}
                   </p>
                 </div>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  project.status === 'active' ? 'bg-green-100 text-green-700' :
-                  project.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
+                <span className={`px-2 py-1 text-xs rounded-full ${project.status === 'active' ? 'bg-green-100 text-green-700' :
+                    project.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                      'bg-gray-100 text-gray-700'
+                  }`}>
                   {project.status}
                 </span>
               </div>
-              
+
               {/* Progress Bar */}
               <div className="mb-3">
                 <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">

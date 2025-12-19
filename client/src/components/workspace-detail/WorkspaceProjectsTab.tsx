@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Plus, FolderOpen, Edit, Trash2, X, Calendar, DollarSign, 
+import {
+  Plus, FolderOpen, Edit, Trash2, X, Calendar, DollarSign,
   Users, Tag, AlertCircle, Eye, Briefcase, Clock, CheckCircle,
   Pause, XCircle, Play, Archive
 } from 'lucide-react';
@@ -14,10 +14,10 @@ interface WorkspaceProjectsTabProps {
   onClearClientFilter?: () => void;
 }
 
-const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({ 
-  workspaceId, 
+const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
+  workspaceId,
   selectedClientId,
-  onClearClientFilter 
+  onClearClientFilter
 }) => {
   const { state, dispatch } = useApp();
   const { t, i18n } = useTranslation();
@@ -37,21 +37,21 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
     budgetActual: '0',
     tags: ''
   });
-  
+
   // Get projects and clients from AppContext
   const workspace = state.workspaces.find(w => w._id === workspaceId);
   const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
-  
+
   // Filter projects based on user role
   // Owner sees all projects, employees see only projects they're assigned to
   const allWorkspaceProjects = state.projects.filter(p => p.workspace === workspaceId);
-  const workspaceProjects = isWorkspaceOwner 
+  const workspaceProjects = isWorkspaceOwner
     ? allWorkspaceProjects
-    : allWorkspaceProjects.filter(p => 
-        (p as any).team?.some((member: any) => member._id === state.userProfile._id) ||
-        p.createdBy === state.userProfile._id
-      );
-  
+    : allWorkspaceProjects.filter(p =>
+      (p as any).team?.some((member: any) => member._id === state.userProfile._id) ||
+      p.createdBy === state.userProfile._id
+    );
+
   const workspaceClients = state.clients || [];
 
   const handleCreateProject = () => {
@@ -208,7 +208,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   };
 
   // Filter projects by selected client
-  const filteredProjects = selectedClientId 
+  const filteredProjects = selectedClientId
     ? workspaceProjects.filter(p => p.client === workspaceClients.find(c => c._id === selectedClientId)?.name)
     : workspaceProjects;
 
@@ -223,7 +223,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   }, {});
 
   // Get selected client name
-  const selectedClientName = selectedClientId 
+  const selectedClientName = selectedClientId
     ? workspaceClients.find(c => c._id === selectedClientId)?.name
     : null;
 
@@ -281,10 +281,10 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   <h4 className="font-semibold text-gray-900">{clientName}</h4>
                   <span className="text-sm text-gray-600">({clientProjects.length})</span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {clientProjects.map((project: any) => (
-                    <div 
+                    <div
                       key={project._id}
                       className="bg-white border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
@@ -327,7 +327,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                         )}
                         <div className="flex items-center gap-2">
                           <div className="flex-1 bg-gray-300 rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-accent h-2 rounded-full transition-all"
                               style={{ width: `${project.progress || 0}%` }}
                             />
@@ -348,9 +348,9 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                       )}
 
                       {/* Actions */}
-                      <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                      <div className="flex items-center gap-2 pt-3 border-gray-200">
                         <button
-                          onClick={() => navigate(`/project-view/${project._id}`)}
+                          onClick={() => navigate(`/project/${project._id}/overview`)}
                           className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-sm bg-accent text-gray-900 rounded hover:bg-accent-hover"
                         >
                           <Eye className="w-3 h-3" />

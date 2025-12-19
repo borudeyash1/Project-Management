@@ -434,6 +434,7 @@ const userSchema = new Schema<IUser>({
     trialEndsAt: Date
   },
   // Sartthi Ecosystem Modules (Mail, Calendar, etc.)
+  // DEPRECATED: Use connectedAccounts instead. Kept for backward compatibility during migration.
   modules: {
     mail: {
       isEnabled: {
@@ -475,6 +476,46 @@ const userSchema = new Schema<IUser>({
       connectedAt: Date,
       lastSyncedAt: Date
     }
+  },
+  // NEW: Multi-account support for Sartthi services
+  connectedAccounts: {
+    type: {
+      mail: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
+      calendar: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
+      vault: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      }
+    },
+    required: false,
+    default: undefined
   },
   settings: {
     themeColor: {

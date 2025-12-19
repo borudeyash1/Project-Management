@@ -59,6 +59,12 @@ export interface DashboardData {
     size: number;
     updatedAt: string;
   }>;
+  workspaces?: Array<{
+    _id: string;
+    name: string;
+    description?: string;
+    memberCount?: number;
+  }>;
 }
 
 export const getDashboardData = async (): Promise<DashboardData> => {
@@ -71,7 +77,8 @@ export const getDashboardData = async (): Promise<DashboardData> => {
       notifications: [],
       deadlines: [],
       teamActivity: [],
-      recentFiles: []
+      recentFiles: [],
+      workspaces: []
     };
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
@@ -83,7 +90,8 @@ export const getDashboardData = async (): Promise<DashboardData> => {
       notifications: [],
       deadlines: [],
       teamActivity: [],
-      recentFiles: []
+      recentFiles: [],
+      workspaces: []
     };
   }
 };

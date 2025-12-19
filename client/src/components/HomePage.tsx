@@ -6,7 +6,8 @@ import {
   MessageSquare, FileText, Zap, Bot, Crown,
   CheckCircle, AlertCircle, Play, Pause, Square, X,
   CheckSquare, Type, List, Activity, Folder, Download,
-  Upload, Link as LinkIcon, Award, Flame, ArrowUp, ArrowDown
+  Upload, Link as LinkIcon, Award, Flame, ArrowUp, ArrowDown, RefreshCw,
+  Sparkles, Rocket, TrendingDown, Monitor, Package
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PlanStatus } from './FeatureRestriction';
@@ -16,14 +17,21 @@ import { useRefreshData } from '../hooks/useRefreshData';
 import SubscriptionBadge from './SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/homeService';
+import { goalService, Goal } from '../services/goalService';
 import { apiService } from '../services/api';
 import CalendarWidget from './dashboard/CalendarWidget';
 import ReportsWidget from './dashboard/ReportsWidget';
 import PendingTasksWidget from './dashboard/PendingTasksWidget';
 import ExpandedStatCard from './dashboard/ExpandedStatCard';
+import SartthiAppsWidget from './dashboard/SartthiAppsWidget';
+import DashboardSkeleton from './dashboard/DashboardSkeleton';
+import WorkspacesWidget from './dashboard/WorkspacesWidget';
+import DownloadAppWidget from './dashboard/DownloadAppWidget';
+import GoalsWidget from './dashboard/GoalsWidget';
 import ContentBanner from './ContentBanner';
 import { useTranslation } from 'react-i18next';
 import AIChatbot from './AIChatbot';
+import ProfileSummaryWidget from './dashboard/ProfileSummaryWidget';
 
 interface QuickTask {
   _id: string;
@@ -62,7 +70,7 @@ interface Project {
   name: string;
   description: string;
   progress: number;
-  status: 'active' | 'on-hold' | 'completed';
+  status: 'active' | 'on-hold' | 'completed' | 'planning' | 'in_progress' | 'cancelled';
   team: number;
   teamMembers?: {
     _id: string;
@@ -102,10 +110,20 @@ interface RecentFile {
   uploadedAt: Date;
 }
 
+interface DesktopRelease {
+  _id: string;
+  version: string;
+  platform: string;
+  downloadUrl: string;
+  releaseNotes: string;
+  isLatest: boolean;
+  createdAt: string;
+}
+
 const HomePage: React.FC = () => {
   const { state, dispatch } = useApp();
   const { userPlan, canUseAI } = useFeatureAccess();
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, preferences } = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
@@ -116,141 +134,109 @@ const HomePage: React.FC = () => {
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [teamActivity, setTeamActivity] = useState<TeamActivity[]>([]);
   const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [latestRelease, setLatestRelease] = useState<DesktopRelease | null>(null);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskType, setNewTaskType] = useState<'task' | 'note' | 'checklist'>('task');
   const [productivityData, setProductivityData] = useState<number[]>([65, 72, 68, 85, 78, 90, 88]);
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<'tasks' | 'projects' | 'team' | 'progress' | null>(null);
+
+  // Get accent color from preferences
+  const accentColor = preferences.accentColor || '#FBBF24';
 
   const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getDashboardData();
+
+      const [response, goalsResponse, releasesResponse] = await Promise.all([
+        getDashboardData(),
+        goalService.getGoals().catch(e => ({ data: [] })),
+        apiService.get('/releases/latest').catch(e => ({ data: [] }))
+      ]);
+
+      if (goalsResponse && Array.isArray(goalsResponse.data)) {
+        setGoals(goalsResponse.data);
+      } else if (Array.isArray(goalsResponse)) {
+        setGoals(goalsResponse);
+      }
+
+
+      if ('success' in releasesResponse && releasesResponse.success && releasesResponse.data && releasesResponse.data.length > 0) {
+        const windowsRelease = releasesResponse.data.find((r: DesktopRelease) => r.platform === 'windows' && r.isLatest);
+        if (windowsRelease) setLatestRelease(windowsRelease);
+      }
+
 
       setQuickTasks(
-        (response.quickTasks || []).map((task) => ({
+        (response.quickTasks || []).map((task: any) => ({
           ...task,
+          type: task.type || 'task',
+          priority: task.priority || 'medium',
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
-          type: 'task',
-          priority: (task as any).priority || 'medium',
-          project: (task as any).project?.name,
         })),
       );
+
       setRecentActivity(
-        (response.recentActivity || []).map((activity) => {
-          const rawActivity = activity as any;
-          const rawUser = rawActivity.user || {};
-          return {
-            _id: activity._id,
-            type: rawActivity.type || 'task_updated',
-            title: rawActivity.title || rawActivity.message || 'Activity',
-            description: rawActivity.description || rawActivity.message || 'Recent update',
-            timestamp: activity.timestamp ? new Date(activity.timestamp) : new Date(),
-            user: rawUser.name
-              ? {
-                name: rawUser.name,
-                avatar: rawUser.avatar,
-              }
-              : undefined,
-          } as RecentActivity;
-        }),
-      );
-      setProjects(
-        (response.projects || []).map((project) => {
-          // Ensure _id is preserved from the API response
-          const projectData = project as any;
-          const projectId = projectData._id || projectData.id;
-          
-          console.log('🔍 [DASHBOARD] Raw project data:', projectData);
-          console.log('🔍 [DASHBOARD] Project team:', projectData.team);
-          
-          // Extract team members with proper null checks
-          let teamMembers: any[] = [];
-          if (Array.isArray(projectData.team)) {
-            teamMembers = projectData.team
-              .filter((member: any) => {
-                const isValid = member && member._id;
-                console.log('🔍 [DASHBOARD] Filtering member:', member, 'Valid:', isValid);
-                return isValid;
-              })
-              .map((member: any) => {
-                const mapped = {
-                  _id: member._id,
-                  name: member.name || 'Unknown User',
-                  email: member.email || '',
-                  avatar: member.avatar || member.avatarUrl,
-                  role: member.role || 'member'
-                };
-                console.log('✅ [DASHBOARD] Mapped member:', mapped);
-                return mapped;
-              });
-          }
-          
-          console.log('✅ [DASHBOARD] Final team members for project', projectData.name, ':', teamMembers);
-          
-          return {
-            _id: projectId,
-            name: projectData.name,
-            description: projectData.description,
-            progress: projectData.progress || 0,
-            dueDate: projectData.dueDate || projectData.endDate ? new Date(projectData.dueDate || projectData.endDate) : undefined,
-            team: teamMembers.length,
-            teamMembers: teamMembers,
-            color: 'bg-blue-500',
-            status: (projectData.status || 'active') as Project['status'],
-          };
-        }),
-      );
-      setNotifications(
-        (response.notifications || []).map((notification) => ({
-          _id: notification._id,
-          title: 'Notification',
-          message: notification.message,
-          type: (notification as any).type || 'info',
-          timestamp: notification.createdAt ? new Date(notification.createdAt) : new Date(),
-          read: notification.read,
+        (response.recentActivity || []).map((activity: any) => ({
+          ...activity,
+          type: activity.type || 'task_completed',
+          title: activity.title || activity.message || 'Activity',
+          description: activity.description || activity.message || '',
+          timestamp: new Date(activity.timestamp),
         })),
       );
+
+      setProjects(
+        (response.projects || []).map((project: any) => ({
+          ...project,
+          color: project.color || '#6366f1',
+          team: project.team?.length || project.team || 0,
+          teamMembers: project.team || [],
+          dueDate: project.dueDate ? new Date(project.dueDate) : undefined,
+        })),
+      );
+
+      setNotifications(
+        (response.notifications || []).map((notification: any) => ({
+          ...notification,
+          title: notification.title || 'Notification',
+          timestamp: new Date(notification.timestamp || notification.createdAt),
+        })),
+      );
+
       setDeadlines(
-        (response.deadlines || []).map((deadline) => {
-          const dueDate = deadline.dueDate ? new Date(deadline.dueDate) : new Date();
-          return {
-            _id: deadline._id,
-            title: deadline.title,
-            project: deadline.project?.name || 'General',
-            dueDate,
-            priority: ((deadline as any).priority || 'medium') as Deadline['priority'],
-            daysLeft: Math.max(
-              0,
-              Math.ceil((dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-            ),
-          };
-        }),
+        (response.deadlines || []).map((deadline: any) => ({
+          ...deadline,
+          priority: deadline.priority || 'medium',
+          daysLeft: deadline.daysLeft || 0,
+          dueDate: new Date(deadline.dueDate),
+        })),
       );
+
       setTeamActivity(
-        (response.teamActivity || []).map((activity) => {
-          const raw = activity as any;
-          return {
-            _id: activity._id,
-            user: raw.user?.name || 'User',
-            action: raw.action || 'updated',
-            target: raw.target || 'Task',
-            timestamp: activity.timestamp ? new Date(activity.timestamp) : new Date(),
-          } as TeamActivity;
-        }),
+        (response.teamActivity || []).map((activity: any) => ({
+          ...activity,
+          target: activity.target || '',
+          timestamp: new Date(activity.timestamp),
+        })),
       );
+
       setRecentFiles(
-        (response.recentFiles || []).map((file) => ({
+        (response.recentFiles || []).map((file: any) => ({
           ...file,
           size: `${((file.size || 0) / (1024 * 1024)).toFixed(1)} MB`,
           uploadedBy: file.name,
           uploadedAt: file.updatedAt ? new Date(file.updatedAt) : new Date(),
         })),
       );
+
+      setWorkspaces(response.workspaces || []);
     } catch (err: any) {
       console.error('Failed to load dashboard data', err);
       setError(err.message || 'Failed to load dashboard data');
@@ -263,28 +249,22 @@ const HomePage: React.FC = () => {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  // Enable refresh button for this page
   useRefreshData(loadDashboardData, [loadDashboardData]);
 
   const handleAddQuickTask = async () => {
     if (!newTaskTitle.trim()) return;
 
     try {
-      // Minimal payload - only what's required
       const payload: any = {
         title: newTaskTitle,
       };
-      
-      // Only add workspace if user is in a workspace
+
       if (state.currentWorkspace) {
         payload.workspace = state.currentWorkspace;
       }
 
-      console.log('📝 [QUICK ACTION] Creating task:', payload);
       const createdTask = await apiService.createTask(payload);
-      console.log('✅ [QUICK ACTION] Task created:', createdTask);
 
-      // Add to local state
       const newTask: QuickTask = {
         _id: createdTask._id,
         title: createdTask.title,
@@ -298,70 +278,51 @@ const HomePage: React.FC = () => {
       setNewTaskType('task');
       setShowQuickAdd(false);
 
-      // Show success message
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: 'Task created successfully!',
+          message: 'Task created successfully',
           duration: 3000,
         },
       });
-      
-      // Reload dashboard data to sync
-      loadDashboardData();
-    } catch (error: any) {
-      console.error('❌ [QUICK ACTION] Failed to create task:', error);
-      console.error('❌ [QUICK ACTION] Error message:', error.message);
-      console.error('❌ [QUICK ACTION] Error stack:', error.stack);
-      
-      // Extract more detailed error message
-      const errorMessage = error.message || 'Failed to create task. Please try again.';
-      
+    } catch (error) {
+      console.error('Failed to create task:', error);
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'error',
-          message: errorMessage,
-          duration: 5000,
+          message: 'Failed to create task',
+          duration: 3000,
         },
       });
     }
   };
 
-  const markNotificationAsRead = (notificationId: string) => {
-    setNotifications(notifications.map(notif =>
-      notif._id === notificationId ? { ...notif, read: true } : notif
-    ));
-  };
+  const handleToggleTask = async (taskId: string) => {
+    const task = quickTasks.find((t) => t._id === taskId);
+    if (!task) return;
 
-  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
-
-  const toggleTaskCompletion = (taskId: string) => {
-    setQuickTasks(tasks =>
-      tasks.map(task =>
-        task._id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+    try {
+      await apiService.updateTask(taskId, { status: task.completed ? 'pending' : 'completed' } as any);
+      setQuickTasks(
+        quickTasks.map((t) =>
+          t._id === taskId ? { ...t, completed: !t.completed } : t,
+        ),
+      );
+    } catch (error) {
+      console.error('Failed to toggle task:', error);
+    }
   };
 
   const getPriorityColor = (priority: string) => {
-    if (isDarkMode) {
-      switch (priority) {
-        case 'urgent': return 'text-red-400 bg-red-900/50';
-        case 'high': return 'text-orange-400 bg-orange-900/50';
-        case 'medium': return 'text-yellow-400 bg-yellow-900/50';
-        case 'low': return 'text-gray-400 bg-gray-800/50';
-        default: return 'text-gray-400 bg-gray-800/50';
-      }
-    }
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-800 bg-yellow-200';
-      case 'low': return 'text-gray-600 bg-gray-100';
+      case 'urgent': return 'text-red-600 bg-red-100 dark:bg-red-900/20 dark:text-red-400';
+      case 'high': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400';
+      case 'low': return 'text-green-600 bg-green-100 dark:bg-green-900/20 dark:text-green-400';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -385,493 +346,625 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    if (isDarkMode) {
-      switch (status) {
-        case 'active': return 'bg-green-900/50 text-green-400';
-        case 'on-hold': return 'bg-yellow-900/50 text-yellow-400';
-        case 'completed': return 'bg-gray-800/50 text-gray-400';
-        default: return 'bg-gray-800/50 text-gray-400';
-      }
-    }
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'on-hold': return 'bg-yellow-100 text-yellow-800';
-      case 'completed': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getFileIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'pdf': return <FileText className="w-5 h-5 text-red-500" />;
-      case 'figma': return <Folder className="w-5 h-5 text-purple-500" />;
-      case 'excel': return <FileText className="w-5 h-5 text-green-500" />;
-      default: return <FileText className="w-5 h-5 text-gray-500" />;
-    }
-  };
-
-  const getActionColor = (action: string) => {
-    switch (action) {
-      case 'completed': return 'text-green-600';
-      case 'commented on': return 'text-blue-600';
-      case 'uploaded': return 'text-purple-600';
-      case 'created': return 'text-orange-600';
-      default: return 'text-gray-600';
-    }
-  };
-
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full py-20">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-xl shadow border border-red-200 dark:border-red-900 mt-10 p-6">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-          <div>
-            <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">Unable to load dashboard</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{error}</p>
-            <button
-              onClick={loadDashboardData}
-              className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
-            >
-              Retry
-            </button>
+      <div className="flex items-center justify-center h-full p-6">
+        <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-red-100 dark:border-red-900/30 p-8 text-center">
+          <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-500" />
           </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Unable to load dashboard</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">{error}</p>
+          <button
+            onClick={loadDashboardData}
+            className="inline-flex items-center px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-red-500/30"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Try Again
+          </button>
         </div>
       </div>
     );
   }
 
+  const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'planning' || p.status === 'in_progress');
+  const completedTasks = quickTasks.filter(t => t.completed).length;
+  const totalTasks = quickTasks.length;
+  const taskCompletionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const totalTeamMembers = projects.reduce((acc, p) => acc + (Array.isArray(p.teamMembers) ? p.teamMembers.length : (typeof p.team === 'number' ? p.team : 0)), 0);
+
   return (
-    <div className={`h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Content Banner */}
+    <div className={`min-h-screen pb-8 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
       <ContentBanner route="/" />
 
-      {/* Header */}
-      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {t('dashboard.welcomeBack', { name: state.userProfile?.fullName })}
-            </h1>
-            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-              {t('dashboard.todayOverview')}
-            </p>
-          </div>
-        </div>
-      </div>
+      <div className="max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
 
-      <div className="p-6 max-w-[1600px] mx-auto">
-        {/* Top Row - Stats Overview */}
-        {/* Top Row - Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div
-            onClick={() => setExpandedCard('tasks')}
-            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('dashboard.pendingTasks')}</p>
-                <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
-                  {quickTasks.filter(t => !t.completed).length}
-                </p>
+        {/* Hero Section with Glassmorphism */}
+        <div className={`relative overflow-hidden rounded-3xl p-8 ${isDarkMode
+          ? 'bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 border border-white/10 backdrop-blur-xl'
+          : 'bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 border border-white/50 backdrop-blur-xl shadow-2xl'
+          }`}>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -mr-48 -mt-48" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-pink-500/20 to-orange-500/20 rounded-full blur-3xl -ml-48 -mb-48" />
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <h1 className={`text-4xl md:text-5xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
+                  Welcome back, {state.userProfile?.fullName?.split(' ')[0]}
+                  <span className="ml-3 inline-block animate-wave">👋</span>
+                </h1>
               </div>
-              <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-blue-900/50' : 'bg-blue-50'}`}>
-                <Clock className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-              </div>
+              <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} flex items-center gap-2`}>
+                <Sparkles className="w-5 h-5 text-yellow-500" />
+                {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
             </div>
-          </div>
-          <div
-            onClick={() => setExpandedCard('projects')}
-            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.active')}</p>
-                <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
-                  {projects.length}
-                </p>
-              </div>
-              <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-green-900/50' : 'bg-green-50'}`}>
-                <Target className={`w-6 h-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-              </div>
-            </div>
-          </div>
-          <div
-            onClick={() => setExpandedCard('team')}
-            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('team.members')}</p>
-                <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
-                  {projects.reduce((acc, p) => acc + p.team, 0)}
-                </p>
-              </div>
-              <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-purple-900/50' : 'bg-purple-50'}`}>
-                <Users className={`w-6 h-6 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-              </div>
-            </div>
-          </div>
-          <div
-            onClick={() => setExpandedCard('progress')}
-            className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} border cursor-pointer transition-colors`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('dashboard.avgProgress')}</p>
-                <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mt-1`}>
-                  {Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))}%
-                </p>
-              </div>
-              <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-orange-900/50' : 'bg-orange-50'}`}>
-                <TrendingUp className={`w-6 h-6 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
-              </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsAIModalOpen(true)}
+                className="group relative px-6 py-3 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+                  boxShadow: `0 10px 25px -5px ${accentColor}40`
+                }}
+              >
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+                <Bot className="w-5 h-5 relative z-10" />
+                <span className="relative z-10">AI Assistant</span>
+              </button>
+              <button
+                onClick={loadDashboardData}
+                className={`p-3 rounded-2xl border transition-all ${isDarkMode
+                  ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                  : 'bg-white/50 border-white/50 text-gray-600 hover:bg-white shadow-sm'
+                  }`}
+              >
+                <RefreshCw className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid - Responsive Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-6">
-            {/* Plan Status */}
-            <PlanStatus />
+        {/* Stats Grid - Beautiful Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              id: 'tasks',
+              label: 'Active Tasks',
+              value: quickTasks.filter(t => !t.completed).length,
+              total: totalTasks,
+              icon: CheckSquare,
+              gradient: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+              trend: `${taskCompletionRate}% completed`,
+              trendUp: taskCompletionRate > 50
+            },
+            {
+              id: 'projects',
+              label: 'Active Projects',
+              value: activeProjects.length,
+              total: projects.length,
+              icon: Rocket,
+              gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+              trend: `${projects.filter(p => p.status === 'completed').length} completed`,
+              trendUp: true
+            },
+            {
+              id: 'team',
+              label: 'Team Members',
+              value: totalTeamMembers,
+              icon: Users,
+              gradient: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
+              trend: `${activeProjects.length} active projects`,
+              trendUp: true
+            },
+            {
+              id: 'progress',
+              label: 'Avg Progress',
+              value: `${Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))}%`,
+              icon: TrendingUp,
+              gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              trend: 'On track',
+              trendUp: true
+            }
+          ].map((stat, index) => (
+            <div
+              key={index}
+              onClick={() => setExpandedCard(stat.id as any)}
+              className={`group relative overflow-hidden rounded-2xl p-6 border transition-all duration-500 hover:scale-105 cursor-pointer ${isDarkMode
+                ? 'bg-gray-800/50 border-gray-700/50 hover:border-gray-600 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-200/50 hover:shadow-2xl backdrop-blur-sm'
+                }`}
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `${stat.gradient}10` }} />
 
-            {/* Quick Actions */}
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.quickActions')}</h2>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 rounded-xl shadow-lg" style={{ background: stat.gradient }}>
+                    <stat.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${stat.trendUp
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    }`}>
+                    {stat.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                    {stat.trend}
+                  </div>
+                </div>
+                <h3 className={`text-4xl font-black mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {stat.value}
+                </h3>
+                <p className={`text-sm font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {stat.label}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Sartthi Desktop Download Card */}
+        {latestRelease && (
+          <div className={`relative overflow-hidden rounded-2xl border ${isDarkMode
+            ? 'bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border-indigo-500/20'
+            : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200/50 shadow-lg'
+            }`}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+
+            <div className="relative z-10 p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Icon */}
+                <div className="flex-shrink-0">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-xl">
+                    <Monitor className="w-12 h-12 text-white" />
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      Sartthi Desktop
+                    </h3>
+                    <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full">
+                      v{latestRelease.version}
+                    </span>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+                      }`}>
+                      Latest
+                    </span>
+                  </div>
+
+                  <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Experience the full power of Sartthi with our native desktop application. Faster, more powerful, and works offline.
+                  </p>
+
+                  {/* Features */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
+                      <div className="text-lg mb-1">⚡</div>
+                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Lightning Fast
+                      </div>
+                    </div>
+                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
+                      <div className="text-lg mb-1">📴</div>
+                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Offline Mode
+                      </div>
+                    </div>
+                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
+                      <div className="text-lg mb-1">🔔</div>
+                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Notifications
+                      </div>
+                    </div>
+                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
+                      <div className="text-lg mb-1">🔒</div>
+                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Secure
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Release Notes */}
+                  {latestRelease.releaseNotes && (
+                    <div className={`p-3 rounded-lg mb-4 ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/50'}`}>
+                      <p className={`text-xs font-semibold mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        What's New:
+                      </p>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} line-clamp-2`}>
+                        {latestRelease.releaseNotes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Download Button */}
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={latestRelease.downloadUrl}
+                      download
+                      className="group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+                      <Download className="w-5 h-5 relative z-10" />
+                      <span className="relative z-10">Download for Windows</span>
+                    </a>
+                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <div className="font-medium">Windows 10/11</div>
+                      <div>64-bit</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sartthi Ecosystem */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Sartthi Ecosystem
+            </h2>
+          </div>
+          <SartthiAppsWidget />
+        </section>
+
+        {/* Professional Profile - Full Width */}
+        <section className="mt-8 mb-8">
+          <ProfileSummaryWidget />
+        </section>
+
+        {/* Main Content - Bento Box Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Left Column - Tasks & Projects */}
+          <div className="lg:col-span-7 space-y-6 min-h-[600px]">
+
+            {/* Quick Tasks */}
+            <div className={`rounded-2xl border p-6 ${isDarkMode
+              ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
+              : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+              }`}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
+                    <CheckSquare className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      Quick Tasks
+                    </h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {quickTasks.filter(t => !t.completed).length} pending
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowQuickAdd(!showQuickAdd)}
-                  className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                  className="px-4 py-2 text-white rounded-xl text-sm font-semibold transition-all shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+                    boxShadow: `0 4px 12px -2px ${accentColor}40`
+                  }}
                 >
-                  <Plus className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <Plus className="w-4 h-4 inline mr-1.5" />
+                  Add Task
                 </button>
               </div>
 
-              {/* Quick Add Task */}
               {showQuickAdd && (
-                <div className={`mb-4 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-                  <div className="flex gap-2 mb-3">
-                    <button
-                      onClick={() => setNewTaskType('task')}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'task'
-                        ? 'bg-accent text-white'
-                        : isDarkMode
-                          ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                    >
-                      <CheckSquare className="w-4 h-4" />
-                      {t('tasks.title')}
-                    </button>
-                    <button
-                      onClick={() => setNewTaskType('note')}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'note'
-                        ? 'bg-accent text-white'
-                        : isDarkMode
-                          ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                    >
-                      <Type className="w-4 h-4" />
-                      {t('common.note', { defaultValue: 'Note' })}
-                    </button>
-                    <button
-                      onClick={() => setNewTaskType('checklist')}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${newTaskType === 'checklist'
-                        ? 'bg-accent text-white'
-                        : isDarkMode
-                          ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                    >
-                      <List className="w-4 h-4" />
-                      {t('tasks.checklist')}
-                    </button>
-                  </div>
+                <div className={`mb-4 p-4 rounded-xl border ${isDarkMode ? 'bg-gray-700/30 border-gray-600' : 'bg-gray-50 border-gray-200'
+                  }`}>
+                  <input
+                    type="text"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddQuickTask()}
+                    placeholder="What needs to be done?"
+                    className={`w-full px-4 py-3 rounded-lg border mb-3 ${isDarkMode
+                      ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                      } focus:ring-2 focus:border-transparent transition-all`}
+                    style={{
+                      outlineColor: accentColor
+                    }}
+                    autoFocus
+                  />
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newTaskTitle}
-                      onChange={(e) => setNewTaskTitle(e.target.value)}
-                      placeholder={`What ${newTaskType === 'note' ? 'note' : newTaskType === 'checklist' ? 'checklist' : 'task'} needs to be added?`}
-                      className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDarkMode
-                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
-                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                        }`}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddQuickTask()}
-                    />
                     <button
                       onClick={handleAddQuickTask}
-                      className="px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90"
+                      className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+                      style={{ backgroundColor: accentColor }}
                     >
-                      Add
+                      Create
+                    </button>
+                    <button
+                      onClick={() => setShowQuickAdd(false)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkMode
+                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                        : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                        }`}
+                    >
+                      Cancel
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* Quick Tasks or Empty State */}
-              {quickTasks.length > 0 ? (
-                <div className="space-y-2">
-                  {quickTasks.slice(0, 5).map(task => (
-                    <div
-                      key={task._id}
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                        }`}
-                    >
-                      <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {getTaskTypeIcon(task.type)}
-                      </div>
+              <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
+                {quickTasks.slice(0, 8).map((task) => (
+                  <div
+                    key={task._id}
+                    className={`group p-4 rounded-xl border transition-all hover:scale-[1.02] ${task.completed
+                      ? isDarkMode
+                        ? 'bg-gray-700/20 border-gray-700/50 opacity-60'
+                        : 'bg-gray-50 border-gray-200 opacity-60'
+                      : isDarkMode
+                        ? 'bg-gray-700/30 border-gray-600'
+                        : 'bg-white border-gray-200 hover:shadow-md'
+                      }`}
+                    style={{
+                      borderColor: !task.completed ? `${accentColor}20` : undefined
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
                       <button
-                        onClick={() => toggleTaskCompletion(task._id)}
-                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${task.completed
-                          ? 'bg-green-500 border-green-500 text-white'
+                        onClick={() => handleToggleTask(task._id)}
+                        className={`flex-shrink-0 w-5 h-5 rounded-md border-2 transition-all ${task.completed
+                          ? 'border-green-500'
                           : isDarkMode
-                            ? 'border-gray-500'
+                            ? 'border-gray-600'
                             : 'border-gray-300'
-                          }`}
+                          } flex items-center justify-center`}
+                        style={{
+                          backgroundColor: task.completed ? '#10b981' : 'transparent',
+                          borderColor: task.completed ? '#10b981' : (!task.completed ? accentColor : undefined)
+                        }}
                       >
-                        {task.completed && <CheckCircle className="w-3 h-3" />}
+                        {task.completed && <CheckCircle className="w-4 h-4 text-white" />}
                       </button>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm truncate ${task.completed
-                          ? isDarkMode
-                            ? 'line-through text-gray-500'
-                            : 'line-through text-gray-500'
+                        <p className={`font-medium ${task.completed
+                          ? 'line-through text-gray-500'
                           : isDarkMode
-                              ? 'text-gray-200'
-                              : 'text-gray-900'
-                            }`}>
-                            {task.title}
-                          </p>
-                          {task.project && (
-                            <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>{task.project}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                            {task.priority}
-                          </span>
-                          {task.dueDate && (
-                            <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                              {new Date(task.dueDate).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
+                            ? 'text-gray-200'
+                            : 'text-gray-900'
+                          }`}>
+                          {task.title}
+                        </p>
                       </div>
-                    ))}
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(task.priority)}`}>
+                        {task.priority}
+                      </span>
+                    </div>
                   </div>
-                ) : (
-                  <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <CheckSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p className="text-sm">No tasks yet. Click "New Task" to get started!</p>
+                ))}
+                {quickTasks.length === 0 && (
+                  <div className="text-center py-12">
+                    <CheckSquare className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+                    <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      No tasks yet. Create one to get started!
+                    </p>
                   </div>
                 )}
               </div>
+            </div>
 
-            {/* Recent Activity */}
-            {recentActivity.length > 0 && (
-              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.recentActivity')}</h2>
-                  <button
-                    onClick={() => navigate('/activity')}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    {t('buttons.viewAll')}
-                  </button>
+            {/* Active Projects */}
+            <div className={`rounded-2xl border p-6 ${isDarkMode
+              ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
+              : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+              }`}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                    <Rocket className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      Active Projects
+                    </h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {activeProjects.length} in progress
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  {recentActivity.slice(0, 5).map(activity => (
-                    <div key={activity._id} className="flex items-start gap-3">
-                      <div className={`w-8 h-8 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full flex items-center justify-center flex-shrink-0`}>
-                        {getActivityIcon(activity.type)}
+                <button
+                  onClick={() => navigate('/projects')}
+                  className={`text-sm font-medium flex items-center gap-1 transition-colors`}
+                  style={{ color: accentColor }}
+                >
+                  View All
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {activeProjects.slice(0, 4).map((project) => (
+                  <div
+                    key={project._id}
+                    onClick={() => navigate(`/project/${project._id}`)}
+                    className={`group p-5 rounded-xl border cursor-pointer transition-all hover:scale-105 ${isDarkMode
+                      ? 'bg-gray-700/30 border-gray-600 hover:border-purple-500/50'
+                      : 'bg-white border-gray-200 hover:border-purple-500/50 hover:shadow-xl'
+                      }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h4 className={`font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {project.name}
+                        </h4>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} line-clamp-2`}>
+                          {project.description}
+                        </p>
+                      </div>
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0 ml-2"
+                        style={{ backgroundColor: project.color }}
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Progress</span>
+                        <span className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {project.progress}%
+                        </span>
+                      </div>
+                      <div className={`h-2 rounded-full overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                        <div
+                          className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex -space-x-2">
+                        {Array.isArray(project.teamMembers) && project.teamMembers.slice(0, 3).map((member, idx) => (
+                          <div
+                            key={idx}
+                            className={`w-8 h-8 rounded-full border-2 ${isDarkMode ? 'border-gray-800' : 'border-white'
+                              } bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold`}
+                            title={member.name}
+                          >
+                            {member.name?.charAt(0) || '?'}
+                          </div>
+                        ))}
+                        {((Array.isArray(project.teamMembers) ? project.teamMembers.length : (typeof project.team === 'number' ? project.team : 0)) > 3) && (
+                          <div className={`w-8 h-8 rounded-full border-2 ${isDarkMode ? 'border-gray-800 bg-gray-700' : 'border-white bg-gray-200'
+                            } flex items-center justify-center text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                            }`}>
+                            +{(Array.isArray(project.teamMembers) ? project.teamMembers.length : (typeof project.team === 'number' ? project.team : 0)) - 3}
+                          </div>
+                        )}
+                      </div>
+                      <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {Array.isArray(project.teamMembers) ? project.teamMembers.length : (typeof project.team === 'number' ? project.team : 0)} members
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Activity (Moved to Left) */}
+            <div className={`rounded-2xl border p-6 ${isDarkMode
+              ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
+              : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+              }`}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+                  <Activity className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Recent Activity
+                  </h3>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Latest updates
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                {recentActivity.slice(0, 6).map((activity) => (
+                  <div
+                    key={activity._id}
+                    className={`p-4 rounded-xl border ${isDarkMode
+                      ? 'bg-gray-700/30 border-gray-600'
+                      : 'bg-white border-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                        {activity.type === 'project_created' ? (
+                          <Folder className={`w-4 h-4 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                        ) : activity.type === 'task_completed' ? (
+                          <CheckSquare className={`w-4 h-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                        ) : (
+                          <Activity className={`w-4 h-4 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {t(`activity.types.${activity.type}`, { defaultValue: activity.title })}
-                        </p>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{activity.description}</p>
-                        <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>
-                          {new Date(activity.timestamp).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Team Activity Feed */}
-            {teamActivity.length > 0 && (
-              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.teamActivity')}</h2>
-                  <Activity className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                </div>
-                <div className="space-y-4">
-                  {teamActivity.slice(0, 5).map(activity => (
-                    <div key={activity._id} className="flex items-start gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-                        }`}>
-                        <User className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                          <span className="font-medium">{activity.user}</span>{' '}
-                          <span className={getActionColor(activity.action)}>{activity.action}</span>{' '}
-                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{activity.target}</span>
-                        </p>
-                        <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>
-                          {new Date(activity.timestamp).toLocaleTimeString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Upcoming Deadlines - Moved to Right Column */}
-
-            {/* Projects Overview */}
-            {projects.length > 0 && (
-              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.title')}</h2>
-                  <button
-                    onClick={() => navigate('/projects')}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    {t('buttons.viewAll')}
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {projects.slice(0, 3).map(project => {
-                    if (!project._id) {
-                      console.warn('Project missing _id:', project);
-                      return null;
-                    }
-                    return (
-                      <div key={project._id} className={`p-4 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                        }`}>
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${project.color}`} />
-                          <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.name}</h3>
-                        </div>
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                          {t('projects.' + project.status.toLowerCase().replace(' ', ''))}
-                        </span>
-                      </div>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3 line-clamp-2`}>{project.description}</p>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('projects.progress')}</span>
-                          <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{project.progress}%</span>
-                        </div>
-                        <div className={`w-full rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                          <div
-                            className="bg-accent h-2 rounded-full transition-all"
-                            style={{ width: `${project.progress}%` }}
-                          />
-                        </div>
-                        <div className={`flex items-center justify-between text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                          <span>{t('projects.teamMembers', { count: project.team })}</span>
-                          {project.dueDate && (
-                            <span>{t('projects.due', { date: new Date(project.dueDate).toLocaleDateString() })}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* AI Assistant */}
-            {/* AI Assistant Card Removed - Redundant with global chatbot */}
-
-            {/* AI Chatbot Modal */}
-            <AIChatbot 
-              isOpen={isAIModalOpen} 
-              onClose={() => setIsAIModalOpen(false)} 
-            />
-
-            {/* Pending Tasks Widget */}
-            <PendingTasksWidget />
-
-            {/* Recent Files */}
-            {recentFiles.length > 0 && (
-              <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Files</h2>
-                  <button
-                    onClick={() => navigate('/files')}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    {t('buttons.viewAll')}
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {recentFiles.slice(0, 5).map(file => (
-                    <div key={file._id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer">
-                      <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                        {getFileIcon(file.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {file.name}
+                          {activity.title}
                         </p>
                         <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {file.size} • {new Date(file.uploadedAt).toLocaleDateString()}
+                          {activity.description}
                         </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="w-3 h-3 text-gray-400" />
+                          <span className="text-xs text-gray-400">
+                            {new Date(activity.timestamp).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
-                      <Download className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} opacity-0 group-hover:opacity-100 transition-opacity`} />
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            )}
-
-            {/* Calendar Widget */}
-            <CalendarWidget />
+            </div>
 
             {/* Reports Widget */}
             <ReportsWidget />
           </div>
+
+          {/* Right Column - Download, Calendar, Workspaces */}
+          <div className="lg:col-span-5 flex flex-col gap-6 min-h-[600px]">
+
+            <DownloadAppWidget />
+
+            {/* Calendar Widget */}
+            <div className="h-[600px] shrink-0">
+              <CalendarWidget />
+            </div>
+
+            <div className="flex-1 min-h-[200px]">
+              <WorkspacesWidget workspaces={workspaces} loading={loading} />
+            </div>
+
+          </div>
+        </div>
+
+        {/* Bottom Section - Pending Tasks & Goals */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Pending Tasks (Left) */}
+          <div className="h-[400px]">
+            <PendingTasksWidget />
+          </div>
+
+          {/* Goals (Right) */}
+          <div className="h-[400px]">
+            <GoalsWidget goals={goals} loading={loading} />
+          </div>
         </div>
       </div>
+
+      {/* AI Chatbot Modal */}
+      {isAIModalOpen && (
+        <AIChatbot isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
+      )}
+
+      {/* Expanded Stat Card Modal */}
       {expandedCard && (
         <ExpandedStatCard
           type={expandedCard}
           onClose={() => setExpandedCard(null)}
           data={{
             tasks: quickTasks.filter(t => !t.completed),
-            projects: projects,
-            teamMembers: Array.from(
-              new Map(
-                projects.flatMap(p => p.teamMembers || [])
-                  .map(member => [member._id, member])
-              ).values()
-            ),
+            projects: activeProjects,
+            teamMembers: projects.flatMap(p => Array.isArray(p.teamMembers) ? p.teamMembers : []),
             avgProgress: Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))
           }}
         />

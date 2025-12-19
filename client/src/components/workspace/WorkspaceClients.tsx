@@ -176,11 +176,10 @@ const WorkspaceClients: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100">{client.name}</h3>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    client.status === 'active' 
+                  <span className={`text-xs px-2 py-1 rounded-full ${client.status === 'active'
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600'
                       : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
-                  }`}>
+                    }`}>
                     {client.status}
                   </span>
                 </div>
@@ -232,7 +231,7 @@ const WorkspaceClients: React.FC = () => {
 
             {isOwner && (
               <div className="flex items-center gap-2 mt-4">
-                <button 
+                <button
                   onClick={() => {
                     setSelectedClient(client);
                     setShowEditModal(true);
@@ -242,7 +241,7 @@ const WorkspaceClients: React.FC = () => {
                   <Edit className="w-3 h-3" />
                   {t('workspace.clients.edit')}
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setSelectedClient(client);
                     setShowDeleteModal(true);
@@ -376,7 +375,7 @@ const WorkspaceClients: React.FC = () => {
                       <div
                         key={project._id}
                         onClick={() => {
-                          navigate(`/project-view/${project._id}`);
+                          navigate(`/project/${project._id}/overview`);
                           setShowClientProjects(false);
                         }}
                         className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:shadow-md cursor-pointer transition-all"

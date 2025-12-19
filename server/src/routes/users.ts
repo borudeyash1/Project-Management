@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 import {
   getProfile,
   updateProfile,
+  getSettings,
   updateSettings,
   deleteAccount,
   uploadAvatar,
@@ -84,6 +85,7 @@ router.get('/profile', getProfile);
 router.put('/profile', updateProfileValidation, validateRequest, updateProfile);
 router.post('/face-scan', saveFaceScan);
 router.post('/verify-face', verifyFace);
+router.get('/settings', getSettings); // GET for fetching settings
 router.put('/settings', validateRequest, updateSettings);
 router.delete('/account', deleteAccount);
 router.post('/avatar', uploadAvatar);
@@ -92,7 +94,7 @@ router.post('/avatar', uploadAvatar);
 router.get('/preferences', getPreferences);
 router.put('/preferences', validateRequest, updatePreferences);
 
-// Get user by ID (for viewing other users' profiles)
+// Get user by ID (for viewing other users' profiles) - MUST BE LAST
 router.get('/:userId', getUserById);
 
 export default router;

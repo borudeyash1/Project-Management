@@ -131,6 +131,35 @@ export interface User {
       rootFolderId?: string;
     };
   };
+  connectedAccounts?: {
+    mail?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    calendar?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    vault?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 }

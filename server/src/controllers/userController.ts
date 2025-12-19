@@ -80,13 +80,13 @@ export const verifyFace = async (req: AuthenticatedRequest, res: Response): Prom
     // In production, use a proper face recognition library like face-api.js
     // For now, we'll do a basic check
     const storedImage = user.faceScanImage;
-    
+
     // Basic similarity check (placeholder)
     // In production, you would use:
     // - face-api.js for browser-based recognition
     // - AWS Rekognition, Azure Face API, or similar for server-side
     // - TensorFlow.js with a face recognition model
-    
+
     const isSimilar = storedImage.length > 0 && capturedImage.length > 0;
     const confidence = isSimilar ? Math.floor(Math.random() * 15) + 85 : 0; // 85-100% for demo
 
@@ -339,14 +339,188 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response): P
   }
 };
 
+// Get user settings
+export const getSettings = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user!;
+
+    // Default settings if not present
+    const userSettings = (user.settings as any) || {};
+
+    // Construct the response matching client SettingsData interface expected by Settings.tsx
+    const responseData = {
+      account: {
+        username: user.username,
+        email: user.email,
+        twoFactorEnabled: userSettings.privacy?.twoFactorAuth || false,
+        loginNotifications: userSettings.loginNotifications ?? true,
+        sessionTimeout: userSettings.sessionTimeout || 30,
+        accountDeletion: userSettings.accountDeletion || {
+          scheduledDate: null,
+          reason: ''
+        }
+      },
+      notifications: {
+        email: {
+          enabled: typeof userSettings.notifications?.email === 'boolean'
+            ? userSettings.notifications.email
+            : (userSettings.notifications?.email?.enabled ?? true),
+          taskUpdates: true, projectUpdates: true, mentions: true, deadlines: true, weeklyDigest: true
+        },
+        push: {
+          enabled: typeof userSettings.notifications?.push === 'boolean'
+            ? userSettings.notifications.push
+            : (userSettings.notifications?.push?.enabled ?? true),
+          taskUpdates: true, projectUpdates: false, mentions: true, deadlines: true
+        },
+        sms: { enabled: false, urgentOnly: true, phoneNumber: '' },
+        desktop: { enabled: true, sound: true, badges: true }
+      },
+      privacy: {
+        profileVisibility: userSettings.privacy?.profileVisibility || 'workspace',
+        showEmail: true,
+        showPhone: false,
+        showLastSeen: true,
+        allowDirectMessages: true,
+        dataSharing: { analytics: true, crashReports: true, usageStats: false }
+      },
+      appearance: {
+        theme: userSettings.darkMode ? 'dark' : 'light',
+        accentColor: userSettings.themeColor || '#3B82F6',
+        fontSize: 'medium',
+        density: 'comfortable',
+        sidebarCollapsed: false,
+        animations: true,
+        reducedMotion: false
+      },
+      workspace: {
+        defaultView: userSettings.workspace?.defaultView || userSettings.calendar?.defaultView || 'dashboard',
+        autoArchive: true,
+        archiveAfterDays: 30,
+        showCompletedTasks: true,
+        taskGrouping: 'project',
+        timeTracking: true,
+        breakReminders: true,
+        breakInterval: 60
+      },
+      integrations: {
+        googleCalendar: { enabled: userSettings.calendar?.syncGoogle || false, syncTasks: false, syncProjects: false },
+        slack: { enabled: false, channel: '', notifications: false },
+        github: { enabled: false, repository: '', syncIssues: false },
+        jira: { enabled: false, url: '', syncProjects: false }
+      },
+      security: {
+        passwordPolicy: { minLength: 8, requireUppercase: true, requireLowercase: true, requireNumbers: true, requireSymbols: false },
+        sessionManagement: { maxConcurrentSessions: 5, sessionTimeout: 30, requireReauth: false },
+        ipWhitelist: [],
+        deviceManagement: { trustedDevices: [] }
+      },
+      billing: {
+        plan: 'free',
+        nextBillingDate: '',
+        paymentMethod: { type: 'card', last4: '', brand: '' },
+        invoices: [],
+        usage: { projects: 0, maxProjects: 10, storage: 0, maxStorage: 5, teamMembers: 1, maxTeamMembers: 5 }
+      },
+      data: {
+        exportFormats: ['json', 'csv', 'pdf'],
+        autoBackup: false,
+        backupFrequency: 'weekly',
+        retentionPeriod: 30,
+        dataLocation: 'us'
+      }
+    };
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Settings retrieved successfully',
+      data: responseData
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Get settings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 // Update user settings
 export const updateSettings = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { settings } = req.body;
     const user = req.user!;
 
-    // Update settings
-    user.settings = { ...user.settings, ...settings };
+    if (!settings) {
+      res.status(400).json({
+        success: false,
+        message: 'Settings data is required'
+      });
+      return;
+    }
+
+    // Initialize objects if they don't exist
+    if (!user.settings) user.settings = {};
+    const settingsObj = user.settings as any;
+
+    if (!settingsObj.notifications) settingsObj.notifications = {};
+    if (!settingsObj.calendar) settingsObj.calendar = {};
+    if (!settingsObj.privacy) settingsObj.privacy = {};
+    if (!settingsObj.workspace) settingsObj.workspace = {};
+
+    // 1. Handle Account section (2FA, loginNotifications, etc.)
+    if (settings.account) {
+      // Map 2FA to privacy.twoFactorAuth as used in backend
+      if (settings.account.twoFactorEnabled !== undefined) {
+        settingsObj.privacy.twoFactorAuth = settings.account.twoFactorEnabled;
+      }
+      // Handle other account fields dynamically
+      if (settings.account.loginNotifications !== undefined) settingsObj.loginNotifications = settings.account.loginNotifications;
+      if (settings.account.sessionTimeout !== undefined) settingsObj.sessionTimeout = settings.account.sessionTimeout;
+      if (settings.account.accountDeletion) settingsObj.accountDeletion = settings.account.accountDeletion;
+    }
+
+    // 2. Handle Notifications (map detailed structure to backend booleans if needed)
+    if (settings.notifications) {
+      if (settings.notifications.email !== undefined) {
+        if (typeof settings.notifications.email === 'boolean') {
+          settingsObj.notifications.email = settings.notifications.email;
+        } else if (settings.notifications.email.enabled !== undefined) {
+          settingsObj.notifications.email = settings.notifications.email.enabled;
+        }
+      }
+      if (settings.notifications.push !== undefined) {
+        if (typeof settings.notifications.push === 'boolean') {
+          settingsObj.notifications.push = settings.notifications.push;
+        } else if (settings.notifications.push.enabled !== undefined) {
+          settingsObj.notifications.push = settings.notifications.push.enabled;
+        }
+      }
+      if (settings.notifications.inApp !== undefined) settingsObj.notifications.inApp = settings.notifications.inApp;
+    }
+
+    // 3. Handle Privacy
+    if (settings.privacy) {
+      if (settings.privacy.profileVisibility) settingsObj.privacy.profileVisibility = settings.privacy.profileVisibility;
+      if (settings.privacy.twoFactorAuth !== undefined) settingsObj.privacy.twoFactorAuth = settings.privacy.twoFactorAuth;
+    }
+
+    // 4. Handle Workspace
+    if (settings.workspace) {
+      if (settings.workspace.defaultView) settingsObj.workspace.defaultView = settings.workspace.defaultView;
+    }
+
+    // 5. Handle Legacy/Shared mappings
+    if (settings.themeColor) settingsObj.themeColor = settings.themeColor;
+    if (settings.darkMode !== undefined) settingsObj.darkMode = settings.darkMode;
+    if (settings.calendar) {
+      if (settings.calendar.syncGoogle !== undefined) settingsObj.calendar.syncGoogle = settings.calendar.syncGoogle;
+      if (settings.calendar.defaultView !== undefined) settingsObj.calendar.defaultView = settings.calendar.defaultView;
+    }
+
+    user.markModified('settings');
     await user.save();
 
     const response: ApiResponse = {
@@ -545,4 +719,3 @@ export const getUserById = async (req: AuthenticatedRequest, res: Response): Pro
     });
   }
 };
-

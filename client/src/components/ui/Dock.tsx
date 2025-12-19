@@ -62,14 +62,14 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
   const getPositionClasses = useCallback(() => {
     switch (dockPosition) {
       case 'top':
-        return 'top-6 left-1/2 -translate-x-1/2';
+        return 'top-0 left-1/2 -translate-x-1/2';
       case 'left':
         return 'left-6 top-1/2 -translate-y-1/2';
       case 'right':
         return 'right-6 top-1/2 -translate-y-1/2';
       case 'bottom':
       default:
-        return 'bottom-0 left-1/2 -translate-x-1/2'; // Changed from bottom-6 to bottom-0
+        return 'bottom-0 left-1/2 -translate-x-1/2';
     }
   }, [dockPosition]);
 
@@ -204,9 +204,16 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       >
         <div
           ref={dockRef}
-          className={`${isTopOrBottom ? 'bg-white dark:bg-gray-800 shadow-none' : ''}`}
+          className={`${isTopOrBottom
+              ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm'
+              : ''
+            }`}
           style={{
-            background: (isTopOrBottom || isVertical) ? 'transparent' : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+            background: (isTopOrBottom || isVertical)
+              ? undefined
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             position: 'relative',
             display: 'flex',
             alignItems: isVertical ? 'flex-start' : 'center',
@@ -214,15 +221,18 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
             flexDirection: isVertical ? 'column' : 'row',
             gap: isVertical ? '0.5rem' : '0.5rem',
             padding: isTopOrBottom ? '0 1rem' : (isVertical ? '5rem 0.25rem 1.5rem 0.25rem' : '0.85rem 1.5rem 0.85rem 3.5rem'),
-            borderRadius: isTopOrBottom ? '0' : '1rem',
-            boxShadow: (isTopOrBottom || isVertical) ? 'none' : '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+            borderRadius: isTopOrBottom ? '0' : '1.5rem',
+            boxShadow: (isTopOrBottom || isVertical)
+              ? 'none'
+              : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
             overflow: 'hidden',
             minWidth: isVertical ? '60px' : undefined,
             width: isTopOrBottom ? '100%' : undefined,
-            height: isTopOrBottom ? '60px' : undefined, // Increased from 48px to 60px
+            height: isTopOrBottom ? '48px' : undefined,
             maxHeight: isVertical ? '70vh' : undefined,
             pointerEvents: 'auto',
-            cursor: (isLocked || isTopOrBottom) ? 'default' : 'grab'
+            cursor: (isLocked || isTopOrBottom) ? 'default' : 'grab',
+            border: (isTopOrBottom || isVertical) ? undefined : '1px solid rgba(255, 255, 255, 0.3)'
           }}
         >
           <div
@@ -236,24 +246,24 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
             <button
               type="button"
               onClick={() => setIsLocked((prev) => !prev)}
-              className="p-1.5 rounded-full bg-white/70 text-gray-700 shadow hover:bg-white"
+              className="p-1.5 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 shadow-lg hover:bg-white dark:hover:bg-gray-700 backdrop-blur-sm border border-gray-200/50 dark:border-gray-600/50 transition-all"
               title={isLocked ? 'Lock dock' : 'Unlock dock'}
             >
               {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
             </button>
           </div>
 
-          {/* Glass Effect Overlay - Hide for Top/Bottom Navbar and Vertical Docks */}
+          {/* Glass Effect Overlay - Enhanced for modern look */}
           {!isTopOrBottom && !isVertical && (
-            <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-700/40 dark:via-gray-800/20 dark:to-transparent backdrop-blur-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/30 to-transparent dark:from-gray-800/60 dark:via-gray-900/30 dark:to-transparent backdrop-blur-3xl rounded-[1.5rem]" />
           )}
 
-          {/* Border Gradient - Hide for Top/Bottom Navbar */}
+          {/* Border Gradient - Enhanced */}
           {!isTopOrBottom && (
             <div
-              className="absolute inset-0 rounded-2xl border border-white/30 dark:border-gray-600/30"
+              className="absolute inset-0 rounded-[1.5rem]"
               style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%)',
                 WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                 WebkitMaskComposite: 'xor',
                 maskComposite: 'exclude',
@@ -269,18 +279,19 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
               zIndex: 10,
               display: 'flex',
               alignItems: isVertical ? 'flex-start' : 'center',
-              justifyContent: isTopOrBottom ? (isMobile ? 'flex-start' : 'center') : 'flex-start', // Start align on mobile for scroll
+              justifyContent: isTopOrBottom ? (isMobile ? 'flex-start' : 'center') : 'flex-start',
               flexDirection: isVertical ? 'column' : 'row',
               flexWrap: 'nowrap',
-              gap: '0.75rem',
-              overflowX: isVertical ? 'hidden' : 'auto',
+              gap: isTopOrBottom ? (isMobile ? '0.5rem' : '0.75rem') : '0.75rem',
+              overflowX: isVertical ? 'hidden' : (isTopOrBottom && isMobile ? 'auto' : 'auto'),
               overflowY: isVertical ? 'auto' : 'hidden',
               scrollbarWidth: 'none',
               width: '100%',
               maxWidth: '100%',
               maxHeight: '100%',
-              paddingLeft: isMobile ? '1rem' : '0',
-              paddingRight: isMobile ? '1rem' : '0',
+              paddingLeft: (isTopOrBottom && isMobile) ? '0.5rem' : '0',
+              paddingRight: (isTopOrBottom && isMobile) ? '0.5rem' : '0',
+              WebkitOverflowScrolling: 'touch'
             }}
             className="scrollbar-hide"
           >

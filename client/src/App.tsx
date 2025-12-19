@@ -125,38 +125,42 @@ const WorkspaceAttendanceWrapper: React.FC = () => {
 
 // Main App Layout Component with Flexible Dock Positioning
 const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { dockPosition } = useDock();
+  const { dockPosition, isMobile } = useDock();
+  const { state } = useApp();
 
   const isHorizontalDock = dockPosition === 'left' || dockPosition === 'right';
   const isTopDock = dockPosition === 'top';
   const isBottomDock = dockPosition === 'bottom';
+
+  // Show dock only if not on mobile OR if on mobile and sidebar is collapsed (menu hidden)
+  const showDock = !isMobile || state.sidebar.collapsed;
 
   // For top/bottom: Dock is fixed at viewport edges
   if (!isHorizontalDock) {
     return (
       <div className="h-screen bg-bg dark:bg-gray-900 flex flex-col">
         {/* Dock Header - Fixed at Top */}
-        {isTopDock && (
-          <div className="flex-shrink-0 z-[100] flex justify-between items-center py-3 px-6 bg-bg dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+        {isTopDock && showDock && (
+          <div className="flex-shrink-0 h-12 z-[100] flex justify-between items-center px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             {/* AI Button on left for top */}
             <div className="flex-1 flex justify-start">
               <ChatbotButton />
             </div>
-            
+
             {/* Centered Dock */}
             <div className="flex-shrink-0">
               <DockNavigation />
             </div>
-            
+
             {/* Empty space on right */}
             <div className="flex-1"></div>
           </div>
         )}
 
-        {/* Main Content Area - Scrollable Section */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        {/* Main Content Area - Scrollable Section with smooth transition */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden transition-all duration-300 ease-in-out">
           <Header />
-          <main 
+          <main
             className="flex-1 overflow-y-auto bg-bg dark:bg-gray-900"
             style={{
               scrollbarWidth: 'none',
@@ -169,23 +173,23 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
                 display: none;
               }
             `}</style>
-            <div className={isBottomDock ? 'pb-24' : isTopDock ? 'pt-6' : ''}>
+            <div className={isBottomDock ? 'pb-16' : ''}>
               {children}
             </div>
           </main>
         </div>
 
         {/* Dock Footer - Fixed at Bottom */}
-        {isBottomDock && (
-          <div className="flex-shrink-0 z-[100] flex justify-between items-center py-3 px-6 bg-bg dark:bg-gray-900">
+        {isBottomDock && showDock && (
+          <div className="flex-shrink-0 h-12 z-[100] flex justify-between items-center px-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             {/* Empty space on left */}
             <div className="flex-1"></div>
-            
+
             {/* Centered Dock */}
             <div className="flex-shrink-0">
               <DockNavigation />
             </div>
-            
+
             {/* AI Button on right */}
             <div className="flex-1 flex justify-end">
               <ChatbotButton />
@@ -206,11 +210,11 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
     <div className="min-h-screen bg-bg dark:bg-gray-900 flex flex-col">
       {/* Header spans full width */}
       <Header />
-      
+
       {/* Dock and Content Row */}
       <div className="flex-1 flex">
         {/* Dock at Left */}
-        {dockPosition === 'left' && (
+        {dockPosition === 'left' && showDock && (
           <div className="flex-shrink-0">
             <DockNavigation />
           </div>
@@ -224,7 +228,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
         </div>
 
         {/* Dock at Right */}
-        {dockPosition === 'right' && (
+        {dockPosition === 'right' && showDock && (
           <div className="flex-shrink-0">
             <DockNavigation />
           </div>

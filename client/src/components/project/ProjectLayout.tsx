@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useParams, useNavigate } from 'react-router-dom';
+import { Outlet, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import ProjectInternalNav from './ProjectInternalNav';
@@ -9,13 +9,45 @@ const ProjectLayout: React.FC = () => {
   const { state, dispatch } = useApp();
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
-  
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | 'none'>('none');
+  const [prevPath, setPrevPath] = useState('');
+
   const project = state.projects.find(p => p._id === projectId);
   const workspace = state.workspaces.find(w => w._id === project?.workspace);
-  
+
   // Get all projects in the same workspace for the dropdown
   const workspaceProjects = state.projects.filter(p => p.workspace === project?.workspace);
+
+  // Tab order for determining slide direction
+  const tabOrder = [
+    'overview', 'info', 'team', 'tasks', 'timeline',
+    'progress', 'workload', 'reports', 'documents', 'inbox', 'settings'
+  ];
+
+  // Determine slide direction based on navigation
+  useEffect(() => {
+    const currentTab = location.pathname.split('/').pop() || '';
+    const previousTab = prevPath.split('/').pop() || '';
+
+    const currentIndex = tabOrder.indexOf(currentTab);
+    const previousIndex = tabOrder.indexOf(previousTab);
+
+    if (currentIndex !== -1 && previousIndex !== -1) {
+      if (currentIndex > previousIndex) {
+        setSlideDirection('right'); // Moving forward, slide from right
+      } else if (currentIndex < previousIndex) {
+        setSlideDirection('left'); // Moving backward, slide from left
+      } else {
+        setSlideDirection('none');
+      }
+    } else {
+      setSlideDirection('none');
+    }
+
+    setPrevPath(location.pathname);
+  }, [location.pathname]);
 
   // Load project from API if not in state (handles page refresh)
   useEffect(() => {
@@ -44,17 +76,17 @@ const ProjectLayout: React.FC = () => {
       try {
         console.log('📥 [PROJECT LAYOUT] Fetching project from API:', projectId);
         const response = await apiService.get(`/projects/${projectId}`);
-        
+
         if (response.data.success) {
           const fetchedProject = response.data.data;
           console.log('✅ [PROJECT LAYOUT] Project loaded:', fetchedProject.name);
-          
+
           // Add to state
           dispatch({
             type: 'ADD_PROJECT',
             payload: fetchedProject
           });
-          
+
           // Fetch workspace if needed
           if (fetchedProject.workspace && !state.workspaces.find(w => w._id === fetchedProject.workspace)) {
             console.log('📥 [PROJECT LAYOUT] Fetching workspace:', fetchedProject.workspace);
@@ -71,7 +103,7 @@ const ProjectLayout: React.FC = () => {
               console.error('❌ [PROJECT LAYOUT] Failed to load workspace:', wsError);
             }
           }
-          
+
           setLoading(false);
         } else {
           console.error('❌ [PROJECT LAYOUT] API returned success: false');
@@ -113,6 +145,16 @@ const ProjectLayout: React.FC = () => {
     );
   }
 
+  // Animation classes based on direction
+  const getAnimationClass = () => {
+    if (slideDirection === 'right') {
+      return 'animate-slideInFromRight';
+    } else if (slideDirection === 'left') {
+      return 'animate-slideInFromLeft';
+    }
+    return 'animate-fadeIn';
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Project Header with Breadcrumb */}
@@ -132,14 +174,14 @@ const ProjectLayout: React.FC = () => {
             <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-600 dark:text-gray-200">{workspace?.name}</span>
               <span className="text-gray-600">/</span>
-              
+
               {/* Project Selector Dropdown */}
               <div className="relative group">
                 <button className="flex items-center gap-2 px-3 py-1.5 font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                   {project.name}
                   <ChevronDown className="w-4 h-4" />
                 </button>
-                
+
                 {/* Dropdown Menu */}
                 <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                   <div className="p-2 max-h-64 overflow-y-auto">
@@ -147,11 +189,10 @@ const ProjectLayout: React.FC = () => {
                       <button
                         key={proj._id}
                         onClick={() => navigate(`/project/${proj._id}/overview`)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          proj._id === projectId
-                            ? 'bg-blue-50 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light'
-                            : 'text-gray-700 dark:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        }`}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${proj._id === projectId
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-accent-dark dark:text-accent-light'
+                          : 'text-gray-700 dark:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          }`}
                       >
                         <div className="font-medium">{proj.name}</div>
                         <div className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
@@ -167,20 +208,18 @@ const ProjectLayout: React.FC = () => {
 
           {/* Project Status Badge */}
           <div className="flex items-center gap-2">
-            <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-              project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
+            <span className={`px-3 py-1 text-xs font-medium rounded-full ${project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
               project.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light' :
-              project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-600' :
-              'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
-            }`}>
+                project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-600' :
+                  'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+              }`}>
               {project.status}
             </span>
-            <span className={`px-3 py-1 text-xs font-medium rounded-full border ${
-              project.priority === 'critical' ? 'border-red-300 text-red-600' :
+            <span className={`px-3 py-1 text-xs font-medium rounded-full border ${project.priority === 'critical' ? 'border-red-300 text-red-600' :
               project.priority === 'high' ? 'border-orange-300 text-orange-600' :
-              project.priority === 'medium' ? 'border-yellow-300 text-yellow-600' :
-              'border-green-300 text-green-600'
-            }`}>
+                project.priority === 'medium' ? 'border-yellow-300 text-yellow-600' :
+                  'border-green-300 text-green-600'
+              }`}>
               {project.priority}
             </span>
           </div>
@@ -190,9 +229,11 @@ const ProjectLayout: React.FC = () => {
       {/* Project Internal Navigation */}
       <ProjectInternalNav />
 
-      {/* Project Content */}
+      {/* Project Content with Directional Slide Animation */}
       <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-        <Outlet />
+        <div key={location.pathname} className={getAnimationClass()}>
+          <Outlet />
+        </div>
       </div>
     </div>
   );

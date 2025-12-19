@@ -10,14 +10,18 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
+import { useTheme } from '../context/ThemeContext';
 import AddGoalModal from './goals/AddGoalModal';
 import GoalCard from './goals/GoalCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import GlassmorphicCard from './ui/GlassmorphicCard';
 import { goalService, Goal, GoalStats } from '../services/goalService';
 
 const GoalsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { state, dispatch } = useApp();
   const { dockPosition } = useDock();
+  const { isDarkMode } = useTheme();
   const { canUseAI, canCreateGoals, canManageGoals } = useFeatureAccess();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalStats, setGoalStats] = useState<GoalStats | null>(null);
@@ -38,7 +42,7 @@ const GoalsPage: React.FC = () => {
         goalService.getGoals(),
         goalService.getGoalStats()
       ]);
-      
+
       // goalsResponse is already { data: Goal[], count: number }
       if (goalsResponse && Array.isArray(goalsResponse.data)) {
         setGoals(goalsResponse.data);
@@ -49,7 +53,7 @@ const GoalsPage: React.FC = () => {
         console.error('Unexpected goals response structure:', goalsResponse);
         setGoals([]);
       }
-      
+
       if (statsData) {
         setGoalStats(statsData);
       }
@@ -176,36 +180,35 @@ const GoalsPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen bg-gray-50 dark:bg-gray-700 p-6 transition-all duration-300"
-      style={{
-        paddingLeft: dockPosition === 'left' ? '100px' : undefined,
-        paddingRight: dockPosition === 'right' ? '100px' : undefined
-      }}
+      className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/20 to-purple-50/20'}`}
     >
-      <div className="w-full">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
-                <Target className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('goals.title')}</h1>
-                <p className="text-gray-600 dark:text-gray-400">{t('goals.subtitle')}</p>
-              </div>
-            </div>
-            {canCreateGoals() && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-3 py-2 border border-transparent rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent/90 transition-all"
-              >
-                <Plus className="w-4 h-4 text-gray-900 dark:text-gray-100" />
-                <span className="text-gray-900 dark:text-gray-100 font-medium">{t('goals.newGoal')}</span>
-              </button>
-            )}
-          </div>
+      <div
+        className="p-6 transition-all duration-300"
+        style={{
+          paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
+          paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
+        }}
+      >
+        {/* Glassmorphic Page Header */}
+        <GlassmorphicPageHeader
+          icon={Target}
+          title={t('goals.title')}
+          subtitle={t('goals.subtitle')}
+        />
 
+        {/* Action Button */}
+        <div className="flex justify-end mb-6">
+          {canCreateGoals() && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <Plus className="w-5 h-5" />
+              {t('goals.addGoal')}
+            </button>
+          )}
+        </div>
+        <div className="w-full">
           {/* Stats */}
           {goalStats && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

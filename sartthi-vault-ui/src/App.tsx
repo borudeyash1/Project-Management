@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     checkAuth();
-    
+
     // Check if returning from OAuth callback
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success') || urlParams.get('code')) {
@@ -27,7 +27,7 @@ function App() {
       // 1. Check for token in URL (SSO)
       const params = new URLSearchParams(window.location.search);
       let token = params.get('token');
-      
+
       if (token) {
         localStorage.setItem('accessToken', token);
         // Clean URL
@@ -99,20 +99,22 @@ function App() {
           <h1>Activate Sartthi Vault</h1>
           <p>Secure, unlimited cloud storage for your workspace.</p>
           <p className="powered-by">Powered by Google Drive</p>
-          <button className="btn-connect" onClick={() => {
-            const token = localStorage.getItem('accessToken');
-            const url = token 
-              ? `${API_URL}/api/auth/sartthi/connect-vault?token=${encodeURIComponent(token)}`
-              : `${API_URL}/api/auth/sartthi/connect-vault`;
-            window.location.href = url;
+          <div style={{
+            background: 'rgba(99, 102, 241, 0.1)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            borderRadius: '8px',
+            padding: '1.5rem',
+            marginTop: '2rem',
+            maxWidth: '500px',
+            margin: '2rem auto 0'
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-              <line x1="12" y1="22.08" x2="12" y2="12" />
-            </svg>
-            Connect Storage
-          </button>
+            <p style={{ fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '0.5rem' }}>
+              Connect your Google Drive account from the main Sartthi application to access your files here.
+            </p>
+            <p style={{ fontSize: '0.85rem', color: '#999', marginTop: '1rem' }}>
+              💡 <strong>Tip:</strong> Go to Home → Sartthi Ecosystem → Connect Vault
+            </p>
+          </div>
         </div>
       </div>
     );
