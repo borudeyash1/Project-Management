@@ -1,0 +1,92 @@
+// Add these two sections to LandingPage.tsx after the Integrations section (around line 702)
+// and before the Testimonials section (around line 704)
+
+{/* Endless Possibilities Section */}
+<section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+  <div className="max-w-7xl mx-auto">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Endless possibilities
+      </h2>
+      <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+        Everything you need to design both the marketing site and the admin interface for your SaaS product.
+      </p>
+    </div>
+
+    {/* Stats Grid */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+      <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+        <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">200<span className="text-3xl">+</span></div>
+        <div className="text-gray-600 font-medium">Blocks</div>
+      </div>
+      <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+        <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">50<span className="text-3xl">+</span></div>
+        <div className="text-gray-600 font-medium">Admin pages</div>
+      </div>
+      <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+        <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">7<span className="text-3xl">+</span></div>
+        <div className="text-gray-600 font-medium">Landing demos</div>
+      </div>
+      <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+        <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">1200<span className="text-3xl">+</span></div>
+        <div className="text-gray-600 font-medium">Hours saved</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Tailored for Every Industry Section */}
+<section className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F1F4F9' }}>
+  <div className="max-w-7xl mx-auto">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Tailored for every industry
+      </h2>
+      <p className="text-lg text-gray-600 max-w-4xl mx-auto">
+        From project management to AI, see how our UI Kit helps you build SaaS applications tailored for a variety of industries.
+      </p>
+    </div>
+
+    {/* Industry Tags */}
+    <div className="flex flex-wrap justify-center gap-3 mb-12">
+      {[
+        'Project Management',
+        'Customer Relationship Management (CRM)',
+        'HR & Recruitment',
+        'Finance & Accounting',
+        'E-commerce Solutions',
+        'Marketing Automation',
+        'Healthcare & Telemedicine',
+        'LMS',
+        'AI & ML Platforms',
+        'Inventory & Supply Chain Management',
+        'Customer Support & Help Desk',
+        'Email Marketing and SEO Tools',
+        'Networking Platforms',
+        'Blogging Tools',
+        'Data Analytics & Business Intelligence'
+      ].map((industry, index) => (
+        <span
+          key={index}
+          className="px-6 py-3 bg-white rounded-full text-gray-800 font-medium hover:shadow-md transition-all cursor-pointer"
+        >
+          {industry}
+        </span>
+      ))}
+    </div>
+
+    {/* Documentation Button */}
+    <div className="text-center">
+      <Link
+        to="/docs"
+        className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+        style={{ backgroundColor: '#006397' }}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Documentation
+      </Link>
+    </div>
+  </div>
+</section>

@@ -758,14 +758,14 @@
     }
   },
   "pricing": {
-    "badge": "Flexible pricing for every workspace",
-    "title": "Unlock Sartthi's full Project & Payroll suite",
-    "subtitle": "Choose a plan configured by your admins. Apply coupons or affiliate links at checkout, and upgrade instantly without a payment gateway.",
+    "badge": "Flexible pricing for every team",
+    "title": "Choose the Perfect Plan for Your Team",
+    "subtitle": "From startups to enterprises, Sartthi scales with your needs. Get started free and upgrade as you grow.",
     "highlights": {
-      "aiCollaboration": "Unlimited collaboration with AI copilots",
-      "coupons": "Admin-defined coupons & affiliate earnings",
-      "analytics": "Advanced analytics, payroll, and automation",
-      "security": "Enterprise-grade security & compliance"
+      "aiCollaboration": "AI-powered insights and smart scheduling",
+      "coupons": "Task management with Kanban boards",
+      "analytics": "Real-time collaboration and file sharing",
+      "security": "Smart attendance with face recognition"
     },
     "authPrompt": {
       "title": "Authentication required",
@@ -786,26 +786,26 @@
     },
     "buttons": {
       "getStartedFree": "Get Started Free",
-      "choosePro": "Choose Pro User",
+      "choosePro": "Choose Pro",
       "chooseUltra": "Choose Ultra"
     },
     "features": {
       "security": {
-        "title": "Security-first architecture",
-        "description": "Role-based access, audit logs, SSO-ready.",
+        "title": "Enterprise-Grade Security",
+        "description": "Your data is protected with industry-leading security.",
         "items": {
-          "planLimits": "Admin-configurable plan limits",
-          "otpGated": "OTP-gated workspace creation",
-          "customBilling": "Custom billing bypass with approvals"
+          "planLimits": "Role-based access control",
+          "otpGated": "Two-factor authentication (2FA)",
+          "customBilling": "Encrypted data storage and transfer"
         }
       },
       "affiliate": {
-        "title": "Affiliate & coupon engine",
-        "description": "Reward evangelists, delight teams with instant savings.",
+        "title": "Advanced Features",
+        "description": "Powerful tools to boost your team's productivity.",
         "items": {
-          "couponCatalog": "Admin-managed coupon catalog",
-          "affiliateCodes": "Affiliate codes with commission tracking",
-          "instantValidation": "Instant validation during checkout"
+          "couponCatalog": "Custom workflows and automations",
+          "affiliateCodes": "Advanced analytics and reporting",
+          "instantValidation": "Priority support and training"
         }
       }
     }
