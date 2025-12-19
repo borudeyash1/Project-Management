@@ -120,6 +120,39 @@ a:hover {
   color: var(--accent-hover);
 }
 
+/* Keep button text white on hover for #006397 buttons */
+a.bg-\[#006397\],
+a[style*="#006397"],
+a[style*="rgb(0, 99, 151)"],
+button.bg-\[#006397\],
+button[style*="#006397"],
+button[style*="rgb(0, 99, 151)"] {
+  color: white !important;
+}
+
+a.bg-\[#006397\]:hover,
+a.bg-\[#006397\]:hover span,
+a.bg-\[#006397\]:hover svg,
+a[style*="#006397"]:hover,
+a[style*="#006397"]:hover span,
+a[style*="#006397"]:hover svg,
+a[style*="rgb(0, 99, 151)"]:hover,
+a[style*="rgb(0, 99, 151)"]:hover span,
+a[style*="rgb(0, 99, 151)"]:hover svg,
+button.bg-\[#006397\]:hover,
+button.bg-\[#006397\]:hover span,
+button.bg-\[#006397\]:hover svg,
+button[style*="#006397"]:hover,
+button[style*="#006397"]:hover span,
+button[style*="#006397"]:hover svg,
+button[style*="rgb(0, 99, 151)"]:hover,
+button[style*="rgb(0, 99, 151)"]:hover span,
+button[style*="rgb(0, 99, 151)"]:hover svg {
+  color: white !important;
+}
+
+
+
 /* Ensure proper contrast for muted text */
 .text-muted,
 .text-gray-400,

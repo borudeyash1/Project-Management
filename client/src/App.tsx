@@ -48,6 +48,8 @@ import Settings from './components/Settings';
 import ProjectManagementView from './components/ProjectManagementView';
 import Header from './components/Header';
 import DockNavigation from './components/DockNavigation';
+import BlogPage from './components/BlogPage';
+import BlogPost from './components/BlogPost';
 import ToastContainer from './components/ToastContainer';
 import NotificationsPanel from './components/NotificationsPanel';
 import TaskDrawer from './components/TaskDrawer';
@@ -261,6 +263,8 @@ const AppContent: React.FC = () => {
         <Route path="/docs" element={<Docs />} />
         <Route path="/docs/:slug" element={<Docs />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         <Route path="/desktop-handshake" element={<DesktopHandshake />} />

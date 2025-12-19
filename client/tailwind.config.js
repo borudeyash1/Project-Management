@@ -83,6 +83,10 @@ module.exports = {
       },
       animation: {
         aurora: "aurora 60s linear infinite",
+        marquee: 'marquee 15s linear infinite'
+      },
+      translate: {
+        '101': '101%',
       },
       keyframes: {
         aurora: {
@@ -93,6 +97,10 @@ module.exports = {
             backgroundPosition: "350% 50%, 350% 50%",
           },
         },
+        marquee: {
+          'from': { transform: 'translateX(0%)' },
+          'to': { transform: 'translateX(-50%)' }
+        }
       },
       transitionProperty: {
         'transform-opacity': 'transform, opacity',

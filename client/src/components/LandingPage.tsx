@@ -1,742 +1,1947 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Users, BarChart3, Shield, Brain, Zap, ClipboardCheck, Activity, Briefcase, MapPin, DollarSign, Eye, Sparkles, Play } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
-import { useTranslation } from 'react-i18next';
+import { 
+  ArrowRight, CheckCircle, Star, Users, Shield, 
+  Clock, Target, Sparkles, ChevronRight,
+  BarChart3, Calendar, Zap, TrendingUp, Award,
+  Code, Palette, Globe, Smartphone,
+  Play, Pause
+} from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
-import ContentBanner from './ContentBanner';
-import Orb from './animations/Orb';
-import GradualBlur from './animations/GradualBlur';
-import StarBorder from './animations/StarBorder';
-import SpotlightCard from './animations/SpotlightCard';
-import CardSwap, { Card } from './animations/CardSwap';
-import ScrollStack, { ScrollStackItem } from './animations/ScrollStack';
-import CenterCarousel from './animations/CenterCarousel';
-import { ExpandingCardsDemo } from './animations/ExpandingCardsDemo';
-import { TasksTabsDemo } from './animations/TasksTabsDemo';
-import { ProjectsMarquee } from './animations/ProjectsMarquee';
-import { AuroraBackground } from './ui/aurora-background';
+import FlowingMenu from './FlowingMenu';
+import { getRecentPosts } from '../data/blogData';
 
 const LandingPage: React.FC = () => {
-  const { t } = useTranslation();
-  useTheme();
+  const [isVisible, setIsVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [adminFeatureTab, setAdminFeatureTab] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    setIsVisible(true);
+    
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Video intersection observer with proper async handling
+  useEffect(() => {
+    let isPlayingRef = false;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(async (entry) => {
+          if (entry.isIntersecting && videoRef.current && !isPlayingRef) {
+            try {
+              await videoRef.current.play();
+              isPlayingRef = true;
+              setIsVideoPlaying(true);
+            } catch (error) {
+              // Ignore play interruption errors
+              console.debug('Video play interrupted:', error);
+            }
+          } else if (!entry.isIntersecting && videoRef.current && isPlayingRef) {
+            try {
+              videoRef.current.pause();
+              isPlayingRef = false;
+              setIsVideoPlaying(false);
+            } catch (error) {
+              // Ignore pause errors
+              console.debug('Video pause error:', error);
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    const currentVideo = videoRef.current;
+    if (currentVideo) {
+      observer.observe(currentVideo);
+    }
+
+    return () => {
+      if (currentVideo) {
+        observer.unobserve(currentVideo);
+      }
+    };
+  }, []);
+
+  const features = [
+    {
+      icon: <Target className="w-6 h-6" />,
+      title: "Project Management",
+      description: "Organize and track your projects with powerful tools and intuitive interfaces that scale with your team."
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "Team Collaboration",
+      description: "Work together seamlessly with real-time updates, comments, and file sharing capabilities."
+    },
+    {
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: "Advanced Analytics",
+      description: "Get deep insights into your team's performance with customizable dashboards and detailed reports."
+    },
+    {
+      icon: <Clock className="w-6 h-6" />,
+      title: "Time Tracking",
+      description: "Monitor time spent on tasks and projects to improve productivity and billing accuracy."
+    },
+      {
+        icon: <Calendar className="w-6 h-6" />,
+        title: "Smart Scheduling",
+        description: "Automated intelligent scheduling based on comprehensive user profiles, availability, and workload patterns."
+      },
+    {
+      icon: <Shield className="w-6 h-6" />,
+      title: "Enterprise Security",
+      description: "Your data is protected with enterprise-grade security, encryption, and compliance standards."
+    },
+      {
+        icon: <Zap className="w-6 h-6" />,
+        title: "AI Automation",
+        description: "Integrate your own AI chatbot API and leverage AI-powered automation for smarter workflows."
+      },
+      {
+        icon: <Code className="w-6 h-6" />,
+        title: "Smart Attendance",
+        description: "Face and location-based attendance tracking in workspace for accurate and secure time management."
+      },
+      {
+        icon: <Smartphone className="w-6 h-6" />,
+        title: "Desktop Application",
+        description: "Access your projects with our powerful native desktop application for enhanced productivity."
+      }
+  ];
+
+  const metrics = [
+    { value: "1K+", label: "Active Users", icon: <Users className="w-8 h-8" /> },
+    { value: "99.5%", label: "Uptime", icon: <TrendingUp className="w-8 h-8" /> },
+    { value: "10+", label: "Countries", icon: <Globe className="w-8 h-8" /> },
+    { value: "4.7/5", label: "User Rating", icon: <Star className="w-8 h-8" /> }
+  ];
+
+  const testimonials = [
+    {
+      name: "Priya Sharma",
+      role: "Project Manager",
+      company: "Tech Solutions India",
+      content: "Sartthi has transformed how we manage projects. The intuitive interface and powerful features have increased our team's productivity by 40%. The task management and AI insights are exceptional.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Priya+Sharma&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Rajesh Kumar",
+      role: "CEO",
+      company: "StartupHub Bangalore",
+      content: "The best project management tool we've used. It's helped us scale from 5 to 50 team members without missing a beat. The smart attendance and collaboration features are game-changers.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Rajesh+Kumar&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Ananya Patel",
+      role: "Team Lead",
+      company: "Design Studio Mumbai",
+      content: "Collaboration has never been easier. Our remote team feels more connected than ever before. The real-time updates and file sharing capabilities have revolutionized our workflow.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Ananya+Patel&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Vikram Singh",
+      role: "CTO",
+      company: "Innovation Labs Delhi",
+      content: "The AI-powered insights and custom API integration capabilities are outstanding. We've connected all our tools seamlessly, creating a unified workflow that our entire team loves.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Vikram+Singh&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Sneha Reddy",
+      role: "Operations Director",
+      company: "Global Services Hyderabad",
+      content: "Security and compliance were our top priorities, and Sartthi exceeded all expectations. The face recognition attendance and enterprise features are robust and reliable.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Sneha+Reddy&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Arjun Mehta",
+      role: "Product Manager",
+      company: "Digital Agency Pune",
+      content: "The analytics and reporting features give us insights we never had before. The AI-powered predictions and smart scheduling have made data-driven decisions effortless.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Arjun+Mehta&background=006397&color=fff&size=150"
+    }
+  ];
+
+  const pricingPlans = [
+    {
+      name: "Free",
+      price: "$0",
+      period: "forever",
+      description: "Perfect for individuals and small teams getting started",
+      features: [
+        "Up to 5 team members",
+        "5 projects",
+        "Basic analytics",
+        "Community support",
+        "1GB storage",
+        "Mobile apps",
+        "Basic integrations"
+      ],
+      highlighted: false,
+      popular: false
+    },
+    {
+      name: "Pro",
+      price: "$12",
+      period: "per user/month",
+      description: "For growing teams and businesses that need more power",
+      features: [
+        "Unlimited team members",
+        "Unlimited projects",
+        "Advanced analytics",
+        "Priority support",
+        "50GB storage",
+        "Custom integrations",
+        "Advanced security",
+        "Time tracking",
+        "Custom workflows",
+        "API access"
+      ],
+      highlighted: true,
+      popular: true
+    },
+    {
+      name: "Enterprise",
+      price: "Custom",
+      period: "contact us",
+      description: "For large organizations with specific requirements",
+      features: [
+        "Everything in Pro",
+        "Dedicated account manager",
+        "Custom training",
+        "SLA guarantee",
+        "Unlimited storage",
+        "Advanced permissions",
+        "SSO integration",
+        "Custom branding",
+        "Audit logs",
+        "24/7 phone support"
+      ],
+      highlighted: false,
+      popular: false
+    }
+  ];
+
+  const integrations = [
+    { name: "Slack", logo: "https://img.icons8.com/?size=100&id=19978&format=png&color=000000", category: "Communication" },
+    { name: "Google Drive", logo: "https://img.icons8.com/?size=100&id=13630&format=png&color=000000", category: "Cloud Storage" },
+    { name: "GitHub", logo: "https://img.icons8.com/?size=100&id=12599&format=png&color=000000", category: "Development" },
+    { name: "Custom AI API", logo: "https://img.icons8.com/?size=100&id=GVghUo9qfGPW&format=png&color=000000", category: "AI Integration" },
+    { name: "Zoom", logo: "https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000", category: "Meeting Links" },
+    { name: "Dropbox", logo: "https://img.icons8.com/?size=100&id=13657&format=png&color=000000", category: "Cloud Storage" },
+    { name: "Microsoft Teams", logo: "https://img.icons8.com/?size=100&id=GcSqCxRXjzNd&format=png&color=000000", category: "Communication" },
+    { name: "OneDrive", logo: "https://img.icons8.com/?size=100&id=117559&format=png&color=000000", category: "Cloud Storage" },
+    { name: "Jira", logo: "https://img.icons8.com/?size=100&id=oROcPah5ues6&format=png&color=000000", category: "Project Management" },
+    { name: "Google Meet", logo: "https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000", category: "Meeting Links" },
+    { name: "Notion", logo: "https://img.icons8.com/?size=100&id=HDd694003FZa&format=png&color=000000", category: "Documentation" },
+    { name: "OpenAI", logo: "https://img.icons8.com/?size=100&id=Nts60kQIvGqe&format=png&color=000000", category: "AI Integration" }
+  ];
+
+  const useCases = [
+    {
+      title: "Software Development",
+      description: "Manage sprints, track bugs, and collaborate on code with integrated development tools.",
+      icon: <Code className="w-12 h-12" />,
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      title: "Remote Teams",
+      description: "Keep distributed teams aligned with real-time collaboration, smart attendance, and seamless communication.",
+      icon: <Users className="w-12 h-12" />,
+      color: "from-purple-600 to-indigo-600"
+    },
+    {
+      title: "Design & Creative",
+      description: "Collaborate on design projects with feedback tools, asset management, and creative workflows.",
+      icon: <Target className="w-12 h-12" />,
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      title: "Product Management",
+      description: "Coordinate cross-functional teams, track milestones, and deliver successful product launches.",
+      icon: <Star className="w-12 h-12" />,
+      color: "from-green-500 to-emerald-500"
+    }
+  ];
+
+  const faqs = [
+    // General Questions
+    {
+      question: "What is Sartthi?",
+      answer: "Sartthi is a comprehensive project management platform designed to help teams collaborate, track progress, and deliver projects efficiently. It combines task management, team collaboration, AI-powered insights, and smart attendance in one unified platform.",
+      category: "General"
+    },
+    {
+      question: "Is Sartthi only for SaaS web apps?",
+      answer: "No, Sartthi is a versatile project management platform that works for any type of project - from software development to marketing campaigns, design projects, construction, and more. It's designed to adapt to your workflow regardless of your industry.",
+      category: "General"
+    },
+    {
+      question: "What makes Sartthi different from other project management tools?",
+      answer: "Sartthi stands out with its AI-powered task scheduling, smart attendance with face recognition, custom cloud storage integration, and real-time AI suggestions. We combine powerful enterprise features with an intuitive interface that teams actually enjoy using.",
+      category: "General"
+    },
+    {
+      question: "Is Sartthi suitable for both developers and designers?",
+      answer: "Absolutely! Sartthi is built for cross-functional teams. Developers can track sprints and bugs, designers can manage design projects and feedback, managers can oversee workload, and everyone works in one unified platform with role-based access control.",
+      category: "General"
+    },
+    {
+      question: "Can remote teams use Sartthi effectively?",
+      answer: "Yes! Sartthi is perfect for remote and distributed teams with features like real-time collaboration, smart attendance tracking with location verification, video integration, and asynchronous communication tools.",
+      category: "General"
+    },
+    
+    // Pricing & Plans
+    {
+      question: "What is the difference between the Free and Pro plans?",
+      answer: "Free plan includes 1 project with 5 members and limited task types. Pro plan ($29/month) offers 5 workspaces with 5 projects each, 20 employees per project, AI access with limited tokens, desktop application, and no ads. See our pricing page for full details.",
+      category: "Pricing & Plans"
+    },
+    {
+      question: "Do you offer a free trial?",
+      answer: "Yes! You can start with our Free plan immediately with no credit card required. For Pro features, we offer a 14-day free trial. Enterprise customers can schedule a personalized demo with our team.",
+      category: "Pricing & Plans"
+    },
+    {
+      question: "Can I upgrade or downgrade my plan anytime?",
+      answer: "Yes, you can change your plan at any time. When upgrading, you'll get immediate access to new features. When downgrading, changes take effect at the end of your current billing cycle, and you'll retain access to paid features until then.",
+      category: "Pricing & Plans"
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept all major credit cards (Visa, Mastercard, American Express), debit cards, and PayPal. Enterprise customers can also pay via wire transfer or purchase orders.",
+      category: "Pricing & Plans"
+    },
+    {
+      question: "Do you offer refunds?",
+      answer: "Yes, we offer a 30-day money-back guarantee on all paid plans. If you're not satisfied with Sartthi for any reason, contact our support team within 30 days of purchase for a full refund, no questions asked.",
+      category: "Pricing & Plans"
+    },
+    {
+      question: "Are there any hidden fees?",
+      answer: "No hidden fees! The price you see is what you pay. All features listed in your plan are included. Additional costs only apply if you choose optional add-ons like extra storage or premium integrations.",
+      category: "Pricing & Plans"
+    },
+    {
+      question: "Do you offer discounts for non-profits or educational institutions?",
+      answer: "Yes! We offer special pricing for non-profit organizations and educational institutions. Contact our sales team with proof of your organization's status to learn about available discounts.",
+      category: "Pricing & Plans"
+    },
+
+    // Features & Functionality
+    {
+      question: "Can I use Sartthi for multiple projects?",
+      answer: "Yes! Free plan allows 1 project, Pro plan includes 5 workspaces with 5 projects each (25 total), and Enterprise plan offers 10 workspaces with 20 projects each (200 total). Each project can have its own team and settings.",
+      category: "Features & Functionality"
+    },
+    {
+      question: "How does the AI-powered task scheduling work?",
+      answer: "Our AI analyzes your team's working history, current workload, deadlines, and dependencies to automatically suggest optimal task schedules. It learns from patterns and helps project managers make data-driven decisions about resource allocation.",
+      category: "Features & Functionality"
+    },
+    {
+      question: "What is Smart Attendance and how does it work?",
+      answer: "Smart Attendance uses face recognition technology and location tracking to verify team member presence. It automatically generates attendance reports, supports workspace verification, and integrates with your project timelines for accurate time tracking.",
+      category: "Features & Functionality"
+    },
+    {
+      question: "Can I integrate Sartthi with other tools?",
+      answer: "Yes! Sartthi integrates with popular tools including Slack, Microsoft Teams, Google Drive, Dropbox, GitHub, Jira, Zoom, and more. Enterprise plans also support custom API integrations and private cloud storage.",
+      category: "Features & Functionality"
+    },
+    {
+      question: "Is there a mobile app available?",
+      answer: "Yes! Sartthi is available on web, desktop (Windows, Mac, Linux), and mobile (iOS and Android). All platforms sync in real-time, so you can work from anywhere.",
+      category: "Features & Functionality"
+    },
+    {
+      question: "Can I customize workflows and task types?",
+      answer: "Absolutely! Pro and Enterprise plans allow you to create custom workflows, task types, and statuses. You can also set up automation rules, custom fields, and templates to match your team's unique processes.",
+      category: "Features & Functionality"
+    },
+
+    // Security & Privacy
+    {
+      question: "How secure is my data on Sartthi?",
+      answer: "We take security seriously. All data is encrypted in transit (TLS 1.3) and at rest (AES-256). We use industry-standard security practices, regular security audits, and comply with GDPR, SOC 2, and other major compliance frameworks.",
+      category: "Security & Privacy"
+    },
+    {
+      question: "Where is my data stored?",
+      answer: "Data is stored in secure, redundant data centers with automatic backups. Enterprise customers can choose their preferred data region and even use custom cloud storage integration with their private infrastructure.",
+      category: "Security & Privacy"
+    },
+    {
+      question: "Who can access my project data?",
+      answer: "Only team members you explicitly invite can access your projects. We implement role-based access control, so you can define exactly what each team member can see and do. Your data is never shared with third parties.",
+      category: "Security & Privacy"
+    },
+    {
+      question: "Do you offer two-factor authentication (2FA)?",
+      answer: "Yes! All plans include two-factor authentication for enhanced account security. We support authenticator apps, SMS codes, and backup codes. Enterprise plans also support SSO and advanced authentication methods.",
+      category: "Security & Privacy"
+    },
+
+    // Support & Updates
+    {
+      question: "What kind of customer support do you offer?",
+      answer: "Free plan includes email support (24-48 hour response). Pro plan gets priority email support (4-hour response). Enterprise customers receive 24/7 dedicated support with phone, chat, and a dedicated account manager.",
+      category: "Support & Updates"
+    },
+    {
+      question: "Do I get access to future updates?",
+      answer: "Yes! All plans include automatic updates at no extra cost. We regularly release new features, improvements, and security updates. You'll always have access to the latest version of Sartthi.",
+      category: "Support & Updates"
+    },
+    {
+      question: "Can I import data from other tools?",
+      answer: "Yes, we provide import tools for popular platforms including Asana, Trello, Jira, Monday.com, and Basecamp. We also offer CSV import for custom data. Enterprise customers get dedicated migration assistance from our team.",
+      category: "Support & Updates"
+    },
+    {
+      question: "Do you provide training for new teams?",
+      answer: "Yes! We offer comprehensive documentation, video tutorials, and webinars for all users. Pro customers get onboarding assistance, and Enterprise customers receive custom training sessions tailored to their workflow.",
+      category: "Support & Updates"
+    },
+    {
+      question: "How do I report bugs or request features?",
+      answer: "You can submit bug reports and feature requests directly through the app or by contacting support. We actively review all feedback and regularly implement user-requested features. Enterprise customers can influence our product roadmap.",
+      category: "Support & Updates"
+    }
+  ];
+
+  // Filter FAQs based on selected category
+  const categories = ['General', 'Pricing & Plans', 'Features & Functionality', 'Security & Privacy', 'Support & Updates'];
+  const filteredFaqs = faqs.filter(faq => faq.category === categories[activeTab]);
+
+  const companyLogos = [
+    "Google", "Microsoft", "Amazon", "Apple", "Meta", "Netflix", "Spotify", "Uber", "Airbnb", "Tesla"
+  ];
+
+  const blogPosts = getRecentPosts(3);
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-white">
-      {/* Main Content Wrapper */}
-      <div className="relative z-10">
-        <SharedNavbar />
-        <ContentBanner route="/" />
+    <div className="min-h-screen bg-[#F5F8FD] overflow-hidden">
+      <SharedNavbar />
+      
+      {/* Hero Section with Advanced Animations */}
+      <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div 
+            className="absolute top-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
+            style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+          ></div>
+          <div 
+            className="absolute top-0 right-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+            style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+          ></div>
+          <div 
+            className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"
+            style={{ transform: `translateY(${scrollY * 0.4}px)` }}
+          ></div>
+        </div>
 
-      {/* HERO SECTION */}
-      <div className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center relative">
-            
-            {/* Main Headline - More Impactful */}
-            <div className="relative z-10 mb-10">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-tight tracking-tight">
-                <span className="block mb-2">
-                  Your work,
-                </span>
-                <span className="block bg-gradient-to-r from-[#FFD700] to-[#E6C200] bg-clip-text text-transparent">
-                  supercharged
-                </span>
-              </h1>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            {/* Animated Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full text-blue-700 font-medium mb-6 animate-bounce-slow border border-blue-200 shadow-lg">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              <span className="text-sm font-semibold">New: AI-Powered Project Insights</span>
+              <ChevronRight className="w-4 h-4" />
             </div>
             
-            {/* Subheadline - More Concise */}
-            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Streamline operations, synchronize teams, and automate the mundane.
+            {/* Main Headline with Gradient */}
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+              Manage Projects Like
+              <br />
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-[#006397] via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient-x">
+                  Never Before
+                </span>
+                <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 300 12" fill="none">
+                  <path d="M2 10C50 5, 100 2, 150 3C200 4, 250 7, 298 10" stroke="url(#gradient)" strokeWidth="3" strokeLinecap="round"/>
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#3B82F6" />
+                      <stop offset="50%" stopColor="#9333EA" />
+                      <stop offset="100%" stopColor="#EC4899" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Sartthi is the all-in-one project management platform that helps teams collaborate, 
+              track progress, and deliver exceptional results faster than ever before.
             </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+            
+            {/* CTA Buttons with Animations */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
                 to="/register"
-                className="group bg-[#FFD700] hover:bg-[#FFC700] text-gray-900 px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform flex items-center gap-3"
+                className="group relative px-8 py-4 bg-[#006397] text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden"
               >
-                Get Started Free
-                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                <span className="relative z-10">Get Started Free</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
-              
               <Link
-                to="/user-guide"
-                className="group bg-white hover:bg-gray-50 text-gray-900 px-10 py-5 rounded-2xl text-lg font-bold border-2 border-gray-900 hover:border-[#FFD700] transition-all duration-300 hover:scale-105 transform shadow-md flex items-center gap-3"
+                to="/docs"
+                className="group px-8 py-4 bg-[#F5F8FD] text-gray-900 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 flex items-center gap-2"
               >
-                <Play size={20} className="group-hover:scale-110 transition-transform" />
-                Learn More
+                <Play className="w-5 h-5" />
+                Watch Demo
               </Link>
             </div>
-
+            
             {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-600 max-w-2xl mx-auto">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-green-500" />
-                <span className="font-medium">No credit card required</span>
+            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">
+              <div className="flex items-center gap-2 bg-[#F5F8FD] px-4 py-2 rounded-full shadow-sm">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>No credit card required</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-green-500" />
-                <span className="font-medium">14-day free trial</span>
+              <div className="flex items-center gap-2 bg-[#F5F8FD] px-4 py-2 rounded-full shadow-sm">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>14-day free trial</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-green-500" />
-                <span className="font-medium">Cancel anytime</span>
+              <div className="flex items-center gap-2 bg-[#F5F8FD] px-4 py-2 rounded-full shadow-sm">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>Cancel anytime</span>
               </div>
             </div>
           </div>
-
-          {/* Hero Dashboard Image - Smaller and Better Proportioned */}
-          <div className="mt-16 relative max-w-5xl mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10 pointer-events-none"></div>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-[#FFD700] transform hover:scale-[1.02] transition-transform duration-500">
-              {/* This will be replaced with an animated GIF/video */}
-              <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100">
-                <img 
-                  src="/hero_dashboard_mockup_1764317223182.png"
-                  alt="Sartthi Dashboard Interface"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Fallback to gradient if image fails to load
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = `
-                      <div class="aspect-video bg-gradient-to-br from-yellow-50 via-white to-yellow-100 flex items-center justify-center">
-                        <div class="text-center">
-                          <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
-                            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                          </div>
-                          <p class="text-2xl font-bold text-gray-900">Sartthi Dashboard</p>
-                          <p class="text-gray-600 mt-2">Your Command Center</p>
-                        </div>
-                      </div>
-                    `;
-                  }}
-                />
+          
+          {/* Hero Video/Image with Parallax Effect */}
+          <div className={`mt-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="relative mx-auto max-w-6xl" style={{ transform: `translateY(${scrollY * 0.1}px)` }}>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FFC700] to-[#FFD700] rounded-3xl blur-3xl opacity-30 animate-pulse-slow"></div>
+              <div className="relative bg-[#F5F8FD] rounded-2xl shadow-2xl p-2 border-4 border-gray-200">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden relative group">
+                  <video
+                    ref={videoRef}
+                    className="w-full h-full object-cover"
+                    loop
+                    muted
+                    playsInline
+                    poster="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&h=675&fit=crop"
+                  >
+                    <source src="/demo-video.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-20 transition-all">
+                    <button 
+                      onClick={async () => {
+                        if (videoRef.current) {
+                          try {
+                            if (isVideoPlaying) {
+                              videoRef.current.pause();
+                              setIsVideoPlaying(false);
+                            } else {
+                              await videoRef.current.play();
+                              setIsVideoPlaying(true);
+                            }
+                          } catch (error) {
+                            console.debug('Video toggle error:', error);
+                          }
+                        }
+                      }}
+                      className="w-20 h-20 bg-[#F5F8FD] rounded-full flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform"
+                    >
+                      {isVideoPlaying ? (
+                        <Pause className="w-8 h-8 text-[#006397]" />
+                      ) : (
+                        <Play className="w-8 h-8 text-[#006397] ml-1" />
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
+              {/* Floating Elements */}
+              <div className="absolute -top-8 -left-8 w-24 h-24 bg-yellow-400 rounded-2xl shadow-lg transform rotate-12 animate-float"></div>
+              <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-pink-400 rounded-full shadow-lg animate-float animation-delay-2000"></div>
+            </div>
+          </div>
+
+          {/* Tech Stack Badges */}
+          <div className="mt-16 flex flex-wrap justify-center gap-3">
+            {['Task Management', 'Team Collaboration', 'Real-time Updates', 'Project Analytics', 'Workspace Management', 'File Sharing'].map((tech, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 bg-[#F5F8FD] rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <span className="text-sm font-medium text-gray-700">{tech}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trusted By Section */}
+      <section className="py-12 bg-[#F5F8FD] border-y border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-gray-500 mb-8 font-semibold uppercase tracking-wider">
+            Trusted by leading companies worldwide
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center opacity-60">
+            {companyLogos.map((company, index) => (
+              <div key={index} className="flex items-center justify-center">
+                <span className="text-2xl font-bold text-gray-400 hover:text-gray-600 transition-colors">
+                  {company}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Metrics Section with Animated Counters */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {metrics.map((metric, index) => (
+              <div 
+                key={index} 
+                className="text-center transform hover:scale-110 transition-transform duration-300"
+              >
+                <div className="flex justify-center mb-4 text-[#FFC700]">
+                  {metric.icon}
+                </div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-[#FFC700] to-[#FFD700] bg-clip-text text-transparent">
+                  {metric.value}
+                </div>
+                <div className="text-gray-300 font-medium">{metric.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section with Grid Layout */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F5F8FD] relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 bg-blue-100 text-[#006397] rounded-full text-sm font-semibold mb-4">
+              Features
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Everything You Need to Succeed
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Powerful features designed to help your team work smarter, not harder.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="group relative p-8 bg-[#F5F8FD] rounded-2xl border-2 border-gray-100 hover:border-blue-300 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#006397] transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-semibold mb-4">
+              Use Cases
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Built for Every Team
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              From software development to marketing, Sartthi adapts to your workflow.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {useCases.map((useCase, index) => (
+              <div
+                key={index}
+                className="group relative bg-[#F5F8FD] rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden"
+              >
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${useCase.color} rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity`}></div>
+                <div className={`relative w-20 h-20 bg-gradient-to-br ${useCase.color} rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
+                  {useCase.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  {useCase.title}
+                </h3>
+                <p className="text-gray-600">
+                  {useCase.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Integration Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 bg-green-100 text-green-600 rounded-full text-sm font-semibold mb-4">
+              Integrations
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Connects With Your Favorite Tools
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Seamlessly integrate with the tools you already use and love.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {integrations.map((integration, index) => (
+              <div
+        key={index}
+        className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all cursor-pointer border border-gray-100 hover:border-blue-200"
+      >
+        <div className="flex items-center justify-center mb-3 h-16 w-16 mx-auto group-hover:scale-110 transition-transform">
+          <img src={integration.logo} alt={integration.name} className="w-full h-full object-contain" />
+        </div>
+        <div className="text-sm font-semibold text-gray-700 text-center">
+          {integration.name}
+        </div>
+        <div className="text-xs text-gray-500 text-center mt-1">
+          {integration.category}
+        </div>
+      </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <button
+              onClick={() => {
+                const token = localStorage.getItem('token');
+                if (token) {
+                  window.location.href = '/home';
+                } else {
+                  window.location.href = '/login';
+                }
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#006397] text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
+            >
+              View All Integrations
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </section>
+      {/* Endless Possibilities Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Endless possibilities
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Everything you need to manage projects, collaborate with teams, and deliver results efficiently.
+            </p>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">500<span className="text-3xl">+</span></div>
+              <div className="text-gray-600 font-medium">Projects Managed</div>
+            </div>
+            <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">50<span className="text-3xl">+</span></div>
+              <div className="text-gray-600 font-medium">Team Members</div>
+            </div>
+            <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">10K<span className="text-3xl">+</span></div>
+              <div className="text-gray-600 font-medium">Tasks Completed</div>
+            </div>
+            <div className="text-center p-8 rounded-3xl" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">40<span className="text-3xl">%</span></div>
+              <div className="text-gray-600 font-medium">Productivity Boost</div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* SARTTHI AI - AI THAT ACTS */}
-      <div className="py-32 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-block px-6 py-2 bg-[#FFD700]/10 rounded-full mb-6">
-              <span className="text-[#FFD700] font-bold text-sm uppercase tracking-wide">Sartthi AI</span>
-            </div>
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6">
-              AI That Acts.
+      {/* Tailored for Every Industry Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F1F4F9' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Tailored for every industry
             </h2>
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-600 mb-8">
-              Not Just Thinks.
-            </h3>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Most AI gives you ideas. Sartthi AI does the work—creating schedules, drafting reports, and automating operations while you sleep.
+            <p className="text-lg text-gray-600 max-w-4xl mx-auto">
+              From startups to enterprises, Sartthi adapts to your workflow and helps teams across industries manage projects efficiently.
             </p>
           </div>
 
-          {/* AI Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-            {/* Permission Aware */}
-            <div className="bg-white rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <Shield className="w-10 h-10 text-gray-900" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Permission Aware</h3>
-              <p className="text-xl text-gray-600 mb-8">
-                Secure by design. It knows who can see what.
-              </p>
-              
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
-                  <span className="text-lg text-gray-700">Role-based access control</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
-                  <span className="text-lg text-gray-700">Data privacy guaranteed</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
-                  <span className="text-lg text-gray-700">Audit logs for compliance</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Context Driven */}
-            <div className="bg-white rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <Sparkles className="w-10 h-10 text-gray-900" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Context Driven</h3>
-              <p className="text-xl text-gray-600 mb-8">
-                It learns your workflow to provide proactive solutions.
-              </p>
-              
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
-                  <span className="text-lg text-gray-700">Learns from your patterns</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
-                  <span className="text-lg text-gray-700">Proactive suggestions</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD700] flex-shrink-0 mt-1" />
-                  <span className="text-lg text-gray-700">Automated workflows</span>
-                </li>
-              </ul>
-            </div>
+          {/* Industry Tags */}
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {[
+              'Software Development',
+              'Marketing & Advertising',
+              'Design & Creative',
+              'Finance & Accounting',
+              'Healthcare & Medical',
+              'Education & Training',
+              'Real Estate',
+              'Manufacturing',
+              'Consulting Services',
+              'E-commerce & Retail',
+              'Legal Services',
+              'Construction',
+              'Media & Entertainment',
+              'Non-Profit Organizations',
+              'Research & Development'
+            ].map((industry, index) => (
+              <span
+                key={index}
+                className="px-6 py-3 bg-[#F5F8FD] rounded-full text-gray-800 font-medium hover:shadow-md transition-all cursor-pointer"
+              >
+                {industry}
+              </span>
+            ))}
           </div>
 
-          {/* CTA */}
+          {/* Documentation Button */}
           <div className="text-center">
             <Link
-              to="/ai"
-              className="inline-flex items-center gap-3 bg-[#FFD700] hover:bg-[#FFC700] text-gray-900 px-10 py-5 rounded-2xl text-xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
+              to="/docs"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+              style={{ backgroundColor: '#006397' }}
             >
-              Experience AI-Powered Work
-              <ArrowRight size={24} />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Documentation
             </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* SECTION 2: ONE SUITE. INFINITE CAPABILITIES */}
-      <div className="py-32 bg-white relative overflow-hidden">
-        {/* Clean background - no decorations */}
 
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
-              One Suite. <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Infinite Capabilities.</span>
+      {/* Powerful Admin Interface Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Powerful admin interface
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to manage, collaborate, and succeed—all in one powerful platform.
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Manage data, users, and workflows effortlessly with intuitive, customizable admin controls and features.
             </p>
           </div>
 
-          {/* Core Features Grid - Clean Design */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Card 1: Task Management */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                  <ClipboardCheck className="w-8 h-8 text-black" />
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-3">Task Management</h3>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                  Create, assign, and track tasks with ease. Set priorities, deadlines, and dependencies.
-                </p>
-              </div>
-              
-              {/* Video Placeholder */}
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-yellow-50 to-yellow-100 flex items-center justify-center border-2 border-yellow-200">
-                <div className="text-center p-6">
-                  <ClipboardCheck className="mx-auto mb-3 text-yellow-600" size={48} />
-                  <p className="text-sm font-semibold text-gray-700">Task Management Demo</p>
-                  <p className="text-xs text-gray-500 mt-1">Video placeholder</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Real-Time Collaboration */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                  <Users className="w-8 h-8 text-black" />
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-3">Real-Time Collaboration</h3>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                  Work together seamlessly with live updates, comments, and instant notifications.
-                </p>
-              </div>
-              
-              {/* Video Placeholder */}
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center border-2 border-blue-200">
-                <div className="text-center p-6">
-                  <Users className="mx-auto mb-3 text-blue-600" size={48} />
-                  <p className="text-sm font-semibold text-gray-700">Collaboration Demo</p>
-                  <p className="text-xs text-gray-500 mt-1">Video placeholder</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3: Intelligence & Analytics */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                  <BarChart3 className="w-8 h-8 text-black" />
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-3">Intelligence & Analytics</h3>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                  Gain insights with powerful analytics and AI-driven recommendations.
-                </p>
-              </div>
-              
-              {/* Video Placeholder */}
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center border-2 border-purple-200">
-                <div className="text-center p-6">
-                  <BarChart3 className="mx-auto mb-3 text-purple-600" size={48} />
-                  <p className="text-sm font-semibold text-gray-700">Analytics Demo</p>
-                  <p className="text-xs text-gray-500 mt-1">Video placeholder</p>
-                </div>
-              </div>
+          {/* Feature Selector */}
+          <div className="flex justify-center mb-16">
+            <div className="radio-inputs">
+              <label className="radio">
+                <input 
+                  type="radio" 
+                  name="admin-feature" 
+                  checked={adminFeatureTab === 0}
+                  onChange={() => setAdminFeatureTab(0)}
+                />
+                <span className="name">Task Management</span>
+              </label>
+              <label className="radio">
+                <input 
+                  type="radio" 
+                  name="admin-feature"
+                  checked={adminFeatureTab === 1}
+                  onChange={() => setAdminFeatureTab(1)}
+                />
+                <span className="name">Team Collaboration</span>
+              </label>
+              <label className="radio">
+                <input 
+                  type="radio" 
+                  name="admin-feature"
+                  checked={adminFeatureTab === 2}
+                  onChange={() => setAdminFeatureTab(2)}
+                />
+                <span className="name">AI-Powered Insights</span>
+              </label>
+              <label className="radio">
+                <input 
+                  type="radio" 
+                  name="admin-feature"
+                  checked={adminFeatureTab === 3}
+                  onChange={() => setAdminFeatureTab(3)}
+                />
+                <span className="name">Smart Attendance</span>
+              </label>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* FEATURE DEEP DIVE: Full-Width Sections with ScrollStack */}
-      <div className="py-20 bg-white">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-          <div className="text-center">
-            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
-              Explore <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Every Feature.</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comprehensive tools for every aspect of your work. Scroll to explore.
-            </p>
-          </div>
-        </div>
-
-
-        {/* TASKS - TabsSwitcher */}
-        <div className="w-full bg-white py-20 mb-20">
-          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-center gap-4 justify-center text-center mb-16">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
-                <ClipboardCheck className="w-12 h-12 text-white" />
-              </div>
-              <div>
-                <h3 className="text-5xl md:text-6xl font-black text-gray-900 mb-2">Tasks</h3>
-                <p className="text-2xl text-gray-600">Get Things Done</p>
-              </div>
-            </div>
-            
-            {/* TabsSwitcher Component */}
-            <div className="w-full">
-              <TasksTabsDemo />
-            </div>
-          </div>
-        </div>
-
-        {/* TRACKER - Grid with Fade-in */}
-        <div className="w-full bg-white py-20 mb-20">
-          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-center gap-4 justify-center text-center mb-16">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
-                <Activity className="w-12 h-12 text-white" />
-              </div>
-              <div>
-                <h3 className="text-5xl md:text-6xl font-black text-gray-900 mb-2">Tracker</h3>
-                <p className="text-2xl text-gray-600">Monitor Time & Productivity</p>
-              </div>
-            </div>
-            
-            {/* Grid layout with stagger */}
-            <div className="w-full overflow-hidden">
-              <ExpandingCardsDemo />
-            </div>
-          </div>
-        </div>
-
-        {/* GOALS - Diagonal Layout */}
-        <div className="w-full bg-gradient-to-b from-yellow-50/30 to-white py-20 mb-20">
-          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-center gap-4 justify-center text-center mb-16">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-3xl flex items-center justify-center shadow-2xl">
-                <Eye className="w-12 h-12 text-white" />
-              </div>
-              <div>
-                <h3 className="text-5xl md:text-6xl font-black text-gray-900 mb-2">Goals</h3>
-                <p className="text-2xl text-gray-600">Set & Achieve Your Objectives</p>
-              </div>
-            </div>
-            
-            {/* Diagonal grid */}
-            <div className="w-full">
-              <CenterCarousel autoplay={true}>
-                {[
-                  { title: 'Goal Overview', url: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=400&fit=crop' },
-                  { title: 'Progress Tracking', url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop' },
-                  { title: 'Milestones', url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop' },
-                  { title: 'Team Goals', url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop' },
-                  { title: 'Analytics', url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop' }
-                ].map((view, index) => (
-                  <div key={index} className="transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1 h-full p-4">
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-[#44a0d1]/30 hover:border-[#FFD700] h-full">
-                      <img src={view.url} alt={view.title} className="w-full h-48 object-cover" />
-                      <div className="p-6">
-                        <h4 className="text-xl font-bold text-gray-900">{view.title}</h4>
+          {/* Content Grid */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left - Dashboard Preview */}
+            <div className="rounded-3xl overflow-hidden shadow-2xl" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="p-8">
+                {/* Dynamic Feature UI Mockup */}
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-6">
+                  {/* Task Management UI */}
+                  {adminFeatureTab === 0 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-gray-900">Project Board</h3>
+                        <div className="flex gap-2">
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        {['To Do', 'In Progress', 'Done'].map((status, idx) => (
+                          <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                            <div className="text-xs font-semibold text-gray-600 mb-2">{status}</div>
+                            <div className="space-y-2">
+                              {[1, 2].map((item) => (
+                                <div key={item} className="bg-white p-2 rounded shadow-sm border-l-2" style={{ borderColor: idx === 0 ? '#FFC700' : idx === 1 ? '#006397' : '#10B981' }}>
+                                  <div className="text-xs font-medium text-gray-900">Task {item}</div>
+                                  <div className="text-xs text-gray-500 mt-1">Due: Dec {20 + item}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                ))}
-              </CenterCarousel>
+                  )}
+
+                  {/* Team Collaboration UI */}
+                  {adminFeatureTab === 1 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-gray-900">Team Chat</h3>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <span className="text-xs text-gray-600">5 Online</span>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        {[
+                          { name: 'John Doe', msg: 'Updated the design files', time: '10:30 AM', avatar: 'JD' },
+                          { name: 'Sarah Smith', msg: 'Meeting at 2 PM today?', time: '10:45 AM', avatar: 'SS' },
+                          { name: 'Mike Johnson', msg: 'Task completed ✓', time: '11:00 AM', avatar: 'MJ' }
+                        ].map((chat, idx) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: '#006397' }}>
+                              {chat.avatar}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-900">{chat.name}</span>
+                                <span className="text-xs text-gray-500">{chat.time}</span>
+                              </div>
+                              <div className="text-sm text-gray-600 mt-1 bg-gray-50 rounded-lg p-2">{chat.msg}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI-Powered Insights UI */}
+                  {adminFeatureTab === 2 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-gray-900">AI Analytics Dashboard</h3>
+                        <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">AI Powered</div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        {[
+                          { label: 'Productivity', value: '87%', trend: '+12%' },
+                          { label: 'On-Time Delivery', value: '94%', trend: '+5%' }
+                        ].map((stat, idx) => (
+                          <div key={idx} className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4">
+                            <div className="text-xs text-gray-600">{stat.label}</div>
+                            <div className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</div>
+                            <div className="text-xs text-green-600 mt-1">{stat.trend}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs font-semibold text-gray-600 mb-3">Project Timeline Prediction</div>
+                        <div className="h-24 relative">
+                          <svg className="w-full h-full" viewBox="0 0 300 80">
+                            <defs>
+                              <linearGradient id="aiGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stopColor="#006397" stopOpacity="0.3"/>
+                                <stop offset="100%" stopColor="#006397" stopOpacity="0"/>
+                              </linearGradient>
+                            </defs>
+                            <polyline points="0,60 60,45 120,50 180,30 240,35 300,20" fill="url(#aiGradient)" stroke="#006397" strokeWidth="2"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Smart Attendance UI */}
+                  {adminFeatureTab === 3 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-gray-900">Attendance Tracker</h3>
+                        <div className="text-xs text-gray-600">Today: Dec 19, 2025</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-4 mb-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-xs text-gray-600">Check-in Status</div>
+                            <div className="text-2xl font-bold text-gray-900 mt-1">8:45 AM</div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span className="text-xs text-green-700">Face Verified</span>
+                            </div>
+                          </div>
+                          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-md">
+                            <div className="text-3xl">👤</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-xs font-semibold text-gray-600 mb-2">Team Status</div>
+                        {[
+                          { name: 'Alice Brown', status: 'Present', time: '8:30 AM', location: 'Office' },
+                          { name: 'Bob Wilson', status: 'Present', time: '8:45 AM', location: 'Remote' },
+                          { name: 'Carol Davis', status: 'Absent', time: '-', location: '-' }
+                        ].map((member, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2 h-2 rounded-full ${member.status === 'Present' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                                <div className="text-xs text-gray-500">{member.location}</div>
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-600">{member.time}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right - Features */}
+            <div>
+              <div className="mb-8">
+                {(() => {
+                  const features = [
+                    {
+                      icon: '📋',
+                      title: 'Task Management',
+                      heading: 'Organize and track tasks effortlessly',
+                      description: 'Comprehensive task management with priorities, deadlines, and progress tracking',
+                      items: ['Kanban boards', 'Task dependencies', 'Priority levels', 'Progress tracking'],
+                      image: 'https://via.placeholder.com/600x400/006397/FFFFFF?text=Task+Management+Dashboard'
+                    },
+                    {
+                      icon: '👥',
+                      title: 'Team Collaboration',
+                      heading: 'Work together seamlessly in real-time',
+                      description: 'Enable your team to collaborate effectively with real-time updates and communication tools',
+                      items: ['Real-time updates', 'Team chat', 'File sharing', 'Activity feeds'],
+                      image: 'https://via.placeholder.com/600x400/006397/FFFFFF?text=Team+Collaboration+View'
+                    },
+                    {
+                      icon: '🤖',
+                      title: 'AI-Powered Insights',
+                      heading: 'Smart analytics with custom AI integration',
+                      description: 'Integrate your own AI API for intelligent project insights and automated recommendations',
+                      items: ['Custom AI API integration', 'Predictive analytics', 'Smart scheduling', 'Automated reports'],
+                      image: 'https://via.placeholder.com/600x400/006397/FFFFFF?text=AI+Analytics+Dashboard'
+                    },
+                    {
+                      icon: '📍',
+                      title: 'Smart Attendance',
+                      heading: 'Face and location-based attendance tracking',
+                      description: 'Advanced attendance system with face recognition and location verification for secure workspace management',
+                      items: ['Face recognition', 'Location tracking', 'Attendance reports', 'Workspace verification'],
+                      image: 'https://via.placeholder.com/600x400/006397/FFFFFF?text=Smart+Attendance+System'
+                    }
+                  ];
+                  const current = features[adminFeatureTab];
+                  return (
+                    <>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full mb-6">
+                        <span className="text-2xl">{current.icon}</span>
+                        <span className="font-semibold text-gray-900">{current.title}</span>
+                      </div>
+                      <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                        {current.heading}
+                      </h3>
+                      <p className="text-gray-600 mb-6">
+                        {current.description}
+                      </p>
+
+                      {/* Feature List */}
+                      <div className="space-y-4 mb-8">
+                        {current.items.map((feature, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#006397' }}>
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-gray-700">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {/* Buttons */}
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    to="/docs"
+                    className="inline-flex items-center gap-2 px-6 py-3 border-2 rounded-full font-semibold transition-all hover:opacity-90"
+                    style={{ borderColor: '#006397', color: '#006397' }}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Docs
+                  </Link>
+                  <Link
+                    to="/demo"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+                    style={{ backgroundColor: '#006397' }}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    View Dashboard
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Bottom CTA */}
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-600 text-lg mb-6">And there's more: Reports, Team Management, Reminders, Workspace Settings, Planner, and beyond.</p>
-          <Link to="/register" className="inline-flex items-center gap-3 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] hover:from-[#3688b5] hover:to-[#2b6d8a] text-white px-12 py-5 rounded-2xl text-xl font-bold transition-all duration-300 shadow-2xl hover:scale-105">
-            Explore All Features
-            <ArrowRight size={24} />
-          </Link>
-        </div>
-      </div>
-
-      {/* SECTION 3: BUILT FOR EVERY TEAM */}
-      <div className="py-32 bg-gradient-to-b from-blue-50/30 via-white to-blue-50/30 relative overflow-hidden">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
-              Built for <span className="bg-gradient-to-r from-[#44a0d1] to-[#3380a1] bg-clip-text text-transparent">Every Team.</span>
+      </section>
+      {/* Testimonials Section with Carousel */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 bg-yellow-100 text-yellow-600 rounded-full text-sm font-semibold mb-4">
+              Testimonials
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Loved by Teams Worldwide
             </h2>
-            <p className="text-2xl font-semibold text-gray-700 mb-4">
-              Optimized for Every Workflow.
-            </p>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From HR to field operations, Sartthi adapts to your team's unique needs.
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              See what our customers have to say about Sartthi.
             </p>
           </div>
-
-          {/* Use Cases Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { 
-                key: 'hr', 
-                icon: Users, 
-                gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-white',
-                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
-              },
-              { 
-                key: 'operations', 
-                icon: Activity, 
-                gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-white',
-                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
-              },
-              { 
-                key: 'managers', 
-                icon: Briefcase, 
-                gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-white',
-                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
-              },
-              { 
-                key: 'fieldTeams', 
-                icon: MapPin, 
-                gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-white',
-                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
-              },
-              { 
-                key: 'finance', 
-                icon: DollarSign, 
-                gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-white',
-                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
-              },
-              { 
-                key: 'founders', 
-                icon: Eye, 
-                gradient: 'from-[#FFD700] to-[#E6C200]',
-                bgGradient: 'from-yellow-50 to-white',
-                iconBg: 'bg-gradient-to-br from-[#FFD700] to-[#E6C200]'
-              }
-            ].map((item, index) => (
-              <div 
-                key={item.key} 
-                className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-2 border-gray-100 hover:border-[#FFD700] overflow-hidden"
-                style={{
-                  animationDelay: `${index * 100}ms`
-                }}
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="group bg-[#F5F8FD] p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-200"
               >
-                {/* Background gradient on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  {/* Icon */}
-                  <div className={`w-16 h-16 ${item.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon className="w-8 h-8 text-white" />
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed italic">
+                  "{testimonial.content}"
+                </p>
+                <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                  <img
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-14 h-14 rounded-full ring-4 ring-blue-100 group-hover:ring-blue-200 transition-all"
+                  />
+                  <div>
+                    <div className="font-bold text-gray-900">{testimonial.name}</div>
+                    <div className="text-sm text-gray-600">
+                      {testimonial.role} at {testimonial.company}
+                    </div>
                   </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-black transition-colors duration-300">
-                    {t(`landing.useCases.${item.key}.title`)}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-gray-600 text-lg leading-relaxed group-hover:text-gray-900 transition-colors duration-300">
-                    {t(`landing.useCases.${item.key}.description`)}
-                  </p>
-
-                  {/* Decorative element */}
-                  <div className={`absolute -bottom-2 -right-2 w-24 h-24 bg-gradient-to-br ${item.gradient} rounded-full opacity-0 group-hover:opacity-20 blur-2xl transition-opacity duration-500`}></div>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* Bottom CTA */}
-          <div className="mt-16 text-center">
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-[#44a0d1] to-[#3380a1] hover:from-[#3688b5] hover:to-[#2b6d8a] text-white px-10 py-5 rounded-2xl text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
-            >
-              Start Your Free Trial
-              <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
         </div>
-      </div>
+      </section>
 
-      {/* SARTTHI AI TEASER */}
-      <div className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-[#FFD700]/20 px-6 py-3 rounded-full mb-8">
-            <Sparkles size={24} className="text-[#E6C200]" />
-            <span className="text-lg font-bold text-gray-900">Introducing Sartthi AI</span>
-          </div>
 
-          {/* Headline */}
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
-            AI That <span className="bg-gradient-to-r from-[#FFD700] to-[#E6C200] bg-clip-text text-transparent">Acts.</span>
-          </h2>
-          <h3 className="text-4xl md:text-5xl font-black text-gray-600 mb-8">
-            Not Just Thinks.
-          </h3>
-
-          {/* Description */}
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Most AI gives you ideas. Sartthi AI does the work—creating schedules, drafting reports, and automating operations while you sleep.
-          </p>
-
-          {/* Key Features - Simple List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12">
-            <div className="flex items-start gap-4 text-left">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-xl flex items-center justify-center flex-shrink-0">
-                <Shield className="w-6 h-6 text-gray-900" />
-              </div>
-              <div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Permission Aware</h4>
-                <p className="text-gray-600">Secure by design. It knows who can see what.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 text-left">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-xl flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-6 h-6 text-gray-900" />
-              </div>
-              <div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Context Driven</h4>
-                <p className="text-gray-600">Learns your workflow to provide proactive solutions.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <Link
-            to="/ai"
-            className="inline-flex items-center gap-3 bg-gray-900 hover:bg-gray-800 text-white px-10 py-5 rounded-xl text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105"
-          >
-            Explore Sartthi AI
-            <ArrowRight size={24} />
-          </Link>
-        </div>
-      </div>
-
-      {/* SARTTHI APPS SHOWCASE - At Bottom */}
-      <div className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
-              One platform. <span className="bg-gradient-to-r from-[#FFD700] to-[#E6C200] bg-clip-text text-transparent">Four powerful apps.</span>
+      {/* Why Choose Sartthi Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F1F4F9' }}>
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Why Choose Sartthi?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to run your business, all in one place.
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              The all-in-one project management platform designed for modern teams. Boost productivity, streamline workflows, and achieve your goals faster.
             </p>
           </div>
 
-          {/* Apps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Sartthi Mail */}
-            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="text-5xl">📧</div>
-                <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Sartthi Mail</h3>
-                  <p className="text-gray-600">Professional email with AI-powered features</p>
-                </div>
-              </div>
-              
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">📧</div>
-                    <p className="text-sm">Mail Demo Video</p>
-                  </div>
-                </div>
-              </div>
-              
-              <Link to="/mail" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
-                Learn more →
-              </Link>
-            </div>
 
-            {/* Calendar */}
-            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="text-5xl">📅</div>
-                <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Calendar</h3>
-                  <p className="text-gray-600">Smart scheduling and time management</p>
-                </div>
-              </div>
-              
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">📅</div>
-                    <p className="text-sm">Calendar Demo Video</p>
-                  </div>
-                </div>
-              </div>
-              
-              <Link to="/calendar" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
-                Learn more →
-              </Link>
-            </div>
 
-            {/* Vault */}
-            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="text-5xl">🔒</div>
-                <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Vault</h3>
-                  <p className="text-gray-600">Secure document storage and sharing</p>
-                </div>
-              </div>
-              
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">🔒</div>
-                    <p className="text-sm">Vault Demo Video</p>
-                  </div>
-                </div>
-              </div>
-              
-              <Link to="/vault" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
-                Learn more →
-              </Link>
-            </div>
+          {/* FlowingMenu */}
+          <div style={{ height: '600px', position: 'relative', marginBottom: '4rem' }}>
+            <FlowingMenu items={[
+              { 
+                link: '#task-management', 
+                text: 'Task Management', 
+                description: 'Organize tasks with Kanban boards • Set priorities and deadlines • Track progress in real-time • Manage dependencies',
+                image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=400&fit=crop'
+              },
+              { 
+                link: '#team-collaboration', 
+                text: 'Team Collaboration', 
+                description: 'Real-time chat and updates • Share files instantly • Activity feeds • Work together seamlessly from anywhere',
+                image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop'
+              },
+              { 
+                link: '#ai-insights', 
+                text: 'AI-Powered Insights', 
+                description: 'Custom AI API integration • Predictive analytics • Smart scheduling • Automated reports and recommendations',
+                image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop'
+              },
+              { 
+                link: '#smart-attendance', 
+                text: 'Smart Attendance', 
+                description: 'Face recognition technology • Location tracking • Automated attendance reports • Secure workspace verification',
+                image: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=600&h=400&fit=crop'
+              }
+            ]} />
+          </div>
 
-            {/* Desktop */}
-            <div className="group bg-white rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-[#FFD700]/30">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="text-5xl">💻</div>
-                <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Desktop App</h3>
-                  <p className="text-gray-600">Native performance, offline access</p>
+          {/* Feature Highlights */}
+          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left - Features List */}
+              <div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-8">
+                  Everything You Need in One Platform
+                </h3>
+                <div className="space-y-6">
+                  {[
+                    { icon: '📋', title: 'Task Management', desc: 'Kanban boards, priorities, and dependencies' },
+                    { icon: '👥', title: 'Team Collaboration', desc: 'Real-time chat, file sharing, and updates' },
+                    { icon: '📊', title: 'Analytics & Reports', desc: 'AI-powered insights and predictions' },
+                    { icon: '📍', title: 'Smart Attendance', desc: 'Face recognition and location tracking' }
+                  ].map((feature, idx) => (
+                    <div key={idx} className="flex items-start gap-4">
+                      <div className="text-3xl flex-shrink-0">{feature.icon}</div>
+                      <div>
+                        <div className="font-semibold text-gray-900 mb-1">{feature.title}</div>
+                        <div className="text-sm text-gray-600">{feature.desc}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200">
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">💻</div>
-                    <p className="text-sm">Desktop Demo Video</p>
+
+              {/* Right - CTA Card */}
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
+                <div className="text-center">
+                  <div className="text-6xl mb-6">🚀</div>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-4">
+                    Ready to Get Started?
+                  </h4>
+                  <p className="text-gray-600 mb-8">
+                    Join thousands of teams already using Sartthi to manage their projects more efficiently.
+                  </p>
+                  <div className="space-y-4">
+                    <Link
+                      to="/pricing"
+                      className="block w-full py-4 px-6 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+                      style={{ backgroundColor: '#006397' }}
+                    >
+                      Start Free Trial
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="block w-full py-4 px-6 border-2 rounded-full font-semibold transition-all hover:bg-gray-50"
+                      style={{ borderColor: '#006397', color: '#006397' }}
+                    >
+                      Sign In
+                    </Link>
                   </div>
+                  <p className="text-xs text-gray-500 mt-6">
+                    No credit card required • Free 14-day trial
+                  </p>
                 </div>
               </div>
-              
-              <Link to="/desktop" className="mt-6 inline-flex items-center text-[#FFD700] hover:text-[#E6C200] font-semibold transition-colors">
-                Learn more →
-              </Link>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* FINAL CALL TO ACTION */}
-      <div className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50/30 to-white">
-        <div className="max-w-[1920px] mx-auto relative">
-          <div className="relative bg-gradient-to-r from-[#FFD700] to-[#FFC700] rounded-3xl overflow-hidden py-20 px-8 md:px-16 text-center shadow-2xl border-4 border-[#E6C200]">
-            {/* Decorative Elements */}
-            <div className="absolute inset-0 bg-grid-white/10 bg-[size:30px_30px]"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            
-            {/* Floating elements */}
-            <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-2xl shadow-xl animate-float opacity-80"></div>
-            <div className="absolute bottom-10 right-10 w-16 h-16 bg-white rounded-2xl shadow-xl animate-float animation-delay-500 opacity-80"></div>
-
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6">
-                Ready to get started?
-              </h2>
-              <p className="text-xl md:text-2xl text-gray-800 mb-4 max-w-3xl mx-auto font-semibold">
-                Join thousands of teams already using Sartthi
-              </p>
-              <p className="text-lg md:text-xl text-gray-700 mb-12 max-w-2xl mx-auto">
-                to manage their projects efficiently.
-              </p>
+      </section>
+      {/* Pricing Section - Reference Design */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Choose the plan that fits your team's needs. All plans include core features.
+            </p>
+          </div>
+          
+          {/* Pricing Cards */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Free Plan */}
+            <div className="rounded-3xl p-8 border-2 border-gray-200 hover:shadow-lg transition-all" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-center mb-8">
+                <h3 className="text-base text-gray-700 mb-4 font-medium">Free</h3>
+                <div className="text-5xl font-bold text-gray-900 mb-6">$0</div>
+                <div className="w-full h-px bg-gray-300 mb-6"></div>
+                <p className="text-sm text-gray-700 font-medium">Get started for free</p>
+              </div>
               
-              <div className="flex flex-col sm:flex-row gap-6 justify-center mb-10">
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">All task functionality</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">1 project with 5 members</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Limited task allotment types</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Pay per workspace option</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Mobile app access</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-gray-400">No collaborator option</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-gray-400">No AI assistance</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-gray-400">Ads present</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-gray-400">No desktop application</span>
+                </li>
+              </ul>
+              
+              <div className="space-y-3">
                 <Link
                   to="/register"
-                  className="group bg-[#FFD700] hover:bg-[#FFC700] text-gray-900 px-12 py-5 rounded-2xl text-xl font-black transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-2xl hover:scale-105 transform"
+                  className="block w-full py-3 px-6 rounded-full font-semibold text-center border-2 border-[#006397] text-[#006397] hover:bg-blue-50 transition-all"
                 >
-                  Start Your Free Trial
-                  <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  to="/about"
-                  className="bg-white text-gray-900 border-2 border-gray-900 px-12 py-5 rounded-2xl text-xl font-black hover:bg-gray-50 transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-xl hover:scale-105 transform"
-                >
-                  Learn More About Us
+                  Get Started Free
                 </Link>
               </div>
+            </div>
+
+            {/* Pro Plan - Recommended */}
+            <div className="rounded-3xl p-8 border-2 hover:shadow-2xl transition-all relative" style={{ backgroundColor: '#F1F4F9', borderColor: '#006397' }}>
+              <div className="text-center mb-8">
+                <h3 className="text-base text-gray-700 mb-4 font-medium">Pro</h3>
+                <div className="text-5xl font-bold text-gray-900 mb-6">$29</div>
+                <div className="w-full h-px bg-gray-300 mb-6"></div>
+                <p className="text-sm font-semibold" style={{ color: '#006397' }}>Recommended</p>
+              </div>
               
-              {/* Trust indicators */}
-              <div className="flex flex-wrap justify-center items-center gap-6 text-gray-800 text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-gray-900" />
-                  <span className="font-semibold">No credit card required</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-gray-900" />
-                  <span className="font-semibold">14-day free trial</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-gray-900" />
-                  <span className="font-semibold">Cancel anytime</span>
-                </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">5 workspaces, 5 projects each</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">20 employees per project</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">5 clients per workspace</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Complete project management</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Collaborator option available</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">AI access (limited tokens)</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Desktop application access</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">No ads</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-gray-400">No custom cloud storage</span>
+                </li>
+              </ul>
+              
+              <div className="space-y-3">
+                <Link
+                  to="/pricing"
+                  className="block w-full py-3 px-6 rounded-full font-semibold text-center text-white transition-all shadow-md hover:shadow-lg hover:opacity-90"
+                  style={{ backgroundColor: '#006397' }}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="rounded-3xl p-8 border-2 border-gray-200 hover:shadow-lg transition-all" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-center mb-8">
+                <h3 className="text-base text-gray-700 mb-4 font-medium">Enterprise</h3>
+                <div className="text-5xl font-bold text-gray-900 mb-6">Custom</div>
+                <div className="w-full h-px bg-gray-300 mb-6"></div>
+                <p className="text-sm text-gray-700 font-medium">For large organizations</p>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">10 workspaces, 20 projects each</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">25-30 members per project</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Custom cloud storage integration</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">AI auto task scheduling</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Real-time AI suggestions</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Custom role-based access control</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Advanced security features</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">Desktop application access</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                  <span className="text-gray-900">No ads + dedicated support</span>
+                </li>
+              </ul>
+              
+              <div className="space-y-3">
+                <Link
+                  to="/pricing"
+                  className="block w-full py-3 px-6 rounded-full font-semibold text-center border-2 transition-all hover:bg-blue-50"
+                  style={{ borderColor: '#006397', color: '#006397' }}
+                >
+                  Contact Sales
+                </Link>
+                <p className="text-sm text-gray-600 text-center">
+                  or <Link to="/contact" className="font-semibold hover:underline" style={{ color: '#006397' }}>Contact us</Link>
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      </div>
+      </section>
 
-      <div className="relative z-10">
-        <SharedFooter />
-      </div>
+
+      {/* Blog/Resources Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4" style={{ backgroundColor: '#FFF3CD', color: '#856404' }}>
+              Resources
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Latest from Our Blog
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Tips, insights, and best practices for project management.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {blogPosts.map((post, index) => (
+              <article
+                key={index}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="px-3 py-1 text-gray-900 text-xs font-semibold rounded-full" style={{ backgroundColor: '#FFC700' }}>
+                      {post.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                    <span>{post.date}</span>
+                    <span>•</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#006397] transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {post.excerpt}
+                  </p>
+                  <Link
+                    to={`/blog/${post.id}`}
+                    className="inline-flex items-center gap-2 text-[#006397] font-semibold hover:gap-3 transition-all"
+                  >
+                    Read More
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section with Gradient */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[#006397] via-purple-600 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-[#F5F8FD] rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#F5F8FD] rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Ready to Transform Your Workflow?
+          </h2>
+          <p className="text-xl mb-10 text-blue-100">
+            Join thousands of teams already using Sartthi to manage their projects better.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/register"
+              className="group px-8 py-4 bg-[#F5F8FD] text-[#006397] rounded-xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              Start Free Trial
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/pricing"
+              className="px-8 py-4 bg-transparent text-white rounded-xl font-bold text-lg border-2 border-white hover:bg-[#F5F8FD] hover:text-[#006397] transition-all duration-300"
+            >
+              View Pricing
+            </Link>
+          </div>
+          <p className="mt-8 text-blue-100 text-sm">
+            ✨ No credit card required • 14-day free trial • Cancel anytime
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ Section with Category Filters */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Header with Get In Touch Button */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+                Frequently asked questions
+              </h2>
+              <p className="text-lg text-gray-600">
+                Answers to common queries about Sartthi.
+              </p>
+            </div>
+            <Link
+              to="/contact"
+              className="px-8 py-3 bg-[#006397] text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+            >
+              Get In Touch
+            </Link>
+          </div>
+
+          {/* Category Filter Tabs */}
+          <div className="flex flex-wrap gap-2 mb-12 overflow-x-auto pb-2">
+            {['General', 'Pricing & Plans', 'Features & Functionality', 'Security & Privacy', 'Support & Updates'].map((category, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTab(index)}
+                className={`px-6 py-2.5 rounded-lg border font-medium transition-all whitespace-nowrap ${
+                  activeTab === index
+                    ? 'bg-gray-100 border-gray-300 text-gray-900'
+                    : 'bg-[#F5F8FD] border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* FAQ Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredFaqs.map((faq, index) => {
+              // Create unique hash from question text for truly unique designs
+              const hashString = (str: string) => {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                  const char = str.charCodeAt(i);
+                  hash = ((hash << 5) - hash) + char;
+                  hash = hash & hash; // Convert to 32bit integer
+                }
+                return Math.abs(hash);
+              };
+              
+              const uniqueHash = hashString(faq.question);
+              
+              // Seeded random function using unique hash
+              const seededRandom = (seed: number) => {
+                const x = Math.sin(seed) * 10000;
+                return x - Math.floor(x);
+              };
+              
+              // All available gradient colors
+              const allGradientColors = [
+                { from: 'rgba(253, 186, 116, 0.4)', to: 'rgba(254, 215, 170, 0.2)' }, // Orange
+                { from: 'rgba(147, 197, 253, 0.4)', to: 'rgba(191, 219, 254, 0.2)' }, // Blue
+                { from: 'rgba(216, 180, 254, 0.4)', to: 'rgba(233, 213, 255, 0.2)' }, // Purple
+                { from: 'rgba(251, 207, 232, 0.4)', to: 'rgba(252, 231, 243, 0.2)' }, // Pink
+                { from: 'rgba(153, 246, 228, 0.4)', to: 'rgba(204, 251, 241, 0.2)' }, // Teal
+                { from: 'rgba(253, 224, 71, 0.4)', to: 'rgba(254, 240, 138, 0.2)' },  // Yellow
+                { from: 'rgba(252, 165, 165, 0.4)', to: 'rgba(254, 202, 202, 0.2)' }, // Red
+                { from: 'rgba(167, 243, 208, 0.4)', to: 'rgba(209, 250, 229, 0.2)' }, // Green
+                { from: 'rgba(196, 181, 253, 0.4)', to: 'rgba(221, 214, 254, 0.2)' }, // Indigo
+                { from: 'rgba(254, 202, 87, 0.4)', to: 'rgba(254, 243, 199, 0.2)' },  // Amber
+                { from: 'rgba(134, 239, 172, 0.4)', to: 'rgba(187, 247, 208, 0.2)' }, // Lime
+                { from: 'rgba(252, 211, 77, 0.4)', to: 'rgba(253, 230, 138, 0.2)' },  // Gold
+              ];
+              
+              const blurOptions = ['blur-lg', 'blur-xl', 'blur-2xl', 'blur-3xl'];
+              
+              // Generate random properties for circle 1 using unique hash
+              const circle1ColorIndex = Math.floor(seededRandom(uniqueHash + 1) * allGradientColors.length);
+              const circle1Color = allGradientColors[circle1ColorIndex];
+              const circle1Size = 80 + Math.floor(seededRandom(uniqueHash + 2) * 100); // 80-180px
+              const circle1Top = 10 + Math.floor(seededRandom(uniqueHash + 3) * 30); // 10-40%
+              const circle1Right = 5 + Math.floor(seededRandom(uniqueHash + 4) * 15); // 5-20%
+              const circle1Blur = blurOptions[Math.floor(seededRandom(uniqueHash + 5) * blurOptions.length)];
+              
+              // Generate random properties for circle 2 (different color)
+              let circle2ColorIndex = Math.floor(seededRandom(uniqueHash + 6) * allGradientColors.length);
+              // Ensure different color from circle 1
+              if (circle2ColorIndex === circle1ColorIndex) {
+                circle2ColorIndex = (circle2ColorIndex + 1) % allGradientColors.length;
+              }
+              const circle2Color = allGradientColors[circle2ColorIndex];
+              const circle2Size = 60 + Math.floor(seededRandom(uniqueHash + 7) * 80); // 60-140px
+              const circle2Bottom = 5 + Math.floor(seededRandom(uniqueHash + 8) * 25); // 5-30%
+              const circle2Left = 5 + Math.floor(seededRandom(uniqueHash + 9) * 15); // 5-20%
+              const circle2Blur = blurOptions[Math.floor(seededRandom(uniqueHash + 10) * blurOptions.length)];
+              
+              return (
+                <div
+                  key={index}
+                  className="group relative h-[280px] w-full p-6 border-2 border-gray-400/60 rounded-xl backdrop-blur-[20px] transition-all duration-300 hover:shadow-[0px_0px_20px_1px_rgba(255,187,118,0.25)] hover:border-gray-500 flex flex-col justify-center items-center text-center overflow-hidden"
+                  style={{ backgroundColor: '#F5F8FD' }}
+                >
+                  {/* Decorative glass effect gradient circles */}
+                  <div 
+                    className={`absolute rounded-full ${circle1Blur} pointer-events-none`}
+                    style={{ 
+                      width: `${circle1Size}px`, 
+                      height: `${circle1Size}px`,
+                      top: `${circle1Top}%`, 
+                      right: `${circle1Right}%`,
+                      background: `linear-gradient(to bottom right, ${circle1Color.from}, ${circle1Color.to})`
+                    }}
+                  ></div>
+                  <div 
+                    className={`absolute rounded-full ${circle2Blur} pointer-events-none`}
+                    style={{ 
+                      width: `${circle2Size}px`, 
+                      height: `${circle2Size}px`,
+                      bottom: `${circle2Bottom}%`, 
+                      left: `${circle2Left}%`,
+                      background: `linear-gradient(to top left, ${circle2Color.from}, ${circle2Color.to})`
+                    }}
+                  ></div>
+                  
+                  {/* Question - visible by default */}
+                  <div className="absolute inset-0 p-6 flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity duration-300 z-10">
+                    <h3 className="text-lg font-bold text-gray-900 leading-tight">
+                      {faq.question}
+                    </h3>
+                  </div>
+                  
+                  {/* Answer - visible on hover */}
+                  <div className="absolute inset-0 p-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 overflow-y-auto z-10">
+                    <p className="text-base font-extrabold text-gray-900 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Large Gradient Text Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-center text-5xl md:text-9xl lg:text-[18rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 dark:from-neutral-950 to-neutral-200 dark:to-neutral-800 inset-x-0">
+            SARTTHI
+          </p>
+        </div>
+      </section>
+
+      <style>{`
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25% { transform: translate(20px, -50px) scale(1.1); }
+          50% { transform: translate(-20px, 20px) scale(0.9); }
+          75% { transform: translate(50px, 50px) scale(1.05); }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.5; }
+        }
+        
+        .animate-bounce-slow {
+          animation: bounce-slow 3s ease-in-out infinite;
+        }
+        
+        .animate-blob {
+          animation: blob 7s ease-in-out infinite;
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-gradient-x {
+          background-size: 200% 200%;
+          animation: gradient-x 3s ease infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+        
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+        
+        .bg-grid-pattern {
+          background-image: 
+            linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+            linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+
+        /* Segmented Radio Button Selector */
+        .radio-inputs {
+          position: relative;
+          display: flex;
+          flex-wrap: wrap;
+          border-radius: 0.5rem;
+          background-color: #eee;
+          box-sizing: border-box;
+          box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
+          padding: 0.25rem;
+          width: auto;
+          max-width: 800px;
+          font-size: 14px;
+        }
+
+        .radio-inputs .radio {
+          flex: 1 1 auto;
+          text-align: center;
+        }
+
+        .radio-inputs .radio input {
+          display: none;
+        }
+
+        .radio-inputs .radio .name {
+          display: flex;
+          cursor: pointer;
+          align-items: center;
+          justify-content: center;
+          border-radius: 0.5rem;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          color: rgba(51, 65, 85, 1);
+          transition: all 0.15s ease-in-out;
+        }
+
+        .radio-inputs .radio input:checked + .name {
+          background-color: #fff;
+          font-weight: 600;
+        }
+
+        .radio-inputs .radio:hover .name {
+          background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .radio-inputs .radio input:checked + .name {
+          position: relative;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          animation: select 0.3s ease;
+        }
+
+        @keyframes select {
+          0% {
+            transform: scale(0.95);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        .radio-inputs .radio input:checked + .name::before,
+        .radio-inputs .radio input:checked + .name::after {
+          content: "";
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #006397;
+          opacity: 0;
+          animation: particles 0.5s ease forwards;
+        }
+
+        .radio-inputs .radio input:checked + .name::before {
+          top: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          --direction: -10px;
+        }
+
+        .radio-inputs .radio input:checked + .name::after {
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          --direction: 10px;
+        }
+
+        @keyframes particles {
+          0% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(0);
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(var(--direction));
+          }
+        }
+        }
+      `}</style>
+      
+      <SharedFooter />
     </div>
   );
 };
