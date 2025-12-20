@@ -107,13 +107,23 @@ export const useWhisper = (): UseWhisperReturn => {
             audioBufferRef.current = [];
             lastProcessTimeRef.current = Date.now();
 
+            // Request microphone with enhanced noise suppression
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     echoCancellation: true,
                     noiseSuppression: true,
                     autoGainControl: true,
                     sampleRate: 16000,
-                },
+                    // Advanced constraints for better quality
+                    channelCount: 1,
+                    latency: 0,
+                    // Enhanced noise suppression settings (Chrome/Edge)
+                    googEchoCancellation: true,
+                    googAutoGainControl: true,
+                    googNoiseSuppression: true,
+                    googHighpassFilter: true,
+                    googTypingNoiseDetection: true,
+                } as any,
             });
 
             streamRef.current = stream;
@@ -122,6 +132,28 @@ export const useWhisper = (): UseWhisperReturn => {
             audioContextRef.current = audioContext;
 
             const source = audioContext.createMediaStreamSource(stream);
+
+            // Create advanced audio processing chain
+            // 1. High-pass filter to remove low-frequency noise (rumble, hum)
+            const highPassFilter = audioContext.createBiquadFilter();
+            highPassFilter.type = 'highpass';
+            highPassFilter.frequency.value = 200; // Remove frequencies below 200Hz
+            highPassFilter.Q.value = 0.7;
+
+            // 2. Dynamic range compressor for consistent volume
+            const compressor = audioContext.createDynamicsCompressor();
+            compressor.threshold.value = -50;
+            compressor.knee.value = 40;
+            compressor.ratio.value = 12;
+            compressor.attack.value = 0;
+            compressor.release.value = 0.25;
+
+            // 3. Low-pass filter to remove high-frequency noise
+            const lowPassFilter = audioContext.createBiquadFilter();
+            lowPassFilter.type = 'lowpass';
+            lowPassFilter.frequency.value = 3400; // Human speech range is ~300-3400Hz
+            lowPassFilter.Q.value = 0.7;
+
             const processor = audioContext.createScriptProcessor(4096, 1, 1);
             processorRef.current = processor;
 
@@ -138,11 +170,17 @@ export const useWhisper = (): UseWhisperReturn => {
                 }
             };
 
-            source.connect(processor);
+            // Connect audio processing chain
+            source
+                .connect(highPassFilter)
+                .connect(compressor)
+                .connect(lowPassFilter)
+                .connect(processor);
+
             processor.connect(audioContext.destination);
 
             setIsRecording(true);
-            console.log('🎤 Whisper recording started (1-second chunks)');
+            console.log('🎤 Whisper recording started with noise reduction');
         } catch (err: any) {
             setError(err.message || 'Failed to start recording');
             console.error('❌ Recording error:', err);
