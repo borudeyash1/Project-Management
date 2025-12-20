@@ -44,6 +44,7 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
     const [useWebSpeech, setUseWebSpeech] = useState(true);
     const [webSpeechFailed, setWebSpeechFailed] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
+    const [modelDownloadConfirmed, setModelDownloadConfirmed] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [aiResult, setAiResult] = useState<MeetingAnalysis | null>(null);
@@ -59,12 +60,19 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
     const isRecordingRef = useRef(false);
     const webSpeechAttempts = useRef(0);
 
-    // Sync Whisper transcript
+    // Sync Whisper transcript and recording state
     useEffect(() => {
         if (!useWebSpeech && whisper.transcript) {
             setTranscript(whisper.transcript);
         }
     }, [whisper.transcript, useWebSpeech]);
+
+    // Sync recording state with Whisper
+    useEffect(() => {
+        if (!useWebSpeech) {
+            setIsRecording(whisper.isRecording);
+        }
+    }, [whisper.isRecording, useWebSpeech]);
 
     // Auto-scroll transcript
     useEffect(() => {
