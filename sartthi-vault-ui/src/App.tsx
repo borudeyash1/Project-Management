@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import VaultPage from './components/VaultPage';
+import OAuthLoginPage from './pages/OAuthLoginPage';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -37,13 +38,17 @@ function App() {
         token = localStorage.getItem('accessToken');
       }
 
+      if (!token) {
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
 
       const response = await fetch(`${API_URL}/api/auth/me`, {
         credentials: 'include',
@@ -55,14 +60,16 @@ function App() {
         setUser(data.data);
         setIsAuthenticated(true);
       } else {
+        // Auth failed, clear token
+        localStorage.removeItem('accessToken');
         setIsAuthenticated(false);
-        if (response.status === 401) {
-          localStorage.removeItem('accessToken');
-        }
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      localStorage.removeItem('accessToken');
       setIsAuthenticated(false);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -78,15 +85,7 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="auth-error">
-        <h2>Authentication Required</h2>
-        <p>Please log in to Sartthi Project Management first.</p>
-        <button onClick={() => window.location.href = 'http://localhost:3000'}>
-          Go to Login
-        </button>
-      </div>
-    );
+    return <OAuthLoginPage />;
   }
 
   const isVaultConnected = user?.modules?.vault?.isEnabled;

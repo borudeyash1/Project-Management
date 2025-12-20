@@ -77,6 +77,7 @@ import FolderDemo from './components/FolderDemo';
 import CalendarPage from './components/calendar/CalendarPage';
 import InboxPage from './components/mail/InboxPage';
 import NotesPage from './components/NotesPage';
+import MeetingNotesPage from './components/MeetingNotesPage';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -500,6 +501,14 @@ const AppContent: React.FC = () => {
         <Route path="/notes" element={
           <ProtectedRoute>
             <NotesPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/notes/meeting" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <MeetingNotesPage />
+            </AppLayout>
           </ProtectedRoute>
         } />
 

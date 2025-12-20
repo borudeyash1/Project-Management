@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ConnectMailPage from './pages/ConnectMailPage';
 import InboxPage from './pages/InboxPage';
+import OAuthLoginPage from './pages/OAuthLoginPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import './App.css';
@@ -32,11 +33,11 @@ function App() {
     try {
       console.log('[Mail App] Checking authentication...');
       console.log('[Mail App] API URL:', API_URL);
-      
+
       // 1. Check for token in URL (SSO)
       const params = new URLSearchParams(window.location.search);
       let token = params.get('token');
-      
+
       if (token) {
         console.log('[Mail App] Found token in URL, saving to storage');
         localStorage.setItem('accessToken', token);
@@ -57,6 +58,7 @@ function App() {
 
       if (!token) {
         console.log('[Mail App] No token found');
+        setUser(null);
         setLoading(false);
         return;
       }
@@ -70,7 +72,12 @@ function App() {
       console.log('[Mail App] Response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        console.log('[Mail App] Auth failed, clearing token');
+        localStorage.removeItem('accessToken');
+        setUser(null);
+        setError('Authentication failed');
+        setLoading(false);
+        return;
       }
 
       const data = await response.json();
@@ -78,14 +85,19 @@ function App() {
 
       if (data.success && data.data) {
         setUser(data.data);
+        setError(null);
       } else {
-        throw new Error('Invalid response format');
+        console.log('[Mail App] Invalid response format');
+        localStorage.removeItem('accessToken');
+        setUser(null);
+        setError('Invalid response format');
       }
     } catch (err: any) {
       console.error('[Mail App] Auth error:', err);
       setError(err.message || 'Authentication failed');
       // Clear invalid token
       localStorage.removeItem('accessToken');
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -93,10 +105,10 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         background: '#1a1a1a'
       }}>
@@ -117,38 +129,7 @@ function App() {
   }
 
   if (error || !user) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        background: '#1a1a1a',
-        color: '#fff'
-      }}>
-        <div style={{ textAlign: 'center', maxWidth: '400px', padding: '2rem' }}>
-          <h2 style={{ color: '#ef4444', marginBottom: '1rem' }}>Authentication Required</h2>
-          <p style={{ color: '#999', marginBottom: '2rem' }}>
-            {error || 'Please sign in through the main Sartthi application'}
-          </p>
-          <button
-            onClick={() => window.location.href = '/'}
-            style={{
-              padding: '0.75rem 2rem',
-              background: '#6366f1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}
-          >
-            Go to Main App
-          </button>
-        </div>
-      </div>
-    );
+    return <OAuthLoginPage />;
   }
 
   const isMailConnected = user.modules?.mail?.isEnabled && user.modules?.mail?.refreshToken;

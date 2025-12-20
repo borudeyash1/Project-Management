@@ -65,6 +65,7 @@ export interface DashboardData {
     description?: string;
     memberCount?: number;
   }>;
+  totalUniqueTeamMembers?: number;
 }
 
 export const getDashboardData = async (): Promise<DashboardData> => {

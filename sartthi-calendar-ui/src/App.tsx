@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import WeekGrid from './components/WeekGrid';
+import OAuthLoginPage from './pages/OAuthLoginPage';
 // import ConnectCalendarPage from './pages/ConnectCalendarPage';
 // import CalendarPage from './pages/CalendarPage';
 
@@ -40,13 +41,17 @@ function App() {
         token = localStorage.getItem('accessToken');
       }
 
+      if (!token) {
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
 
       // Verify token with backend
       const response = await fetch(`${API_URL}/api/auth/me`, {
@@ -59,14 +64,16 @@ function App() {
         setUser(data.data);
         setIsAuthenticated(true);
       } else {
+        // Auth failed, clear token
+        localStorage.removeItem('accessToken');
         setIsAuthenticated(false);
-        if (response.status === 401) {
-          localStorage.removeItem('accessToken');
-        }
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      localStorage.removeItem('accessToken');
       setIsAuthenticated(false);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -82,15 +89,7 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="auth-error">
-        <h2>Authentication Required</h2>
-        <p>Please log in to Sartthi Project Management first.</p>
-        <button onClick={() => window.location.href = 'http://localhost:3000'}>
-          Go to Login
-        </button>
-      </div>
-    );
+    return <OAuthLoginPage />;
   }
 
   // Check if calendar module is enabled

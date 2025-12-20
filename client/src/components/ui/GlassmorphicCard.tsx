@@ -1,28 +1,34 @@
 import React from 'react';
-import { useTheme } from '../../context/ThemeContext';
 
 interface GlassmorphicCardProps {
     children: React.ReactNode;
     className?: string;
-    hoverEffect?: boolean;
     onClick?: () => void;
+    hover?: boolean;
+    hoverEffect?: boolean;
 }
 
 const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
     children,
     className = '',
-    hoverEffect = false,
-    onClick
+    onClick,
+    hover = false,
+    hoverEffect = false
 }) => {
-    const { isDarkMode } = useTheme();
+    const baseClasses = `
+        backdrop-blur-xl 
+        bg-white/70 dark:bg-gray-800/70 
+        rounded-2xl 
+        border border-white/20 dark:border-gray-700/20 
+        shadow-lg
+        ${hover || hoverEffect ? 'transition-all duration-300 hover:shadow-xl hover:scale-[1.02]' : ''}
+        ${onClick ? 'cursor-pointer' : ''}
+    `;
 
     return (
         <div
+            className={`${baseClasses} ${className}`}
             onClick={onClick}
-            className={`rounded-2xl border ${isDarkMode
-                ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-                : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
-                } ${hoverEffect ? 'transition-all hover:scale-[1.02] hover:shadow-xl cursor-pointer' : ''} ${className}`}
         >
             {children}
         </div>

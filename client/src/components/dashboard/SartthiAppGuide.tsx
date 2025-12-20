@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Calendar as CalendarIcon, HardDrive, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { getAppUrl } from '../../utils/appUrls';
 
 interface SartthiAppGuideProps {
@@ -13,6 +14,7 @@ interface SartthiAppGuideProps {
 const SartthiAppGuide: React.FC<SartthiAppGuideProps> = ({ service, isOpen, onClose }) => {
     const { t } = useTranslation();
     const { isDarkMode } = useTheme();
+    const navigate = useNavigate();
 
     const appConfig = {
         mail: {
@@ -67,21 +69,9 @@ const SartthiAppGuide: React.FC<SartthiAppGuideProps> = ({ service, isOpen, onCl
 
     const config = appConfig[service];
 
-    const handleConnect = () => {
-        const token = localStorage.getItem('accessToken');
-        const appUrl = getAppUrl(service);
-        window.location.href = `${appUrl}/api/auth/sartthi/connect-${service}?token=${encodeURIComponent(token || '')}`;
-    };
-
-    const handleOpenApp = () => {
-        const token = localStorage.getItem('accessToken');
-        const appUrl = getAppUrl(service);
-        if (token) {
-            const separator = appUrl.includes('?') ? '&' : '?';
-            window.open(`${appUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
-        } else {
-            window.open(appUrl, '_blank');
-        }
+    const handleAddAccount = () => {
+        // Navigate to settings page with the service tab selected
+        navigate('/settings', { state: { activeTab: 'connected-accounts', service } });
         onClose();
     };
 
@@ -136,10 +126,10 @@ const SartthiAppGuide: React.FC<SartthiAppGuideProps> = ({ service, isOpen, onCl
                     {/* Action Button */}
                     <div>
                         <button
-                            onClick={handleOpenApp}
+                            onClick={handleAddAccount}
                             className={`w-full py-3 rounded-xl font-medium text-white transition-all ${config.bgColor} hover:shadow-lg`}
                         >
-                            Open App
+                            Add Account
                         </button>
                     </div>
                 </div>

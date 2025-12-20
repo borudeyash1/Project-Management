@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Calendar as CalendarIcon, HardDrive, ArrowRight, Loader, CheckCircle2, Lock, X, ExternalLink, Clock, User, Folder, File, Maximize2, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../services/api';
 import SartthiAppGuide from './SartthiAppGuide';
+import SartthiOnboardingGuide from './SartthiOnboardingGuide';
 import { useApp } from '../../context/AppContext';
 
 interface EmailData {
@@ -50,22 +52,12 @@ const AppCard: React.FC<{
     data?: React.ReactNode;
     onConnect: () => void;
     onExpand: () => void;
+    onOpenApp: () => void;
     color: string;
     link: string;
     loading?: boolean;
-}> = ({ icon: Icon, title, description, isConnected, data, onConnect, onExpand, color, link, loading }) => {
+}> = ({ icon: Icon, title, description, isConnected, data, onConnect, onExpand, onOpenApp, color, link, loading }) => {
     const { isDarkMode } = useTheme();
-
-    const handleOpenApp = () => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            const separator = link.includes('?') ? '&' : '?';
-            const authUrl = `${link}${separator}token=${token}`;
-            window.open(authUrl, '_blank');
-        } else {
-            window.open(link, '_blank');
-        }
-    };
 
     return (
         <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${isDarkMode
@@ -133,7 +125,7 @@ const AppCard: React.FC<{
                                     </button>
                                 )}
                                 <button
-                                    onClick={isConnected ? handleOpenApp : onConnect}
+                                    onClick={isConnected ? onOpenApp : onConnect}
                                     className={`flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg transition-all ${isConnected
                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                         : 'bg-orange-600 text-white hover:bg-orange-700'
@@ -218,6 +210,7 @@ const SartthiAppsWidget: React.FC = () => {
     const { t } = useTranslation();
     const { isDarkMode } = useTheme();
     const { state } = useApp();
+    const navigate = useNavigate();
 
     const [mailData, setMailData] = useState<EmailData | null>(null);
     const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
@@ -225,6 +218,7 @@ const SartthiAppsWidget: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [showGuide, setShowGuide] = useState<'mail' | 'calendar' | 'vault' | null>(null);
     const [expandedView, setExpandedView] = useState<'mail' | 'calendar' | 'vault' | null>(null);
+    const [showOnboarding, setShowOnboarding] = useState<'mail' | 'calendar' | 'vault' | null>(null);
 
     const isMailConnected =
         state.userProfile?.modules?.mail?.isEnabled ||
@@ -263,7 +257,40 @@ const SartthiAppsWidget: React.FC = () => {
     };
 
     const handleConnect = (service: 'mail' | 'calendar' | 'vault') => {
-        setShowGuide(service);
+        // Navigate to settings page with the service tab selected
+        navigate('/settings', { state: { activeTab: 'connected-accounts', service } });
+    };
+
+    const handleOpenApp = (service: 'mail' | 'calendar' | 'vault', link: string) => {
+        // Check if user has completed the onboarding guide
+        const guideCompleted = localStorage.getItem(`sartthi-${service}-guide-completed`);
+
+        if (!guideCompleted) {
+            // Show onboarding guide for first-time users
+            setShowOnboarding(service);
+        } else {
+            // Open app directly
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                const separator = link.includes('?') ? '&' : '?';
+                const authUrl = `${link}${separator}token=${token}`;
+                window.open(authUrl, '_blank');
+            } else {
+                window.open(link, '_blank');
+            }
+        }
+    };
+
+    const handleOnboardingComplete = (service: 'mail' | 'calendar' | 'vault', link: string) => {
+        // Open the app after onboarding is complete
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            const separator = link.includes('?') ? '&' : '?';
+            const authUrl = `${link}${separator}token=${token}`;
+            window.open(authUrl, '_blank');
+        } else {
+            window.open(link, '_blank');
+        }
     };
 
     const handleOpenEmail = (emailId: string) => {
@@ -369,6 +396,7 @@ const SartthiAppsWidget: React.FC = () => {
                     data={mailContent}
                     onConnect={() => handleConnect('mail')}
                     onExpand={() => setExpandedView('mail')}
+                    onOpenApp={() => handleOpenApp('mail', 'http://localhost:3001')}
                     color="from-blue-500 to-cyan-500"
                     link="http://localhost:3001"
                     loading={loading}
@@ -382,6 +410,7 @@ const SartthiAppsWidget: React.FC = () => {
                     data={calendarContent}
                     onConnect={() => handleConnect('calendar')}
                     onExpand={() => setExpandedView('calendar')}
+                    onOpenApp={() => handleOpenApp('calendar', 'http://localhost:3002')}
                     color="from-purple-500 to-pink-500"
                     link="http://localhost:3002"
                     loading={loading}
@@ -395,6 +424,7 @@ const SartthiAppsWidget: React.FC = () => {
                     data={vaultContent}
                     onConnect={() => handleConnect('vault')}
                     onExpand={() => setExpandedView('vault')}
+                    onOpenApp={() => handleOpenApp('vault', 'http://localhost:3003')}
                     color="from-green-500 to-emerald-500"
                     link="http://localhost:3003"
                     loading={loading}
@@ -663,6 +693,26 @@ const SartthiAppsWidget: React.FC = () => {
                 service="vault"
                 isOpen={showGuide === 'vault'}
                 onClose={() => setShowGuide(null)}
+            />
+
+            {/* Onboarding Guides */}
+            <SartthiOnboardingGuide
+                service="mail"
+                isOpen={showOnboarding === 'mail'}
+                onClose={() => setShowOnboarding(null)}
+                onComplete={() => handleOnboardingComplete('mail', 'http://localhost:3001')}
+            />
+            <SartthiOnboardingGuide
+                service="calendar"
+                isOpen={showOnboarding === 'calendar'}
+                onClose={() => setShowOnboarding(null)}
+                onComplete={() => handleOnboardingComplete('calendar', 'http://localhost:3002')}
+            />
+            <SartthiOnboardingGuide
+                service="vault"
+                isOpen={showOnboarding === 'vault'}
+                onClose={() => setShowOnboarding(null)}
+                onComplete={() => handleOnboardingComplete('vault', 'http://localhost:3003')}
             />
         </div>
     );

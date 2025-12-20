@@ -2,6 +2,7 @@ import express from 'express';
 import { authenticate } from '../middleware/auth';
 import {
   getReports,
+  getReportsSummary,
   createReport,
   getProjectAnalytics,
   getTeamAnalytics,
@@ -13,6 +14,9 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+// Report summary for home page widget
+router.get('/summary', getReportsSummary);
 
 // Report CRUD
 router.get('/', getReports);

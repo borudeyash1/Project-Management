@@ -5,6 +5,108 @@ import Task from '../models/Task';
 import User from '../models/User';
 import { AuthenticatedRequest, ApiResponse } from '../types';
 
+// Get reports summary for home page widget
+export const getReportsSummary = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?._id;
+
+    // Get date range for this week
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const startOfLastWeek = new Date(startOfWeek);
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+
+    // Get tasks completed this week
+    const tasksThisWeek = await Task.find({
+      $or: [{ assignee: userId }, { createdBy: userId }],
+      status: 'completed',
+      updatedAt: { $gte: startOfWeek }
+    }).lean();
+
+    // Get tasks completed last week for comparison
+    const tasksLastWeek = await Task.find({
+      $or: [{ assignee: userId }, { createdBy: userId }],
+      status: 'completed',
+      updatedAt: { $gte: startOfLastWeek, $lt: startOfWeek }
+    }).lean();
+
+    const tasksCompletedThisWeek = tasksThisWeek.length;
+    const tasksCompletedLastWeek = tasksLastWeek.length;
+    const tasksCompletedChange = tasksCompletedLastWeek > 0
+      ? Math.round(((tasksCompletedThisWeek - tasksCompletedLastWeek) / tasksCompletedLastWeek) * 100)
+      : 0;
+
+    // Get projects data
+    const projects = await Project.find({
+      $or: [
+        { createdBy: userId },
+        { 'teamMembers.user': userId }
+      ],
+      isActive: true
+    }).lean();
+
+    const totalProjects = projects.length;
+    const projectsOnTrack = projects.filter(p =>
+      p.status === 'active'
+    ).length;
+    const projectsAtRisk = projects.filter(p => {
+      if (p.dueDate) {
+        const daysUntilDue = Math.ceil((new Date(p.dueDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return daysUntilDue < 7 && daysUntilDue >= 0 && p.status !== 'completed';
+      }
+      return false;
+    }).length;
+
+    // Calculate productivity score
+    const allTasks = await Task.find({
+      $or: [{ assignee: userId }, { createdBy: userId }],
+      updatedAt: { $gte: startOfWeek }
+    }).lean();
+
+    const completedTasksCount = allTasks.filter(t => t.status === 'completed').length;
+    const productivityScore = allTasks.length > 0
+      ? Math.round((completedTasksCount / allTasks.length) * 100)
+      : 0;
+
+    // Calculate productivity change
+    const allTasksLastWeek = await Task.find({
+      $or: [{ assignee: userId }, { createdBy: userId }],
+      updatedAt: { $gte: startOfLastWeek, $lt: startOfWeek }
+    }).lean();
+
+    const completedTasksLastWeek = allTasksLastWeek.filter(t => t.status === 'completed').length;
+    const productivityScoreLastWeek = allTasksLastWeek.length > 0
+      ? Math.round((completedTasksLastWeek / allTasksLastWeek.length) * 100)
+      : 0;
+
+    const productivityChange = productivityScoreLastWeek > 0
+      ? productivityScore - productivityScoreLastWeek
+      : 0;
+
+    const summary = {
+      tasksCompletedThisWeek,
+      tasksCompletedChange,
+      projectsOnTrack,
+      totalProjects,
+      projectsAtRisk,
+      productivityScore,
+      productivityChange
+    };
+
+    res.status(200).json(summary);
+  } catch (error: any) {
+    console.error('Get reports summary error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve reports summary',
+      error: error.message
+    });
+  }
+};
+
 // Get all reports for the authenticated user
 export const getReports = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {

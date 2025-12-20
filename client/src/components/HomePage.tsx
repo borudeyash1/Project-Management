@@ -145,6 +145,7 @@ const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<'tasks' | 'projects' | 'team' | 'progress' | null>(null);
+  const [totalTeamMembers, setTotalTeamMembers] = useState(0);
 
   // Get accent color from preferences
   const accentColor = preferences.accentColor || '#FBBF24';
@@ -237,6 +238,9 @@ const HomePage: React.FC = () => {
       );
 
       setWorkspaces(response.workspaces || []);
+
+      // Set total team members from backend calculation
+      setTotalTeamMembers(response.totalUniqueTeamMembers || 0);
     } catch (err: any) {
       console.error('Failed to load dashboard data', err);
       setError(err.message || 'Failed to load dashboard data');
@@ -375,7 +379,6 @@ const HomePage: React.FC = () => {
   const completedTasks = quickTasks.filter(t => t.completed).length;
   const totalTasks = quickTasks.length;
   const taskCompletionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  const totalTeamMembers = projects.reduce((acc, p) => acc + (Array.isArray(p.teamMembers) ? p.teamMembers.length : (typeof p.team === 'number' ? p.team : 0)), 0);
 
   return (
     <div className={`min-h-screen pb-8 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>

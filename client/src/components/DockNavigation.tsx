@@ -129,8 +129,8 @@ const DockNavigation: React.FC = () => {
     const isConnected = hasRefreshToken || hasConnectedAccount;
 
     if (!isConnected) {
-      // Show info card
-      setShowInfoCard(appName);
+      // Navigate to settings page for account connection
+      navigate('/settings', { state: { activeTab: 'connected-accounts', service: appName } });
       return;
     }
 

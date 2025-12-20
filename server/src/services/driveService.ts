@@ -42,10 +42,43 @@ export const listFiles = async (userId: string, folderId?: string, view?: string
     }
 
     const drive = await getDriveClient(userId);
-    const sartthiVaultFolder = user.modules.vault.rootFolderId;
+    let sartthiVaultFolder = user.modules.vault.rootFolderId;
 
+    // Auto-initialize if folder doesn't exist (for users who connected before this fix)
     if (!sartthiVaultFolder) {
-        throw new Error('Sartthi Vault folder not initialized');
+        console.log('📁 [DRIVE] Root folder not found, initializing...');
+
+        // Search for existing "Sartthi Vault" folder
+        const searchResponse = await drive.files.list({
+            q: "name='Sartthi Vault' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+            fields: 'files(id, name)',
+            spaces: 'drive'
+        });
+
+        if (searchResponse.data.files && searchResponse.data.files.length > 0) {
+            // Found existing folder
+            sartthiVaultFolder = searchResponse.data.files[0]?.id!;
+            console.log('📁 [DRIVE] Found existing Sartthi Vault folder:', sartthiVaultFolder);
+        } else {
+            // Create new folder
+            const folderMetadata = {
+                name: 'Sartthi Vault',
+                mimeType: 'application/vnd.google-apps.folder'
+            };
+
+            const folderResponse = await drive.files.create({
+                requestBody: folderMetadata,
+                fields: 'id'
+            });
+
+            sartthiVaultFolder = folderResponse.data.id!;
+            console.log('📁 [DRIVE] Created new Sartthi Vault folder:', sartthiVaultFolder);
+        }
+
+        // Update user with the folder ID
+        user.modules.vault.rootFolderId = sartthiVaultFolder;
+        await user.save();
+        console.log('📁 [DRIVE] Updated user with rootFolderId');
     }
 
     // Use dedicated Sartthi Vault folder for privacy and security

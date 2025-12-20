@@ -17,6 +17,24 @@ import { reportService, Report, CreateReportData } from '../services/reportServi
 import { useTheme } from '../context/ThemeContext';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import EnhancedCharts from './reports/EnhancedCharts';
+import {
+  LineChart as RechartsLineChart,
+  BarChart as RechartsBarChart,
+  PieChart as RechartsPieChart,
+  AreaChart,
+  Line,
+  Bar,
+  Pie,
+  Cell,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 interface ReportData {
   _id: string;
@@ -550,123 +568,310 @@ const ReportsPage: React.FC = () => {
                 ))}
               </div>
             </GlassmorphicCard>
+
+            {/* Enhanced Analytics Charts */}
+            <EnhancedCharts
+              timeTrackingData={timeTrackingData}
+              teamPerformance={teamPerformance}
+              projectMetrics={projectMetrics}
+              isDarkMode={isDarkMode}
+            />
+            {/* Old charts below - can be removed after testing
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              {/* Time Tracking Chart */}
+            <GlassmorphicCard className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Time Tracking</h3>
+                <Clock className="w-5 h-5 text-accent" />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <RechartsLineChart data={timeTrackingData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} />
+                  <XAxis
+                    dataKey="date"
+                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                  />
+                  <YAxis
+                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                      borderRadius: '8px'
+                    }}
+                    labelStyle={{ color: isDarkMode ? '#f3f4f6' : '#111827' }}
+                  />
+                  <Legend wrapperStyle={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }} />
+                  <Line
+                    type="monotone"
+                    dataKey="hours"
+                    stroke="#FBBF24"
+                    strokeWidth={2}
+                    name="Total Hours"
+                    dot={{ fill: '#FBBF24', r: 4 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="billableHours"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    name="Billable Hours"
+                    dot={{ fill: '#10b981', r: 4 }}
+                  />
+                </RechartsLineChart>
+              </ResponsiveContainer>
+            </GlassmorphicCard>
+
+            {/* Team Performance Chart */}
+            <GlassmorphicCard className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Team Performance</h3>
+                <Users className="w-5 h-5 text-purple-500" />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <RechartsBarChart data={teamPerformance.slice(0, 5)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} />
+                  <XAxis
+                    dataKey="name"
+                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280', fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis
+                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                      borderRadius: '8px'
+                    }}
+                    labelStyle={{ color: isDarkMode ? '#f3f4f6' : '#111827' }}
+                  />
+                  <Legend wrapperStyle={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }} />
+                  <Bar dataKey="productivityScore" fill="#8b5cf6" name="Productivity Score" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="completionRate" fill="#FBBF24" name="Completion Rate %" radius={[8, 8, 0, 0]} />
+                </RechartsBarChart>
+              </ResponsiveContainer>
+            </GlassmorphicCard>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* AI Insights */}
-            {canUseAI() && (
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white">
+          {/* Project Progress & Productivity Trend */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            {/* Project Progress Pie Chart */}
+            <GlassmorphicCard className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Status Distribution</h3>
+                <Target className="w-5 h-5 text-orange-500" />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <RechartsPieChart>
+                  <Pie
+                    data={[
+                      { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
+                      { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
+                      { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
+                      { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
+                    ].filter(item => item.value > 0)}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {[
+                      { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
+                      { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
+                      { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
+                      { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
+                    ].filter(item => item.value > 0).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                      borderRadius: '8px'
+                    }}
+                  />
+                </RechartsPieChart>
+              </ResponsiveContainer>
+            </GlassmorphicCard>
+
+            {/* Productivity Trend Area Chart */}
+            <GlassmorphicCard className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Productivity Trend</h3>
+                <TrendingUp className="w-5 h-5 text-green-500" />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={timeTrackingData}>
+                  <defs>
+                    <linearGradient id="colorProductivity" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#FBBF24" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#FBBF24" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} />
+                  <XAxis
+                    dataKey="date"
+                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                  />
+                  <YAxis
+                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                      borderRadius: '8px'
+                    }}
+                    labelStyle={{ color: isDarkMode ? '#f3f4f6' : '#111827' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="hours"
+                    stroke="#FBBF24"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorProductivity)"
+                    name="Hours Worked"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </GlassmorphicCard>
+          </div>
+          */}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* AI Insights */}
+          {canUseAI() && (
+            <GlassmorphicCard className="p-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-blue-500/20 pointer-events-none"></div>
+              <div className="relative">
                 <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-5 h-5" />
-                  <h3 className="font-semibold">AI Insights</h3>
+                  <Bot className="w-5 h-5 text-accent-dark" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white">AI Insights</h3>
                 </div>
-                <p className="text-sm text-purple-100 mb-3">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                   Get AI-powered insights and recommendations for your team's performance.
                 </p>
                 <button
                   onClick={generateAIReport}
                   disabled={isGenerating}
-                  className="w-full bg-white dark:bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent-hover hover:to-blue-600 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 shadow-md"
                 >
                   {isGenerating ? 'Generating...' : 'Generate Insights'}
                 </button>
               </div>
-            )}
+            </GlassmorphicCard>
+          )}
 
-            {/* Project Performance */}
-            <GlassmorphicCard className="p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Project Performance</h3>
-              <div className="space-y-3">
-                {projectMetrics.map(project => (
-                  <div key={project._id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{project.progress}%</span>
+          {/* Project Performance */}
+          <GlassmorphicCard className="p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Project Performance</h3>
+            <div className="space-y-3">
+              {projectMetrics.map(project => (
+                <div key={project._id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{project.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+                    <div
+                      className="bg-accent h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${project.progress}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                    <span>{project.completedTasks}/{project.totalTasks} tasks</span>
+                    <span>${project.spent.toLocaleString()}/${project.budget.toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassmorphicCard>
+
+          {/* Team Leaderboard */}
+          <GlassmorphicCard className="p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Team Leaderboard</h3>
+            <div className="space-y-3">
+              {teamPerformance
+                .sort((a, b) => b.productivityScore - a.productivityScore)
+                .slice(0, 5)
+                .map((member, index) => (
+                  <div key={member._id} className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium dark:text-gray-300">
+                      {index + 1}
                     </div>
-                    <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-accent h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${project.progress}%` }}
-                      />
+                    <div className="flex items-center gap-2 flex-1">
+                      {member.avatar ? (
+                        <img
+                          src={member.avatar}
+                          alt={member.name}
+                          className="w-6 h-6 rounded-full"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
+                          <span className="text-xs font-medium text-gray-600 dark:text-gray-200">
+                            {member.name.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{member.name}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{member.role}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                      <span>{project.completedTasks}/{project.totalTasks} tasks</span>
-                      <span>${project.spent.toLocaleString()}/${project.budget.toLocaleString()}</span>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.productivityScore}%</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{member.completionRate}% tasks</p>
                     </div>
                   </div>
                 ))}
-              </div>
-            </GlassmorphicCard>
+            </div>
+          </GlassmorphicCard>
 
-            {/* Team Leaderboard */}
-            <GlassmorphicCard className="p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Team Leaderboard</h3>
-              <div className="space-y-3">
-                {teamPerformance
-                  .sort((a, b) => b.productivityScore - a.productivityScore)
-                  .slice(0, 5)
-                  .map((member, index) => (
-                    <div key={member._id} className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium dark:text-gray-300">
-                        {index + 1}
-                      </div>
-                      <div className="flex items-center gap-2 flex-1">
-                        {member.avatar ? (
-                          <img
-                            src={member.avatar}
-                            alt={member.name}
-                            className="w-6 h-6 rounded-full"
-                          />
-                        ) : (
-                          <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600 dark:text-gray-200">
-                              {member.name.charAt(0)}
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">{member.role}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.productivityScore}%</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{member.completionRate}% tasks</p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </GlassmorphicCard>
-
-            {/* Quick Actions */}
-            <GlassmorphicCard className="p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h3>
-              <div className="space-y-2">
-                <button
-                  onClick={handleExportAllData}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <Download className="w-4 h-4 inline mr-2" />
-                  Export All Data
-                </button>
-                <button
-                  onClick={handleShareDashboard}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <Share2 className="w-4 h-4 inline mr-2" />
-                  Share Dashboard
-                </button>
-                <button
-                  onClick={() => setShowScheduleModal(true)}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <Calendar className="w-4 h-4 inline mr-2" />
-                  Schedule Report
-                </button>
-              </div>
-            </GlassmorphicCard>
-          </div>
+          {/* Quick Actions */}
+          <GlassmorphicCard className="p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h3>
+            <div className="space-y-2">
+              <button
+                onClick={handleExportAllData}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <Download className="w-4 h-4 inline mr-2" />
+                Export All Data
+              </button>
+              <button
+                onClick={handleShareDashboard}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <Share2 className="w-4 h-4 inline mr-2" />
+                Share Dashboard
+              </button>
+              <button
+                onClick={() => setShowScheduleModal(true)}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <Calendar className="w-4 h-4 inline mr-2" />
+                Schedule Report
+              </button>
+            </div>
+          </GlassmorphicCard>
         </div>
       </div>
 

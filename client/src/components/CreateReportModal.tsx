@@ -105,11 +105,10 @@ const CreateReportModal: React.FC<CreateReportModalProps> = ({ isOpen, onClose, 
                     key={reportType.value}
                     type="button"
                     onClick={() => setType(reportType.value as any)}
-                    className={`p-4 border-2 rounded-lg transition-all ${
-                      type === reportType.value
+                    className={`p-4 border-2 rounded-lg transition-all ${type === reportType.value
                         ? 'border-accent bg-accent bg-opacity-10'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                   >
                     <Icon className={`w-6 h-6 ${reportType.color} mx-auto mb-2`} />
                     <p className="text-sm font-medium text-gray-900 text-center">

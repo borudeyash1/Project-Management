@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import CreateProjectModal from './CreateProjectModal';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import GlassmorphicCard from './ui/GlassmorphicCard';
+import ConfirmDialog from './common/ConfirmDialog';
 import {
   getProjects,
   createProject as createProjectApi,
@@ -76,6 +77,8 @@ const ProjectsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [creatingProject, setCreatingProject] = useState(false);
   const [processingProjectId, setProcessingProjectId] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const activeWorkspaceId = useMemo(() => {
     // If in Personal Mode, return 'personal' to load personal projects
@@ -308,15 +311,24 @@ const ProjectsPage: React.FC = () => {
     }
   };
 
-  const handleDeleteProject = async (projectId: string) => {
-    const confirmDelete = window.confirm(t('messages.confirmDeleteProject'));
-    if (!confirmDelete) return;
+  const handleDeleteProject = (projectId: string) => {
+    const project = projects.find(p => p._id === projectId);
+    if (project) {
+      setProjectToDelete({ id: projectId, name: project.name });
+      setDeleteConfirmOpen(true);
+    }
+  };
+
+  const confirmDeleteProject = async () => {
+    if (!projectToDelete) return;
 
     try {
-      setProcessingProjectId(projectId);
-      await deleteProjectApi(projectId);
+      setProcessingProjectId(projectToDelete.id);
+      await deleteProjectApi(projectToDelete.id);
       dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: t('messages.projectDeleted') } });
       await loadProjects();
+      setDeleteConfirmOpen(false);
+      setProjectToDelete(null);
     } catch (err: any) {
       dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || t('messages.deleteFailed') } });
     } finally {
@@ -777,6 +789,22 @@ const ProjectsPage: React.FC = () => {
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateProject}
         isSubmitting={creatingProject}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirmOpen}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setProjectToDelete(null);
+        }}
+        onConfirm={confirmDeleteProject}
+        title={t('projects.deleteProject')}
+        message={projectToDelete ? `${t('messages.confirmDeleteProject')} "${projectToDelete.name}"?` : ''}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        variant="danger"
+        loading={processingProjectId === projectToDelete?.id}
       />
     </div>
   );

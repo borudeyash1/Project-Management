@@ -436,8 +436,8 @@ const WorkspaceOverview: React.FC = () => {
                   </p>
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ${project.status === 'active' ? 'bg-green-100 text-green-700' :
-                    project.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-700'
+                  project.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                    'bg-gray-100 text-gray-700'
                   }`}>
                   {project.status}
                 </span>

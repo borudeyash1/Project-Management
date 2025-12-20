@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import aiService from "../services/aiService";
+import geminiMeetingService from "../services/gemini-meeting";
 
 interface ChatRequest {
   message: string;
@@ -140,6 +141,59 @@ export const healthCheck = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "AI service health check failed",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+/**
+ * Handle meeting notes processing
+ */
+export const handleMeetingNotesProcessing = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { transcript } = req.body;
+
+    // Validate input
+    if (!transcript || typeof transcript !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Transcript is required and must be a string",
+      });
+    }
+
+    if (transcript.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Transcript cannot be empty",
+      });
+    }
+
+    // Process the transcript
+    const result = await geminiMeetingService.processMeetingTranscript(
+      transcript
+    );
+
+    // Check if result is an error
+    if ("error" in result) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+      });
+    }
+
+    // Return successful result
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    console.error("Error in handleMeetingNotesProcessing:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while processing the meeting transcript",
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }

@@ -4,7 +4,9 @@ import {
   handleProjectCreation,
   handleMilestoneSuggestion,
   healthCheck,
+  handleMeetingNotesProcessing,
 } from "../controllers/aiController";
+import { authenticate as protect } from "../middleware/auth";
 
 const router = Router();
 
@@ -35,5 +37,12 @@ router.post("/milestones/suggest", handleMilestoneSuggestion);
  * @access  Public
  */
 router.get("/health", healthCheck);
+
+/**
+ * @route   POST /api/ai/meeting-notes
+ * @desc    Process meeting transcript and extract structured information
+ * @access  Private (should be authenticated)
+ */
+router.post("/meeting-notes", protect, handleMeetingNotesProcessing);
 
 export default router;

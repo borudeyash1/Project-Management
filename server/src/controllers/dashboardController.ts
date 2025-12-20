@@ -206,6 +206,20 @@ export const getDashboardData = async (
       })
       .slice(0, 6);
 
+    // Calculate total unique team members across all workspaces (excluding current user)
+    const allTeamMemberIds = new Set<string>();
+    (workspaces || []).forEach((workspace: any) => {
+      if (Array.isArray(workspace.members)) {
+        workspace.members.forEach((member: any) => {
+          const memberId = member.user?._id?.toString() || member.user?.toString();
+          // Exclude the current user
+          if (memberId && memberId !== userId.toString()) {
+            allTeamMemberIds.add(memberId);
+          }
+        });
+      }
+    });
+
     res.status(200).json({
       success: true,
       data: {
@@ -217,6 +231,7 @@ export const getDashboardData = async (
         teamActivity,
         recentFiles,
         workspaces: dashboardWorkspaces,
+        totalUniqueTeamMembers: allTeamMemberIds.size,
       },
     });
   } catch (error: any) {

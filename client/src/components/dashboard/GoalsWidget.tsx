@@ -15,7 +15,7 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const activeGoals = goals.filter(g => g.status === 'in_progress').slice(0, 3);
+    const activeGoals = goals.filter(g => g.status === 'in_progress' || g.status === 'not_started').slice(0, 3);
 
     if (loading) {
         return (
@@ -56,16 +56,16 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
                             key={goal._id}
                             onClick={() => navigate('/goals')}
                             className={`p-3 rounded-xl border transition-all cursor-pointer group ${isDarkMode
-                                    ? 'bg-gray-700/30 border-gray-600 hover:bg-gray-700/50'
-                                    : 'bg-gray-50 border-gray-100 hover:bg-gray-100 hover:border-purple-200'
+                                ? 'bg-gray-700/30 border-gray-600 hover:bg-gray-700/50'
+                                : 'bg-gray-50 border-gray-100 hover:bg-gray-100 hover:border-purple-200'
                                 }`}
                         >
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className={`text-sm font-semibold line-clamp-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{goal.title}</h4>
                                 <div className="flex items-center gap-1">
                                     <span className={`text-xs px-2 py-0.5 rounded-full ${goal.priority === 'high' || goal.priority === 'urgent'
-                                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                        : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                         }`}>
                                         {goal.progress}%
                                     </span>

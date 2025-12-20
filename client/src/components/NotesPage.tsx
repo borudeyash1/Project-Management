@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, FileText, Wand2, Save, Trash2, Plus } from 'lucide-react';
+import { Sparkles, FileText, Wand2, Save, Trash2, Plus, Mic } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import ContentBanner from './ContentBanner';
@@ -11,6 +11,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useRefreshData } from '../hooks/useRefreshData';
 import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext'; import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import { useNavigate } from 'react-router-dom';
 
 interface Note {
   _id: string;
@@ -25,6 +26,7 @@ const NotesPage: React.FC = () => {
   const { isDarkMode, preferences } = useTheme();
   const { dispatch } = useApp();
   const { dockPosition } = useDock();
+  const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -278,23 +280,47 @@ const NotesPage: React.FC = () => {
                       <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{t('notes.noNotes')}</p>
                     </div>
                   ) : (
-                    notes.map(note => (
-                      <div
-                        key={note._id}
-                        onClick={() => handleSelectNote(note)}
-                        className={`p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.02] ${selectedNote?._id === note._id
-                          ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700] shadow-lg'
-                          : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
-                          }`}
-                      >
-                        <h3 className={`font-bold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {note.title || 'Untitled'}
-                        </h3>
-                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {new Date(note.updatedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    ))
+                    notes.map(note => {
+                      // Detect if this is a meeting note (starts with "Meeting Notes" or contains timestamp pattern)
+                      const isMeetingNote = note.title.startsWith('Meeting Notes') ||
+                        /\d{1,2}\/\d{1,2}\/\d{4}/.test(note.title) ||
+                        note.title.includes('Meeting -');
+
+                      return (
+                        <div
+                          key={note._id}
+                          onClick={() => handleSelectNote(note)}
+                          className={`p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.02] relative ${selectedNote?._id === note._id
+                              ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700] shadow-lg'
+                              : isMeetingNote
+                                ? `${isDarkMode
+                                  ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-900/40 hover:to-purple-900/40 border-2 border-blue-700/50'
+                                  : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200'}`
+                                : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
+                            }`}
+                        >
+                          {isMeetingNote && (
+                            <div className="absolute top-2 right-2">
+                              <Mic className={`w-4 h-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                            </div>
+                          )}
+                          <h3 className={`font-bold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'} ${isMeetingNote ? 'pr-8' : ''}`}>
+                            {note.title || 'Untitled'}
+                          </h3>
+                          <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {new Date(note.updatedAt).toLocaleDateString()}
+                          </p>
+                          {isMeetingNote && (
+                            <span className={`inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-semibold ${isDarkMode
+                                ? 'bg-blue-900/50 text-blue-300'
+                                : 'bg-blue-100 text-blue-700'
+                              }`}>
+                              Meeting
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -329,6 +355,16 @@ const NotesPage: React.FC = () => {
                         >
                           <Wand2 size={18} />
                           <span>Refine with AI</span>
+                        </button>
+                        <button
+                          onClick={() => navigate('/notes/meeting')}
+                          style={{
+                            background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
+                          }}
+                          className="flex items-center gap-2 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:opacity-90"
+                        >
+                          <Mic size={18} />
+                          <span>New Meeting Note</span>
                         </button>
                       </div>
                       <div className="flex items-center gap-2">
