@@ -115,51 +115,51 @@ const SharedNavbar: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
-            {/* Products Dropdown */}
-            <div className="relative" ref={productsDropdownRef}>
-              <button
-                onClick={() => setShowProductsMenu(!showProductsMenu)}
-                className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-gray-900 hover:bg-yellow-50 hover:text-gray-900"
-              >
+            {/* Products Animated Dropdown */}
+            <div className="products-select" ref={productsDropdownRef}>
+              <div className="products-selected">
                 <Grid size={18} />
-                Products
-              </button>
-              
-              {showProductsMenu && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn">
-                  {products.map((product) => (
-                    product.external ? (
-                      <a
-                        key={product.url}
-                        href={product.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-start gap-4 px-4 py-3 hover:bg-yellow-50 transition-colors duration-200"
-                        onClick={() => setShowProductsMenu(false)}
-                      >
-                        <span className="text-3xl">{product.icon}</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">{product.name}</div>
-                          <div className="text-sm text-gray-600">{product.description}</div>
-                        </div>
-                      </a>
-                    ) : (
-                      <Link
-                        key={product.path}
-                        to={product.path!}
-                        className="flex items-start gap-4 px-4 py-3 hover:bg-yellow-50 transition-colors duration-200"
-                        onClick={() => setShowProductsMenu(false)}
-                      >
-                        <span className="text-3xl">{product.icon}</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">{product.name}</div>
-                          <div className="text-sm text-gray-600">{product.description}</div>
-                        </div>
-                      </Link>
-                    )
-                  ))}
-                </div>
-              )}
+                <span>Products</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="1em"
+                  viewBox="0 0 512 512"
+                  className="products-arrow"
+                >
+                  <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
+                </svg>
+              </div>
+              <div className="products-options">
+                {products.map((product) => (
+                  product.external ? (
+                    <a
+                      key={product.url}
+                      href={product.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="products-option"
+                    >
+                      <span className="products-option-icon">{product.icon}</span>
+                      <div className="products-option-content">
+                        <div className="products-option-title">{product.name}</div>
+                        <div className="products-option-description">{product.description}</div>
+                      </div>
+                    </a>
+                  ) : (
+                    <Link
+                      key={product.path}
+                      to={product.path!}
+                      className="products-option"
+                    >
+                      <span className="products-option-icon">{product.icon}</span>
+                      <div className="products-option-content">
+                        <div className="products-option-title">{product.name}</div>
+                        <div className="products-option-description">{product.description}</div>
+                      </div>
+                    </Link>
+                  )
+                ))}
+              </div>
             </div>
 
             {/* Regular Nav Links */}

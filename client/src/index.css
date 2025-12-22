@@ -556,3 +556,109 @@ label {
 .feature-card:active {
   transform: scale(0.95);
 }
+
+/* Animated Products Dropdown Styles */
+.products-select {
+  width: fit-content;
+  cursor: pointer;
+  position: relative;
+  transition: 300ms;
+  color: #111827;
+  overflow: visible;
+}
+
+.products-selected {
+  background-color: transparent;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  position: relative;
+  z-index: 100000;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.products-selected:hover {
+  background-color: #FEF3C7;
+}
+
+.products-arrow {
+  position: relative;
+  right: 0px;
+  height: 10px;
+  transform: rotate(-90deg);
+  width: 18px;
+  fill: #111827;
+  z-index: 100000;
+  transition: 300ms;
+}
+
+.products-options {
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem;
+  padding: 0.75rem;
+  background-color: white;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  min-width: 18rem;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+}
+
+.products-select:hover > .products-options {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.products-select:hover > .products-selected .products-arrow {
+  transform: rotate(0deg);
+}
+
+.products-option {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: all 200ms;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.products-option:hover {
+  background-color: #FEF3C7;
+}
+
+.products-option-icon {
+  font-size: 1.875rem;
+  line-height: 1;
+}
+
+.products-option-content {
+  flex: 1;
+}
+
+.products-option-title {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
+  margin-bottom: 0.125rem;
+}
+
+.products-option-description {
+  font-size: 0.75rem;
+  color: #6B7280;
+}
+

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { pipeline, env } from '@xenova/transformers';
 
 // Configure environment

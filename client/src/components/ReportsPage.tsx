@@ -752,7 +752,6 @@ const ReportsPage: React.FC = () => {
               </ResponsiveContainer>
             </GlassmorphicCard>
           </div>
-          */}
         </div>
 
         {/* Sidebar */}
