@@ -113,7 +113,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault', accountId: string) => {
-    if (!confirm('Are you sure you want to disconnect this account?')) {
+    if (!window.confirm('Are you sure you want to disconnect this account?')) {
       return;
     }
 

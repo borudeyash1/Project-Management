@@ -1,255 +1,669 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Crown, Users, Shield, ArrowRight, CheckCircle2, Sparkles, Award } from 'lucide-react';
+import { CheckCircle2, Sparkles, X } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
-import PricingModal from './PricingModal';
-import api, { SubscriptionPlanData } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
-import { useApp } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import ContentBanner from './ContentBanner';
-
-const planIconMap: Record<'free' | 'pro' | 'ultra', React.ReactNode> = {
-  free: <Users className="w-8 h-8 text-emerald-500" />,
-  pro: <Zap className="w-8 h-8 text-[accent]" />,
-  ultra: <Crown className="w-8 h-8 text-purple-500" />
-};
-
-
 
 const PricingPage: React.FC = () => {
   useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [presetPlan, setPresetPlan] = useState<'free' | 'pro' | 'ultra' | null>(null);
-  const [authPrompt, setAuthPrompt] = useState<{ planKey: 'free' | 'pro' | 'ultra'; planName: string } | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [isYearly, setIsYearly] = useState(false);
 
   useEffect(() => {
-    const loadPlans = async () => {
-      try {
-        const data = await api.getSubscriptionPlans();
-        setPlans(data);
-      } catch (error) {
-        console.error('Failed to fetch subscription plans', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPlans();
+    setIsVisible(true);
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const sortedPlans = useMemo(() => {
-    return [...plans].sort((a, b) => a.order - b.order);
-  }, [plans]);
-
-  const { state } = useApp();
-  
-  const handleChoosePlan = (plan: SubscriptionPlanData) => {
-    const isAuthenticated = !!state.userProfile._id;
-    if (!isAuthenticated) {
-      setAuthPrompt({ planKey: plan.planKey, planName: plan.displayName });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
+  // Pricing plans matching the landing page reference
+  const pricingPlans = [
+    {
+      name: 'Free',
+      price: 0,
+      description: 'Get started for free',
+      recommended: false,
+      features: [
+        { text: 'All task functionality', included: true },
+        { text: '1 project with 5 members', included: true },
+        { text: 'Limited task allotment types', included: true },
+        { text: 'Pay per workspace option', included: true },
+        { text: 'Mobile app access', included: true },
+        { text: 'No collaborator option', included: false },
+        { text: 'No AI assistance', included: false },
+        { text: 'Ads present', included: false },
+        { text: 'No desktop application', included: false }
+      ],
+      buttonText: 'Get Started Free',
+      buttonStyle: 'outline'
+    },
+    {
+      name: 'Pro',
+      price: 29,
+      description: 'Recommended',
+      recommended: true,
+      features: [
+        { text: '5 workspaces, 5 projects each', included: true },
+        { text: '20 employees per project', included: true },
+        { text: '5 clients per workspace', included: true },
+        { text: 'Complete project management', included: true },
+        { text: 'Collaborator option available', included: true },
+        { text: 'AI access (limited tokens)', included: true },
+        { text: 'Desktop application access', included: true },
+        { text: 'No ads', included: true },
+        { text: 'No custom cloud storage', included: false }
+      ],
+      buttonText: 'Get Started',
+      buttonStyle: 'solid'
+    },
+    {
+      name: 'Enterprise',
+      price: 'Custom',
+      description: 'For large organizations',
+      recommended: false,
+      features: [
+        { text: '10 workspaces, 20 projects each', included: true },
+        { text: '25-30 members per project', included: true },
+        { text: 'Custom cloud storage integration', included: true },
+        { text: 'AI auto task scheduling', included: true },
+        { text: 'Real-time AI suggestions', included: true },
+        { text: 'Custom role-based access control', included: true },
+        { text: 'Advanced security features', included: true },
+        { text: 'Desktop application access', included: true },
+        { text: 'No ads + dedicated support', included: true }
+      ],
+      buttonText: 'Contact Sales',
+      buttonStyle: 'outline',
+      contactLink: true
     }
-    setAuthPrompt(null);
-    setPresetPlan(plan.planKey);
-    setModalOpen(true);
-  };
+  ];
 
-  const handleLoginRedirect = (route: '/login' | '/register') => {
-    navigate(route);
+  const handleGetStarted = (planName: string) => {
+    navigate('/login');
   };
 
   return (
-    <div className={`min-h-screen flex flex-col bg-white text-gray-900`}>
+    <div className="min-h-screen flex flex-col bg-white text-gray-900">
       <SharedNavbar />
       <ContentBanner route="/pricing" />
 
-      <main className="flex-1 pt-24 pb-16">
-        <section className={`px-4 bg-gradient-to-b from-amber-50 via-white to-white`}>
-          <div className="max-w-6xl mx-auto text-center py-16">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-amber-100 text-amber-700`}>
-              <Sparkles className="w-4 h-4" /> {t('pricing.badge')}
-            </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold mt-6 tracking-tight">
-              {t('pricing.title')}
+      {/* Hero + Pricing Section - Combined */}
+      <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div 
+            className="absolute top-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
+            style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+          ></div>
+          <div 
+            className="absolute top-0 right-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+            style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+          ></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Hero Content */}
+          <div className={`text-center transition-all duration-1000 mb-16 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full text-[#006397] font-medium mb-6 animate-bounce-slow border border-blue-200 shadow-lg">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              <span className="text-sm font-semibold">Flexible Pricing Plans</span>
+            </div>
+            
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+              Pricing
             </h1>
-            <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-              {t('pricing.subtitle')}
+            
+            <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
+              Plans that scale with you. Start today, no credit card required
             </p>
-            <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 border-gray-300 bg-white shadow-sm`}>
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-base font-medium">{t('pricing.highlights.aiCollaboration')}</span>
-              </div>
-              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 border-gray-300 bg-white shadow-sm`}>
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-base font-medium">{t('pricing.highlights.coupons')}</span>
-              </div>
-              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 border-gray-300 bg-white shadow-sm`}>
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-base font-medium">{t('pricing.highlights.analytics')}</span>
-              </div>
-              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 border-gray-300 bg-white shadow-sm`}>
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-base font-medium">{t('pricing.highlights.security')}</span>
-              </div>
+
+            {/* Billing Toggle */}
+            <div className="flex items-center justify-center gap-3">
+              <span className={`text-sm font-medium ${!isYearly ? 'text-gray-900' : 'text-gray-500'}`}>
+                Billed monthly
+              </span>
+              <button
+                onClick={() => setIsYearly(!isYearly)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  isYearly ? 'bg-green-500' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    isYearly ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+              <span className={`text-sm font-medium ${isYearly ? 'text-gray-900' : 'text-gray-500'}`}>
+                Billed yearly
+              </span>
+              {isYearly && (
+                <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                  SAVE 10%
+                </span>
+              )}
             </div>
-
-            {authPrompt && (
-              <div className={`mt-8 max-w-3xl mx-auto rounded-3xl border px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-gray-300 bg-white shadow-lg`}>
-                <div>
-                  <p className="text-sm uppercase tracking-wider text-amber-500 font-semibold">{t('pricing.authPrompt.title')}</p>
-                  <h2 className="text-xl font-bold mt-1">{t('pricing.authPrompt.message', { planName: authPrompt.planName })}</h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {t('pricing.authPrompt.description')}
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={() => handleLoginRedirect('/login')}
-                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-semibold border border-[accent] text-[accent] hover:bg-blue-50"
-                  >
-                    {t('pricing.authPrompt.login')}
-                  </button>
-                  <button
-                    onClick={() => handleLoginRedirect('/register')}
-                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-semibold bg-[accent] text-white hover:bg-[accent-hover]"
-                  >
-                    {t('pricing.authPrompt.signup')}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
-        </section>
 
-        <section className="px-4">
+          {/* Pricing Cards - Now inside the same section */}
           <div className="max-w-6xl mx-auto">
-            {loading && (
-              <div className="text-center py-16 text-gray-600">{t('pricing.loading')}</div>
-            )}
-            {!loading && (
-              <div className="grid gap-8 md:grid-cols-3">
-                {sortedPlans.map((plan) => (
-                  <div
-                    key={plan.planKey}
-                    className={`relative rounded-3xl border-2 p-8 shadow-lg transition-all ${plan.planKey === 'pro'
-                      ? 'border-[accent] shadow-blue-100'
-                      : plan.planKey === 'ultra'
-                        ? 'border-purple-500 shadow-purple-100'
-                        : 'border-gray-200'
-                      } bg-white`}
-                  >
-                    {plan.planKey === 'pro' && (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[accent] text-white text-xs font-semibold shadow-md">
-                        {t('pricing.mostPopular')}
-                      </span>
-                    )}
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-16 h-16 rounded-full bg-white shadow flex items-center justify-center mb-4">
-                        {planIconMap[plan.planKey]}
-                      </div>
-                      <h2 className="text-2xl font-bold">{plan.displayName}</h2>
-                      <p className="text-gray-600 mt-2">{plan.summary}</p>
-                      <div className="mt-6">
-                        <div className="text-4xl font-extrabold">
-                          {plan.monthlyPrice === 0 ? t('pricing.free') : `$${plan.monthlyPrice}`}
-                        </div>
-                        <p className="text-sm text-gray-600">{t('pricing.perMonth')}</p>
-                      </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {pricingPlans.map((plan, index) => {
+              const finalPrice = typeof plan.price === 'number' && isYearly 
+                ? Math.round(plan.price * 12 * 0.9) 
+                : plan.price;
+              
+              return (
+                <div
+                  key={plan.name}
+                  className={`relative rounded-3xl p-8 transition-all duration-300 ${
+                    plan.recommended
+                      ? 'border-2 border-[#006397] shadow-2xl scale-105 z-10'
+                      : 'border-2 border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl'
+                  }`}
+                  style={{ 
+                    backgroundColor: plan.recommended ? '#ffffff' : '#F1F4F9',
+                    animationDelay: `${index * 100}ms` 
+                  }}
+                >
+                  {/* Plan Name */}
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                      {plan.name}
+                    </h3>
+                    
+                    {/* Price */}
+                    <div className="mb-4">
+                      {typeof finalPrice === 'number' ? (
+                        <span className="text-5xl font-bold text-gray-900">
+                          ${finalPrice}
+                        </span>
+                      ) : (
+                        <span className="text-5xl font-bold text-gray-900">
+                          {finalPrice}
+                        </span>
+                      )}
                     </div>
-
-                    <div className="mt-8 space-y-3 text-sm">
-                      <div className="flex justify-between border-b pb-2 border-gray-300">
-                        <span className="text-gray-600">{t('pricing.limits.workspaces')}</span>
-                        <span className="font-semibold">{plan.limits.maxWorkspaces === -1 ? t('pricing.limits.unlimited') : plan.limits.maxWorkspaces}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2 border-gray-300">
-                        <span className="text-gray-600">{t('pricing.limits.projects')}</span>
-                        <span className="font-semibold">{plan.limits.maxProjects === -1 ? t('pricing.limits.unlimited') : plan.limits.maxProjects}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2 border-gray-300">
-                        <span className="text-gray-600">{t('pricing.limits.teamMembers')}</span>
-                        <span className="font-semibold">{plan.limits.maxTeamMembers === -1 ? t('pricing.limits.unlimited') : plan.limits.maxTeamMembers}</span>
-                      </div>
-
+                    
+                    {/* Description/Badge */}
+                    <div className={`inline-block px-4 py-1 text-sm font-semibold rounded-full mb-6 ${
+                      plan.recommended 
+                        ? 'bg-blue-100 text-[#006397]' 
+                        : 'text-gray-600'
+                    }`}>
+                      {plan.description}
                     </div>
-
-                    <button
-                      onClick={() => handleChoosePlan(plan)}
-                      className={`mt-8 w-full inline-flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold transition-all ${plan.planKey === 'pro'
-                        ? 'bg-[accent] text-white hover:bg-[accent-hover]'
-                        : plan.planKey === 'ultra'
-                          ? 'bg-purple-600 text-white hover:bg-purple-700'
-                          : 'bg-gray-100 text-gray-900 hover:bg-gray-300'
-                        }`}
-                    >
-                      {plan.planKey === 'free'
-                        ? t('pricing.buttons.getStartedFree')
-                        : plan.planKey === 'pro'
-                          ? t('pricing.buttons.choosePro')
-                          : t('pricing.buttons.chooseUltra')}
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
 
-        <section className="px-4 mt-20">
-          <div className="max-w-5xl mx-auto grid gap-8 md:grid-cols-2">
-            <div className={`rounded-3xl p-8 border border-gray-300 bg-white shadow-lg`}>
-              <div className="flex items-center gap-3">
-                <Shield className="w-10 h-10 text-emerald-500" />
-                <div>
-                  <h3 className="text-xl font-semibold">{t('pricing.features.security.title')}</h3>
-                  <p className="text-gray-600 text-sm">{t('pricing.features.security.description')}</p>
+                  {/* Features List */}
+                  <div className="space-y-4 mb-8">
+                    {plan.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        {feature.included ? (
+                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        ) : (
+                          <X className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" />
+                        )}
+                        <span className={`text-sm ${feature.included ? 'text-gray-700' : 'text-gray-400'}`}>
+                          {feature.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <button
+                    onClick={() => handleGetStarted(plan.name)}
+                    className={`w-full py-3 px-6 rounded-full font-semibold transition-all duration-300 ${
+                      plan.buttonStyle === 'solid'
+                        ? 'bg-[#006397] text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+                        : 'bg-white text-[#006397] border-2 border-[#006397] hover:bg-blue-50'
+                    }`}
+                  >
+                    {plan.buttonText}
+                  </button>
+                  
+                  {/* Contact us link for Enterprise plan */}
+                  {plan.contactLink && (
+                    <div className="text-center mt-4">
+                      <a href="/login" className="text-sm text-[#006397] hover:underline">
+                        or Contact us
+                      </a>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Feature Lists - Continuous Snake Flow */}
+          <div className="text-center mb-12">
+            <p className="text-sm text-gray-600 mb-8">Recognized and recommended by top industry experts</p>
+            
+            {/* Row 1 - Scrolling Left (Features 1-10) */}
+            <div className="relative overflow-hidden mb-4 py-3">
+              {/* Left fade gradient */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+              {/* Right fade gradient */}
+              <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+              
+              <div className="flex animate-marquee whitespace-nowrap gap-4">
+                  <div className="feature-card"><span>Workspace Management</span></div>
+                  <div className="feature-card"><span>Project Planning</span></div>
+                  <div className="feature-card"><span>Task Management</span></div>
+                  <div className="feature-card"><span>Team Collaboration</span></div>
+                  <div className="feature-card"><span>Client Portal</span></div>
+                  <div className="feature-card"><span>Time Tracking</span></div>
+                  <div className="feature-card"><span>Resource Allocation</span></div>
+                  <div className="feature-card"><span>Budget Management</span></div>
+                  <div className="feature-card"><span>Invoice Generation</span></div>
+                  <div className="feature-card"><span>Expense Tracking</span></div>
+                  {/* Duplicate for seamless loop */}
+                  <div className="feature-card"><span>Workspace Management</span></div>
+                  <div className="feature-card"><span>Project Planning</span></div>
+                  <div className="feature-card"><span>Task Management</span></div>
+                  <div className="feature-card"><span>Team Collaboration</span></div>
+                  <div className="feature-card"><span>Client Portal</span></div>
+                  <div className="feature-card"><span>Time Tracking</span></div>
+                  <div className="feature-card"><span>Resource Allocation</span></div>
+                  <div className="feature-card"><span>Budget Management</span></div>
+                  <div className="feature-card"><span>Invoice Generation</span></div>
+                  <div className="feature-card"><span>Expense Tracking</span></div>
+                  {/* Triple for ultra-smooth loop */}
+                  <div className="feature-card"><span>Workspace Management</span></div>
+                  <div className="feature-card"><span>Project Planning</span></div>
+                  <div className="feature-card"><span>Task Management</span></div>
+                  <div className="feature-card"><span>Team Collaboration</span></div>
+                  <div className="feature-card"><span>Client Portal</span></div>
+                  <div className="feature-card"><span>Time Tracking</span></div>
+                  <div className="feature-card"><span>Resource Allocation</span></div>
+                  <div className="feature-card"><span>Budget Management</span></div>
+                  <div className="feature-card"><span>Invoice Generation</span></div>
+                  <div className="feature-card"><span>Expense Tracking</span></div>
                 </div>
               </div>
-              <ul className="mt-6 space-y-3 text-sm text-gray-600">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.security.items.planLimits')}</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.security.items.otpGated')}</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.security.items.customBilling')}</li>
-              </ul>
+
+              {/* Row 2 - Scrolling Right (Features 11-20) */}
+              <div className="relative overflow-hidden mb-4 py-3">
+                {/* Left fade gradient */}
+                <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+                {/* Right fade gradient */}
+                <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+                
+                <div className="flex animate-marquee-reverse whitespace-nowrap gap-4">
+                  <div className="feature-card"><span>Kanban Boards</span></div>
+                  <div className="feature-card"><span>Gantt Charts</span></div>
+                  <div className="feature-card"><span>Calendar View</span></div>
+                  <div className="feature-card"><span>Timeline View</span></div>
+                  <div className="feature-card"><span>File Sharing</span></div>
+                  <div className="feature-card"><span>Document Management</span></div>
+                  <div className="feature-card"><span>Version Control</span></div>
+                  <div className="feature-card"><span>Real-time Chat</span></div>
+                  <div className="feature-card"><span>Video Conferencing</span></div>
+                  <div className="feature-card"><span>Screen Sharing</span></div>
+                  {/* Duplicate for seamless loop */}
+                  <div className="feature-card"><span>Kanban Boards</span></div>
+                  <div className="feature-card"><span>Gantt Charts</span></div>
+                  <div className="feature-card"><span>Calendar View</span></div>
+                  <div className="feature-card"><span>Timeline View</span></div>
+                  <div className="feature-card"><span>File Sharing</span></div>
+                  <div className="feature-card"><span>Document Management</span></div>
+                  <div className="feature-card"><span>Version Control</span></div>
+                  <div className="feature-card"><span>Real-time Chat</span></div>
+                  <div className="feature-card"><span>Video Conferencing</span></div>
+                  <div className="feature-card"><span>Screen Sharing</span></div>
+                  {/* Triple for ultra-smooth loop */}
+                  <div className="feature-card"><span>Kanban Boards</span></div>
+                  <div className="feature-card"><span>Gantt Charts</span></div>
+                  <div className="feature-card"><span>Calendar View</span></div>
+                  <div className="feature-card"><span>Timeline View</span></div>
+                  <div className="feature-card"><span>File Sharing</span></div>
+                  <div className="feature-card"><span>Document Management</span></div>
+                  <div className="feature-card"><span>Version Control</span></div>
+                  <div className="feature-card"><span>Real-time Chat</span></div>
+                  <div className="feature-card"><span>Video Conferencing</span></div>
+                  <div className="feature-card"><span>Screen Sharing</span></div>
+                </div>
+              </div>
+
+              {/* Row 3 - Scrolling Left (Features 21-30) */}
+              <div className="relative overflow-hidden mb-4 py-3">
+                {/* Left fade gradient */}
+                <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+                {/* Right fade gradient */}
+                <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+                
+                <div className="flex animate-marquee whitespace-nowrap gap-4">
+                  <div className="feature-card"><span>Custom Workflows</span></div>
+                  <div className="feature-card"><span>Automation Rules</span></div>
+                  <div className="feature-card"><span>AI-Powered Insights</span></div>
+                  <div className="feature-card"><span>Analytics Dashboard</span></div>
+                  <div className="feature-card"><span>Reporting Tools</span></div>
+                  <div className="feature-card"><span>Performance Metrics</span></div>
+                  <div className="feature-card"><span>Goal Tracking</span></div>
+                  <div className="feature-card"><span>Milestone Management</span></div>
+                  <div className="feature-card"><span>Risk Assessment</span></div>
+                  <div className="feature-card"><span>Dependency Tracking</span></div>
+                  {/* Duplicate for seamless loop */}
+                  <div className="feature-card"><span>Custom Workflows</span></div>
+                  <div className="feature-card"><span>Automation Rules</span></div>
+                  <div className="feature-card"><span>AI-Powered Insights</span></div>
+                  <div className="feature-card"><span>Analytics Dashboard</span></div>
+                  <div className="feature-card"><span>Reporting Tools</span></div>
+                  <div className="feature-card"><span>Performance Metrics</span></div>
+                  <div className="feature-card"><span>Goal Tracking</span></div>
+                  <div className="feature-card"><span>Milestone Management</span></div>
+                  <div className="feature-card"><span>Risk Assessment</span></div>
+                  <div className="feature-card"><span>Dependency Tracking</span></div>
+                  {/* Triple for ultra-smooth loop */}
+                  <div className="feature-card"><span>Custom Workflows</span></div>
+                  <div className="feature-card"><span>Automation Rules</span></div>
+                  <div className="feature-card"><span>AI-Powered Insights</span></div>
+                  <div className="feature-card"><span>Analytics Dashboard</span></div>
+                  <div className="feature-card"><span>Reporting Tools</span></div>
+                  <div className="feature-card"><span>Performance Metrics</span></div>
+                  <div className="feature-card"><span>Goal Tracking</span></div>
+                  <div className="feature-card"><span>Milestone Management</span></div>
+                  <div className="feature-card"><span>Risk Assessment</span></div>
+                  <div className="feature-card"><span>Dependency Tracking</span></div>
+                </div>
+              </div>
+
+              {/* Row 4 - Scrolling Right (Features 31-40) */}
+              <div className="relative overflow-hidden py-3">
+                {/* Left fade gradient */}
+                <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+                {/* Right fade gradient */}
+                <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+                
+                <div className="flex animate-marquee-reverse whitespace-nowrap gap-4">
+                  <div className="feature-card"><span>Mobile Apps</span></div>
+                  <div className="feature-card"><span>Email Integration</span></div>
+                  <div className="feature-card"><span>API Access</span></div>
+                  <div className="feature-card"><span>Webhooks</span></div>
+                  <div className="feature-card"><span>Third-party Integrations</span></div>
+                  <div className="feature-card"><span>Role-based Permissions</span></div>
+                  <div className="feature-card"><span>Security & Compliance</span></div>
+                  <div className="feature-card"><span>Data Backup</span></div>
+                  <div className="feature-card"><span>Export & Import</span></div>
+                  <div className="feature-card"><span>24/7 Support</span></div>
+                  {/* Duplicate for seamless loop */}
+                  <div className="feature-card"><span>Mobile Apps</span></div>
+                  <div className="feature-card"><span>Email Integration</span></div>
+                  <div className="feature-card"><span>API Access</span></div>
+                  <div className="feature-card"><span>Webhooks</span></div>
+                  <div className="feature-card"><span>Third-party Integrations</span></div>
+                  <div className="feature-card"><span>Role-based Permissions</span></div>
+                  <div className="feature-card"><span>Security & Compliance</span></div>
+                  <div className="feature-card"><span>Data Backup</span></div>
+                  <div className="feature-card"><span>Export & Import</span></div>
+                  <div className="feature-card"><span>24/7 Support</span></div>
+                  {/* Triple for ultra-smooth loop */}
+                  <div className="feature-card"><span>Mobile Apps</span></div>
+                  <div className="feature-card"><span>Email Integration</span></div>
+                  <div className="feature-card"><span>API Access</span></div>
+                  <div className="feature-card"><span>Webhooks</span></div>
+                  <div className="feature-card"><span>Third-party Integrations</span></div>
+                  <div className="feature-card"><span>Role-based Permissions</span></div>
+                  <div className="feature-card"><span>Security & Compliance</span></div>
+                  <div className="feature-card"><span>Data Backup</span></div>
+                  <div className="feature-card"><span>Export & Import</span></div>
+                  <div className="feature-card"><span>24/7 Support</span></div>
+                </div>
+              </div>
             </div>
-            <div className={`rounded-3xl p-8 border border-gray-300 bg-white shadow-lg`}>
-              <div className="flex items-center gap-3">
-                <Award className="w-10 h-10 text-amber-500" />
-                <div>
-                  <h3 className="text-xl font-semibold">{t('pricing.features.affiliate.title')}</h3>
-                  <p className="text-gray-600 text-sm">{t('pricing.features.affiliate.description')}</p>
+
+          {/* Trust Card */}
+          <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl p-8 md:p-12">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-8">
+              <div className="flex-1">
+                {/* User Reviews */}
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="flex -space-x-2">
+                    <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
+                      <img 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" 
+                        alt="User A"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
+                      <img 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Beth" 
+                        alt="User B"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
+                      <img 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" 
+                        alt="User D"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="ml-2">
+                    <p className="text-sm font-semibold text-gray-700">100+ User Reviews</p>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                        </svg>
+                      ))}
+                      <span className="text-sm text-gray-600 ml-1">(4.8 out of 5)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Heading */}
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                  Why trust Sartthi for your project management needs?
+                </h2>
+
+                {/* Trust Points */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">5+ Years expertise</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">1k+ Satisfied customers</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">Elite project management platform</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">Regular updates provided</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">24/7 support, Guaranteed</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">Proven industry leader</span>
+                  </div>
                 </div>
               </div>
-              <ul className="mt-6 space-y-3 text-sm text-gray-600">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.affiliate.items.couponCatalog')}</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.affiliate.items.affiliateCodes')}</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> {t('pricing.features.affiliate.items.instantValidation')}</li>
-              </ul>
+
+              {/* CTA Button */}
+              <div className="flex flex-col items-center md:items-end gap-4">
+                <div className="text-sm text-[#006397] font-medium flex items-center gap-2">
+                  Learn More
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  </svg>
+                </div>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-8 py-4 bg-[#006397] text-white rounded-full font-semibold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Read Our Story
+                </button>
+              </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* Endless Possibilities Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Endless possibilities
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Everything you need to manage projects efficiently and collaborate seamlessly for your team.
+            </p>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            <div className="rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                50<span className="text-[#006397]">+</span>
+              </div>
+              <p className="text-sm text-gray-600">Features</p>
+            </div>
+            <div className="rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                15<span className="text-[#006397]">+</span>
+              </div>
+              <p className="text-sm text-gray-600">Integrations</p>
+            </div>
+            <div className="rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                5<span className="text-[#006397]">+</span>
+              </div>
+              <p className="text-sm text-gray-600">Project templates</p>
+            </div>
+            <div className="rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                500<span className="text-[#006397]">+</span>
+              </div>
+              <p className="text-sm text-gray-600">Hours saved</p>
+            </div>
+          </div>
+
+          {/* What's Inside */}
+          <div className="text-center mb-8">
+            <h3 className="text-3xl font-bold text-gray-900">
+              What's inside of Sartthi platform
+            </h3>
+          </div>
+
+          {/* Feature Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Card 1 - Project Management */}
+            <div className="backdrop-blur-md rounded-xl p-6 border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Project Management</h4>
+              <p className="text-gray-600 mb-4">
+                Organize and track your projects with powerful tools and intuitive interfaces that scale with your team.
+              </p>
+            </div>
+
+            {/* Card 2 - Team Collaboration */}
+            <div className="backdrop-blur-md rounded-xl p-6 border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Team Collaboration</h4>
+              <p className="text-gray-600 mb-4">
+                Work together seamlessly with real-time updates, comments, and file sharing capabilities.
+              </p>
+            </div>
+
+            {/* Card 3 - Advanced Analytics */}
+            <div className="backdrop-blur-md rounded-xl p-6 border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h4>
+              <p className="text-gray-600 mb-4">
+                Get deep insights into your team's performance with customizable dashboards and detailed reports.
+              </p>
+            </div>
+
+            {/* Card 4 - Time Tracking */}
+            <div className="backdrop-blur-md rounded-xl p-6 border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Time Tracking</h4>
+              <p className="text-gray-600 mb-4">
+                Monitor time spent on tasks and projects to improve productivity and billing accuracy.
+              </p>
+            </div>
+
+            {/* Card 5 - Smart Scheduling */}
+            <div className="backdrop-blur-md rounded-xl p-6 border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#F1F4F9' }}>
+              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-violet-500 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Smart Scheduling</h4>
+              <p className="text-gray-600 mb-4">
+                Automated intelligent scheduling based on comprehensive user profiles, availability, and workload patterns.
+              </p>
+            </div>
+
+            {/* Card 6 - CTA */}
+            <div className="bg-gradient-to-br from-[#006397] to-blue-600 backdrop-blur-md rounded-xl p-6 flex flex-col justify-center items-center text-center border border-blue-400/30 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <h4 className="text-xl font-semibold text-white mb-2">Check out our pricing plan</h4>
+              <p className="text-white/90 mb-4">
+                Choose the plan that aligns with your team's requirements.
+              </p>
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg backdrop-blur-sm transition-colors text-white font-semibold"
+              >
+                Pricing Plan
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Large Gradient Text Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-center text-5xl md:text-9xl lg:text-[18rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 dark:from-neutral-950 to-neutral-200 dark:to-neutral-800 inset-x-0">
+            SARTTHI
+          </p>
+        </div>
+      </section>
 
       <SharedFooter />
-
-      {
-        modalOpen && (
-          <PricingModal
-            isOpen={modalOpen}
-            presetPlanKey={presetPlan ?? undefined}
-            onClose={() => setModalOpen(false)}
-          />
-        )
-      }
-    </div >
+    </div>
   );
 };
 
