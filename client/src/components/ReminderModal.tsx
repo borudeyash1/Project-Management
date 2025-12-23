@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   X, Calendar, Clock, Bell, Tag, Users, MapPin, Link as LinkIcon,
   Repeat, Paperclip, FileText, AlertCircle, Plus, Trash2
 } from 'lucide-react';
@@ -325,7 +325,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                   >
                     <option value="push">{t('reminders.push')}</option>
                     <option value="email">{t('common.email')}</option>
-                    <option value="sms">{t('reminders.sms')}</option>
+
                   </select>
                   <input
                     type="number"

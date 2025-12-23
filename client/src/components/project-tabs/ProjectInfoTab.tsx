@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Edit, Save, X, Calendar, DollarSign, Tag, Briefcase, 
+import {
+  Edit, Save, X, Calendar, DollarSign, Tag, Briefcase,
   Clock, TrendingUp, Users, FileText, AlertCircle
 } from 'lucide-react';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 import { useTranslation } from 'react-i18next';
 
@@ -44,7 +45,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       },
       tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)
     };
-    
+
     onUpdate(updates);
     setIsEditing(false);
   };
@@ -381,6 +382,24 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           </div>
         </div>
       </div>
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          projectInfo: {
+            name: project.name,
+            client: project.client,
+            status: project.status,
+            priority: project.priority,
+            startDate: project.startDate,
+            dueDate: project.dueDate,
+            budget: project.budget,
+            progress: project.progress,
+            tags: project.tags,
+            teamSize: project.team?.length || project.teamMemberCount || 0
+          }
+        }}
+      />
     </div>
   );
 };

@@ -19,7 +19,7 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
 
     if (loading) {
         return (
-            <div className={`rounded-2xl border p-6 h-full ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+            <div className={`rounded-2xl border p-6 h-full ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                 <div className="animate-pulse space-y-4">
                     <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
                     <div className="space-y-3">
@@ -33,7 +33,7 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
     }
 
     return (
-        <div className={`rounded-2xl border p-6 h-full flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+        <div className={`rounded-2xl border p-6 h-full flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
                     <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">

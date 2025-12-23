@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { useDock } from '../../context/DockContext';
 import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
 import { getProjects as getWorkspaceProjects, createProject as createWorkspaceProject } from '../../services/projectService';
 import apiService from '../../services/api';
@@ -25,11 +26,13 @@ import {
   Archive,
   X
 } from 'lucide-react';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 const WorkspaceProjects: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
+  const { dockPosition } = useDock();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -231,7 +234,10 @@ const WorkspaceProjects: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+        'p-4 sm:p-6'
+      }`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -322,7 +328,7 @@ const WorkspaceProjects: React.FC = () => {
           {filteredProjects.map((project) => (
             <div
               key={project._id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5 hover:shadow-lg transition-all cursor-pointer group"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5 transition-all cursor-pointer group"
               onClick={() => navigate(`/project/${project._id}`)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -633,7 +639,7 @@ const WorkspaceProjects: React.FC = () => {
       {/* Rename Modal */}
       {renameModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition-all border border-gray-200 dark:border-gray-700">
+          <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-2xl transform transition-all border border-gray-200 dark:border-gray-700">
             <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">{t('workspace.projects.modals.rename.title')}</h3>
 
             <form onSubmit={submitRename}>
@@ -714,6 +720,27 @@ const WorkspaceProjects: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          totalProjects: workspaceProjects.length,
+          stats: {
+            active: workspaceProjects.filter(p => p.status === 'active').length,
+            completed: workspaceProjects.filter(p => p.status === 'completed').length,
+            onHold: workspaceProjects.filter(p => p.status === 'on-hold').length,
+            planning: workspaceProjects.filter(p => p.status === 'planning').length
+          },
+          projects: filteredProjects.slice(0, 10).map(p => ({
+            name: p.name,
+            status: p.status,
+            priority: p.priority,
+            progress: p.progress,
+            teamSize: p.teamMemberCount,
+            dueDate: p.dueDate
+          }))
+        }}
+      />
     </div>
   );
 };

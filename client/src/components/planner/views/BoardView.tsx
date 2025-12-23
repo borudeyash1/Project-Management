@@ -87,12 +87,12 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   }
 
   return (
-    <div className={`h-full overflow-x-auto p-6 ${dockPosition === 'left' ? 'pl-24' : ''} ${dockPosition === 'right' ? 'pr-24' : ''}`}>
-      <div className="flex gap-4 h-full min-w-max">
+    <div className="h-full overflow-x-auto p-6">
+      <div className="flex gap-6 h-full w-full">
         {columns.map(column => (
           <div
             key={column.id}
-            className={`flex-shrink-0 w-80 bg-gray-50 dark:bg-gray-700 rounded-lg transition-all duration-200 ${draggedOverColumn === column.id
+            className={`flex-1 min-w-[300px] bg-gray-50 dark:bg-gray-700 rounded-lg transition-all duration-200 ${draggedOverColumn === column.id
               ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300'
               : 'border border-gray-200 dark:border-gray-600'
               }`}

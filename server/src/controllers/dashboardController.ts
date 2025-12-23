@@ -88,8 +88,10 @@ export const getDashboardData = async (
       _id: task._id,
       title: task.title,
       dueDate: task.dueDate,
-      completed: task.status === 'done',
+      completed: ['completed', 'done', 'verified'].includes(String(task.status || '')),
       priority: task.priority,
+      category: task.category,
+      type: task.type,
     }));
 
     const recentActivity = (activities || []).map((activity) => ({

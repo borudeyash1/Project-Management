@@ -6,8 +6,9 @@ import { useRefreshData } from '../../hooks/useRefreshData';
 import { usePlanner } from '../../context/PlannerContext';
 import {
   LayoutGrid, List, Calendar, Clock, Inbox, BarChart3,
-  Settings, Plus, Search, Filter, Command, Bell
+  Settings, Plus, Search, Filter, Command, Bell, Target
 } from 'lucide-react';
+import GlassmorphicPageHeader from '../ui/GlassmorphicPageHeader';
 import BoardView from './views/BoardView';
 import ListView from './views/ListView';
 import GanttView from './views/GanttView';
@@ -98,43 +99,50 @@ const PlannerLayout: React.FC = () => {
   return (
     <div
       className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 transition-all duration-300"
-      style={{
-        paddingLeft: dockPosition === 'left' ? '100px' : undefined,
-        paddingRight: dockPosition === 'right' ? '100px' : undefined
-      }}
     >
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('planner.title')}</h1>
+      <GlassmorphicPageHeader
+        title={t('planner.title')}
+        subtitle={t('planner.description')}
+        icon={Target}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+        decorativeGradients={{
+          topRight: 'rgba(124, 58, 237, 0.2)',
+          bottomLeft: 'rgba(59, 130, 246, 0.2)'
+        }}
+      />
 
-            {/* View Switcher */}
-            <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
-              {views.map(view => {
-                const Icon = view.icon;
-                return (
-                  <button
-                    key={view.id}
-                    onClick={() => setCurrentView(view.id as ViewType)}
-                    className={`px-3 py-2 text-sm font-medium flex items-center gap-2 ${currentView === view.id
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
-                      }`}
-                    title={view.label}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden md:inline">{view.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      {/* View Switcher Row */}
+      <div className={`pr-6 mb-6 mt-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+        dockPosition === 'right' ? 'pr-[71px]' :
+          'pl-6'
+        }`}>
+        <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-gray-800/50 rounded-xl overflow-x-auto border border-gray-300/60 dark:border-gray-700/70 backdrop-blur-sm w-fit">
+          {views.map(view => {
+            const Icon = view.icon;
+            return (
+              <button
+                key={view.id}
+                onClick={() => setCurrentView(view.id as ViewType)}
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${currentView === view.id
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ring-1 ring-black/5 dark:ring-white/10'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
+                  }`}
+                title={view.label}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="hidden md:inline">{view.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className={`flex-1 overflow-hidden transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+        dockPosition === 'right' ? 'pr-[71px]' :
+          'pl-6'
+        }`}>
         {renderView()}
       </div>
 

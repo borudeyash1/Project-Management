@@ -493,16 +493,14 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
-      <div className="p-6">
-        {/* Glassmorphic Page Header */}
-        <GlassmorphicPageHeader
-          icon={Bell}
-          title={t('navigation.notifications')}
-          subtitle={t('notifications.unreadTotal', { unread: unreadCount, total: notifications.length })}
-        />
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3 mb-6 justify-end">
+      {/* Glassmorphic Page Header */}
+      <GlassmorphicPageHeader
+        icon={Bell}
+        title={t('navigation.notifications')}
+        subtitle={t('notifications.unreadTotal', { unread: unreadCount, total: notifications.length })}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+      >
+        <div className="flex items-center gap-3">
           <button
             onClick={loadNotifications}
             disabled={loading}
@@ -527,10 +525,13 @@ const NotificationsPage: React.FC = () => {
             </button>
           )}
         </div>
-      </div>
+      </GlassmorphicPageHeader>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+      <div className={`bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-6' :
+          'px-6'
+        }`}>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
@@ -583,11 +584,10 @@ const NotificationsPage: React.FC = () => {
 
       {/* Notifications List */}
       <div
-        className="flex-1 overflow-y-auto p-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
-          paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
-        }}
+        className={`flex-1 overflow-y-auto p-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+          dockPosition === 'right' ? 'pr-[71px]' :
+            ''
+          }`}
       >
         {loading ? (
           <div className="flex items-center justify-center h-64">

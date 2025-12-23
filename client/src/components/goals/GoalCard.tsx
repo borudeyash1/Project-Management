@@ -53,15 +53,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
   };
 
   return (
-    <div 
-      className="goal-card relative w-full h-64 rounded-2xl overflow-hidden cursor-pointer"
-      style={{
-        boxShadow: '20px 20px 60px #bebebe, -20px -20px 60px #ffffff'
-      }}
+    <div
+      className="goal-card relative w-full h-64 rounded-2xl overflow-hidden cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-purple-500 transition-colors"
       onClick={onClick}
     >
       {/* Animated Blob */}
-      <div 
+      <div
         className="blob absolute z-10 top-1/2 left-1/2 w-32 h-32 rounded-full opacity-100"
         style={{
           backgroundColor: getBlobColor(goal.priority),
@@ -71,7 +68,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
       />
 
       {/* Content Background */}
-      <div 
+      <div
         className="bg absolute top-1 left-1 right-1 bottom-1 z-20 rounded-xl overflow-hidden"
         style={{
           background: 'rgba(255, 255, 255, .95)',

@@ -2,7 +2,9 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useDock } from '../../context/DockContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
+import { ContextAIButton } from '../ai/ContextAIButton';
 import {
   Search,
   UserPlus,
@@ -46,6 +48,7 @@ const WorkspaceMembers: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { state } = useApp();
   const { isDarkMode, preferences } = useTheme();
+  const { dockPosition } = useDock();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -202,7 +205,10 @@ const WorkspaceMembers: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+        'p-4 sm:p-6'
+      }`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -217,7 +223,7 @@ const WorkspaceMembers: React.FC = () => {
             style={{
               background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
             }}
-            className="flex items-center gap-2 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+            className="flex items-center gap-2 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all transform hover:scale-105 font-semibold"
           >
             <UserPlus className="w-5 h-5" />
             {t('workspace.members.inviteMembers')}
@@ -433,7 +439,7 @@ const WorkspaceMembers: React.FC = () => {
                     className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                   {filteredDirectory.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg z-10 max-h-48 overflow-y-auto">
                       {filteredDirectory.map((user) => (
                         <button
                           key={user.id}
@@ -497,6 +503,23 @@ const WorkspaceMembers: React.FC = () => {
           </div>
         </GlassmorphicCard>
       </div>
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          members: filteredMembers.map(m => ({
+            name: m.name,
+            role: m.role,
+            status: m.status
+          })),
+          totalMembers: members.length,
+          roleDistribution: members.reduce((acc: any, m) => {
+            acc[m.role] = (acc[m.role] || 0) + 1;
+            return acc;
+          }, {}),
+          activeMembers: members.filter(m => m.status === 'active').length
+        }}
+      />
     </div>
   );
 };

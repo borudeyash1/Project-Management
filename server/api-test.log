@@ -1,0 +1,19 @@
+﻿≡ƒöæ Testing DeepSeek API Key...
+
+API Key (first 15 chars): sk-b417ce0c8b7d...
+API Key length: 35
+
+Γ¥î API Key test FAILED!
+
+Status Code: 402
+Status Text: Payment Required
+Error Data: {
+  "error": {
+    "message": "Insufficient Balance",
+    "type": "unknown_error",
+    "param": null,
+    "code": "invalid_request_error"
+  }
+}
+
+≡ƒÆí Payment required - the API key may not have credits or is not activated.

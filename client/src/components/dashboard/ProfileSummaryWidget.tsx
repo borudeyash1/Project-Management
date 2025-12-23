@@ -46,9 +46,9 @@ const ProfileSummaryWidget: React.FC = () => {
 
     return (
         <div
-            className={`rounded-2xl border p-6 transition-all hover:shadow-xl ${isDarkMode
-                ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-                : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+            className={`rounded-2xl border p-6 transition-all ${isDarkMode
+                ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-300/60 backdrop-blur-sm'
                 }`}
         >
             {/* Header */}
@@ -209,10 +209,9 @@ const ProfileSummaryWidget: React.FC = () => {
                     </p>
                     <button
                         onClick={() => navigate('/profile')}
-                        className="px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all shadow-lg"
+                        className="px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all"
                         style={{
-                            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-                            boxShadow: `0 4px 12px -2px ${accentColor}40`
+                            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`
                         }}
                     >
                         {t('home.completeProfile')}

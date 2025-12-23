@@ -13,7 +13,7 @@ import {
   Lock, Shield, Key, Bell, EyeOff, Monitor, Smartphone,
   Sun, Moon, Palette, Settings as SettingsIcon, User,
   Calendar as CalendarIcon, Clock as ClockIcon, Target as TargetIcon,
-  Building as BuildingIcon, LayoutGrid, List,
+  Building as BuildingIcon, LayoutGrid, Layout, List,
   TrendingDown, ArrowUp, ArrowDown, Minus, X, Check,
   RefreshCw, Save, Send, Reply, Forward, Archive as ArchiveIcon,
   Trash, Undo, Redo, Copy as CopyIcon,
@@ -45,6 +45,7 @@ import ProjectAttendanceManagerTab from './project-tabs/ProjectAttendanceManager
 import ProjectAttendanceEmployeeTab from './project-tabs/ProjectAttendanceEmployeeTab';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import { ContextAIButton } from './ai/ContextAIButton';
 
 interface Project {
   _id: string;
@@ -869,7 +870,13 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   const renderProjectHeader = () => (
-    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} border-b px-6 py-4`}>
+    <div
+      className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} border-b py-4 transition-all duration-300`}
+      style={{
+        paddingLeft: dockPosition === 'left' ? '71px' : '24px',
+        paddingRight: dockPosition === 'right' ? '71px' : '24px'
+      }}
+    >
       {/* Role Selector for Testing */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -912,7 +919,7 @@ const ProjectViewDetailed: React.FC = () => {
             className="fixed inset-0 z-10"
             onClick={() => setShowProjectSelector(false)}
           />
-          <div className={`absolute top-16 left-6 w-80 rounded-lg shadow-lg z-20 border ${isDarkMode ? '!bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
+          <div className={`absolute top-16 left-6 w-80 rounded-lg z-20 border ${isDarkMode ? '!bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Switch Project</h3>
@@ -970,39 +977,92 @@ const ProjectViewDetailed: React.FC = () => {
     const canManageTeam = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
 
     const allTabs = [
-      { id: 'overview', label: 'Overview', icon: LayoutGrid, visible: true },
-      { id: 'info', label: 'Project Info', icon: FileText, visible: true },
-      { id: 'team', label: 'Team', icon: Users, visible: canManageTeam }, // Only owner/PM can see
-      { id: 'tasks', label: 'Tasks & Board', icon: CheckCircle, visible: true },
-      { id: 'timeline', label: 'Timeline', icon: Calendar, visible: true },
-      { id: 'progress', label: 'Progress Tracker', icon: TrendingUp, visible: true },
-      { id: 'workload', label: 'Workload', icon: Activity, visible: true },
-      { id: 'attendance', label: 'Attendance', icon: ClockIcon, visible: true },
-      { id: 'reports', label: 'Reports', icon: BarChart3, visible: true },
-      { id: 'documents', label: 'Documents', icon: Folder, visible: true },
-      { id: 'inbox', label: 'Inbox', icon: Mail, visible: true },
-      { id: 'settings', label: 'Settings', icon: Settings, visible: canManageTeam }
+      { id: 'overview', label: t('project.tabs.overview'), icon: LayoutGrid, visible: true },
+      { id: 'info', label: t('project.tabs.info'), icon: FileText, visible: true },
+      { id: 'team', label: t('project.tabs.team'), icon: Users, visible: canManageTeam }, // Only owner/PM can see
+      { id: 'tasks', label: t('project.tabs.tasks'), icon: CheckCircle, visible: false }, // Tasks moved to board view in planner
+      { id: 'board', label: t('project.tabs.tasks'), icon: Layout, visible: true }, // Replaces tasks tab
+      { id: 'timeline', label: t('project.tabs.timeline'), icon: Calendar, visible: true },
+      { id: 'progress', label: t('project.tabs.progress'), icon: TrendingUp, visible: true },
+      { id: 'workload', label: t('project.tabs.workload'), icon: Activity, visible: true },
+      { id: 'attendance', label: t('project.tabs.attendance'), icon: ClockIcon, visible: true },
+      { id: 'reports', label: t('project.tabs.reports'), icon: BarChart3, visible: true },
+      { id: 'documents', label: t('project.tabs.documents'), icon: Folder, visible: true },
+      { id: 'inbox', label: t('project.tabs.inbox'), icon: Mail, visible: true },
+      { id: 'settings', label: t('project.tabs.settings'), icon: Settings, visible: canManageTeam }
     ];
 
-    const tabs = allTabs.filter(tab => tab.visible);
+    // Filter tabs based on visibility and handle special cases
+    // Note: 'tasks' id is kept in activeView state but we show 'board' UI logic for it in some cases
+    // To match original logic where 'tasks' came from URL, we map 'tasks' to 'board' tab label but keep id suitable for URL
+
+    // Correction: In original code, id was 'tasks'. Let's keep 'tasks' as primary.
+    // I noticed I changed id: 'tasks' to visible: false and added 'board'. 
+    // Let's stick to the original IDs to avoid breaking URL routing which expects 'tasks', 'timeline' etc.
+    // I'll just update the labels with t().
+
+    const tabs = [
+      { id: 'overview', label: t('project.tabs.overview'), icon: LayoutGrid, visible: true },
+      { id: 'info', label: t('project.tabs.info'), icon: FileText, visible: true },
+      { id: 'team', label: t('project.tabs.team'), icon: Users, visible: canManageTeam },
+      { id: 'tasks', label: t('project.tabs.tasks'), icon: CheckCircle, visible: true },
+      { id: 'timeline', label: t('project.tabs.timeline'), icon: Calendar, visible: true },
+      { id: 'progress', label: t('project.tabs.progress'), icon: TrendingUp, visible: true },
+      { id: 'workload', label: t('project.tabs.workload'), icon: Activity, visible: true },
+      { id: 'attendance', label: t('project.tabs.attendance'), icon: ClockIcon, visible: true },
+      { id: 'reports', label: t('project.tabs.reports'), icon: BarChart3, visible: true },
+      { id: 'documents', label: t('project.tabs.documents'), icon: Folder, visible: true },
+      { id: 'inbox', label: t('project.tabs.inbox'), icon: Mail, visible: true },
+      { id: 'settings', label: t('project.tabs.settings'), icon: Settings, visible: canManageTeam }
+    ].filter(tab => tab.visible);
 
     return (
       <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
-        <nav className="flex space-x-4 px-6 overflow-x-auto">
+        {/* Mobile View: Dropdown */}
+        <div className="lg:hidden p-4">
+          <label htmlFor="mobile-tab-select" className="sr-only">Select a tab</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              {(() => {
+                const activeTab = tabs.find(t => t.id === activeView) || tabs[0];
+                const Icon = activeTab.icon;
+                return <Icon className={`h-5 w-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />;
+              })()}
+            </div>
+            <select
+              id="mobile-tab-select"
+              className={`block w-full pl-10 pr-10 py-2.5 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent sm:text-sm rounded-lg appearance-none ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900'
+                }`}
+              value={activeView}
+              onChange={(e) => setActiveView(e.target.value as any)}
+            >
+              {tabs.map((tab) => (
+                <option key={tab.id} value={tab.id}>
+                  {tab.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+              <ChevronDown className="h-4 w-4" />
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop View: Tabs */}
+        <nav className="hidden lg:flex space-x-1 px-6 overflow-x-auto hide-scrollbar">
           {tabs.map(tab => {
             const Icon = tab.icon;
+            const isActive = activeView === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id as any)}
-                className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium transition-colors whitespace-nowrap ${activeView === tab.id
-                  ? 'border-accent-dark text-accent-dark'
-                  : isDarkMode
-                    ? 'border-transparent text-gray-600 hover:text-gray-700'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                className={`flex items-center gap-2 py-4 px-4 border-b-2 font-medium transition-all whitespace-nowrap ${isActive
+                  ? 'border-accent text-accent-dark dark:text-accent-light'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-accent' : 'text-gray-400 dark:text-gray-500'}`} />
                 {tab.label}
               </button>
             );
@@ -1025,7 +1085,7 @@ const ProjectViewDetailed: React.FC = () => {
               <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.progress}%</p>
             </div>
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)` }}
             >
               <Target className="w-7 h-7 text-white" />
@@ -1034,7 +1094,7 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="mt-4 relative z-10">
             <div className={`w-full rounded-full h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
               <div
-                className="h-3 rounded-full transition-all duration-500 shadow-lg"
+                className="h-3 rounded-full transition-all duration-500"
                 style={{
                   width: `${activeProject?.progress}%`,
                   background: `linear-gradient(90deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
@@ -1057,7 +1117,7 @@ const ProjectViewDetailed: React.FC = () => {
                 {formatCurrency(activeProject?.budget || 0)}
               </p>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
               <DollarSign className="w-7 h-7 text-white" />
             </div>
           </div>
@@ -1076,7 +1136,7 @@ const ProjectViewDetailed: React.FC = () => {
                 {activeProject?.team?.length || 0}
               </p>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
               <Users className="w-7 h-7 text-white drop-shadow-lg" />
             </div>
           </div>
@@ -1095,7 +1155,7 @@ const ProjectViewDetailed: React.FC = () => {
                 {activeProject?.tasks?.length || 0}
               </p>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
               <CheckCircle className="w-7 h-7 text-white" />
             </div>
           </div>
@@ -1729,6 +1789,27 @@ const ProjectViewDetailed: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          timeline: {
+            totalEvents: activeProject?.timeline?.length || 0,
+            recentEvents: activeProject?.timeline?.slice(0, 5).map(e => ({
+              type: e.type,
+              title: e.title,
+              date: e.date,
+              user: e.user?.name
+            })) || [],
+            milestones: activeProject?.milestones?.map(m => ({
+              title: m.title,
+              dueDate: m.dueDate,
+              status: m.status,
+              progress: m.progress
+            })) || []
+          }
+        }}
+      />
     </div>
   );
 
@@ -1801,7 +1882,7 @@ const ProjectViewDetailed: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeProject?.documents.map((doc) => (
-                <div key={doc._id} className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${isDarkMode ? 'border-gray-600 bg-gray-900' : 'border-gray-300 bg-white'}`}>
+                <div key={doc._id} className={`border rounded-lg p-4 transition-shadow ${isDarkMode ? 'border-gray-600 bg-gray-900' : 'border-gray-300 bg-white'}`}>
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
@@ -1840,7 +1921,28 @@ const ProjectViewDetailed: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          documents: {
+            totalFiles: activeProject?.documents.length || 0,
+            storageUsed: ((activeProject?.documents.reduce((acc, doc) => acc + (doc.size || 0), 0) || 0) / 1024 / 1024).toFixed(2) + ' MB',
+            recentUploads: activeProject?.documents.filter(d => {
+              const dayAgo = new Date();
+              dayAgo.setDate(dayAgo.getDate() - 1);
+              return new Date(d.uploadedAt) > dayAgo;
+            }).length || 0,
+            types: {
+              files: activeProject?.documents.filter(d => d.type === 'file').length || 0,
+              images: activeProject?.documents.filter(d => d.type === 'image').length || 0,
+              folders: activeProject?.documents.filter(d => d.type === 'folder').length || 0
+            }
+          }
+        }}
+      />
+    </div >
   );
 
   const renderAnalyticsView = () => (
@@ -1866,7 +1968,7 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.completionRate')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -1878,7 +1980,7 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.teamVelocity')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500">
               <Activity className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -1892,7 +1994,7 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.budgetUsage')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
               <DollarSign className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -1910,7 +2012,7 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.teamWorkload')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500">
               <Users className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -2053,7 +2155,26 @@ const ProjectViewDetailed: React.FC = () => {
           </div>
         </div>
       </GlassmorphicCard>
-    </div>
+
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          analytics: {
+            completionRate: activeProject?.progress || 0,
+            tasksCompleted: activeProject?.tasks.filter(t => t.status === 'completed').length || 0,
+            totalTasks: activeProject?.tasks.length || 0,
+            budgetUsed: activeProject?.budget && activeProject?.spent
+              ? Math.round((activeProject.spent / activeProject.budget) * 100)
+              : 0 + '%',
+            teamMembers: activeProject?.team.length || 0,
+            averageWorkload: activeProject?.team.length
+              ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
+              : 0
+          }
+        }}
+      />
+    </div >
 
   );
 
@@ -2846,16 +2967,16 @@ const ProjectViewDetailed: React.FC = () => {
   };
 
   return (
-    <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <div
+      className={`h-full flex flex-col transition-all duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}
+      style={{
+        paddingLeft: dockPosition === 'left' ? '65px' : undefined,
+        paddingRight: dockPosition === 'right' ? '65px' : undefined
+      }}
+    >
       {renderProjectHeader()}
 
-      <div
-        className="flex flex-1 flex-col lg:flex-row overflow-hidden transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : undefined,
-          paddingRight: dockPosition === 'right' ? '100px' : undefined
-        }}
-      >
+      <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto w-full">
           <div className="p-4 md:p-6">

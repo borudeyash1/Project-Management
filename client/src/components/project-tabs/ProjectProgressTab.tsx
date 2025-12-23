@@ -3,6 +3,7 @@ import { TrendingUp, CheckCircle, Clock, AlertCircle, Target, Calendar } from 'l
 import { useTheme } from '../../context/ThemeContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
 import { useTranslation } from 'react-i18next';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 interface ProjectProgressTabProps {
   project: any;
@@ -234,6 +235,33 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
           </div>
         </GlassmorphicCard>
       )}
+
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          progressQuery: {
+            overall: project?.progress || 0,
+            tasks: {
+              total: totalTasks,
+              completed: completedTasks,
+              pending: pendingTasks,
+              blocked: blockedTasks
+            },
+            budget: project?.budget ? {
+              estimated: project.budget.estimated,
+              spent: project.budget.actual,
+              remaining: (project.budget.estimated || 0) - (project.budget.actual || 0)
+            } : null,
+            milestones: project?.milestones?.map((m: any) => ({
+              name: m.name,
+              completed: m.completed,
+              dueDate: m.dueDate
+            })) || [],
+            daysRemaining: daysRemaining
+          }
+        }}
+      />
     </div>
   );
 };

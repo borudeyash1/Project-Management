@@ -417,7 +417,7 @@ const ProjectManagementView: React.FC = () => {
       </button>
       
       {showProjectSelector && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg z-50">
           <div className="p-2">
             {projects.map(project => (
               <button
@@ -654,7 +654,7 @@ const ProjectManagementView: React.FC = () => {
                       setSelectedTask(task);
                       setShowTaskModal(true);
                     }}
-                    className="bg-white p-4 rounded-lg border border-gray-300 cursor-pointer hover:shadow-md transition-shadow"
+                    className="bg-white p-4 rounded-lg border border-gray-300 cursor-pointer transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-gray-900 text-sm">{task.title}</h4>

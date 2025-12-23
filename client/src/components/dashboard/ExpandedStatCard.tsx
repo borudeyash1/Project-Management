@@ -249,8 +249,8 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                         return (
                                             <div
                                                 key={member._id || index}
-                                                className={`rounded-xl overflow-hidden relative text-center p-4 group items-center flex flex-col hover:shadow-2xl transition-all duration-500 ${
-                                                    isDarkMode ? 'bg-gray-700 shadow-lg' : 'bg-white shadow-xl'
+                                                className={`rounded-xl overflow-hidden relative text-center p-4 group items-center flex flex-col transition-all duration-500 ${
+                                                    isDarkMode ? 'bg-gray-700' : 'bg-white'
                                                 }`}
                                             >
                                                 {/* Avatar */}
@@ -280,7 +280,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                 
                                                 {/* Social Icons - Appear on Hover */}
                                                 <div className="flex items-center transition-all duration-500 delay-200 group-hover:bottom-3 -bottom-full absolute gap-2 justify-evenly w-full">
-                                                    <div className={`flex gap-3 text-2xl p-1 hover:p-2 transition-all duration-500 delay-200 rounded-full shadow-sm ${
+                                                    <div className={`flex gap-3 text-2xl p-1 hover:p-2 transition-all duration-500 delay-200 rounded-full ${
                                                         isDarkMode ? 'bg-gray-600 text-white' : 'bg-gray-700 text-white'
                                                     }`}>
                                                         {/* Message Icon */}
@@ -366,7 +366,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                     opacity: 0
                                                 }}
                                             >
-                                                <span className="tooltip absolute -right-3 -top-7 text-xs font-bold px-2 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-lg">
+                                                <span className="tooltip absolute -right-3 -top-7 text-xs font-bold px-2 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                                     {project.progress}%
                                                     <span className="absolute left-1/2 -bottom-1 w-2 h-2 bg-white dark:bg-gray-700 transform -translate-x-1/2 rotate-45"></span>
                                                 </span>
@@ -431,7 +431,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                     exit={{ scale: 0.9, opacity: 0 }}
                     onClick={(e: any) => e.stopPropagation()}
                     className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        } rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6`}
+                        } rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6`}
                 >
                     {renderContent()}
                 </MotionDiv>
@@ -451,7 +451,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         onClick={(e: any) => e.stopPropagation()}
-                        className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6`}
+                        className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6`}
                     >
                         {/* Profile Header */}
                         <div className="flex items-center justify-between mb-6">

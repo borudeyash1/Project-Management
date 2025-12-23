@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import apiService from '../../services/api';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useDock } from '../../context/DockContext';
 import { Clock, Settings, Users, Calendar, MapPin } from 'lucide-react';
 import ManualAttendanceView from './ManualAttendanceView';
 import EmployeeAttendanceView from './EmployeeAttendanceView';
@@ -59,6 +60,7 @@ const formatDateInput = (d: Date) => d.toISOString().slice(0, 10);
 const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspaceId }) => {
   const { state, dispatch } = useApp();
   const { t } = useTranslation();
+  const { dockPosition } = useDock();
 
   // Check if user is workspace owner
   const workspace = state.workspaces.find(w => w._id === workspaceId);
@@ -180,11 +182,21 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
   };
 
   if (!isWorkspaceOwner) {
-    return <EmployeeAttendanceView workspaceId={workspaceId} config={config} />;
+    return (
+      <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-6'
+        }`}>
+        <EmployeeAttendanceView workspaceId={workspaceId} config={config} />
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+        'p-6'
+      }`}>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -218,12 +230,12 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
       {/* Mode Selection */}
       <div className="flex items-center gap-4">
         <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('workspace.attendance.modeLabel')}</span>
-        <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden shadow-sm">
+        <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
           <button
             onClick={() => setMode('automatic')}
             className={`px-6 py-2.5 text-sm font-medium transition-colors ${mode === 'automatic'
-                ? 'bg-accent text-gray-900'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              ? 'bg-accent text-gray-900'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
           >
             {t('workspace.attendance.mode.automatic')}
@@ -231,8 +243,8 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
           <button
             onClick={() => setMode('manual')}
             className={`px-6 py-2.5 text-sm font-medium transition-colors border-l border-gray-300 dark:border-gray-600 ${mode === 'manual'
-                ? 'bg-accent text-gray-900'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              ? 'bg-accent text-gray-900'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
           >
             {t('workspace.attendance.mode.manual')}
@@ -334,7 +346,7 @@ const OwnerAutomaticView: React.FC<{ workspaceId: string; config: AttendanceConf
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Calendar Section */}
       <div className="lg:col-span-1">
-        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-accent" />
             <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('workspace.attendance.selectDate')}</h4>
@@ -378,7 +390,7 @@ const OwnerAutomaticView: React.FC<{ workspaceId: string; config: AttendanceConf
 
       {/* Attendance Table Section */}
       <div className="lg:col-span-2">
-        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm">
+        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('workspace.attendance.overviewTitle')}</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('workspace.attendance.overviewSubtitle')}</p>
@@ -394,7 +406,7 @@ const OwnerAutomaticView: React.FC<{ workspaceId: string; config: AttendanceConf
               <p className="text-gray-600 dark:text-gray-400">{t('workspace.attendance.noRecords')}</p>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">

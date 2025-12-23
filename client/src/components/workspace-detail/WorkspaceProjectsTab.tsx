@@ -286,7 +286,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   {clientProjects.map((project: any) => (
                     <div
                       key={project._id}
-                      className="bg-white border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      className="bg-white border border-gray-300 rounded-lg p-4 transition-shadow"
                     >
                       {/* Project Header */}
                       <div className="flex items-start justify-between mb-3">

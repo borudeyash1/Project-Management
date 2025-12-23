@@ -413,7 +413,7 @@ const ProjectView: React.FC = () => {
                     key={task._id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, task)}
-                    className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-move border-l-4"
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 transition-shadow cursor-move border-l-4"
                     style={{ borderLeftColor: task.color }}
                     onClick={() => {
                       setSelectedTask(task);
@@ -534,7 +534,7 @@ const ProjectView: React.FC = () => {
                         {dayTasks.slice(0, 2).map((task) => (
                           <div
                             key={task._id}
-                            className="text-xs p-1 rounded truncate cursor-pointer hover:bg-white dark:bg-gray-800 hover:shadow-sm transition-all"
+                            className="text-xs p-1 rounded truncate cursor-pointer hover:bg-white dark:bg-gray-800 transition-all"
                             style={{ backgroundColor: task.color + '20', color: task.color }}
                             onClick={() => {
                               setSelectedTask(task);
@@ -585,7 +585,7 @@ const ProjectView: React.FC = () => {
                 </div>
                 
                 <div className="ml-6 flex-1">
-                  <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-4 shadow-sm">
+                  <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-gray-900 dark:text-gray-100">{milestone.title}</h4>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${

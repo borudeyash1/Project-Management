@@ -2725,7 +2725,9 @@
     "interval": "Intervalo",
     "sms": "SMS",
     "personal": "Pessoal",
-    "assignedTo": "Atribuído a"
+    "assignedTo": "Atribuído a",
+    "noReminders": "Nenhum lembrete encontrado",
+    "noRemindersDesc": "Nenhum lembrete futuro. Crie um para se manter organizado!"
   },
   "forms": {
     "required": "Este campo é obrigatório",

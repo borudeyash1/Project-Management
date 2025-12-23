@@ -79,7 +79,7 @@ const SartthiAppGuide: React.FC<SartthiAppGuideProps> = ({ service, isOpen, onCl
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className={`relative w-full max-w-md mx-4 rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl`}>
+            <div className={`relative w-full max-w-md mx-4 rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                 {/* Header with gradient */}
                 <div className={`${config.bgColor} p-6 text-white relative`}>
                     <button
@@ -127,7 +127,7 @@ const SartthiAppGuide: React.FC<SartthiAppGuideProps> = ({ service, isOpen, onCl
                     <div>
                         <button
                             onClick={handleAddAccount}
-                            className={`w-full py-3 rounded-xl font-medium text-white transition-all ${config.bgColor} hover:shadow-lg`}
+                            className={`w-full py-3 rounded-xl font-medium text-white transition-all ${config.bgColor}`}
                         >
                             Add Account
                         </button>

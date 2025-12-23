@@ -719,7 +719,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                       }`}
                   />
                   {filteredDirectoryUsers.length > 0 && (
-                    <div className={`absolute mt-2 w-full border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
+                    <div className={`absolute mt-2 w-full border rounded-lg z-10 max-h-48 overflow-y-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
                       }`}>
                       {filteredDirectoryUsers.map((user) => (
                         <button

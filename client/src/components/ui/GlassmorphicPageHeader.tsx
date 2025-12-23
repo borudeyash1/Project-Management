@@ -11,6 +11,7 @@ interface GlassmorphicPageHeaderProps {
         bottomLeft: string;
     };
     className?: string;
+    contentClassName?: string;
 }
 
 const GlassmorphicPageHeader: React.FC<GlassmorphicPageHeaderProps & { children?: React.ReactNode }> = ({
@@ -20,6 +21,7 @@ const GlassmorphicPageHeader: React.FC<GlassmorphicPageHeaderProps & { children?
     subtitle,
     decorativeGradients,
     className = '',
+    contentClassName = '',
     children
 }) => {
     const { isDarkMode, preferences } = useTheme();
@@ -45,9 +47,9 @@ const GlassmorphicPageHeader: React.FC<GlassmorphicPageHeaderProps & { children?
     };
 
     return (
-        <div className={`relative overflow-hidden rounded-3xl p-8 mb-8 ${isDarkMode
-            ? 'bg-gradient-to-br from-gray-800/50 via-gray-700/50 to-gray-800/50 border border-white/10 backdrop-blur-xl'
-            : 'bg-gradient-to-br from-white/80 via-gray-50/80 to-white/80 border border-white/50 backdrop-blur-xl shadow-2xl'
+        <div className={`relative overflow-hidden rounded-3xl p-8 mb-4 ${isDarkMode
+            ? 'bg-gradient-to-br from-gray-800/50 via-gray-700/50 to-gray-800/50 border border-gray-700/70 backdrop-blur-xl'
+            : 'bg-gradient-to-br from-white/80 via-gray-50/80 to-white/80 border border-gray-300/60 backdrop-blur-xl'
             } ${className}`}>
             {/* Decorative blur orbs using accent color */}
             <div
@@ -60,7 +62,7 @@ const GlassmorphicPageHeader: React.FC<GlassmorphicPageHeaderProps & { children?
             />
 
             {/* Content */}
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className={`relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 ${contentClassName}`}>
                 <div className="flex items-center gap-4">
                     <div
                         className="p-3 rounded-2xl shadow-lg"

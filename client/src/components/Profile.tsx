@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import FaceEnrollmentSection from './profile/FaceEnrollmentSection';
 import GlassmorphicCard from './ui/GlassmorphicCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface ProfileData {
   fullName: string;
@@ -661,7 +662,7 @@ const Profile: React.FC = () => {
           <img
             src={profileData?.avatarUrl || `https://ui-avatars.com/api/?name=${profileData?.fullName}&background=random`}
             alt="Profile"
-            className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+            className="w-24 h-24 rounded-full object-cover border-4 border-white"
           />
           <button className="absolute bottom-0 right-0 bg-accent text-gray-900 dark:text-gray-100 rounded-full p-2 hover:bg-accent-hover transition-colors">
             <Camera className="w-4 h-4" />
@@ -1269,7 +1270,10 @@ const Profile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-4 sm:p-6">
+      <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
         <div className="bg-white dark:bg-gray-800 border border-border rounded-xl p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
@@ -1286,47 +1290,51 @@ const Profile: React.FC = () => {
 
   return (
     <div
-      className="p-4 sm:p-6 transition-all duration-300"
-      style={{
-        paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-        paddingRight: dockPosition === 'right' ? '80px' : undefined
-      }}
+      className={`min-h-screen transition-all duration-300 bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-gray-50 via-blue-50/30 to-purple-50/20'}`}
     >
-      <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
-        {/* Header */}
-        <div className="p-6 border-b border-border dark:border-gray-600">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.title')}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-1">{t('descriptions.profile')}</p>
-        </div>
+      <GlassmorphicPageHeader
+        title={t('profile.title')}
+        subtitle={t('descriptions.profile')}
+        icon={User}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+      />
 
-        {/* Tabs */}
-        <div className="border-b border-border dark:border-gray-600">
-          <nav className="flex space-x-8 px-6 overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
-                    ? 'border-accent text-accent-dark dark:text-accent-light'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+      <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
 
-        {/* Content */}
-        <div className="p-6">
-          {activeTab === 'personal' && renderPersonalInfo()}
-          {activeTab === 'professional' && renderProfessionalProfile()}
-          {activeTab === 'addresses' && renderAddresses()}
-          {activeTab === 'payments' && renderPaymentMethods()}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/60 dark:border-gray-700/70 rounded-xl">
+
+          {/* Tabs */}
+          <div className="border-b border-border dark:border-gray-600">
+            <nav className="flex space-x-8 px-6 overflow-x-auto">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                      ? 'border-accent text-accent-dark dark:text-accent-light'
+                      : 'border-transparent text-gray-600 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {activeTab === 'personal' && renderPersonalInfo()}
+            {activeTab === 'professional' && renderProfessionalProfile()}
+            {activeTab === 'addresses' && renderAddresses()}
+            {activeTab === 'payments' && renderPaymentMethods()}
+          </div>
         </div>
       </div>
 

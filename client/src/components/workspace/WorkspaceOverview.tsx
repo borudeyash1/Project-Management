@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useDock } from '../../context/DockContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
+import { ContextAIButton } from '../ai/ContextAIButton';
 import { getProjects as getWorkspaceProjects } from '../../services/projectService';
 import { apiService } from '../../services/api';
 import { format } from 'date-fns';
@@ -40,6 +42,7 @@ const WorkspaceOverview: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isDarkMode, preferences } = useTheme();
+  const { dockPosition } = useDock();
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats>({ present: 0, absent: 0, wfh: 0, total: 0 });
@@ -188,7 +191,10 @@ const WorkspaceOverview: React.FC = () => {
     }));
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+        'p-4 sm:p-6'
+      }`}>
       {/* Workspace Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -212,7 +218,7 @@ const WorkspaceOverview: React.FC = () => {
             style={{
               background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
             }}
-            className="flex items-center gap-2 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+            className="flex items-center gap-2 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all transform hover:scale-105 font-semibold"
           >
             <Plus className="w-5 h-5" />
             {t('workspace.overview.newProject')}
@@ -231,7 +237,7 @@ const WorkspaceOverview: React.FC = () => {
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
                 <div className="flex items-center justify-between mb-3 relative z-10">
                   <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{stat.label}</span>
-                  <div className={`p-3 rounded-xl ${stat.bgColor} shadow-lg`}>
+                  <div className={`p-3 rounded-xl ${stat.bgColor}`}>
                     <Icon className={`w-5 h-5 ${stat.color}`} />
                   </div>
                 </div>
@@ -351,7 +357,7 @@ const WorkspaceOverview: React.FC = () => {
                   <div
                     key={note._id}
                     onClick={() => navigate('/notes')}
-                    className="bg-white dark:bg-gray-800 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
+                    className="bg-white dark:bg-gray-800 rounded-lg p-3 transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-start gap-2">
                       <Edit3 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
@@ -424,7 +430,7 @@ const WorkspaceOverview: React.FC = () => {
             <div
               key={project._id}
               onClick={() => navigate(`/project/${project._id}`)}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 transition-shadow cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -478,6 +484,23 @@ const WorkspaceOverview: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          workspaceName: currentWorkspace?.name,
+          memberCount: currentWorkspace?.members?.filter((m: any) => m.status === 'active').length || 0,
+          activeProjects,
+          attendanceRate: attendanceStats.total > 0
+            ? Math.round((attendanceStats.present / attendanceStats.total) * 100)
+            : 0,
+          recentActivity: workspaceProjects.slice(0, 5).map(p => ({
+            name: p.name,
+            status: p.status,
+            progress: p.progress
+          }))
+        }}
+      />
     </div>
   );
 };

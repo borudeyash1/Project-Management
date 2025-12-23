@@ -51,6 +51,7 @@ import { useApp } from '../context/AppContext';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import { useTheme } from '../context/ThemeContext';
+import { ContextAIButton } from './ai/ContextAIButton';
 
 interface WorkloadRequest {
   _id: string;
@@ -709,7 +710,7 @@ const WorkloadDeadlineManagement: React.FC = () => {
                 <div className="w-full bg-gray-300 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full transition-all duration-300 ${employee.utilizationPercentage >= 90 ? 'bg-red-500' :
-                        employee.utilizationPercentage >= 75 ? 'bg-yellow-500' : 'bg-green-500'
+                      employee.utilizationPercentage >= 75 ? 'bg-yellow-500' : 'bg-green-500'
                       }`}
                     style={{ width: `${employee.utilizationPercentage}%` }}
                   />
@@ -899,8 +900,8 @@ const WorkloadDeadlineManagement: React.FC = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
-                      ? 'border-accent text-accent-dark'
-                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-accent text-accent-dark'
+                    : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   title={tab.description}
                 >
@@ -922,8 +923,8 @@ const WorkloadDeadlineManagement: React.FC = () => {
       {message && (
         <div className="fixed top-4 right-4 z-50">
           <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-              message.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-                'bg-blue-50 text-blue-800 border border-blue-200'
+            message.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
+              'bg-blue-50 text-blue-800 border border-blue-200'
             }`}>
             {message.type === 'success' && <CheckCircle className="w-5 h-5" />}
             {message.type === 'error' && <AlertCircle className="w-5 h-5" />}
@@ -938,6 +939,26 @@ const WorkloadDeadlineManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          analytics: workloadAnalytics,
+          requestsSummary: {
+            total: workloadRequests.length + deadlineExtensionRequests.length,
+            pending: workloadRequests.filter(r => r.status === 'pending').length + deadlineExtensionRequests.filter(r => r.status === 'pending').length,
+            approved: workloadRequests.filter(r => r.status === 'approved').length + deadlineExtensionRequests.filter(r => r.status === 'approved').length
+          },
+          employeeWorkloads: employeeWorkloads.map(e => ({
+            name: e.name,
+            role: e.role,
+            utilization: e.utilizationPercentage,
+            activeTasks: e.activeTasks,
+            overdue: e.overdueTasks
+          })),
+          activeTab
+        }}
+      />
     </div>
   );
 };

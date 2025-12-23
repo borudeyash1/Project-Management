@@ -14,6 +14,7 @@ import {
 
 import { useTranslation } from 'react-i18next';
 import ProjectPageSkeleton from './ProjectPageSkeleton';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 const ProjectOverview: React.FC = () => {
   const { t } = useTranslation();
@@ -72,6 +73,7 @@ const ProjectOverview: React.FC = () => {
 
   // Get milestones from project data (if available)
   const milestones = (project as any).milestones || [];
+  const activeMilestones = milestones; // Define alias for cleaner usage below
 
   // Get recent activity from project data (if available)
   const recentActivity = (project as any).recentActivity || [];
@@ -247,6 +249,26 @@ const ProjectOverview: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          projectName: project.name,
+          status: project.status,
+          progress: project.progress,
+          teamSize: project.teamMemberCount || 0,
+          milestones: activeMilestones.map((m: any) => ({
+            name: m.name,
+            status: m.status,
+            date: m.date
+          })),
+          recentActivity: recentActivity.slice(0, 5).map((a: any) => ({
+            user: a.user,
+            action: a.action,
+            item: a.item
+          }))
+        }}
+      />
     </div>
   );
 };

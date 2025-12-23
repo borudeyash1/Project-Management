@@ -16,6 +16,7 @@ import * as XLSX from 'xlsx';
 import { reportService, Report, CreateReportData } from '../services/reportService';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { useDock } from '../context/DockContext';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import EnhancedCharts from './reports/EnhancedCharts';
@@ -91,6 +92,7 @@ interface TimeTrackingData {
 const ReportsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
   const { t } = useTranslation();
+  const { dockPosition } = useDock();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canExportReports, canUseAI } = useFeatureAccess();
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -115,11 +117,16 @@ const ReportsPage: React.FC = () => {
       ]);
 
       if (reportsRes) {
-        setReports(reportsRes.data || []);
+        const reportsData = reportsRes || [];
+        setReports(reportsData.map((r: any) => ({
+          ...r,
+          createdAt: new Date(r.createdAt),
+          updatedAt: new Date(r.updatedAt)
+        })));
       }
 
       if (projectsRes) {
-        const projectsData = projectsRes.data || [];
+        const projectsData = projectsRes || [];
         setProjectMetrics(projectsData.map((p: any) => ({
           ...p,
           startDate: new Date(p.startDate),
@@ -128,7 +135,7 @@ const ReportsPage: React.FC = () => {
       }
 
       if (teamRes) {
-        const teamData = teamRes.data || [];
+        const teamData = teamRes || [];
         setTeamPerformance(teamData.map((t: any) => ({
           ...t,
           lastActive: new Date(t.lastActive)
@@ -136,7 +143,7 @@ const ReportsPage: React.FC = () => {
       }
 
       if (timeRes) {
-        const timeData = timeRes.data?.dailyData || [];
+        const timeData = timeRes.dailyData || [];
         setTimeTrackingData(timeData.map((t: any) => ({
           date: t.date,
           hours: t.hours,
@@ -193,34 +200,51 @@ const ReportsPage: React.FC = () => {
     if (!canUseAI()) return;
 
     setIsGenerating(true);
-    // Simulate AI report generation
-    setTimeout(() => {
-      const newReport: ReportData = {
-        _id: Date.now().toString(),
+    try {
+      // Create AI report data
+      const createData: CreateReportData = {
         name: `AI Generated Report - ${new Date().toLocaleDateString()}`,
-        type: 'productivity',
         description: 'AI-powered analysis of team productivity and recommendations',
-        data: {
-          insights: [
-            'Team productivity increased by 15% this month',
-            'Peak productivity hours are 10 AM - 2 PM',
-            'Mobile App project is ahead of schedule',
-            'Recommend focusing on Dashboard Redesign next week'
-          ],
-          recommendations: [
-            'Schedule important tasks during peak hours',
-            'Consider pair programming for complex features',
-            'Implement daily standups for better communication'
-          ]
+        type: 'productivity',
+        dateRange: {
+          startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+          endDate: new Date()
         },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isPublic: false,
-        tags: ['ai', 'productivity', 'recommendations']
+        tags: ['ai', 'productivity', 'recommendations'],
+        isPublic: false
       };
-      setReports([newReport, ...reports]);
+
+      const newReport = await reportService.createReport(createData);
+      const reportWithDates = {
+        ...newReport,
+        createdAt: new Date((newReport as any).createdAt),
+        updatedAt: new Date((newReport as any).updatedAt)
+      };
+      setReports([reportWithDates as any, ...reports]);
+
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: 'AI report generated successfully',
+          duration: 3000
+        }
+      });
+    } catch (error) {
+      console.error('Failed to generate AI report:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to generate AI report',
+          duration: 3000
+        }
+      });
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const exportReport = (report: ReportData) => {
@@ -275,7 +299,12 @@ const ReportsPage: React.FC = () => {
       };
 
       const newReport = await reportService.createReport(createData);
-      setReports([newReport as any, ...reports]);
+      const reportWithDates = {
+        ...newReport,
+        createdAt: new Date((newReport as any).createdAt),
+        updatedAt: new Date((newReport as any).updatedAt)
+      };
+      setReports([reportWithDates as any, ...reports]);
 
       dispatch({
         type: 'ADD_TOAST',
@@ -382,7 +411,7 @@ const ReportsPage: React.FC = () => {
             <button
               onClick={generateAIReport}
               disabled={isGenerating}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover disabled:opacity-50"
             >
               {isGenerating ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -402,7 +431,10 @@ const ReportsPage: React.FC = () => {
         </div>
       </GlassmorphicPageHeader>
 
-      <div className="p-6">
+      <div className={`p-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+        dockPosition === 'right' ? 'pr-[71px]' :
+          ''
+        }`}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
@@ -598,7 +630,7 @@ const ReportsPage: React.FC = () => {
                   <button
                     onClick={generateAIReport}
                     disabled={isGenerating}
-                    className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent-hover hover:to-blue-600 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 shadow-md"
+                    className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent-hover hover:to-blue-600 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     {isGenerating ? t('reports.generating') : t('reports.aiInsights.generateBtn')}
                   </button>

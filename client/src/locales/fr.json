@@ -2725,7 +2725,9 @@
         "interval": "Intervalle",
         "sms": "SMS",
         "personal": "Personnel",
-        "assignedTo": "Assigné à"
+        "assignedTo": "Assigné à",
+        "noReminders": "Aucun rappel trouvé",
+        "noRemindersDesc": "Aucun rappel à venir. Créez-en un pour rester organisé !"
     },
     "forms": {
         "required": "Ce champ est requis",

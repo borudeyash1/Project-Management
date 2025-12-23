@@ -371,26 +371,25 @@ const ProjectsPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-purple-50/20 to-pink-50/20'}`}>
-      <div
-        className="p-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
-          paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
-        }}
-      >
-        {/* Glassmorphic Page Header - Uses Accent Color */}
-        <GlassmorphicPageHeader
-          icon={Target}
-          title={t('projects.title')}
-          subtitle={t('descriptions.projects')}
-        />
+      {/* Glassmorphic Page Header - Uses Accent Color */}
+      <GlassmorphicPageHeader
+        icon={Target}
+        title={t('projects.title')}
+        subtitle={t('descriptions.projects')}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+      />
+
+      <div className={`flex-1 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
 
         {/* Action Button */}
         <div className="flex justify-end mb-6">
           {canCreateProject() ? (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
             >
               <Plus className="w-5 h-5" />
               {t('projects.newProject')}
@@ -567,7 +566,7 @@ const ProjectsPage: React.FC = () => {
                       className={`h-3 rounded-full transition-all duration-500 bg-gradient-to-r ${project.progress < 30 ? 'from-red-500 to-orange-500' :
                         project.progress < 70 ? 'from-yellow-500 to-amber-500' :
                           'from-green-500 to-emerald-500'
-                        } shadow-lg`}
+                        }`}
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -835,7 +834,7 @@ const ProjectsPage: React.FC = () => {
       {/* Rename Modal */}
       {renameModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className={`w-full max-w-md p-6 rounded-2xl shadow-xl transform transition-all ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
+          <div className={`w-full max-w-md p-6 rounded-2xl transform transition-all ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
             <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.renameProject')}</h3>
 
             <form onSubmit={submitRename}>

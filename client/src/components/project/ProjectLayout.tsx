@@ -185,7 +185,7 @@ const ProjectLayout: React.FC = () => {
                 </button>
 
                 {/* Dropdown Menu */}
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                   <div className="p-2 max-h-64 overflow-y-auto">
                     {workspaceProjects.map((proj) => (
                       <button

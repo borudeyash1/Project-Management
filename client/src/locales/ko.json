@@ -2725,7 +2725,9 @@
         "interval": "간격",
         "sms": "SMS",
         "personal": "개인",
-        "assignedTo": "담당자"
+        "assignedTo": "담당자",
+        "noReminders": "알림을 찾을 수 없습니다",
+        "noRemindersDesc": "다가오는 알림이 없습니다. 정리된 상태를 유지하려면 알림을 만드세요!"
     },
     "forms": {
         "required": "이 필드는 필수입니다",

@@ -120,7 +120,7 @@ const WorkspaceClients: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -167,7 +167,7 @@ const WorkspaceClients: React.FC = () => {
         {filteredClients.map((client) => (
           <div
             key={client._id}
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5 hover:shadow-lg transition-all"
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5 transition-all"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -378,7 +378,7 @@ const WorkspaceClients: React.FC = () => {
                           navigate(`/project/${project._id}/overview`);
                           setShowClientProjects(false);
                         }}
-                        className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:shadow-md cursor-pointer transition-all"
+                        className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer transition-all"
                       >
                         <div className="flex items-center justify-between">
                           <div>

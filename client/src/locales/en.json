@@ -106,6 +106,8 @@
     "team": "Team",
     "reports": "Reports",
     "settings": "Settings",
+    "reminders": "Reminders",
+    "notes": "Notes",
     "notifications": "Notifications",
     "help": "Help",
     "docs": "Documentation",
@@ -511,6 +513,8 @@
     "taskName": "Task Name",
     "taskDescription": "Task Description",
     "assignee": "Assignee",
+    "noProject": "No Project",
+    "unassigned": "Unassigned",
     "assignTo": "Assign To",
     "dueDate": "Due Date",
     "priority": "Priority",
@@ -526,6 +530,12 @@
     "review": "Review",
     "approved": "Approved",
     "rejected": "Rejected",
+    "overdueBy": "Overdue by {{days}} day",
+    "overdueBy_other": "Overdue by {{days}} days",
+    "dueToday": "Due today",
+    "dueTomorrow": "Due tomorrow",
+    "dueInDays": "Due in {{days}} days",
+    "assignedTo": "Assigned to",
     "overdue": "Overdue",
     "today": "Today",
     "tomorrow": "Tomorrow",
@@ -566,8 +576,6 @@
     "enterDescription": "Enter task description",
     "selectAssignee": "Select assignee",
     "tagsPlaceholder": "Add tags...",
-    "unassigned": "Unassigned",
-    "noProject": "No Project",
     "dropTasksHere": "Drop tasks here",
     "assigned": "Assigned",
     "inProgressActive": "In Progress (Active)",
@@ -799,6 +807,37 @@
       "startTrial": "Start Free Trial",
       "learnMore": "Learn more about us",
       "footer": "No credit card required • 14 days free trial • Cancel anytime"
+    }
+  },
+  "project": {
+    "tabs": {
+      "overview": "Overview",
+      "info": "Project Info",
+      "team": "Team",
+      "tasks": "Tasks & Board",
+      "timeline": "Timeline",
+      "progress": "Progress Tracker",
+      "workload": "Workload",
+      "attendance": "Attendance",
+      "reports": "Reports",
+      "documents": "Documents",
+      "inbox": "Inbox",
+      "settings": "Settings"
+    },
+    "sidebar": {
+      "projectInfo": "Project Info",
+      "status": "Status",
+      "priority": "Priority",
+      "progress": "Progress",
+      "budget": "Budget",
+      "spent": "Spent",
+      "teamMembers": "Team Members",
+      "quickStats": "Quick Stats",
+      "totalTasks": "Total Tasks",
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "overdue": "Overdue",
+      "moreMembers": "+{{count}} more"
     }
   },
   "about": {
@@ -2699,7 +2738,7 @@
     "addDescription": "Add description...",
     "addTag": "Add Tag",
     "push": "Push",
-    "minutesBefore": "minutes before",
+    "minutesBefore": "Minutes before",
     "addNotification": "Add Notification",
     "recurring": "Recurring",
     "showAdvancedOptions": "Show Advanced Options",
@@ -2724,7 +2763,9 @@
     "interval": "Interval",
     "sms": "SMS",
     "personal": "Personal",
-    "assignedTo": "Assigned to"
+    "assignedTo": "Assigned to",
+    "noReminders": "No reminders found",
+    "noRemindersDesc": "You have no upcoming reminders. Create one to stay organized!"
   },
   "forms": {
     "required": "This field is required",
@@ -2768,16 +2809,23 @@
     "primary": "Primary",
     "connected": "Connected",
     "setActive": "Set Active",
-    "confirmDisconnect": "Are you sure you want to disconnect this account?"
-  },
-  "tasks": {
-    "overdueBy": "Overdue by {{days}} day",
-    "overdueBy_other": "Overdue by {{days}} days",
-    "dueToday": "Due today",
-    "dueTomorrow": "Due tomorrow",
-    "dueInDays": "Due in {{days}} days",
-    "taskName": "Task",
-    "assignedTo": "Assigned to"
+    "confirmDisconnect": "Are you sure you want to disconnect this account?",
+    "email": "Email",
+    "notAvailable": "Not available",
+    "connectedOn": "Connected on {{date}}",
+    "disconnect": "Disconnect",
+    "connect": "Connect",
+    "privacyTitle": "Privacy",
+    "privacyMessage": "We only access files in your \"Sartthi Vault\" folder. Your personal files remain private.",
+    "aboutTitle": "About Connected Accounts",
+    "aboutPoint1": "You can disconnect and reconnect accounts at any time",
+    "aboutPoint2": "Disconnecting will remove access but won't delete your data",
+    "aboutPoint3": "Your data remains in your Google account",
+    "aboutPoint4": "You can connect a different Google account after disconnecting",
+    "disconnectConfirm": "Are you sure you want to disconnect this account?",
+    "disconnectSuccess": "Account disconnected successfully",
+    "connectSuccess": "Account connected successfully",
+    "connectionError": "Failed to connect account. Please try again."
   },
   "goals": {
     "title": "Goals",
@@ -2878,6 +2926,7 @@
   },
   "planner": {
     "title": "My Work",
+    "description": "Plan, organize, and track your team's work in one place",
     "addTask": "Add Task",
     "activeTasks": "{{count}} active tasks",
     "board": {
@@ -3435,32 +3484,6 @@
     "audioCaptureTip": "Tip:",
     "audioCaptureInstructions": "To capture audio from {{platform}}, enable \"Include System Audio\" below and select the meeting tab when prompted. Make sure to check \"Share audio\" in the browser dialog."
   },
-  "connectedAccounts": {
-    "title": "Connected Accounts",
-    "subtitle": "Manage your connected Google services. You can disconnect and reconnect at any time.",
-    "sartthiMail": "Sartthi Mail",
-    "sartthiMailDesc": "Gmail integration for email management",
-    "sartthiCalendar": "Sartthi Calendar",
-    "sartthiCalendarDesc": "Google Calendar integration",
-    "sartthiVault": "Sartthi Vault",
-    "sartthiVaultDesc": "Secure file storage with Google Drive",
-    "email": "Email",
-    "notAvailable": "Not available",
-    "connectedOn": "Connected on {{date}}",
-    "disconnect": "Disconnect",
-    "connect": "Connect",
-    "privacyTitle": "Privacy",
-    "privacyMessage": "We only access files in your \"Sartthi Vault\" folder. Your personal files remain private.",
-    "aboutTitle": "About Connected Accounts",
-    "aboutPoint1": "You can disconnect and reconnect accounts at any time",
-    "aboutPoint2": "Disconnecting will remove access but won't delete your data",
-    "aboutPoint3": "Your data remains in your Google account",
-    "aboutPoint4": "You can connect a different Google account after disconnecting",
-    "disconnectConfirm": "Are you sure you want to disconnect this account?",
-    "disconnectSuccess": "Account disconnected successfully",
-    "connectSuccess": "Account connected successfully",
-    "connectionError": "Failed to connect account. Please try again."
-  },
   "workspace": {
     "verifyOwnership": "Verify Ownership",
     "verifyOwnershipDesc": "Please verify your email to confirm workspace ownership",
@@ -3618,6 +3641,11 @@
       "projects": "Projects",
       "profile": "Profile",
       "inbox": "Inbox"
+    },
+    "detail": {
+      "tabs": {
+        "attendance": "Attendance"
+      }
     },
     "overview": {
       "viewingWorkspace": "Viewing workspace overview",

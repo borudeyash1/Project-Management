@@ -172,7 +172,7 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
             <div
-                className={`relative w-full max-w-2xl mx-4 rounded-2xl overflow-hidden shadow-2xl transform transition-all ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+                className={`relative w-full max-w-2xl mx-4 rounded-2xl overflow-hidden transform transition-all ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
                     }`}
             >
                 {/* Header */}
@@ -271,7 +271,7 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                         )}
                         <button
                             onClick={handleNext}
-                            className={`px-6 py-2 rounded-lg font-medium text-white transition-all flex items-center gap-2 ${config.bgColor} hover:shadow-lg`}
+                            className={`px-6 py-2 rounded-lg font-medium text-white transition-all flex items-center gap-2 ${config.bgColor}`}
                         >
                             {currentStep === totalSteps - 1 ? (
                                 <>

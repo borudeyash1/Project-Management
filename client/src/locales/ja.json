@@ -528,6 +528,13 @@
         "approved": "承認済み",
         "rejected": "却下",
         "overdue": "期限切れ",
+        "overdueBy": "{{days}}日遅れ",
+        "overdueBy_other": "{{days}}日遅れ",
+        "dueToday": "今日が期限",
+        "dueTomorrow": "明日が期限",
+        "dueInDays": "{{days}}日後が期限",
+        "taskName": "タスク名",
+        "assignedTo": "担当者",
         "today": "今日",
         "tomorrow": "明日",
         "thisWeek": "今週",
@@ -800,6 +807,37 @@
             "startTrial": "無料トライアルを開始",
             "learnMore": "私たちについてもっと知る",
             "footer": "クレジットカード不要 • 14日間無料トライアル • いつでもキャンセル可能"
+        }
+    },
+    "project": {
+        "tabs": {
+            "overview": "概要",
+            "info": "プロジェクト情報",
+            "team": "チーム",
+            "tasks": "タスク＆ボード",
+            "timeline": "タイムライン",
+            "progress": "進捗トラッカー",
+            "workload": "ワークロード",
+            "attendance": "出勤管理",
+            "reports": "レポート",
+            "documents": "ドキュメント",
+            "inbox": "受信トレイ",
+            "settings": "設定"
+        },
+        "sidebar": {
+            "projectInfo": "プロジェクト情報",
+            "status": "ステータス",
+            "priority": "優先度",
+            "progress": "進捗",
+            "budget": "予算",
+            "spent": "使用済み",
+            "teamMembers": "チームメンバー",
+            "quickStats": "クイック統計",
+            "totalTasks": "総タスク数",
+            "completed": "完了",
+            "inProgress": "進行中",
+            "overdue": "期限切れ",
+            "moreMembers": "+{{count}} 他"
         }
     },
     "about": {
@@ -2725,7 +2763,9 @@
         "interval": "間隔",
         "sms": "SMS",
         "personal": "個人",
-        "assignedTo": "担当者"
+        "assignedTo": "担当者",
+        "noReminders": "リマインダーが見つかりません",
+        "noRemindersDesc": "今後のリマインダーはありません。整理するために作成しましょう！"
     },
     "forms": {
         "required": "この項目は必須です",
@@ -2752,15 +2792,6 @@
         "currentPassword": "現在のパスワード",
         "newPassword": "新しいパスワード",
         "confirmNewPassword": "新しいパスワードを確認"
-    },
-    "tasks": {
-        "overdueBy": "{{days}}日遅れ",
-        "overdueBy_other": "{{days}}日遅れ",
-        "dueToday": "今日が期限",
-        "dueTomorrow": "明日が期限",
-        "dueInDays": "{{days}}日後が期限",
-        "taskName": "タスク",
-        "assignedTo": "担当者"
     },
     "goals": {
         "title": "目標",
@@ -2861,6 +2892,7 @@
     },
     "planner": {
         "title": "マイワーク",
+        "description": "チームの仕事を一か所で計画、整理、追跡します",
         "addTask": "タスクを追加",
         "activeTasks": "{{count}}件のアクティブなタスク",
         "board": {

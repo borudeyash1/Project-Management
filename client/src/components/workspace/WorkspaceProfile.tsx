@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useDock } from '../../context/DockContext';
 import {
   Mail, Phone, Shield, User as UserIcon, BarChart3, MessageSquare, Bot,
   Calendar, Building2, Clock, AlertCircle, TrendingUp, Users, CheckSquare,
@@ -12,6 +13,7 @@ import apiService from '../../services/api';
 const WorkspaceProfile: React.FC = () => {
   const { t } = useTranslation();
   const { state, addToast } = useApp();
+  const { dockPosition } = useDock();
   const navigate = useNavigate();
   const location = useLocation();
   const currentWorkspace = state.workspaces.find((ws) => ws._id === state.currentWorkspace);
@@ -501,7 +503,10 @@ const WorkspaceProfile: React.FC = () => {
   );
 
   return (
-    <div className="p-6">
+    <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-6 py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-6 py-6' :
+        'p-6'
+      }`}>
       <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-gray-300 dark:border-gray-600">
@@ -521,8 +526,8 @@ const WorkspaceProfile: React.FC = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
-                      ? 'border-accent text-accent-dark'
-                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
+                    ? 'border-accent text-accent-dark'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
                     }`}
                 >
                   <Icon className="w-4 h-4" />

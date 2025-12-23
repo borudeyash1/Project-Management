@@ -63,7 +63,7 @@ const AppCard: React.FC<{
     return (
         <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${isDarkMode
             ? 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
-            : 'bg-white border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-md'
+            : 'bg-white border-gray-100 hover:border-blue-100'
             }`}>
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${color} opacity-[0.03] rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110`} />
 
@@ -167,7 +167,7 @@ const DetailModal: React.FC<{
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div
                 className={`relative w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-                    } shadow-2xl`}
+                    }`}
             >
                 {/* Header */}
                 <div className={`sticky top-0 z-10 px-6 py-4 border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -469,7 +469,7 @@ const SartthiAppsWidget: React.FC = () => {
                                         onClick={() => handleOpenEmail(email.id)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
                                             ? 'bg-gray-700/30 border-gray-600 hover:border-blue-500'
-                                            : 'bg-white border-gray-200 hover:border-blue-500 hover:shadow-md'
+                                            : 'bg-white border-gray-200 hover:border-blue-500'
                                             }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
@@ -548,7 +548,7 @@ const SartthiAppsWidget: React.FC = () => {
                                         onClick={() => handleOpenEvent(event.id)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
                                             ? 'bg-gray-700/30 border-gray-600 hover:border-purple-500'
-                                            : 'bg-white border-gray-200 hover:border-purple-500 hover:shadow-md'
+                                            : 'bg-white border-gray-200 hover:border-purple-500'
                                             }`}
                                     >
                                         <div className="flex items-start gap-3">
@@ -643,7 +643,7 @@ const SartthiAppsWidget: React.FC = () => {
                                         onClick={() => handleOpenFile(file.id)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
                                             ? 'bg-gray-700/30 border-gray-600 hover:border-green-500'
-                                            : 'bg-white border-gray-200 hover:border-green-500 hover:shadow-md'
+                                            : 'bg-white border-gray-200 hover:border-green-500'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">

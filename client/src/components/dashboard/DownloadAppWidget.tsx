@@ -10,7 +10,7 @@ const DownloadAppWidget: React.FC = () => {
     return (
         <div className={`rounded-2xl border p-6 overflow-hidden relative ${isDarkMode
             ? 'bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900 border-gray-700'
-            : 'bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 text-white border-transparent shadow-lg'
+            : 'bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 text-white border-transparent'
             }`}>
             <div className="flex items-start justify-between relative z-10">
                 <div className="flex-1 pr-4">
@@ -21,8 +21,8 @@ const DownloadAppWidget: React.FC = () => {
                         {t('home.downloadSartthiDesktop')}
                     </p>
                     <button className={`px-4 py-2 rounded-lg text-sm font-bold transition-all transform hover:scale-105 ${isDarkMode
-                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-lg shadow-purple-500/50'
-                        : 'bg-white text-indigo-600 hover:bg-gray-50 shadow-md'
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600-500/50'
+                        : 'bg-white text-indigo-600 hover:bg-gray-50'
                         }`}>
                         {t('home.downloadNow')}
                     </button>

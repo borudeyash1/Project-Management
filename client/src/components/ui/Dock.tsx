@@ -146,10 +146,11 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
       };
     }
 
+
     if (dockPosition === 'left') {
-      return { ...base, left: DOCK_EDGE_GAP + 6, top: '160px', bottom: 'auto' }; // Start below header
+      return { ...base, left: DOCK_EDGE_GAP + 6, top: '166px', bottom: 'auto' }; // Start below header (6px lower)
     }
-    return { ...base, right: DOCK_EDGE_GAP + 6, top: '160px', bottom: 'auto' }; // Start below header
+    return { ...base, right: DOCK_EDGE_GAP + 6, top: '166px', bottom: 'auto' }; // Start below header (6px lower)
   }, [dockPosition, dockSize.width, isLocked, x, y]);
 
   useEffect(() => {
@@ -205,8 +206,8 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
         <div
           ref={dockRef}
           className={`${isTopOrBottom
-              ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm'
-              : ''
+            ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm'
+            : ''
             }`}
           style={{
             background: (isTopOrBottom || isVertical)
