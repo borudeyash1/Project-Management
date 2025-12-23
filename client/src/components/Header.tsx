@@ -397,7 +397,7 @@ const Header: React.FC = () => {
               <div className="grid grid-cols-4 gap-3">
                 {mobileNavItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = location.pathname === item.path;
+                  const isActive = window.location.pathname === item.path;
                   // Shorten specific labels for mobile grid if needed
                   let label = t(item.translationKey);
                   if (item.id === 'mail') label = 'Mail';
