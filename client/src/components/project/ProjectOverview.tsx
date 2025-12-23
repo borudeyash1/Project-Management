@@ -170,7 +170,7 @@ const ProjectOverview: React.FC = () => {
             <div className="text-center py-8">
               <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                No milestones have been set for this project yet.
+                {t('projects.noMilestones')}
               </p>
             </div>
           )}
@@ -206,7 +206,7 @@ const ProjectOverview: React.FC = () => {
             <div className="text-center py-8">
               <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                No recent activity to display.
+                {t('projects.noRecentActivity')}
               </p>
             </div>
           )}

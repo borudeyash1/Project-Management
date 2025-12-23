@@ -622,9 +622,9 @@ const RemindersPage: React.FC = () => {
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day Headers */}
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => (
                     <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {day}
+                      {t(`common.days.short.${day}`)}
                     </div>
                   ))}
 
@@ -666,7 +666,7 @@ const RemindersPage: React.FC = () => {
                           ))}
                           {dayReminders.length > 2 && (
                             <div className="text-xs text-gray-600 dark:text-gray-400">
-                              +{dayReminders.length - 2} more
+                              {t('reminders.more', { count: dayReminders.length - 2 })}
                             </div>
                           )}
                         </div>

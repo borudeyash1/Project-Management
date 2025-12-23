@@ -648,7 +648,7 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: 'personal', label: t('profile.personalInfo'), icon: User },
-    { id: 'professional', label: 'Professional Profile', icon: Target },
+    { id: 'professional', label: t('profile.professionalProfile'), icon: Target },
     { id: 'addresses', label: t('profile.addresses'), icon: MapPin },
     { id: 'payments', label: t('profile.payments'), icon: CreditCard }
   ];
@@ -1126,17 +1126,17 @@ const Profile: React.FC = () => {
   const renderProfessionalProfile = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Professional Profile</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Your professional summary</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.professionalProfile')}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.professionalSummary')}</p>
       </div>
 
       <GlassmorphicCard className="p-6">
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Job Title</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">{t('profile.jobTitle')}</label>
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {profileData?.profile?.jobTitle || 'Not set'}
+                {profileData?.profile?.jobTitle || t('profile.notSet')}
               </p>
               <button
                 onClick={() => {
@@ -1151,10 +1151,10 @@ const Profile: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Company</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">{t('profile.company')}</label>
             <div className="flex items-center justify-between">
               <p className="text-gray-900 dark:text-gray-100">
-                {profileData?.profile?.company || 'Not set'}
+                {profileData?.profile?.company || t('profile.notSet')}
               </p>
               <button
                 onClick={() => {
@@ -1172,10 +1172,10 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <GlassmorphicCard className="p-6">
-          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">Industry</label>
+          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">{t('profile.industry')}</label>
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">
-              {profileData?.profile?.industry || 'Not set'}
+              {profileData?.profile?.industry || t('profile.notSet')}
             </p>
             <button
               onClick={() => {
@@ -1190,13 +1190,13 @@ const Profile: React.FC = () => {
         </GlassmorphicCard>
 
         <GlassmorphicCard className="p-6">
-          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">Experience</label>
+          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">{t('profile.experience')}</label>
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {profileData?.profile?.experience === 'mid' ? '3-5 years' :
                 profileData?.profile?.experience === 'senior' ? '6-10 years' :
                   profileData?.profile?.experience === 'junior' ? '1-3 years' :
-                    profileData?.profile?.experience || 'Not set'}
+                    profileData?.profile?.experience || t('profile.notSet')}
             </p>
             <button
               onClick={() => {
@@ -1213,7 +1213,7 @@ const Profile: React.FC = () => {
 
       <GlassmorphicCard className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Skills</h4>
+          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('profile.topSkills')}</h4>
           <button
             onClick={() => {
               setEditingField('profile.skills');
@@ -1238,7 +1238,7 @@ const Profile: React.FC = () => {
             );
           })}
           {(!profileData?.profile?.skills || profileData.profile.skills.length === 0) && (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">No skills added yet</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{t('profile.noSkillsAdded')}</p>
           )}
         </div>
       </GlassmorphicCard>
@@ -1246,12 +1246,12 @@ const Profile: React.FC = () => {
       <GlassmorphicCard className="p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700/50">
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300">Career Goals</h4>
+          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('profile.careerGoals')}</h4>
         </div>
 
         <div className="flex items-center justify-between">
           <p className="text-gray-700 dark:text-gray-300 flex-1">
-            {profileData?.profile?.goals?.careerAspirations || 'Set your career goals in profile'}
+            {profileData?.profile?.goals?.careerAspirations || t('profile.setCareerGoals')}
           </p>
           <button
             onClick={() => {

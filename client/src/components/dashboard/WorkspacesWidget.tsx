@@ -2,6 +2,7 @@ import React from 'react';
 import { Briefcase, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface Workspace {
     _id: string;
@@ -18,6 +19,7 @@ interface WorkspacesWidgetProps {
 const WorkspacesWidget: React.FC<WorkspacesWidgetProps> = ({ workspaces, loading }) => {
     const { isDarkMode } = useTheme();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     if (loading) {
         return (
@@ -41,13 +43,13 @@ const WorkspacesWidget: React.FC<WorkspacesWidgetProps> = ({ workspaces, loading
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                         <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Workspaces</h3>
+                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('home.workspaces')}</h3>
                 </div>
                 <button
                     onClick={() => navigate('/workspace')}
                     className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
                 >
-                    View All
+                    {t('home.viewAll')}
                 </button>
             </div>
 

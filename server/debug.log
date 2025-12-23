@@ -122,3 +122,17 @@
 2025-12-20T12:21:47.815Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
 2025-12-20T15:39:25.129Z [DEBUG] Google Auth Request: email=borudeyash12@gmail.com, isRegistration=false
 2025-12-20T15:39:25.131Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2025-12-20T20:19:18.313Z [DEBUG] Google Auth Request: email=borudeyash1@gmail.com, isRegistration=false
+2025-12-20T20:19:18.318Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2025-12-20T23:14:49.082Z [DEBUG] Google Auth Request: email=borudeyash12@gmail.com, isRegistration=false
+2025-12-20T23:14:49.089Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2025-12-20T23:15:06.118Z [DEBUG] Google Auth Request: email=borudeyash12@gmail.com, isRegistration=false
+2025-12-20T23:15:06.142Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2025-12-20T23:22:44.433Z [ERROR] Google Auth Failed: No matching document found for id "6943c540f9417c4e9d98b36f" version 50 modifiedPaths "lastLogin, loginHistory"
+VersionError: No matching document found for id "6943c540f9417c4e9d98b36f" version 50 modifiedPaths "lastLogin, loginHistory"
+    at generateVersionError (D:\YASH\Project Management\server\node_modules\mongoose\lib\model.js:571:10)
+    at model.save (D:\YASH\Project Management\server\node_modules\mongoose\lib\model.js:629:28)
+    at googleAuth (D:\YASH\Project Management\server\src\controllers\authController.ts:1001:16)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-12-21T10:53:47.891Z [DEBUG] Google Auth Request: email=borudeyash12@gmail.com, isRegistration=false
+2025-12-21T10:53:47.903Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true

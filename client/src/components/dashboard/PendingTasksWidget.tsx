@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface PendingTask {
     _id: string;
@@ -20,6 +21,7 @@ const PendingTasksWidget: React.FC = () => {
     const { isDarkMode } = useTheme();
     const { state } = useApp();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [pendingTasks, setPendingTasks] = useState<PendingTask[]>([]);
     const [loading, setLoading] = useState(false);
     const currentUserId = state.userProfile?._id;
@@ -71,13 +73,13 @@ const PendingTasksWidget: React.FC = () => {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays < 0) {
-            return `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''}`;
+            return t('tasks.overdueBy', { days: Math.abs(diffDays) });
         } else if (diffDays === 0) {
-            return 'Due today';
+            return t('tasks.dueToday');
         } else if (diffDays === 1) {
-            return 'Due tomorrow';
+            return t('tasks.dueTomorrow');
         } else if (diffDays <= 7) {
-            return `Due in ${diffDays} days`;
+            return t('tasks.dueInDays', { days: diffDays });
         } else {
             return date.toLocaleDateString();
         }
@@ -101,7 +103,7 @@ const PendingTasksWidget: React.FC = () => {
     if (loading) {
         return (
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col justify-center items-center`}>
-                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Loading pending tasks...</p>
+                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('common.loading')}</p>
             </div>
         );
     }
@@ -110,11 +112,11 @@ const PendingTasksWidget: React.FC = () => {
         return (
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
                 <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Pending Tasks
+                    {t('home.pendingTasks')}
                 </h2>
                 <div className="flex-1 flex items-center justify-center">
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        No pending tasks. Great job! 🎉
+                        {t('home.noPendingTasks')}
                     </p>
                 </div>
             </div>
@@ -124,7 +126,7 @@ const PendingTasksWidget: React.FC = () => {
     return (
         <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
             <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                Pending Tasks
+                {t('home.pendingTasks')}
             </h2>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
@@ -199,7 +201,7 @@ const PendingTasksWidget: React.FC = () => {
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                         }`}
                 >
-                    View All Tasks
+                    {t('home.viewAllTasks')}
                 </button>
             )}
         </div>

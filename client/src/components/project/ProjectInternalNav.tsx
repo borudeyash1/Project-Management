@@ -40,7 +40,7 @@ const ProjectInternalNav: React.FC = () => {
   const isOwner = state.workspaces.find(w => w._id === project?.workspace)?.owner === state.userProfile._id;
   const canManage = isProjectManager || isOwner;
 
-  const projectTabs: ProjectTab[] = [
+  const projectTabs: ProjectTab[] = React.useMemo(() => [
     {
       id: 'overview',
       label: t('project.tabs.overview'),
@@ -79,7 +79,7 @@ const ProjectInternalNav: React.FC = () => {
     },
     {
       id: 'workload',
-      label: 'Workload & Deadlines',
+      label: t('project.tabs.workload'),
       icon: Clock,
       path: `/project/${projectId}/workload`
     },
@@ -108,10 +108,10 @@ const ProjectInternalNav: React.FC = () => {
       path: `/project/${projectId}/settings`,
       managerOnly: true
     }
-  ];
+  ], [t, projectId]);
 
   // Filter tabs based on user role
-  const visibleTabs = projectTabs.filter(tab => !tab.managerOnly || canManage);
+  const visibleTabs = React.useMemo(() => projectTabs.filter(tab => !tab.managerOnly || canManage), [projectTabs, canManage]);
 
   const isActiveTab = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path);
@@ -154,8 +154,8 @@ const ProjectInternalNav: React.FC = () => {
                 ref={(el) => (tabRefs.current[tab.id] = el)}
                 onClick={() => navigate(tab.path)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${active
-                    ? 'text-accent-dark dark:text-accent-light'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'text-accent-dark dark:text-accent-light'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
               >
                 <Icon className="w-4 h-4" />

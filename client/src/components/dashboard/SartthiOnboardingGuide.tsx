@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, Mail, Calendar as CalendarIcon, HardDrive, MousePointer, Home as HomeIcon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface SartthiOnboardingGuideProps {
     isOpen: boolean;
@@ -16,120 +17,121 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
     service,
 }) => {
     const { isDarkMode } = useTheme();
+    const { t } = useTranslation();
     const [currentStep, setCurrentStep] = useState(0);
 
     const serviceConfig = {
         mail: {
             icon: Mail,
-            title: 'Sartthi Mail',
+            title: t('onboarding.mail.title'),
             color: 'from-blue-500 to-cyan-500',
             bgColor: 'bg-gradient-to-br from-blue-500 to-cyan-500',
             steps: [
                 {
-                    title: 'Welcome to Sartthi Mail',
-                    description: 'Your secure email platform integrated with Google Mail',
+                    title: t('onboarding.mail.welcome'),
+                    description: t('onboarding.mail.welcomeDesc'),
                     icon: Mail,
-                    content: 'Sartthi Mail provides a seamless email experience with powerful features for managing your inbox, composing messages, and staying organized.',
+                    content: t('onboarding.mail.welcomeContent'),
                 },
                 {
-                    title: 'Access from Dock',
-                    description: 'Quick access from the sidebar',
+                    title: t('onboarding.mail.accessDock'),
+                    description: t('onboarding.mail.accessDockDesc'),
                     icon: MousePointer,
-                    content: 'Click the Mail icon in the Dock (sidebar) anytime to quickly open Sartthi Mail in a new tab.',
+                    content: t('onboarding.mail.accessDockContent'),
                 },
                 {
-                    title: 'Access from Home',
-                    description: 'Open from your dashboard',
+                    title: t('onboarding.mail.accessHome'),
+                    description: t('onboarding.mail.accessHomeDesc'),
                     icon: HomeIcon,
-                    content: 'Navigate to the Home page and click "Open App" in the Sartthi Mail card to launch the application.',
+                    content: t('onboarding.mail.accessHomeContent'),
                 },
                 {
-                    title: 'Key Features',
-                    description: 'What you can do',
+                    title: t('onboarding.mail.keyFeatures'),
+                    description: t('onboarding.mail.keyFeaturesDesc'),
                     icon: Check,
-                    content: 'Manage your inbox, compose emails, organize with folders, search messages, and sync with your Google Mail account.',
+                    content: t('onboarding.mail.keyFeaturesContent'),
                 },
                 {
-                    title: "You're All Set!",
-                    description: 'Start managing your emails',
+                    title: t('onboarding.mail.allSet'),
+                    description: t('onboarding.mail.allSetDesc'),
                     icon: Check,
-                    content: 'Your account is connected and ready to use. Click "Get Started" to open Sartthi Mail and begin managing your emails.',
+                    content: t('onboarding.mail.allSetContent'),
                 },
             ],
         },
         calendar: {
             icon: CalendarIcon,
-            title: 'Sartthi Calendar',
+            title: t('onboarding.calendar.title'),
             color: 'from-purple-500 to-pink-500',
             bgColor: 'bg-gradient-to-br from-purple-500 to-pink-500',
             steps: [
                 {
-                    title: 'Welcome to Sartthi Calendar',
-                    description: 'Manage your schedule with ease',
+                    title: t('onboarding.calendar.welcome'),
+                    description: t('onboarding.calendar.welcomeDesc'),
                     icon: CalendarIcon,
-                    content: 'Sartthi Calendar helps you organize events, set reminders, and stay on top of your schedule with Google Calendar integration.',
+                    content: t('onboarding.calendar.welcomeContent'),
                 },
                 {
-                    title: 'Access from Dock',
-                    description: 'Quick access from the sidebar',
+                    title: t('onboarding.calendar.accessDock'),
+                    description: t('onboarding.calendar.accessDockDesc'),
                     icon: MousePointer,
-                    content: 'Click the Calendar icon in the Dock (sidebar) anytime to quickly open Sartthi Calendar in a new tab.',
+                    content: t('onboarding.calendar.accessDockContent'),
                 },
                 {
-                    title: 'Access from Home',
-                    description: 'Open from your dashboard',
+                    title: t('onboarding.calendar.accessHome'),
+                    description: t('onboarding.calendar.accessHomeDesc'),
                     icon: HomeIcon,
-                    content: 'Navigate to the Home page and click "Open App" in the Sartthi Calendar card to launch the application.',
+                    content: t('onboarding.calendar.accessHomeContent'),
                 },
                 {
-                    title: 'Key Features',
-                    description: 'What you can do',
+                    title: t('onboarding.calendar.keyFeatures'),
+                    description: t('onboarding.calendar.keyFeaturesDesc'),
                     icon: Check,
-                    content: 'Create events, set reminders, share calendars, view multiple calendar views, and sync with your Google Calendar.',
+                    content: t('onboarding.calendar.keyFeaturesContent'),
                 },
                 {
-                    title: "You're All Set!",
-                    description: 'Start scheduling events',
+                    title: t('onboarding.calendar.allSet'),
+                    description: t('onboarding.calendar.allSetDesc'),
                     icon: Check,
-                    content: 'Your account is connected and ready to use. Click "Get Started" to open Sartthi Calendar and begin managing your schedule.',
+                    content: t('onboarding.calendar.allSetContent'),
                 },
             ],
         },
         vault: {
             icon: HardDrive,
-            title: 'Sartthi Vault',
+            title: t('onboarding.vault.title'),
             color: 'from-green-500 to-emerald-500',
             bgColor: 'bg-gradient-to-br from-green-500 to-emerald-500',
             steps: [
                 {
-                    title: 'Welcome to Sartthi Vault',
-                    description: 'Secure file storage powered by Google Drive',
+                    title: t('onboarding.vault.welcome'),
+                    description: t('onboarding.vault.welcomeDesc'),
                     icon: HardDrive,
-                    content: 'Sartthi Vault provides secure cloud storage for all your files with seamless Google Drive integration.',
+                    content: t('onboarding.vault.welcomeContent'),
                 },
                 {
-                    title: 'Access from Dock',
-                    description: 'Quick access from the sidebar',
+                    title: t('onboarding.vault.accessDock'),
+                    description: t('onboarding.vault.accessDockDesc'),
                     icon: MousePointer,
-                    content: 'Click the Vault icon in the Dock (sidebar) anytime to quickly open Sartthi Vault in a new tab.',
+                    content: t('onboarding.vault.accessDockContent'),
                 },
                 {
-                    title: 'Access from Home',
-                    description: 'Open from your dashboard',
+                    title: t('onboarding.vault.accessHome'),
+                    description: t('onboarding.vault.accessHomeDesc'),
                     icon: HomeIcon,
-                    content: 'Navigate to the Home page and click "Open App" in the Sartthi Vault card to launch the application.',
+                    content: t('onboarding.vault.accessHomeContent'),
                 },
                 {
-                    title: 'Key Features',
-                    description: 'What you can do',
+                    title: t('onboarding.vault.keyFeatures'),
+                    description: t('onboarding.vault.keyFeaturesDesc'),
                     icon: Check,
-                    content: 'Upload files, organize folders, share documents, search your storage, and sync with your Google Drive.',
+                    content: t('onboarding.vault.keyFeaturesContent'),
                 },
                 {
-                    title: "You're All Set!",
-                    description: 'Start storing files',
+                    title: t('onboarding.vault.allSet'),
+                    description: t('onboarding.vault.allSetDesc'),
                     icon: Check,
-                    content: 'Your account is connected and ready to use. Click "Get Started" to open Sartthi Vault and begin managing your files.',
+                    content: t('onboarding.vault.allSetContent'),
                 },
             ],
         },
@@ -188,7 +190,7 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                         <div>
                             <h2 className="text-2xl font-bold">{config.title}</h2>
                             <p className="text-white/80 text-sm">
-                                Step {currentStep + 1} of {totalSteps}
+                                {t('onboarding.stepOf', { current: currentStep + 1, total: totalSteps })}
                             </p>
                         </div>
                     </div>
@@ -229,10 +231,10 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                                 key={index}
                                 onClick={() => setCurrentStep(index)}
                                 className={`h-2 rounded-full transition-all ${index === currentStep
-                                        ? `w-8 ${config.bgColor}`
-                                        : index < currentStep
-                                            ? `w-2 ${config.bgColor} opacity-50`
-                                            : `w-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`
+                                    ? `w-8 ${config.bgColor}`
+                                    : index < currentStep
+                                        ? `w-2 ${config.bgColor} opacity-50`
+                                        : `w-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`
                                     }`}
                             />
                         ))}
@@ -247,11 +249,11 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                     <button
                         onClick={handleSkip}
                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode
-                                ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                             }`}
                     >
-                        Skip Guide
+                        {t('onboarding.skipGuide')}
                     </button>
 
                     <div className="flex gap-3">
@@ -259,12 +261,12 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                             <button
                                 onClick={handlePrevious}
                                 className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${isDarkMode
-                                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-                                        : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300'
+                                    ? 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                                    : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300'
                                     }`}
                             >
                                 <ChevronLeft className="w-4 h-4" />
-                                Previous
+                                {t('onboarding.previous')}
                             </button>
                         )}
                         <button
@@ -273,12 +275,12 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                         >
                             {currentStep === totalSteps - 1 ? (
                                 <>
-                                    Get Started
+                                    {t('onboarding.getStarted')}
                                     <Check className="w-4 h-4" />
                                 </>
                             ) : (
                                 <>
-                                    Next
+                                    {t('onboarding.next')}
                                     <ChevronRight className="w-4 h-4" />
                                 </>
                             )}

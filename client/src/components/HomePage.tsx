@@ -125,7 +125,7 @@ const HomePage: React.FC = () => {
   const { userPlan, canUseAI } = useFeatureAccess();
   const { isDarkMode, preferences } = useTheme();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [quickTasks, setQuickTasks] = useState<QuickTask[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
@@ -399,13 +399,12 @@ const HomePage: React.FC = () => {
               <div className="flex items-center gap-3 mb-3">
                 <h1 className={`text-4xl md:text-5xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>
-                  Welcome back, {state.userProfile?.fullName?.split(' ')[0]}
-                  <span className="ml-3 inline-block animate-wave">👋</span>
+                  {t('home.welcomeBack', { name: state.userProfile?.fullName?.split(' ')[0] })}
                 </h1>
               </div>
               <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} flex items-center gap-2`}>
                 <Sparkles className="w-5 h-5 text-yellow-500" />
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date().toLocaleDateString(i18n.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>
 
@@ -420,7 +419,7 @@ const HomePage: React.FC = () => {
               >
                 <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
                 <Bot className="w-5 h-5 relative z-10" />
-                <span className="relative z-10">AI Assistant</span>
+                <span className="relative z-10">{t('home.aiAssistant')}</span>
               </button>
               <button
                 onClick={loadDashboardData}
@@ -440,40 +439,40 @@ const HomePage: React.FC = () => {
           {[
             {
               id: 'tasks',
-              label: 'Active Tasks',
+              label: t('home.activeTasks'),
               value: quickTasks.filter(t => !t.completed).length,
               total: totalTasks,
               icon: CheckSquare,
               gradient: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-              trend: `${taskCompletionRate}% completed`,
+              trend: t('home.percentCompleted', { percent: taskCompletionRate }),
               trendUp: taskCompletionRate > 50
             },
             {
               id: 'projects',
-              label: 'Active Projects',
+              label: t('home.activeProjects'),
               value: activeProjects.length,
               total: projects.length,
               icon: Rocket,
               gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-              trend: `${projects.filter(p => p.status === 'completed').length} completed`,
+              trend: t('home.tasksCompleted', { count: projects.filter(p => p.status === 'completed').length }),
               trendUp: true
             },
             {
               id: 'team',
-              label: 'Team Members',
+              label: t('home.teamMembers'),
               value: totalTeamMembers,
               icon: Users,
               gradient: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
-              trend: `${activeProjects.length} active projects`,
+              trend: t('home.projectsActive', { count: activeProjects.length }),
               trendUp: true
             },
             {
               id: 'progress',
-              label: 'Avg Progress',
+              label: t('home.avgProgress'),
               value: `${Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))}%`,
               icon: TrendingUp,
               gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              trend: 'On track',
+              trend: t('home.onTrack'),
               trendUp: true
             }
           ].map((stat, index) => (
@@ -532,7 +531,7 @@ const HomePage: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Sartthi Desktop
+                      {t('home.sartthiDesktop')}
                     </h3>
                     <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full">
                       v{latestRelease.version}
@@ -544,7 +543,7 @@ const HomePage: React.FC = () => {
                   </div>
 
                   <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Experience the full power of Sartthi with our native desktop application. Faster, more powerful, and works offline.
+                    {t('home.downloadSartthiDesktop')}
                   </p>
 
                   {/* Features */}
@@ -596,7 +595,7 @@ const HomePage: React.FC = () => {
                     >
                       <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
                       <Download className="w-5 h-5 relative z-10" />
-                      <span className="relative z-10">Download for Windows</span>
+                      <span className="relative z-10">{t('home.downloadNow')}</span>
                     </a>
                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       <div className="font-medium">Windows 10/11</div>
@@ -616,7 +615,7 @@ const HomePage: React.FC = () => {
               <Zap className="w-5 h-5 text-white" />
             </div>
             <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Sartthi Ecosystem
+              {t('home.sartthiEcosystem')}
             </h2>
           </div>
           <SartthiAppsWidget />
@@ -645,7 +644,7 @@ const HomePage: React.FC = () => {
                   </div>
                   <div>
                     <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Quick Tasks
+                      {t('home.quickTasks')}
                     </h3>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {quickTasks.filter(t => !t.completed).length} pending
@@ -661,7 +660,7 @@ const HomePage: React.FC = () => {
                   }}
                 >
                   <Plus className="w-4 h-4 inline mr-1.5" />
-                  Add Task
+                  {t('home.addTask')}
                 </button>
               </div>
 
@@ -756,7 +755,7 @@ const HomePage: React.FC = () => {
                   <div className="text-center py-12">
                     <CheckSquare className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
                     <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      No tasks yet. Create one to get started!
+                      {t('home.noTasksYet')}
                     </p>
                   </div>
                 )}
@@ -775,10 +774,10 @@ const HomePage: React.FC = () => {
                   </div>
                   <div>
                     <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Active Projects
+                      {t('home.activeProjects')}
                     </h3>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {activeProjects.length} in progress
+                      {t('home.activeProjectsCount', { count: activeProjects.length })}
                     </p>
                   </div>
                 </div>
@@ -787,7 +786,7 @@ const HomePage: React.FC = () => {
                   className={`text-sm font-medium flex items-center gap-1 transition-colors`}
                   style={{ color: accentColor }}
                 >
-                  View All
+                  {t('home.viewAll')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -872,10 +871,10 @@ const HomePage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Recent Activity
+                    {t('home.recentActivity')}
                   </h3>
                   <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Latest updates
+                    {t('home.latestUpdates')}
                   </p>
                 </div>
               </div>

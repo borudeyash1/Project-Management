@@ -3,11 +3,13 @@ import { User, Briefcase, Building2, TrendingUp, Target, BookOpen, Zap, Award, C
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 
 const ProfileSummaryWidget: React.FC = () => {
     const { isDarkMode, preferences } = useTheme();
     const { state } = useApp();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const accentColor = preferences.accentColor || '#FBBF24';
 
     const profile = state.userProfile?.profile || {};
@@ -60,10 +62,10 @@ const ProfileSummaryWidget: React.FC = () => {
                     </div>
                     <div>
                         <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            Professional Profile
+                            {t('home.professionalProfile')}
                         </h3>
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {isProfileComplete ? 'Your professional summary' : 'Complete your profile'}
+                            {isProfileComplete ? t('home.yourProfessionalSummary') : t('home.completeYourProfile')}
                         </p>
                     </div>
                 </div>
@@ -72,7 +74,7 @@ const ProfileSummaryWidget: React.FC = () => {
                     className={`text-sm font-medium flex items-center gap-1 transition-colors`}
                     style={{ color: accentColor }}
                 >
-                    {isProfileComplete ? 'Edit' : 'Complete'}
+                    {isProfileComplete ? t('common.edit') : t('home.complete')}
                     <ChevronRight className="w-4 h-4" />
                 </button>
             </div>
@@ -102,7 +104,7 @@ const ProfileSummaryWidget: React.FC = () => {
                             <div className="flex items-center gap-2 mb-1">
                                 <IndustryIcon className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                                 <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Industry
+                                    {t('home.industry')}
                                 </span>
                             </div>
                             <p className={`text-sm font-semibold capitalize ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -114,7 +116,7 @@ const ProfileSummaryWidget: React.FC = () => {
                             <div className="flex items-center gap-2 mb-1">
                                 <TrendingUp className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                                 <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Experience
+                                    {t('home.experience')}
                                 </span>
                             </div>
                             <p className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -129,7 +131,7 @@ const ProfileSummaryWidget: React.FC = () => {
                             <div className="flex items-center gap-2 mb-2">
                                 <Award className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                                 <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Top Skills
+                                    {t('home.topSkills')}
                                 </span>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -155,7 +157,7 @@ const ProfileSummaryWidget: React.FC = () => {
                                             : 'bg-gray-100 text-gray-600'
                                             }`}
                                     >
-                                        +{skills.length - 5} more
+                                        +{skills.length - 5} {t('common.more')}
                                     </span>
                                 )}
                             </div>
@@ -171,7 +173,7 @@ const ProfileSummaryWidget: React.FC = () => {
                             <div className="flex items-center gap-2 mb-2">
                                 <Target className={`w-4 h-4 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                                 <span className={`text-xs font-semibold ${isDarkMode ? 'text-purple-300' : 'text-purple-700'}`}>
-                                    Career Goals
+                                    {t('home.careerGoals')}
                                 </span>
                             </div>
                             <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -186,7 +188,7 @@ const ProfileSummaryWidget: React.FC = () => {
                                         return item.description || item.title || item.name || '';
                                     };
 
-                                    return getText(shortTerm) || getText(longTerm) || 'Set your career goals in profile';
+                                    return getText(shortTerm) || getText(longTerm) || t('home.setCareerGoals');
                                 })()}
                             </p>
                         </div>
@@ -200,10 +202,10 @@ const ProfileSummaryWidget: React.FC = () => {
                         <User className={`w-8 h-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`} />
                     </div>
                     <p className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Complete Your Professional Profile
+                        {t('home.completeProfileTitle')}
                     </p>
                     <p className={`text-xs mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        Add your job title, company, skills and more
+                        {t('home.completeProfileDesc')}
                     </p>
                     <button
                         onClick={() => navigate('/profile')}
@@ -213,7 +215,7 @@ const ProfileSummaryWidget: React.FC = () => {
                             boxShadow: `0 4px 12px -2px ${accentColor}40`
                         }}
                     >
-                        Complete Profile
+                        {t('home.completeProfile')}
                     </button>
                 </div>
             )}

@@ -7,12 +7,14 @@ import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import MeetingRecorder from './meeting/MeetingRecorder';
+import { useTranslation } from 'react-i18next';
 
 const MeetingNotesPage: React.FC = () => {
     const { isDarkMode, preferences } = useTheme();
     const { dockPosition } = useDock();
     const { dispatch } = useApp();
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
 
     const [platform, setPlatform] = useState<string>('in-person');
     const [meetingLink, setMeetingLink] = useState('');
@@ -34,10 +36,10 @@ const MeetingNotesPage: React.FC = () => {
     });
 
     const platforms = [
-        { value: 'google-meet', label: 'Google Meet', icon: Video },
-        { value: 'zoom', label: 'Zoom', icon: Video },
-        { value: 'teams', label: 'Microsoft Teams', icon: Video },
-        { value: 'in-person', label: 'In-Person', icon: Calendar },
+        { value: 'google-meet', label: t('notes.googleMeet'), icon: Video },
+        { value: 'zoom', label: t('notes.zoom'), icon: Video },
+        { value: 'teams', label: t('notes.microsoftTeams'), icon: Video },
+        { value: 'in-person', label: t('notes.inPerson'), icon: Calendar },
     ];
 
     // Open meeting link in new tab
@@ -131,8 +133,8 @@ const MeetingNotesPage: React.FC = () => {
     return (
         <div
             className={`min-h-screen flex flex-col ${isDarkMode
-                    ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'
-                    : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'
+                ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'
+                : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'
                 }`}
         >
             <div
@@ -145,7 +147,7 @@ const MeetingNotesPage: React.FC = () => {
                 {/* Page Header */}
                 <GlassmorphicPageHeader
                     icon={Mic}
-                    title="New Meeting Note"
+                    title={t('notes.newMeetingNote')}
                     subtitle={`${dateStr} at ${timeStr}`}
                 />
 
@@ -153,28 +155,28 @@ const MeetingNotesPage: React.FC = () => {
                 <div className="mt-6">
                     <div
                         className={`p-4 rounded-2xl border backdrop-blur-sm ${isDarkMode
-                                ? 'bg-gray-800/50 border-gray-700/50'
-                                : 'bg-white/80 border-gray-200/50 shadow-lg'
+                            ? 'bg-gray-800/50 border-gray-700/50'
+                            : 'bg-white/80 border-gray-200/50 shadow-lg'
                             }`}
                     >
                         <label
                             className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}
                         >
-                            Meeting Title (Optional)
+                            {t('notes.meetingTitle')}
                         </label>
                         <input
                             type="text"
                             value={meetingTitle}
                             onChange={(e) => setMeetingTitle(e.target.value)}
-                            placeholder="e.g., Q4 Planning Meeting, Sprint Review..."
+                            placeholder={t('notes.meetingTitlePlaceholder')}
                             className={`w-full px-4 py-3 rounded-xl border transition-all ${isDarkMode
-                                    ? 'bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 focus:border-gray-600'
-                                    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-300'
+                                ? 'bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 focus:border-gray-600'
+                                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-300'
                                 } focus:outline-none`}
                         />
                         <p className={`mt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                            If left empty, notes will be saved with a timestamp
+                            {t('notes.meetingTitleHelper')}
                         </p>
                     </div>
                 </div>
@@ -183,15 +185,15 @@ const MeetingNotesPage: React.FC = () => {
                 <div className="mt-6">
                     <div
                         className={`p-4 rounded-2xl border backdrop-blur-sm ${isDarkMode
-                                ? 'bg-gray-800/50 border-gray-700/50'
-                                : 'bg-white/80 border-gray-200/50 shadow-lg'
+                            ? 'bg-gray-800/50 border-gray-700/50'
+                            : 'bg-white/80 border-gray-200/50 shadow-lg'
                             }`}
                     >
                         <label
                             className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}
                         >
-                            Meeting Platform
+                            {t('notes.meetingPlatform')}
                         </label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {platforms.map((p) => {
@@ -202,12 +204,12 @@ const MeetingNotesPage: React.FC = () => {
                                         key={p.value}
                                         onClick={() => setPlatform(p.value)}
                                         className={`p-4 rounded-xl border transition-all ${isSelected
-                                                ? isDarkMode
-                                                    ? 'bg-gray-700/50 border-gray-600'
-                                                    : 'bg-white border-gray-300 shadow-md'
-                                                : isDarkMode
-                                                    ? 'bg-gray-800/30 border-gray-700/50 hover:bg-gray-700/30'
-                                                    : 'bg-white/50 border-gray-200/50 hover:bg-white/80'
+                                            ? isDarkMode
+                                                ? 'bg-gray-700/50 border-gray-600'
+                                                : 'bg-white border-gray-300 shadow-md'
+                                            : isDarkMode
+                                                ? 'bg-gray-800/30 border-gray-700/50 hover:bg-gray-700/30'
+                                                : 'bg-white/50 border-gray-200/50 hover:bg-white/80'
                                             }`}
                                         style={
                                             isSelected
@@ -220,23 +222,23 @@ const MeetingNotesPage: React.FC = () => {
                                     >
                                         <Icon
                                             className={`w-5 h-5 mx-auto mb-2 ${isSelected
-                                                    ? isDarkMode
-                                                        ? 'text-white'
-                                                        : 'text-gray-900'
-                                                    : isDarkMode
-                                                        ? 'text-gray-400'
-                                                        : 'text-gray-600'
+                                                ? isDarkMode
+                                                    ? 'text-white'
+                                                    : 'text-gray-900'
+                                                : isDarkMode
+                                                    ? 'text-gray-400'
+                                                    : 'text-gray-600'
                                                 }`}
                                             style={isSelected ? { color: preferences.accentColor } : undefined}
                                         />
                                         <div
                                             className={`text-sm font-medium ${isSelected
-                                                    ? isDarkMode
-                                                        ? 'text-white'
-                                                        : 'text-gray-900'
-                                                    : isDarkMode
-                                                        ? 'text-gray-400'
-                                                        : 'text-gray-600'
+                                                ? isDarkMode
+                                                    ? 'text-white'
+                                                    : 'text-gray-900'
+                                                : isDarkMode
+                                                    ? 'text-gray-400'
+                                                    : 'text-gray-600'
                                                 }`}
                                         >
                                             {p.label}
@@ -253,8 +255,8 @@ const MeetingNotesPage: React.FC = () => {
                     <div className="mt-6">
                         <div
                             className={`p-4 rounded-2xl border backdrop-blur-sm ${isDarkMode
-                                    ? 'bg-gray-800/50 border-gray-700/50'
-                                    : 'bg-white/80 border-gray-200/50 shadow-lg'
+                                ? 'bg-gray-800/50 border-gray-700/50'
+                                : 'bg-white/80 border-gray-200/50 shadow-lg'
                                 }`}
                         >
                             <label
@@ -262,17 +264,17 @@ const MeetingNotesPage: React.FC = () => {
                                     }`}
                             >
                                 <LinkIcon className="w-4 h-4 inline mr-2" />
-                                Meeting Link
+                                {t('notes.meetingLink')}
                             </label>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={meetingLink}
                                     onChange={(e) => setMeetingLink(e.target.value)}
-                                    placeholder={`Paste your ${platforms.find(p => p.value === platform)?.label} link here...`}
+                                    placeholder={t('notes.meetingLinkPlaceholder', { platform: platforms.find(p => p.value === platform)?.label })}
                                     className={`flex-1 px-4 py-3 rounded-xl border transition-all ${isDarkMode
-                                            ? 'bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 focus:border-gray-600'
-                                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-300'
+                                        ? 'bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 focus:border-gray-600'
+                                        : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-300'
                                         } focus:outline-none`}
                                 />
                                 <button
@@ -284,18 +286,18 @@ const MeetingNotesPage: React.FC = () => {
                                             : undefined,
                                     }}
                                     className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${meetingLink.trim()
-                                            ? 'text-white hover:opacity-90 shadow-lg'
-                                            : isDarkMode
-                                                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        ? 'text-white hover:opacity-90 shadow-lg'
+                                        : isDarkMode
+                                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                         }`}
                                 >
                                     <ExternalLink className="w-5 h-5" />
-                                    Join
+                                    {t('notes.join')}
                                 </button>
                             </div>
                             <p className={`mt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                The meeting will open in a new tab. Then enable "Include System Audio" below to record it.
+                                {t('notes.meetingLinkHelper')}
                             </p>
                         </div>
                     </div>
@@ -305,8 +307,8 @@ const MeetingNotesPage: React.FC = () => {
                 {platform !== 'in-person' && (
                     <div
                         className={`mt-6 p-4 rounded-xl border ${isDarkMode
-                                ? 'bg-blue-900/20 border-blue-700/50'
-                                : 'bg-blue-50 border-blue-200'
+                            ? 'bg-blue-900/20 border-blue-700/50'
+                            : 'bg-blue-50 border-blue-200'
                             }`}
                     >
                         <div className="flex items-start">
@@ -319,9 +321,7 @@ const MeetingNotesPage: React.FC = () => {
                                     className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-800'
                                         }`}
                                 >
-                                    <strong>Tip:</strong> To capture audio from {platforms.find(p => p.value === platform)?.label},
-                                    enable "Include System Audio" below and select the meeting tab when prompted.
-                                    Make sure to check "Share audio" in the browser dialog.
+                                    <strong>{t('notes.audioCaptureTip')}</strong> {t('notes.audioCaptureInstructions', { platform: platforms.find(p => p.value === platform)?.label })}
                                 </p>
                             </div>
                         </div>

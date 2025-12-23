@@ -262,7 +262,7 @@ const WorkspaceOverview: React.FC = () => {
       <div>
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Today's Attendance</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('workspace.overview.todaysAttendance')}</h3>
             <Clock className="w-5 h-5 text-gray-400" />
           </div>
 
@@ -270,26 +270,26 @@ const WorkspaceOverview: React.FC = () => {
             <div className="grid grid-cols-4 gap-4">
               <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">{attendanceStats.present}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Present</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('workspace.overview.present')}</div>
               </div>
               <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="text-2xl font-bold text-red-600">{attendanceStats.absent}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Absent</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('workspace.overview.absent')}</div>
               </div>
               <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">{attendanceStats.wfh}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">WFH</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('workspace.overview.wfh')}</div>
               </div>
               <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="text-2xl font-bold text-gray-600 dark:text-gray-300">{attendanceStats.total}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('workspace.overview.total')}</div>
               </div>
             </div>
           ) : (
             <div className="text-center py-6">
               <Clock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                No attendance data available for today
+                {t('workspace.overview.noAttendanceData')}
               </p>
             </div>
           )}
@@ -315,14 +315,14 @@ const WorkspaceOverview: React.FC = () => {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                AI Notes
+                {t('workspace.overview.aiNotes')}
               </h3>
             </div>
             <button
               onClick={() => navigate('/notes')}
               className="text-sm text-purple-600 hover:text-purple-700 font-medium"
             >
-              View All
+              {t('workspace.overview.viewAll')}
             </button>
           </div>
 
@@ -334,14 +334,14 @@ const WorkspaceOverview: React.FC = () => {
             <div className="text-center py-8">
               <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                No notes yet. Create your first AI-powered note!
+                {t('workspace.overview.noNotesYet')}
               </p>
               <button
                 onClick={() => navigate('/notes')}
                 className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm font-medium"
               >
                 <Plus className="w-4 h-4 inline mr-1" />
-                Create Note
+                {t('workspace.overview.createNote')}
               </button>
             </div>
           ) : (
@@ -375,7 +375,7 @@ const WorkspaceOverview: React.FC = () => {
                 className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm font-medium"
               >
                 <Sparkles className="w-4 h-4 inline mr-1" />
-                Create AI Note
+                {t('workspace.overview.createAINote')}
               </button>
             </>
           )}

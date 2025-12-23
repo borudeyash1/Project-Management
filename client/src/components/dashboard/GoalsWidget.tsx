@@ -45,7 +45,7 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
                     onClick={() => navigate('/goals')}
                     className="text-sm font-medium text-purple-600 hover:text-purple-700 hover:underline"
                 >
-                    View All
+                    {t('home.viewAll')}
                 </button>
             </div>
 
@@ -91,12 +91,12 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
                 ) : (
                     <div className="flex flex-col items-center justify-center h-40 text-center opacity-60">
                         <Target className="w-10 h-10 mb-2 text-gray-400" />
-                        <p className="text-sm">No active goals</p>
+                        <p className="text-sm">{t('home.noActiveGoals')}</p>
                         <button
                             onClick={() => navigate('/goals')}
                             className="mt-2 text-xs text-purple-600 font-medium hover:underline"
                         >
-                            Create One
+                            {t('home.createOne')}
                         </button>
                     </div>
                 )}

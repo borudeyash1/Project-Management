@@ -896,7 +896,7 @@ const Settings: React.FC = () => {
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.currentPlan')}</h3>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} Plan</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} {t('settings.plan')}</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.nextBilling', { date: new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString() })}</p>
           </div>
           <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">

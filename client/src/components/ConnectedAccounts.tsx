@@ -32,24 +32,24 @@ const ConnectedAccounts: React.FC = () => {
   const appConfig = {
     mail: {
       icon: <Mail className="w-6 h-6" />,
-      title: t('connectedAccounts.sartthiMail') || 'Sartthi Mail',
-      description: t('connectedAccounts.sartthiMailDesc') || 'Secure email platform',
+      title: t('connectedAccounts.sartthiMail'),
+      description: t('connectedAccounts.sartthiMailDesc'),
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
       borderColor: 'border-blue-500/20'
     },
     calendar: {
       icon: <Calendar className="w-6 h-6" />,
-      title: t('connectedAccounts.sartthiCalendar') || 'Sartthi Calendar',
-      description: t('connectedAccounts.sartthiCalendarDesc') || 'Schedule and manage time',
+      title: t('connectedAccounts.sartthiCalendar'),
+      description: t('connectedAccounts.sartthiCalendarDesc'),
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
       borderColor: 'border-purple-500/20'
     },
     vault: {
       icon: <Shield className="w-6 h-6" />,
-      title: t('connectedAccounts.sartthiVault') || 'Sartthi Vault',
-      description: t('connectedAccounts.sartthiVaultDesc') || 'Secure cloud storage',
+      title: t('connectedAccounts.sartthiVault'),
+      description: t('connectedAccounts.sartthiVaultDesc'),
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
       borderColor: 'border-green-500/20'
@@ -113,7 +113,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault', accountId: string) => {
-    if (!confirm('Are you sure you want to disconnect this account?')) {
+    if (!confirm(t('connectedAccounts.confirmDisconnect'))) {
       return;
     }
 
@@ -165,14 +165,14 @@ const ConnectedAccounts: React.FC = () => {
             ) : (
               <Plus className="w-4 h-4" />
             )}
-            Add Account
+            {t('connectedAccounts.addAccount')}
           </button>
         </div>
 
         {accounts.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p>No accounts connected</p>
-            <p className="text-sm mt-1">Click "Add Account" to connect your first account</p>
+            <p>{t('connectedAccounts.noAccounts')}</p>
+            <p className="text-sm mt-1">{t('connectedAccounts.clickAddAccount')}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -203,12 +203,12 @@ const ConnectedAccounts: React.FC = () => {
                       </p>
                       {account.isActive && (
                         <span className="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">
-                          Active
+                          {t('connectedAccounts.active')}
                         </span>
                       )}
                       {account.isPrimary && (
                         <span className="px-2 py-0.5 bg-yellow-500 text-white text-xs rounded-full">
-                          Primary
+                          {t('connectedAccounts.primary')}
                         </span>
                       )}
                     </div>
@@ -216,7 +216,7 @@ const ConnectedAccounts: React.FC = () => {
                       {account.providerEmail}
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500">
-                      Connected {new Date(account.createdAt).toLocaleDateString()}
+                      {t('connectedAccounts.connected')} {new Date(account.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ const ConnectedAccounts: React.FC = () => {
                       {actionLoading === `active-${account._id}` ? (
                         <Loader className="w-4 h-4 animate-spin" />
                       ) : (
-                        'Set Active'
+                        t('connectedAccounts.setActive')
                       )}
                     </button>
                   )}
@@ -267,10 +267,10 @@ const ConnectedAccounts: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Connected Accounts
+          {t('connectedAccounts.title')}
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Manage your connected Sartthi services. You can connect multiple accounts for each service.
+          {t('connectedAccounts.subtitle')}
         </p>
       </div>
 

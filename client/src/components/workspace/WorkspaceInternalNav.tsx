@@ -47,7 +47,7 @@ const WorkspaceInternalNav: React.FC = () => {
     },
     {
       id: 'attendance',
-      label: 'Attendance',
+      label: t('workspace.detail.tabs.attendance'),
       icon: Calendar,
       path: `/workspace/${activeWorkspaceId}/attendance`
     },
@@ -105,11 +105,10 @@ const WorkspaceInternalNav: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => navigate(tab.path)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  active
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${active
                     ? 'border-accent-dark text-accent-dark dark:text-accent-light'
                     : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label}

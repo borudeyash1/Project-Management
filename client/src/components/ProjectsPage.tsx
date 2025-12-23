@@ -80,6 +80,11 @@ const ProjectsPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
 
+  // Rename State
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [projectToRename, setProjectToRename] = useState<{ id: string; name: string } | null>(null);
+  const [newProjectName, setNewProjectName] = useState('');
+
   const activeWorkspaceId = useMemo(() => {
     // If in Personal Mode, return 'personal' to load personal projects
     if (state.mode === 'Personal') {
@@ -340,8 +345,28 @@ const ProjectsPage: React.FC = () => {
     navigate(`/project/${projectId}/overview`);
   };
 
-  const handleEditProject = (projectId: string) => {
-    navigate(`/project/${projectId}/overview`);
+  const handleRenameProject = (project: Project) => {
+    setProjectToRename({ id: project._id, name: project.name });
+    setNewProjectName(project.name);
+    setRenameModalOpen(true);
+  };
+
+  const submitRename = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!projectToRename || !newProjectName.trim()) return;
+
+    try {
+      setProcessingProjectId(projectToRename.id);
+      await updateProjectApi(projectToRename.id, { name: newProjectName });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project renamed successfully' } });
+      await loadProjects();
+      setRenameModalOpen(false);
+      setProjectToRename(null);
+    } catch (err: any) {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || 'Failed to rename project' } });
+    } finally {
+      setProcessingProjectId(null);
+    }
   };
 
   return (
@@ -607,14 +632,14 @@ const ProjectsPage: React.FC = () => {
                     {t('common.view')}
                   </button>
                   <button
-                    onClick={() => handleEditProject(project._id)}
+                    onClick={() => handleRenameProject(project)}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
                       ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
                       : 'text-gray-600 border-gray-300 hover:bg-gray-50'
                       }`}
                   >
                     <Edit className="w-4 h-4" />
-                    {t('common.edit')}
+                    {t('projects.rename')}
                   </button>
                   {project.status !== 'completed' && (
                     <button
@@ -728,7 +753,7 @@ const ProjectsPage: React.FC = () => {
                           <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" onClick={() => handleViewProject(project._id)}>
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-600" onClick={() => handleEditProject(project._id)}>
+                          <button className="text-gray-600 hover:text-gray-600" onClick={() => handleRenameProject(project)} title="Rename">
                             <Edit className="w-4 h-4" />
                           </button>
                           {project.status !== 'completed' && (
@@ -806,6 +831,54 @@ const ProjectsPage: React.FC = () => {
         variant="danger"
         loading={processingProjectId === projectToDelete?.id}
       />
+
+      {/* Rename Modal */}
+      {renameModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className={`w-full max-w-md p-6 rounded-2xl shadow-xl transform transition-all ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
+            <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.renameProject')}</h3>
+
+            <form onSubmit={submitRename}>
+              <div className="mb-4">
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  {t('projects.projectName')}
+                </label>
+                <input
+                  type="text"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900'
+                    }`}
+                  placeholder="Enter new project name"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setRenameModalOpen(false)}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode
+                    ? 'text-gray-300 hover:bg-gray-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                >
+                  {t('projects.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newProjectName.trim() || processingProjectId === projectToRename?.id}
+                  className="px-4 py-2 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processingProjectId === projectToRename?.id ? 'Renaming...' : t('projects.rename')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

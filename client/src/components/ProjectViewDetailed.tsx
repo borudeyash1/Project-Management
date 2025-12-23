@@ -898,7 +898,7 @@ const ProjectViewDetailed: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
             >
               <Plus className="w-4 h-4" />
-              Add Task
+              {t('taskCreation.addTaskButton')}
             </button>
           )}
         </div>
@@ -1643,16 +1643,16 @@ const ProjectViewDetailed: React.FC = () => {
   const renderTimelineView = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Timeline</h3>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.projectTimeline')}</h3>
         <div className="flex items-center gap-2">
           <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-            Day
+            {t('projects.day')}
           </button>
           <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50'}`}>
-            Week
+            {t('projects.week')}
           </button>
           <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-            Month
+            {t('projects.month')}
           </button>
         </div>
       </div>
@@ -1663,8 +1663,8 @@ const ProjectViewDetailed: React.FC = () => {
           {!activeProject?.timeline || activeProject?.timeline.length === 0 ? (
             <div className={`p-12 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               <Activity className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
-              <p className="font-medium">No activity yet</p>
-              <p className="text-sm mt-1">Activity will appear here as work progresses</p>
+              <p className="font-medium">{t('projects.noActivityYet')}</p>
+              <p className="text-sm mt-1">{t('projects.activityWillAppear')}</p>
             </div>
           ) : (
             activeProject?.timeline.map((event, index) => (
@@ -1703,10 +1703,10 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Milestones */}
       <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
-        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Milestones</h4>
+        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.milestones')}</h4>
         <div className="space-y-4">
           {!activeProject?.milestones || activeProject?.milestones.length === 0 ? (
-            <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No milestones defined</p>
+            <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.noMilestonesDefined')}</p>
           ) : (
             activeProject?.milestones.map((milestone) => (
               <div key={milestone._id} className={`flex items-center justify-between p-4 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
@@ -1735,15 +1735,15 @@ const ProjectViewDetailed: React.FC = () => {
   const renderDocumentsView = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Documents</h3>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.documents')}</h3>
         <div className="flex items-center gap-2">
           <button className={`flex items-center gap-2 px-4 py-2 border rounded-lg ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
             <Upload className="w-4 h-4" />
-            Upload
+            {t('projects.upload')}
           </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover">
             <Plus className="w-4 h-4" />
-            New Folder
+            {t('projects.newFolder')}
           </button>
         </div>
       </div>
@@ -1751,17 +1751,17 @@ const ProjectViewDetailed: React.FC = () => {
       {/* Document Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Files</p>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.totalFiles')}</p>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeProject?.documents.length || 0}</p>
         </div>
         <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Storage Used</p>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.storageUsed')}</p>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {((activeProject?.documents.reduce((acc, doc) => acc + (doc.size || 0), 0) || 0) / 1024 / 1024).toFixed(2)} MB
           </p>
         </div>
         <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Recent Uploads</p>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.recentUploads')}</p>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {activeProject?.documents.filter(d => {
               const dayAgo = new Date();
@@ -1777,16 +1777,16 @@ const ProjectViewDetailed: React.FC = () => {
         <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center gap-4">
             <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-blue-400 bg-blue-900/30' : 'text-accent-dark bg-blue-50'}`}>
-              All Files
+              {t('projects.allFiles')}
             </button>
             <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              Images
+              {t('projects.images')}
             </button>
             <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              Documents
+              {t('projects.documentsTab')}
             </button>
             <button className={`px-3 py-1 text-sm font-medium rounded-lg ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              Recent
+              {t('projects.recent')}
             </button>
           </div>
         </div>
@@ -1795,8 +1795,8 @@ const ProjectViewDetailed: React.FC = () => {
           {activeProject?.documents.length === 0 ? (
             <div className={`p-12 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               <FileText className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
-              <p className="font-medium">No documents yet</p>
-              <p className="text-sm mt-1">Upload files to share with your team</p>
+              <p className="font-medium">{t('projects.noDocumentsYet')}</p>
+              <p className="text-sm mt-1">{t('projects.uploadFilesPrompt')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1846,16 +1846,16 @@ const ProjectViewDetailed: React.FC = () => {
   const renderAnalyticsView = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Project Analytics</h3>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.projectAnalytics')}</h3>
         <div className="flex items-center gap-2">
           <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
-            Last 7 Days
+            {t('projects.last7Days')}
           </button>
           <button className="px-3 py-1 text-sm font-medium text-accent-dark bg-blue-50 rounded-lg">
-            Last 30 Days
+            {t('projects.last30Days')}
           </button>
           <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
-            All Time
+            {t('projects.allTime')}
           </button>
         </div>
       </div>
@@ -1865,7 +1865,7 @@ const ProjectViewDetailed: React.FC = () => {
         <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
-            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Completion Rate</p>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.completionRate')}</p>
             <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
@@ -1877,7 +1877,7 @@ const ProjectViewDetailed: React.FC = () => {
         <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
-            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Velocity</p>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.teamVelocity')}</p>
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
               <Activity className="w-5 h-5 text-white" />
             </div>
@@ -1885,13 +1885,13 @@ const ProjectViewDetailed: React.FC = () => {
           <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative z-10">
             {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
           </p>
-          <p className={`text-sm mt-2 font-semibold relative z-10 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>Tasks completed</p>
+          <p className={`text-sm mt-2 font-semibold relative z-10 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{t('projects.tasksCompleted')}</p>
         </GlassmorphicCard>
 
         <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
-            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Budget Usage</p>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.budgetUsage')}</p>
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
               <DollarSign className="w-5 h-5 text-white" />
             </div>
@@ -1909,7 +1909,7 @@ const ProjectViewDetailed: React.FC = () => {
         <GlassmorphicCard hoverEffect={true} className="p-6 group relative overflow-hidden">
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
-            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Team Workload</p>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.teamWorkload')}</p>
             <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg">
               <Users className="w-5 h-5 text-white" />
             </div>
@@ -1919,7 +1919,7 @@ const ProjectViewDetailed: React.FC = () => {
               ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
               : 0}%
           </p>
-          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Average workload</p>
+          <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.averageWorkload')}</p>
         </GlassmorphicCard>
       </div>
 
@@ -1927,7 +1927,7 @@ const ProjectViewDetailed: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Task Status Distribution */}
         <GlassmorphicCard className="p-6">
-          <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Task Status Distribution</h4>
+          <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.taskStatusDistribution')}</h4>
           <div className="space-y-3">
             {['pending', 'in-progress', 'review', 'completed', 'blocked'].map((status) => {
               const count = activeProject?.tasks.filter(t => t.status === status).length || 0;
@@ -1958,7 +1958,7 @@ const ProjectViewDetailed: React.FC = () => {
 
         {/* Team Performance */}
         <GlassmorphicCard className="p-6">
-          <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Team Performance</h4>
+          <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.teamPerformance')}</h4>
           <div className="space-y-4">
             {activeProject?.team.map((member) => (
               <div key={member._id}>
@@ -1986,18 +1986,18 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Budget Breakdown */}
       <GlassmorphicCard className="p-6">
-        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Budget Breakdown</h4>
+        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.budgetBreakdown')}</h4>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Total Budget</span>
+            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.totalBudget')}</span>
             <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Spent</span>
+            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.spent')}</span>
             <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Remaining</span>
+            <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.remaining')}</span>
             <span className="font-semibold text-green-600">
               {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
             </span>
@@ -2019,19 +2019,19 @@ const ProjectViewDetailed: React.FC = () => {
 
       {/* Recent Activity */}
       <GlassmorphicCard className="p-6">
-        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Activity Summary</h4>
+        <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.activitySummary')}</h4>
         <div className="space-y-3">
           <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}>
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-blue-600" />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tasks Created</span>
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.tasksCreated')}</span>
             </div>
             <span className="text-lg font-bold text-blue-600">{activeProject?.tasks.length || 0}</span>
           </div>
           <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-green-500/10' : 'bg-green-50'}`}>
             <div className="flex items-center gap-3">
               <Check className="w-5 h-5 text-green-600" />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tasks Completed</span>
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.tasksCompleted')}</span>
             </div>
             <span className="text-lg font-bold text-green-600">
               {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
@@ -2069,10 +2069,9 @@ const ProjectViewDetailed: React.FC = () => {
       );
     }
 
-    const isWorkspaceOwner = activeProject?.createdBy === state.userProfile?._id;
-    const isProjectManager = (activeProject as any)?.projectManager === state.userProfile?._id ||
-      (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
-    const canEdit = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
+    // Use component-level currentUserRole which is derived correctly
+    // Restrict edit to strictly workspace owner as requested
+    const canEdit = currentUserRole === 'owner';
 
     switch (activeView) {
       case 'overview':
@@ -2083,16 +2082,35 @@ const ProjectViewDetailed: React.FC = () => {
           <ProjectInfoTab
             project={activeProject}
             canEdit={canEdit}
-            onUpdate={(updates) => {
+            onUpdate={async (updates) => {
               if (activeProject) {
-                dispatch({
-                  type: 'UPDATE_PROJECT',
-                  payload: {
-                    projectId: activeProject._id,
-                    updates
+                try {
+                  console.log('💾 [PROJECT INFO] Saving updates:', updates);
+                  const response = await apiService.put(`/projects/${activeProject._id}`, updates);
+
+                  if (response.data.success) {
+                    dispatch({
+                      type: 'UPDATE_PROJECT',
+                      payload: {
+                        projectId: activeProject._id,
+                        updates: response.data.data
+                      }
+                    });
+                    setActiveProject({ ...activeProject, ...response.data.data });
+                    dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project updated successfully' } });
+                  } else {
+                    throw new Error('API returned success: false');
                   }
-                });
-                setActiveProject({ ...activeProject, ...updates });
+                } catch (error: any) {
+                  console.error('Failed to update project:', error);
+                  dispatch({
+                    type: 'ADD_TOAST',
+                    payload: {
+                      type: 'error',
+                      message: error.response?.data?.message || error.message || 'Failed to update project'
+                    }
+                  });
+                }
               }
             }}
           />
@@ -2854,7 +2872,7 @@ const ProjectViewDetailed: React.FC = () => {
         isOpen={showAddMemberModal}
         onClose={() => setShowAddMemberModal(false)}
         onAddMember={handleAddTeamMember}
-        currentTeamIds={activeProject?.team.map(m => m._id) || []}
+        currentTeamIds={activeProject?.team?.map(m => m._id) || []}
         workspaceId={state.currentWorkspace || sessionStorage.getItem('currentWorkspaceId') || undefined}
       />
 

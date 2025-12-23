@@ -131,8 +131,8 @@ const CalendarWidget: React.FC = () => {
 
     return (
         <div className={`rounded-2xl border transition-all duration-300 ${isDarkMode
-                ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 backdrop-blur-sm'
-                : 'bg-gradient-to-br from-white to-blue-50/30 border-gray-200/50 shadow-lg'
+            ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 backdrop-blur-sm'
+            : 'bg-gradient-to-br from-white to-blue-50/30 border-gray-200/50 shadow-lg'
             } overflow-hidden h-full flex flex-col`}>
             {/* Header */}
             <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700/50' : 'border-gray-200/50'}`}>
@@ -143,21 +143,21 @@ const CalendarWidget: React.FC = () => {
                         </div>
                         <div>
                             <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Calendar
+                                {t('home.calendar')}
                             </h3>
                             <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                Powered by Sartthi
+                                {t('home.poweredBySartthi')}
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={() => navigate('/planner')}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isDarkMode
-                                ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
-                                : 'bg-blue-500/10 text-blue-600 hover:bg-blue-500/20'
+                            ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
+                            : 'bg-blue-500/10 text-blue-600 hover:bg-blue-500/20'
                             }`}
                     >
-                        View Planner
+                        {t('home.viewPlanner')}
                     </button>
                 </div>
 
@@ -166,8 +166,8 @@ const CalendarWidget: React.FC = () => {
                     <button
                         onClick={handlePrevMonth}
                         className={`p-2 rounded-lg transition-all ${isDarkMode
-                                ? 'hover:bg-gray-700/50 text-gray-400 hover:text-white'
-                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+                            ? 'hover:bg-gray-700/50 text-gray-400 hover:text-white'
+                            : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
                             }`}
                     >
                         <ChevronLeft className="w-4 h-4" />
@@ -178,8 +178,8 @@ const CalendarWidget: React.FC = () => {
                     <button
                         onClick={handleNextMonth}
                         className={`p-2 rounded-lg transition-all ${isDarkMode
-                                ? 'hover:bg-gray-700/50 text-gray-400 hover:text-white'
-                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+                            ? 'hover:bg-gray-700/50 text-gray-400 hover:text-white'
+                            : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
                             }`}
                     >
                         <ChevronRight className="w-4 h-4" />
@@ -221,16 +221,16 @@ const CalendarWidget: React.FC = () => {
                                 key={day}
                                 onClick={() => handleDateClick(day)}
                                 className={`aspect-square rounded-lg p-1 text-xs font-medium transition-all relative group ${today
+                                    ? isDarkMode
+                                        ? 'bg-blue-500/20 text-blue-400 ring-2 ring-blue-500/50'
+                                        : 'bg-blue-500/20 text-blue-600 ring-2 ring-blue-500/50'
+                                    : selected
                                         ? isDarkMode
-                                            ? 'bg-blue-500/20 text-blue-400 ring-2 ring-blue-500/50'
-                                            : 'bg-blue-500/20 text-blue-600 ring-2 ring-blue-500/50'
-                                        : selected
-                                            ? isDarkMode
-                                                ? 'bg-blue-500/30 text-white'
-                                                : 'bg-blue-500/30 text-blue-900'
-                                            : isDarkMode
-                                                ? 'text-gray-300 hover:bg-gray-700/50'
-                                                : 'text-gray-700 hover:bg-gray-100'
+                                            ? 'bg-blue-500/30 text-white'
+                                            : 'bg-blue-500/30 text-blue-900'
+                                        : isDarkMode
+                                            ? 'text-gray-300 hover:bg-gray-700/50'
+                                            : 'text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
                                 <span className="block">{day}</span>

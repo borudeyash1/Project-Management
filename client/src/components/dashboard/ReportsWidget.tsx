@@ -33,26 +33,26 @@ const ReportsWidget: React.FC = () => {
 
             setMetrics([
                 {
-                    label: t('widgets.tasksCompleted'),
+                    label: t('home.tasksCompletedWidget'),
                     value: data.tasksCompletedThisWeek || 0,
                     change: data.tasksCompletedChange || 0,
                     icon: CheckCircle,
                     color: 'text-green-600'
                 },
                 {
-                    label: t('widgets.projectsOnTrack'),
+                    label: t('home.projectsOnTrack'),
                     value: `${data.projectsOnTrack || 0}/${data.totalProjects || 0}`,
                     icon: Target,
                     color: 'text-blue-600'
                 },
                 {
-                    label: t('widgets.atRisk'),
+                    label: t('home.atRisk'),
                     value: data.projectsAtRisk || 0,
                     icon: AlertTriangle,
                     color: 'text-red-600'
                 },
                 {
-                    label: t('widgets.productivity'),
+                    label: t('home.productivityWidget'),
                     value: `${data.productivityScore || 0}%`,
                     change: data.productivityChange || 0,
                     icon: TrendingUp,
@@ -84,7 +84,7 @@ const ReportsWidget: React.FC = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {t('widgets.weeklyReports')}
+                        {t('home.weeklyReports')}
                     </h2>
                     <BarChart3 className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                 </div>
@@ -93,10 +93,10 @@ const ReportsWidget: React.FC = () => {
                 <div className="flex flex-col items-center justify-center py-8">
                     <BarChart3 className={`w-12 h-12 mb-3 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
                     <p className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        No Reports Available
+                        {t('home.noReportsAvailable')}
                     </p>
                     <p className={`text-xs text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                        Start working on tasks and projects to see your weekly progress here
+                        {t('home.startWorkingMessage')}
                     </p>
                 </div>
 
@@ -105,7 +105,7 @@ const ReportsWidget: React.FC = () => {
                     onClick={() => navigate('/reports')}
                     className="w-full py-2 px-4 bg-accent text-gray-900 rounded-lg hover:bg-accent/90 transition-colors text-sm font-medium"
                 >
-                    {t('widgets.viewFullReport')}
+                    {t('home.viewFullReport')}
                 </button>
             </div>
         );
@@ -116,7 +116,7 @@ const ReportsWidget: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {t('widgets.weeklyReports')}
+                    {t('home.weeklyReports')}
                 </h2>
                 <BarChart3 className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
             </div>
@@ -158,7 +158,7 @@ const ReportsWidget: React.FC = () => {
                 onClick={() => navigate('/reports')}
                 className="w-full py-2 px-4 bg-accent text-gray-900 rounded-lg hover:bg-accent/90 transition-colors text-sm font-medium"
             >
-                {t('widgets.viewFullReport')}
+                {t('home.viewFullReport')}
             </button>
         </div>
     );

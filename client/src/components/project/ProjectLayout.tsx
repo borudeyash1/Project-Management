@@ -4,12 +4,14 @@ import { useApp } from '../../context/AppContext';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import ProjectInternalNav from './ProjectInternalNav';
 import { apiService } from '../../services/api';
+import { useTranslation } from 'react-i18next';
 
 const ProjectLayout: React.FC = () => {
   const { state, dispatch } = useApp();
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | 'none'>('none');
   const [prevPath, setPrevPath] = useState('');
@@ -77,8 +79,8 @@ const ProjectLayout: React.FC = () => {
         console.log('📥 [PROJECT LAYOUT] Fetching project from API:', projectId);
         const response = await apiService.get(`/projects/${projectId}`);
 
-        if (response.data.success) {
-          const fetchedProject = response.data.data;
+        if (response.success) {
+          const fetchedProject = response.data;
           console.log('✅ [PROJECT LAYOUT] Project loaded:', fetchedProject.name);
 
           // Add to state
@@ -92,11 +94,11 @@ const ProjectLayout: React.FC = () => {
             console.log('📥 [PROJECT LAYOUT] Fetching workspace:', fetchedProject.workspace);
             try {
               const wsResponse = await apiService.get(`/workspaces/${fetchedProject.workspace}`);
-              if (wsResponse.data.success) {
-                console.log('✅ [PROJECT LAYOUT] Workspace loaded:', wsResponse.data.data.name);
+              if (wsResponse.success) {
+                console.log('✅ [PROJECT LAYOUT] Workspace loaded:', wsResponse.data.name);
                 dispatch({
                   type: 'ADD_WORKSPACE',
-                  payload: wsResponse.data.data
+                  payload: wsResponse.data
                 });
               }
             } catch (wsError) {
@@ -167,7 +169,7 @@ const ProjectLayout: React.FC = () => {
               className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Workspace
+              {t('projects.backToWorkspace')}
             </button>
 
             {/* Breadcrumb */}

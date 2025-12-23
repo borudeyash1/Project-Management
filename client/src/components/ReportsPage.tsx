@@ -15,6 +15,7 @@ import { downloadReportPDF, printReportPDF } from '../utils/pdfGenerator';
 import * as XLSX from 'xlsx';
 import { reportService, Report, CreateReportData } from '../services/reportService';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import EnhancedCharts from './reports/EnhancedCharts';
@@ -89,6 +90,7 @@ interface TimeTrackingData {
 
 const ReportsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { canUseAdvancedAnalytics, canExportReports, canUseAI } = useFeatureAccess();
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -371,8 +373,8 @@ const ReportsPage: React.FC = () => {
   return (
     <div className={`h-full min-h-screen bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
       <GlassmorphicPageHeader
-        title="Reports & Analytics"
-        subtitle="Track performance and generate insights"
+        title={t('reports.pageTitle')}
+        subtitle={t('reports.pageSubtitle')}
         icon={BarChart3}
       >
         <div className="flex items-center gap-3">
@@ -387,7 +389,7 @@ const ReportsPage: React.FC = () => {
               ) : (
                 <Bot className="w-4 h-4" />
               )}
-              {isGenerating ? 'Generating...' : 'AI Report'}
+              {isGenerating ? t('reports.generating') : t('reports.aiReport')}
             </button>
           )}
           <button
@@ -395,7 +397,7 @@ const ReportsPage: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover"
           >
             <Plus className="w-4 h-4" />
-            New Report
+            {t('reports.newReport')}
           </button>
         </div>
       </GlassmorphicPageHeader>
@@ -409,56 +411,56 @@ const ReportsPage: React.FC = () => {
               <GlassmorphicCard className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Hours</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reports.totalHours')}</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalHours().toFixed(1)}h</p>
                   </div>
                   <Clock className="w-8 h-8 text-accent" />
                 </div>
                 <div className="flex items-center mt-2">
                   <ArrowUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600 ml-1">+12% from last week</span>
+                  <span className="text-sm text-green-600 ml-1">{t('reports.fromLastWeek', { percent: 12 })}</span>
                 </div>
               </GlassmorphicCard>
 
               <GlassmorphicCard className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Billable Hours</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reports.billableHours')}</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getBillableHours().toFixed(1)}h</p>
                   </div>
                   <DollarSign className="w-8 h-8 text-green-500" />
                 </div>
                 <div className="flex items-center mt-2">
                   <ArrowUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600 ml-1">+8% from last week</span>
+                  <span className="text-sm text-green-600 ml-1">{t('reports.fromLastWeek', { percent: 8 })}</span>
                 </div>
               </GlassmorphicCard>
 
               <GlassmorphicCard className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Team Productivity</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reports.teamProductivity')}</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getAverageProductivity().toFixed(0)}%</p>
                   </div>
                   <TrendingUp className="w-8 h-8 text-purple-500" />
                 </div>
                 <div className="flex items-center mt-2">
                   <ArrowUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600 ml-1">+5% from last month</span>
+                  <span className="text-sm text-green-600 ml-1">{t('reports.fromLastMonth', { percent: 5 })}</span>
                 </div>
               </GlassmorphicCard>
 
               <GlassmorphicCard className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Project Progress</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reports.projectProgress')}</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getProjectProgress().toFixed(0)}%</p>
                   </div>
                   <Target className="w-8 h-8 text-orange-500" />
                 </div>
                 <div className="flex items-center mt-2">
                   <ArrowUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600 ml-1">+3% from last week</span>
+                  <span className="text-sm text-green-600 ml-1">{t('reports.fromLastWeek', { percent: 3 })}</span>
                 </div>
               </GlassmorphicCard>
             </div>
@@ -472,12 +474,12 @@ const ReportsPage: React.FC = () => {
                     onChange={(e) => setReportType(e.target.value as any)}
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
-                    <option value="all">All Reports</option>
-                    <option value="productivity">Productivity</option>
-                    <option value="time">Time Tracking</option>
-                    <option value="team">Team Performance</option>
-                    <option value="financial">Financial</option>
-                    <option value="project">Project</option>
+                    <option value="all">{t('reports.allReports')}</option>
+                    <option value="productivity">{t('reports.types.productivity')}</option>
+                    <option value="time">{t('reports.types.time')}</option>
+                    <option value="team">{t('reports.types.team')}</option>
+                    <option value="financial">{t('reports.types.financial')}</option>
+                    <option value="project">{t('reports.types.project')}</option>
                   </select>
 
                   <select
@@ -485,10 +487,10 @@ const ReportsPage: React.FC = () => {
                     onChange={(e) => setDateRange(e.target.value as any)}
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="90d">Last 90 days</option>
-                    <option value="1y">Last year</option>
+                    <option value="7d">{t('reports.last7Days')}</option>
+                    <option value="30d">{t('reports.last30Days')}</option>
+                    <option value="90d">{t('reports.last90Days')}</option>
+                    <option value="1y">{t('reports.lastYear')}</option>
                   </select>
                 </div>
 
@@ -506,7 +508,7 @@ const ReportsPage: React.FC = () => {
             {/* Reports List */}
             <GlassmorphicCard>
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Reports</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('reports.title')}</h2>
               </div>
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {getFilteredReports().map(report => (
@@ -524,7 +526,7 @@ const ReportsPage: React.FC = () => {
                           </span>
                           {report.isPublic && (
                             <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium text-accent-dark bg-blue-100">
-                              Public
+                              {t('reports.public')}
                             </span>
                           )}
                         </div>
@@ -532,8 +534,8 @@ const ReportsPage: React.FC = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{report.description}</p>
 
                         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                          <span>Created {report.createdAt.toLocaleDateString()}</span>
-                          <span>Updated {report.updatedAt.toLocaleDateString()}</span>
+                          <span>{t('reports.created', { date: report.createdAt.toLocaleDateString() })}</span>
+                          <span>{t('reports.updated', { date: report.updatedAt.toLocaleDateString() })}</span>
                           <div className="flex items-center gap-1">
                             {report.tags.map(tag => (
                               <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs">
@@ -576,302 +578,62 @@ const ReportsPage: React.FC = () => {
               projectMetrics={projectMetrics}
               isDarkMode={isDarkMode}
             />
-            {/* Old charts below - can be removed after testing
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-              {/* Time Tracking Chart */}
-            <GlassmorphicCard className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Time Tracking</h3>
-                <Clock className="w-5 h-5 text-accent" />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsLineChart data={timeTrackingData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} />
-                  <XAxis
-                    dataKey="date"
-                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
-                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
-                  />
-                  <YAxis
-                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
-                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                      borderRadius: '8px'
-                    }}
-                    labelStyle={{ color: isDarkMode ? '#f3f4f6' : '#111827' }}
-                  />
-                  <Legend wrapperStyle={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }} />
-                  <Line
-                    type="monotone"
-                    dataKey="hours"
-                    stroke="#FBBF24"
-                    strokeWidth={2}
-                    name="Total Hours"
-                    dot={{ fill: '#FBBF24', r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="billableHours"
-                    stroke="#10b981"
-                    strokeWidth={2}
-                    name="Billable Hours"
-                    dot={{ fill: '#10b981', r: 4 }}
-                  />
-                </RechartsLineChart>
-              </ResponsiveContainer>
-            </GlassmorphicCard>
 
-            {/* Team Performance Chart */}
-            <GlassmorphicCard className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Team Performance</h3>
-                <Users className="w-5 h-5 text-purple-500" />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsBarChart data={teamPerformance.slice(0, 5)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} />
-                  <XAxis
-                    dataKey="name"
-                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
-                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280', fontSize: 12 }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis
-                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
-                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                      borderRadius: '8px'
-                    }}
-                    labelStyle={{ color: isDarkMode ? '#f3f4f6' : '#111827' }}
-                  />
-                  <Legend wrapperStyle={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }} />
-                  <Bar dataKey="productivityScore" fill="#8b5cf6" name="Productivity Score" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="completionRate" fill="#FBBF24" name="Completion Rate %" radius={[8, 8, 0, 0]} />
-                </RechartsBarChart>
-              </ResponsiveContainer>
-            </GlassmorphicCard>
           </div>
 
-          {/* Project Progress & Productivity Trend */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            {/* Project Progress Pie Chart */}
-            <GlassmorphicCard className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Status Distribution</h3>
-                <Target className="w-5 h-5 text-orange-500" />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsPieChart>
-                  <Pie
-                    data={[
-                      { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
-                      { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
-                      { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
-                      { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
-                    ].filter(item => item.value > 0)}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* AI Insights */}
+            {canUseAI() && (
+              <GlassmorphicCard className="p-4 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-blue-500/20 pointer-events-none"></div>
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Bot className="w-5 h-5 text-accent-dark" />
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{t('reports.aiInsights.title')}</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    {t('reports.aiInsights.description')}
+                  </p>
+                  <button
+                    onClick={generateAIReport}
+                    disabled={isGenerating}
+                    className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent-hover hover:to-blue-600 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 shadow-md"
                   >
-                    {[
-                      { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
-                      { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
-                      { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
-                      { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
-                    ].filter(item => item.value > 0).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                      borderRadius: '8px'
-                    }}
-                  />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </GlassmorphicCard>
-
-            {/* Productivity Trend Area Chart */}
-            <GlassmorphicCard className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Productivity Trend</h3>
-                <TrendingUp className="w-5 h-5 text-green-500" />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={timeTrackingData}>
-                  <defs>
-                    <linearGradient id="colorProductivity" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FBBF24" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#FBBF24" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} />
-                  <XAxis
-                    dataKey="date"
-                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
-                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
-                  />
-                  <YAxis
-                    stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
-                    tick={{ fill: isDarkMode ? '#9ca3af' : '#6b7280' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                      border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                      borderRadius: '8px'
-                    }}
-                    labelStyle={{ color: isDarkMode ? '#f3f4f6' : '#111827' }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="hours"
-                    stroke="#FBBF24"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorProductivity)"
-                    name="Hours Worked"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </GlassmorphicCard>
-          </div>
-          */}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* AI Insights */}
-          {canUseAI() && (
-            <GlassmorphicCard className="p-4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-blue-500/20 pointer-events-none"></div>
-              <div className="relative">
-                <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-5 h-5 text-accent-dark" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">AI Insights</h3>
+                    {isGenerating ? t('reports.generating') : t('reports.aiInsights.generateBtn')}
+                  </button>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                  Get AI-powered insights and recommendations for your team's performance.
-                </p>
+              </GlassmorphicCard>
+            )}
+
+            {/* Quick Actions */}
+            <GlassmorphicCard className="p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('reports.quickActions.title')}</h3>
+              <div className="space-y-2">
                 <button
-                  onClick={generateAIReport}
-                  disabled={isGenerating}
-                  className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent-hover hover:to-blue-600 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 shadow-md"
+                  onClick={handleExportAllData}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  {isGenerating ? 'Generating...' : 'Generate Insights'}
+                  <Download className="w-4 h-4 inline mr-2" />
+                  {t('reports.quickActions.export')}
+                </button>
+                <button
+                  onClick={handleShareDashboard}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <Share2 className="w-4 h-4 inline mr-2" />
+                  {t('reports.quickActions.share')}
+                </button>
+                <button
+                  onClick={() => setShowScheduleModal(true)}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <Calendar className="w-4 h-4 inline mr-2" />
+                  {t('reports.quickActions.schedule')}
                 </button>
               </div>
             </GlassmorphicCard>
-          )}
-
-          {/* Project Performance */}
-          <GlassmorphicCard className="p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Project Performance</h3>
-            <div className="space-y-3">
-              {projectMetrics.map(project => (
-                <div key={project._id} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{project.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
-                    <div
-                      className="bg-accent h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                    <span>{project.completedTasks}/{project.totalTasks} tasks</span>
-                    <span>${project.spent.toLocaleString()}/${project.budget.toLocaleString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </GlassmorphicCard>
-
-          {/* Team Leaderboard */}
-          <GlassmorphicCard className="p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Team Leaderboard</h3>
-            <div className="space-y-3">
-              {teamPerformance
-                .sort((a, b) => b.productivityScore - a.productivityScore)
-                .slice(0, 5)
-                .map((member, index) => (
-                  <div key={member._id} className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium dark:text-gray-300">
-                      {index + 1}
-                    </div>
-                    <div className="flex items-center gap-2 flex-1">
-                      {member.avatar ? (
-                        <img
-                          src={member.avatar}
-                          alt={member.name}
-                          className="w-6 h-6 rounded-full"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
-                          <span className="text-xs font-medium text-gray-600 dark:text-gray-200">
-                            {member.name.charAt(0)}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{member.name}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{member.role}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.productivityScore}%</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{member.completionRate}% tasks</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </GlassmorphicCard>
-
-          {/* Quick Actions */}
-          <GlassmorphicCard className="p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h3>
-            <div className="space-y-2">
-              <button
-                onClick={handleExportAllData}
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <Download className="w-4 h-4 inline mr-2" />
-                Export All Data
-              </button>
-              <button
-                onClick={handleShareDashboard}
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <Share2 className="w-4 h-4 inline mr-2" />
-                Share Dashboard
-              </button>
-              <button
-                onClick={() => setShowScheduleModal(true)}
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <Calendar className="w-4 h-4 inline mr-2" />
-                Schedule Report
-              </button>
-            </div>
-          </GlassmorphicCard>
+          </div>
         </div>
       </div>
 
@@ -901,17 +663,16 @@ const ReportsPage: React.FC = () => {
 
             <div className="p-6">
               <div className="bg-gradient-to-r from-accent/10 to-blue-100 rounded-lg p-6 mb-4">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Report Preview</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('reports.modal.reportPreview')}</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  This report contains {Object.keys(selectedReport.data).length} data points.
-                  Download as PDF for a formatted view or export as JSON for raw data.
+                  {t('reports.modal.reportStats', { count: Object.keys(selectedReport.data).length })}
                 </p>
 
                 {/* Data Summary */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
                   {selectedReport.data.insights ? (
                     <div>
-                      <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Key Insights:</h5>
+                      <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2">{t('reports.modal.keyInsights')}</h5>
                       <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                         {selectedReport.data.insights.map((insight: string, i: number) => (
                           <li key={i}>{insight}</li>
@@ -919,7 +680,7 @@ const ReportsPage: React.FC = () => {
                       </ul>
                       {selectedReport.data.recommendations && (
                         <div className="mt-4">
-                          <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Recommendations:</h5>
+                          <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2">{t('reports.modal.recommendations')}</h5>
                           <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                             {selectedReport.data.recommendations.map((rec: string, i: number) => (
                               <li key={i}>{rec}</li>
@@ -946,7 +707,7 @@ const ReportsPage: React.FC = () => {
               {/* Raw JSON (collapsible) */}
               <details className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-100">
-                  View Raw JSON Data
+                  {t('reports.modal.viewRawJson')}
                 </summary>
                 <pre className="mt-3 text-xs text-gray-700 overflow-x-auto">
                   {JSON.stringify(selectedReport.data, null, 2)}
@@ -959,14 +720,14 @@ const ReportsPage: React.FC = () => {
                 onClick={() => setSelectedReport(null)}
                 className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700"
               >
-                Close
+                {t('reports.modal.close')}
               </button>
               <button
                 onClick={() => printReportPDF(selectedReport)}
                 className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 inline-flex items-center gap-2"
               >
                 <Printer className="w-4 h-4" />
-                Print
+                {t('reports.modal.print')}
               </button>
               {canExportReports() && (
                 <>
@@ -975,14 +736,14 @@ const ReportsPage: React.FC = () => {
                     className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 inline-flex items-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
-                    Export JSON
+                    {t('reports.modal.exportJson')}
                   </button>
                   <button
                     onClick={() => downloadReportPDF(selectedReport)}
                     className="px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover inline-flex items-center gap-2"
                   >
                     <Download className="w-4 h-4" />
-                    Download PDF
+                    {t('reports.modal.downloadPdf')}
                   </button>
                 </>
               )}

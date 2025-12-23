@@ -58,6 +58,7 @@ const AppCard: React.FC<{
     loading?: boolean;
 }> = ({ icon: Icon, title, description, isConnected, data, onConnect, onExpand, onOpenApp, color, link, loading }) => {
     const { isDarkMode } = useTheme();
+    const { t } = useTranslation();
 
     return (
         <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${isDarkMode
@@ -74,12 +75,12 @@ const AppCard: React.FC<{
                     {isConnected ? (
                         <span className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                             <CheckCircle2 className="w-3 h-3" />
-                            Connected
+                            {t('home.connected')}
                         </span>
                     ) : (
                         <span className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-1 rounded-full bg-gray-500/10 text-gray-500">
                             <Lock className="w-3 h-3" />
-                            Not Connected
+                            {t('home.notConnected')}
                         </span>
                     )}
                 </div>
@@ -107,7 +108,7 @@ const AppCard: React.FC<{
                             {!isConnected && (
                                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                                     <p className="text-xs text-blue-700 dark:text-blue-300">
-                                        Connect your Sartthi account to access {title}
+                                        {t('home.connectAccountMessage')} {title}
                                     </p>
                                 </div>
                             )}
@@ -121,7 +122,7 @@ const AppCard: React.FC<{
                                             }`}
                                     >
                                         <Maximize2 className="w-4 h-4" />
-                                        View Details
+                                        {t('home.viewDetails')}
                                     </button>
                                 )}
                                 <button
@@ -133,11 +134,11 @@ const AppCard: React.FC<{
                                 >
                                     {isConnected ? (
                                         <>
-                                            Open {title.split(' ')[1]} <ExternalLink className="w-4 h-4" />
+                                            {title.includes('Mail') ? t('home.openMail') : title.includes('Calendar') ? t('home.openCalendar') : t('home.openVault')} <ExternalLink className="w-4 h-4" />
                                         </>
                                     ) : (
                                         <>
-                                            Connect Account <ArrowRight className="w-4 h-4" />
+                                            {t('home.connectAccount')} <ArrowRight className="w-4 h-4" />
                                         </>
                                     )}
                                 </button>
@@ -346,7 +347,7 @@ const SartthiAppsWidget: React.FC = () => {
                     </div>
                 ))
             ) : (
-                <div className="text-xs text-gray-400">No recent emails</div>
+                <div className="text-xs text-gray-400">{t('home.noRecentEmails')}</div>
             )}
         </>
     ) : null;
@@ -364,7 +365,7 @@ const SartthiAppsWidget: React.FC = () => {
                     </div>
                 ))
             ) : (
-                <div className="text-xs text-gray-400">No upcoming events</div>
+                <div className="text-xs text-gray-400">{t('home.noUpcomingEvents')}</div>
             )}
         </>
     ) : null;
@@ -390,8 +391,8 @@ const SartthiAppsWidget: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AppCard
                     icon={Mail}
-                    title="Sartthi Mail"
-                    description="Secure, intelligent email platform for seamless communication."
+                    title={t('home.sartthiMail')}
+                    description={t('home.sartthiMailDesc')}
                     isConnected={!!mailData?.account}
                     data={mailContent}
                     onConnect={() => handleConnect('mail')}
@@ -404,8 +405,8 @@ const SartthiAppsWidget: React.FC = () => {
 
                 <AppCard
                     icon={CalendarIcon}
-                    title="Sartthi Calendar"
-                    description="Schedule meetings and manage your time efficiently."
+                    title={t('home.sartthiCalendar')}
+                    description={t('home.sartthiCalendarDesc')}
                     isConnected={!!calendarData?.account}
                     data={calendarContent}
                     onConnect={() => handleConnect('calendar')}
@@ -418,8 +419,8 @@ const SartthiAppsWidget: React.FC = () => {
 
                 <AppCard
                     icon={HardDrive}
-                    title="Sartthi Vault"
-                    description="Secure cloud storage for all your project files and assets."
+                    title={t('home.sartthiVault')}
+                    description={t('home.sartthiVaultDesc')}
                     isConnected={!!vaultData?.account}
                     data={vaultContent}
                     onConnect={() => handleConnect('vault')}
@@ -435,7 +436,7 @@ const SartthiAppsWidget: React.FC = () => {
             <DetailModal
                 isOpen={expandedView === 'mail'}
                 onClose={() => setExpandedView(null)}
-                title="Sartthi Mail"
+                title={t('home.sartthiMail')}
                 icon={Mail}
                 color="from-blue-500 to-cyan-500"
             >
@@ -514,7 +515,7 @@ const SartthiAppsWidget: React.FC = () => {
             <DetailModal
                 isOpen={expandedView === 'calendar'}
                 onClose={() => setExpandedView(null)}
-                title="Sartthi Calendar"
+                title={t('home.sartthiCalendar')}
                 icon={CalendarIcon}
                 color="from-purple-500 to-pink-500"
             >
@@ -593,7 +594,7 @@ const SartthiAppsWidget: React.FC = () => {
             <DetailModal
                 isOpen={expandedView === 'vault'}
                 onClose={() => setExpandedView(null)}
-                title="Sartthi Vault"
+                title={t('home.sartthiVault')}
                 icon={HardDrive}
                 color="from-green-500 to-emerald-500"
             >

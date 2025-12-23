@@ -404,75 +404,74 @@ const PlannerPage: React.FC = () => {
             topRight: 'rgba(124, 58, 237, 0.2)',
             bottomLeft: 'rgba(59, 130, 246, 0.2)'
           }}
-        />
-
-        {/* Toolbar */}
-        <GlassmorphicCard className="p-4 mb-6 flex flex-col xl:flex-row items-center justify-between gap-4">
+        >
           {/* View Tab Toggle */}
-          <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800/50 rounded-xl overflow-x-auto w-full xl:w-auto">
-            {[
-              { id: 'board', label: 'Board', icon: Layout },
-              { id: 'list', label: 'List', icon: ListIcon },
-              { id: 'gantt', label: 'Gantt', icon: BarChart2 },
-              { id: 'calendar', label: 'Calendar', icon: Calendar }
-            ].map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${activeTab === tab.id
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
-                    }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-3 w-full xl:w-auto justify-end">
-            {activeTab === 'calendar' && (
-              <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
-                {[
-                  { id: 'day', label: t('planner.day') },
-                  { id: 'week', label: t('planner.week') },
-                  { id: 'month', label: t('planner.month') }
-                ].map((mode) => (
+          <div className="flex flex-col xl:flex-row items-center gap-4">
+            <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-gray-800/50 rounded-xl overflow-x-auto border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm">
+              {[
+                { id: 'board', label: t('planner.views.board'), icon: Layout },
+                { id: 'list', label: t('planner.views.list'), icon: ListIcon },
+                { id: 'gantt', label: t('planner.views.gantt'), icon: BarChart2 },
+                { id: 'calendar', label: t('planner.views.calendar'), icon: Calendar }
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
                   <button
-                    key={mode.id}
-                    onClick={() => setCalendarView(mode.id as any)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${calendarView === mode.id
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${activeTab === tab.id
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
                       }`}
                   >
-                    {mode.label}
+                    <Icon className="w-4 h-4" />
+                    {tab.label}
                   </button>
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
 
-            <button
-              onClick={() => {
-                const today = new Date();
-                setSelectedDate(today);
-                setNewTask({
-                  ...newTask,
-                  dueDate: today.toISOString().split('T')[0],
-                  dueTime: '09:00'
-                });
-                setShowTaskModal(true);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover shadow-lg shadow-accent/20 transition-all font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              {t('planner.addTask')}
-            </button>
+            <div className="flex items-center gap-3">
+              {activeTab === 'calendar' && (
+                <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm">
+                  {[
+                    { id: 'day', label: t('planner.day') },
+                    { id: 'week', label: t('planner.week') },
+                    { id: 'month', label: t('planner.month') }
+                  ].map((mode) => (
+                    <button
+                      key={mode.id}
+                      onClick={() => setCalendarView(mode.id as any)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${calendarView === mode.id
+                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        }`}
+                    >
+                      {mode.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => {
+                  const today = new Date();
+                  setSelectedDate(today);
+                  setNewTask({
+                    ...newTask,
+                    dueDate: today.toISOString().split('T')[0],
+                    dueTime: '09:00'
+                  });
+                  setShowTaskModal(true);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover shadow-lg shadow-accent/20 transition-all font-medium whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                {t('planner.addTask')}
+              </button>
+            </div>
           </div>
-        </GlassmorphicCard>
+        </GlassmorphicPageHeader>
       </div>
 
       <div
@@ -669,7 +668,7 @@ const PlannerPage: React.FC = () => {
                           status === 'in-progress' ? 'bg-blue-500' :
                             status === 'completed' ? 'bg-green-500' : 'bg-red-500'
                           }`} />
-                        {status.replace('-', ' ')}
+                        {t(`planner.board.${status.replace('-', '')}`)}
                       </h3>
                       <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
                         {tasks.filter(t => t.status === status).length}
@@ -720,12 +719,12 @@ const PlannerPage: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Task</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priority</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Project</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.status')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('tasks.taskName')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.priority')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.dueDate')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.project')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -787,10 +786,10 @@ const PlannerPage: React.FC = () => {
             {activeTab === 'gantt' && (
               <GlassmorphicCard className="p-6 overflow-hidden">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Timeline</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('planner.gantt.title')}</h3>
                   <div className="flex gap-2">
                     <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><ChevronLeft className="w-4 h-4" /></button>
-                    <span className="text-sm font-medium">March 2024</span>
+                    <span className="text-sm font-medium">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                     <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><ChevronRight className="w-4 h-4" /></button>
                   </div>
                 </div>

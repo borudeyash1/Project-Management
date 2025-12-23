@@ -279,7 +279,7 @@ const Header: React.FC = () => {
             <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl shadow-2xl z-[100] overflow-hidden">
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border dark:border-gray-600">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('settings.profileSettings')}</h3>
                 <button
                   onClick={toggleUserMenu}
                   className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -326,7 +326,7 @@ const Header: React.FC = () => {
                     )}
                     <Sun className="w-4 h-4 mb-1.5 relative z-10" />
                     <span className="text-[11px] font-semibold relative z-10">Light</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Bright</span>
+                    <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.light')}</span>
                   </button>
                   <button
                     onClick={() => applyTheme('dark')}
@@ -340,7 +340,7 @@ const Header: React.FC = () => {
                     )}
                     <Moon className="w-4 h-4 mb-1.5 relative z-10" />
                     <span className="text-[11px] font-semibold relative z-10">Dark</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Easy</span>
+                    <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.dark')}</span>
                   </button>
                   <button
                     onClick={() => applyTheme('system')}
@@ -354,7 +354,7 @@ const Header: React.FC = () => {
                     )}
                     <Monitor className="w-4 h-4 mb-1.5 relative z-10" />
                     <span className="text-[11px] font-semibold relative z-10">System</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">Auto</span>
+                    <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.system')}</span>
                   </button>
                 </div>
               </div>

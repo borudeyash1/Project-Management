@@ -1,9 +1,11 @@
 import React from 'react';
 import { Download, Monitor } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const DownloadAppWidget: React.FC = () => {
     const { isDarkMode } = useTheme();
+    const { t } = useTranslation();
 
     return (
         <div className={`rounded-2xl border p-6 overflow-hidden relative ${isDarkMode
@@ -13,16 +15,16 @@ const DownloadAppWidget: React.FC = () => {
             <div className="flex items-start justify-between relative z-10">
                 <div className="flex-1 pr-4">
                     <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-white'}`}>
-                        Sartthi Desktop
+                        {t('home.sartthiDesktop')}
                     </h3>
                     <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-200' : 'text-indigo-100'}`}>
-                        Download Sartthi Desktop for efficient use and better performance.
+                        {t('home.downloadSartthiDesktop')}
                     </p>
                     <button className={`px-4 py-2 rounded-lg text-sm font-bold transition-all transform hover:scale-105 ${isDarkMode
                         ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-lg shadow-purple-500/50'
                         : 'bg-white text-indigo-600 hover:bg-gray-50 shadow-md'
                         }`}>
-                        Download Now
+                        {t('home.downloadNow')}
                     </button>
                 </div>
                 <div className={`p-3 rounded-2xl ${isDarkMode ? 'bg-white/10' : 'bg-white/20'}`}>

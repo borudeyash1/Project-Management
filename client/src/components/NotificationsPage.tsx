@@ -159,7 +159,21 @@ const NotificationsPage: React.FC = () => {
       alert('Workspace invitation accepted!');
     } catch (error: any) {
       console.error('Failed to accept invitation:', error);
-      alert(error.response?.data?.message || 'Failed to accept invitation');
+      const errorMessage = error.response?.data?.message || error.message || error.toString();
+      const lowerError = errorMessage.toLowerCase();
+
+      // If user is already a member, treat it as accepted/success
+      if (lowerError.includes('already a member') || lowerError.includes('already joined') || lowerError.includes('already part of')) {
+        setNotifications(prev =>
+          prev.map(n =>
+            n._id === notification._id
+              ? { ...n, metadata: { ...n.metadata, status: 'accepted' }, message: 'You have joined the workspace' }
+              : n
+          )
+        );
+      } else {
+        alert(errorMessage);
+      }
     } finally {
       setActionLoading(prev => {
         const newSet = new Set(prev);
@@ -276,116 +290,112 @@ const NotificationsPage: React.FC = () => {
   const renderActionButtons = (notification: Notification) => {
     const isLoading = actionLoading.has(notification._id);
     const title = notification.title.toLowerCase();
-    const message = notification.message.toLowerCase();
+    const message = (notification.message || '').toLowerCase();
     const status = notification.metadata?.status;
 
     // Workspace invitation
     if (title.includes('invitation') || message.includes('invited you')) {
-      if (message.includes('accepted') || message.includes('joined') || status === 'accepted') {
+      if (status === 'accepted' || message.includes('accepted') || message.includes('joined')) {
         return (
           <div className="flex items-center gap-2 mt-2">
             <span className="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg text-sm flex items-center gap-1">
               <UserCheck className="w-4 h-4" />
-              Joined
+              {t('notifications.status.joined')}
             </span>
           </div>
         );
       }
-      if (message.includes('declined') || status === 'declined') {
+      if (status === 'declined' || message.includes('declined')) {
         return (
           <div className="flex items-center gap-2 mt-2">
             <span className="px-3 py-1 bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 rounded-lg text-sm flex items-center gap-1">
               <XIcon className="w-4 h-4" />
-              Declined
+              {t('notifications.status.declined')}
             </span>
           </div>
         );
       }
       return (
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 mt-2 action-buttons">
           <button
             onClick={() => handleAcceptInvitation(notification)}
             disabled={isLoading}
-            className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50"
+            className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50 shadow-sm"
           >
             <Check className="w-4 h-4" />
-            Accept
+            {t('buttons.accept')}
           </button>
           <button
             onClick={() => handleDeclineInvitation(notification)}
             disabled={isLoading}
-            className="px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50"
+            className="px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50 shadow-sm"
           >
             <XIcon className="w-4 h-4" />
-            Decline
+            {t('buttons.decline')}
           </button>
         </div>
       );
     }
 
-    // Join request (for workspace owner)
-    if (title.includes('join request') && !title.includes('approved') && !title.includes('rejected')) {
-      // Check if we have the necessary metadata
-      if (!notification.metadata?.joinRequestId) {
+    // Join requests (Owner view or Requester view)
+    if (title.includes('join request') || title.includes('approved') || title.includes('rejected')) {
+      // Check for approved status (either via metadata or title text)
+      if (status === 'approved' || title.includes('approved')) {
         return (
           <div className="flex items-center gap-2 mt-2">
-            <span className="px-3 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-lg text-sm">
-              ⚠️ This notification will be auto-fixed on next refresh
+            <span className="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg text-sm flex items-center gap-1">
+              <CheckCircle className="w-4 h-4" />
+              {t('notifications.status.approved')}
+            </span>
+            {/* If it's the requester seeing "Approved", show View Workspace button */}
+            {(title.includes('approved') || notification.type !== 'join_request') && (
+              <button
+                onClick={() => handleViewWorkspace(notification)}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1 shadow-sm"
+              >
+                <ExternalLink className="w-4 h-4" />
+                {t('buttons.viewWorkspace')}
+              </button>
+            )}
+          </div>
+        );
+      }
+
+      // Check for rejected status
+      if (status === 'rejected' || title.includes('rejected')) {
+        return (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-lg text-sm flex items-center gap-1">
+              <XIcon className="w-4 h-4" />
+              {t('notifications.status.rejected')}
             </span>
           </div>
         );
       }
 
-      return (
-        <div className="flex items-center gap-2 mt-2">
-          <button
-            onClick={() => handleApproveJoinRequest(notification)}
-            disabled={isLoading}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50"
-          >
-            <UserPlus className="w-4 h-4" />
-            Approve
-          </button>
-          <button
-            onClick={() => handleRejectJoinRequest(notification)}
-            disabled={isLoading}
-            className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50"
-          >
-            <XIcon className="w-4 h-4" />
-            Reject
-          </button>
-        </div>
-      );
-    }
-
-    // Join request approved/rejected status
-    if (title.includes('approved')) {
-      return (
-        <div className="flex items-center gap-2 mt-2">
-          <span className="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg text-sm flex items-center gap-1">
-            <CheckCircle className="w-4 h-4" />
-            Approved
-          </span>
-          <button
-            onClick={() => handleViewWorkspace(notification)}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1"
-          >
-            <ExternalLink className="w-4 h-4" />
-            View Workspace
-          </button>
-        </div>
-      );
-    }
-
-    if (title.includes('rejected')) {
-      return (
-        <div className="flex items-center gap-2 mt-2">
-          <span className="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-lg text-sm flex items-center gap-1">
-            <XIcon className="w-4 h-4" />
-            Rejected
-          </span>
-        </div>
-      );
+      // If neither, and it's a join request with an ID, show action buttons (for Owner)
+      if (notification.metadata?.joinRequestId) {
+        return (
+          <div className="flex items-center gap-2 mt-2 action-buttons">
+            <button
+              onClick={() => handleApproveJoinRequest(notification)}
+              disabled={isLoading}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50 shadow-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              {t('buttons.approve')}
+            </button>
+            <button
+              onClick={() => handleRejectJoinRequest(notification)}
+              disabled={isLoading}
+              className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center gap-1 disabled:opacity-50 shadow-sm"
+            >
+              <XIcon className="w-4 h-4" />
+              {t('buttons.reject')}
+            </button>
+          </div>
+        );
+      }
     }
 
     // Task notification
@@ -394,10 +404,10 @@ const NotificationsPage: React.FC = () => {
         <div className="flex items-center gap-2 mt-2">
           <button
             onClick={() => handleViewTask(notification)}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1"
+            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1 shadow-sm"
           >
             <Eye className="w-4 h-4" />
-            View Task
+            {t('buttons.viewTask')}
           </button>
         </div>
       );
@@ -409,10 +419,10 @@ const NotificationsPage: React.FC = () => {
         <div className="flex items-center gap-2 mt-2">
           <button
             onClick={() => handleViewProject(notification)}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1"
+            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1 shadow-sm"
           >
             <Eye className="w-4 h-4" />
-            View Project
+            {t('buttons.viewProject')}
           </button>
         </div>
       );
@@ -424,10 +434,10 @@ const NotificationsPage: React.FC = () => {
         <div className="flex items-center gap-2 mt-2">
           <button
             onClick={() => handleViewWorkspace(notification)}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1"
+            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1 shadow-sm"
           >
             <Eye className="w-4 h-4" />
-            View Workspace
+            {t('buttons.viewWorkspace')}
           </button>
         </div>
       );
@@ -487,8 +497,8 @@ const NotificationsPage: React.FC = () => {
         {/* Glassmorphic Page Header */}
         <GlassmorphicPageHeader
           icon={Bell}
-          title={t('navigation.notifications') || 'Notifications'}
-          subtitle={`${unreadCount} unread • ${notifications.length} total`}
+          title={t('navigation.notifications')}
+          subtitle={t('notifications.unreadTotal', { unread: unreadCount, total: notifications.length })}
         />
 
         {/* Action Buttons */}
@@ -500,7 +510,7 @@ const NotificationsPage: React.FC = () => {
               ? 'hover:bg-gray-700/50 text-gray-300 backdrop-blur-sm'
               : 'hover:bg-white/50 text-gray-600 backdrop-blur-sm'
               } transition-all shadow-lg`}
-            title="Refresh"
+            title={t('common.refresh')}
           >
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -513,7 +523,7 @@ const NotificationsPage: React.FC = () => {
               className="px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
             >
               <CheckCircle className="w-5 h-5" />
-              Mark all as read
+              {t('notifications.markAllRead')}
             </button>
           )}
         </div>
@@ -532,9 +542,9 @@ const NotificationsPage: React.FC = () => {
                 : 'bg-white border-gray-300 text-gray-900'
                 } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
-              <option value="all">All Notifications</option>
-              <option value="unread">Unread Only</option>
-              <option value="read">Read Only</option>
+              <option value="all">{t('notifications.filters.all')}</option>
+              <option value="unread">{t('notifications.filters.unread')}</option>
+              <option value="read">{t('notifications.filters.read')}</option>
             </select>
           </div>
 
@@ -546,10 +556,10 @@ const NotificationsPage: React.FC = () => {
               : 'bg-white border-gray-300 text-gray-900'
               } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           >
-            <option value="all">All Types</option>
+            <option value="all">{t('notifications.types.all')}</option>
             {uniqueTypes.map(type => (
               <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
+                {t(`notifications.types.${type}`)}
               </option>
             ))}
           </select>
@@ -557,14 +567,14 @@ const NotificationsPage: React.FC = () => {
           {selectedNotifications.size > 0 && (
             <div className="flex items-center gap-2 ml-auto">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {selectedNotifications.size} selected
+                {t('common.selectedCount', { count: selectedNotifications.size })}
               </span>
               <button
                 onClick={deleteSelected}
                 className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete
+                {t('common.delete')}
               </button>
             </div>
           )}
@@ -586,8 +596,8 @@ const NotificationsPage: React.FC = () => {
         ) : filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-gray-500">
             <Inbox className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg font-medium">No notifications</p>
-            <p className="text-sm">You're all caught up!</p>
+            <p className="text-lg font-medium">{t('notifications.empty.title')}</p>
+            <p className="text-sm">{t('notifications.empty.message')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -598,7 +608,7 @@ const NotificationsPage: React.FC = () => {
                 onChange={selectAll}
                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">Select all</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{t('common.selectAll')}</span>
             </div>
 
             {filteredNotifications.map((notification) => (

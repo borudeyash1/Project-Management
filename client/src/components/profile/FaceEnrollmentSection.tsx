@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Camera, CheckCircle, AlertCircle } from 'lucide-react';
 import FaceEnrollmentModal from '../workspace-detail/FaceEnrollmentModal';
 import apiService from '../../services/api';
+import { useTranslation } from 'react-i18next';
 
 interface FaceEnrollmentSectionProps {
   userId: string;
@@ -18,6 +19,7 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
   faceData,
   onUpdate
 }) => {
+  const { t } = useTranslation();
   const [showEnrollment, setShowEnrollment] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,17 +35,17 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
         faceImages
       });
 
-      setSuccess('Face enrolled successfully! You can now use face recognition for attendance.');
+      setSuccess(t('profile.faceRecognition.enrollSuccess'));
       onUpdate();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to enroll face');
+      setError(err.response?.data?.message || t('profile.faceRecognition.enrollFailed'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleRemoveFace = async () => {
-    if (!window.confirm('Are you sure you want to remove your face data? You will need to re-enroll to use face recognition.')) {
+    if (!window.confirm(t('profile.faceRecognition.removeConfirm'))) {
       return;
     }
 
@@ -52,10 +54,10 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
 
     try {
       await apiService.delete('/users/profile/face-data');
-      setSuccess('Face data removed successfully');
+      setSuccess(t('profile.faceRecognition.removeSuccess'));
       onUpdate();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to remove face data');
+      setError(err.response?.data?.message || t('profile.faceRecognition.removeFailed'));
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-        Face Recognition
+        {t('profile.faceRecognition.title')}
       </h3>
 
       {error && (
@@ -87,10 +89,10 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
             <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
             <div className="flex-1">
               <div className="font-semibold text-green-900 dark:text-green-100">
-                Face Enrolled
+                {t('profile.faceRecognition.faceEnrolled')}
               </div>
               <div className="text-sm text-green-700 dark:text-green-300">
-                Last updated: {new Date(faceData.lastUpdated).toLocaleDateString()}
+                {t('profile.faceRecognition.lastUpdated')}: {new Date(faceData.lastUpdated).toLocaleDateString()}
               </div>
             </div>
           </div>
@@ -98,7 +100,7 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
           {faceData.images && faceData.images.length > 0 && (
             <div>
               <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Enrolled Images ({faceData.images.length})
+                {t('profile.faceRecognition.enrolledImages')} ({faceData.images.length})
               </div>
               <div className="flex gap-2 flex-wrap">
                 {faceData.images.map((img, index) => (
@@ -119,14 +121,14 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
               disabled={loading}
               className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 font-semibold"
             >
-              Re-enroll Face
+              {t('profile.faceRecognition.reEnroll')}
             </button>
             <button
               onClick={handleRemoveFace}
               disabled={loading}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 font-semibold"
             >
-              Remove Face Data
+              {t('profile.faceRecognition.removeFaceData')}
             </button>
           </div>
         </div>
@@ -137,11 +139,10 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
               <Camera className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                  Enable Face Recognition
+                  {t('profile.faceRecognition.enableTitle')}
                 </div>
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  Enroll your face to use face recognition for attendance marking. 
-                  This is a secure and convenient way to verify your identity.
+                  {t('profile.faceRecognition.enrollDescription')}
                 </p>
               </div>
             </div>
@@ -150,15 +151,15 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span>Secure and encrypted storage</span>
+              <span>{t('profile.faceRecognition.secureStorage')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span>Liveness detection prevents spoofing</span>
+              <span>{t('profile.faceRecognition.livenessDetection')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span>Quick and contactless attendance</span>
+              <span>{t('profile.faceRecognition.quickAttendance')}</span>
             </div>
           </div>
 
@@ -168,7 +169,7 @@ const FaceEnrollmentSection: React.FC<FaceEnrollmentSectionProps> = ({
             className="w-full px-6 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 font-semibold flex items-center justify-center gap-2"
           >
             <Camera className="w-5 h-5" />
-            Enroll Face Now
+            {t('profile.faceRecognition.enrollNow')}
           </button>
         </div>
       )}

@@ -291,12 +291,12 @@ const NotesPage: React.FC = () => {
                           key={note._id}
                           onClick={() => handleSelectNote(note)}
                           className={`p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.02] relative ${selectedNote?._id === note._id
-                              ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700] shadow-lg'
-                              : isMeetingNote
-                                ? `${isDarkMode
-                                  ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-900/40 hover:to-purple-900/40 border-2 border-blue-700/50'
-                                  : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200'}`
-                                : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
+                            ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700] shadow-lg'
+                            : isMeetingNote
+                              ? `${isDarkMode
+                                ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-900/40 hover:to-purple-900/40 border-2 border-blue-700/50'
+                                : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200'}`
+                              : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
                             }`}
                         >
                           {isMeetingNote && (
@@ -312,8 +312,8 @@ const NotesPage: React.FC = () => {
                           </p>
                           {isMeetingNote && (
                             <span className={`inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-semibold ${isDarkMode
-                                ? 'bg-blue-900/50 text-blue-300'
-                                : 'bg-blue-100 text-blue-700'
+                              ? 'bg-blue-900/50 text-blue-300'
+                              : 'bg-blue-100 text-blue-700'
                               }`}>
                               Meeting
                             </span>
@@ -343,7 +343,7 @@ const NotesPage: React.FC = () => {
                           className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-purple-500/30"
                         >
                           <Sparkles size={18} />
-                          <span>Ask AI to Write</span>
+                          <span>{t('notes.askAIToWrite')}</span>
                         </button>
                         <button
                           onClick={() => {
@@ -354,7 +354,7 @@ const NotesPage: React.FC = () => {
                           className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Wand2 size={18} />
-                          <span>Refine with AI</span>
+                          <span>{t('notes.refineWithAI')}</span>
                         </button>
                         <button
                           onClick={() => navigate('/notes/meeting')}
@@ -364,7 +364,7 @@ const NotesPage: React.FC = () => {
                           className="flex items-center gap-2 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:opacity-90"
                         >
                           <Mic size={18} />
-                          <span>New Meeting Note</span>
+                          <span>{t('notes.newMeetingNote')}</span>
                         </button>
                       </div>
                       <div className="flex items-center gap-2">
@@ -415,10 +415,10 @@ const NotesPage: React.FC = () => {
                       <FileText className={`w-16 h-16 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     </div>
                     <h3 className={`text-3xl font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      No Note Selected
+                      {t('notes.noNoteSelected')}
                     </h3>
                     <p className={`text-center mb-8 max-w-md text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Select an existing note from the sidebar or create a new one to get started
+                      {t('notes.selectNotePrompt')}
                     </p>
                     <button
                       onClick={() => {
@@ -430,7 +430,7 @@ const NotesPage: React.FC = () => {
                       className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-yellow-500/30 hover:scale-105"
                     >
                       <Plus size={24} />
-                      Create New Note
+                      {t('notes.createNewNote')}
                     </button>
                   </div>
                 )}
@@ -445,11 +445,11 @@ const NotesPage: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className={`rounded-2xl shadow-2xl max-w-2xl w-full p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {aiAction === 'generate' ? 'Generate Note with AI' : 'Refine Note with AI'}
+              {aiAction === 'generate' ? t('notes.generateNoteWithAI') : 'Refine Note with AI'}
             </h2>
             <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {aiAction === 'generate'
-                ? 'Tell the AI what you want to write about, and it will generate a detailed note for you.'
+                ? t('notes.aiPromptPlaceholder')
                 : 'Tell the AI how you want to improve your note (e.g., "make it more concise", "add more details", "fix grammar").'}
             </p>
 
@@ -463,7 +463,7 @@ const NotesPage: React.FC = () => {
               }}
               placeholder={
                 aiAction === 'generate'
-                  ? 'e.g., "Write a comprehensive guide on project management best practices"'
+                  ? t('notes.aiPromptExample')
                   : 'e.g., "Make it more concise and professional"'
               }
               className={`w-full h-32 px-4 py-3 border-2 rounded-xl focus:border-[#FFD700] focus:outline-none resize-none ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-200 text-gray-900'}`}
@@ -487,7 +487,7 @@ const NotesPage: React.FC = () => {
                 ) : (
                   <>
                     <Sparkles size={20} />
-                    {aiAction === 'generate' ? 'Generate' : 'Refine'}
+                    {aiAction === 'generate' ? t('notes.generate') : 'Refine'}
                   </>
                 )}
               </button>
