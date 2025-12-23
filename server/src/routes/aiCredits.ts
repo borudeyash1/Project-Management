@@ -1,5 +1,6 @@
 import express from 'express';
-import { protect } from '../middleware/auth';
+import { authenticate as protect } from '../middleware/auth';
+import { AuthenticatedRequest } from '../types';
 import aiCreditsService from '../services/aiCreditsService';
 import { getAICostEstimate } from '../middleware/aiCredits';
 
@@ -12,7 +13,7 @@ const router = express.Router();
  */
 router.get('/usage', protect, async (req, res) => {
     try {
-        const userId = req.user!._id;
+        const userId = (req as AuthenticatedRequest).user!._id;
         const stats = await aiCreditsService.getUsageStats(userId);
 
         return res.status(200).json({
@@ -46,7 +47,7 @@ router.post('/estimate', protect, async (req, res) => {
         }
 
         const estimate = getAICostEstimate(feature, inputSize);
-        const userId = req.user!._id;
+        const userId = (req as AuthenticatedRequest).user!._id;
         const creditCheck = await aiCreditsService.checkCredits(userId, feature);
 
         return res.status(200).json({
@@ -74,7 +75,7 @@ router.post('/estimate', protect, async (req, res) => {
  */
 router.get('/history', protect, async (req, res) => {
     try {
-        const userId = req.user!._id;
+        const userId = (req as AuthenticatedRequest).user!._id;
         const stats = await aiCreditsService.getUsageStats(userId);
 
         return res.status(200).json({
