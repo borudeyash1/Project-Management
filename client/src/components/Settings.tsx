@@ -6,7 +6,7 @@ import {
   Monitor, Smartphone, Tablet, Wifi, Cloud, Server, HardDrive,
   Zap, Moon, Sun, Volume2, VolumeX, Mic, MicOff, Camera, CameraOff,
   MapPin, Clock, Calendar, Mail, MessageSquare, Phone, Users,
-  BarChart3, PieChart, TrendingUp, Activity, Target, Award, Languages
+  BarChart3, PieChart, TrendingUp, Activity, Target, Award, Languages, FileText
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
@@ -524,6 +524,56 @@ const Settings: React.FC = () => {
         <ConnectedAccounts />
       </GlassmorphicCard>
 
+      {/* Privacy & Legal Section */}
+      <GlassmorphicCard className="p-4">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+          <Shield className="w-5 h-5" />
+          {t('settings.privacyLegal', 'Privacy & Legal')}
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.privacyPolicy', 'Privacy Policy')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.privacyPolicyDesc', 'Learn how we protect your data')}</p>
+              </div>
+            </div>
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-dark transition-colors flex items-center gap-2"
+            >
+              {t('settings.viewPolicy', 'View Policy')}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.termsOfUse', 'Terms of Use')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.termsOfUseDesc', 'Review our terms and conditions')}</p>
+              </div>
+            </div>
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-dark transition-colors flex items-center gap-2"
+            >
+              {t('settings.viewTerms', 'View Terms')}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </GlassmorphicCard>
+
       {/* Account Information */}
       <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accountInfo')}</h3>
@@ -749,8 +799,8 @@ const Settings: React.FC = () => {
           <div className="relative group">
             <div
               className={`w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center overflow-hidden ${!['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].includes(preferences.accentColor)
-                  ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800'
+                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
                 }`}
               style={{
                 backgroundColor: !['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].includes(preferences.accentColor)

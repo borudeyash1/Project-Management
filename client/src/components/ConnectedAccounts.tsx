@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 interface ConnectedAccount {
   _id: string;
-  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify';
+  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify';
   providerEmail: string;
   providerName: string;
   providerAvatar?: string;
@@ -29,7 +29,6 @@ const ConnectedAccounts: React.FC = () => {
   const [slackAccounts, setSlackAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [githubAccounts, setGithubAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [dropboxAccounts, setDropboxAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
-  const [onedriveAccounts, setOnedriveAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [figmaAccounts, setFigmaAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [notionAccounts, setNotionAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [zoomAccounts, setZoomAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
@@ -88,14 +87,6 @@ const ConnectedAccounts: React.FC = () => {
       bgColor: 'bg-blue-400/10',
       borderColor: 'border-blue-400/20'
     },
-    onedrive: {
-      icon: <Cloud className="w-6 h-6" />,
-      title: 'OneDrive',
-      description: 'Cloud Storage',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-600/10',
-      borderColor: 'border-blue-600/20'
-    },
     figma: {
       icon: <Figma className="w-6 h-6" />,
       title: 'Figma',
@@ -145,14 +136,13 @@ const ConnectedAccounts: React.FC = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const [mail, calendar, vault, slack, github, dropbox, onedrive, figma, notion, zoom, vercel, spotify] = await Promise.all([
+      const [mail, calendar, vault, slack, github, dropbox, figma, notion, zoom, vercel, spotify] = await Promise.all([
         apiService.get('/sartthi-accounts/mail'),
         apiService.get('/sartthi-accounts/calendar'),
         apiService.get('/sartthi-accounts/vault'),
         apiService.get('/sartthi-accounts/slack'),
         apiService.get('/sartthi-accounts/github'),
         apiService.get('/sartthi-accounts/dropbox'),
-        apiService.get('/sartthi-accounts/onedrive'),
         apiService.get('/sartthi-accounts/figma'),
         apiService.get('/sartthi-accounts/notion'),
         apiService.get('/sartthi-accounts/zoom'),
@@ -166,7 +156,6 @@ const ConnectedAccounts: React.FC = () => {
       if (slack.success) setSlackAccounts(slack.data);
       if (github.success) setGithubAccounts(github.data);
       if (dropbox.success) setDropboxAccounts(dropbox.data);
-      if (onedrive.success) setOnedriveAccounts(onedrive.data);
       if (figma.success) setFigmaAccounts(figma.data);
       if (notion.success) setNotionAccounts(notion.data);
       if (zoom.success) setZoomAccounts(zoom.data);
@@ -179,7 +168,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify') => {
+  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify') => {
     try {
       setActionLoading(`connect-${service}`);
       const response = await apiService.post(`/sartthi-accounts/${service}/connect`, {});
@@ -196,7 +185,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify', accountId: string) => {
+  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify', accountId: string) => {
     try {
       setActionLoading(`active-${accountId}`);
       const response = await apiService.put(`/sartthi-accounts/${service}/active`, { accountId });
@@ -212,7 +201,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify', accountId: string) => {
+  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify', accountId: string) => {
     if (!window.confirm(t('connectedAccounts.confirmDisconnect'))) {
       return;
     }
@@ -233,7 +222,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const renderServiceSection = (
-    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify',
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify',
     accountsData: AccountsData
   ) => {
     const config = appConfig[service];
@@ -390,7 +379,6 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('slack', slackAccounts)}
       {renderServiceSection('github', githubAccounts)}
       {renderServiceSection('dropbox', dropboxAccounts)}
-      {renderServiceSection('onedrive', onedriveAccounts)}
       {renderServiceSection('figma', figmaAccounts)}
       {renderServiceSection('notion', notionAccounts)}
       {renderServiceSection('zoom', zoomAccounts)}

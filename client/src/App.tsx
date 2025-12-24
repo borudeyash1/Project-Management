@@ -60,6 +60,8 @@ import About from './components/About';
 import SartthiApps from './components/SartthiApps';
 import Docs from './components/Docs';
 import PricingPage from './components/PricingPage';
+import PrivacyPage from './components/PrivacyPage';
+import TermsPage from './components/TermsPage';
 import ActivityPage from './components/ActivityPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
@@ -267,6 +269,8 @@ const AppContent: React.FC = () => {
         <Route path="/docs" element={<Docs />} />
         <Route path="/docs/:slug" element={<Docs />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/login" element={<Auth />} />
