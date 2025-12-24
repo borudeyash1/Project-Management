@@ -325,7 +325,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                   >
                     <option value="push">{t('reminders.push')}</option>
                     <option value="email">{t('common.email')}</option>
-
+                    <option value="slack">Slack</option>
                   </select>
                   <input
                     type="number"

@@ -6,6 +6,8 @@ import { Reminder } from '../models/Reminder';
 import User from '../models/User';
 import { sendEmail } from '../services/emailService';
 import { sendEmailViaGmail } from '../services/gmailService';
+import { getSlackService } from '../services/sartthi/slackService';
+import { ConnectedAccount } from '../models/ConnectedAccount';
 
 dotenv.config();
 
@@ -108,6 +110,26 @@ const run = async () => {
           subject: reminderTitle,
           html: emailHtml,
         });
+      }
+
+      // Check for Slack Notification
+      if (trigger.payload?.notificationType === 'slack') {
+        try {
+          const slackService = getSlackService();
+          // Find Slack connected account for the user
+          const slackAccount = await ConnectedAccount.findOne({ userId: primaryUser._id, service: 'slack', isActive: true });
+
+          if (slackAccount && slackAccount.providerAccountId) {
+            const message = `*${reminderTitle}*\n${trigger.payload?.description || 'No description'}\nDue: ${trigger.triggerTime.toLocaleString()}`;
+            // Send to the user's providerAccountId (which is their Slack User ID)
+            await slackService.postMessage(primaryUser._id.toString(), slackAccount.providerAccountId, message);
+            log(`Slack notification sent for trigger ${trigger._id}`);
+          } else {
+            log(`Skipping Slack for trigger ${trigger._id}: No active Slack account found.`);
+          }
+        } catch (slackError) {
+          console.error(logPrefix, `Failed to send Slack notification for trigger ${trigger._id}:`, slackError);
+        }
       }
     } catch (error) {
       console.error(logPrefix, `Failed to send reminder email for trigger ${trigger._id}:`, error);

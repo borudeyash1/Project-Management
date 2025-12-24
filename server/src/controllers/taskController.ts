@@ -5,6 +5,7 @@ import { ApiResponse } from '../types';
 import { createActivity } from '../utils/activityUtils';
 import { getCalendarService } from '../services/sartthi/calendarService';
 import { getMailService } from '../services/sartthi/mailService';
+import { getSlackService } from '../services/sartthi/slackService';
 import User from '../models/User';
 
 // GET /api/tasks?projectId=...&status=...&priority=...
@@ -108,6 +109,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       links,
       requiresLink,
       requiresFile,
+      slackChannelId, // Added for Slack integration
     } = req.body;
 
     // Only title is required now - project and workspace are optional
@@ -184,6 +186,17 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       }
     }
 
+    // Sartthi Integration: Slack Notification
+    if (slackChannelId) {
+      try {
+        const slackService = getSlackService();
+        const message = `*New Task Created: ${task.title}*\n${task.description || 'No description'}\nPriority: ${task.priority}\nDue: ${task.dueDate ? new Date(task.dueDate as any).toLocaleDateString() : 'No due date'}\n*Project:* ${project ? project.name : 'No Project'}\n<https://sartthi.com/projects/${projectId || ''}/tasks|View Task>`;
+        await slackService.postMessage(authUser._id, slackChannelId, message);
+      } catch (error) {
+        console.error('Failed to send Slack notification', error);
+      }
+    }
+
     const response: ApiResponse = {
       success: true,
       message: 'Task created successfully',
@@ -251,7 +264,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     if (taskType !== undefined) task.taskType = taskType;
     if (requiresFile !== undefined) task.requiresFile = requiresFile;
     if (requiresLink !== undefined) task.requiresLink = requiresLink;
-    
+
     // Handle verification and rating fields
     if (rating !== undefined) task.rating = rating;
     if (ratingDetails !== undefined) task.ratingDetails = ratingDetails;
@@ -350,7 +363,7 @@ export const reassignTask = async (req: Request, res: Response): Promise<void> =
     }
 
     const { assignedTo } = req.body;
-    
+
     console.log('👥 [REASSIGN TASK] Task:', req.params.id, 'New Assignee:', assignedTo);
 
     if (!assignedTo) {

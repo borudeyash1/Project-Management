@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Trash2, Upload, Calendar, Flag, User } from 'lucide-react';
+import { X, Plus, Trash2, Upload, Calendar, Flag, User, Hash } from 'lucide-react';
+import { apiService } from '../services/api';
 
 interface TeamMember {
   _id: string;
@@ -49,6 +50,25 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
   const [newReferenceLink, setNewReferenceLink] = useState('');
+  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string; isPrivate: boolean }>>([]);
+  const [selectedSlackChannel, setSelectedSlackChannel] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSlackChannels();
+    }
+  }, [isOpen]);
+
+  const fetchSlackChannels = async () => {
+    try {
+      const response = await apiService.get('/slack/channels');
+      if (response.success) {
+        setSlackChannels(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Slack channels:', error);
+    }
+  };
 
   // Extract team members properly from project teamMembers
   const getTeamMembers = () => {
@@ -165,7 +185,8 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
       requiresFile: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-      projectId: projectId
+      projectId: projectId,
+      slackChannelId: selectedSlackChannel
     };
 
     console.log('🎯 [TASK MODAL] Creating task with taskType:', taskData.taskType);
@@ -407,23 +428,46 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            {t('taskCreation.cancel')}
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-          >
-            {t('taskCreation.submit')}
-          </button>
-        </div>
+        {/* Slack Channel Selection */}
+        {slackChannels.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Hash className="w-4 h-4 inline mr-1" />
+              Post to Slack Channel
+            </label>
+            <select
+              value={selectedSlackChannel}
+              onChange={(e) => setSelectedSlackChannel(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+            >
+              <option value="">Don't post to Slack</option>
+              {slackChannels.map((channel) => (
+                <option key={channel.id} value={channel.id}>
+                  #{channel.name} {channel.isPrivate ? '🔒' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
+        <button
+          onClick={onClose}
+          className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          {t('taskCreation.cancel')}
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+        >
+          {t('taskCreation.submit')}
+        </button>
       </div>
     </div>
+    </div >
   );
 };
 

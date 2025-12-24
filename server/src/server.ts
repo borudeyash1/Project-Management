@@ -50,6 +50,7 @@ import milestoneRoutes from "./routes/milestones";
 import analyticsRoutes from "./routes/analytics";
 import faceEnrollmentRoutes from "./routes/faceEnrollment";
 import notificationSettingsRoutes from "./routes/notificationSettings";
+import slackRoutes from "./routes/slackRoutes";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 
@@ -166,6 +167,7 @@ app.use("/api/notification-settings", notificationSettingsRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/milestones", milestoneRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/slack", slackRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

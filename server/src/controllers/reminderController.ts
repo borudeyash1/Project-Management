@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Reminder } from '../models/Reminder';
+import { scheduleReminderTrigger } from '../services/reminderScheduler';
 
 // Create a new reminder
 export const createReminder = async (req: Request, res: Response) => {
@@ -14,6 +15,27 @@ export const createReminder = async (req: Request, res: Response) => {
 
     const reminder = new Reminder(reminderData);
     await reminder.save();
+
+    // Schedule triggers for each notification
+    if (reminder.notifications && reminder.notifications.length > 0) {
+      for (const notif of reminderData.notifications) {
+        if (notif.minutesBefore !== undefined) {
+          const triggerTime = new Date(new Date(reminderData.dueDate).getTime() - (notif.minutesBefore * 60000));
+          await scheduleReminderTrigger({
+            entityType: 'custom',
+            entityId: String(reminder._id),
+            userIds: [String(userId)],
+            triggerType: 'custom',
+            triggerTime: triggerTime,
+            payload: {
+              message: `Reminder: ${reminder.title}`,
+              description: reminder.description,
+              notificationType: notif.type
+            }
+          });
+        }
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -123,8 +145,8 @@ export const updateReminder = async (req: Request, res: Response): Promise<void>
       { ...req.body, updatedAt: new Date() },
       { new: true }
     ).populate('createdBy', 'name email avatar')
-     .populate('assignedTo', 'name email avatar')
-     .populate('project', 'name color');
+      .populate('assignedTo', 'name email avatar')
+      .populate('project', 'name color');
 
     if (!reminder) {
       res.status(404).json({
@@ -221,13 +243,13 @@ export const getReminderStats = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
 
     const totalReminders = await Reminder.countDocuments({ createdBy: userId });
-    const completedReminders = await Reminder.countDocuments({ 
-      createdBy: userId, 
-      completed: true 
+    const completedReminders = await Reminder.countDocuments({
+      createdBy: userId,
+      completed: true
     });
-    const pendingReminders = await Reminder.countDocuments({ 
-      createdBy: userId, 
-      completed: false 
+    const pendingReminders = await Reminder.countDocuments({
+      createdBy: userId,
+      completed: false
     });
     const overdueReminders = await Reminder.countDocuments({
       createdBy: userId,
