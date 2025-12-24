@@ -93,7 +93,7 @@ export const getAccounts = async (req: Request, res: Response): Promise<void> =>
         const { service } = req.params;
         const userId = (req as any).user._id;
 
-        if (!service || !['mail', 'calendar', 'vault'].includes(service)) {
+        if (!service || !isValidService(service)) {
             res.status(400).json({ success: false, message: 'Invalid service' });
             return;
         }
@@ -439,7 +439,7 @@ export const setActiveAccount = async (req: Request, res: Response): Promise<voi
         const { accountId } = req.body;
         const userId = (req as any).user._id;
 
-        if (!service || !['mail', 'calendar', 'vault'].includes(service)) {
+        if (!service || !isValidService(service)) {
             res.status(400).json({ success: false, message: 'Invalid service' });
             return;
         }
