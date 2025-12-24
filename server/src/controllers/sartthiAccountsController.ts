@@ -366,7 +366,10 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                 tokens = tokenResponse.data;
                 // Get account info
                 const accountResponse = await axios.post('https://api.dropboxapi.com/2/users/get_current_account', null, {
-                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                    headers: {
+                        'Authorization': `Bearer ${tokens.access_token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 userInfo = {
                     id: accountResponse.data.account_id,

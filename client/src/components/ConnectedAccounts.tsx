@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 interface ConnectedAccount {
   _id: string;
-  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify';
+  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'vercel' | 'spotify';
   providerEmail: string;
   providerName: string;
   providerAvatar?: string;
@@ -31,7 +31,6 @@ const ConnectedAccounts: React.FC = () => {
   const [dropboxAccounts, setDropboxAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [figmaAccounts, setFigmaAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [notionAccounts, setNotionAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
-  const [zoomAccounts, setZoomAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [vercelAccounts, setVercelAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [spotifyAccounts, setSpotifyAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
 
@@ -136,7 +135,7 @@ const ConnectedAccounts: React.FC = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const [mail, calendar, vault, slack, github, dropbox, figma, notion, zoom, vercel, spotify] = await Promise.all([
+      const [mail, calendar, vault, slack, github, dropbox, figma, notion, vercel, spotify] = await Promise.all([
         apiService.get('/sartthi-accounts/mail'),
         apiService.get('/sartthi-accounts/calendar'),
         apiService.get('/sartthi-accounts/vault'),
@@ -145,7 +144,6 @@ const ConnectedAccounts: React.FC = () => {
         apiService.get('/sartthi-accounts/dropbox'),
         apiService.get('/sartthi-accounts/figma'),
         apiService.get('/sartthi-accounts/notion'),
-        apiService.get('/sartthi-accounts/zoom'),
         apiService.get('/sartthi-accounts/vercel'),
         apiService.get('/sartthi-accounts/spotify')
       ]);
@@ -158,7 +156,6 @@ const ConnectedAccounts: React.FC = () => {
       if (dropbox.success) setDropboxAccounts(dropbox.data);
       if (figma.success) setFigmaAccounts(figma.data);
       if (notion.success) setNotionAccounts(notion.data);
-      if (zoom.success) setZoomAccounts(zoom.data);
       if (vercel.success) setVercelAccounts(vercel.data);
       if (spotify.success) setSpotifyAccounts(spotify.data);
     } catch (error) {
@@ -168,7 +165,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify') => {
+  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'vercel' | 'spotify') => {
     try {
       setActionLoading(`connect-${service}`);
       const response = await apiService.post(`/sartthi-accounts/${service}/connect`, {});
@@ -185,7 +182,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify', accountId: string) => {
+  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'vercel' | 'spotify', accountId: string) => {
     try {
       setActionLoading(`active-${accountId}`);
       const response = await apiService.put(`/sartthi-accounts/${service}/active`, { accountId });
@@ -222,7 +219,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const renderServiceSection = (
-    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify',
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'vercel' | 'spotify',
     accountsData: AccountsData
   ) => {
     const config = appConfig[service];
@@ -381,7 +378,6 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('dropbox', dropboxAccounts)}
       {renderServiceSection('figma', figmaAccounts)}
       {renderServiceSection('notion', notionAccounts)}
-      {renderServiceSection('zoom', zoomAccounts)}
       {renderServiceSection('vercel', vercelAccounts)}
       {renderServiceSection('spotify', spotifyAccounts)}
     </div>
