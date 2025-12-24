@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit2, Save, Upload, Link as LinkIcon, Calendar, Clock, Flag, User, Tag, FileText, Check, MessageSquare, Download, Trash2, Plus } from 'lucide-react';
+import { X, Edit2, Save, Upload, Link as LinkIcon, Calendar, Clock, Flag, User, Tag, FileText, Check, MessageSquare, Download, Trash2, Plus, GitPullRequest, Github } from 'lucide-react';
 import axios from 'axios';
 
 interface Task {
@@ -22,6 +22,13 @@ interface Task {
   updatedAt: Date;
   rating?: number;
   reviewComments?: string;
+  githubPr?: {
+    id: number;
+    number: number;
+    title: string;
+    url: string;
+    state: string;
+  };
 }
 
 interface TaskDetailModalProps {
@@ -50,6 +57,66 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const [newComment, setNewComment] = useState('');
   const [newSubtask, setNewSubtask] = useState('');
   const [newLink, setNewLink] = useState('');
+
+  // GitHub Integration State
+  const [showGithubLink, setShowGithubLink] = useState(false);
+  const [repos, setRepos] = useState<any[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState<any>(null);
+  const [pullRequests, setPullRequests] = useState<any[]>([]);
+  const [loadingGithub, setLoadingGithub] = useState(false);
+
+  const fetchRepos = async () => {
+    try {
+      setLoadingGithub(true);
+      const response = await axios.get('/api/github/repos');
+      if (response.data.success) {
+        setRepos(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch repos', error);
+      alert('Failed to fetch GitHub repositories. Please ensure you have connected your GitHub account in Settings.');
+    } finally {
+      setLoadingGithub(false);
+    }
+  };
+
+  const fetchPRs = async (owner: string, repo: string) => {
+    try {
+      setLoadingGithub(true);
+      const response = await axios.get(`/api/github/repos/${owner}/${repo}/pulls`);
+      if (response.data.success) {
+        setPullRequests(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch PRs', error);
+    } finally {
+      setLoadingGithub(false);
+    }
+  };
+
+  const handleLinkPR = (pr: any) => {
+    if (!task) return;
+    const prData = {
+      githubPr: {
+        id: pr.id,
+        number: pr.number,
+        title: pr.title,
+        url: pr.html_url,
+        state: pr.state
+      }
+    };
+    onUpdateTask(task._id, prData);
+    setEditedTask({ ...editedTask, ...prData });
+    setShowGithubLink(false);
+  };
+
+  const handleUnlinkPR = () => {
+    if (!task) return;
+    if (window.confirm('Are you sure you want to unlink this Pull Request?')) {
+      onUpdateTask(task._id, { githubPr: null });
+      setEditedTask({ ...editedTask, githubPr: null });
+    }
+  };
 
   useEffect(() => {
     if (task) {
@@ -472,6 +539,107 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* GitHub Integration */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <Github className="w-4 h-4" />
+                  GitHub Integration
+                </h3>
+
+                {editedTask.githubPr ? (
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <GitPullRequest className={`w-5 h-5 ${editedTask.githubPr.state === 'open' ? 'text-green-600' : 'text-purple-600'}`} />
+                      <div>
+                        <a href={editedTask.githubPr.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline">
+                          #{editedTask.githubPr.number} {editedTask.githubPr.title}
+                        </a>
+                        <p className="text-xs text-gray-500 capitalize">State: {editedTask.githubPr.state}</p>
+                      </div>
+                    </div>
+                    {canEdit && (
+                      <button onClick={handleUnlinkPR} className="p-1 hover:bg-red-50 text-red-500 rounded">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  canEdit && (
+                    <div className="space-y-3">
+                      {!showGithubLink ? (
+                        <button
+                          onClick={() => {
+                            setShowGithubLink(true);
+                            if (repos.length === 0) fetchRepos();
+                          }}
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg px-3 py-2 w-full justify-center hover:bg-gray-50 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Link Pull Request
+                        </button>
+                      ) : (
+                        <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                          <div className="flex justify-between items-center mb-3">
+                            <h4 className="text-xs font-semibold uppercase text-gray-500">Select Pull Request</h4>
+                            <button onClick={() => setShowGithubLink(false)}><X className="w-4 h-4 text-gray-400" /></button>
+                          </div>
+
+                          {loadingGithub ? (
+                            <div className="text-center py-4 text-sm text-gray-500">Loading...</div>
+                          ) : (
+                            <div className="space-y-3">
+                              {!selectedRepo ? (
+                                <select
+                                  className="w-full text-sm border-gray-300 rounded-md"
+                                  onChange={(e) => {
+                                    const repo = repos.find(r => r.full_name === e.target.value);
+                                    if (repo) {
+                                      setSelectedRepo(repo);
+                                      fetchPRs(repo.owner.login, repo.name);
+                                    }
+                                  }}
+                                  defaultValue=""
+                                >
+                                  <option value="" disabled>Select Repository</option>
+                                  {repos.map(repo => (
+                                    <option key={repo.id} value={repo.full_name}>{repo.full_name}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                                    <button onClick={() => { setSelectedRepo(null); setPullRequests([]); }} className="hover:underline text-blue-600">&larr; Back</button>
+                                    <span className="font-medium text-gray-900">{selectedRepo.full_name}</span>
+                                  </div>
+
+                                  {pullRequests.length === 0 ? (
+                                    <p className="text-xs text-gray-500 italic">No open pull requests found.</p>
+                                  ) : (
+                                    <ul className="max-h-40 overflow-y-auto space-y-1">
+                                      {pullRequests.map(pr => (
+                                        <li key={pr.id}>
+                                          <button
+                                            onClick={() => handleLinkPR(pr)}
+                                            className="w-full text-left p-2 hover:bg-white rounded border border-transparent hover:border-gray-200 text-sm flex items-start gap-2"
+                                          >
+                                            <GitPullRequest className="w-4 h-4 text-green-600 mt-0.5" />
+                                            <span className="truncate">#{pr.number} {pr.title}</span>
+                                          </button>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
               </div>
 
               {/* Comments */}

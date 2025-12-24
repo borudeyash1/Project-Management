@@ -153,6 +153,13 @@ const taskSchema: Schema<any> = new Schema<any>(
         },
       },
     ],
+    githubPr: {
+      id: Number,
+      number: Number,
+      title: String,
+      url: String,
+      state: String,
+    },
     attachments: [
       {
         filename: {
