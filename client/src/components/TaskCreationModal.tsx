@@ -211,7 +211,6 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
       createdAt: new Date(),
       updatedAt: new Date(),
       projectId: projectId,
-      projectId: projectId,
       slackChannelId: selectedSlackChannel,
       slackAccountId: selectedSlackAccount
     };
