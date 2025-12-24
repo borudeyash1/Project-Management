@@ -36,14 +36,19 @@ const SCOPES = {
     slack: ['channels:read', 'chat:write'],
     github: ['repo', 'user'],
     dropbox: [],
-    onedrive: ['Files.ReadWrite.All', 'offline_access']
+    onedrive: ['Files.ReadWrite.All', 'offline_access'],
+    figma: ['files:read'],
+    notion: [], // Notion uses internal integration tokens usually, or specific flow
+    zoom: ['meeting:write:admin'],
+    vercel: [],
+    spotify: ['user-read-private', 'user-read-email']
 };
 
-type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive';
+type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify';
 
 // Validation helper
 const isValidService = (service: string): service is ServiceType => {
-    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive'].includes(service);
+    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify'].includes(service);
 };
 
 // Provider Config Helper
@@ -81,6 +86,41 @@ const getProviderConfig = (service: ServiceType) => {
             clientSecret: process.env.ONEDRIVE_CLIENT_SECRET || '',
             authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
             tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+            callbackUrl
+        };
+        case 'figma': return {
+            clientId: process.env.FIGMA_CLIENT_ID || '',
+            clientSecret: process.env.FIGMA_CLIENT_SECRET || '',
+            authUrl: 'https://www.figma.com/oauth',
+            tokenUrl: 'https://www.figma.com/api/oauth/token',
+            callbackUrl
+        };
+        case 'notion': return {
+            clientId: process.env.NOTION_CLIENT_ID || '',
+            clientSecret: process.env.NOTION_CLIENT_SECRET || '',
+            authUrl: 'https://api.notion.com/v1/oauth/authorize',
+            tokenUrl: 'https://api.notion.com/v1/oauth/token',
+            callbackUrl
+        };
+        case 'zoom': return {
+            clientId: process.env.ZOOM_CLIENT_ID || '',
+            clientSecret: process.env.ZOOM_CLIENT_SECRET || '',
+            authUrl: 'https://zoom.us/oauth/authorize',
+            tokenUrl: 'https://zoom.us/oauth/token',
+            callbackUrl
+        };
+        case 'vercel': return {
+            clientId: process.env.VERCEL_CLIENT_ID || '',
+            clientSecret: process.env.VERCEL_CLIENT_SECRET || '',
+            authUrl: 'https://vercel.com/oauth/authorize',
+            tokenUrl: 'https://api.vercel.com/v2/oauth/access_token',
+            callbackUrl
+        };
+        case 'spotify': return {
+            clientId: process.env.SPOTIFY_CLIENT_ID || '',
+            clientSecret: process.env.SPOTIFY_CLIENT_SECRET || '',
+            authUrl: 'https://accounts.spotify.com/authorize',
+            tokenUrl: 'https://accounts.spotify.com/api/token',
             callbackUrl
         };
         default: return null;
@@ -188,7 +228,15 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
         } else if (service === 'dropbox') {
             url += '&response_type=code';
         } else if (service === 'slack') {
-            url += '&user_scope='; // If needed for user tokens vs bot tokens, but using scope above is standard for user oauth
+            url += '&user_scope=';
+        } else if (service === 'figma') {
+            url += '&response_type=code';
+        } else if (service === 'notion') {
+            url += '&response_type=code&owner=user';
+        } else if (service === 'zoom') {
+            url += '&response_type=code';
+        } else if (service === 'spotify') {
+            url += '&response_type=code&show_dialog=true';
         }
 
         res.json({
@@ -347,6 +395,105 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     email: meResponse.data.mail || meResponse.data.userPrincipalName,
                     name: meResponse.data.displayName,
                     picture: ''
+                };
+            } else if (service === 'figma') {
+                tokenResponse = await axios.post(config.tokenUrl, {
+                    client_id: config.clientId,
+                    client_secret: config.clientSecret,
+                    redirect_uri: config.callbackUrl,
+                    code,
+                    grant_type: 'authorization_code'
+                });
+                tokens = tokenResponse.data;
+                const meResponse = await axios.get('https://api.figma.com/v1/me', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+                userInfo = {
+                    id: meResponse.data.id,
+                    email: meResponse.data.email,
+                    name: meResponse.data.handle,
+                    picture: meResponse.data.img_url
+                };
+            } else if (service === 'notion') {
+                // Notion uses Basic Auth for token endpoint usually
+                const auth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+                tokenResponse = await axios.post(config.tokenUrl, {
+                    grant_type: 'authorization_code',
+                    code,
+                    redirect_uri: config.callbackUrl
+                }, {
+                    headers: { Authorization: `Basic ${auth}` }
+                });
+                tokens = tokenResponse.data;
+                // Notion doesn't have a standardized "me" endpoint for user info, but returns workspace info in token response
+                userInfo = {
+                    id: tokens.owner?.user?.id || tokens.bot_id, // Use bot_id if user id not present
+                    email: tokens.owner?.user?.person?.email || 'notion_user',
+                    name: tokens.workspace_name || tokens.owner?.user?.name || 'Notion Workspace',
+                    picture: tokens.owner?.user?.avatar_url || tokens.icon
+                };
+            } else if (service === 'zoom') {
+                const auth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+                const params = new URLSearchParams();
+                params.append('grant_type', 'authorization_code');
+                params.append('code', code as string);
+                params.append('redirect_uri', config.callbackUrl);
+
+                tokenResponse = await axios.post(config.tokenUrl, params, {
+                    headers: { Authorization: `Basic ${auth}` }
+                });
+                tokens = tokenResponse.data;
+                const meResponse = await axios.get('https://api.zoom.us/v2/users/me', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+                userInfo = {
+                    id: meResponse.data.id,
+                    email: meResponse.data.email,
+                    name: `${meResponse.data.first_name} ${meResponse.data.last_name}`,
+                    picture: meResponse.data.pic_url
+                };
+            } else if (service === 'vercel') {
+                const params = new URLSearchParams();
+                params.append('client_id', config.clientId || '');
+                params.append('client_secret', config.clientSecret || '');
+                params.append('code', code as string);
+                params.append('redirect_uri', config.callbackUrl);
+
+                tokenResponse = await axios.post(config.tokenUrl, params);
+                tokens = tokenResponse.data;
+
+                // Vercel token response usually contains user_id/team_id
+                // We can fetch user info
+                // Note: Vercel API structure varies, assuming standard oauth response + user endpoint
+                const meResponse = await axios.get('https://api.vercel.com/v2/user', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+                userInfo = {
+                    id: meResponse.data.user.id,
+                    email: meResponse.data.user.email,
+                    name: meResponse.data.user.name,
+                    picture: `https://vercel.com/api/www/avatar/${meResponse.data.user.avatar}?s=60`
+                };
+            } else if (service === 'spotify') {
+                const params = new URLSearchParams();
+                params.append('grant_type', 'authorization_code');
+                params.append('code', code as string);
+                params.append('redirect_uri', config.callbackUrl);
+                params.append('client_id', config.clientId || '');
+                params.append('client_secret', config.clientSecret || '');
+
+                tokenResponse = await axios.post(config.tokenUrl, params, {
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+                tokens = tokenResponse.data;
+                const meResponse = await axios.get('https://api.spotify.com/v1/me', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+                userInfo = {
+                    id: meResponse.data.id,
+                    email: meResponse.data.email,
+                    name: meResponse.data.display_name,
+                    picture: meResponse.data.images?.[0]?.url
                 };
             }
         }

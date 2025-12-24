@@ -6,6 +6,7 @@ import { createActivity } from '../utils/activityUtils';
 import { getCalendarService } from '../services/sartthi/calendarService';
 import { getMailService } from '../services/sartthi/mailService';
 import { getSlackService } from '../services/sartthi/slackService';
+import { notifySlackForTask, notifySlackTaskCompleted, notifySlackTaskUpdated } from '../utils/slackNotifications';
 import User from '../models/User';
 
 // GET /api/tasks?projectId=...&status=...&priority=...
@@ -286,6 +287,9 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         'Task',
         String(task._id)
       );
+
+      // Notify via Slack
+      await notifySlackTaskCompleted(task, authUser._id);
     } else {
       await createActivity(
         authUser._id,
@@ -295,6 +299,17 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         'Task',
         String(task._id)
       );
+
+      // Notify via Slack
+      const changes = [];
+      if (status !== undefined) changes.push(`Status: ${status}`);
+      if (priority !== undefined) changes.push(`Priority: ${priority}`);
+      if (assignee !== undefined) changes.push('Assignee changed');
+      if (dueDate !== undefined) changes.push('Due date changed');
+
+      if (changes.length > 0) {
+        await notifySlackTaskUpdated(task, authUser._id, changes.join(', '));
+      }
     }
 
     // Sartthi Integration: Calendar Sync
