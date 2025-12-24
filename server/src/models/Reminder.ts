@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface INotification {
-  type: 'email' | 'push' | 'sms';
+  type: 'email' | 'push' | 'sms' | 'slack';
   time: Date;
   sent: boolean;
 }
@@ -39,7 +39,7 @@ export interface IReminder extends Document {
 const notificationSchema = new Schema<INotification>({
   type: {
     type: String,
-    enum: ['email', 'push', 'sms'],
+    enum: ['email', 'push', 'sms', 'slack'],
     required: true
   },
   time: {
