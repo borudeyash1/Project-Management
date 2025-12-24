@@ -467,7 +467,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
         </button>
       </div>
     </div>
-    </div >
+
   );
 };
 
