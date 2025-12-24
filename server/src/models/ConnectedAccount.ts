@@ -2,8 +2,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IConnectedAccount extends Document {
     userId: mongoose.Types.ObjectId;
-    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive';
-    provider: 'google' | 'microsoft' | 'slack' | 'github' | 'dropbox';
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'vercel' | 'spotify';
+    provider: 'google' | 'microsoft' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'vercel' | 'spotify';
 
     // OAuth tokens
     accessToken: string;
@@ -36,13 +36,13 @@ const connectedAccountSchema = new Schema<IConnectedAccount>({
     },
     service: {
         type: String,
-        enum: ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive'],
+        enum: ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'vercel', 'spotify'],
         required: true,
         index: true
     },
     provider: {
         type: String,
-        enum: ['google', 'microsoft', 'slack', 'github', 'dropbox'],
+        enum: ['google', 'microsoft', 'slack', 'github', 'dropbox', 'figma', 'notion', 'vercel', 'spotify'],
         required: true
     },
 
