@@ -110,6 +110,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       requiresLink,
       requiresFile,
       slackChannelId, // Added for Slack integration
+      slackAccountId,
     } = req.body;
 
     // Only title is required now - project and workspace are optional
@@ -191,7 +192,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       try {
         const slackService = getSlackService();
         const message = `*New Task Created: ${task.title}*\n${task.description || 'No description'}\nPriority: ${task.priority}\nDue: ${task.dueDate ? new Date(task.dueDate as any).toLocaleDateString() : 'No due date'}\n*Project:* ${project ? project.name : 'No Project'}\n<https://sartthi.com/projects/${projectId || ''}/tasks|View Task>`;
-        await slackService.postMessage(authUser._id, slackChannelId, message);
+        await slackService.postMessage(authUser._id, slackChannelId, message, undefined, slackAccountId);
       } catch (error) {
         console.error('Failed to send Slack notification', error);
       }

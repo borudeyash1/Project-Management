@@ -9,12 +9,19 @@ export const getSlackService = () => {
         'Content-Type': 'application/json',
     });
 
-    const getAccessToken = async (userId: string) => {
-        const account = await ConnectedAccount.findOne({
+    const getAccessToken = async (userId: string, accountId?: string) => {
+        let query: any = {
             userId,
-            service: 'slack',
-            isActive: true
-        });
+            service: 'slack'
+        };
+
+        if (accountId) {
+            query._id = accountId;
+        } else {
+            query.isActive = true;
+        }
+
+        const account = await ConnectedAccount.findOne(query);
 
         if (!account || !account.accessToken) {
             throw new Error('Slack account not connected');
@@ -23,9 +30,9 @@ export const getSlackService = () => {
         return account.accessToken;
     };
 
-    const getChannels = async (userId: string) => {
+    const getChannels = async (userId: string, accountId?: string) => {
         try {
-            const token = await getAccessToken(userId);
+            const token = await getAccessToken(userId, accountId);
             const response = await axios.get(`${SLACK_API_URL}/conversations.list`, {
                 headers: getHeaders(token),
                 params: {
@@ -50,9 +57,9 @@ export const getSlackService = () => {
         }
     };
 
-    const postMessage = async (userId: string, channelId: string, text: string, blocks?: any[]) => {
+    const postMessage = async (userId: string, channelId: string, text: string, blocks?: any[], accountId?: string) => {
         try {
-            const token = await getAccessToken(userId);
+            const token = await getAccessToken(userId, accountId);
             const response = await axios.post(`${SLACK_API_URL}/chat.postMessage`, {
                 channel: channelId,
                 text,

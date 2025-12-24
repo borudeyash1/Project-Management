@@ -8,7 +8,8 @@ router.get('/channels', async (req, res) => {
     try {
         const userId = (req as any).user._id;
         const slackService = getSlackService();
-        const channels = await slackService.getChannels(userId);
+        const accountId = req.query.accountId as string;
+        const channels = await slackService.getChannels(userId, accountId);
         res.json({ success: true, data: channels });
     } catch (error: any) {
         console.error('Get Slack channels error:', error);

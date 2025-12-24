@@ -14,7 +14,8 @@ router.get('/repos', apiLimiter, async (req, res) => {
     try {
         const userId = (req as any).user.id;
         const githubService = getGitHubService();
-        const repos = await githubService.getRepositories(String(userId));
+        const accountId = req.query.accountId as string;
+        const repos = await githubService.getRepositories(String(userId), accountId);
 
         res.json({
             success: true,
@@ -35,9 +36,10 @@ router.get('/repos/:owner/:repo/pulls', apiLimiter, async (req, res) => {
     try {
         const userId = (req as any).user.id;
         const { owner, repo } = req.params;
+        const accountId = req.query.accountId as string;
 
         const githubService = getGitHubService();
-        const prs = await githubService.getPullRequests(String(userId), String(owner), String(repo));
+        const prs = await githubService.getPullRequests(String(userId), String(owner), String(repo), accountId);
 
         res.json({
             success: true,

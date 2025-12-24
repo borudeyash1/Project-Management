@@ -29,12 +29,19 @@ interface GitHubPR {
 
 const GITHUB_API_BASE = 'https://api.github.com';
 
-const getAccessToken = async (userId: string): Promise<string> => {
-    const account = await ConnectedAccount.findOne({
+const getAccessToken = async (userId: string, accountId?: string): Promise<string> => {
+    let query: any = {
         userId,
-        service: 'github',
-        isActive: true
-    });
+        service: 'github'
+    };
+
+    if (accountId) {
+        query._id = accountId;
+    } else {
+        query.isActive = true;
+    }
+
+    const account = await ConnectedAccount.findOne(query);
 
     if (!account || !account.accessToken) {
         throw new Error('No active GitHub account found');
@@ -49,14 +56,14 @@ const getHeaders = (accessToken: string) => ({
 });
 
 interface IGitHubService {
-    getRepositories(userId: string): Promise<GitHubRepo[]>;
-    getPullRequests(userId: string, owner: string, repo: string): Promise<GitHubPR[]>;
+    getRepositories(userId: string, accountId?: string): Promise<GitHubRepo[]>;
+    getPullRequests(userId: string, owner: string, repo: string, accountId?: string): Promise<GitHubPR[]>;
 }
 
 export const getGitHubService = (): IGitHubService => {
     return {
-        async getRepositories(userId: string): Promise<GitHubRepo[]> {
-            const accessToken = await getAccessToken(userId);
+        async getRepositories(userId: string, accountId?: string): Promise<GitHubRepo[]> {
+            const accessToken = await getAccessToken(userId, accountId);
             // Fetch repos where the user is an owner or collaborator
             // Using /user/repos?sort=updated for most relevant
             const response = await axios.get<GitHubRepo[]>(`${GITHUB_API_BASE}/user/repos?sort=updated&per_page=100`, {
@@ -65,8 +72,8 @@ export const getGitHubService = (): IGitHubService => {
             return response.data;
         },
 
-        async getPullRequests(userId: string, owner: string, repo: string): Promise<GitHubPR[]> {
-            const accessToken = await getAccessToken(userId);
+        async getPullRequests(userId: string, owner: string, repo: string, accountId?: string): Promise<GitHubPR[]> {
+            const accessToken = await getAccessToken(userId, accountId);
             const response = await axios.get<GitHubPR[]>(`${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls?state=all&sort=updated&per_page=50`, {
                 headers: getHeaders(accessToken)
             });

@@ -60,21 +60,42 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
   // GitHub Integration State
   const [showGithubLink, setShowGithubLink] = useState(false);
+  const [githubAccounts, setGithubAccounts] = useState<any[]>([]);
+  const [selectedGithubAccount, setSelectedGithubAccount] = useState<string | null>(null);
   const [repos, setRepos] = useState<any[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
   const [pullRequests, setPullRequests] = useState<any[]>([]);
   const [loadingGithub, setLoadingGithub] = useState(false);
 
-  const fetchRepos = async () => {
+  const fetchGithubAccounts = async () => {
+    try {
+      const response = await axios.get('/api/sartthi-accounts/github');
+      if (response.data.success && response.data.data.accounts) {
+        setGithubAccounts(response.data.data.accounts);
+        // Default to active account or first one
+        const active = response.data.data.activeAccount;
+        if (active) setSelectedGithubAccount(active._id);
+        else if (response.data.data.accounts.length > 0) setSelectedGithubAccount(response.data.data.accounts[0]._id);
+      }
+    } catch (error) {
+      console.error('Failed to fetch GitHub accounts', error);
+    }
+  };
+
+  const fetchRepos = async (accountId?: string) => {
     try {
       setLoadingGithub(true);
-      const response = await axios.get('/api/github/repos');
+      const targetAccount = accountId || selectedGithubAccount;
+      // Pass accountId query param if present
+      const url = targetAccount ? `/api/github/repos?accountId=${targetAccount}` : '/api/github/repos';
+
+      const response = await axios.get(url);
       if (response.data.success) {
         setRepos(response.data.data);
       }
     } catch (error) {
       console.error('Failed to fetch repos', error);
-      alert('Failed to fetch GitHub repositories. Please ensure you have connected your GitHub account in Settings.');
+      alert('Failed to fetch repositories. Ensure an account is connected.');
     } finally {
       setLoadingGithub(false);
     }
@@ -83,7 +104,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const fetchPRs = async (owner: string, repo: string) => {
     try {
       setLoadingGithub(true);
-      const response = await axios.get(`/api/github/repos/${owner}/${repo}/pulls`);
+      const targetAccount = selectedGithubAccount;
+      const url = targetAccount
+        ? `/api/github/repos/${owner}/${repo}/pulls?accountId=${targetAccount}`
+        : `/api/github/repos/${owner}/${repo}/pulls`;
+      const response = await axios.get(url);
       if (response.data.success) {
         setPullRequests(response.data.data);
       }
@@ -572,7 +597,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         <button
                           onClick={() => {
                             setShowGithubLink(true);
-                            if (repos.length === 0) fetchRepos();
+                            if (githubAccounts.length === 0) {
+                              fetchGithubAccounts().then(() => fetchRepos());
+                            } else if (repos.length === 0) {
+                              fetchRepos();
+                            }
                           }}
                           className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg px-3 py-2 w-full justify-center hover:bg-gray-50 transition-colors"
                         >
@@ -590,6 +619,24 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                             <div className="text-center py-4 text-sm text-gray-500">Loading...</div>
                           ) : (
                             <div className="space-y-3">
+                              {/* Account Selector if multiple accounts exist */}
+                              {githubAccounts.length > 1 && !selectedRepo && (
+                                <select
+                                  className="w-full text-sm border-gray-300 rounded-lg mb-2"
+                                  value={selectedGithubAccount || ''}
+                                  onChange={(e) => {
+                                    setSelectedGithubAccount(e.target.value);
+                                    fetchRepos(e.target.value);
+                                  }}
+                                >
+                                  {githubAccounts.map(acc => (
+                                    <option key={acc._id} value={acc._id}>
+                                      {acc.providerName} ({acc.providerEmail})
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+
                               {!selectedRepo ? (
                                 <select
                                   className="w-full text-sm border-gray-300 rounded-md"
