@@ -146,3 +146,5 @@ VersionError: No matching document found for id "6943c540f9417c4e9d98b36f" versi
 2025-12-24T09:33:06.487Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
 2025-12-24T11:21:45.914Z [DEBUG] Google Auth Request: email=borudeyash1@gmail.com, isRegistration=false
 2025-12-24T11:21:45.930Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2025-12-24T16:27:33.357Z [DEBUG] Google Auth Request: email=borudeyash12@gmail.com, isRegistration=false
+2025-12-24T16:27:33.374Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true

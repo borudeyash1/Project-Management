@@ -16,11 +16,22 @@ export const createReminder = async (req: Request, res: Response) => {
     const reminder = new Reminder(reminderData);
     await reminder.save();
 
+    console.log('DEBUG: Reminder saved', reminder._id);
+    console.log('DEBUG: Req body notifications:', req.body.notifications);
+    console.log('DEBUG: ReminderData notifications:', reminderData.notifications);
+
     // Schedule triggers for each notification
     if (reminder.notifications && reminder.notifications.length > 0) {
       for (const notif of reminderData.notifications) {
-        if (notif.minutesBefore !== undefined) {
-          const triggerTime = new Date(new Date(reminderData.dueDate).getTime() - (notif.minutesBefore * 60000));
+        let triggerTime: Date | undefined;
+
+        if (notif.time) {
+          triggerTime = new Date(notif.time);
+        } else if (notif.minutesBefore !== undefined) {
+          triggerTime = new Date(new Date(reminderData.dueDate).getTime() - (notif.minutesBefore * 60000));
+        }
+
+        if (triggerTime) {
           await scheduleReminderTrigger({
             entityType: 'custom',
             entityId: String(reminder._id),
