@@ -294,7 +294,7 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                 if (!tokenResponse.data.ok) throw new Error(tokenResponse.data.error || 'Slack auth failed');
 
                 tokens = {
-                    access_token: tokenResponse.data.authed_user.access_token,
+                    access_token: tokenResponse.data.access_token || tokenResponse.data.authed_user.access_token,
                     refresh_token: undefined, // Slack often doesn't give refresh tokens for simple apps
                     expiry_date: undefined
                 };
