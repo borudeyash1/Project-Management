@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Calendar, Shield, Link as LinkIcon, Unlink, CheckCircle, AlertCircle, Loader, Plus, Trash2, Check } from 'lucide-react';
+import { Mail, Calendar, Shield, Link as LinkIcon, Unlink, CheckCircle, AlertCircle, Loader, Plus, Trash2, Check, Slack, Github, HardDrive, Cloud } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
 import { useTranslation } from 'react-i18next';
 
 interface ConnectedAccount {
   _id: string;
-  service: 'mail' | 'calendar' | 'vault';
+  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive';
   providerEmail: string;
   providerName: string;
   providerAvatar?: string;
@@ -26,6 +26,10 @@ const ConnectedAccounts: React.FC = () => {
   const [mailAccounts, setMailAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [calendarAccounts, setCalendarAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [vaultAccounts, setVaultAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [slackAccounts, setSlackAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [githubAccounts, setGithubAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [dropboxAccounts, setDropboxAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [onedriveAccounts, setOnedriveAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -53,6 +57,38 @@ const ConnectedAccounts: React.FC = () => {
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
       borderColor: 'border-green-500/20'
+    },
+    slack: {
+      icon: <Slack className="w-6 h-6" />,
+      title: 'Slack',
+      description: 'Communication',
+      color: 'text-pink-500',
+      bgColor: 'bg-pink-500/10',
+      borderColor: 'border-pink-500/20'
+    },
+    github: {
+      icon: <Github className="w-6 h-6" />,
+      title: 'GitHub',
+      description: 'Development',
+      color: 'text-gray-900 dark:text-gray-100',
+      bgColor: 'bg-gray-900/10 dark:bg-gray-100/10',
+      borderColor: 'border-gray-900/20'
+    },
+    dropbox: {
+      icon: <HardDrive className="w-6 h-6" />,
+      title: 'Dropbox',
+      description: 'Cloud Storage',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-400/10',
+      borderColor: 'border-blue-400/20'
+    },
+    onedrive: {
+      icon: <Cloud className="w-6 h-6" />,
+      title: 'OneDrive',
+      description: 'Cloud Storage',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-600/10',
+      borderColor: 'border-blue-600/20'
     }
   };
 
@@ -63,15 +99,23 @@ const ConnectedAccounts: React.FC = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const [mail, calendar, vault] = await Promise.all([
+      const [mail, calendar, vault, slack, github, dropbox, onedrive] = await Promise.all([
         apiService.get('/sartthi-accounts/mail'),
         apiService.get('/sartthi-accounts/calendar'),
-        apiService.get('/sartthi-accounts/vault')
+        apiService.get('/sartthi-accounts/vault'),
+        apiService.get('/sartthi-accounts/slack'),
+        apiService.get('/sartthi-accounts/github'),
+        apiService.get('/sartthi-accounts/dropbox'),
+        apiService.get('/sartthi-accounts/onedrive')
       ]);
 
       if (mail.success) setMailAccounts(mail.data);
       if (calendar.success) setCalendarAccounts(calendar.data);
       if (vault.success) setVaultAccounts(vault.data);
+      if (slack.success) setSlackAccounts(slack.data);
+      if (github.success) setGithubAccounts(github.data);
+      if (dropbox.success) setDropboxAccounts(dropbox.data);
+      if (onedrive.success) setOnedriveAccounts(onedrive.data);
     } catch (error) {
       console.error('Failed to fetch accounts:', error);
     } finally {
@@ -79,7 +123,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleConnect = async (service: 'mail' | 'calendar' | 'vault') => {
+  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive') => {
     try {
       setActionLoading(`connect-${service}`);
       const response = await apiService.post(`/sartthi-accounts/${service}/connect`, {});
@@ -96,7 +140,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault', accountId: string) => {
+  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive', accountId: string) => {
     try {
       setActionLoading(`active-${accountId}`);
       const response = await apiService.put(`/sartthi-accounts/${service}/active`, { accountId });
@@ -112,7 +156,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault', accountId: string) => {
+  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive', accountId: string) => {
     if (!window.confirm(t('connectedAccounts.confirmDisconnect'))) {
       return;
     }
@@ -133,7 +177,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const renderServiceSection = (
-    service: 'mail' | 'calendar' | 'vault',
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive',
     accountsData: AccountsData
   ) => {
     const config = appConfig[service];
@@ -277,6 +321,10 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('mail', mailAccounts)}
       {renderServiceSection('calendar', calendarAccounts)}
       {renderServiceSection('vault', vaultAccounts)}
+      {renderServiceSection('slack', slackAccounts)}
+      {renderServiceSection('github', githubAccounts)}
+      {renderServiceSection('dropbox', dropboxAccounts)}
+      {renderServiceSection('onedrive', onedriveAccounts)}
     </div>
   );
 };

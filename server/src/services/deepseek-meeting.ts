@@ -33,11 +33,12 @@ class DeepSeekMeetingService {
     private apiUrl: string = 'https://api.deepseek.com/v1/chat/completions';
 
     constructor() {
-        const apiKey = process.env.DEEPSEEK_API_KEY;
+        // Use a fallback empty string instead of throwing immediately to prevent server startup crash
+        const apiKey = process.env.DEEPSEEK_API_KEY || '';
 
         if (!apiKey) {
-            console.error('DEEPSEEK_API_KEY is not set in environment variables');
-            throw new Error('DeepSeek API key is required');
+            console.warn('⚠️ DEEPSEEK_API_KEY is not set in environment variables. DeepSeek meeting features will be disabled.');
+            // Do NOT throw error here, as it crashes the entire server
         }
 
         this.apiKey = apiKey;
@@ -52,6 +53,13 @@ class DeepSeekMeetingService {
         transcriptText: string
     ): Promise<MeetingAnalysis | ErrorResponse> {
         try {
+            // Check if API key is configured
+            if (!this.apiKey) {
+                return {
+                    error: 'DeepSeek API key is not configured. Please contact the administrator to enable AI meeting features.',
+                };
+            }
+
             // Validate input
             if (!transcriptText || transcriptText.trim().length === 0) {
                 return {

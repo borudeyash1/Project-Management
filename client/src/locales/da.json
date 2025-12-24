@@ -118,16 +118,18 @@
     "profile": "Profil"
   },
   "switcher": {
+    "personalMode": "Personlig tilstand",
+    "individualWorkspace": "Individuelt arbejdsområde",
+    "teamWorkspace": "Team arbejdsområde",
     "workspaces": "Arbejdsområder",
     "quickActions": "Hurtige handlinger",
     "createWorkspace": "Opret arbejdsområde",
-    "createWorkspaceDesc": "Opret et nyt arbejdsområde",
-    "discoverWorkspaces": "Opdag arbejdsområder",
-    "discoverWorkspacesDesc": "Gennemse tilgængelige arbejdsområder",
-    "personalMode": "Personlig tilstand",
-    "individualWorkspace": "Personligt arbejdsområde",
-    "teamWorkspace": "Team arbejdsområde",
-    "members": "{{count}} Medlemmer"
+    "createWorkspaceDesc": "Start et nyt team arbejdsområde",
+    "discoverWorkspaces": "Udforsk arbejdsområder",
+    "discoverWorkspacesDesc": "Find og tilslut dig teams",
+    "switchedTo": "Skiftede til {{name}}",
+    "switchedToPersonal": "Skiftede til Personlig tilstand",
+    "members": "{{count}} medlemmer"
   },
   "messages": {
     "noWorkspace": "Intet arbejdsområde valgt",
@@ -1463,20 +1465,6 @@
     "roles": "Roller",
     "owner": "Ejer",
     "admin": "Admin",
-    "switcher": {
-      "personalMode": "Personlig tilstand",
-      "individualWorkspace": "Individuelt arbejdsområde",
-      "teamWorkspace": "Team arbejdsområde",
-      "workspaces": "Arbejdsområder",
-      "quickActions": "Hurtige handlinger",
-      "createWorkspace": "Opret arbejdsområde",
-      "createWorkspaceDesc": "Start et nyt team arbejdsområde",
-      "discoverWorkspaces": "Udforsk arbejdsområder",
-      "discoverWorkspacesDesc": "Find og tilslut dig teams",
-      "switchedTo": "Skiftede til {{name}}",
-      "switchedToPersonal": "Skiftede til Personlig tilstand",
-      "members": "{{count}} medlemmer"
-    },
     "member": "Medlem",
     "guest": "Gæst",
     "management": "Arbejdsområdeadministration",

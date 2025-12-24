@@ -118,16 +118,18 @@
     "profile": "Perfil"
   },
   "switcher": {
-    "workspaces": "Espaços de trabalho",
-    "quickActions": "Ações rápidas",
-    "createWorkspace": "Criar espaço de trabalho",
-    "createWorkspaceDesc": "Criar um novo espaço de trabalho",
-    "discoverWorkspaces": "Descobrir espaços",
-    "discoverWorkspacesDesc": "Navegar por espaços disponíveis",
     "personalMode": "Modo Pessoal",
     "individualWorkspace": "Espaço Pessoal",
     "teamWorkspace": "Espaço de Equipe",
-    "members": "{{count}} Membros"
+    "workspaces": "Espaços de Trabalho",
+    "quickActions": "Ações Rápidas",
+    "createWorkspace": "Criar Espaço",
+    "createWorkspaceDesc": "Iniciar novo espaço de equipe",
+    "discoverWorkspaces": "Explorar Espaços",
+    "discoverWorkspacesDesc": "Encontrar e entrar em equipes",
+    "switchedTo": "Mudou para {{name}}",
+    "switchedToPersonal": "Mudou para Modo Pessoal",
+    "members": "{{count}} membros"
   },
   "messages": {
     "noWorkspace": "Nenhum espaço de trabalho selecionado",
@@ -1463,20 +1465,6 @@
     "roles": "Funções",
     "owner": "Proprietário",
     "admin": "Admin",
-    "switcher": {
-      "personalMode": "Modo Pessoal",
-      "individualWorkspace": "Espaço Pessoal",
-      "teamWorkspace": "Espaço de Equipe",
-      "workspaces": "Espaços de Trabalho",
-      "quickActions": "Ações Rápidas",
-      "createWorkspace": "Criar Espaço",
-      "createWorkspaceDesc": "Iniciar novo espaço de equipe",
-      "discoverWorkspaces": "Explorar Espaços",
-      "discoverWorkspacesDesc": "Encontrar e entrar em equipes",
-      "switchedTo": "Mudou para {{name}}",
-      "switchedToPersonal": "Mudou para Modo Pessoal",
-      "members": "{{count}} membros"
-    },
     "member": "Membro",
     "guest": "Convidado",
     "management": "Gerenciamento do Espaço",

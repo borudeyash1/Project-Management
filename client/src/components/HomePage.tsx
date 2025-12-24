@@ -510,15 +510,16 @@ const HomePage: React.FC = () => {
         {latestRelease && (
           <div className={`relative overflow-hidden rounded-2xl border ${isDarkMode
             ? 'bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border-indigo-500/20'
-            : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200/50 shadow-lg'
-            }`}>
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            : 'border-gray-200 shadow-sm'
+            }`}
+            style={!isDarkMode ? { background: `linear-gradient(135deg, #ffffff 60%, ${accentColor}15 100%)` } : undefined}>
+            <div className="absolute top-0 right-0 w-64 h-64 opacity-10 rounded-full blur-3xl -mr-32 -mt-32" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }} />
 
             <div className="relative z-10 p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Icon */}
                 <div className="flex-shrink-0">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-xl">
+                  <div className="p-4 rounded-2xl shadow-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                     <Monitor className="w-12 h-12 text-white" />
                   </div>
                 </div>
@@ -529,7 +530,7 @@ const HomePage: React.FC = () => {
                     <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       {t('home.sartthiDesktop')}
                     </h3>
-                    <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full">
+                    <span className="px-2 py-1 text-xs font-bold text-white rounded-full" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                       v{latestRelease.version}
                     </span>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
@@ -587,7 +588,8 @@ const HomePage: React.FC = () => {
                     <a
                       href={latestRelease.downloadUrl}
                       download
-                      className="group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+                      className="group relative px-6 py-3 text-gray-900 border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+                      style={{ background: `linear-gradient(135deg, #ffffff 20%, ${accentColor}15 100%)` }}
                     >
                       <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
                       <Download className="w-5 h-5 relative z-10" />
@@ -631,7 +633,7 @@ const HomePage: React.FC = () => {
             {/* Quick Tasks */}
             <div className={`rounded-2xl border p-6 ${isDarkMode
               ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
-              : 'bg-white/80 border-gray-300/60 backdrop-blur-sm shadow-lg'
+              : 'bg-white/80 border-gray-200 backdrop-blur-sm'
               }`}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -806,11 +808,11 @@ const HomePage: React.FC = () => {
             {/* Active Projects */}
             <div className={`rounded-2xl border p-6 ${isDarkMode
               ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
-              : 'bg-white/80 border-gray-300/60 backdrop-blur-sm shadow-lg'
+              : 'bg-white/80 border-gray-200 backdrop-blur-sm'
               }`}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                  <div className="p-2 rounded-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                     <Rocket className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -904,10 +906,10 @@ const HomePage: React.FC = () => {
             {/* Recent Activity (Moved to Left) */}
             <div className={`rounded-2xl border p-6 ${isDarkMode
               ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
-              : 'bg-white/80 border-gray-300/60 backdrop-blur-sm shadow-lg'
+              : 'bg-white/80 border-gray-200 backdrop-blur-sm'
               }`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+                <div className="p-2 rounded-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <div>

@@ -4,6 +4,7 @@ import { Home, Info, FileText, BadgeDollarSign, Grid, Globe, ChevronDown, Menu, 
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getAppUrl } from '../utils/appUrls';
+import DropdownTransition from './animations/DropdownTransition';
 
 const SharedNavbar: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -11,7 +12,7 @@ const SharedNavbar: React.FC = () => {
   const location = useLocation();
   // Check if we are on a public page where we want to hide the theme toggle and language changer
   const isPublicPage = ['/', '/about', '/apps', '/docs', '/pricing', '/login', '/register', '/user-guide'].some(path => location.pathname === path || location.pathname.startsWith('/docs'));
-  
+
   // Force light theme logic for public pages
   const effectiveDarkMode = isPublicPage ? false : isDarkMode;
 
@@ -98,11 +99,11 @@ const SharedNavbar: React.FC = () => {
       fixed top-0 left-0 right-0 z-50 
       transition-all duration-500 ease-in-out
       ${scrolled || isAuthPage
-        ? 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-200' 
+        ? 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-200'
         : 'bg-transparent py-6'
       }
-    `} 
-    style={(scrolled || isAuthPage) ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
+    `}
+      style={(scrolled || isAuthPage) ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
 
@@ -116,7 +117,12 @@ const SharedNavbar: React.FC = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
             {/* Products Animated Dropdown */}
-            <div className="products-select" ref={productsDropdownRef}>
+            <div
+              className="products-select"
+              ref={productsDropdownRef}
+              onMouseEnter={() => setShowProductsMenu(true)}
+              onMouseLeave={() => setShowProductsMenu(false)}
+            >
               <div className="products-selected">
                 <Grid size={18} />
                 <span>Products</span>
@@ -124,12 +130,16 @@ const SharedNavbar: React.FC = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   height="1em"
                   viewBox="0 0 512 512"
-                  className="products-arrow"
+                  className={`products-arrow transition-transform duration-300 ${showProductsMenu ? 'rotate-180' : ''}`}
                 >
                   <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
                 </svg>
               </div>
-              <div className="products-options">
+
+              <DropdownTransition
+                isOpen={showProductsMenu}
+                className="products-options absolute top-full left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl p-2 min-w-[280px]"
+              >
                 {products.map((product) => (
                   product.external ? (
                     <a
@@ -137,29 +147,29 @@ const SharedNavbar: React.FC = () => {
                       href={product.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="products-option"
+                      className="products-option flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
                     >
-                      <span className="products-option-icon">{product.icon}</span>
+                      <span className="products-option-icon text-2xl group-hover:scale-110 transition-transform">{product.icon}</span>
                       <div className="products-option-content">
-                        <div className="products-option-title">{product.name}</div>
-                        <div className="products-option-description">{product.description}</div>
+                        <div className="products-option-title font-semibold text-gray-900 dark:text-gray-100">{product.name}</div>
+                        <div className="products-option-description text-sm text-gray-500 dark:text-gray-400">{product.description}</div>
                       </div>
                     </a>
                   ) : (
                     <Link
                       key={product.path}
                       to={product.path!}
-                      className="products-option"
+                      className="products-option flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
                     >
-                      <span className="products-option-icon">{product.icon}</span>
+                      <span className="products-option-icon text-2xl group-hover:scale-110 transition-transform">{product.icon}</span>
                       <div className="products-option-content">
-                        <div className="products-option-title">{product.name}</div>
-                        <div className="products-option-description">{product.description}</div>
+                        <div className="products-option-title font-semibold text-gray-900 dark:text-gray-100">{product.name}</div>
+                        <div className="products-option-description text-sm text-gray-500 dark:text-gray-400">{product.description}</div>
                       </div>
                     </Link>
                   )
                 ))}
-              </div>
+              </DropdownTransition>
             </div>
 
             {/* Regular Nav Links */}
@@ -167,11 +177,10 @@ const SharedNavbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                  isActive(link.path)
-                    ? 'bg-yellow-50 text-gray-900 font-semibold'
-                    : 'text-gray-900 hover:bg-yellow-50 hover:text-gray-900'
-                }`}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${isActive(link.path)
+                  ? 'bg-yellow-50 text-gray-900 font-semibold'
+                  : 'text-gray-900 hover:bg-yellow-50 hover:text-gray-900'
+                  }`}
               >
                 {link.icon}
                 {link.label}
@@ -190,28 +199,28 @@ const SharedNavbar: React.FC = () => {
                   <Languages size={20} />
                 </button>
 
-                {showLanguageMenu && (
-                  <div className={`absolute right-0 mt-2 w-48 rounded-xl shadow-2xl ${effectiveDarkMode && !isPublicPage ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} overflow-hidden z-50`}>
-                    <div className="py-1 max-h-96 overflow-y-auto custom-scrollbar">
-                      {languages.map((lang) => (
-                        <button
-                          key={lang.code}
-                          onClick={() => handleLanguageChange(lang.code)}
-                          className={`w-full px-4 py-2 text-left flex items-center gap-3 ${
-                            i18n.language === lang.code
-                              ? 'bg-accent/10 text-accent'
-                              : effectiveDarkMode && !isPublicPage
-                                ? 'text-gray-200 hover:bg-gray-700'
-                                : 'text-gray-800 hover:bg-gray-50'
+                <DropdownTransition
+                  isOpen={showLanguageMenu}
+                  className={`absolute right-0 mt-2 w-48 rounded-xl shadow-2xl ${effectiveDarkMode && !isPublicPage ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} overflow-hidden z-50`}
+                >
+                  <div className="py-1 max-h-96 overflow-y-auto custom-scrollbar">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang.code)}
+                        className={`w-full px-4 py-2 text-left flex items-center gap-3 ${i18n.language === lang.code
+                            ? 'bg-accent/10 text-accent'
+                            : effectiveDarkMode && !isPublicPage
+                              ? 'text-gray-200 hover:bg-gray-700'
+                              : 'text-gray-800 hover:bg-gray-50'
                           } transition-colors`}
-                        >
-                          <span className="text-lg">{lang.flag}</span>
-                          <span className="text-sm font-medium">{lang.name}</span>
-                        </button>
-                      ))}
-                    </div>
+                      >
+                        <span className="text-lg">{lang.flag}</span>
+                        <span className="text-sm font-medium">{lang.name}</span>
+                      </button>
+                    ))}
                   </div>
-                )}
+                </DropdownTransition>
               </div>
             )}
 
@@ -236,11 +245,10 @@ const SharedNavbar: React.FC = () => {
             </Link>
             <Link
               to="/register"
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${
-                scrolled
-                  ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
-                  : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${scrolled
+                ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+                : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+                }`}
             >
               <UserPlus size={18} />
               Register
@@ -268,10 +276,9 @@ const SharedNavbar: React.FC = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        } bg-white/95 border-b border-gray-200 shadow-sm`}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+          } bg-white/95 border-b border-gray-200 shadow-sm`}
       >
         <div className="px-4 pt-2 pb-6 space-y-1">
           {navLinks.map((link) => (
@@ -279,11 +286,10 @@ const SharedNavbar: React.FC = () => {
               key={link.path}
               to={link.path}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`block px-3 py-3 rounded-lg text-base font-medium transition-colors ${
-                isActive(link.path)
-                  ? 'bg-yellow-50 text-gray-900 font-semibold'
-                  : 'text-gray-700 hover:bg-yellow-50 hover:text-gray-900'
-              }`}
+              className={`block px-3 py-3 rounded-lg text-base font-medium transition-colors ${isActive(link.path)
+                ? 'bg-yellow-50 text-gray-900 font-semibold'
+                : 'text-gray-700 hover:bg-yellow-50 hover:text-gray-900'
+                }`}
             >
               <div className="flex items-center gap-3">
                 {link.icon}
@@ -313,7 +319,7 @@ const SharedNavbar: React.FC = () => {
               Register Now
             </Link>
           </div>
-          
+
           {/* Language Section - Hidden on public pages */}
           {!isPublicPage && (
             <div className={`mt-4 pt-4 border-t ${effectiveDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -325,11 +331,10 @@ const SharedNavbar: React.FC = () => {
                   <button
                     key={lang.code}
                     onClick={() => handleLanguageChange(lang.code)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      i18n.language === lang.code
-                        ? effectiveDarkMode ? 'bg-accent/20 text-accent' : 'bg-accent/10 text-accent'
-                        : effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${i18n.language === lang.code
+                      ? effectiveDarkMode ? 'bg-accent/20 text-accent' : 'bg-accent/10 text-accent'
+                      : effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
                   >
                     <span>{lang.flag}</span>
                     <span>{lang.name}</span>

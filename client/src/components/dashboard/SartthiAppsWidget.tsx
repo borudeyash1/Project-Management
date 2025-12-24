@@ -62,8 +62,8 @@ const AppCard: React.FC<{
 
     return (
         <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${isDarkMode
-            ? 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
-            : 'bg-white border-gray-100 hover:border-blue-100'
+            ? 'bg-gray-800/50 border-gray-700/70 hover:border-gray-600'
+            : 'bg-white border-gray-200 hover:border-blue-200'
             }`}>
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${color} opacity-[0.03] rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110`} />
 

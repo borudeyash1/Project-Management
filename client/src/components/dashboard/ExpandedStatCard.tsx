@@ -157,7 +157,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        
+
                         {/* Show skeleton loader if no data */}
                         {!data.projects || data.projects.length === 0 ? (
                             <div className="space-y-4">
@@ -249,16 +249,15 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                         return (
                                             <div
                                                 key={member._id || index}
-                                                className={`rounded-xl overflow-hidden relative text-center p-4 group items-center flex flex-col transition-all duration-500 ${
-                                                    isDarkMode ? 'bg-gray-700' : 'bg-white'
-                                                }`}
+                                                className={`rounded-xl overflow-hidden relative text-center p-4 group items-center flex flex-col transition-all duration-500 ${isDarkMode ? 'bg-gray-700' : 'bg-white'
+                                                    }`}
                                             >
                                                 {/* Avatar */}
                                                 <div className={`transition-all group-hover:scale-105 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                                     {member.avatar ? (
-                                                        <img 
-                                                            src={member.avatar} 
-                                                            alt={member.name} 
+                                                        <img
+                                                            src={member.avatar}
+                                                            alt={member.name}
                                                             className="w-16 h-16 rounded-full object-cover"
                                                         />
                                                     ) : (
@@ -267,7 +266,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                         </svg>
                                                     )}
                                                 </div>
-                                                
+
                                                 {/* Name and Role */}
                                                 <div className="group-hover:pb-10 transition-all duration-500 delay-200">
                                                     <h1 className={`font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -277,12 +276,11 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                         {member.email || `@${member.role || 'member'}`}
                                                     </p>
                                                 </div>
-                                                
+
                                                 {/* Social Icons - Appear on Hover */}
                                                 <div className="flex items-center transition-all duration-500 delay-200 group-hover:bottom-3 -bottom-full absolute gap-2 justify-evenly w-full">
-                                                    <div className={`flex gap-3 text-2xl p-1 hover:p-2 transition-all duration-500 delay-200 rounded-full ${
-                                                        isDarkMode ? 'bg-gray-600 text-white' : 'bg-gray-700 text-white'
-                                                    }`}>
+                                                    <div className={`flex gap-3 text-2xl p-1 hover:p-2 transition-all duration-500 delay-200 rounded-full ${isDarkMode ? 'bg-gray-600 text-white' : 'bg-gray-700 text-white'
+                                                        }`}>
                                                         {/* Message Icon */}
                                                         <button
                                                             onClick={() => handleChatClick(member)}
@@ -291,7 +289,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                         >
                                                             <MessageSquare className="w-5 h-5" />
                                                         </button>
-                                                        
+
                                                         {/* Email Icon */}
                                                         {member.email && (
                                                             <a
@@ -305,7 +303,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                                 </svg>
                                                             </a>
                                                         )}
-                                                        
+
                                                         {/* User Profile Icon */}
                                                         <button
                                                             onClick={() => handleProfileClick(member)}
@@ -348,9 +346,14 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                             {data.projects && data.projects.length > 0 ? (
                                 data.projects.map((project: Project, index: number) => (
                                     <div key={project._id} className="skill-box">
-                                        <span className={`block text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                                            {project.name}
-                                        </span>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className={`text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                                                {project.name}
+                                            </span>
+                                            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                                                {project.progress}%
+                                            </span>
+                                        </div>
                                         <div className={`skill-bar h-2 w-full rounded-md ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-200'}`}>
                                             <div
                                                 className="skill-per relative h-full rounded-md"
@@ -365,12 +368,7 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                     animationDelay: `${index * 0.1}s`,
                                                     opacity: 0
                                                 }}
-                                            >
-                                                <span className="tooltip absolute -right-3 -top-7 text-xs font-bold px-2 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                                    {project.progress}%
-                                                    <span className="absolute left-1/2 -bottom-1 w-2 h-2 bg-white dark:bg-gray-700 transform -translate-x-1/2 rotate-45"></span>
-                                                </span>
-                                            </div>
+                                            />
                                         </div>
                                     </div>
                                 ))
@@ -477,15 +475,14 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                     {/* Avatar */}
                                     <div className="mb-4">
                                         {(profileData?.avatarUrl || selectedProfile.avatar) ? (
-                                            <img 
-                                                src={profileData?.avatarUrl || selectedProfile.avatar} 
-                                                alt={profileData?.fullName || selectedProfile.name} 
+                                            <img
+                                                src={profileData?.avatarUrl || selectedProfile.avatar}
+                                                alt={profileData?.fullName || selectedProfile.name}
                                                 className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600"
                                             />
                                         ) : (
-                                            <div className={`w-24 h-24 rounded-full flex items-center justify-center border-4 ${
-                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'
-                                            }`}>
+                                            <div className={`w-24 h-24 rounded-full flex items-center justify-center border-4 ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'
+                                                }`}>
                                                 <User className={`w-12 h-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                                             </div>
                                         )}
@@ -504,17 +501,15 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                     )}
 
                                     {/* Designation/Role */}
-                                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${
-                                        isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700'
-                                    }`}>
+                                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700'
+                                        }`}>
                                         {profileData?.designation || selectedProfile.role || 'Member'}
                                     </span>
 
                                     {/* Bio */}
                                     {profileData?.bio && (
-                                        <div className={`w-full text-left p-4 rounded-lg mb-4 ${
-                                            isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-                                        }`}>
+                                        <div className={`w-full text-left p-4 rounded-lg mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+                                            }`}>
                                             <h4 className={`text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                 Bio
                                             </h4>
@@ -526,19 +521,17 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
 
                                     {/* Recent Activity */}
                                     {profileData?.recentActivity && profileData.recentActivity.length > 0 && (
-                                        <div className={`w-full text-left p-4 rounded-lg mb-4 ${
-                                            isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-                                        }`}>
+                                        <div className={`w-full text-left p-4 rounded-lg mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+                                            }`}>
                                             <h4 className={`text-sm font-semibold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                 Recent Activity
                                             </h4>
                                             <div className="space-y-2">
                                                 {profileData.recentActivity.slice(0, 5).map((activity: any, index: number) => (
-                                                    <div 
+                                                    <div
                                                         key={index}
-                                                        className={`text-xs p-2 rounded ${
-                                                            isDarkMode ? 'bg-gray-600' : 'bg-white'
-                                                        }`}
+                                                        className={`text-xs p-2 rounded ${isDarkMode ? 'bg-gray-600' : 'bg-white'
+                                                            }`}
                                                     >
                                                         <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                             {activity.description || activity.title || activity.message}
@@ -561,11 +554,10 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                                 handleChatClick(selectedProfile);
                                                 closeProfileModal();
                                             }}
-                                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
-                                                isDarkMode 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                            }`}
+                                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${isDarkMode
+                                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                }`}
                                         >
                                             <MessageSquare className="w-5 h-5" />
                                             Send Message
@@ -574,11 +566,10 @@ const ExpandedStatCard: React.FC<ExpandedStatCardProps> = ({ type, onClose, data
                                         {(profileData?.email || selectedProfile.email) && (
                                             <a
                                                 href={`mailto:${profileData?.email || selectedProfile.email}`}
-                                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
-                                                    isDarkMode 
-                                                    ? 'bg-gray-700 hover:bg-gray-600 text-white' 
-                                                    : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                                                }`}
+                                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${isDarkMode
+                                                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                                                        : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                                                    }`}
                                             >
                                                 <svg className="w-5 h-5" viewBox="0 0 24 24" stroke="currentColor" fill="none">
                                                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, Clock, Flag, User, Calendar, Upload, Link as LinkIcon, ChevronDown, ChevronUp, List, LayoutGrid, CalendarDays, BarChart3, Table2, Activity, Users2 } from 'lucide-react';
+import { CheckCircle, Clock, Flag, User, Calendar, Upload, Link as LinkIcon, ChevronDown, ChevronUp, List, LayoutGrid, CalendarDays, BarChart3, Table2, Activity, Users2, Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Slider } from '@heroui/slider';
 
@@ -59,21 +59,58 @@ interface EmployeeTasksTabProps {
   tasks: Task[];
   currentUserId: string;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => void;
+  onCreateTask?: (task: Partial<Task>) => void;
 }
 
 const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   tasks,
   currentUserId,
-  onUpdateTask
+  onUpdateTask,
+  onCreateTask
 }) => {
   const { t } = useTranslation();
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [newLink, setNewLink] = useState<{[taskId: string]: string}>({});
-  const [statusUpdate, setStatusUpdate] = useState<{[taskId: string]: string}>({});
+  const [newLink, setNewLink] = useState<{ [taskId: string]: string }>({});
+  const [statusUpdate, setStatusUpdate] = useState<{ [taskId: string]: string }>({});
   const [viewMode, setViewMode] = useState<'list' | 'kanban' | 'calendar' | 'gantt' | 'table' | 'dashboard' | 'workload'>('list');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [selectedTaskForModal, setSelectedTaskForModal] = useState<Task | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
+    dueDate: new Date().toISOString().split('T')[0]
+  });
+
+  const handleCreateNewTask = () => {
+    if (!newTask.title.trim()) return;
+
+    if (onCreateTask) {
+      onCreateTask({
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority,
+        dueDate: new Date(newTask.dueDate),
+        status: 'pending',
+        assignedTo: currentUserId,
+        taskType: 'general',
+        startDate: new Date(),
+        progress: 0,
+        subtasks: [],
+        files: [],
+        links: []
+      });
+      setShowCreateModal(false);
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'medium',
+        dueDate: new Date().toISOString().split('T')[0]
+      });
+    }
+  };
 
   // Filter tasks assigned to current user
   const myTasks = tasks.filter(task => task.assignedTo === currentUserId);
@@ -83,11 +120,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   const verifiedTasks = myTasks.filter(task => task.status === 'verified');
 
   // Apply status filter to active tasks only
-  const filteredTasks = filterStatus === 'all' 
-    ? activeTasks 
+  const filteredTasks = filterStatus === 'all'
+    ? activeTasks
     : filterStatus === 'verified'
-    ? verifiedTasks
-    : activeTasks.filter(task => task.status === filterStatus);
+      ? verifiedTasks
+      : activeTasks.filter(task => task.status === filterStatus);
 
   const handleStatusChange = (taskId: string, newStatus: Task['status']) => {
     onUpdateTask(taskId, { status: newStatus });
@@ -126,22 +163,22 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
     const completedCount = updatedSubtasks.filter(st => st.completed).length;
     const progress = Math.round((completedCount / updatedSubtasks.length) * 100);
 
-    onUpdateTask(taskId, { 
+    onUpdateTask(taskId, {
       subtasks: updatedSubtasks,
-      progress 
+      progress
     });
   };
 
   const handleAddLink = (taskId: string) => {
     const link = newLink[taskId];
     if (!link || !link.trim()) return;
-    
+
     const task = tasks.find(t => t._id === taskId);
     if (!task) return;
 
     const updatedLinks = [...(task.links || []), link.trim()];
     onUpdateTask(taskId, { links: updatedLinks });
-    
+
     // Clear input
     setNewLink({ ...newLink, [taskId]: '' });
   };
@@ -190,7 +227,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
     // In a real app, you'd save this to a comments/updates array
     // For now, we'll add it to the description or a custom field
     alert(t('project.employeeTasks.submitUpdate') + `: ${update}`);
-    
+
     // Clear input
     setStatusUpdate({ ...statusUpdate, [taskId]: '' });
   };
@@ -241,6 +278,18 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </p>
           </div>
 
+          <div className="flex items-center gap-3">
+            {onCreateTask && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors font-medium shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                {t('project.tasks.addTask', 'Add Task')}
+              </button>
+            )}
+          </div>
+
           {/* Status Filter */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">{t('project.employeeTasks.filter.label')}</span>
@@ -262,11 +311,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
           <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 flex-wrap">
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'list' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'list'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.list')}
             >
               <List className="w-4 h-4" />
@@ -274,11 +322,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </button>
             <button
               onClick={() => setViewMode('kanban')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'kanban' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'kanban'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.kanban')}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -286,11 +333,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </button>
             <button
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'calendar' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'calendar'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.calendar')}
             >
               <CalendarDays className="w-4 h-4" />
@@ -298,11 +344,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </button>
             <button
               onClick={() => setViewMode('gantt')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'gantt' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'gantt'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.gantt')}
             >
               <BarChart3 className="w-4 h-4" />
@@ -310,11 +355,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'table' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'table'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.table')}
             >
               <Table2 className="w-4 h-4" />
@@ -322,11 +366,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </button>
             <button
               onClick={() => setViewMode('dashboard')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'dashboard' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'dashboard'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.dashboard')}
             >
               <Activity className="w-4 h-4" />
@@ -334,11 +377,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </button>
             <button
               onClick={() => setViewMode('workload')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${
-                viewMode === 'workload' 
-                  ? 'bg-white text-accent-dark shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'workload'
+                ? 'bg-white text-accent-dark shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
               title={t('project.employeeTasks.views.workload')}
             >
               <Users2 className="w-4 h-4" />
@@ -381,383 +423,266 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 <User className="w-12 h-12 mx-auto mb-3 text-gray-600" />
                 <p className="font-medium">{t('project.employeeTasks.noTasks')}</p>
                 <p className="text-sm mt-1">
-                  {filterStatus === 'all' 
+                  {filterStatus === 'all'
                     ? t('project.employeeTasks.noTasksSubtitle.all')
                     : t('project.employeeTasks.noTasksSubtitle.filtered', { status: filterStatus })}
                 </p>
               </div>
             ) : (
               filteredTasks.map((task) => (
-              <div 
-                key={task._id} 
-                className={`border-2 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 ${
-                  isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
-                    ? 'border-red-400 bg-gradient-to-br from-red-50 to-white' 
+                <div
+                  key={task._id}
+                  className={`border-2 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 ${isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
+                    ? 'border-red-400 bg-gradient-to-br from-red-50 to-white'
                     : 'border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:border-accent'
-                }`}
-              >
-                {/* Colored Status Bar */}
-                <div className={`h-1.5 ${
-                  task.status === 'completed' || task.status === 'verified' ? 'bg-gradient-to-r from-green-400 to-green-600' :
-                  task.status === 'in-progress' ? 'bg-gradient-to-r from-blue-400 to-blue-600' :
-                  task.status === 'blocked' ? 'bg-gradient-to-r from-red-400 to-red-600' :
-                  'bg-gradient-to-r from-gray-300 to-gray-500'
-                }`} />
+                    }`}
+                >
+                  {/* Colored Status Bar */}
+                  <div className={`h-1.5 ${task.status === 'completed' || task.status === 'verified' ? 'bg-gradient-to-r from-green-400 to-green-600' :
+                    task.status === 'in-progress' ? 'bg-gradient-to-r from-blue-400 to-blue-600' :
+                      task.status === 'blocked' ? 'bg-gradient-to-r from-red-400 to-red-600' :
+                        'bg-gradient-to-r from-gray-300 to-gray-500'
+                    }`} />
 
-                <div className="p-4">
-                  {/* Task Header */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="text-lg font-bold text-gray-900">{task.title}</h4>
-                        {task.isFinished && (
-                          <span className="px-2.5 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm">
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            {t('project.employeeTasks.finished')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed mb-2">{task.description}</p>
-                      
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {/* Task Type Badge */}
-                        {task.taskType && (() => {
-                          const typeInfo = getTaskTypeInfo(task.taskType);
-                          return (
-                            <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${typeInfo.color} shadow-sm`}>
-                              <span className="mr-1">{typeInfo.icon}</span>
-                              {typeInfo.label}
+                  <div className="p-4">
+                    {/* Task Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="text-lg font-bold text-gray-900">{task.title}</h4>
+                          {task.isFinished && (
+                            <span className="px-2.5 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm">
+                              <CheckCircle className="w-3.5 h-3.5" />
+                              {t('project.employeeTasks.finished')}
                             </span>
-                          );
-                        })()}
-                        
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${getPriorityColor(task.priority)} shadow-sm`}>
-                          <Flag className="w-3 h-3 inline mr-1" />
-                          {task.priority.toUpperCase()}
-                        </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-2">{task.description}</p>
 
-                        {isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified' && (
-                          <span className="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-lg shadow-sm animate-pulse">
-                            ⚠️ {t('project.employeeTasks.overdue')}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {/* Task Type Badge */}
+                          {task.taskType && (() => {
+                            const typeInfo = getTaskTypeInfo(task.taskType);
+                            return (
+                              <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${typeInfo.color} shadow-sm`}>
+                                <span className="mr-1">{typeInfo.icon}</span>
+                                {typeInfo.label}
+                              </span>
+                            );
+                          })()}
+
+                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${getPriorityColor(task.priority)} shadow-sm`}>
+                            <Flag className="w-3 h-3 inline mr-1" />
+                            {task.priority.toUpperCase()}
                           </span>
-                        )}
+
+                          {isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified' && (
+                            <span className="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-lg shadow-sm animate-pulse">
+                              ⚠️ {t('project.employeeTasks.overdue')}
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Expand/Collapse Button - Only show if there's expandable content */}
+                      {((task.taskType === 'submission' && !task.isFinished) ||
+                        (task.links && task.links.length > 0) ||
+                        (task.files && task.files.length > 0) ||
+                        (task.isFinished && task.rating)) ? (
+                        <button
+                          onClick={() => setExpandedTaskId(expandedTaskId === task._id ? null : task._id)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors ml-3"
+                        >
+                          {expandedTaskId === task._id ? (
+                            <ChevronUp className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                      ) : null}
                     </div>
 
-                    {/* Expand/Collapse Button - Only show if there's expandable content */}
-                    {((task.taskType === 'submission' && !task.isFinished) ||
-                     (task.links && task.links.length > 0) ||
-                     (task.files && task.files.length > 0) ||
-                     (task.isFinished && task.rating)) ? (
-                      <button
-                        onClick={() => setExpandedTaskId(expandedTaskId === task._id ? null : task._id)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors ml-3"
-                      >
-                        {expandedTaskId === task._id ? (
-                          <ChevronUp className="w-5 h-5 text-gray-600" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-gray-600" />
-                        )}
-                      </button>
-                    ) : null}
-                  </div>
-
-                  {/* Dates - Compact Single Row */}
-                  <div className="flex items-center gap-4 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className="p-1.5 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                        <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-300" />
+                    {/* Dates - Compact Single Row */}
+                    <div className="flex items-center gap-4 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className="p-1.5 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                          <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-300" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('project.tasks.startDate')}</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                            {new Date(task.startDate).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('project.tasks.startDate')}</p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {new Date(task.startDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className={`p-1.5 rounded-lg ${
-                        isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
-                          ? 'bg-red-100 dark:bg-red-900' 
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className={`p-1.5 rounded-lg ${isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
+                          ? 'bg-red-100 dark:bg-red-900'
                           : 'bg-green-100 dark:bg-green-900'
-                      }`}>
-                        <Clock className={`w-4 h-4 ${
-                          isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
-                            ? 'text-red-600 dark:text-red-300' 
+                          }`}>
+                          <Clock className={`w-4 h-4 ${isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
+                            ? 'text-red-600 dark:text-red-300'
                             : 'text-green-600 dark:text-green-300'
-                        }`} />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('project.tasks.dueDate')}</p>
-                        <p className={`text-sm font-semibold ${
-                          isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
-                            ? 'text-red-600 dark:text-red-400' 
+                            }`} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('project.tasks.dueDate')}</p>
+                          <p className={`text-sm font-semibold ${isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
+                            ? 'text-red-600 dark:text-red-400'
                             : 'text-gray-900 dark:text-gray-100'
-                        }`}>
-                          {new Date(task.dueDate).toLocaleDateString()}
-                        </p>
+                            }`}>
+                            {new Date(task.dueDate).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Status Slider - HeroUI Component */}
-                  {task.status !== 'verified' && task.taskType === 'general' && (
-                    <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <div className="w-full max-w-2xl mx-auto">
-                        <Slider
-                          label="Task Status"
-                          size="md"
-                          className="w-full"
-                          value={
-                            task.status === 'pending' ? 0 :
-                            task.status === 'in-progress' ? 0.33 :
-                            task.status === 'completed' ? 0.66 :
-                            task.status === 'blocked' ? 0 : 0
-                          }
-                          onChange={(value: number | number[]) => {
-                            const numValue = Array.isArray(value) ? value[0] : value;
-                            let newStatus: Task['status'] = 'pending';
-                            
-                            // Determine status based on slider position
-                            if (numValue <= 0.16) newStatus = 'pending';
-                            else if (numValue <= 0.5) newStatus = 'in-progress';
-                            else if (numValue <= 0.83) newStatus = 'completed';
-                            else newStatus = 'verified';
-                            
-                            // Only update if status actually changed
-                            if (newStatus !== task.status) {
-                              handleStatusChange(task._id, newStatus);
+                    {/* Status Slider - HeroUI Component */}
+                    {task.status !== 'verified' && task.taskType === 'general' && (
+                      <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="w-full max-w-2xl mx-auto">
+                          <Slider
+                            label="Task Status"
+                            size="md"
+                            className="w-full"
+                            value={
+                              task.status === 'pending' ? 0 :
+                                task.status === 'in-progress' ? 0.33 :
+                                  task.status === 'completed' ? 0.66 :
+                                    task.status === 'blocked' ? 0 : 0
                             }
-                          }}
-                          onChangeEnd={(value: number | number[]) => {
-                            // Snap to nearest mark when released
-                            const numValue = Array.isArray(value) ? value[0] : value;
-                            let newStatus: Task['status'] = 'pending';
-                            
-                            if (numValue <= 0.16) newStatus = 'pending';
-                            else if (numValue <= 0.5) newStatus = 'in-progress';
-                            else if (numValue <= 0.83) newStatus = 'completed';
-                            else newStatus = 'verified';
-                            
-                            // Ensure final status is set
-                            if (newStatus !== task.status) {
-                              handleStatusChange(task._id, newStatus);
-                            }
-                          }}
-                          marks={[
-                            { value: 0, label: "Pending" },
-                            { value: 0.33, label: "In Progress" },
-                            { value: 0.66, label: "Completed" },
-                            { value: 1, label: "Verified" }
-                          ]}
-                          minValue={0}
-                          maxValue={1}
-                          step={0.01}
-                          showTooltip={true}
-                          classNames={{
-                            base: "gap-3",
-                            track: "h-2 bg-gray-300 dark:bg-gray-600",
-                            filler: task.status === 'pending' ? "bg-gradient-to-r from-yellow-400 to-orange-500" :
-                                    task.status === 'in-progress' ? "bg-gradient-to-r from-blue-400 to-blue-600" :
-                                    task.status === 'completed' ? "bg-gradient-to-r from-green-400 to-green-600" :
+                            onChange={(value: number | number[]) => {
+                              const numValue = Array.isArray(value) ? value[0] : value;
+                              let newStatus: Task['status'] = 'pending';
+
+                              // Determine status based on slider position
+                              if (numValue <= 0.16) newStatus = 'pending';
+                              else if (numValue <= 0.5) newStatus = 'in-progress';
+                              else if (numValue <= 0.83) newStatus = 'completed';
+                              else newStatus = 'verified';
+
+                              // Only update if status actually changed
+                              if (newStatus !== task.status) {
+                                handleStatusChange(task._id, newStatus);
+                              }
+                            }}
+                            onChangeEnd={(value: number | number[]) => {
+                              // Snap to nearest mark when released
+                              const numValue = Array.isArray(value) ? value[0] : value;
+                              let newStatus: Task['status'] = 'pending';
+
+                              if (numValue <= 0.16) newStatus = 'pending';
+                              else if (numValue <= 0.5) newStatus = 'in-progress';
+                              else if (numValue <= 0.83) newStatus = 'completed';
+                              else newStatus = 'verified';
+
+                              // Ensure final status is set
+                              if (newStatus !== task.status) {
+                                handleStatusChange(task._id, newStatus);
+                              }
+                            }}
+                            marks={[
+                              { value: 0, label: "Pending" },
+                              { value: 0.33, label: "In Progress" },
+                              { value: 0.66, label: "Completed" },
+                              { value: 1, label: "Verified" }
+                            ]}
+                            minValue={0}
+                            maxValue={1}
+                            step={0.01}
+                            showTooltip={true}
+                            classNames={{
+                              base: "gap-3",
+                              track: "h-2 bg-gray-300 dark:bg-gray-600",
+                              filler: task.status === 'pending' ? "bg-gradient-to-r from-yellow-400 to-orange-500" :
+                                task.status === 'in-progress' ? "bg-gradient-to-r from-blue-400 to-blue-600" :
+                                  task.status === 'completed' ? "bg-gradient-to-r from-green-400 to-green-600" :
                                     "bg-gray-400",
-                            thumb: task.status === 'pending' ? "w-5 h-5 bg-orange-500 shadow-lg" :
-                                   task.status === 'in-progress' ? "w-5 h-5 bg-blue-500 shadow-lg" :
-                                   task.status === 'completed' ? "w-5 h-5 bg-green-500 shadow-lg" :
-                                   "w-5 h-5 bg-gray-500 shadow-lg",
-                            label: "text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3",
-                            mark: "text-xs font-medium"
-                          }}
-                        />
-                      </div>
+                              thumb: task.status === 'pending' ? "w-5 h-5 bg-orange-500 shadow-lg" :
+                                task.status === 'in-progress' ? "w-5 h-5 bg-blue-500 shadow-lg" :
+                                  task.status === 'completed' ? "w-5 h-5 bg-green-500 shadow-lg" :
+                                    "w-5 h-5 bg-gray-500 shadow-lg",
+                              label: "text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3",
+                              mark: "text-xs font-medium"
+                            }}
+                          />
+                        </div>
 
-                      {/* Current Status Display */}
-                      <div className="mt-4 flex items-center justify-center gap-2">
-                        <span className={`px-5 py-2.5 text-sm font-bold rounded-lg shadow-md ${
-                          task.status === 'pending' ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white' :
-                          task.status === 'in-progress' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white' :
-                          task.status === 'completed' ? 'bg-gradient-to-r from-green-400 to-green-600 text-white' :
-                          task.status === 'blocked' ? 'bg-red-500 text-white' :
-                          'bg-gray-400 text-white'
-                        }`}>
-                          {task.status === 'in-progress' ? 'IN PROGRESS' : task.status.toUpperCase()}
+                        {/* Current Status Display */}
+                        <div className="mt-4 flex items-center justify-center gap-2">
+                          <span className={`px-5 py-2.5 text-sm font-bold rounded-lg shadow-md ${task.status === 'pending' ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white' :
+                            task.status === 'in-progress' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white' :
+                              task.status === 'completed' ? 'bg-gradient-to-r from-green-400 to-green-600 text-white' :
+                                task.status === 'blocked' ? 'bg-red-500 text-white' :
+                                  'bg-gray-400 text-white'
+                            }`}>
+                            {task.status === 'in-progress' ? 'IN PROGRESS' : task.status.toUpperCase()}
+                          </span>
+                        </div>
+
+                        {/* Blocked Status - Separate */}
+                        {task.status === 'blocked' && (
+                          <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
+                                !
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-red-700 dark:text-red-300">Task Blocked</p>
+                                <p className="text-xs text-red-600 dark:text-red-400">This task has been marked as blocked</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Status Badge for Special Task Types or Verified */}
+                    {(task.taskType === 'submission' || task.status === 'verified') && (
+                      <div className="mb-3">
+                        <span className={`inline-block px-3 py-1.5 text-sm font-semibold rounded-lg shadow-sm ${getStatusColor(task.status)}`}>
+                          Status: {task.status.toUpperCase()}
                         </span>
                       </div>
+                    )}
 
-                      {/* Blocked Status - Separate */}
-                      {task.status === 'blocked' && (
-                        <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
-                              !
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-red-700 dark:text-red-300">Task Blocked</p>
-                              <p className="text-xs text-red-600 dark:text-red-400">This task has been marked as blocked</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Status Badge for Special Task Types or Verified */}
-                  {(task.taskType === 'submission' || task.status === 'verified') && (
-                    <div className="mb-3">
-                      <span className={`inline-block px-3 py-1.5 text-sm font-semibold rounded-lg shadow-sm ${getStatusColor(task.status)}`}>
-                        Status: {task.status.toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Subtasks - Always Visible */}
-                  {task.subtasks && task.subtasks.length > 0 && (
-                    <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <h5 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4" />
-                        {t('project.employeeTasks.subtasks', { completed: task.subtasks.filter(st => st.completed).length, total: task.subtasks.length })}
-                      </h5>
-                      <div className="space-y-2">
-                        {task.subtasks.map((subtask) => (
-                          <div key={subtask._id} className="flex items-center gap-2.5 p-1.5 bg-white dark:bg-gray-800 rounded-lg hover:shadow-sm transition-shadow">
-                            <input
-                              type="checkbox"
-                              checked={subtask.completed}
-                              onChange={() => handleToggleSubtask(task._id, subtask._id)}
-                              className="w-4 h-4 text-accent-dark rounded focus:ring-2 focus:ring-accent"
-                              disabled={task.isFinished}
-                            />
-                            <span className={`text-sm flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-800 dark:text-gray-200 font-medium'}`}>
-                              {subtask.title}
-                            </span>
-                            {subtask.completed && (
-                              <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Submission Task - URL Submission (Always Visible) */}
-                  {task.taskType === 'submission' && (
-                    <div className="mb-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-                      <h5 className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-2 flex items-center gap-2">
-                        <LinkIcon className="w-4 h-4" />
-                        🔗 Submit URL
-                      </h5>
-                      
-                      {/* Link Input - Only show if not finished */}
-                      {!task.isFinished && (
-                        <div className="flex gap-2 mb-3">
-                          <input
-                            type="url"
-                            value={newLink[task._id] || ''}
-                            onChange={(e) => setNewLink({ ...newLink, [task._id]: e.target.value })}
-                            placeholder="https://example.com"
-                            className="flex-1 px-3 py-2 text-sm border border-indigo-300 dark:border-indigo-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800"
-                          />
-                          <button
-                            onClick={() => handleAddLink(task._id)}
-                            className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 font-medium"
-                          >
-                            Add
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Submitted Links */}
-                      {task.links && task.links.length > 0 && (
-                        <div className="space-y-2 mb-3">
-                          <p className="text-xs font-medium text-indigo-900 dark:text-indigo-100">Submitted URLs:</p>
-                          {task.links.map((link, index) => (
-                            <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded p-2">
-                              <a 
-                                href={link} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline truncate flex-1 min-w-0"
-                              >
-                                {link}
-                              </a>
-                              {!task.isFinished && (
-                                <button
-                                  onClick={() => handleRemoveLink(task._id, index)}
-                                  className="text-red-600 hover:text-red-700 text-xs ml-2 font-medium"
-                                >
-                                  Remove
-                                </button>
+                    {/* Subtasks - Always Visible */}
+                    {task.subtasks && task.subtasks.length > 0 && (
+                      <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <h5 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4" />
+                          {t('project.employeeTasks.subtasks', { completed: task.subtasks.filter(st => st.completed).length, total: task.subtasks.length })}
+                        </h5>
+                        <div className="space-y-2">
+                          {task.subtasks.map((subtask) => (
+                            <div key={subtask._id} className="flex items-center gap-2.5 p-1.5 bg-white dark:bg-gray-800 rounded-lg hover:shadow-sm transition-shadow">
+                              <input
+                                type="checkbox"
+                                checked={subtask.completed}
+                                onChange={() => handleToggleSubtask(task._id, subtask._id)}
+                                className="w-4 h-4 text-accent-dark rounded focus:ring-2 focus:ring-accent"
+                                disabled={task.isFinished}
+                              />
+                              <span className={`text-sm flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-800 dark:text-gray-200 font-medium'}`}>
+                                {subtask.title}
+                              </span>
+                              {subtask.completed && (
+                                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
                               )}
                             </div>
                           ))}
                         </div>
-                      )}
-
-                      {/* Submit Button */}
-                      {task.links && task.links.length > 0 && task.status !== 'completed' && task.status !== 'verified' && !task.isFinished && (
-                        <button
-                          onClick={() => handleStatusChange(task._id, 'completed')}
-                          className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium flex items-center justify-center gap-2"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          Submit for Review
-                        </button>
-                      )}
-
-                      {/* Submitted Status */}
-                      {(task.status === 'completed' || task.status === 'verified') && (
-                        <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
-                          <CheckCircle className="w-4 h-4" />
-                          {task.status === 'verified' ? 'Verified by Manager ✓' : 'Submitted - Waiting for Manager Review'}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Reference Links - Always Visible for General Tasks */}
-                  {task.links && task.links.length > 0 && task.taskType !== 'submission' && (
-                    <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <h5 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
-                        <LinkIcon className="w-4 h-4" />
-                        📎 Reference Links (from Manager)
-                      </h5>
-                      <div className="space-y-2">
-                        {task.links.map((link, index) => (
-                          <a 
-                            key={index}
-                            href={link} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors group"
-                          >
-                            <LinkIcon className="w-3 h-3 text-blue-600 flex-shrink-0" />
-                            <span className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate flex-1">
-                              {link}
-                            </span>
-                            <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                              Open →
-                            </span>
-                          </a>
-                        ))}
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
 
-                {/* Expanded Content */}
-                {expandedTaskId === task._id && (
-                  <div className="px-6 pb-6 space-y-4 border-t-2 border-gray-200 dark:border-gray-700 pt-4">
-                    {/* Task Type Specific Sections */}
-                    
-                    {/* Submission Task - URL Submission */}
-                    {(task.taskType === 'submission' && !task.isFinished) || 
-                     (task.links && task.links.length > 0 && task.taskType === 'submission') ? (
-                      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-                        <h5 className="text-sm font-medium text-indigo-900 mb-2 flex items-center gap-2">
+                    {/* Submission Task - URL Submission (Always Visible) */}
+                    {task.taskType === 'submission' && (
+                      <div className="mb-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                        <h5 className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-2 flex items-center gap-2">
                           <LinkIcon className="w-4 h-4" />
-                          Submit URL
+                          🔗 Submit URL
                         </h5>
-                        
+
                         {/* Link Input - Only show if not finished */}
                         {!task.isFinished && (
                           <div className="flex gap-2 mb-3">
@@ -766,37 +691,37 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                               value={newLink[task._id] || ''}
                               onChange={(e) => setNewLink({ ...newLink, [task._id]: e.target.value })}
                               placeholder="https://example.com"
-                              className="flex-1 px-3 py-2 text-sm border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="flex-1 px-3 py-2 text-sm border border-indigo-300 dark:border-indigo-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800"
                             />
                             <button
                               onClick={() => handleAddLink(task._id)}
-                              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+                              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 font-medium"
                             >
-                              {t('project.employeeTasks.add')}
+                              Add
                             </button>
                           </div>
                         )}
 
                         {/* Submitted Links */}
                         {task.links && task.links.length > 0 && (
-                          <div className="space-y-2">
-                            <p className="text-xs font-medium text-gray-700">Submitted URLs:</p>
+                          <div className="space-y-2 mb-3">
+                            <p className="text-xs font-medium text-indigo-900 dark:text-indigo-100">Submitted URLs:</p>
                             {task.links.map((link, index) => (
-                              <div key={index} className="flex items-center justify-between bg-white rounded p-2">
-                                <a 
-                                  href={link} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="text-sm text-indigo-600 hover:underline truncate flex-1 min-w-0"
+                              <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded p-2">
+                                <a
+                                  href={link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline truncate flex-1 min-w-0"
                                 >
                                   {link}
                                 </a>
                                 {!task.isFinished && (
                                   <button
                                     onClick={() => handleRemoveLink(task._id, index)}
-                                    className="text-red-600 hover:text-red-700 text-xs ml-2"
+                                    className="text-red-600 hover:text-red-700 text-xs ml-2 font-medium"
                                   >
-                                    {t('project.employeeTasks.remove')}
+                                    Remove
                                   </button>
                                 )}
                               </div>
@@ -805,57 +730,168 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                         )}
 
                         {/* Submit Button */}
-                        {task.links && task.links.length > 0 && task.status !== 'completed' && !task.isFinished && (
+                        {task.links && task.links.length > 0 && task.status !== 'completed' && task.status !== 'verified' && !task.isFinished && (
                           <button
                             onClick={() => handleStatusChange(task._id, 'completed')}
-                            className="w-full mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                            className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium flex items-center justify-center gap-2"
                           >
+                            <CheckCircle className="w-4 h-4" />
                             Submit for Review
                           </button>
                         )}
-                      </div>
-                    ) : null}
 
-
-                    {/* Display Files (for all tasks) */}
-                    {task.files && task.files.length > 0 && (
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                          <Upload className="w-4 h-4" />
-                          {t('project.employeeTasks.attachedFiles')}
-                        </h5>
-                        <div className="space-y-1 pl-4">
-                          {task.files.map((file) => (
-                            <div key={file._id} className="flex items-center gap-2">
-                              <Upload className="w-3 h-3 text-gray-600" />
-                              <span className="text-sm text-gray-700">{file.name}</span>
-                            </div>
-                          ))}
-                        </div>
+                        {/* Submitted Status */}
+                        {(task.status === 'completed' || task.status === 'verified') && (
+                          <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
+                            <CheckCircle className="w-4 h-4" />
+                            {task.status === 'verified' ? 'Verified by Manager ✓' : 'Submitted - Waiting for Manager Review'}
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {/* Rating Display */}
-                    {task.isFinished && task.rating && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <p className="text-sm font-medium text-gray-700 mb-1">{t('project.employeeTasks.taskRating')}</p>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <span key={star} className={star <= task.rating! ? 'text-yellow-600 text-lg' : 'text-gray-700 text-lg'}>
-                              ⭐
-                            </span>
+                    {/* Reference Links - Always Visible for General Tasks */}
+                    {task.links && task.links.length > 0 && task.taskType !== 'submission' && (
+                      <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <h5 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          <LinkIcon className="w-4 h-4" />
+                          📎 Reference Links (from Manager)
+                        </h5>
+                        <div className="space-y-2">
+                          {task.links.map((link, index) => (
+                            <a
+                              key={index}
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors group"
+                            >
+                              <LinkIcon className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                              <span className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate flex-1">
+                                {link}
+                              </span>
+                              <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Open →
+                              </span>
+                            </a>
                           ))}
-                          <span className="text-sm text-gray-600 ml-2">
-                            ({task.rating}/5)
-                          </span>
                         </div>
                       </div>
                     )}
                   </div>
-                )}
-              </div>
-            ))
-          )}
+
+                  {/* Expanded Content */}
+                  {expandedTaskId === task._id && (
+                    <div className="px-6 pb-6 space-y-4 border-t-2 border-gray-200 dark:border-gray-700 pt-4">
+                      {/* Task Type Specific Sections */}
+
+                      {/* Submission Task - URL Submission */}
+                      {(task.taskType === 'submission' && !task.isFinished) ||
+                        (task.links && task.links.length > 0 && task.taskType === 'submission') ? (
+                        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                          <h5 className="text-sm font-medium text-indigo-900 mb-2 flex items-center gap-2">
+                            <LinkIcon className="w-4 h-4" />
+                            Submit URL
+                          </h5>
+
+                          {/* Link Input - Only show if not finished */}
+                          {!task.isFinished && (
+                            <div className="flex gap-2 mb-3">
+                              <input
+                                type="url"
+                                value={newLink[task._id] || ''}
+                                onChange={(e) => setNewLink({ ...newLink, [task._id]: e.target.value })}
+                                placeholder="https://example.com"
+                                className="flex-1 px-3 py-2 text-sm border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              />
+                              <button
+                                onClick={() => handleAddLink(task._id)}
+                                className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+                              >
+                                {t('project.employeeTasks.add')}
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Submitted Links */}
+                          {task.links && task.links.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-xs font-medium text-gray-700">Submitted URLs:</p>
+                              {task.links.map((link, index) => (
+                                <div key={index} className="flex items-center justify-between bg-white rounded p-2">
+                                  <a
+                                    href={link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-indigo-600 hover:underline truncate flex-1 min-w-0"
+                                  >
+                                    {link}
+                                  </a>
+                                  {!task.isFinished && (
+                                    <button
+                                      onClick={() => handleRemoveLink(task._id, index)}
+                                      className="text-red-600 hover:text-red-700 text-xs ml-2"
+                                    >
+                                      {t('project.employeeTasks.remove')}
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Submit Button */}
+                          {task.links && task.links.length > 0 && task.status !== 'completed' && !task.isFinished && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, 'completed')}
+                              className="w-full mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                            >
+                              Submit for Review
+                            </button>
+                          )}
+                        </div>
+                      ) : null}
+
+
+                      {/* Display Files (for all tasks) */}
+                      {task.files && task.files.length > 0 && (
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                            <Upload className="w-4 h-4" />
+                            {t('project.employeeTasks.attachedFiles')}
+                          </h5>
+                          <div className="space-y-1 pl-4">
+                            {task.files.map((file) => (
+                              <div key={file._id} className="flex items-center gap-2">
+                                <Upload className="w-3 h-3 text-gray-600" />
+                                <span className="text-sm text-gray-700">{file.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Rating Display */}
+                      {task.isFinished && task.rating && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                          <p className="text-sm font-medium text-gray-700 mb-1">{t('project.employeeTasks.taskRating')}</p>
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span key={star} className={star <= task.rating! ? 'text-yellow-600 text-lg' : 'text-gray-700 text-lg'}>
+                                ⭐
+                              </span>
+                            ))}
+                            <span className="text-sm text-gray-600 ml-2">
+                              ({task.rating}/5)
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         )}
 
@@ -863,7 +899,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {viewMode === 'kanban' && (
           <div className="grid grid-cols-4 gap-4">
             {/* Pending Column */}
-            <div 
+            <div
               className="bg-gray-50 rounded-lg p-4 min-h-[400px]"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('pending')}
@@ -876,14 +912,13 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </h3>
               <div className="space-y-3">
                 {filteredTasks.filter(t => t.status === 'pending').map(task => (
-                  <div 
-                    key={task._id} 
+                  <div
+                    key={task._id}
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     onClick={() => handleTaskClick(task)}
-                    className={`bg-white border border-gray-300 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${
-                      draggedTask?._id === task._id ? 'opacity-50' : ''
-                    }`}
+                    className={`bg-white border border-gray-300 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${draggedTask?._id === task._id ? 'opacity-50' : ''
+                      }`}
                   >
                     <h4 className="font-medium text-gray-900 text-sm mb-2">{task.title}</h4>
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -909,7 +944,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </div>
 
             {/* In Progress Column */}
-            <div 
+            <div
               className="bg-blue-50 rounded-lg p-4 min-h-[400px]"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('in-progress')}
@@ -922,14 +957,13 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </h3>
               <div className="space-y-3">
                 {filteredTasks.filter(t => t.status === 'in-progress').map(task => (
-                  <div 
-                    key={task._id} 
+                  <div
+                    key={task._id}
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     onClick={() => handleTaskClick(task)}
-                    className={`bg-white border border-blue-200 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${
-                      draggedTask?._id === task._id ? 'opacity-50' : ''
-                    }`}
+                    className={`bg-white border border-blue-200 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${draggedTask?._id === task._id ? 'opacity-50' : ''
+                      }`}
                   >
                     <h4 className="font-medium text-gray-900 text-sm mb-2">{task.title}</h4>
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -958,7 +992,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </div>
 
             {/* Completed Column */}
-            <div 
+            <div
               className="bg-green-50 rounded-lg p-4 min-h-[400px]"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('completed')}
@@ -971,14 +1005,13 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </h3>
               <div className="space-y-3">
                 {filteredTasks.filter(t => t.status === 'completed').map(task => (
-                  <div 
-                    key={task._id} 
+                  <div
+                    key={task._id}
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     onClick={() => handleTaskClick(task)}
-                    className={`bg-white border border-green-200 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${
-                      draggedTask?._id === task._id ? 'opacity-50' : ''
-                    }`}
+                    className={`bg-white border border-green-200 rounded-lg p-3 hover:shadow-md transition-all cursor-move ${draggedTask?._id === task._id ? 'opacity-50' : ''
+                      }`}
                   >
                     <h4 className="font-medium text-gray-900 text-sm mb-2">{task.title}</h4>
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -1004,7 +1037,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </div>
 
             {/* Verified/Blocked Column */}
-            <div 
+            <div
               className="bg-purple-50 rounded-lg p-4 min-h-[400px]"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('verified')}
@@ -1017,16 +1050,14 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </h3>
               <div className="space-y-3">
                 {filteredTasks.filter(t => t.status === 'verified' || t.status === 'blocked').map(task => (
-                  <div 
-                    key={task._id} 
+                  <div
+                    key={task._id}
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     onClick={() => handleTaskClick(task)}
-                    className={`bg-white border rounded-lg p-3 hover:shadow-md transition-all cursor-move ${
-                      draggedTask?._id === task._id ? 'opacity-50' : ''
-                    } ${
-                      task.status === 'blocked' ? 'border-red-200' : 'border-purple-200'
-                    }`}
+                    className={`bg-white border rounded-lg p-3 hover:shadow-md transition-all cursor-move ${draggedTask?._id === task._id ? 'opacity-50' : ''
+                      } ${task.status === 'blocked' ? 'border-red-200' : 'border-purple-200'
+                      }`}
                   >
                     <h4 className="font-medium text-gray-900 text-sm mb-2">{task.title}</h4>
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -1038,9 +1069,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           </span>
                         );
                       })()}
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${
-                        task.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-purple-100 text-purple-700'
-                      }`}>
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${task.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-purple-100 text-purple-700'
+                        }`}>
                         {task.status}
                       </span>
                     </div>
@@ -1068,7 +1098,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   </div>
                 ))}
               </div>
-              
+
               <div className="grid grid-cols-7 gap-2">
                 {(() => {
                   const today = new Date();
@@ -1076,51 +1106,48 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
                   const startingDayOfWeek = firstDay.getDay();
                   const daysInMonth = lastDay.getDate();
-                  
+
                   const days = [];
-                  
+
                   // Empty cells for days before month starts
                   for (let i = 0; i < startingDayOfWeek; i++) {
                     days.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 rounded"></div>);
                   }
-                  
+
                   // Days of the month
                   for (let day = 1; day <= daysInMonth; day++) {
                     const currentDate = new Date(today.getFullYear(), today.getMonth(), day);
                     const tasksOnDay = filteredTasks.filter(task => {
                       const taskDate = new Date(task.dueDate);
-                      return taskDate.getDate() === day && 
-                             taskDate.getMonth() === today.getMonth() && 
-                             taskDate.getFullYear() === today.getFullYear();
+                      return taskDate.getDate() === day &&
+                        taskDate.getMonth() === today.getMonth() &&
+                        taskDate.getFullYear() === today.getFullYear();
                     });
-                    
+
                     const isToday = day === today.getDate();
-                    
+
                     days.push(
-                      <div 
-                        key={day} 
-                        className={`h-24 border rounded-lg p-2 ${
-                          isToday ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'
-                        }`}
+                      <div
+                        key={day}
+                        className={`h-24 border rounded-lg p-2 ${isToday ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'
+                          }`}
                       >
-                        <div className={`text-sm font-semibold mb-1 ${
-                          isToday ? 'text-accent-dark' : 'text-gray-700'
-                        }`}>
+                        <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-accent-dark' : 'text-gray-700'
+                          }`}>
                           {day}
                         </div>
                         <div className="space-y-1">
                           {tasksOnDay.slice(0, 2).map(task => (
-                            <div 
-                              key={task._id} 
+                            <div
+                              key={task._id}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleTaskClick(task);
                               }}
-                              className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:shadow-sm transition-shadow ${
-                                task.status === 'completed' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
+                              className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:shadow-sm transition-shadow ${task.status === 'completed' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
                                 task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' :
-                                'bg-gray-100 text-gray-700 hover:bg-gray-300'
-                              }`}
+                                  'bg-gray-100 text-gray-700 hover:bg-gray-300'
+                                }`}
                               title={task.title}
                             >
                               {task.taskType && getTaskTypeInfo(task.taskType).icon} {task.title}
@@ -1135,7 +1162,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       </div>
                     );
                   }
-                  
+
                   return days;
                 })()}
               </div>
@@ -1147,7 +1174,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {viewMode === 'gantt' && (
           <div className="bg-white rounded-lg border border-gray-300 p-6 overflow-x-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.views.gantt')}</h3>
-            
+
             <div className="min-w-[800px]">
               {/* Timeline Header */}
               <div className="flex border-b border-gray-300 pb-2 mb-4">
@@ -1166,10 +1193,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 const today = new Date();
                 const daysDiff = Math.ceil((dueDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
                 const startOffset = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                
+
                 return (
-                  <div 
-                    key={task._id} 
+                  <div
+                    key={task._id}
                     className="flex items-center mb-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -mx-2"
                     onClick={() => handleTaskClick(task)}
                   >
@@ -1190,13 +1217,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       </div>
                     </div>
                     <div className="flex-1 relative h-8">
-                      <div 
-                        className={`absolute h-6 rounded flex items-center px-2 text-xs text-white ${
-                          task.status === 'completed' ? 'bg-green-500' :
+                      <div
+                        className={`absolute h-6 rounded flex items-center px-2 text-xs text-white ${task.status === 'completed' ? 'bg-green-500' :
                           task.status === 'in-progress' ? 'bg-accent' :
-                          task.status === 'blocked' ? 'bg-red-500' :
-                          'bg-gray-400'
-                        }`}
+                            task.status === 'blocked' ? 'bg-red-500' :
+                              'bg-gray-400'
+                          }`}
                         style={{
                           left: `${Math.max(0, (startOffset / 7) * 100)}%`,
                           width: `${Math.min(100, (daysDiff / 7) * 100)}%`
@@ -1230,8 +1256,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredTasks.map(task => (
-                  <tr 
-                    key={task._id} 
+                  <tr
+                    key={task._id}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => handleTaskClick(task)}
                   >
@@ -1262,8 +1288,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex-1 bg-gray-300 rounded-full h-2 max-w-[100px]">
-                          <div 
-                            className="bg-accent h-2 rounded-full" 
+                          <div
+                            className="bg-accent h-2 rounded-full"
                             style={{ width: `${task.progress}%` }}
                           />
                         </div>
@@ -1306,7 +1332,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 <p className="text-3xl font-bold">{myTasks.length}</p>
                 <p className="text-xs opacity-75 mt-1">{t('project.employeeTasks.dashboard.totalTasksDesc')}</p>
               </div>
-              
+
               <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.completed')}</h3>
@@ -1319,7 +1345,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   {t('project.employeeTasks.dashboard.completedDesc', { percent: Math.round((myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length / myTasks.length) * 100) })}
                 </p>
               </div>
-              
+
               <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.inProgress')}</h3>
@@ -1330,7 +1356,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 </p>
                 <p className="text-xs opacity-75 mt-1">{t('project.employeeTasks.dashboard.inProgressDesc')}</p>
               </div>
-              
+
               <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-medium opacity-90">{t('project.employeeTasks.dashboard.overdue')}</h3>
@@ -1359,7 +1385,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           <span className="text-sm font-medium text-gray-900">{count}</span>
                         </div>
                         <div className="w-full bg-gray-300 rounded-full h-2">
-                          <div 
+                          <div
                             className={`h-2 rounded-full ${getStatusColor(status).replace('text-', 'bg-').replace('100', '500')}`}
                             style={{ width: `${percentage}%` }}
                           />
@@ -1384,7 +1410,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           <span className="text-sm font-medium text-gray-900">{count}</span>
                         </div>
                         <div className="w-full bg-gray-300 rounded-full h-2">
-                          <div 
+                          <div
                             className={`h-2 rounded-full ${getPriorityColor(priority).replace('text-', 'bg-').replace('100', '500')}`}
                             style={{ width: `${percentage}%` }}
                           />
@@ -1401,8 +1427,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.dashboard.recentTasks')}</h3>
               <div className="space-y-2">
                 {filteredTasks.slice(0, 5).map(task => (
-                  <div 
-                    key={task._id} 
+                  <div
+                    key={task._id}
                     onClick={() => handleTaskClick(task)}
                     className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
                   >
@@ -1435,7 +1461,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {viewMode === 'workload' && (
           <div className="bg-white rounded-lg border border-gray-300 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('project.employeeTasks.workload.title')}</h3>
-            
+
             {/* Workload Summary */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-blue-50 rounded-lg p-4">
@@ -1461,13 +1487,13 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               <h4 className="font-semibold text-gray-900">{t('project.employeeTasks.workload.tasksByWeek')}</h4>
               {(() => {
                 const weeks = [
-                  t('project.employeeTasks.workload.weeks.thisWeek'), 
-                  t('project.employeeTasks.workload.weeks.nextWeek'), 
+                  t('project.employeeTasks.workload.weeks.thisWeek'),
+                  t('project.employeeTasks.workload.weeks.nextWeek'),
                   t('project.employeeTasks.workload.weeks.later')
                 ];
                 const today = new Date();
                 const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-                
+
                 return weeks.map(week => {
                   let weekTasks;
                   if (week === t('project.employeeTasks.workload.weeks.thisWeek')) {
@@ -1479,7 +1505,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     const twoWeeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
                     weekTasks = myTasks.filter(t => new Date(t.dueDate) > twoWeeks);
                   }
-                  
+
                   return (
                     <div key={week} className="border border-gray-300 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
@@ -1488,17 +1514,16 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                       </div>
                       <div className="space-y-2">
                         {weekTasks.slice(0, 3).map(task => (
-                          <div 
-                            key={task._id} 
+                          <div
+                            key={task._id}
                             onClick={() => handleTaskClick(task)}
                             className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 rounded p-1 -mx-1"
                           >
-                            <span className={`w-2 h-2 rounded-full ${
-                              task.priority === 'critical' ? 'bg-red-500' :
+                            <span className={`w-2 h-2 rounded-full ${task.priority === 'critical' ? 'bg-red-500' :
                               task.priority === 'high' ? 'bg-orange-500' :
-                              task.priority === 'medium' ? 'bg-accent' :
-                              'bg-gray-400'
-                            }`} />
+                                task.priority === 'medium' ? 'bg-accent' :
+                                  'bg-gray-400'
+                              }`} />
                             <span className="flex-1 text-gray-700 truncate">{task.title}</span>
                             <span className="text-xs text-gray-600">{new Date(task.dueDate).toLocaleDateString()}</span>
                           </div>
@@ -1517,11 +1542,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
         {/* Task Detail Modal */}
         {selectedTaskForModal && (
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             onClick={() => setSelectedTaskForModal(null)}
           >
-            <div 
+            <div
               className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
@@ -1574,11 +1599,10 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-1">{t('project.tasks.dueDate')}</h3>
-                    <p className={`text-sm flex items-center gap-1 ${
-                      isOverdue(selectedTaskForModal.dueDate) && selectedTaskForModal.status !== 'completed' 
-                        ? 'text-red-600 font-semibold' 
-                        : 'text-gray-600'
-                    }`}>
+                    <p className={`text-sm flex items-center gap-1 ${isOverdue(selectedTaskForModal.dueDate) && selectedTaskForModal.status !== 'completed'
+                      ? 'text-red-600 font-semibold'
+                      : 'text-gray-600'
+                      }`}>
                       <Clock className="w-4 h-4" />
                       {new Date(selectedTaskForModal.dueDate).toLocaleDateString()}
                     </p>
@@ -1592,7 +1616,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <span className="text-sm font-medium text-gray-900">{selectedTaskForModal.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-3">
-                    <div 
+                    <div
                       className="bg-accent h-3 rounded-full transition-all"
                       style={{ width: `${selectedTaskForModal.progress}%` }}
                     />
@@ -1652,11 +1676,11 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     </h3>
                     <div className="space-y-2">
                       {selectedTaskForModal.links.map((link, index) => (
-                        <a 
+                        <a
                           key={index}
-                          href={link} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="block text-sm text-accent-dark hover:underline p-2 bg-gray-50 rounded"
                         >
                           {link}
@@ -1697,7 +1721,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     value={selectedTaskForModal.status}
                     onChange={(e) => {
                       handleStatusChange(selectedTaskForModal._id, e.target.value as Task['status']);
-                      setSelectedTaskForModal({...selectedTaskForModal, status: e.target.value as Task['status']});
+                      setSelectedTaskForModal({ ...selectedTaskForModal, status: e.target.value as Task['status'] });
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
                   >
@@ -1727,8 +1751,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
           <div className="space-y-3">
             {verifiedTasks.map((task) => (
-              <div 
-                key={task._id} 
+              <div
+                key={task._id}
                 className="border border-gray-300 bg-gray-50 rounded-lg p-4 opacity-75"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -1745,18 +1769,18 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                           </span>
                         );
                       })()}
-                      
+
                       <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
                         ✓ Verified
                       </span>
-                      
+
                       {/* Rating Display */}
                       {task.rating && (
                         <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full flex items-center gap-1">
                           ⭐ {task.rating.toFixed(1)} / 5.0
                         </span>
                       )}
-                      
+
                       {task.verifiedAt && (
                         <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">
                           Verified on {new Date(task.verifiedAt).toLocaleDateString()}
@@ -1834,6 +1858,94 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+      {/* Create Task Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('project.tasks.modal.title.create', 'Create New Task')}</h3>
+              <button onClick={() => setShowCreateModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('project.tasks.modal.title', 'Task Title')} *
+                </label>
+                <input
+                  type="text"
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
+                  placeholder="e.g. Update Documentation"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('project.tasks.modal.description', 'Description')}
+                </label>
+                <textarea
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
+                  rows={3}
+                  placeholder="Describe the task details..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('project.tasks.modal.priority', 'Priority')}
+                  </label>
+                  <select
+                    value={newTask.priority}
+                    onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('project.tasks.modal.dueDate', 'Due Date')}
+                  </label>
+                  <input
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
+              <button
+                onClick={handleCreateNewTask}
+                className="flex-1 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover font-medium shadow-sm transition-colors"
+                disabled={!newTask.title.trim()}
+              >
+                {t('project.tasks.modal.submit', 'Create Task')}
+              </button>
+            </div>
           </div>
         </div>
       )}

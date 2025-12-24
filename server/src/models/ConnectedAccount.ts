@@ -2,13 +2,13 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IConnectedAccount extends Document {
     userId: mongoose.Types.ObjectId;
-    service: 'mail' | 'calendar' | 'vault';
-    provider: 'google' | 'microsoft';
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive';
+    provider: 'google' | 'microsoft' | 'slack' | 'github' | 'dropbox';
 
     // OAuth tokens
     accessToken: string;
-    refreshToken: string;
-    expiresAt: Date;
+    refreshToken?: string;
+    expiresAt?: Date;
 
     // Account details from provider
     providerAccountId: string;
@@ -36,13 +36,13 @@ const connectedAccountSchema = new Schema<IConnectedAccount>({
     },
     service: {
         type: String,
-        enum: ['mail', 'calendar', 'vault'],
+        enum: ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive'],
         required: true,
         index: true
     },
     provider: {
         type: String,
-        enum: ['google', 'microsoft'],
+        enum: ['google', 'microsoft', 'slack', 'github', 'dropbox'],
         required: true
     },
 
@@ -53,11 +53,11 @@ const connectedAccountSchema = new Schema<IConnectedAccount>({
     },
     refreshToken: {
         type: String,
-        required: true
+        required: false
     },
     expiresAt: {
         type: Date,
-        required: true
+        required: false
     },
 
     // Provider account details

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle, Clock } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
-import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getPlannerData } from '../../services/plannerService';
 
 interface PendingTask {
     _id: string;
@@ -18,38 +18,45 @@ interface PendingTask {
 }
 
 const PendingTasksWidget: React.FC = () => {
-    const { isDarkMode } = useTheme();
+    const { isDarkMode, preferences } = useTheme();
     const { state } = useApp();
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [pendingTasks, setPendingTasks] = useState<PendingTask[]>([]);
     const [loading, setLoading] = useState(false);
     const currentUserId = state.userProfile?._id;
+    // @ts-ignore - Assuming currentWorkspace exists on state based on context usage in other files
+    const currentWorkspaceId = state.currentWorkspace?._id;
+    const accentColor = preferences.accentColor || '#3b82f6';
 
     useEffect(() => {
         loadPendingTasks();
-    }, [currentUserId]);
+    }, [currentUserId, currentWorkspaceId]);
 
     const loadPendingTasks = async () => {
         if (!currentUserId) return;
 
         try {
             setLoading(true);
-            const response = await api.get('/home/dashboard');
+            const data = await getPlannerData({
+                workspaceId: currentWorkspaceId
+            });
 
-            if (response.data?.data?.quickTasks) {
-                // Filter for pending tasks assigned to current user
-                const pending = response.data.data.quickTasks
+            // The API returns { tasks: [], ... }
+            if (data?.tasks) {
+                // Filter for pending tasks (todo or in-progress)
+                const pending = data.tasks
                     .filter((task: any) => {
-                        const isAssignedToUser = task.assignee === currentUserId ||
-                            task.assignee?._id === currentUserId ||
-                            task.assignedTo === currentUserId;
-                        return !task.completed && isAssignedToUser && task.dueDate;
+                        // Filter logic: Check status and assignment if necessary
+                        // The server might return all workspace tasks, so we filter by assignee if not handled by server
+                        const isAssignedToUser = task.assignee?._id === currentUserId || task.assignee === currentUserId;
+                        const isPending = task.status === 'todo' || task.status === 'in-progress';
+                        return isPending && isAssignedToUser;
                     })
                     .map((task: any) => ({
                         _id: task._id,
                         title: task.title,
-                        dueDate: new Date(task.dueDate),
+                        dueDate: task.dueDate ? new Date(task.dueDate) : new Date(),
                         priority: task.priority || 'medium',
                         project: task.project
                     }))
@@ -108,101 +115,111 @@ const PendingTasksWidget: React.FC = () => {
         );
     }
 
-    if (pendingTasks.length === 0) {
-        return (
-            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
-                <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {t('home.pendingTasks')}
-                </h2>
+    return (
+        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${accentColor}20` }}>
+                        <AlertCircle className="w-5 h-5" style={{ color: accentColor }} />
+                    </div>
+                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('home.pendingTasks')}</h3>
+                </div>
+                <button
+                    onClick={() => navigate('/tasks')}
+                    className="text-sm font-medium hover:underline transition-colors block md:hidden"
+                    style={{ color: accentColor }}
+                >
+                    {t('home.viewAll')}
+                </button>
+            </div>
+
+            {pendingTasks.length === 0 ? (
                 <div className="flex-1 flex items-center justify-center">
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         {t('home.noPendingTasks')}
                     </p>
                 </div>
-            </div>
-        );
-    }
+            ) : (
+                <>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                        <div className="notifications-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {pendingTasks.map((task) => {
+                                const borderColor = getPriorityColor(task.priority);
+                                const isOverdue = task.dueDate.getTime() < new Date().getTime();
 
-    return (
-        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border p-6 h-full flex flex-col`}>
-            <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                {t('home.pendingTasks')}
-            </h2>
-
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
-                <div className="notifications-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {pendingTasks.map((task) => {
-                        const borderColor = getPriorityColor(task.priority);
-                        const isOverdue = task.dueDate.getTime() < new Date().getTime();
-
-                        return (
-                            <div
-                                key={task._id}
-                                className="alert"
-                                style={{
-                                    backgroundColor: isDarkMode ? 'rgb(31 41 55)' : 'rgb(254 252 232)',
-                                    borderLeftWidth: '4px',
-                                    borderLeftColor: borderColor,
-                                    borderRadius: '0.375rem',
-                                    padding: '1rem',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => navigate(`/tasks/${task._id}`)}
-                            >
-                                <div className="flex">
-                                    <div className="flex-shrink-0">
-                                        <AlertCircle
-                                            className="alert-svg"
-                                            style={{
-                                                height: '1.25rem',
-                                                width: '1.25rem',
-                                                color: borderColor
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="alert-prompt-wrap" style={{ marginLeft: '0.75rem', flex: 1 }}>
-                                        <p
-                                            className="alert-prompt"
-                                            style={{
-                                                fontWeight: 500,
-                                                color: isDarkMode ? 'rgb(209 213 219)' : 'rgb(202 138 4)',
-                                                marginBottom: '0.25rem'
-                                            }}
-                                        >
-                                            {task.title}
-                                        </p>
-                                        <div className="flex items-center gap-2 text-xs" style={{
-                                            color: isDarkMode ? 'rgb(156 163 175)' : 'rgb(161 98 7)'
-                                        }}>
-                                            <Clock className="w-3 h-3" />
-                                            <span className={isOverdue ? 'font-bold' : ''}>
-                                                {formatDeadline(task.dueDate)}
-                                            </span>
-                                            {task.project && (
-                                                <>
-                                                    <span>•</span>
-                                                    <span>{task.project.name}</span>
-                                                </>
-                                            )}
+                                return (
+                                    <div
+                                        key={task._id}
+                                        className="alert"
+                                        style={{
+                                            backgroundColor: isDarkMode ? 'rgb(31 41 55)' : 'rgb(254 252 232)',
+                                            borderLeftWidth: '4px',
+                                            borderLeftColor: borderColor,
+                                            borderRadius: '0.375rem',
+                                            padding: '1rem',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => navigate(`/tasks/${task._id}`)}
+                                    >
+                                        <div className="flex">
+                                            <div className="flex-shrink-0">
+                                                <AlertCircle
+                                                    className="alert-svg"
+                                                    style={{
+                                                        height: '1.25rem',
+                                                        width: '1.25rem',
+                                                        color: borderColor
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="alert-prompt-wrap" style={{ marginLeft: '0.75rem', flex: 1 }}>
+                                                <p
+                                                    className="alert-prompt"
+                                                    style={{
+                                                        fontWeight: 500,
+                                                        color: isDarkMode ? 'rgb(209 213 219)' : 'rgb(202 138 4)',
+                                                        marginBottom: '0.25rem'
+                                                    }}
+                                                >
+                                                    {task.title}
+                                                </p>
+                                                <div className="flex items-center gap-2 text-xs" style={{
+                                                    color: isDarkMode ? 'rgb(156 163 175)' : 'rgb(161 98 7)'
+                                                }}>
+                                                    <Clock className="w-3 h-3" />
+                                                    <span className={isOverdue ? 'font-bold' : ''}>
+                                                        {formatDeadline(task.dueDate)}
+                                                    </span>
+                                                    {task.project && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>{task.project.name}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+                                );
+                            })}
+                        </div>
+                    </div>
 
-            {pendingTasks.length >= 5 && (
-                <button
-                    onClick={() => navigate('/tasks')}
-                    className={`mt-4 w-full text-sm font-medium py-2 px-4 rounded-2xl transition-colors ${isDarkMode
-                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                        }`}
-                >
-                    {t('home.viewAllTasks')}
-                </button>
+                    {pendingTasks.length >= 5 && (
+                        <button
+                            onClick={() => navigate('/tasks')}
+                            className={`mt-4 w-full text-sm font-medium py-2 px-4 rounded-2xl transition-colors ${isDarkMode
+                                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                                : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                                }`}
+                            style={{
+                                color: accentColor
+                            }}
+                        >
+                            {t('home.viewAllTasks')}
+                        </button>
+                    )}
+                </>
             )}
         </div>
     );

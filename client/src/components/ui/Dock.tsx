@@ -404,7 +404,7 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number>; 
         {/* Tooltip Portal */}
         {tooltip && tooltipPos && createPortal(
           <div
-            className="fixed px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg shadow-2xl z-[9999] pointer-events-none whitespace-nowrap animate-fadeIn"
+            className="fixed px-4 py-2 bg-black/90 dark:bg-gray-900/90 backdrop-blur-md border border-white/10 dark:border-gray-700/50 text-white text-sm font-medium rounded-lg shadow-xl z-[9999] pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-200"
             style={{
               left: tooltipPos.x,
               top: tooltipPos.y,
@@ -421,13 +421,13 @@ export const DockIcon: React.FC<DockIconProps & { mouseX?: MotionValue<number>; 
             {tooltip}
             {/* Arrow */}
             <div
-              className={`absolute w-3 h-3 bg-black transform rotate-45 ${dockPosition === 'left'
-                ? 'left-[-4px] top-1/2 -translate-y-1/2'
+              className={`absolute w-3 h-3 bg-black/90 dark:bg-gray-900/90 border-t border-l border-white/10 dark:border-gray-700/50 transform rotate-45 ${dockPosition === 'left'
+                ? 'left-[-5px] top-1/2 -translate-y-1/2 -rotate-45 border-t-0 border-l-0 border-b border-r'
                 : dockPosition === 'right'
-                  ? 'right-[-4px] top-1/2 -translate-y-1/2'
+                  ? 'right-[-5px] top-1/2 -translate-y-1/2 rotate-135 border-t-0 border-l-0 border-b border-r'
                   : dockPosition === 'top'
-                    ? 'top-[-4px] left-1/2 -translate-x-1/2'
-                    : 'bottom-[-4px] left-1/2 -translate-x-1/2'
+                    ? 'top-[-5px] left-1/2 -translate-x-1/2 rotate-45'
+                    : 'bottom-[-5px] left-1/2 -translate-x-1/2 rotate-225'
                 }`}
             />
           </div>,

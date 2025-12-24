@@ -118,16 +118,18 @@
         "profile": "프로필"
     },
     "switcher": {
-        "workspaces": "워크스페이스",
-        "quickActions": "빠른 작업",
-        "createWorkspace": "워크스페이스 만들기",
-        "createWorkspaceDesc": "새 워크스페이스 생성",
-        "discoverWorkspaces": "워크스페이스 찾기",
-        "discoverWorkspacesDesc": "사용 가능한 워크스페이스 탐색",
         "personalMode": "개인 모드",
         "individualWorkspace": "개인 워크스페이스",
         "teamWorkspace": "팀 워크스페이스",
-        "members": "멤버 {{count}}명"
+        "workspaces": "워크스페이스",
+        "quickActions": "빠른 작업",
+        "createWorkspace": "워크스페이스 만들기",
+        "createWorkspaceDesc": "새로운 팀 워크스페이스 시작",
+        "discoverWorkspaces": "워크스페이스 탐색",
+        "discoverWorkspacesDesc": "팀을 찾아 가입",
+        "switchedTo": "{{name}}(으)로 전환됨",
+        "switchedToPersonal": "개인 모드로 전환됨",
+        "members": "{{count}}명의 멤버"
     },
     "messages": {
         "noWorkspace": "워크스페이스가 선택되지 않았습니다",
@@ -1463,20 +1465,6 @@
         "roles": "역할",
         "owner": "소유자",
         "admin": "관리자",
-        "switcher": {
-            "personalMode": "개인 모드",
-            "individualWorkspace": "개인 워크스페이스",
-            "teamWorkspace": "팀 워크스페이스",
-            "workspaces": "워크스페이스",
-            "quickActions": "빠른 작업",
-            "createWorkspace": "워크스페이스 만들기",
-            "createWorkspaceDesc": "새로운 팀 워크스페이스 시작",
-            "discoverWorkspaces": "워크스페이스 탐색",
-            "discoverWorkspacesDesc": "팀을 찾아 가입",
-            "switchedTo": "{{name}}(으)로 전환됨",
-            "switchedToPersonal": "개인 모드로 전환됨",
-            "members": "{{count}}명의 멤버"
-        },
         "member": "멤버",
         "guest": "게스트",
         "management": "워크스페이스 관리",

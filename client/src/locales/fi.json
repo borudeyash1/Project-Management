@@ -94,13 +94,18 @@
     "feedback": "Palaute"
   },
   "switcher": {
-    "workspaces": "Workspaces",
-    "quickActions": "Quick Actions",
-    "createWorkspace": "Create Workspace",
-    "createWorkspaceDesc": "Create a new workspace",
-    "discoverWorkspaces": "Discover Workspaces",
-    "discoverWorkspacesDesc": "Browse available workspaces",
-    "personalMode": "Personal Mode"
+    "personalMode": "Henkilökohtainen tila",
+    "individualWorkspace": "Yksilöllinen työtila",
+    "teamWorkspace": "Tiimityötila",
+    "workspaces": "Työtilat",
+    "quickActions": "Pikatoiminnot",
+    "createWorkspace": "Luo työtila",
+    "createWorkspaceDesc": "Aloita uusi tiimityötila",
+    "discoverWorkspaces": "Löydä työtiloja",
+    "discoverWorkspacesDesc": "Löydä tiimi ja liity mukaan",
+    "switchedTo": "Vaihdettu kohteeseen {{name}}",
+    "switchedToPersonal": "Vaihdettu henkilökohtaiseen tilaan",
+    "members": "{{count}} jäsentä"
   },
   "messages": {
     "noWorkspace": "No workspace selected",
@@ -1054,20 +1059,6 @@
     "roles": "Roolit",
     "owner": "Omistaja",
     "admin": "Ylläpitäjä",
-    "switcher": {
-      "personalMode": "Henkilökohtainen tila",
-      "individualWorkspace": "Yksilöllinen työtila",
-      "teamWorkspace": "Tiimityötila",
-      "workspaces": "Työtilat",
-      "quickActions": "Pikatoiminnot",
-      "createWorkspace": "Luo työtila",
-      "createWorkspaceDesc": "Aloita uusi tiimityötila",
-      "discoverWorkspaces": "Löydä työtiloja",
-      "discoverWorkspacesDesc": "Löydä tiimi ja liity mukaan",
-      "switchedTo": "Vaihdettu kohteeseen {{name}}",
-      "switchedToPersonal": "Vaihdettu henkilökohtaiseen tilaan",
-      "members": "{{count}} jäsentä"
-    },
     "member": "Jäsen",
     "guest": "Vieras",
     "management": "Työtilan hallinta",

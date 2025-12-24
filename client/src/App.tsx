@@ -97,6 +97,8 @@ import ClientModal from './components/ClientModal';
 import PricingModal from './components/PricingModal';
 import RequestChangeModal from './components/RequestChangeModal';
 import LoadingAnimation from './components/LoadingAnimation';
+import { StickyNotesProvider } from './context/StickyNotesContext';
+import StickyNotesContainer from './components/StickyNotesContainer';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -253,6 +255,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="antialiased bg-bg dark:bg-gray-900 text-text dark:text-gray-100 font-inter selection-bg-primary">
+      <StickyNotesContainer />
       <ToastContainer />
 
       <Routes>
@@ -545,13 +548,15 @@ const App: React.FC = () => {
       <Router>
         <AppProvider>
           <ThemeProvider>
-            <DockProvider>
-              <PlannerProvider>
-                <TrackerProvider>
-                  <AppContent />
-                </TrackerProvider>
-              </PlannerProvider>
-            </DockProvider>
+            <StickyNotesProvider>
+              <DockProvider>
+                <PlannerProvider>
+                  <TrackerProvider>
+                    <AppContent />
+                  </TrackerProvider>
+                </PlannerProvider>
+              </DockProvider>
+            </StickyNotesProvider>
           </ThemeProvider>
         </AppProvider>
       </Router>

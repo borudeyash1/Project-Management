@@ -145,6 +145,22 @@ export interface IUser extends Document {
       activeAccountId?: string;
       accounts?: string[];
     };
+    slack?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    github?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    dropbox?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    onedrive?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
   };
   // Enhanced profile information for AI-powered insights
   profile?: {

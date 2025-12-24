@@ -7,6 +7,7 @@ import UserDisplay from './UserDisplay';
 import { AnimatedThemeToggler } from './ui/animated-theme-toggler';
 import { SparklesText } from './ui/sparkles-text';
 import { useTheme } from '../context/ThemeContext';
+import DropdownTransition from './animations/DropdownTransition';
 import {
   Search,
   Bell,
@@ -219,38 +220,40 @@ const Header: React.FC = () => {
             <Globe className="w-4 h-4 text-gray-700 dark:text-gray-300" />
           </button>
 
-          {showLanguageMenu && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-              <div className="p-2">
-                {[
-                  { code: 'en', name: 'English', flag: '🇬🇧' },
-                  { code: 'ja', name: '日本語', flag: '🇯🇵' },
-                  { code: 'ko', name: '한국어', flag: '🇰🇷' },
-                  { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
-                  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-                  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-                  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-                  { code: 'es', name: 'Español', flag: '🇪🇸' },
-                  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-                  { code: 'da', name: 'Dansk', flag: '🇩🇰' },
-                  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
-                  { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
-                  { code: 'no', name: 'Norsk', flag: '🇳🇴' },
-                  { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
-                ].map((lang) => (
-                  <button
-                    key={lang.code}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
-                      }`}
-                    onClick={() => changeLanguage(lang.code)}
-                  >
-                    <span className="text-lg">{lang.flag}</span>
-                    <span className="dark:text-gray-200">{lang.name}</span>
-                  </button>
-                ))}
-              </div>
+
+          <DropdownTransition
+            isOpen={showLanguageMenu}
+            className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
+          >
+            <div className="p-2">
+              {[
+                { code: 'en', name: 'English', flag: '🇬🇧' },
+                { code: 'ja', name: '日本語', flag: '🇯🇵' },
+                { code: 'ko', name: '한국어', flag: '🇰🇷' },
+                { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+                { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+                { code: 'fr', name: 'Français', flag: '🇫🇷' },
+                { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+                { code: 'es', name: 'Español', flag: '🇪🇸' },
+                { code: 'pt', name: 'Português', flag: '🇵🇹' },
+                { code: 'da', name: 'Dansk', flag: '🇩🇰' },
+                { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+                { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
+                { code: 'no', name: 'Norsk', flag: '🇳🇴' },
+                { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
+              ].map((lang) => (
+                <button
+                  key={lang.code}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 text-sm ${i18n.language === lang.code ? 'bg-slate-100 dark:bg-gray-700' : ''
+                    }`}
+                  onClick={() => changeLanguage(lang.code)}
+                >
+                  <span className="text-lg">{lang.flag}</span>
+                  <span className="dark:text-gray-200">{lang.name}</span>
+                </button>
+              ))}
             </div>
-          )}
+          </DropdownTransition>
         </div>
 
         {/* User Menu */}
@@ -275,91 +278,93 @@ const Header: React.FC = () => {
           </button>
 
           {/* User Dropdown */}
-          {isUserMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl shadow-2xl z-[100] overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border dark:border-gray-600">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('settings.profileSettings')}</h3>
-                <button
-                  onClick={toggleUserMenu}
-                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+          <DropdownTransition
+            isOpen={isUserMenuOpen}
+            className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl shadow-2xl z-[100] overflow-hidden"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border dark:border-gray-600">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('settings.profileSettings')}</h3>
+              <button
+                onClick={toggleUserMenu}
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-              {/* Profile Info */}
-              <div className="p-4 flex items-center gap-4">
-                <div className="relative">
-                  {state.userProfile.avatarUrl ? (
-                    <img
-                      src={state.userProfile.avatarUrl}
-                      alt={state.userProfile.fullName}
-                      className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-                      {state.userProfile.fullName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-                <div className="overflow-hidden">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{state.userProfile.fullName}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 truncate">{state.userProfile.email}</p>
-                </div>
+            {/* Profile Info */}
+            <div className="p-4 flex items-center gap-4">
+              <div className="relative">
+                {state.userProfile.avatarUrl ? (
+                  <img
+                    src={state.userProfile.avatarUrl}
+                    alt={state.userProfile.fullName}
+                    className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                    {state.userProfile.fullName.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
-
-              <div className="px-4 py-3">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                  {t('settings.theme')}
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => applyTheme('light')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'light'
-                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
-                  >
-                    {preferences.theme === 'light' && (
-                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
-                    )}
-                    <Sun className="w-4 h-4 mb-1.5 relative z-10" />
-                    <span className="text-[11px] font-semibold relative z-10">Light</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.light')}</span>
-                  </button>
-                  <button
-                    onClick={() => applyTheme('dark')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'dark'
-                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
-                  >
-                    {preferences.theme === 'dark' && (
-                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
-                    )}
-                    <Moon className="w-4 h-4 mb-1.5 relative z-10" />
-                    <span className="text-[11px] font-semibold relative z-10">Dark</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.dark')}</span>
-                  </button>
-                  <button
-                    onClick={() => applyTheme('system')}
-                    className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'system'
-                      ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
-                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
-                  >
-                    {preferences.theme === 'system' && (
-                      <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
-                    )}
-                    <Monitor className="w-4 h-4 mb-1.5 relative z-10" />
-                    <span className="text-[11px] font-semibold relative z-10">System</span>
-                    <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.system')}</span>
-                  </button>
-                </div>
+              <div className="overflow-hidden">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{state.userProfile.fullName}</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 truncate">{state.userProfile.email}</p>
               </div>
             </div>
-          )}
+
+            <div className="px-4 py-3">
+
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                {t('settings.theme')}
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => applyTheme('light')}
+                  className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'light'
+                    ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  {preferences.theme === 'light' && (
+                    <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
+                  )}
+                  <Sun className="w-4 h-4 mb-1.5 relative z-10" />
+                  <span className="text-[11px] font-semibold relative z-10">Light</span>
+                  <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.light')}</span>
+                </button>
+                <button
+                  onClick={() => applyTheme('dark')}
+                  className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'dark'
+                    ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  {preferences.theme === 'dark' && (
+                    <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
+                  )}
+                  <Moon className="w-4 h-4 mb-1.5 relative z-10" />
+                  <span className="text-[11px] font-semibold relative z-10">Dark</span>
+                  <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.dark')}</span>
+                </button>
+                <button
+                  onClick={() => applyTheme('system')}
+                  className={`relative flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-200 overflow-hidden group ${preferences.theme === 'system'
+                    ? 'bg-blue-50 border-blue-400 text-blue-600 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400 shadow-sm'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  {preferences.theme === 'system' && (
+                    <div className="absolute inset-0 bg-blue-400/10 dark:bg-blue-500/10 blur-xl rounded-full scale-150" />
+                  )}
+                  <Monitor className="w-4 h-4 mb-1.5 relative z-10" />
+                  <span className="text-[11px] font-semibold relative z-10">System</span>
+                  <span className="text-[9px] opacity-60 leading-tight relative z-10">{t('settings.themeDescriptions.system')}</span>
+                </button>
+              </div>
+            </div>
+          </DropdownTransition>
         </div>
       </div>
 

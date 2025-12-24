@@ -386,19 +386,13 @@ const ProjectsPage: React.FC = () => {
 
         {/* Action Button */}
         <div className="flex justify-end mb-6">
-          {canCreateProject() ? (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
-            >
-              <Plus className="w-5 h-5" />
-              {t('projects.newProject')}
-            </button>
-          ) : (
-            <WorkspaceCreationRestriction>
-              <div />
-            </WorkspaceCreationRestriction>
-          )}
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-gray-900 dark:text-white rounded-xl hover:bg-accent-hover transition-all transform hover:scale-105"
+          >
+            <Plus className="w-5 h-5" />
+            {t('projects.newProject')}
+          </button>
         </div>
         {/* Filters and Search */}
         <GlassmorphicCard className="p-6 mb-6">

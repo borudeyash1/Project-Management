@@ -118,16 +118,18 @@
         "profile": "プロフィール"
     },
     "switcher": {
+        "personalMode": "個人モード",
+        "individualWorkspace": "個人のワークスペース",
+        "teamWorkspace": "チームワークスペース",
         "workspaces": "ワークスペース",
         "quickActions": "クイックアクション",
         "createWorkspace": "ワークスペースを作成",
-        "createWorkspaceDesc": "新しいワークスペースを作成",
-        "discoverWorkspaces": "ワークスペースを探す",
-        "discoverWorkspacesDesc": "利用可能なワークスペースを閲覧",
-        "personalMode": "個人モード",
-        "individualWorkspace": "個人用ワークスペース",
-        "teamWorkspace": "チームワークスペース",
-        "members": "{{count}} 人のメンバー"
+        "createWorkspaceDesc": "新しいチームワークスペースを開始",
+        "discoverWorkspaces": "ワークスペースを探索",
+        "discoverWorkspacesDesc": "チームを見つけて参加",
+        "switchedTo": "{{name}}に切り替えました",
+        "switchedToPersonal": "個人モードに切り替えました",
+        "members": "{{count}}人のメンバー"
     },
     "messages": {
         "noWorkspace": "ワークスペースが選択されていません",
@@ -1501,20 +1503,6 @@
         "roles": "役割",
         "owner": "オーナー",
         "admin": "管理者",
-        "switcher": {
-            "personalMode": "個人モード",
-            "individualWorkspace": "個人のワークスペース",
-            "teamWorkspace": "チームワークスペース",
-            "workspaces": "ワークスペース",
-            "quickActions": "クイックアクション",
-            "createWorkspace": "ワークスペースを作成",
-            "createWorkspaceDesc": "新しいチームワークスペースを開始",
-            "discoverWorkspaces": "ワークスペースを探索",
-            "discoverWorkspacesDesc": "チームを見つけて参加",
-            "switchedTo": "{{name}}に切り替えました",
-            "switchedToPersonal": "個人モードに切り替えました",
-            "members": "{{count}}人のメンバー"
-        },
         "member": "メンバー",
         "guest": "ゲスト",
         "management": "ワークスペース管理",

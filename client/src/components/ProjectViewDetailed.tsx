@@ -2456,6 +2456,7 @@ const ProjectViewDetailed: React.FC = () => {
             tasks={projectTasks}
             currentUserId={currentTestUserId}
             onUpdateTask={handleUpdateTask}
+            onCreateTask={handleCreateTask}
           />
         );
 

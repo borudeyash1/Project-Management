@@ -28,8 +28,8 @@ import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
-import StickyNote from './StickyNote';
 import AIChatbot from './AIChatbot';
+import { useStickyNotes } from '../context/StickyNotesContext';
 
 interface NavItem {
   id: string;
@@ -209,87 +209,12 @@ const DockNavigation: React.FC = () => {
       (path !== '/home' && location.pathname.startsWith(path));
   };
 
-  // Sticky Notes State
-  const [activeStickyNotes, setActiveStickyNotes] = useState<any[]>([]);
-
-  // Load persistent sticky notes on mount
-  useEffect(() => {
-    const fetchStickyNotes = async () => {
-      try {
-        const res = await apiService.get('/notes');
-        if ((res as any).data) {
-          // Filter for sticky notes that are not archived/deleted
-          const savedNotes = (res as any).data.filter((n: any) => n.isSticky && !n.isArchived && !n.isDeleted);
-          setActiveStickyNotes(savedNotes);
-        }
-      } catch (e) {
-        console.error('Failed to load sticky notes', e);
-      }
-    };
-    fetchStickyNotes();
-  }, []);
+  // Sticky Notes Context
+  const { addNote } = useStickyNotes();
 
   const handleCreateStickyNote = () => {
-    const tempId = `temp-${Date.now()}`;
-    const newNote = {
-      _id: tempId,
-      isTemp: true,
-      isSticky: true,
-      title: '',
-      content: '',
-      color: '#fff9c4',
-      position: { x: window.innerWidth / 2 - 100, y: window.innerHeight / 2 - 100 }
-    };
-    setActiveStickyNotes(prev => [...prev, newNote]);
+    addNote();
     setHoveredItem(null); // Close menu
-  };
-
-  const handleCloseStickyNote = (id: string) => {
-    setActiveStickyNotes(prev => prev.filter(note => note._id !== id));
-  };
-
-  const handleNoteSave = (savedNote: any) => {
-    setActiveStickyNotes(prev => prev.map(n => {
-      // If we are updating a temp note with a real saved note
-      if (n.isTemp && !savedNote.isTemp) {
-        // Match by some logic? Or we just assume the last created one?
-        // Actually, StickyNote component doesn't pass back the 'id' prop it received if it was temp.
-        // But we can assume if the content matches or if we pass a callback per note.
-        // Actually, the StickyNote component will pass the new _id from the backend.
-        // We need to find the temporary note that was replaced by this savedNote.
-        // A simple way is to assume the last temporary note created is the one being saved.
-        // Or, if the StickyNote component itself manages its ID state and passes it back,
-        // we can use that. For now, let's assume the `savedNote` object contains the new `_id`
-        // and we need to update the corresponding entry in `activeStickyNotes`.
-        // The `StickyNote` component will pass its `_id` (either temp or real) back in `savedNote._id`.
-        // So we just need to find the note with that `_id` and replace it.
-        return n._id === savedNote._id ? savedNote : n;
-      }
-      // Better: StickyNote logic handles ID update internally for itself.
-      // Can we update our list?
-      // If we pass 'id' as undefined, StickyNote generates new one.
-      // When `onSave` fires, it gives us the full saved object including `_id`.
-      // We need to replace the temporary entry in `activeStickyNotes` with this real entry.
-      // How to identify which temp entry it was?
-      // We can't easily unless we passed the temp ID to StickyNote and it passed it back.
-      // StickyNote doesn't seem to support passing 'custom context'.
-
-      // However, if we just reload the list? No, interruption.
-
-      // Simple fix: Once it saves, we update our list to have the ID.
-      // We can match by reference if we used objects? No state updates clone.
-
-      // Let's rely on the fact that if it saves, subsequent edits will validly PUT to that ID.
-      // We mainly need to update our state so if we navigate away and back, we have the ID.
-      // If the user refreshes, we re-fetch.
-      // So actually, explicit state update of ID isn't strictly critical for the CURRENT session 
-      // as long as StickyNote component holds the new ID in its own state (which it does: `setNoteId`).
-      // But if we unmount DockNavigation (unlikely), we lose it.
-
-      // If we just return the savedNote if IDs match?
-      if (n._id === savedNote._id) return savedNote;
-      return n;
-    }));
   };
 
   // Check if dock is in vertical mode (left/right)
@@ -297,20 +222,6 @@ const DockNavigation: React.FC = () => {
 
   return (
     <>
-      {/* Sticky Notes Layer */}
-      {activeStickyNotes.map(note => (
-        <StickyNote
-          key={note._id}
-          id={note.isTemp ? undefined : note._id}
-          initialTitle={note.title}
-          initialContent={note.content}
-          initialColor={note.color}
-          initialPosition={note.position}
-          onClose={() => handleCloseStickyNote(note._id)}
-          onSave={handleNoteSave}
-        />
-      ))}
-
       {/* Main Dock */}
       <Dock direction="middle">
         {mainNavItems.map((item) => {
