@@ -402,12 +402,16 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     picture: ''
                 };
             } else if (service === 'figma') {
-                tokenResponse = await axios.post(config.tokenUrl, {
-                    client_id: config.clientId,
-                    client_secret: config.clientSecret,
-                    redirect_uri: config.callbackUrl,
-                    code,
-                    grant_type: 'authorization_code'
+                // Figma expects form-encoded body, not JSON
+                const params = new URLSearchParams();
+                params.append('client_id', config.clientId || '');
+                params.append('client_secret', config.clientSecret || '');
+                params.append('redirect_uri', config.callbackUrl);
+                params.append('code', code as string);
+                params.append('grant_type', 'authorization_code');
+
+                tokenResponse = await axios.post(config.tokenUrl, params, {
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 });
                 tokens = tokenResponse.data;
                 const meResponse = await axios.get('https://api.figma.com/v1/me', {
