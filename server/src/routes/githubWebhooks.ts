@@ -1,6 +1,11 @@
 import express, { Request, Response } from 'express';
 import crypto from 'crypto';
 import { rateLimit } from 'express-rate-limit';
+import {
+    handlePREvent as syncPREvent,
+    handleReviewEvent as syncReviewEvent,
+    handleIssuesEvent as syncIssuesEvent
+} from '../services/githubSync';
 
 const router = express.Router();
 
@@ -105,43 +110,30 @@ router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => 
     }
 });
 
-// Event handlers (to be implemented in Phase 2)
+
+
+// Event handlers
 async function handlePullRequestEvent(payload: any) {
     const action = payload.action;
     const pr = payload.pull_request;
     const repo = payload.repository;
 
-    console.log(`[GitHub Webhook] PR ${action}: ${repo.full_name}#${pr.number}`);
-
-    // TODO: Implement in Phase 2
-    // - opened: Create task
-    // - closed + merged: Complete task
-    // - closed + not merged: Cancel task
-    // - reopened: Reopen task
-    // - review_requested: Create reminder
+    await syncPREvent(action, pr, repo);
 }
 
 async function handlePullRequestReviewEvent(payload: any) {
     const action = payload.action;
     const review = payload.review;
     const pr = payload.pull_request;
+    const repo = payload.repository;
 
-    console.log(`[GitHub Webhook] PR Review ${action}: ${review.state}`);
-
-    // TODO: Implement in Phase 2
-    // - submitted: Notify task owner
-    // - approved: Add comment to task
-    // - changes_requested: Update task priority
+    await syncReviewEvent(action, review, pr, repo);
 }
 
 async function handlePullRequestReviewCommentEvent(payload: any) {
-    const action = payload.action;
-    const comment = payload.comment;
-
-    console.log(`[GitHub Webhook] PR Review Comment ${action}`);
-
-    // TODO: Implement in Phase 2
-    // - created: Add comment to task
+    // Optional: treating review comments same as reviews or separate
+    // For now logging only, can be expanded
+    console.log(`[GitHub Webhook] PR Review Comment ${payload.action}`);
 }
 
 async function handleIssuesEvent(payload: any) {
@@ -149,34 +141,20 @@ async function handleIssuesEvent(payload: any) {
     const issue = payload.issue;
     const repo = payload.repository;
 
-    console.log(`[GitHub Webhook] Issue ${action}: ${repo.full_name}#${issue.number}`);
-
-    // TODO: Implement in Phase 2
-    // - opened: Create task
-    // - closed: Complete task
-    // - reopened: Reopen task
+    await syncIssuesEvent(action, issue, repo);
 }
 
 async function handleIssueCommentEvent(payload: any) {
-    const action = payload.action;
-    const comment = payload.comment;
-
-    console.log(`[GitHub Webhook] Issue Comment ${action}`);
-
-    // TODO: Implement in Phase 2
-    // - created: Add comment to task
+    // Optional: sync comments to task
+    console.log(`[GitHub Webhook] Issue Comment ${payload.action}`);
 }
 
 async function handlePushEvent(payload: any) {
+    // Optional: track commits
     const ref = payload.ref;
     const commits = payload.commits;
     const repo = payload.repository;
-
     console.log(`[GitHub Webhook] Push to ${repo.full_name}:${ref} (${commits.length} commits)`);
-
-    // TODO: Implement in Phase 2
-    // - Track commits for linked tasks
-    // - Update task progress
 }
 
 async function handleReleaseEvent(payload: any) {
@@ -185,10 +163,7 @@ async function handleReleaseEvent(payload: any) {
     const repo = payload.repository;
 
     console.log(`[GitHub Webhook] Release ${action}: ${repo.full_name} ${release.tag_name}`);
-
-    // TODO: Implement in Phase 2
-    // - published: Mark milestone complete
-    // - Notify team
+    // Future: Mark milestones complete
 }
 
 export default router;
