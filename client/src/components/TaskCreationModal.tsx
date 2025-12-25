@@ -535,8 +535,8 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
           </button>
         </div>
       </div>
-
-      );
+    </div>
+  );
 };
 
-      export default TaskCreationModal;
+export default TaskCreationModal;
