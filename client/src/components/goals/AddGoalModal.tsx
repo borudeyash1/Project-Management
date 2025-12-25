@@ -24,32 +24,20 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({ onClose, onSuccess }) => {
     slackChannelId: ''
   });
   const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string }>>([]);
-  const [hasSlackConnected, setHasSlackConnected] = useState(false);
 
   useEffect(() => {
-    checkSlackConnection();
+    fetchSlackChannels();
   }, []);
-
-  const checkSlackConnection = async () => {
-    try {
-      const response = await apiService.get('/sartthi-accounts/slack');
-      if (response.success && response.data.accounts && response.data.accounts.length > 0) {
-        setHasSlackConnected(true);
-        fetchSlackChannels();
-      }
-    } catch (error) {
-      console.error('Failed to check Slack connection:', error);
-    }
-  };
 
   const fetchSlackChannels = async () => {
     try {
       const response = await apiService.get('/slack/channels');
-      if (response.success) {
+      if (response.success && response.data) {
         setSlackChannels(response.data);
       }
     } catch (error) {
       console.error('Failed to fetch Slack channels:', error);
+      // Silently fail - just don't show Slack option
     }
   };
 
@@ -191,7 +179,7 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({ onClose, onSuccess }) => {
           </div>
 
           {/* Slack Channel */}
-          {hasSlackConnected && slackChannels.length > 0 && (
+          {slackChannels.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Hash className="w-4 h-4 inline mr-1" />
