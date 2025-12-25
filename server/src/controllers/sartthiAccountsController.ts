@@ -235,6 +235,8 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
             url += '&response_type=code&owner=user';
         } else if (service === 'zoom') {
             url += '&response_type=code';
+        } else if (service === 'vercel') {
+            url += '&response_type=code';
         } else if (service === 'spotify') {
             url += '&response_type=code&show_dialog=true';
         }
@@ -456,26 +458,26 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     picture: meResponse.data.pic_url
                 };
             } else if (service === 'vercel') {
-                const params = new URLSearchParams();
-                params.append('client_id', config.clientId || '');
-                params.append('client_secret', config.clientSecret || '');
-                params.append('code', code as string);
-                params.append('redirect_uri', config.callbackUrl);
-
-                tokenResponse = await axios.post(config.tokenUrl, params);
+                // Vercel expects JSON body, not form-encoded
+                tokenResponse = await axios.post(config.tokenUrl, {
+                    client_id: config.clientId,
+                    client_secret: config.clientSecret,
+                    code: code as string,
+                    redirect_uri: config.callbackUrl
+                }, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
                 tokens = tokenResponse.data;
 
-                // Vercel token response usually contains user_id/team_id
-                // We can fetch user info
-                // Note: Vercel API structure varies, assuming standard oauth response + user endpoint
-                const meResponse = await axios.get('https://api.vercel.com/v2/user', {
+                // Fetch user info from correct endpoint
+                const meResponse = await axios.get('https://api.vercel.com/www/user', {
                     headers: { Authorization: `Bearer ${tokens.access_token}` }
                 });
                 userInfo = {
                     id: meResponse.data.user.id,
                     email: meResponse.data.user.email,
-                    name: meResponse.data.user.name,
-                    picture: `https://vercel.com/api/www/avatar/${meResponse.data.user.avatar}?s=60`
+                    name: meResponse.data.user.name || meResponse.data.user.username,
+                    picture: meResponse.data.user.avatar ? `https://vercel.com/api/www/avatar/${meResponse.data.user.avatar}?s=60` : ''
                 };
             } else if (service === 'spotify') {
                 const params = new URLSearchParams();
