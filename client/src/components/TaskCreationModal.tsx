@@ -310,18 +310,36 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 <User className="w-4 h-4 inline mr-1" />
                 {t('taskCreation.assignTo')} <span className="text-red-500">*</span>
               </label>
-              <select
-                value={taskData.assigneeId}
-                onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="">{t('taskCreation.selectMember')}</option>
-                {teamMembers.map((member) => (
-                  <option key={member._id} value={member._id}>
-                    {member.name} - {member.role}
-                  </option>
-                ))}
-              </select>
+              {teamMembers.length > 0 ? (
+                <select
+                  value={taskData.assigneeId}
+                  onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                >
+                  <option value="">{t('taskCreation.selectMember')}</option>
+                  {teamMembers.map((member) => (
+                    <option key={member._id} value={member._id}>
+                      {member.name} - {member.role}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <div className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-sm">
+                    No team members available
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = `/project/${projectId}/team`;
+                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Team Members
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
@@ -452,74 +470,73 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               )}
             </div>
           </div>
-        </div>
 
-        {/* Slack Channel Selection */}
-        {(slackChannels.length > 0 || slackAccounts.length > 0) && (
-          <div className="space-y-3">
-            {/* Account Selector if multiple accounts exist */}
-            {slackAccounts.length > 1 && (
+          {/* Slack Channel Selection */}
+          {(slackChannels.length > 0 || slackAccounts.length > 0) && (
+            <div className="space-y-3">
+              {/* Account Selector if multiple accounts exist */}
+              {slackAccounts.length > 1 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Select Slack Workspace
+                  </label>
+                  <select
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                    value={selectedSlackAccount || ''}
+                    onChange={(e) => {
+                      setSelectedSlackAccount(e.target.value);
+                      fetchSlackChannels(e.target.value);
+                    }}
+                  >
+                    {slackAccounts.map(acc => (
+                      <option key={acc._id} value={acc._id}>
+                        {acc.providerName} ({acc.providerEmail})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Select Slack Workspace
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <Hash className="w-4 h-4 inline mr-1" />
+                  Post to Slack Channel
                 </label>
                 <select
+                  value={selectedSlackChannel}
+                  onChange={(e) => setSelectedSlackChannel(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                  value={selectedSlackAccount || ''}
-                  onChange={(e) => {
-                    setSelectedSlackAccount(e.target.value);
-                    fetchSlackChannels(e.target.value);
-                  }}
                 >
-                  {slackAccounts.map(acc => (
-                    <option key={acc._id} value={acc._id}>
-                      {acc.providerName} ({acc.providerEmail})
+                  <option value="">Don't post to Slack</option>
+                  {slackChannels.map((channel) => (
+                    <option key={channel.id} value={channel.id}>
+                      #{channel.name} {channel.isPrivate ? '🔒' : ''}
                     </option>
                   ))}
                 </select>
               </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <Hash className="w-4 h-4 inline mr-1" />
-                Post to Slack Channel
-              </label>
-              <select
-                value={selectedSlackChannel}
-                onChange={(e) => setSelectedSlackChannel(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="">Don't post to Slack</option>
-                {slackChannels.map((channel) => (
-                  <option key={channel.id} value={channel.id}>
-                    #{channel.name} {channel.isPrivate ? '🔒' : ''}
-                  </option>
-                ))}
-              </select>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            {t('taskCreation.cancel')}
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+          >
+            {t('taskCreation.submit')}
+          </button>
+        </div>
       </div>
 
-      {/* Footer */}
-      <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
-        <button
-          onClick={onClose}
-          className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          {t('taskCreation.cancel')}
-        </button>
-        <button
-          onClick={handleSubmit}
-          className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-        >
-          {t('taskCreation.submit')}
-        </button>
-      </div>
-    </div>
-
-  );
+      );
 };
 
-export default TaskCreationModal;
+      export default TaskCreationModal;
