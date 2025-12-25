@@ -739,6 +739,7 @@ export interface INotification extends Document {
     [key: string]: any;
   };
   createdAt: Date;
+  actionStatus?: 'accepted' | 'declined' | 'pending';
 }
 
 // Error Types

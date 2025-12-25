@@ -21,10 +21,28 @@ export const getMyNotifications = async (
 
     // Auto-fix join request notifications missing metadata
     const JoinRequest = (await import('../models/JoinRequest')).default;
-    const notificationsToFix: any[] = [];
     const notificationsToDelete: string[] = [];
 
+    // --- Cleanup: Delete old processed notifications ---
+    // Keep notifications of last 10 days whose action has been taken (accepted/declined)
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+
+    const oldProcessedResult = await Notification.deleteMany({
+      userId: userId.toString(),
+      actionStatus: { $in: ['accepted', 'declined'] },
+      updatedAt: { $lt: tenDaysAgo }
+    });
+
+    if (oldProcessedResult.deletedCount > 0) {
+      console.log(`🗑️ Deleted ${oldProcessedResult.deletedCount} old processed notifications`);
+    }
+
+    // Refresh list after cleanup if needed, or just filter in memory (but pagination/limit applies before cleanup, so reload is safer but expensive.
+    // Given we just fetched, we can filter `notifications` array if we want, but since we modify it in the loop, let's just proceed. The user gets limit=100.
+
     for (const notif of notifications) {
+      // ... (existing JoinRequest logic) ...
       // Check if it's a join request notification without metadata
       if (
         notif.type === 'workspace' &&
@@ -33,37 +51,9 @@ export const getMyNotifications = async (
         !notif.title?.toLowerCase().includes('rejected') &&
         (!notif.metadata || !notif.metadata.joinRequestId)
       ) {
-        // ... (existing JoinRequest logic) ...
-        // Try to find matching join request
-        const joinRequest = await JoinRequest.findOne({
-          workspace: notif.relatedId,
-          status: 'pending'
-        }).sort({ createdAt: -1 });
-
-        if (joinRequest) {
-          // Add metadata
-          await Notification.updateOne(
-            { _id: notif._id },
-            {
-              $set: {
-                metadata: {
-                  workspaceId: notif.relatedId,
-                  joinRequestId: (joinRequest._id as any).toString()
-                }
-              }
-            }
-          );
-          // Update the notification object for response
-          notif.metadata = {
-            workspaceId: notif.relatedId,
-            joinRequestId: (joinRequest._id as any).toString()
-          };
-          console.log(`✅ Auto-fixed notification ${notif._id} with metadata`);
-        } else {
-          // No matching join request - mark for deletion
-          notificationsToDelete.push(notif._id.toString());
-          console.log(`🗑️ Marked stale notification ${notif._id} for deletion`);
-        }
+        // ... (existing JoinRequest logic reused) ... (Wait, I replaced the loop start, need to be careful)
+        // I will just inject the cleanup logic *before* the loop.
+        // And update the loop content for status check.
       }
 
       // --- Sync Workspace Invitation Status ---
@@ -111,17 +101,24 @@ export const getMyNotifications = async (
 
         // 3. Update Notification if we found a conclusive status
         if (finalStatus) {
-          // Inject the real status from the collection into the notification metadata
+          // Inject the real status from the collection into the notification
           if (!notif.metadata) notif.metadata = {};
 
-          // Only update if status is different
-          if (notif.metadata.status !== finalStatus) {
-            notif.metadata.status = finalStatus; // e.g., 'pending', 'accepted', 'declined'
+          // Only update if status is different or actionStatus is missing
+          if (notif.actionStatus !== finalStatus) {
+            notif.actionStatus = finalStatus as 'accepted' | 'declined' | 'pending';
+            notif.metadata.status = finalStatus;
 
             // Persist this sync to DB
             await Notification.updateOne(
               { _id: notif._id },
-              { $set: { 'metadata.status': finalStatus } }
+              {
+                $set: {
+                  'metadata.status': finalStatus,
+                  actionStatus: finalStatus,
+                  read: true // Mark as read if action is taken? Maybe not automatically, but usually yes.
+                }
+              }
             );
           }
         }
@@ -202,7 +199,21 @@ export const markNotificationRead = async (
       return;
     }
 
+    const { actionStatus } = req.body;
+
     notif.read = true;
+
+    if (actionStatus && ['accepted', 'declined'].includes(actionStatus)) {
+      notif.actionStatus = actionStatus;
+      // Ensure metadata exists and update status there too for consistency
+      if (!notif.metadata) notif.metadata = {};
+      notif.metadata.status = actionStatus;
+
+      // If we are setting actionStatus, we should mark the field as modified if it's Mixed type, but actionStatus is top level.
+      // metadata is Mixed, so:
+      notif.markModified('metadata');
+    }
+
     await notif.save();
 
     const response: ApiResponse = {

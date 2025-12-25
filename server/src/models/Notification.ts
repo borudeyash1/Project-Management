@@ -34,9 +34,14 @@ const notificationSchema = new Schema<INotification>(
       type: Schema.Types.Mixed,
       default: {},
     },
+    actionStatus: {
+      type: String,
+      enum: ['accepted', 'declined', 'pending'],
+      default: 'pending',
+    },
   },
   {
-    timestamps: { createdAt: 'createdAt', updatedAt: false },
+    timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
   }
 );
 

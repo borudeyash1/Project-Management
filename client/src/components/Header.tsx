@@ -169,10 +169,9 @@ const Header: React.FC = () => {
         <button
           className="refresh-button p-2 rounded-lg border border-border dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors"
           onClick={() => {
-            // Dispatch custom event for components to listen to
-            window.dispatchEvent(new CustomEvent('refreshData'));
+            window.location.reload();
           }}
-          title="Refresh Data"
+          title="Reload Page"
         >
           <svg
             className="refresh-icon w-4 h-4 text-gray-700 dark:text-gray-300"

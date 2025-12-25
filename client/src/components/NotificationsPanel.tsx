@@ -5,7 +5,10 @@ import { Bell, X, CheckCircle, AlertCircle, Info, Trash2 } from 'lucide-react';
 import apiService from '../services/api';
 import { Notification as AppNotification } from '../types';
 
+import { useTranslation } from 'react-i18next';
+
 const NotificationsPanel: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { isDarkMode } = useTheme();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -49,8 +52,14 @@ const NotificationsPanel: React.FC = () => {
   const handleAcceptWorkspaceInvite = async (notif: AppNotification) => {
     if (!notif.relatedId) return;
     try {
+      // Update UI immediately (optimistic update)
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === notif._id ? { ...n, read: true, actionStatus: 'accepted' } : n))
+      );
+
       await apiService.acceptWorkspaceInvite(notif.relatedId, notif._id);
-      await markAsRead(notif._id);
+      await markAsRead(notif._id, 'accepted'); // Mark as read and updated status
+
       try {
         const workspaces = await apiService.getWorkspaces();
         dispatch({ type: 'SET_WORKSPACES', payload: workspaces });
@@ -68,6 +77,7 @@ const NotificationsPanel: React.FC = () => {
       });
     } catch (error: any) {
       console.error('Failed to accept workspace invite', error);
+      // Revert optimism if needed, but for now just toast error
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -81,7 +91,13 @@ const NotificationsPanel: React.FC = () => {
   };
 
   const handleDeclineWorkspaceInvite = async (notif: AppNotification) => {
-    await markAsRead(notif._id);
+    // Optimistic update
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === notif._id ? { ...n, read: true, actionStatus: 'declined' } : n))
+    );
+
+    await markAsRead(notif._id, 'declined');
+
     dispatch({
       type: 'ADD_TOAST',
       payload: {
@@ -93,12 +109,12 @@ const NotificationsPanel: React.FC = () => {
     });
   };
 
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = async (notificationId: string, actionStatus?: 'accepted' | 'declined') => {
     setNotifications((prev) =>
-      prev.map((notif) => (notif._id === notificationId ? { ...notif, read: true } : notif)),
+      prev.map((notif) => (notif._id === notificationId ? { ...notif, read: true, ...(actionStatus ? { actionStatus } : {}) } : notif)),
     );
     try {
-      await apiService.markNotificationRead(notificationId);
+      await apiService.markNotificationRead(notificationId, actionStatus);
     } catch (error) {
       console.error('Failed to mark notification as read', error);
     }
@@ -177,7 +193,7 @@ const NotificationsPanel: React.FC = () => {
               </h2>
               {unreadCount > 0 && (
                 <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                  {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+                  {t('notifications.unreadTotal', { count: unreadCount })}
                 </p>
               )}
             </div>
@@ -196,19 +212,18 @@ const NotificationsPanel: React.FC = () => {
             <button
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
-              className={`text-sm font-medium ${
-                unreadCount === 0
-                  ? isDarkMode ? 'text-gray-600' : 'text-gray-600'
-                  : isDarkMode ? 'text-accent-light hover:text-blue-700' : 'text-accent-dark hover:text-blue-700'
-              } disabled:cursor-not-allowed`}
+              className={`text-sm font-medium ${unreadCount === 0
+                ? isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                : isDarkMode ? 'text-accent-light hover:text-blue-700' : 'text-accent-dark hover:text-blue-700'
+                } disabled:cursor-not-allowed`}
             >
-              Mark all as read
+              {t('notifications.markAllRead')}
             </button>
             <button
               onClick={clearAll}
               className={`text-sm font-medium ${isDarkMode ? 'text-red-600 hover:text-red-700' : 'text-red-600 hover:text-red-700'}`}
             >
-              Clear all
+              {t('notifications.clearAll')}
             </button>
           </div>
         )}
@@ -219,10 +234,10 @@ const NotificationsPanel: React.FC = () => {
             <div className="flex flex-col items-center justify-center py-12">
               <Bell className={`w-16 h-16 ${isDarkMode ? 'text-gray-600' : 'text-gray-700'} mb-4`} />
               <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-900'} mb-2`}>
-                No notifications
+                {t('notifications.empty.title')}
               </h3>
               <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                You're all caught up!
+                {t('notifications.empty.message')}
               </p>
             </div>
           ) : (
@@ -230,9 +245,8 @@ const NotificationsPanel: React.FC = () => {
               {notifications.map((notif) => (
                 <div
                   key={notif._id}
-                  className={`p-4 ${getNotificationBg(resolveUiType(notif), notif.read)} ${
-                    isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                  } transition-colors cursor-pointer group`}
+                  className={`p-4 ${getNotificationBg(resolveUiType(notif), notif.read)} ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    } transition-colors cursor-pointer group`}
                   onClick={() => handleNotificationClick(notif)}
                 >
                   <div className="flex items-start gap-3">
@@ -256,36 +270,44 @@ const NotificationsPanel: React.FC = () => {
                           {new Date(notif.createdAt).toLocaleString()}
                         </p>
                         <div className="flex items-center gap-2">
-                          {notif.type === 'workspace' && notif.relatedId && !notif.read && (
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAcceptWorkspaceInvite(notif);
-                                }}
-                                className="px-3 py-1.5 text-xs font-medium rounded-full bg-green-600 text-white hover:bg-green-700"
-                              >
-                                Accept
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeclineWorkspaceInvite(notif);
-                                }}
-                                className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
-                              >
-                                Decline
-                              </button>
-                            </div>
+                          {notif.type === 'workspace' && notif.relatedId && (
+                            notif.actionStatus || (notif.metadata?.status && ['accepted', 'declined'].includes(notif.metadata.status)) ? (
+                              <span className={`px-3 py-1 text-xs font-medium rounded-full ${(notif.actionStatus || notif.metadata?.status) === 'accepted'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                }`}>
+                                {(notif.actionStatus || notif.metadata?.status) === 'accepted' ? 'Accepted' : 'Declined'}
+                              </span>
+                            ) : !notif.read && (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAcceptWorkspaceInvite(notif);
+                                  }}
+                                  className="px-3 py-1.5 text-xs font-medium rounded-full bg-green-600 text-white hover:bg-green-700"
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeclineWorkspaceInvite(notif);
+                                  }}
+                                  className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                >
+                                  Decline
+                                </button>
+                              </div>
+                            )
                           )}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteNotification(notif._id);
                             }}
-                            className={`opacity-0 group-hover:opacity-100 p-1 rounded ${
-                              isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'
-                            } transition-opacity`}
+                            className={`opacity-0 group-hover:opacity-100 p-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'
+                              } transition-opacity`}
                           >
                             <Trash2 className={`w-3 h-3 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
                           </button>

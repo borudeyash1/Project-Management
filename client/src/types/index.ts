@@ -739,5 +739,11 @@ export interface Notification {
   read: boolean;
   userId: string;
   relatedId?: string;
+  actionStatus?: 'accepted' | 'declined' | 'pending';
+  metadata?: {
+    status?: string;
+    invitationId?: string;
+    [key: string]: any;
+  };
   createdAt: Date;
 }
