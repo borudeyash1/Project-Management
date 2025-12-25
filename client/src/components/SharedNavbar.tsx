@@ -10,7 +10,7 @@ const SharedNavbar: React.FC = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
   // Check if we are on a public page where we want to hide the theme toggle and language changer
-  const isPublicPage = ['/', '/about', '/apps', '/docs', '/pricing', '/login', '/register', '/user-guide'].some(path => location.pathname === path || location.pathname.startsWith('/docs'));
+  const isPublicPage = ['/', '/about', '/apps', '/docs', '/pricing', '/login', '/register', '/user-guide', '/ai', '/privacy-policy', '/terms-conditions', '/refund-policy', '/shipping-policy', '/contact-us'].some(path => location.pathname === path || location.pathname.startsWith('/docs'));
   
   // Force light theme logic for public pages
   const effectiveDarkMode = isPublicPage ? false : isDarkMode;

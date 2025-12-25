@@ -148,7 +148,7 @@ const SartthiApps: React.FC = () => {
 
       <SharedNavbar />
 
-      <div className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="flex-grow pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-amber-100 text-amber-700">
@@ -403,7 +403,9 @@ const SartthiApps: React.FC = () => {
           </div>
         </div>
       </div>
-      <SharedFooter />
+      <div className="relative z-20">
+        <SharedFooter />
+      </div>
     </div>
   );
 };

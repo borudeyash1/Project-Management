@@ -164,20 +164,6 @@ const Docs: React.FC = () => {
 
   const Sidebar = () => (
     <div className={`bg-white border-gray-200 border-r h-full overflow-y-auto`}>
-      {/* Search */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder={t('docs.searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-10 pr-4 py-2 rounded-lg border bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[accent]`}
-          />
-        </div>
-      </div>
-
       {/* Categories */}
       <div className="p-4">
         {categories.map((category) => (
@@ -222,7 +208,7 @@ const Docs: React.FC = () => {
   );
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-amber-50 via-white to-white`}>
+    <div className="min-h-screen relative" style={{ background: 'linear-gradient(to bottom, #D7E8FE, #FEFFFF)' }}>
       <SEO
         title="Documentation"
         description="Complete documentation for Sartthi - Learn how to use our project management and payroll suite effectively"
@@ -232,7 +218,48 @@ const Docs: React.FC = () => {
 
       <SharedNavbar />
 
-      <div className="pt-16 min-h-screen">
+      {/* Hero Section */}
+      <div className="relative pt-16 pb-20 overflow-hidden" style={{ backgroundColor: '#F1F4F9' }}>
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20">
+          {/* Badge */}
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-6">
+            <span className="text-sm font-semibold" style={{ color: '#006397' }}>Documentation</span>
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Get Started with Sartthi
+          </h1>
+
+          {/* Description */}
+          <p className="text-lg text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+            Everything you need to know about Sartthi - from getting started guides to advanced features. Learn how to manage projects, collaborate with your team, and boost productivity.
+          </p>
+
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search documentation..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent shadow-lg hover:shadow-xl transition-shadow"
+                onFocus={(e) => {
+                  e.target.style.boxShadow = '0 0 0 3px rgba(0, 99, 151, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.boxShadow = '';
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="min-h-screen relative z-10 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Mobile Header */}
           <div className="lg:hidden mb-4 flex items-center justify-between">
@@ -269,7 +296,7 @@ const Docs: React.FC = () => {
 
             {/* Main Content */}
             <div className="flex-1 min-w-0">
-              {currentArticle ? (
+              {currentArticle && (
                 <div className={`bg-white border-gray-200 border rounded-2xl p-8 shadow-xl`}>
                   {/* Breadcrumb */}
                   <div className="flex items-center gap-2 text-sm mb-6">
@@ -329,16 +356,6 @@ const Docs: React.FC = () => {
                       {currentArticle.content}
                     </ReactMarkdown>
                   </div>
-                </div>
-              ) : (
-                <div className={`bg-white rounded-2xl p-12 text-center`}>
-                  <BookOpen className={`w-16 h-16 mx-auto mb-4 text-gray-400`} />
-                  <h2 className={`text-2xl font-bold mb-2 text-gray-900`}>
-                    {t('docs.noArticleTitle')}
-                  </h2>
-                  <p className={'text-gray-600'}>
-                    {t('docs.noArticleDescription')}
-                  </p>
                 </div>
               )}
             </div>

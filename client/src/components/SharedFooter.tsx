@@ -25,20 +25,24 @@ const SharedFooter: React.FC = () => {
   const footerLinks = {
     resources: [
       { label: 'Documentation', path: '/docs' },
-      { label: 'Blog', path: '/login' },
-      { label: 'API Reference', path: '/login' },
-      { label: 'Tutorials', path: '/login' }
+      { label: 'Blog', path: '/blog' },
+      { label: 'AI Features', path: '/ai' },
+      { label: 'Apps', path: '/apps' }
     ],
     support: [
-      { label: 'Pricing', path: '/login' },
+      { label: 'Pricing', path: '/pricing' },
       { label: 'FAQs', path: '/#faq' },
-      { label: 'Support', path: '/login' },
-      { label: 'Contact Us', path: '/login' }
+      { label: 'Contact Us', path: '/contact-us' }
     ],
     company: [
-      { label: 'About Sartthi', path: '/login' },
-      { label: 'Features', path: '/#features' },
-      { label: 'Contact', path: '/login' }
+      { label: 'About Sartthi', path: '/about' },
+      { label: 'Features', path: '/#features' }
+    ],
+    legal: [
+      { label: 'Privacy Policy', path: '/privacy-policy' },
+      { label: 'Terms & Conditions', path: '/terms-conditions' },
+      { label: 'Refund Policy', path: '/refund-policy' },
+      { label: 'Shipping Policy', path: '/shipping-policy' }
     ]
   };
 
@@ -80,7 +84,7 @@ const SharedFooter: React.FC = () => {
       <footer className="bg-white border-t border-gray-200">
         {/* Main Footer Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand Section */}
             <div className="lg:col-span-2">
               <Link to="/" className="inline-flex items-center gap-2 mb-4">
@@ -146,6 +150,23 @@ const SharedFooter: React.FC = () => {
               <h3 className="text-gray-900 font-semibold mb-4 text-base">Company</h3>
               <ul className="space-y-2.5">
                 {footerLinks.company.map((link, index) => (
+                  <li key={index}>
+                    <Link 
+                      to={link.path} 
+                      className="text-sm text-gray-600 hover:text-[#006397] transition-colors inline-block"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal Links */}
+            <div>
+              <h3 className="text-gray-900 font-semibold mb-4 text-base">Legal</h3>
+              <ul className="space-y-2.5">
+                {footerLinks.legal.map((link, index) => (
                   <li key={index}>
                     <Link 
                       to={link.path} 

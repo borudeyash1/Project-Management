@@ -1,11 +1,17 @@
-HTTrack3.49-2+htsswf+htsjava launched on Mon, 22 Dec 2025 22:34:36 at https://www.saasable.io/pricing +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
-(winhttrack -qiC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://www.saasable.io/pricing -O1 "C:\Users\suraj\Downloads\projects\saasable-pricing" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+HTTrack3.49-2+htsswf+htsjava launched on Tue, 23 Dec 2025 15:31:09 at https://agent-magicui.vercel.app/ +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://agent-magicui.vercel.app/ -O1 "C:\Users\suraj\Downloads\projects\saasable-ai" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
 
 Information, Warnings and Errors reported for this mirror:
 note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
 	such as username/password authentication for websites mirrored in this project
 	do not share these files/folders if you want these information to remain private
 
+15:31:22	Warning: 	link is probably looping, type unknown, aborting: https://agent-magicui.vercel.app/"data:image/svg+xml,%3Csvg width='265' height='268' viewBox='0 0 265 268' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fillRule='evenodd' clipRule='evenodd' d='M121.384 4.5393C124.406 1.99342 128.319 0.585938 132.374 0.585938C136.429 0.585938 140.342 1.99342 143.365 4.5393C173.074 29.6304 210.174 45.6338 249.754 50.4314C253.64 50.9018 257.221 52.6601 259.855 55.3912C262.489 58.1223 264.005 61.6477 264.13 65.3354C265.616 106.338 254.748 146.9 232.782 182.329C210.816 217.759 178.649 246.61 140.002 265.547C137.645 266.701 135.028 267.301 132.371 267.298C129.715 267.294 127.1 266.686 124.747 265.526C86.0991 246.59 53.9325 217.739 31.9665 182.309C10.0005 146.879 -0.867679 106.317 0.618784 65.3147C0.748654 61.6306 2.26627 58.1102 4.9001 55.3833C7.53394 52.6565 11.1121 50.9012 14.9945 50.4314C54.572 45.6396 91.6716 29.6435 121.384 4.56V4.5393Z' fill='black'/%3E%3C/svg%3E"
+15:31:25	Error: 	"Not Found" (404) at link https://agent-magicui.vercel.app/static/chunks/6771-c945178688fbe742.js?dpl=dpl_9cBuoo1fxTK3gpPSusQs6Mm838vo (from https://agent-magicui.vercel.app/)
+15:31:25	Error: 	"Not Found" (404) at link https://agent-magicui.vercel.app/static/chunks/7993-84bc853bc6620961.js?dpl=dpl_9cBuoo1fxTK3gpPSusQs6Mm838vo (from https://agent-magicui.vercel.app/)
+15:31:25	Error: 	"Not Found" (404) at link https://agent-magicui.vercel.app/static/chunks/1874-7896a968bbc71421.js?dpl=dpl_9cBuoo1fxTK3gpPSusQs6Mm838vo (from https://agent-magicui.vercel.app/)
+15:31:25	Error: 	"Not Found" (404) at link https://agent-magicui.vercel.app/static/chunks/23a0b913-b3447f343811209b.js?dpl=dpl_9cBuoo1fxTK3gpPSusQs6Mm838vo (from https://agent-magicui.vercel.app/)
+15:31:25	Error: 	"Not Found" (404) at link https://agent-magicui.vercel.app/static/chunks/5362-db5e286804dd17b4.js?dpl=dpl_9cBuoo1fxTK3gpPSusQs6Mm838vo (from https://agent-magicui.vercel.app/)
 
-HTTrack Website Copier/3.49-2 mirror complete in 10 minutes 56 seconds : 128 links scanned, 127 files written (3522517 bytes overall), no files updated [25403 bytes received at 38 bytes/sec]
-(No errors, 0 warnings, 0 messages)
+HTTrack Website Copier/3.49-2 mirror complete in 16 seconds : 38 links scanned, 32 files written (1966253 bytes overall) [803310 bytes received at 50206 bytes/sec], 1806271 bytes transferred using HTTP compression in 19 files, ratio 29%, 1.4 requests per connection
+(5 errors, 1 warnings, 0 messages)

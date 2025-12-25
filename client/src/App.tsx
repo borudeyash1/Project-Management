@@ -78,6 +78,11 @@ import CalendarPage from './components/calendar/CalendarPage';
 import InboxPage from './components/mail/InboxPage';
 import NotesPage from './components/NotesPage';
 import MeetingNotesPage from './components/MeetingNotesPage';
+import RefundPolicy from './components/RefundPolicy';
+import TermsConditions from './components/TermsConditions';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import ShippingPolicy from './components/ShippingPolicy';
+import ContactUs from './components/ContactUs';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -266,6 +271,11 @@ const AppContent: React.FC = () => {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPost />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
+        <Route path="/terms-conditions" element={<TermsConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+        <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         <Route path="/desktop-handshake" element={<DesktopHandshake />} />

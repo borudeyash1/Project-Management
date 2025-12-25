@@ -5,11 +5,12 @@ import {
   Clock, Target, Sparkles, ChevronRight,
   BarChart3, Calendar, Zap, TrendingUp, Award,
   Code, Palette, Globe, Smartphone,
-  Play, Pause
+  Play, Pause, ChevronDown
 } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import SharedFooter from './SharedFooter';
 import FlowingMenu from './FlowingMenu';
+import Marquee from './Marquee';
 import { getRecentPosts } from '../data/blogData';
 
 const LandingPage: React.FC = () => {
@@ -178,6 +179,54 @@ const LandingPage: React.FC = () => {
       content: "The analytics and reporting features give us insights we never had before. The AI-powered predictions and smart scheduling have made data-driven decisions effortless.",
       rating: 5,
       avatar: "https://ui-avatars.com/api/?name=Arjun+Mehta&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Kavya Nair",
+      role: "Marketing Head",
+      company: "Creative Solutions Chennai",
+      content: "The collaboration tools and real-time updates have streamlined our marketing campaigns. Our team productivity has increased significantly, and the interface is incredibly user-friendly.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Kavya+Nair&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Rohan Gupta",
+      role: "Founder",
+      company: "TechStart Gurgaon",
+      content: "As a startup, we needed a solution that could grow with us. Sartthi's scalability and affordable pricing made it the perfect choice. The desktop app is a game-changer for our team.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Rohan+Gupta&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Meera Iyer",
+      role: "HR Manager",
+      company: "Enterprise Corp Bangalore",
+      content: "The smart attendance system with face recognition has eliminated all our time-tracking issues. It's accurate, secure, and our employees love how easy it is to use.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Meera+Iyer&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Aditya Joshi",
+      role: "Development Lead",
+      company: "Code Factory Noida",
+      content: "The GitHub integration and custom API support are fantastic. We've automated our entire development workflow, and the AI suggestions have helped us catch potential issues early.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Aditya+Joshi&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Divya Kapoor",
+      role: "Design Director",
+      company: "UX Studio Jaipur",
+      content: "The file sharing and feedback tools are perfect for our design team. We can collaborate on projects in real-time, and the version control keeps everything organized.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Divya+Kapoor&background=006397&color=fff&size=150"
+    },
+    {
+      name: "Karthik Menon",
+      role: "Business Analyst",
+      company: "Analytics Pro Kochi",
+      content: "The reporting and analytics dashboards provide exactly the insights we need. The AI-powered predictions have helped us make better business decisions and optimize our workflows.",
+      rating: 5,
+      avatar: "https://ui-avatars.com/api/?name=Karthik+Menon&background=006397&color=fff&size=150"
     }
   ];
 
@@ -502,7 +551,7 @@ const LandingPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
                 to="/register"
-                className="group relative px-8 py-4 bg-[#006397] text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden"
+                className="group relative px-8 py-4 bg-[#006397] text-white hover:text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden"
               >
                 <span className="relative z-10">Get Started Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
@@ -682,7 +731,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">
               Use Cases
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -699,8 +748,8 @@ const LandingPage: React.FC = () => {
                 key={index}
                 className="group relative bg-[#F5F8FD] rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden"
               >
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${useCase.color} rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity`}></div>
-                <div className={`relative w-20 h-20 bg-gradient-to-br ${useCase.color} rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                <div className="relative w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   {useCase.icon}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
@@ -719,7 +768,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-green-100 text-green-600 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">
               Integrations
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -845,7 +894,7 @@ const LandingPage: React.FC = () => {
           <div className="text-center">
             <Link
               to="/docs"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white hover:text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
               style={{ backgroundColor: '#006397' }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1146,7 +1195,7 @@ const LandingPage: React.FC = () => {
                   </Link>
                   <Link
                     to="/demo"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white hover:text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
                     style={{ backgroundColor: '#006397' }}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1161,50 +1210,162 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
-      {/* Testimonials Section with Carousel */}
+      {/* Testimonials Section with Vertical Marquee */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-full mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-yellow-100 text-yellow-600 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">
               Testimonials
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Loved by Teams Worldwide
+              What our customers are saying
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               See what our customers have to say about Sartthi.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="group bg-[#F5F8FD] p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-200"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "{testimonial.content}"
-                </p>
-                <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-14 h-14 rounded-full ring-4 ring-blue-100 group-hover:ring-blue-200 transition-all"
-                  />
-                  <div>
-                    <div className="font-bold text-gray-900">{testimonial.name}</div>
-                    <div className="text-sm text-gray-600">
-                      {testimonial.role} at {testimonial.company}
+          {/* Vertical Marquee Testimonials */}
+          <div className="relative flex h-[500px] w-full flex-row items-center justify-center gap-4 overflow-hidden">
+            {/* Column 1 */}
+            <Marquee pauseOnHover vertical className="[--duration:25s]">
+              {testimonials.slice(0, 3).map((testimonial, index) => (
+                <figure
+                  key={index}
+                  className="relative h-full w-80 cursor-pointer overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 p-6 transition-all duration-300"
+                  style={{ backgroundColor: '#F1F4F9' }}
+                >
+                  <div className="flex flex-row items-center gap-3 mb-4">
+                    <img className="rounded-full w-12 h-12" alt={testimonial.name} src={testimonial.avatar} />
+                    <div className="flex flex-col">
+                      <figcaption className="text-sm font-semibold text-gray-900">
+                        {testimonial.name}
+                      </figcaption>
+                      <p className="text-xs text-gray-600">
+                        {testimonial.role}
+                      </p>
+                      <p className="text-xs text-[#FBBF24]">{testimonial.company}</p>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                  <blockquote className="text-sm text-gray-700">
+                    "{testimonial.content}"
+                  </blockquote>
+                  <div className="flex gap-1 mt-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                    ))}
+                  </div>
+                </figure>
+              ))}
+            </Marquee>
+
+            {/* Column 2 - Reverse */}
+            <Marquee reverse pauseOnHover vertical className="[--duration:25s]">
+              {testimonials.slice(3, 6).map((testimonial, index) => (
+                <figure
+                  key={index}
+                  className="relative h-full w-80 cursor-pointer overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 p-6 transition-all duration-300"
+                  style={{ backgroundColor: '#F1F4F9' }}
+                >
+                  <div className="flex flex-row items-center gap-3 mb-4">
+                    <img className="rounded-full w-12 h-12" alt={testimonial.name} src={testimonial.avatar} />
+                    <div className="flex flex-col">
+                      <figcaption className="text-sm font-semibold text-gray-900">
+                        {testimonial.name}
+                      </figcaption>
+                      <p className="text-xs text-gray-600">
+                        {testimonial.role}
+                      </p>
+                      <p className="text-xs text-[#FBBF24]">{testimonial.company}</p>
+                    </div>
+                  </div>
+                  <blockquote className="text-sm text-gray-700">
+                    "{testimonial.content}"
+                  </blockquote>
+                  <div className="flex gap-1 mt-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                    ))}
+                  </div>
+                </figure>
+              ))}
+            </Marquee>
+
+            {/* Column 3 */}
+            <Marquee pauseOnHover vertical className="[--duration:25s]">
+              {testimonials.slice(6, 9).map((testimonial, index) => (
+                <figure
+                  key={index}
+                  className="relative h-full w-80 cursor-pointer overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 p-6 transition-all duration-300"
+                  style={{ backgroundColor: '#F1F4F9' }}
+                >
+                  <div className="flex flex-row items-center gap-3 mb-4">
+                    <img className="rounded-full w-12 h-12" alt={testimonial.name} src={testimonial.avatar} />
+                    <div className="flex flex-col">
+                      <figcaption className="text-sm font-semibold text-gray-900">
+                        {testimonial.name}
+                      </figcaption>
+                      <p className="text-xs text-gray-600">
+                        {testimonial.role}
+                      </p>
+                      <p className="text-xs text-[#FBBF24]">{testimonial.company}</p>
+                    </div>
+                  </div>
+                  <blockquote className="text-sm text-gray-700">
+                    "{testimonial.content}"
+                  </blockquote>
+                  <div className="flex gap-1 mt-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                    ))}
+                  </div>
+                </figure>
+              ))}
+            </Marquee>
+
+            {/* Column 4 - Reverse */}
+            <Marquee reverse pauseOnHover vertical className="[--duration:25s]">
+              {testimonials.slice(9, 12).map((testimonial, index) => (
+                <figure
+                  key={index}
+                  className="relative h-full w-80 cursor-pointer overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 p-6 transition-all duration-300"
+                  style={{ backgroundColor: '#F1F4F9' }}
+                >
+                  <div className="flex flex-row items-center gap-3 mb-4">
+                    <img className="rounded-full w-12 h-12" alt={testimonial.name} src={testimonial.avatar} />
+                    <div className="flex flex-col">
+                      <figcaption className="text-sm font-semibold text-gray-900">
+                        {testimonial.name}
+                      </figcaption>
+                      <p className="text-xs text-gray-600">
+                        {testimonial.role}
+                      </p>
+                      <p className="text-xs text-[#FBBF24]">{testimonial.company}</p>
+                    </div>
+                  </div>
+                  <blockquote className="text-sm text-gray-700">
+                    "{testimonial.content}"
+                  </blockquote>
+                  <div className="flex gap-1 mt-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                    ))}
+                  </div>
+                </figure>
+              ))}
+            </Marquee>
+
+            {/* Gradient Overlays */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-blue-50/80"></div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-purple-50/80"></div>
           </div>
         </div>
       </section>
@@ -1294,7 +1455,7 @@ const LandingPage: React.FC = () => {
                   <div className="space-y-4">
                     <Link
                       to="/pricing"
-                      className="block w-full py-4 px-6 rounded-full font-semibold text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
+                      className="block w-full py-4 px-6 rounded-full font-semibold text-white hover:text-white transition-all shadow-lg hover:shadow-xl hover:opacity-90"
                       style={{ backgroundColor: '#006397' }}
                     >
                       Start Free Trial
@@ -1450,7 +1611,7 @@ const LandingPage: React.FC = () => {
               <div className="space-y-3">
                 <Link
                   to="/pricing"
-                  className="block w-full py-3 px-6 rounded-full font-semibold text-center text-white transition-all shadow-md hover:shadow-lg hover:opacity-90"
+                  className="block w-full py-3 px-6 rounded-full font-semibold text-center text-white hover:text-white transition-all shadow-md hover:shadow-lg hover:opacity-90"
                   style={{ backgroundColor: '#006397' }}
                 >
                   Get Started
@@ -1632,7 +1793,7 @@ const LandingPage: React.FC = () => {
             </div>
             <Link
               to="/contact"
-              className="px-8 py-3 bg-[#006397] text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+              className="px-8 py-3 bg-[#006397] text-white hover:text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
             >
               Get In Touch
             </Link>
@@ -1655,110 +1816,38 @@ const LandingPage: React.FC = () => {
             ))}
           </div>
 
-          {/* FAQ Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFaqs.map((faq, index) => {
-              // Create unique hash from question text for truly unique designs
-              const hashString = (str: string) => {
-                let hash = 0;
-                for (let i = 0; i < str.length; i++) {
-                  const char = str.charCodeAt(i);
-                  hash = ((hash << 5) - hash) + char;
-                  hash = hash & hash; // Convert to 32bit integer
-                }
-                return Math.abs(hash);
-              };
-              
-              const uniqueHash = hashString(faq.question);
-              
-              // Seeded random function using unique hash
-              const seededRandom = (seed: number) => {
-                const x = Math.sin(seed) * 10000;
-                return x - Math.floor(x);
-              };
-              
-              // All available gradient colors
-              const allGradientColors = [
-                { from: 'rgba(253, 186, 116, 0.4)', to: 'rgba(254, 215, 170, 0.2)' }, // Orange
-                { from: 'rgba(147, 197, 253, 0.4)', to: 'rgba(191, 219, 254, 0.2)' }, // Blue
-                { from: 'rgba(216, 180, 254, 0.4)', to: 'rgba(233, 213, 255, 0.2)' }, // Purple
-                { from: 'rgba(251, 207, 232, 0.4)', to: 'rgba(252, 231, 243, 0.2)' }, // Pink
-                { from: 'rgba(153, 246, 228, 0.4)', to: 'rgba(204, 251, 241, 0.2)' }, // Teal
-                { from: 'rgba(253, 224, 71, 0.4)', to: 'rgba(254, 240, 138, 0.2)' },  // Yellow
-                { from: 'rgba(252, 165, 165, 0.4)', to: 'rgba(254, 202, 202, 0.2)' }, // Red
-                { from: 'rgba(167, 243, 208, 0.4)', to: 'rgba(209, 250, 229, 0.2)' }, // Green
-                { from: 'rgba(196, 181, 253, 0.4)', to: 'rgba(221, 214, 254, 0.2)' }, // Indigo
-                { from: 'rgba(254, 202, 87, 0.4)', to: 'rgba(254, 243, 199, 0.2)' },  // Amber
-                { from: 'rgba(134, 239, 172, 0.4)', to: 'rgba(187, 247, 208, 0.2)' }, // Lime
-                { from: 'rgba(252, 211, 77, 0.4)', to: 'rgba(253, 230, 138, 0.2)' },  // Gold
-              ];
-              
-              const blurOptions = ['blur-lg', 'blur-xl', 'blur-2xl', 'blur-3xl'];
-              
-              // Generate random properties for circle 1 using unique hash
-              const circle1ColorIndex = Math.floor(seededRandom(uniqueHash + 1) * allGradientColors.length);
-              const circle1Color = allGradientColors[circle1ColorIndex];
-              const circle1Size = 80 + Math.floor(seededRandom(uniqueHash + 2) * 100); // 80-180px
-              const circle1Top = 10 + Math.floor(seededRandom(uniqueHash + 3) * 30); // 10-40%
-              const circle1Right = 5 + Math.floor(seededRandom(uniqueHash + 4) * 15); // 5-20%
-              const circle1Blur = blurOptions[Math.floor(seededRandom(uniqueHash + 5) * blurOptions.length)];
-              
-              // Generate random properties for circle 2 (different color)
-              let circle2ColorIndex = Math.floor(seededRandom(uniqueHash + 6) * allGradientColors.length);
-              // Ensure different color from circle 1
-              if (circle2ColorIndex === circle1ColorIndex) {
-                circle2ColorIndex = (circle2ColorIndex + 1) % allGradientColors.length;
-              }
-              const circle2Color = allGradientColors[circle2ColorIndex];
-              const circle2Size = 60 + Math.floor(seededRandom(uniqueHash + 7) * 80); // 60-140px
-              const circle2Bottom = 5 + Math.floor(seededRandom(uniqueHash + 8) * 25); // 5-30%
-              const circle2Left = 5 + Math.floor(seededRandom(uniqueHash + 9) * 15); // 5-20%
-              const circle2Blur = blurOptions[Math.floor(seededRandom(uniqueHash + 10) * blurOptions.length)];
-              
-              return (
-                <div
-                  key={index}
-                  className="group relative h-[280px] w-full p-6 border-2 border-gray-400/60 rounded-xl backdrop-blur-[20px] transition-all duration-300 hover:shadow-[0px_0px_20px_1px_rgba(255,187,118,0.25)] hover:border-gray-500 flex flex-col justify-center items-center text-center overflow-hidden"
-                  style={{ backgroundColor: '#F5F8FD' }}
+          {/* FAQ Accordion */}
+          <div className="max-w-4xl mx-auto space-y-4">
+            {filteredFaqs.map((faq, index) => (
+              <div
+                key={index}
+                className="rounded-lg border border-gray-200 transition-all duration-300"
+                style={{ backgroundColor: '#F1F4F9' }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors duration-200"
                 >
-                  {/* Decorative glass effect gradient circles */}
-                  <div 
-                    className={`absolute rounded-full ${circle1Blur} pointer-events-none`}
-                    style={{ 
-                      width: `${circle1Size}px`, 
-                      height: `${circle1Size}px`,
-                      top: `${circle1Top}%`, 
-                      right: `${circle1Right}%`,
-                      background: `linear-gradient(to bottom right, ${circle1Color.from}, ${circle1Color.to})`
-                    }}
-                  ></div>
-                  <div 
-                    className={`absolute rounded-full ${circle2Blur} pointer-events-none`}
-                    style={{ 
-                      width: `${circle2Size}px`, 
-                      height: `${circle2Size}px`,
-                      bottom: `${circle2Bottom}%`, 
-                      left: `${circle2Left}%`,
-                      background: `linear-gradient(to top left, ${circle2Color.from}, ${circle2Color.to})`
-                    }}
-                  ></div>
-                  
-                  {/* Question - visible by default */}
-                  <div className="absolute inset-0 p-6 flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity duration-300 z-10">
-                    <h3 className="text-lg font-bold text-gray-900 leading-tight">
-                      {faq.question}
-                    </h3>
-                  </div>
-                  
-                  {/* Answer - visible on hover */}
-                  <div className="absolute inset-0 p-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 overflow-y-auto z-10">
-                    <p className="text-base font-extrabold text-gray-900 leading-relaxed">
-                      {faq.answer}
-                    </p>
+                  <h3 className="text-lg font-semibold pr-8 text-gray-900">
+                    {faq.question}
+                  </h3>
+                  <ChevronDown 
+                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 text-gray-600 ${
+                      openFaq === index ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openFaq === index ? 'max-h-96' : 'max-h-0'
+                  }`}
+                >
+                  <div className="px-6 pb-4 text-gray-600">
+                    {faq.answer}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
