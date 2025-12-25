@@ -209,6 +209,14 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({ onClose, onSuccess }) => {
                   </option>
                 ))}
               </select>
+              {formData.slackChannelId && (
+                <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                  <Hash className="w-3 h-3" />
+                  <span>
+                    Will post to: <strong>#{slackChannels.find(c => c.id === formData.slackChannelId)?.name}</strong>
+                  </span>
+                </div>
+              )}
               <p className="text-xs text-gray-500 mt-1">
                 Post this goal to a Slack channel when created
               </p>

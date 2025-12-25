@@ -448,6 +448,14 @@ const PlannerPage: React.FC = () => {
                         </option>
                       ))}
                     </select>
+                    {newEvent.slackChannelId && (
+                      <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Hash className="w-3 h-3" />
+                        <span>
+                          Will post to: <strong>#{slackChannels.find(c => c.id === newEvent.slackChannelId)?.name}</strong>
+                        </span>
+                      </div>
+                    )}
                     <p className="text-xs text-gray-500 mt-1">
                       Post this event to a Slack channel when created
                     </p>
