@@ -226,9 +226,16 @@ const ConnectedAccounts: React.FC = () => {
               {config.icon}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {config.title}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {config.title}
+                </h3>
+                {service === 'figma' && (
+                  <span className="px-2 py-0.5 bg-yellow-500 text-white text-xs rounded-full font-medium">
+                    Coming Soon
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {config.description}
               </p>
@@ -236,7 +243,7 @@ const ConnectedAccounts: React.FC = () => {
           </div>
           <button
             onClick={() => handleConnect(service)}
-            disabled={!!actionLoading}
+            disabled={!!actionLoading || service === 'figma'}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {actionLoading === `connect-${service}` ? (
