@@ -2209,19 +2209,16 @@ const ProjectViewDetailed: React.FC = () => {
                   console.log('💾 [PROJECT INFO] Saving updates:', updates);
                   const response = await apiService.put(`/projects/${activeProject._id}`, updates);
 
-                  if (response.data.success) {
-                    dispatch({
-                      type: 'UPDATE_PROJECT',
-                      payload: {
-                        projectId: activeProject._id,
-                        updates: response.data.data
-                      }
-                    });
-                    setActiveProject({ ...activeProject, ...response.data.data });
-                    dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project updated successfully' } });
-                  } else {
-                    throw new Error('API returned success: false');
-                  }
+                  // apiService already validates success, so if we get here, it succeeded
+                  dispatch({
+                    type: 'UPDATE_PROJECT',
+                    payload: {
+                      projectId: activeProject._id,
+                      updates: response.data
+                    }
+                  });
+                  setActiveProject({ ...activeProject, ...response.data });
+                  dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project updated successfully' } });
                 } catch (error: any) {
                   console.error('Failed to update project:', error);
                   dispatch({
