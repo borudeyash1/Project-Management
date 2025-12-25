@@ -33,10 +33,14 @@ const verifyGitHubSignature = (req: Request): boolean => {
     const hmac = crypto.createHmac('sha256', secret);
     const digest = 'sha256=' + hmac.update(payload).digest('hex');
 
-    return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(digest)
-    );
+    const signatureBuffer = Buffer.from(signature);
+    const digestBuffer = Buffer.from(digest);
+
+    if (signatureBuffer.length !== digestBuffer.length) {
+        return false;
+    }
+
+    return crypto.timingSafeEqual(signatureBuffer, digestBuffer);
 };
 
 // Main webhook endpoint

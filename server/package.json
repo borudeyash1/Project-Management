@@ -10,7 +10,7 @@
     "seed": "node scripts/simple-seed.js",
     "seed:planner": "ts-node src/scripts/createPastPlannerEvent.ts",
     "send:planner-deadlines": "ts-node src/scripts/sendPlannerDeadlineReminders.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "project-management",
@@ -54,12 +54,17 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.10.6",
     "@types/passport-google-oauth20": "^2.0.17",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
     "nodemon": "^3.0.2",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
