@@ -33,7 +33,13 @@ const SCOPES = {
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile'
     ],
-    slack: ['channels:read', 'chat:write'],
+    slack: [
+        'channels:read',
+        'groups:read',
+        'chat:write',
+        'chat:write.public',
+        'users:read'
+    ],
     github: ['repo', 'user'],
     dropbox: [],
     onedrive: ['Files.ReadWrite.All', 'offline_access'],
