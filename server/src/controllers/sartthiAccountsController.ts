@@ -92,7 +92,7 @@ const getProviderConfig = (service: ServiceType) => {
             clientId: process.env.FIGMA_CLIENT_ID || '',
             clientSecret: process.env.FIGMA_CLIENT_SECRET || '',
             authUrl: 'https://www.figma.com/oauth',
-            tokenUrl: 'https://www.figma.com/api/oauth/token',
+            tokenUrl: 'https://api.figma.com/v1/oauth/token',
             callbackUrl
         };
         case 'notion': return {
