@@ -58,7 +58,9 @@ const getHeaders = (accessToken: string) => ({
 interface IGitHubService {
     getRepositories(userId: string, accountId?: string): Promise<GitHubRepo[]>;
     getPullRequests(userId: string, owner: string, repo: string, accountId?: string): Promise<GitHubPR[]>;
+    getPullRequest(userId: string, owner: string, repo: string, number: number, accountId?: string): Promise<GitHubPR>;
     getIssues(userId: string, owner: string, repo: string, accountId?: string): Promise<any[]>;
+    createIssue(userId: string, owner: string, repo: string, data: any, accountId?: string): Promise<any>;
     addComment(userId: string, owner: string, repo: string, number: number, body: string, accountId?: string): Promise<any>;
     addLabel(userId: string, owner: string, repo: string, number: number, labels: string[], accountId?: string): Promise<any>;
 }

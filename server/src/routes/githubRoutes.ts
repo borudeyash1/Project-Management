@@ -1,6 +1,13 @@
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { getGitHubService } from '../services/sartthi/githubService';
+import {
+    linkRepoToProject,
+    unlinkRepoFromProject,
+    updateRepoSettings,
+    linkPrToTask,
+    createIssueFromTask
+} from '../controllers/githubController';
 
 const router = express.Router();
 
@@ -54,5 +61,16 @@ router.get('/repos/:owner/:repo/pulls', apiLimiter, async (req, res) => {
         });
     }
 });
+
+
+
+// Project Integration Routes
+router.post('/projects/:projectId/link-repo', apiLimiter, linkRepoToProject);
+router.delete('/projects/:projectId/unlink-repo/:repoId', apiLimiter, unlinkRepoFromProject);
+router.put('/projects/:projectId/repos/:repoId/settings', apiLimiter, updateRepoSettings);
+
+// Task Integration Routes
+router.post('/tasks/:taskId/link-pr', apiLimiter, linkPrToTask);
+router.post('/tasks/:taskId/create-issue', apiLimiter, createIssueFromTask);
 
 export default router;
