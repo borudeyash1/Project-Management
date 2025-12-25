@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, CheckSquare, Bell, Flag, Calendar } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CheckSquare, Bell, Flag, Calendar, Hash } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { usePlanner } from '../../context/PlannerContext';
 import apiService from '../../services/api';
@@ -38,6 +38,24 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
   // Event specific
   const [endDate, setEndDate] = useState('');
   const [allDay, setAllDay] = useState(false);
+  const [slackChannelId, setSlackChannelId] = useState('');
+  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string }>>([]);
+
+  useEffect(() => {
+    fetchSlackChannels();
+  }, []);
+
+  const fetchSlackChannels = async () => {
+    try {
+      const response = await apiService.get('/slack/channels');
+      if (response.success && response.data) {
+        setSlackChannels(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Slack channels:', error);
+      // Silently fail - just don't show Slack option
+    }
+  };
 
   const itemTypes = [
     { id: 'task', label: 'Task', icon: CheckSquare, color: 'blue' },
@@ -132,7 +150,8 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
             start: new Date(`${eventStartDate}T${dueTime || '09:00'}`),
             end: new Date(`${eventEndDate}T${dueTime || '10:00'}`),
             allDay,
-            participants: [state.userProfile._id]
+            participants: [state.userProfile._id],
+            slackChannelId: slackChannelId || undefined
           };
           console.log('Creating event:', eventData);
           response = await apiService.post('/planner/events', eventData);
@@ -385,18 +404,53 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
 
           {/* All Day (Event only) */}
           {activeType === 'event' && (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="allDay"
-                checked={allDay}
-                onChange={(e) => setAllDay(e.target.checked)}
-                className="rounded border-gray-300 text-accent focus:ring-accent"
-              />
-              <label htmlFor="allDay" className="text-sm text-gray-700 dark:text-gray-300">
-                All day event
-              </label>
-            </div>
+            <>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="allDay"
+                  checked={allDay}
+                  onChange={(e) => setAllDay(e.target.checked)}
+                  className="rounded border-gray-300 text-accent focus:ring-accent"
+                />
+                <label htmlFor="allDay" className="text-sm text-gray-700 dark:text-gray-300">
+                  All day event
+                </label>
+              </div>
+
+              {/* Slack Channel for Events */}
+              {slackChannels.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <Hash className="w-4 h-4 inline mr-1" />
+                    Slack Channel (Optional)
+                  </label>
+                  <select
+                    value={slackChannelId}
+                    onChange={(e) => setSlackChannelId(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                  >
+                    <option value="">Don't post to Slack</option>
+                    {slackChannels.map((channel) => (
+                      <option key={channel.id} value={channel.id}>
+                        #{channel.name}
+                      </option>
+                    ))}
+                  </select>
+                  {slackChannelId && (
+                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Hash className="w-3 h-3" />
+                      <span>
+                        Will post to: <strong>#{slackChannels.find(c => c.id === slackChannelId)?.name}</strong>
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">
+                    Post this event to a Slack channel when created
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </form>
 
