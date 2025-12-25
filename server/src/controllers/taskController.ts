@@ -189,14 +189,31 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     }
 
     // Sartthi Integration: Slack Notification
-    // Check if project has Slack integration configured
-    if (project && project.integrations?.slack?.channelId) {
+    // Priority: Task-level channel > Project default channel
+    let targetChannelId = null;
+    let targetChannelName = null;
+
+    // 1. Check if user selected a specific channel for this task
+    if (slackChannelId && slackChannelId !== 'none' && slackChannelId !== "Don't post to Slack") {
+      targetChannelId = slackChannelId;
+      targetChannelName = 'Task-specific channel';
+      console.log('📤 [SLACK] Using task-specific channel:', slackChannelId);
+    }
+    // 2. Fall back to project's default channel
+    else if (project && project.integrations?.slack?.channelId) {
+      targetChannelId = project.integrations.slack.channelId;
+      targetChannelName = project.integrations.slack.channelName;
+      console.log('📤 [SLACK] Using project default channel:', targetChannelName);
+    }
+
+    // Send notification if we have a target channel
+    if (targetChannelId) {
       try {
-        console.log('📤 [SLACK] Sending notification to channel:', project.integrations.slack.channelName);
+        console.log('📤 [SLACK] Sending notification to channel:', targetChannelName);
         await notifySlackForTask(
           task,
           authUser._id,
-          project.integrations.slack.channelId,
+          targetChannelId,
           slackAccountId
         );
         console.log('✅ [SLACK] Notification sent successfully');
@@ -204,7 +221,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
         console.error('❌ [SLACK] Failed to send notification:', error);
       }
     } else {
-      console.log('ℹ️ [SLACK] No Slack channel configured for this project');
+      console.log('ℹ️ [SLACK] No Slack channel configured for this task');
     }
 
     const response: ApiResponse = {
