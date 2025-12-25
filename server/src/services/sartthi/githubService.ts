@@ -83,9 +83,25 @@ export const getGitHubService = (): IGitHubService => {
             return response.data;
         },
 
+        async getPullRequest(userId: string, owner: string, repo: string, number: number, accountId?: string): Promise<GitHubPR> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.get<GitHubPR>(`${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls/${number}`, {
+                headers: getHeaders(accessToken)
+            });
+            return response.data;
+        },
+
         async getIssues(userId: string, owner: string, repo: string, accountId?: string): Promise<any[]> {
             const accessToken = await getAccessToken(userId, accountId);
             const response = await axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/issues?state=all&sort=updated&per_page=50`, {
+                headers: getHeaders(accessToken)
+            });
+            return response.data;
+        },
+
+        async createIssue(userId: string, owner: string, repo: string, data: any, accountId?: string): Promise<any> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.post(`${GITHUB_API_BASE}/repos/${owner}/${repo}/issues`, data, {
                 headers: getHeaders(accessToken)
             });
             return response.data;

@@ -348,7 +348,7 @@ async function createReviewReminder(
         dueDate.setDate(dueDate.getDate() + 2);
 
         // Create reminder
-        const Reminder = (await import('../models/Reminder')).default;
+        const Reminder = (await import('../models/Reminder')).Reminder;
         await Reminder.create({
             title: `Review PR #${pr.number}: ${pr.title}`,
             description: `You've been requested to review this pull request.\n\n${pr.html_url}`,

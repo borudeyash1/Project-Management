@@ -72,7 +72,7 @@ export const linkRepoToProject = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error('Error linking repo:', error);
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -95,10 +95,10 @@ export const unlinkRepoFromProject = async (req: Request, res: Response) => {
         );
 
         await project.save();
-        res.json({ success: true, message: 'Repository unlinked' });
+        return res.json({ success: true, message: 'Repository unlinked' });
 
     } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 

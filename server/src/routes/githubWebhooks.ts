@@ -94,7 +94,7 @@ router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => 
         }
 
         // Always return 200 to acknowledge receipt
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: 'Webhook processed'
         });
@@ -102,7 +102,7 @@ router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => 
     } catch (error: any) {
         console.error('[GitHub Webhook] Error processing webhook:', error);
         // Still return 200 to prevent GitHub from retrying
-        res.status(200).json({
+        return res.status(200).json({
             success: false,
             message: 'Error processing webhook',
             error: error.message
