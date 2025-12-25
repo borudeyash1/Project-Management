@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
-import { 
-  Mail, Phone, Shield, User as UserIcon, BarChart3, MessageSquare, Bot, 
+import { useDock } from '../../context/DockContext';
+import {
+  Mail, Phone, Shield, User as UserIcon, BarChart3, MessageSquare, Bot,
   Calendar, Building2, Clock, AlertCircle, TrendingUp, Users, CheckSquare,
   Bell, Search, Plus, Filter, Eye, ArrowRight
 } from 'lucide-react';
@@ -12,6 +13,7 @@ import apiService from '../../services/api';
 const WorkspaceProfile: React.FC = () => {
   const { t } = useTranslation();
   const { state, addToast } = useApp();
+  const { dockPosition } = useDock();
   const navigate = useNavigate();
   const location = useLocation();
   const currentWorkspace = state.workspaces.find((ws) => ws._id === state.currentWorkspace);
@@ -44,7 +46,7 @@ const WorkspaceProfile: React.FC = () => {
   useEffect(() => {
     const fetchWorkspaceMembers = async () => {
       if (!state.currentWorkspace) return;
-      
+
       try {
         const response = await apiService.get(`/messages/workspace/${state.currentWorkspace}/members`);
         if (response.data.success && response.data.data) {
@@ -146,11 +148,11 @@ const WorkspaceProfile: React.FC = () => {
     setIsSaving(true);
     try {
       await apiService.put('/users/profile', profileData);
-      
+
       // Update context with new data
       const updatedUser = { ...state.userProfile, ...profileData };
       // Dispatch update to context (you may need to add this action to your reducer)
-      
+
       addToast?.('Profile updated successfully', 'success');
       setIsEditMode(false);
     } catch (error: any) {
@@ -188,7 +190,7 @@ const WorkspaceProfile: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: UserIcon },
+    { id: 'profile', label: t('workspace.profile.tabs.profile'), icon: UserIcon },
     // Hidden - Not fully implemented yet
     // { id: 'inbox', label: 'Inbox', icon: MessageSquare },
     // { id: 'chatbot', label: 'Chatbot', icon: Bot },
@@ -211,7 +213,7 @@ const WorkspaceProfile: React.FC = () => {
                 onClick={() => setIsEditMode(true)}
                 className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
               >
-                Edit Profile
+                {t('workspace.profile.editProfile')}
               </button>
             ) : (
               <div className="flex gap-2">
@@ -220,14 +222,14 @@ const WorkspaceProfile: React.FC = () => {
                   disabled={isSaving}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50"
                 >
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? t('workspace.profile.saving') : t('workspace.profile.save')}
                 </button>
                 <button
                   onClick={handleCancelEdit}
                   disabled={isSaving}
                   className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors text-sm font-medium disabled:opacity-50"
                 >
-                  Cancel
+                  {t('workspace.profile.cancel')}
                 </button>
               </div>
             )}
@@ -262,7 +264,7 @@ const WorkspaceProfile: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                       title="Email cannot be changed"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('workspace.profile.emailCannotBeChanged')}</p>
                   </div>
                 ) : (
                   <p className="font-medium text-gray-900 dark:text-gray-100">{state.userProfile.email || t('workspace.profile.notAvailable')}</p>
@@ -295,17 +297,17 @@ const WorkspaceProfile: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Bio Section */}
           {isEditMode && (
             <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-200 mb-2">Bio</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-200 mb-2">{t('workspace.profile.bioLabel')}</label>
               <textarea
                 value={profileData.bio}
                 onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Tell us about yourself..."
+                placeholder={t('workspace.profile.bioPlaceholder')}
               />
             </div>
           )}
@@ -332,9 +334,9 @@ const WorkspaceProfile: React.FC = () => {
 
       {/* Face Scan Section */}
       <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Face Scan for Attendance</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('workspace.profile.faceScan.title')}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-200 mb-4">
-          Capture your face once so the system can verify you during automatic attendance.
+          {t('workspace.profile.faceScan.description')}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           <div className="space-y-3">
@@ -355,8 +357,7 @@ const WorkspaceProfile: React.FC = () => {
           </div>
           <div className="md:col-span-2 space-y-3 text-sm">
             <p className="text-gray-600 dark:text-gray-200">
-              Make sure your face is clearly visible, with good lighting. This basic capture is stored securely in
-              your profile and used only for attendance verification.
+              {t('workspace.profile.faceScan.instructions')}
             </p>
             <button
               type="button"
@@ -364,7 +365,7 @@ const WorkspaceProfile: React.FC = () => {
               disabled={faceSaving}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-gray-900 hover:bg-accent-hover disabled:opacity-60"
             >
-              {faceSaving ? 'Saving...' : 'Capture & Save Face Scan'}
+              {faceSaving ? t('workspace.profile.faceScan.buttonSaving') : t('workspace.profile.faceScan.button')}
             </button>
             {faceStatus && (
               <p className="text-xs text-gray-600 dark:text-gray-200 mt-2 max-w-md">{faceStatus}</p>
@@ -442,7 +443,7 @@ const WorkspaceProfile: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
               <div className="flex items-center justify-center h-full">
                 <div className="text-center text-gray-600 dark:text-gray-300">
@@ -452,7 +453,7 @@ const WorkspaceProfile: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="p-4 border-t border-gray-200 dark:border-gray-600">
               <div className="flex items-center gap-2">
                 <input
@@ -502,13 +503,16 @@ const WorkspaceProfile: React.FC = () => {
   );
 
   return (
-    <div className="p-6">
+    <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-6 py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-6 py-6' :
+        'p-6'
+      }`}>
       <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl">
         {/* Header */}
         <div className="p-6 border-b border-gray-300 dark:border-gray-600">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Workspace Profile</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t('workspace.profile.title')}</h1>
           <p className="text-sm text-gray-600 dark:text-gray-200 mt-1">
-            Manage your workspace profile and settings
+            {t('workspace.profile.subtitle')}
           </p>
         </div>
 
@@ -521,11 +525,10 @@ const WorkspaceProfile: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-accent text-accent-dark'
-                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                    ? 'border-accent text-accent-dark'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}

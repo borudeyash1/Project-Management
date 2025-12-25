@@ -13,20 +13,17 @@ interface MilestoneTask {
   tasks: string[];
 }
 
-interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
+interface DeepSeekResponse {
+  choices: Array<{
+    message: {
+      content: string;
     };
   }>;
 }
 
 class LLMService {
   private apiKey: string;
-  private apiUrl: string =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent";
+  private apiUrl: string = "https://api.deepseek.com/v1/chat/completions";
 
   constructor() {
     this.apiKey = "";
@@ -34,10 +31,10 @@ class LLMService {
 
   private getApiKey(): string {
     if (!this.apiKey) {
-      this.apiKey = process.env.GEMINI_API_KEY || "";
+      this.apiKey = process.env.DEEPSEEK_API_KEY || "";
       if (!this.apiKey) {
         console.warn(
-          "Warning: GEMINI_API_KEY not found in environment variables",
+          "Warning: DEEPSEEK_API_KEY not found in environment variables",
         );
       }
     }
@@ -84,7 +81,7 @@ Example of desired output:
 `;
 
     try {
-      const response = await this.callGeminiAPI(prompt);
+      const response = await this.callDeepSeekAPI(prompt);
       const projectData = this.parseJSONResponse(response);
 
       // Validate that all required fields are present
@@ -163,7 +160,7 @@ Example of desired output for a "Mobile App Launch" project:
 `;
 
     try {
-      const response = await this.callGeminiAPI(prompt);
+      const response = await this.callDeepSeekAPI(prompt);
       const milestonesData = this.parseJSONResponse(response);
 
       // Validate that the response is an array
@@ -216,7 +213,7 @@ User Query: "${userMessage}"
 Intent:`;
 
     try {
-      const response = await this.callGeminiAPI(prompt);
+      const response = await this.callDeepSeekAPI(prompt);
       const intent = response.trim().toUpperCase();
 
       const validIntents = [
@@ -308,7 +305,7 @@ User Query: "${userMessage}"
 Response (as AI Studio):`;
 
     try {
-      const response = await this.callGeminiAPI(prompt);
+      const response = await this.callDeepSeekAPI(prompt);
       return response;
     } catch (error: any) {
       console.error("Error generating general response:", error.message);
@@ -317,58 +314,51 @@ Response (as AI Studio):`;
   }
 
   /**
-   * Call the Gemini API
+   * Call the DeepSeek API
    */
-  private async callGeminiAPI(prompt: string): Promise<string> {
+  private async callDeepSeekAPI(prompt: string): Promise<string> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error("Gemini API key is not configured");
+      throw new Error("DeepSeek API key is not configured");
     }
 
-    const url = `${this.apiUrl}?key=${apiKey}`;
-
     const requestBody = {
-      contents: [
+      model: "deepseek-chat",
+      messages: [
         {
-          parts: [
-            {
-              text: prompt,
-            },
-          ],
+          role: "user",
+          content: prompt,
         },
       ],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 2048,
-      },
+      temperature: 0.7,
+      max_tokens: 2048,
+      top_p: 0.95,
     };
 
     try {
-      const response = await axios.post<GeminiResponse>(url, requestBody, {
+      const response = await axios.post<DeepSeekResponse>(this.apiUrl, requestBody, {
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
         },
         timeout: 30000, // 30 second timeout
       });
 
-      if (response.data.candidates && response.data.candidates.length > 0) {
-        const candidate = response.data.candidates[0];
-
-        const firstPart = candidate?.content?.parts?.[0];
-        if (firstPart && typeof firstPart.text === "string") {
-          return firstPart.text;
+      if (response.data.choices && response.data.choices.length > 0) {
+        const choice = response.data.choices[0];
+        const content = choice?.message?.content;
+        if (content && typeof content === "string") {
+          return content;
         }
       }
-      throw new Error("No response from Gemini API");
+      throw new Error("No response from DeepSeek API");
     } catch (error: any) {
       if (error.response) {
         throw new Error(
-          `Gemini API error: ${error.response.status} - ${error.response.data?.error?.message || "Unknown error"}`,
+          `DeepSeek API error: ${error.response.status} - ${error.response.data?.error?.message || "Unknown error"}`,
         );
       } else if (error.request) {
-        throw new Error("No response received from Gemini API");
+        throw new Error("No response received from DeepSeek API");
       } else {
         throw new Error(`Request error: ${error.message}`);
       }

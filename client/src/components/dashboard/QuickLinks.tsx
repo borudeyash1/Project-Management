@@ -107,7 +107,7 @@ const QuickLinks: React.FC = () => {
                             key={link.id}
                             onClick={() => navigate(link.path)}
                             className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all hover:scale-105 ${link.bgColor
-                                } ${isDarkMode ? 'hover:bg-opacity-70' : 'hover:shadow-md'}`}
+                                } ${isDarkMode ? 'hover:bg-opacity-70' : ''}`}
                         >
                             <div className={`${link.color}`}>
                                 <Icon className="w-6 h-6" />

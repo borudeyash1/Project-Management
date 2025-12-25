@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useDock } from '../../context/DockContext';
 import { UserPlus, Users, User, Trash2, X, Search, Mail, Calendar, UserCheck, UserX, AlertCircle, Loader2 } from 'lucide-react';
 import api from '../../services/api';
 import RemoveMemberModal from '../RemoveMemberModal';
@@ -35,6 +36,7 @@ interface WorkspaceMembersTabProps {
 const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }) => {
   const { state, dispatch } = useApp();
   const { isDarkMode } = useTheme();
+  const { dockPosition } = useDock();
   const { t, i18n } = useTranslation();
   const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -404,7 +406,10 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
   );
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+        'p-4 sm:p-6'
+      }`}>
       <GlassmorphicCard className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -719,7 +724,7 @@ const WorkspaceMembersTab: React.FC<WorkspaceMembersTabProps> = ({ workspaceId }
                       }`}
                   />
                   {filteredDirectoryUsers.length > 0 && (
-                    <div className={`absolute mt-2 w-full border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
+                    <div className={`absolute mt-2 w-full border rounded-lg z-10 max-h-48 overflow-y-auto ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
                       }`}>
                       {filteredDirectoryUsers.map((user) => (
                         <button

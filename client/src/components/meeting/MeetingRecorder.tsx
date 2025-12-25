@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useWhisper } from '../../hooks/useWhisper';
 import AudioCaptureManager from './AudioCaptureLogic';
 import AIResultDisplay from './AIResultDisplay';
+import { useTranslation } from 'react-i18next';
 
 // Declare SpeechRecognition types
 declare global {
@@ -36,6 +37,7 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
     onManualNotesChange
 }) => {
     const { isDarkMode, preferences } = useTheme();
+    const { t } = useTranslation();
 
     // Whisper hook (fallback mode)
     const whisper = useWhisper();
@@ -334,7 +336,7 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
 
                             <div>
                                 <div className={`text-sm font-medium flex items-center gap-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    {isRecording ? 'Recording...' : 'Ready'}
+                                    {isRecording ? 'Recording...' : t('notes.ready')}
                                     {!useWebSpeech && <Zap className="w-4 h-4 text-yellow-500" title="Offline mode" />}
                                 </div>
                                 <div className={`text-2xl font-mono ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -368,7 +370,7 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
                             style={{ accentColor: preferences.accentColor }}
                         />
                         <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            Include System Audio
+                            {t('notes.includeSystemAudio')}
                         </span>
                     </label>
                 </div>
@@ -386,7 +388,7 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
                 <div className={`p-6 rounded-2xl border backdrop-blur-sm ${isDarkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white/80 border-gray-200/50 shadow-lg'
                     }`}>
                     <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        Live Transcript {!useWebSpeech && '(Offline Mode)'}
+                        {t('notes.liveTranscript')} {!useWebSpeech && '(Offline Mode)'}
                     </h3>
                     <div className={`h-64 overflow-y-auto p-4 rounded-lg ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
                         {transcript ? (
@@ -405,7 +407,7 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
                                             Listening... {useWebSpeech ? '(Real-time)' : '(1-second updates)'}
                                         </>
                                     ) : (
-                                        'Start recording'
+                                        t('notes.startRecording')
                                     )}
                                 </p>
                             </div>
@@ -417,12 +419,12 @@ const MeetingRecorder: React.FC<MeetingRecorderProps> = ({
                 <div className={`p-6 rounded-2xl border backdrop-blur-sm ${isDarkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white/80 border-gray-200/50 shadow-lg'
                     }`}>
                     <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        Manual Notes
+                        {t('notes.manualNotes')}
                     </h3>
                     <textarea
                         value={manualNotes}
                         onChange={(e) => onManualNotesChange?.(e.target.value)}
-                        placeholder="Type additional notes..."
+                        placeholder={t('notes.manualNotesPlaceholder')}
                         className={`w-full h-32 p-4 rounded-lg border resize-none ${isDarkMode
                             ? 'bg-gray-900/50 border-gray-700 text-gray-300 placeholder-gray-500'
                             : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'

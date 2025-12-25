@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { MessageCircle, X, Bot } from 'lucide-react';
 import AIChatbot from './AIChatbot';
 import { useDock } from '../context/DockContext';
+import { useTranslation } from 'react-i18next';
 
 const ChatbotButton: React.FC = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { dockPosition } = useDock();
 
@@ -28,7 +30,7 @@ const ChatbotButton: React.FC = () => {
 
           {/* Tooltip */}
           <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-            Ask AI Assistant
+            {t('home.askAIAssistant')}
             <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
           </div>
         </button>

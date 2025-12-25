@@ -182,26 +182,25 @@ const GoalsPage: React.FC = () => {
     <div
       className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/20 to-purple-50/20'}`}
     >
-      <div
-        className="p-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
-          paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
-        }}
-      >
-        {/* Glassmorphic Page Header */}
-        <GlassmorphicPageHeader
-          icon={Target}
-          title={t('goals.title')}
-          subtitle={t('goals.subtitle')}
-        />
+      {/* Glassmorphic Page Header */}
+      <GlassmorphicPageHeader
+        icon={Target}
+        title={t('goals.title')}
+        subtitle={t('goals.subtitle')}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+      />
+
+      <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
 
         {/* Action Button */}
         <div className="flex justify-end mb-6">
           {canCreateGoals() && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
             >
               <Plus className="w-5 h-5" />
               {t('goals.addGoal')}

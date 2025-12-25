@@ -11,15 +11,16 @@ interface GoalsWidgetProps {
 }
 
 const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
-    const { isDarkMode } = useTheme();
+    const { isDarkMode, preferences } = useTheme();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const accentColor = preferences.accentColor || '#3b82f6'; // Default blue
 
     const activeGoals = goals.filter(g => g.status === 'in_progress' || g.status === 'not_started').slice(0, 3);
 
     if (loading) {
         return (
-            <div className={`rounded-2xl border p-6 h-full ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+            <div className={`rounded-2xl border p-6 h-full ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                 <div className="animate-pulse space-y-4">
                     <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
                     <div className="space-y-3">
@@ -33,19 +34,20 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
     }
 
     return (
-        <div className={`rounded-2xl border p-6 h-full flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+        <div className={`rounded-2xl border p-6 h-full flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                        <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${accentColor}20` }}>
+                        <Target className="w-5 h-5" style={{ color: accentColor }} />
                     </div>
                     <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('goals.title')}</h3>
                 </div>
                 <button
                     onClick={() => navigate('/goals')}
-                    className="text-sm font-medium text-purple-600 hover:text-purple-700 hover:underline"
+                    className="text-sm font-medium hover:underline transition-colors"
+                    style={{ color: accentColor }}
                 >
-                    View All
+                    {t('home.viewAll')}
                 </button>
             </div>
 
@@ -57,8 +59,11 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
                             onClick={() => navigate('/goals')}
                             className={`p-3 rounded-xl border transition-all cursor-pointer group ${isDarkMode
                                 ? 'bg-gray-700/30 border-gray-600 hover:bg-gray-700/50'
-                                : 'bg-gray-50 border-gray-100 hover:bg-gray-100 hover:border-purple-200'
+                                : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
                                 }`}
+                            style={{
+                                '--hover-border-color': `${accentColor}40`
+                            } as any}
                         >
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className={`text-sm font-semibold line-clamp-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{goal.title}</h4>
@@ -74,8 +79,8 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
 
                             <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mb-2">
                                 <div
-                                    className="h-full bg-purple-500 rounded-full transition-all group-hover:bg-purple-400"
-                                    style={{ width: `${goal.progress}%` }}
+                                    className="h-full rounded-full transition-all"
+                                    style={{ width: `${goal.progress}%`, backgroundColor: accentColor }}
                                 />
                             </div>
 
@@ -91,12 +96,13 @@ const GoalsWidget: React.FC<GoalsWidgetProps> = ({ goals, loading }) => {
                 ) : (
                     <div className="flex flex-col items-center justify-center h-40 text-center opacity-60">
                         <Target className="w-10 h-10 mb-2 text-gray-400" />
-                        <p className="text-sm">No active goals</p>
+                        <p className="text-sm">{t('home.noActiveGoals')}</p>
                         <button
                             onClick={() => navigate('/goals')}
-                            className="mt-2 text-xs text-purple-600 font-medium hover:underline"
+                            className="mt-2 text-xs font-medium hover:underline"
+                            style={{ color: accentColor }}
                         >
-                            Create One
+                            {t('home.createOne')}
                         </button>
                     </div>
                 )}

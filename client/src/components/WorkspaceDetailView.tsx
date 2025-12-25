@@ -71,8 +71,8 @@ const WorkspaceDetailView: React.FC = () => {
     { id: 'members', label: t('workspace.detail.tabs.members'), icon: UserPlus },
     { id: 'clients', label: t('workspace.detail.tabs.clients'), icon: Briefcase },
     { id: 'projects', label: t('workspace.detail.tabs.projects'), icon: FolderOpen },
-    { id: 'documents', label: 'Documents', icon: Files },
-    { id: 'attendance', label: 'Attendance', icon: Clock }
+    { id: 'documents', label: t('workspace.detail.tabs.documents'), icon: Files },
+    { id: 'attendance', label: t('workspace.detail.tabs.attendance'), icon: Clock }
   ];
 
   return (
@@ -110,8 +110,8 @@ const WorkspaceDetailView: React.FC = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
-                        ? 'text-accent-dark border-b-2 border-accent-dark'
-                        : isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                      ? 'text-accent-dark border-b-2 border-accent-dark'
+                      : isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
                       }`}
                   >
                     <Icon className="w-4 h-4" />

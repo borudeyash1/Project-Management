@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   X, Calendar, Clock, Bell, Tag, Users, MapPin, Link as LinkIcon,
   Repeat, Paperclip, FileText, AlertCircle, Plus, Trash2
 } from 'lucide-react';
@@ -203,7 +203,11 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
             <input
               type="datetime-local"
               required
-              value={formData.dueDate ? new Date(formData.dueDate).toISOString().slice(0, 16) : ''}
+              value={formData.dueDate ? (() => {
+                const date = new Date(formData.dueDate);
+                const offset = date.getTimezoneOffset() * 60000;
+                return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+              })() : ''}
               onChange={(e) => setFormData({ ...formData, dueDate: new Date(e.target.value) })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
             />
@@ -325,7 +329,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                   >
                     <option value="push">{t('reminders.push')}</option>
                     <option value="email">{t('common.email')}</option>
-                    <option value="sms">{t('reminders.sms')}</option>
+                    <option value="slack">Slack</option>
                   </select>
                   <input
                     type="number"

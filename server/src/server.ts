@@ -50,6 +50,16 @@ import milestoneRoutes from "./routes/milestones";
 import analyticsRoutes from "./routes/analytics";
 import faceEnrollmentRoutes from "./routes/faceEnrollment";
 import notificationSettingsRoutes from "./routes/notificationSettings";
+import slackRoutes from "./routes/slackRoutes";
+import slackWebhooks from "./routes/slackWebhooks";
+import githubRoutes from "./routes/githubRoutes";
+import dropboxRoutes from "./routes/dropboxRoutes";
+import onedriveRoutes from "./routes/onedriveRoutes";
+import figmaRoutes from "./routes/figmaRoutes";
+import notionRoutes from "./routes/notionRoutes";
+import zoomRoutes from "./routes/zoomRoutes";
+import vercelRoutes from "./routes/vercelRoutes";
+import spotifyRoutes from "./routes/spotifyRoutes";
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 
@@ -166,6 +176,16 @@ app.use("/api/notification-settings", notificationSettingsRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/milestones", milestoneRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/slack", slackRoutes);
+app.use("/api/slack/webhooks", slackWebhooks);
+app.use("/api/github", githubRoutes);
+app.use("/api/dropbox", dropboxRoutes);
+app.use("/api/onedrive", onedriveRoutes);
+app.use("/api/figma", figmaRoutes);
+app.use("/api/notion", notionRoutes);
+app.use("/api/zoom", zoomRoutes);
+app.use("/api/vercel", vercelRoutes);
+app.use("/api/spotify", spotifyRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

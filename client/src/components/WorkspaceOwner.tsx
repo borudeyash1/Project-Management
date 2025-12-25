@@ -472,7 +472,7 @@ const WorkspaceOwner: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {clients.map((client) => (
-          <div key={client._id} className={`bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow ${client.status === 'inactive' ? 'grayscale opacity-60' : ''}`}>
+          <div key={client._id} className={`bg-white border border-gray-300 rounded-lg p-6 transition-shadow ${client.status === 'inactive' ? 'grayscale opacity-60' : ''}`}>
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{client.name}</h4>
@@ -584,7 +584,7 @@ const WorkspaceOwner: React.FC = () => {
       {/* Active Employees */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {employees.filter(e => e.status === 'active').map((employee) => (
-          <div key={employee._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={employee._id} className="bg-white border border-gray-300 rounded-lg p-6 transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
                 <img
@@ -663,7 +663,7 @@ const WorkspaceOwner: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project) => (
-          <div key={project._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={project._id} className="bg-white border border-gray-300 rounded-lg p-6 transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{project.name}</h4>

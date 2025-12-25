@@ -220,7 +220,7 @@ const WorkspaceClientsTab: React.FC<WorkspaceClientsTabProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clients.map((client) => (
-              <div key={client._id} className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow group">
+              <div key={client._id} className="border border-gray-300 rounded-lg p-4 transition-shadow group">
                 <div className="flex items-start justify-between mb-3">
                   <div 
                     className="flex-1 cursor-pointer"

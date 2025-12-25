@@ -288,28 +288,27 @@ const WorkspaceDiscover: React.FC = () => {
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
 
       {/* Header */}
-      <div
-        className="pt-6 px-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
-          paddingRight: dockPosition === 'right' ? '100px' : '24px'
+      <GlassmorphicPageHeader
+        title={t('workspace.discoverWorkspaces')}
+        subtitle={t('workspace.findWorkspaces')}
+        icon={Compass}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+        decorativeGradients={{
+          topRight: 'rgba(59, 130, 246, 0.2)',
+          bottomLeft: 'rgba(147, 51, 234, 0.2)'
         }}
-      >
-        <GlassmorphicPageHeader
-          title={t('workspace.discoverWorkspaces')}
-          subtitle={t('workspace.findWorkspaces')}
-          icon={Compass}
-          decorativeGradients={{
-            topRight: 'rgba(59, 130, 246, 0.2)',
-            bottomLeft: 'rgba(147, 51, 234, 0.2)'
-          }}
-        />
+      />
+
+      <div className={`pt-6 pr-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+        dockPosition === 'right' ? 'pr-[71px]' :
+          'pl-6'
+        }`}>
 
         {/* Action Bar */}
         <GlassmorphicCard className="p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Globe className="w-4 h-4" />
-            <span>Discover public workspaces or join by invitation</span>
+            <span>{t('workspace.discoverPublicWorkspaces')}</span>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -321,7 +320,7 @@ const WorkspaceDiscover: React.FC = () => {
             </button>
             <button
               onClick={() => setShowAICreateModal(true)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg font-semibold ${isDarkMode
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-semibold ${isDarkMode
                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
                 : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
                 }`}
@@ -349,8 +348,8 @@ const WorkspaceDiscover: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
-                    ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                  ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-500'
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                   }`}
               />
             </div>
@@ -359,8 +358,8 @@ const WorkspaceDiscover: React.FC = () => {
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`inline-flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${isDarkMode
-                  ? 'border-gray-600 hover:bg-gray-700 text-gray-300'
-                  : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                ? 'border-gray-600 hover:bg-gray-700 text-gray-300'
+                : 'border-gray-300 hover:bg-gray-50 text-gray-700'
                 }`}
             >
               <Filter className="w-4 h-4" />
@@ -379,8 +378,8 @@ const WorkspaceDiscover: React.FC = () => {
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
-                      ? 'bg-gray-800/50 border-gray-700 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
+                    ? 'bg-gray-800/50 border-gray-700 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
                     }`}
                 >
                   <option value="all">All Types</option>
@@ -396,8 +395,8 @@ const WorkspaceDiscover: React.FC = () => {
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${isDarkMode
-                      ? 'bg-gray-800/50 border-gray-700 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
+                    ? 'bg-gray-800/50 border-gray-700 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
                     }`}
                 >
                   <option value="all">All Regions</option>
@@ -428,7 +427,7 @@ const WorkspaceDiscover: React.FC = () => {
           ) : filteredWorkspaces.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredWorkspaces.map((workspace) => (
-                <GlassmorphicCard key={workspace._id} className="p-6 hover:shadow-lg transition-all duration-300 group">
+                <GlassmorphicCard key={workspace._id} className="p-6 transition-all duration-300 group">
                   {/* Workspace Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -477,7 +476,7 @@ const WorkspaceDiscover: React.FC = () => {
                     {isUserOwner(workspace) ? (
                       <button
                         onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2-500/20"
                       >
                         <CheckCircle className="w-4 h-4" />
                         Manage Workspace
@@ -485,7 +484,7 @@ const WorkspaceDiscover: React.FC = () => {
                     ) : isUserMember(workspace._id) ? (
                       <button
                         onClick={() => navigate(`/workspace/${workspace._id}/overview`)}
-                        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2-500/20"
                       >
                         <CheckCircle className="w-4 h-4" />
                         Visit Workspace
@@ -496,7 +495,7 @@ const WorkspaceDiscover: React.FC = () => {
                         disabled={cancellingWorkspaceId === workspace._id}
                         className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${cancellingWorkspaceId === workspace._id
                           ? 'bg-red-500 text-white cursor-not-allowed'
-                          : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-md active:scale-95 shadow-lg shadow-orange-500/20'
+                          : 'bg-orange-500 text-white hover:bg-orange-600 active:scale-95-500/20'
                           }`}
                       >
                         {cancellingWorkspaceId === workspace._id ? (
@@ -518,7 +517,7 @@ const WorkspaceDiscover: React.FC = () => {
                         disabled={requestingWorkspaceId === workspace._id}
                         className={`w-full px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${requestingWorkspaceId === workspace._id
                           ? 'bg-blue-500 text-white cursor-not-allowed'
-                          : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover hover:shadow-md active:scale-95 shadow-lg shadow-accent/20'
+                          : 'bg-accent text-gray-900 dark:text-gray-100 hover:bg-accent-hover active:scale-95/20'
                           }`}
                       >
                         {requestingWorkspaceId === workspace._id ? (

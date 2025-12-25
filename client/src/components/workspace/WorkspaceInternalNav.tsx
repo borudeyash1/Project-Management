@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useDock } from '../../context/DockContext';
 import {
   LayoutDashboard,
   Users,
@@ -21,9 +22,12 @@ interface WorkspaceTab {
   ownerOnly?: boolean;
 }
 
+
+
 const WorkspaceInternalNav: React.FC = () => {
   const { t } = useTranslation();
   const { state } = useApp();
+  const { dockPosition } = useDock();
   const navigate = useNavigate();
   const location = useLocation();
   const { workspaceId: routeWorkspaceId } = useParams<{ workspaceId: string }>();
@@ -47,7 +51,7 @@ const WorkspaceInternalNav: React.FC = () => {
     },
     {
       id: 'attendance',
-      label: 'Attendance',
+      label: t('workspace.detail.tabs.attendance'),
       icon: Calendar,
       path: `/workspace/${activeWorkspaceId}/attendance`
     },
@@ -105,11 +109,10 @@ const WorkspaceInternalNav: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => navigate(tab.path)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  active
-                    ? 'border-accent-dark text-accent-dark dark:text-accent-light'
-                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
-                }`}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${active
+                  ? 'border-accent-dark text-accent-dark dark:text-accent-light'
+                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-300'
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label}

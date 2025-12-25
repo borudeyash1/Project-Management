@@ -46,16 +46,16 @@ export interface CreateReportData {
 
 class ReportService {
   // Get all reports
-  async getReports(type?: string, isPublic?: boolean): Promise<{ data: Report[] }> {
+  async getReports(type?: string, isPublic?: boolean): Promise<Report[]> {
     const params = new URLSearchParams();
     if (type) params.append('type', type);
     if (isPublic !== undefined) params.append('isPublic', String(isPublic));
-    
+
     const queryString = params.toString();
     const url = `/reports${queryString ? `?${queryString}` : ''}`;
-    
-    const response = await apiService.get<{ data: Report[] }>(url);
-    return response.data!;
+
+    const response = await apiService.get<Report[]>(url);
+    return response.data || [];
   }
 
   // Create a new report
@@ -70,21 +70,21 @@ class ReportService {
   }
 
   // Get project analytics
-  async getProjectAnalytics(): Promise<any> {
-    const response = await apiService.get('/reports/analytics/projects');
-    return response.data!;
+  async getProjectAnalytics(): Promise<any[]> {
+    const response = await apiService.get<any[]>('/reports/analytics/projects');
+    return response.data || [];
   }
 
   // Get team analytics
-  async getTeamAnalytics(): Promise<any> {
-    const response = await apiService.get('/reports/analytics/team');
-    return response.data!;
+  async getTeamAnalytics(): Promise<any[]> {
+    const response = await apiService.get<any[]>('/reports/analytics/team');
+    return response.data || [];
   }
 
   // Get time analytics
   async getTimeAnalytics(days: number = 30): Promise<any> {
-    const response = await apiService.get(`/reports/analytics/time?days=${days}`);
-    return response.data!;
+    const response = await apiService.get<any>(`/reports/analytics/time?days=${days}`);
+    return response.data || {};
   }
 }
 

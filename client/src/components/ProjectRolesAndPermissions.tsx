@@ -334,7 +334,7 @@ const ProjectRolesAndPermissions: React.FC = () => {
                 setSelectedUser(user);
                 setShowUserModal(true);
               }}
-              className="bg-white p-6 rounded-lg border border-gray-300 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white p-6 rounded-lg border border-gray-300 transition-shadow cursor-pointer"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">

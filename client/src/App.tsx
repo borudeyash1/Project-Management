@@ -60,6 +60,8 @@ import About from './components/About';
 import SartthiApps from './components/SartthiApps';
 import Docs from './components/Docs';
 import PricingPage from './components/PricingPage';
+import PrivacyPage from './components/PrivacyPage';
+import TermsPage from './components/TermsPage';
 import ActivityPage from './components/ActivityPage';
 import ChatbotButton from './components/ChatbotButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
@@ -102,6 +104,8 @@ import ClientModal from './components/ClientModal';
 import PricingModal from './components/PricingModal';
 import RequestChangeModal from './components/RequestChangeModal';
 import LoadingAnimation from './components/LoadingAnimation';
+import { StickyNotesProvider } from './context/StickyNotesContext';
+import StickyNotesContainer from './components/StickyNotesContainer';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -258,6 +262,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="antialiased bg-bg dark:bg-gray-900 text-text dark:text-gray-100 font-inter selection-bg-primary">
+      <StickyNotesContainer />
       <ToastContainer />
 
       <Routes>
@@ -269,6 +274,8 @@ const AppContent: React.FC = () => {
         <Route path="/docs" element={<Docs />} />
         <Route path="/docs/:slug" element={<Docs />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/refund-policy" element={<RefundPolicy />} />
@@ -555,13 +562,15 @@ const App: React.FC = () => {
       <Router>
         <AppProvider>
           <ThemeProvider>
-            <DockProvider>
-              <PlannerProvider>
-                <TrackerProvider>
-                  <AppContent />
-                </TrackerProvider>
-              </PlannerProvider>
-            </DockProvider>
+            <StickyNotesProvider>
+              <DockProvider>
+                <PlannerProvider>
+                  <TrackerProvider>
+                    <AppContent />
+                  </TrackerProvider>
+                </PlannerProvider>
+              </DockProvider>
+            </StickyNotesProvider>
           </ThemeProvider>
         </AppProvider>
       </Router>

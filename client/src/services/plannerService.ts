@@ -33,7 +33,7 @@ export const getPlannerEvents = async (filters?: PlannerFilters): Promise<Planne
   try {
     // Convert dates to ISO strings if they are Date objects
     const queryParams: Record<string, string> = {};
-    
+
     if (filters) {
       if (filters.start) {
         queryParams.start = filters.start instanceof Date ? filters.start.toISOString() : filters.start;
@@ -48,11 +48,11 @@ export const getPlannerEvents = async (filters?: PlannerFilters): Promise<Planne
         queryParams.userId = filters.userId;
       }
     }
-    
-    const queryString = Object.keys(queryParams).length > 0 
-      ? '?' + new URLSearchParams(queryParams).toString() 
+
+    const queryString = Object.keys(queryParams).length > 0
+      ? '?' + new URLSearchParams(queryParams).toString()
       : '';
-      
+
     const response = await apiService.get(`/planner/events${queryString}`);
     return response.data || [];
   } catch (error) {
@@ -91,7 +91,7 @@ export const deletePlannerEvent = async (id: string): Promise<void> => {
 };
 
 export const updateEventParticipation = async (
-  eventId: string, 
+  eventId: string,
   status: 'accepted' | 'declined' | 'tentative'
 ): Promise<PlannerEvent> => {
   try {
@@ -99,6 +99,36 @@ export const updateEventParticipation = async (
     return response.data;
   } catch (error) {
     console.error('Error updating event participation:', error);
+    throw error;
+  }
+};
+export const getPlannerData = async (filters?: {
+  workspaceId?: string;
+  startDate?: Date | string;
+  endDate?: Date | string;
+}): Promise<{
+  tasks: any[];
+  reminders: any[];
+  milestones: any[];
+  events: PlannerEvent[];
+}> => {
+  try {
+    const queryParams: Record<string, string> = {};
+
+    if (filters) {
+      if (filters.workspaceId) queryParams.workspaceId = filters.workspaceId;
+      if (filters.startDate) queryParams.startDate = filters.startDate instanceof Date ? filters.startDate.toISOString() : filters.startDate;
+      if (filters.endDate) queryParams.endDate = filters.endDate instanceof Date ? filters.endDate.toISOString() : filters.endDate;
+    }
+
+    const queryString = Object.keys(queryParams).length > 0
+      ? '?' + new URLSearchParams(queryParams).toString()
+      : '';
+
+    const response = await apiService.get(`/planner/data${queryString}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all planner data:', error);
     throw error;
   }
 };

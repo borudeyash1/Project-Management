@@ -790,7 +790,7 @@ const WorkspaceMember: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project) => (
-          <div key={project._id} className="bg-white border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={project._id} className="bg-white border border-gray-300 rounded-lg p-6 transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-900">{project.name}</h4>

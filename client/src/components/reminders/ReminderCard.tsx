@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle, Calendar, Clock, Flag, Users, MapPin, Link as LinkIcon, FileText, Tag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ReminderCardProps {
   reminder: {
@@ -32,9 +33,11 @@ interface ReminderCardProps {
 }
 
 const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete, onClick }) => {
+  const { t, i18n } = useTranslation();
+
   const formatTime = (date: Date | string) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleTimeString('en-US', {
+    return dateObj.toLocaleTimeString(i18n.language, {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
@@ -43,7 +46,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
 
   const formatDate = (date: Date | string) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', {
+    return dateObj.toLocaleDateString(i18n.language, {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -78,9 +81,9 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
 
   return (
     <div className="w-full max-w-[240px] h-80" style={{ perspective: '1000px' }}>
-      <div 
+      <div
         className="relative w-full h-full transition-transform duration-700"
-        style={{ 
+        style={{
           transformStyle: 'preserve-3d',
           transform: 'rotateY(0deg)'
         }}
@@ -92,9 +95,9 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
         }}
       >
         {/* Front Side */}
-        <div 
+        <div
           className={`absolute w-full h-full rounded-2xl shadow-lg border-2 flex flex-col justify-center items-center p-6 bg-gradient-to-br ${getPriorityGradient(reminder.priority)} animate-gradient`}
-          style={{ 
+          style={{
             borderColor: getPriorityColor(reminder.priority),
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
@@ -112,18 +115,18 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.completed ? (
               <div className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-full shadow-md">
                 <CheckCircle className="w-4 h-4" />
-                <span className="text-xs font-semibold">Completed</span>
+                <span className="text-xs font-semibold">{t('common.completed')}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 px-3 py-1.5 bg-gray-200 text-gray-700 rounded-full shadow-sm">
                 <Clock className="w-4 h-4" />
-                <span className="text-xs font-semibold">Pending</span>
+                <span className="text-xs font-semibold">{t('common.pending')}</span>
               </div>
             )}
           </div>
 
           {/* Title */}
-          <h3 
+          <h3
             className={`text-2xl font-black text-center mb-4 px-2 ${reminder.completed ? 'line-through' : ''}`}
             style={{ color: getPriorityColor(reminder.priority) }}
           >
@@ -132,11 +135,11 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
 
           {/* Type Badge */}
           <div className="mb-6">
-            <span 
+            <span
               className="px-4 py-2 rounded-full text-sm font-semibold capitalize text-white shadow-md"
               style={{ backgroundColor: getPriorityColor(reminder.priority) }}
             >
-              {reminder.type}
+              {t(`reminders.types.${reminder.type}`)}
             </span>
           </div>
 
@@ -153,13 +156,13 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
           </div>
 
           {/* Hover Hint */}
-          <p className="absolute bottom-4 text-xs text-gray-500 font-medium">Hover for details</p>
+          <p className="absolute bottom-4 text-xs text-gray-500 font-medium">{t('reminders.hoverHint')}</p>
         </div>
 
         {/* Back Side - Clickable for Edit */}
-        <div 
+        <div
           className={`absolute w-full h-full rounded-2xl shadow-lg border-2 bg-gradient-to-br ${getPriorityBackGradient(reminder.priority)} p-6 overflow-y-auto cursor-pointer`}
-          style={{ 
+          style={{
             borderColor: getPriorityColor(reminder.priority),
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
@@ -181,12 +184,11 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
                 e.stopPropagation();
                 onToggleComplete(reminder._id);
               }}
-              className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shadow-lg cursor-pointer ${
-                reminder.completed
-                  ? 'bg-green-500 border-green-400 text-white'
-                  : 'border-gray-400 hover:border-green-500 bg-white hover:bg-green-50'
-              }`}
-              title={reminder.completed ? 'Mark as Pending' : 'Mark as Completed'}
+              className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shadow-lg cursor-pointer ${reminder.completed
+                ? 'bg-green-500 border-green-400 text-white'
+                : 'border-gray-400 hover:border-green-500 bg-white hover:bg-green-50'
+                }`}
+              title={reminder.completed ? t('reminders.markAsPending') : t('reminders.markAsCompleted')}
             >
               {reminder.completed ? (
                 <CheckCircle className="w-6 h-6" />
@@ -197,7 +199,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
           </div>
 
           <h3 className="text-xl font-bold mb-4 text-center border-b-2 border-gray-300 pb-2 mt-8 text-gray-800">
-            Details
+            {t('common.details')}
           </h3>
 
           <div className="space-y-3 text-sm text-gray-700">
@@ -205,7 +207,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.description && (
               <div>
                 <p className="font-semibold mb-1 flex items-center gap-1 text-gray-800">
-                  <FileText className="w-4 h-4" /> Description:
+                  <FileText className="w-4 h-4" /> {t('common.description')}:
                 </p>
                 <p className="text-gray-600 text-xs leading-relaxed">{reminder.description}</p>
               </div>
@@ -215,7 +217,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.project && (
               <div className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${reminder.project.color}`}></div>
-                <span className="font-semibold text-gray-800">Project:</span>
+                <span className="font-semibold text-gray-800">{t('common.project')}:</span>
                 <span className="text-gray-600">{reminder.project.name}</span>
               </div>
             )}
@@ -224,7 +226,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.assignee && (
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
-                <span className="font-semibold text-gray-800">Assigned to:</span>
+                <span className="font-semibold text-gray-800">{t('tasks.assignedTo')}:</span>
                 <span className="text-gray-600">{reminder.assignee.name}</span>
               </div>
             )}
@@ -233,7 +235,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.location && (
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                <span className="font-semibold text-gray-800">Location:</span>
+                <span className="font-semibold text-gray-800">{t('calendar.location')}:</span>
                 <span className="text-gray-600 text-xs">{reminder.location}</span>
               </div>
             )}
@@ -242,14 +244,14 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.meetingLink && (
               <div className="flex items-center gap-2">
                 <LinkIcon className="w-4 h-4" />
-                <a 
-                  href={reminder.meetingLink} 
-                  target="_blank" 
+                <a
+                  href={reminder.meetingLink}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 underline hover:text-blue-800 text-xs truncate"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  Meeting Link
+                  {t('reminders.meetingLink')}
                 </a>
               </div>
             )}
@@ -257,7 +259,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {/* Notes */}
             {reminder.notes && (
               <div>
-                <p className="font-semibold mb-1 text-gray-800">Notes:</p>
+                <p className="font-semibold mb-1 text-gray-800">{t('reminders.notes')}:</p>
                 <p className="text-gray-600 text-xs leading-relaxed">{reminder.notes}</p>
               </div>
             )}
@@ -266,7 +268,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {reminder.tags && reminder.tags.length > 0 && (
               <div>
                 <p className="font-semibold mb-1 flex items-center gap-1 text-gray-800">
-                  <Tag className="w-4 h-4" /> Tags:
+                  <Tag className="w-4 h-4" /> {t('projects.tags')}:
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {reminder.tags.map((tag, index) => (
@@ -284,9 +286,9 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
             {/* Recurring */}
             {reminder.recurring && (
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-800">Recurring:</span>
+                <span className="font-semibold text-gray-800">{t('reminders.recurring')}:</span>
                 <span className="text-gray-600 text-xs">
-                  Every {reminder.recurring.interval} {reminder.recurring.frequency}
+                  {t('reminders.every')} {reminder.recurring.interval} {t(`planner.taskModal.options.recurrence.${reminder.recurring.frequency}`)}
                 </span>
               </div>
             )}

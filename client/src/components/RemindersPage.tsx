@@ -381,24 +381,23 @@ const RemindersPage: React.FC = () => {
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
       {/* Header & Toolbar */}
-      <div
-        className="pt-6 px-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
-          paddingRight: dockPosition === 'right' ? '100px' : '24px'
+      <GlassmorphicPageHeader
+        title={t('reminders.title')}
+        subtitle={t('reminders.subtitle')}
+        icon={Bell}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+        decorativeGradients={{
+          topRight: 'rgba(239, 68, 68, 0.2)',
+          bottomLeft: 'rgba(245, 158, 11, 0.2)'
         }}
-      >
-        <GlassmorphicPageHeader
-          title={t('reminders.title')}
-          subtitle={t('reminders.subtitle')}
-          icon={Bell}
-          decorativeGradients={{
-            topRight: 'rgba(239, 68, 68, 0.2)',
-            bottomLeft: 'rgba(245, 158, 11, 0.2)'
-          }}
-        />
+      />
 
-        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className={`pt-6 pr-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+        dockPosition === 'right' ? 'pr-[71px]' :
+          'pl-6'
+        }`}>
+
+        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4 relative z-20">
           <div className="flex items-center gap-3">
             {/* Notification Permission */}
             {permission === 'default' && (
@@ -427,7 +426,7 @@ const RemindersPage: React.FC = () => {
                 {t('buttons.export')}
               </button>
               {showExportMenu && (
-                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-300 dark:border-gray-700 py-1 z-10GlassmorphicCard">
+                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 py-1 z-50 shadow-xl">
                   <button
                     onClick={() => handleExport('all')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -456,7 +455,7 @@ const RemindersPage: React.FC = () => {
               setSelectedReminder(null);
               setShowAddModal(true);
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover shadow-lg shadow-accent/20 transition-all font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover/20 transition-all font-medium"
           >
             <Plus className="w-4 h-4" />
             {t('reminders.addReminder')}
@@ -465,11 +464,10 @@ const RemindersPage: React.FC = () => {
       </div>
 
       <div
-        className="px-6 pb-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? '100px' : '24px',
-          paddingRight: dockPosition === 'right' ? '100px' : '24px'
-        }}
+        className={`px-6 pb-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+          dockPosition === 'right' ? 'pr-[71px]' :
+            ''
+          }`}
       >
         {/* Search and Filters */}
         <GlassmorphicCard className="p-4 mb-6">
@@ -532,7 +530,7 @@ const RemindersPage: React.FC = () => {
                     key={mode.id}
                     onClick={() => setViewMode(mode.id as any)}
                     className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all ${viewMode === mode.id
-                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm rounded-md m-0.5'
+                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 rounded-md m-0.5'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                       }`}
                   >
@@ -622,9 +620,9 @@ const RemindersPage: React.FC = () => {
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day Headers */}
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => (
                     <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {day}
+                      {t(`common.days.short.${day}`)}
                     </div>
                   ))}
 
@@ -666,7 +664,7 @@ const RemindersPage: React.FC = () => {
                           ))}
                           {dayReminders.length > 2 && (
                             <div className="text-xs text-gray-600 dark:text-gray-400">
-                              +{dayReminders.length - 2} more
+                              {t('reminders.more', { count: dayReminders.length - 2 })}
                             </div>
                           )}
                         </div>
@@ -703,7 +701,7 @@ const RemindersPage: React.FC = () => {
                         {columnReminders.map(reminder => (
                           <div
                             key={reminder._id}
-                            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-3 shadow-sm"
+                            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 p-3"
                           >
                             <div className="flex items-start gap-2 mb-2">
                               {getTypeIcon(reminder.type)}

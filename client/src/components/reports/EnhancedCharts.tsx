@@ -32,6 +32,11 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
     projectMetrics,
     isDarkMode
 }) => {
+    // Get accent color from CSS variables
+    const accentColor = isDarkMode ? '#6366f1' : '#2563EB';
+    const accentHover = isDarkMode ? '#4f46e5' : '#1D4ED8';
+    const accentLight = isDarkMode ? '#818cf8' : '#3B82F6';
+
     return (
         <>
             {/* Analytics Charts */}
@@ -53,12 +58,12 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                             <RechartsLineChart data={timeTrackingData}>
                                 <defs>
                                     <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#FBBF24" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#FBBF24" stopOpacity={0} />
+                                        <stop offset="5%" stopColor={accentColor} stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor={accentColor} stopOpacity={0} />
                                     </linearGradient>
                                     <linearGradient id="colorBillable" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        <stop offset="5%" stopColor={accentLight} stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor={accentLight} stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} strokeOpacity={0.5} />
@@ -92,20 +97,20 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                                 <Line
                                     type="monotone"
                                     dataKey="hours"
-                                    stroke="#FBBF24"
+                                    stroke={accentColor}
                                     strokeWidth={3}
                                     name="Total Hours"
-                                    dot={{ fill: '#FBBF24', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                                    dot={{ fill: accentColor, r: 5, strokeWidth: 2, stroke: '#fff' }}
                                     activeDot={{ r: 7, strokeWidth: 2 }}
                                     fill="url(#colorHours)"
                                 />
                                 <Line
                                     type="monotone"
                                     dataKey="billableHours"
-                                    stroke="#10b981"
+                                    stroke={accentLight}
                                     strokeWidth={3}
                                     name="Billable Hours"
-                                    dot={{ fill: '#10b981', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                                    dot={{ fill: accentLight, r: 5, strokeWidth: 2, stroke: '#fff' }}
                                     activeDot={{ r: 7, strokeWidth: 2 }}
                                     fill="url(#colorBillable)"
                                 />
@@ -123,7 +128,7 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Team Performance</h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Top performers this month</p>
                             </div>
-                            <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg">
+                            <div className="p-3 bg-gradient-to-br from-accent to-blue-500 rounded-xl shadow-lg">
                                 <Users className="w-5 h-5 text-white" />
                             </div>
                         </div>
@@ -131,12 +136,12 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                             <RechartsBarChart data={teamPerformance.slice(0, 5)}>
                                 <defs>
                                     <linearGradient id="colorProductivity" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.9} />
-                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.6} />
+                                        <stop offset="5%" stopColor={accentColor} stopOpacity={0.9} />
+                                        <stop offset="95%" stopColor={accentColor} stopOpacity={0.6} />
                                     </linearGradient>
                                     <linearGradient id="colorCompletion" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#FBBF24" stopOpacity={0.9} />
-                                        <stop offset="95%" stopColor="#FBBF24" stopOpacity={0.6} />
+                                        <stop offset="5%" stopColor={accentLight} stopOpacity={0.9} />
+                                        <stop offset="95%" stopColor={accentLight} stopOpacity={0.6} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} strokeOpacity={0.5} />
@@ -202,7 +207,7 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Project Distribution</h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Status breakdown</p>
                             </div>
-                            <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl shadow-lg">
+                            <div className="p-3 bg-gradient-to-br from-accent to-blue-500 rounded-xl shadow-lg">
                                 <Target className="w-5 h-5 text-white" />
                             </div>
                         </div>
@@ -210,8 +215,8 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                             <RechartsPieChart>
                                 <Pie
                                     data={[
-                                        { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
-                                        { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
+                                        { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: accentColor },
+                                        { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: accentLight },
                                         { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
                                         { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
                                     ].filter(item => item.value > 0)}
@@ -226,8 +231,8 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                                     paddingAngle={3}
                                 >
                                     {[
-                                        { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
-                                        { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
+                                        { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: accentColor },
+                                        { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: accentLight },
                                         { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
                                         { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
                                     ].filter(item => item.value > 0).map((entry, index) => (
@@ -253,8 +258,8 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                         {/* Legend */}
                         <div className="grid grid-cols-2 gap-3 mt-4">
                             {[
-                                { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: '#10b981' },
-                                { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: '#3b82f6' },
+                                { name: 'Active', value: projectMetrics.filter(p => p.status === 'active').length, color: accentColor },
+                                { name: 'Completed', value: projectMetrics.filter(p => p.status === 'completed').length, color: accentLight },
                                 { name: 'Paused', value: projectMetrics.filter(p => p.status === 'paused').length, color: '#FBBF24' },
                                 { name: 'Cancelled', value: projectMetrics.filter(p => p.status === 'cancelled').length, color: '#ef4444' }
                             ].filter(item => item.value > 0).map((item, index) => (
@@ -276,7 +281,7 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Productivity Trend</h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Hours worked over time</p>
                             </div>
-                            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl shadow-lg">
+                            <div className="p-3 bg-gradient-to-br from-accent to-blue-500 rounded-xl shadow-lg">
                                 <TrendingUp className="w-5 h-5 text-white" />
                             </div>
                         </div>
@@ -284,9 +289,9 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                             <AreaChart data={timeTrackingData}>
                                 <defs>
                                     <linearGradient id="colorProductivityArea" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#FBBF24" stopOpacity={0.8} />
-                                        <stop offset="50%" stopColor="#FBBF24" stopOpacity={0.4} />
-                                        <stop offset="95%" stopColor="#FBBF24" stopOpacity={0.1} />
+                                        <stop offset="5%" stopColor={accentColor} stopOpacity={0.8} />
+                                        <stop offset="50%" stopColor={accentColor} stopOpacity={0.4} />
+                                        <stop offset="95%" stopColor={accentColor} stopOpacity={0.1} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} strokeOpacity={0.5} />
@@ -316,12 +321,12 @@ const EnhancedCharts: React.FC<EnhancedChartsProps> = ({
                                 <Area
                                     type="monotone"
                                     dataKey="hours"
-                                    stroke="#FBBF24"
+                                    stroke={accentColor}
                                     strokeWidth={3}
                                     fillOpacity={1}
                                     fill="url(#colorProductivityArea)"
                                     name="Hours Worked"
-                                    dot={{ fill: '#FBBF24', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                                    dot={{ fill: accentColor, r: 4, strokeWidth: 2, stroke: '#fff' }}
                                     activeDot={{ r: 6, strokeWidth: 2 }}
                                 />
                             </AreaChart>

@@ -6,7 +6,7 @@ import {
   Monitor, Smartphone, Tablet, Wifi, Cloud, Server, HardDrive,
   Zap, Moon, Sun, Volume2, VolumeX, Mic, MicOff, Camera, CameraOff,
   MapPin, Clock, Calendar, Mail, MessageSquare, Phone, Users,
-  BarChart3, PieChart, TrendingUp, Activity, Target, Award, Languages
+  BarChart3, PieChart, TrendingUp, Activity, Target, Award, Languages, FileText
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
@@ -524,6 +524,56 @@ const Settings: React.FC = () => {
         <ConnectedAccounts />
       </GlassmorphicCard>
 
+      {/* Privacy & Legal Section */}
+      <GlassmorphicCard className="p-4">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+          <Shield className="w-5 h-5" />
+          {t('settings.privacyLegal', 'Privacy & Legal')}
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.privacyPolicy', 'Privacy Policy')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.privacyPolicyDesc', 'Learn how we protect your data')}</p>
+              </div>
+            </div>
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-dark transition-colors flex items-center gap-2"
+            >
+              {t('settings.viewPolicy', 'View Policy')}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{t('settings.termsOfUse', 'Terms of Use')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.termsOfUseDesc', 'Review our terms and conditions')}</p>
+              </div>
+            </div>
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-dark transition-colors flex items-center gap-2"
+            >
+              {t('settings.viewTerms', 'View Terms')}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </GlassmorphicCard>
+
       {/* Account Information */}
       <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accountInfo')}</h3>
@@ -706,7 +756,7 @@ const Settings: React.FC = () => {
       {/* Accent Color */}
       <GlassmorphicCard className="p-4">
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.accentColor')}</h3>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-3 flex-wrap items-center">
           {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].map((color) => (
             <button
               key={color}
@@ -742,6 +792,42 @@ const Settings: React.FC = () => {
               title={color}
             />
           ))}
+
+          <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+          {/* Custom Color Input */}
+          <div className="relative group">
+            <div
+              className={`w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center overflow-hidden ${!['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].includes(preferences.accentColor)
+                ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800'
+                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                }`}
+              style={{
+                backgroundColor: !['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].includes(preferences.accentColor)
+                  ? preferences.accentColor
+                  : undefined
+              }}
+            >
+              {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].includes(preferences.accentColor) && (
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500 via-green-500 to-blue-500 opacity-20" />
+              )}
+
+              <input
+                type="color"
+                value={preferences.accentColor}
+                onChange={(e) => updateThemePreferences({ accentColor: e.target.value })}
+                className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                title={t('settings.customColor')}
+              />
+
+              {['#FBBF24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'].includes(preferences.accentColor) && (
+                <Plus className="w-5 h-5 text-gray-500 dark:text-gray-400 z-0" />
+              )}
+            </div>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-lg border border-gray-100 dark:border-gray-700 z-20">
+              {t('settings.customColor', 'Custom')}
+            </div>
+          </div>
         </div>
       </GlassmorphicCard>
 
@@ -896,7 +982,7 @@ const Settings: React.FC = () => {
         <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.currentPlan')}</h3>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} Plan</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">{settingsData?.billing.plan} {t('settings.plan')}</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.nextBilling', { date: new Date(settingsData?.billing.nextBillingDate || '').toLocaleDateString() })}</p>
           </div>
           <button className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors">
@@ -1107,11 +1193,10 @@ const Settings: React.FC = () => {
   if (loading) {
     return (
       <div
-        className="p-4 sm:p-6 transition-all duration-300"
-        style={{
-          paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-          paddingRight: dockPosition === 'right' ? '80px' : undefined
-        }}
+        className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+          dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+            'p-4 sm:p-6'
+          }`}
       >
         <div className="bg-white dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl p-8">
           <div className="animate-pulse">
@@ -1129,46 +1214,49 @@ const Settings: React.FC = () => {
 
   return (
     <div
-      className={`p-4 sm:p-6 transition-all duration-300 min-h-screen bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-gray-50 via-blue-50/30 to-purple-50/20'}`}
-      style={{
-        paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-        paddingRight: dockPosition === 'right' ? '80px' : undefined
-      }}
+      className={`min-h-screen transition-all duration-300 bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-gray-50 via-blue-50/30 to-purple-50/20'}`}
     >
       <GlassmorphicPageHeader
         title={t('settings.title')}
         subtitle={t('settings.subtitle')}
         icon={SettingsIcon}
+        className="w-full !rounded-none !border-x-0 !mb-0"
       />
 
-      {/* Tabs */}
-      <GlassmorphicCard className="mb-6">
-        <nav className="flex space-x-8 overflow-x-auto">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
-                  ? 'border-accent text-accent-dark dark:text-accent-light'
-                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                  }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-      </GlassmorphicCard>
+      <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
 
-      {/* Content */}
-      <div className="space-y-6">
-        {activeTab === 'account' && renderAccount()}
-        {activeTab === 'appearance' && renderAppearance()}
-        {activeTab === 'billing' && renderBilling()}
-        {activeTab === 'data' && renderData()}
+        {/* Tabs */}
+        <GlassmorphicCard className="mb-6">
+          <nav className="flex space-x-8 overflow-x-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                    ? 'border-accent text-accent-dark dark:text-accent-light'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </GlassmorphicCard>
+
+        {/* Content */}
+        <div className="space-y-6">
+          {activeTab === 'account' && renderAccount()}
+          {activeTab === 'appearance' && renderAppearance()}
+          {activeTab === 'billing' && renderBilling()}
+          {activeTab === 'data' && renderData()}
+        </div>
       </div>
 
       {/* Delete Account Modal */}

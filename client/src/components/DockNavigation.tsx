@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
@@ -27,8 +28,8 @@ import { apiService } from '../services/api';
 import { redirectToDesktopSplash, shouldHandleInDesktop } from '../constants/desktop';
 import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
-import StickyNote from './StickyNote';
 import AIChatbot from './AIChatbot';
+import { useStickyNotes } from '../context/StickyNotesContext';
 
 interface NavItem {
   id: string;
@@ -48,6 +49,70 @@ const DockNavigation: React.FC = () => {
   const [showInfoCard, setShowInfoCard] = useState<'mail' | 'calendar' | 'vault' | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
+  // Sticky Notes Hover Logic
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const handleIconEnter = (itemId: string, e: React.MouseEvent) => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    setHoveredItem(itemId);
+    setHoveredRect(e.currentTarget.getBoundingClientRect());
+  };
+
+  const handleIconLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setHoveredItem(null);
+      setHoveredRect(null);
+    }, 150); // Grace period to move mouse to menu
+  };
+
+  const handleMenuEnter = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+  };
+
+  const handleMenuLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setHoveredItem(null);
+      setHoveredRect(null);
+    }, 150);
+  };
+
+  const getMenuPositionStyle = () => {
+    if (!hoveredRect) return {};
+
+    const gap = 8;
+    // Default Bottom Dock: Menu above
+    let style: React.CSSProperties = {
+      left: hoveredRect.left + hoveredRect.width / 2,
+      top: hoveredRect.top - gap,
+      transform: 'translate(-50%, -100%)'
+    };
+
+    if (dockPosition === 'left') {
+      style = {
+        left: hoveredRect.right + gap,
+        top: hoveredRect.top + hoveredRect.height / 2,
+        transform: 'translate(0, -50%)'
+      };
+    } else if (dockPosition === 'right') {
+      style = {
+        left: hoveredRect.left - gap,
+        top: hoveredRect.top + hoveredRect.height / 2,
+        transform: 'translate(-100%, -50%)'
+      };
+    } else if (dockPosition === 'top') {
+      style = {
+        left: hoveredRect.left + hoveredRect.width / 2,
+        top: hoveredRect.bottom + gap,
+        transform: 'translate(-50%, 0)'
+      };
+    }
+
+    return style;
+  };
+
+
   // Check if user owns any workspace
   const isWorkspaceOwner = useMemo(() => {
     const ownsWorkspace = state.workspaces.some(w => {
@@ -55,17 +120,7 @@ const DockNavigation: React.FC = () => {
       const ownerId = typeof w.owner === 'string' ? w.owner : (w.owner as any)?._id;
       return ownerId === state.userProfile._id;
     });
-    console.log('[DockNavigation] Checking workspace ownership:', {
-      workspacesCount: state.workspaces.length,
-      userId: state.userProfile._id,
-      ownsWorkspace,
-      workspaces: state.workspaces.map(w => ({
-        id: w._id,
-        name: w.name,
-        owner: w.owner,
-        ownerId: typeof w.owner === 'string' ? w.owner : (w.owner as any)?._id
-      }))
-    });
+    // Removed console log to clean up
     return ownsWorkspace;
   }, [state.workspaces, state.userProfile._id]);
 
@@ -154,16 +209,12 @@ const DockNavigation: React.FC = () => {
       (path !== '/home' && location.pathname.startsWith(path));
   };
 
-  const [activeStickyNotes, setActiveStickyNotes] = useState<string[]>([]);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  // Sticky Notes Context
+  const { addNote } = useStickyNotes();
 
   const handleCreateStickyNote = () => {
-    const id = Date.now().toString();
-    setActiveStickyNotes(prev => [...prev, id]);
-  };
-
-  const handleCloseStickyNote = (id: string) => {
-    setActiveStickyNotes(prev => prev.filter(noteId => noteId !== id));
+    addNote();
+    setHoveredItem(null); // Close menu
   };
 
   // Check if dock is in vertical mode (left/right)
@@ -171,15 +222,6 @@ const DockNavigation: React.FC = () => {
 
   return (
     <>
-      {/* Sticky Notes Layer */}
-      {activeStickyNotes.map(id => (
-        <StickyNote
-          key={id}
-          id={id} // Pass ID for auto-save to work correctly if we want to persist specific instances
-          onClose={() => handleCloseStickyNote(id)}
-        />
-      ))}
-
       {/* Main Dock */}
       <Dock direction="middle">
         {mainNavItems.map((item) => {
@@ -192,8 +234,8 @@ const DockNavigation: React.FC = () => {
             <div
               key={item.id}
               className="relative group"
-              onMouseEnter={() => setHoveredItem(item.id)}
-              onMouseLeave={() => setHoveredItem(null)}
+              onMouseEnter={(e) => handleIconEnter(item.id, e)}
+              onMouseLeave={handleIconLeave}
             >
               <DockIcon
                 onClick={() => handleItemClick(item)}
@@ -203,32 +245,6 @@ const DockNavigation: React.FC = () => {
               >
                 <Icon className="w-5 h-5" />
               </DockIcon>
-
-              {/* Notes Hover Menu */}
-              {isNotes && hoveredItem === 'notes' && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[120px] z-50 animate-in fade-in slide-in-from-bottom-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCreateStickyNote();
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-yellow-300 border border-yellow-400"></span>
-                    {t('notes.stickyNote')}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate('/notes');
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <FileText size={14} />
-                    {t('notes.allNotes')}
-                  </button>
-                </div>
-              )}
             </div>
           );
         })}
@@ -289,6 +305,41 @@ const DockNavigation: React.FC = () => {
           <LogOut className="w-5 h-5" />
         </DockIcon>
       </Dock>
+
+      {/* Portal Sticky Notes Menu */}
+      {hoveredItem === 'notes' && hoveredRect && createPortal(
+        <div
+          className="fixed z-[9999] animate-in fade-in zoom-in-95 duration-200"
+          style={getMenuPositionStyle()}
+          onMouseEnter={handleMenuEnter}
+          onMouseLeave={handleMenuLeave}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[140px]">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCreateStickyNote();
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-yellow-300 border border-yellow-400"></span>
+              {t('notes.stickyNote')}
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/notes');
+                setHoveredItem(null);
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <FileText size={14} />
+              {t('notes.allNotes')}
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Workspace Selector Modal */}
       {showWorkspaces && state.workspaces.length > 0 && (

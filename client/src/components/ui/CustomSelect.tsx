@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DropdownTransition from '../animations/DropdownTransition';
 
 interface SelectOption {
   id: string;
@@ -15,7 +16,7 @@ interface CustomSelectProps {
 
 const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, placeholder = 'Select' }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const selectedOption = options.find(opt => opt.value === value);
   const displayText = selectedOption ? selectedOption.label : placeholder;
 
@@ -25,7 +26,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
   };
 
   return (
-    <div 
+    <div
       className="custom-select relative w-fit cursor-pointer"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
@@ -44,25 +45,23 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
       </div>
 
       {/* Options Dropdown */}
-      <div 
-        className={`options absolute left-0 right-0 mt-1 flex flex-col gap-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50 transition-all duration-300 ${
-          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-        }`}
+      <DropdownTransition
+        isOpen={isOpen}
+        className="options absolute left-0 right-0 mt-1 flex flex-col gap-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50"
       >
         {options.map((option) => (
           <button
             key={option.id}
             onClick={() => handleOptionClick(option.value)}
-            className={`option text-left px-4 py-2 rounded-md text-sm transition-colors ${
-              value === option.value
-                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 font-semibold'
-                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`option text-left px-4 py-2 rounded-md text-sm transition-colors ${value === option.value
+              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 font-semibold'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
             {option.label}
           </button>
         ))}
-      </div>
+      </DropdownTransition>
     </div>
   );
 };

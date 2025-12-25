@@ -3,6 +3,7 @@ import { Users, UserPlus, Trash2, Crown, Shield, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { apiService } from '../../services/api';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 interface WorkspaceMember {
   _id: string;
@@ -77,17 +78,17 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
       userProfile: state.userProfile,
       isOwnerProp: isOwner
     });
-    
+
     if (!state.currentWorkspace || typeof state.currentWorkspace === 'string') {
       console.log('⚠️ [WORKSPACE OWNER] No workspace or workspace is string');
       return isOwner; // Fallback to isOwner prop
     }
-    
+
     const workspace = state.currentWorkspace as any;
-    const ownerId = typeof workspace.owner === 'string' 
-      ? workspace.owner 
+    const ownerId = typeof workspace.owner === 'string'
+      ? workspace.owner
       : workspace.owner?._id;
-    
+
     const result = ownerId === state.userProfile._id;
     console.log('✅ [WORKSPACE OWNER] Result:', result, 'ownerId:', ownerId, 'userId:', state.userProfile._id);
     return result;
@@ -103,7 +104,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         avatarUrl: ''
       };
     }
-    
+
     if (typeof member.user === 'string') {
       return {
         _id: member.user,
@@ -112,7 +113,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
         avatarUrl: ''
       };
     }
-    
+
     return {
       _id: member.user._id,
       name: member.user.fullName || member.user.name || 'Unknown User',
@@ -125,7 +126,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
   useEffect(() => {
     const fetchWorkspaceMembers = async () => {
       if (!workspaceId) return;
-      
+
       setLoading(true);
       try {
         const response = await apiService.get(`/messages/workspace/${workspaceId}/members`);
@@ -139,7 +140,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               email: m.email || '',
               role: m.role || 'member'
             }));
-          
+
           console.log('✅ [PROJECT TEAM] Loaded workspace members:', members.length);
           setWorkspaceMembers(members);
         }
@@ -166,7 +167,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
 
     fetchWorkspaceMembers();
   }, [workspaceId, state.workspaces]);
-  
+
   // Filter out members already in project
   const availableMembers = workspaceMembers.filter(
     (wm) => !projectTeam.some(pt => {
@@ -177,15 +178,15 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
 
   const handleAddMember = () => {
     if (!selectedMemberId) return;
-    
+
     // Use custom role if "custom" is selected, otherwise use selected role
     const finalRole = selectedRole === 'custom' ? customRole.trim() : selectedRole;
-    
+
     if (!finalRole) {
       alert('Please enter a role name');
       return;
     }
-    
+
     onAddMember(selectedMemberId, finalRole);
     setShowAddModal(false);
     setSelectedMemberId('');
@@ -222,12 +223,12 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
       'manager': 'Manager',
       'viewer': 'Viewer'
     };
-    
+
     // Return mapped role or capitalize custom role
     if (roleMap[role]) {
       return roleMap[role];
     }
-    
+
     // Capitalize custom role (e.g., "technical-lead" -> "Technical Lead")
     return role
       .split('-')
@@ -290,7 +291,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
               const userData = getUserData(member);
               const joinedDate = member.joinedAt ? new Date(member.joinedAt) : new Date();
               const isValidDate = !isNaN(joinedDate.getTime());
-              
+
               return (
                 <div
                   key={userData._id || index}
@@ -309,7 +310,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-300">{userData.email}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {isValidDate 
+                        {isValidDate
                           ? t('project.team.added', { date: joinedDate.toLocaleDateString() })
                           : 'Recently added'
                         }
@@ -359,10 +360,10 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                                 setShowEditCustomRoleInput(false);
                               }
                             }}
-                          className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
-                        >
-                          Save
-                        </button>
+                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            Save
+                          </button>
                           <button
                             onClick={() => {
                               setEditingRoleFor(null);
@@ -372,7 +373,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                             }}
                             className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
                           >
-                          Cancel
+                            Cancel
                           </button>
                         </div>
                         {showEditCustomRoleInput && (
@@ -396,11 +397,10 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                           }
                         }}
                         disabled={!isWorkspaceOwner || member.role === 'owner'}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border-2 transition-all ${
-                          member.role === 'project-manager'
-                            ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
-                            : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
-                        } ${isWorkspaceOwner && member.role !== 'owner' ? 'cursor-pointer hover:shadow-md hover:scale-105 hover:border-accent' : 'cursor-default opacity-60'}`}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border-2 transition-all ${member.role === 'project-manager'
+                          ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                          : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                          } ${isWorkspaceOwner && member.role !== 'owner' ? 'cursor-pointer hover:scale-105 hover:border-accent' : 'cursor-default opacity-60'}`}
                         title={member.role === 'owner' ? '🔒 Owner role cannot be changed' : (isWorkspaceOwner ? '✏️ Click to edit role' : '')}
                       >
                         <span className="flex items-center gap-1">
@@ -515,7 +515,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                     <option value="project-manager">Project Manager</option>
                   )}
                 </select>
-                
+
                 {/* Custom Role Input */}
                 {showCustomRoleInput && (
                   <input
@@ -526,7 +526,7 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent mt-2"
                   />
                 )}
-                
+
                 {!isOwner && (
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                     {t('project.team.modal.ownerOnly')}
@@ -559,6 +559,25 @@ const ProjectTeamTab: React.FC<ProjectTeamTabProps> = ({
           </div>
         </div>
       )}
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          teamSize: projectTeam.length,
+          projectManager: currentPM ? getUserData(currentPM).name : 'Unassigned',
+          roleDistribution: projectTeam.reduce((acc: any, member) => {
+            const role = member.role || 'member';
+            acc[role] = (acc[role] || 0) + 1;
+            return acc;
+          }, {}),
+          members: projectTeam.map(m => ({
+            name: getUserData(m).name,
+            role: m.role,
+            email: getUserData(m).email,
+            joinedAt: m.joinedAt
+          }))
+        }}
+      />
     </div>
   );
 };

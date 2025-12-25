@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { useDock } from '../../context/DockContext';
 import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
 import { getProjects as getWorkspaceProjects, createProject as createWorkspaceProject } from '../../services/projectService';
 import apiService from '../../services/api';
@@ -25,11 +26,13 @@ import {
   Archive,
   X
 } from 'lucide-react';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 const WorkspaceProjects: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
+  const { dockPosition } = useDock();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -41,6 +44,12 @@ const WorkspaceProjects: React.FC = () => {
   const [projectToDelete, setProjectToDelete] = useState<any>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Rename State
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [projectToRename, setProjectToRename] = useState<{ id: string; name: string } | null>(null);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   const currentWorkspace = state.workspaces.find((w) => w._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
@@ -79,7 +88,7 @@ const WorkspaceProjects: React.FC = () => {
 
   const filteredProjects = workspaceProjects.filter(project => {
     const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      project.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
     const matchesPriority = filterPriority === 'all' || project.priority === filterPriority;
     return matchesSearch && matchesStatus && matchesPriority;
@@ -141,7 +150,7 @@ const WorkspaceProjects: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete project');
       }
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -150,11 +159,16 @@ const WorkspaceProjects: React.FC = () => {
           message: 'Project deleted successfully',
         },
       });
-      
+
       setShowDeleteModal(false);
       setProjectToDelete(null);
       setDeleteConfirmText('');
-      
+
+      // Remove from global state instead of reload
+      // Assuming DELETE_PROJECT action exists, if not we reload or filter
+      // ProjectService usually handles this via refresh or optimized state update. 
+      // Current impl reloads window. I will keep reload or try to filter.
+      // reload is safer for now as per existing code.
       window.location.reload();
     } catch (error: any) {
       console.error('Failed to delete project', error);
@@ -169,6 +183,49 @@ const WorkspaceProjects: React.FC = () => {
     }
   };
 
+  const handleRenameProject = (project: any) => {
+    setProjectToRename({ id: project._id, name: project.name });
+    setNewProjectName(project.name);
+    setRenameModalOpen(true);
+  };
+
+  const submitRename = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!projectToRename || !newProjectName.trim()) return;
+
+    try {
+      setProcessingId(projectToRename.id);
+      const response = await fetch(`/api/projects/${projectToRename.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify({ name: newProjectName })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to rename project');
+      }
+
+      dispatch({
+        type: 'UPDATE_PROJECT',
+        payload: { projectId: projectToRename.id, updates: { name: newProjectName } },
+      });
+
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: 'Project renamed successfully' } });
+
+      setRenameModalOpen(false);
+      setProjectToRename(null);
+    } catch (error: any) {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: error.message || 'Failed to rename project' } });
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const stats = [
     { label: t('workspace.projects.stats.totalProjects'), value: workspaceProjects.length, color: 'text-accent-dark' },
     { label: t('workspace.projects.stats.active'), value: workspaceProjects.filter(p => p.status === 'active').length, color: 'text-green-600' },
@@ -177,7 +234,10 @@ const WorkspaceProjects: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+      dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+        'p-4 sm:p-6'
+      }`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -219,7 +279,7 @@ const WorkspaceProjects: React.FC = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
           />
         </div>
-        
+
         <div className="flex items-center gap-2">
           <select
             value={filterStatus}
@@ -268,7 +328,7 @@ const WorkspaceProjects: React.FC = () => {
           {filteredProjects.map((project) => (
             <div
               key={project._id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5 hover:shadow-lg transition-all cursor-pointer group"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-5 transition-all cursor-pointer group"
               onClick={() => navigate(`/project/${project._id}`)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -345,13 +405,22 @@ const WorkspaceProjects: React.FC = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedProject(project);
-                      setShowEditModal(true);
+                      navigate(`/project/${project._id}`);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Eye className="w-3 h-3" />
+                    {t('workspace.projects.view')}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRenameProject(project);
                     }}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <Edit className="w-3 h-3" />
-                    Edit
+                    {t('workspace.projects.rename')}
                   </button>
                   <button
                     onClick={(e) => {
@@ -446,11 +515,20 @@ const WorkspaceProjects: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedProject(project);
-                            setShowEditModal(true);
+                            navigate(`/project/${project._id}`);
                           }}
                           className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                          title="Edit"
+                          title={t('workspace.projects.view')}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRenameProject(project);
+                          }}
+                          className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          title={t('workspace.projects.rename')}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -460,7 +538,7 @@ const WorkspaceProjects: React.FC = () => {
                             handleDeleteProject(project);
                           }}
                           className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Delete"
+                          title={t('workspace.projects.delete')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -558,83 +636,46 @@ const WorkspaceProjects: React.FC = () => {
         workspaceId={state.currentWorkspace || ''}
       />
 
-      {/* Edit Project Modal */}
-      {showEditModal && selectedProject && (
-        <WorkspaceCreateProjectModal
-          isOpen={showEditModal}
-          onClose={() => {
-            setShowEditModal(false);
-            setSelectedProject(null);
-          }}
-          initialData={{
-            name: selectedProject.name,
-            description: selectedProject.description,
-            clientId: typeof selectedProject.client === 'string' ? selectedProject.client : selectedProject.client?._id || '',
-            projectManagerId: typeof selectedProject.projectManager === 'string' ? selectedProject.projectManager : selectedProject.projectManager?._id || '',
-            status: selectedProject.status,
-            priority: selectedProject.priority,
-            startDate: selectedProject.startDate ? new Date(selectedProject.startDate).toISOString().split('T')[0] : '',
-            endDate: selectedProject.dueDate ? new Date(selectedProject.dueDate).toISOString().split('T')[0] : '',
-            budget: selectedProject.budget?.toString() || '',
-            tags: selectedProject.tags || [],
-          }}
-          projectId={selectedProject._id}
-          onSubmit={async (projectData) => {
-            try {
-              const response = await fetch(`/api/projects/${selectedProject._id}`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                },
-                body: JSON.stringify({
-                  name: projectData.name,
-                  description: projectData.description,
-                  clientId: projectData.clientId,
-                  projectManager: projectData.projectManagerId,
-                  status: projectData.status,
-                  priority: projectData.priority,
-                  startDate: projectData.startDate,
-                  dueDate: projectData.endDate,
-                  budget: projectData.budget,
-                  tags: projectData.tags,
-                })
-              });
+      {/* Rename Modal */}
+      {renameModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-2xl transform transition-all border border-gray-200 dark:border-gray-700">
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">{t('workspace.projects.modals.rename.title')}</h3>
 
-              const data = await response.json();
+            <form onSubmit={submitRename}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                  {t('workspace.projects.modals.rename.nameLabel')}
+                </label>
+                <input
+                  type="text"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent"
+                  placeholder={t('workspace.projects.modals.rename.placeholder')}
+                  autoFocus
+                />
+              </div>
 
-              if (!response.ok) {
-                throw new Error(data.message || 'Failed to update project');
-              }
-
-              dispatch({
-                type: 'UPDATE_PROJECT',
-                payload: { projectId: selectedProject._id, updates: data.data },
-              });
-
-              dispatch({
-                type: 'ADD_TOAST',
-                payload: {
-                  type: 'success',
-                  message: `Project "${projectData.name}" updated successfully`,
-                },
-              });
-
-              setShowEditModal(false);
-              setSelectedProject(null);
-            } catch (error: any) {
-              console.error('Failed to update project', error);
-              dispatch({
-                type: 'ADD_TOAST',
-                payload: {
-                  type: 'error',
-                  message: error?.message || 'Failed to update project',
-                },
-              });
-            }
-          }}
-          workspaceId={state.currentWorkspace || ''}
-        />
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setRenameModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  {t('workspace.projects.modals.rename.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newProjectName.trim() || processingId === projectToRename?.id}
+                  className="px-4 py-2 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processingId === projectToRename?.id ? t('workspace.projects.modals.rename.renaming') : t('workspace.projects.modals.rename.confirm')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -642,19 +683,19 @@ const WorkspaceProjects: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Delete Project
+              {t('workspace.projects.modals.delete.title')}
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Are you sure you want to delete <strong>{projectToDelete.name}</strong>? This action cannot be undone.
+              {t('workspace.projects.modals.delete.description', { name: projectToDelete.name })}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              Type <strong>DELETE</strong> to confirm:
+              {t('workspace.projects.modals.delete.typeToConfirm')}
             </p>
             <input
               type="text"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
-              placeholder="Type 'DELETE' to confirm"
+              placeholder={t('workspace.projects.modals.delete.placeholder')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
             />
             <div className="flex items-center gap-3">
@@ -666,19 +707,40 @@ const WorkspaceProjects: React.FC = () => {
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Cancel
+                {t('workspace.projects.modals.delete.cancel')}
               </button>
               <button
                 onClick={handleConfirmDelete}
                 disabled={deleteConfirmText.toUpperCase() !== 'DELETE'}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Delete Project
+                {t('workspace.projects.modals.delete.confirm')}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          totalProjects: workspaceProjects.length,
+          stats: {
+            active: workspaceProjects.filter(p => p.status === 'active').length,
+            completed: workspaceProjects.filter(p => p.status === 'completed').length,
+            onHold: workspaceProjects.filter(p => p.status === 'on-hold').length,
+            planning: workspaceProjects.filter(p => p.status === 'planning').length
+          },
+          projects: filteredProjects.slice(0, 10).map(p => ({
+            name: p.name,
+            status: p.status,
+            priority: p.priority,
+            progress: p.progress,
+            teamSize: p.teamMemberCount,
+            dueDate: p.dueDate
+          }))
+        }}
+      />
     </div>
   );
 };

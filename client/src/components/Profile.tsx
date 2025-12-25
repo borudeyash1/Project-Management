@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import FaceEnrollmentSection from './profile/FaceEnrollmentSection';
 import GlassmorphicCard from './ui/GlassmorphicCard';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface ProfileData {
   fullName: string;
@@ -648,9 +649,7 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: 'personal', label: t('profile.personalInfo'), icon: User },
-    { id: 'professional', label: 'Professional Profile', icon: Target },
-    { id: 'addresses', label: t('profile.addresses'), icon: MapPin },
-    { id: 'payments', label: t('profile.payments'), icon: CreditCard }
+    { id: 'professional', label: t('profile.professionalProfile'), icon: Target }
   ];
 
   const renderPersonalInfo = () => (
@@ -661,28 +660,28 @@ const Profile: React.FC = () => {
           <img
             src={profileData?.avatarUrl || `https://ui-avatars.com/api/?name=${profileData?.fullName}&background=random`}
             alt="Profile"
-            className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+            className="w-24 h-24 rounded-full object-cover border-4 border-white"
           />
           <button className="absolute bottom-0 right-0 bg-accent text-gray-900 dark:text-gray-100 rounded-full p-2 hover:bg-accent-hover transition-colors">
             <Camera className="w-4 h-4" />
           </button>
         </div>
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{profileData?.fullName}</h2>
-          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300">{profileData?.designation} • {profileData?.department}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('profile.memberSince', { date: new Date(profileData?.joinDate || '').toLocaleDateString() })}</p>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{profileData?.fullName}</h2>
+          <p className="text-gray-600 dark:text-gray-400">{profileData?.designation} • {profileData?.department}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.memberSince', { date: !isNaN(new Date(profileData?.joinDate || '').getTime()) ? new Date(profileData?.joinDate || '').toLocaleDateString() : 'N/A' })}</p>
         </div>
       </div>
 
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+              <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('profile.fullName')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{profileData?.fullName}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.fullName')}</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.fullName}</p>
               </div>
             </div>
             <button
@@ -696,13 +695,13 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+              <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('common.email')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.email')}</p>
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{profileData?.email}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.email}</p>
                   {profileData?.isEmailVerified && (
                     <CheckCircle className="w-4 h-4 text-green-500" />
                   )}
@@ -715,12 +714,12 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+              <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('profile.contactNumber')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{profileData?.contactNumber}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.contactNumber')}</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.contactNumber}</p>
               </div>
             </div>
             <button
@@ -736,12 +735,12 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <Building className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+              <Building className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('profile.department')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{profileData?.department}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.department')}</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.department}</p>
               </div>
             </div>
             <button
@@ -755,12 +754,12 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+              <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('profile.location')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{profileData?.location}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.location')}</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{profileData?.location}</p>
               </div>
             </div>
             <button
@@ -774,12 +773,12 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
+              <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{t('profile.dateOfBirth')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{new Date(profileData?.dateOfBirth || '').toLocaleDateString()}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.dateOfBirth')}</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{new Date(profileData?.dateOfBirth || '').toLocaleDateString()}</p>
               </div>
             </div>
             <button
@@ -796,9 +795,9 @@ const Profile: React.FC = () => {
       </div>
 
       {/* About Section */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.about')}</h3>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('profile.about')}</h3>
           <button
             onClick={() => {
               setEditingField('about');
@@ -813,8 +812,8 @@ const Profile: React.FC = () => {
       </div>
 
       {/* Security Section */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3">{t('settings.security')}</h3>
+      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">{t('settings.security')}</h3>
         <button
           onClick={() => setShowPasswordForm(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors"
@@ -846,8 +845,8 @@ const Profile: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Theme Preferences */}
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">{t('settings.theme')}</h3>
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.theme')}</h3>
           <div className="flex gap-3">
             {['light', 'dark', 'system'].map((theme) => (
               <button
@@ -879,14 +878,14 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Notification Preferences */}
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">{t('settings.notifications')}</h3>
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.notifications')}</h3>
           <div className="space-y-3">
             {Object.entries(notifications).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
-                  <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{key.charAt(0).toUpperCase() + key.slice(1)} Notifications</span>
+                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{key.charAt(0).toUpperCase() + key.slice(1)} Notifications</span>
                 </div>
                 <button
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
@@ -922,8 +921,8 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Privacy Preferences */}
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">{t('settings.privacy')}</h3>
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.privacy')}</h3>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('profile.visibility')}</label>
@@ -957,7 +956,7 @@ const Profile: React.FC = () => {
             <div className="space-y-3">
               {Object.entries(privacy).filter(([key]) => key !== 'profileVisibility').map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between">
-                  <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.' + key)}</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{t('profile.' + key)}</span>
                   <button
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-accent' : 'bg-gray-300'
                       }`}
@@ -998,7 +997,7 @@ const Profile: React.FC = () => {
   const renderAddresses = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.addresses')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.addresses')}</h3>
         <button
           onClick={() => setShowAddAddress(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors"
@@ -1010,11 +1009,11 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profileData?.addresses?.map((address) => (
-          <div key={address.id} className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div key={address.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
-                <span className="font-medium capitalize text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.' + address.type)}</span>
+                <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="font-medium capitalize text-gray-900 dark:text-gray-100">{t('profile.' + address.type)}</span>
                 {address.isDefault && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{t('profile.default')}</span>
                 )}
@@ -1037,7 +1036,7 @@ const Profile: React.FC = () => {
   const renderPaymentMethods = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.payments')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.payments')}</h3>
         <button
           onClick={() => setShowAddPayment(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors"
@@ -1049,11 +1048,11 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profileData?.paymentMethods?.map((payment) => (
-          <div key={payment.id} className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div key={payment.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-400 dark:text-gray-200" />
-                <span className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{payment.brand} •••• {payment.last4}</span>
+                <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="font-medium text-gray-900 dark:text-gray-100">{payment.brand} •••• {payment.last4}</span>
                 {payment.isDefault && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{t('profile.default')}</span>
                 )}
@@ -1073,7 +1072,7 @@ const Profile: React.FC = () => {
 
   const renderAchievements = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.achievements')}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.achievements')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {profileData?.achievements?.map((achievement) => (
           <div key={achievement.id} className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
@@ -1082,8 +1081,8 @@ const Profile: React.FC = () => {
                 <Award className="w-6 h-6 text-yellow-600" />
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{achievement.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-200">{achievement.description}</p>
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{achievement.title}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{achievement.description}</p>
               </div>
             </div>
             <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
@@ -1100,10 +1099,10 @@ const Profile: React.FC = () => {
 
   const renderActivity = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.activity')}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.activity')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(profileData?.activityStats || {}).map(([key, value]) => (
-          <div key={key} className="p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-800 rounded-lg">
+          <div key={key} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
                 {key.includes('Tasks') && <Target className="w-5 h-5 text-accent-dark" />}
@@ -1113,8 +1112,8 @@ const Profile: React.FC = () => {
                 {key.includes('Hours') && <Clock className="w-5 h-5 text-accent-dark" />}
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100">{value}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 capitalize">{t('profile.' + key)}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{t('profile.' + key)}</p>
               </div>
             </div>
           </div>
@@ -1126,17 +1125,17 @@ const Profile: React.FC = () => {
   const renderProfessionalProfile = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Professional Profile</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Your professional summary</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('profile.professionalProfile')}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.professionalSummary')}</p>
       </div>
 
       <GlassmorphicCard className="p-6">
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Job Title</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">{t('profile.jobTitle')}</label>
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {profileData?.profile?.jobTitle || 'Not set'}
+                {profileData?.profile?.jobTitle || t('profile.notSet')}
               </p>
               <button
                 onClick={() => {
@@ -1151,10 +1150,10 @@ const Profile: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Company</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">{t('profile.company')}</label>
             <div className="flex items-center justify-between">
               <p className="text-gray-900 dark:text-gray-100">
-                {profileData?.profile?.company || 'Not set'}
+                {profileData?.profile?.company || t('profile.notSet')}
               </p>
               <button
                 onClick={() => {
@@ -1172,10 +1171,10 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <GlassmorphicCard className="p-6">
-          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">Industry</label>
+          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">{t('profile.industry')}</label>
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">
-              {profileData?.profile?.industry || 'Not set'}
+              {profileData?.profile?.industry || t('profile.notSet')}
             </p>
             <button
               onClick={() => {
@@ -1190,13 +1189,13 @@ const Profile: React.FC = () => {
         </GlassmorphicCard>
 
         <GlassmorphicCard className="p-6">
-          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">Experience</label>
+          <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">{t('profile.experience')}</label>
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {profileData?.profile?.experience === 'mid' ? '3-5 years' :
                 profileData?.profile?.experience === 'senior' ? '6-10 years' :
                   profileData?.profile?.experience === 'junior' ? '1-3 years' :
-                    profileData?.profile?.experience || 'Not set'}
+                    profileData?.profile?.experience || t('profile.notSet')}
             </p>
             <button
               onClick={() => {
@@ -1213,7 +1212,7 @@ const Profile: React.FC = () => {
 
       <GlassmorphicCard className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Skills</h4>
+          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('profile.topSkills')}</h4>
           <button
             onClick={() => {
               setEditingField('profile.skills');
@@ -1238,7 +1237,7 @@ const Profile: React.FC = () => {
             );
           })}
           {(!profileData?.profile?.skills || profileData.profile.skills.length === 0) && (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">No skills added yet</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{t('profile.noSkillsAdded')}</p>
           )}
         </div>
       </GlassmorphicCard>
@@ -1246,12 +1245,12 @@ const Profile: React.FC = () => {
       <GlassmorphicCard className="p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700/50">
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300">Career Goals</h4>
+          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('profile.careerGoals')}</h4>
         </div>
 
         <div className="flex items-center justify-between">
           <p className="text-gray-700 dark:text-gray-300 flex-1">
-            {profileData?.profile?.goals?.careerAspirations || 'Set your career goals in profile'}
+            {profileData?.profile?.goals?.careerAspirations || t('profile.setCareerGoals')}
           </p>
           <button
             onClick={() => {
@@ -1269,7 +1268,10 @@ const Profile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-4 sm:p-6">
+      <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
         <div className="bg-white dark:bg-gray-800 border border-border rounded-xl p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
@@ -1286,47 +1288,49 @@ const Profile: React.FC = () => {
 
   return (
     <div
-      className="p-4 sm:p-6 transition-all duration-300"
-      style={{
-        paddingLeft: dockPosition === 'left' ? '80px' : undefined,
-        paddingRight: dockPosition === 'right' ? '80px' : undefined
-      }}
+      className={`min-h-screen transition-all duration-300 bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-gray-50 via-blue-50/30 to-purple-50/20'}`}
     >
-      <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 border border-border dark:border-gray-600 rounded-xl">
-        {/* Header */}
-        <div className="p-6 border-b border-border dark:border-gray-600">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{t('profile.title')}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-1">{t('descriptions.profile')}</p>
-        </div>
+      <GlassmorphicPageHeader
+        title={t('profile.title')}
+        subtitle={t('descriptions.profile')}
+        icon={User}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+      />
 
-        {/* Tabs */}
-        <div className="border-b border-border dark:border-gray-600">
-          <nav className="flex space-x-8 px-6 overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
-                    ? 'border-accent text-accent-dark dark:text-accent-light'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+      <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6 py-4 sm:py-6' :
+          'p-4 sm:p-6'
+        }`}>
 
-        {/* Content */}
-        <div className="p-6">
-          {activeTab === 'personal' && renderPersonalInfo()}
-          {activeTab === 'professional' && renderProfessionalProfile()}
-          {activeTab === 'addresses' && renderAddresses()}
-          {activeTab === 'payments' && renderPaymentMethods()}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/60 dark:border-gray-700/70 rounded-xl">
+
+          {/* Tabs */}
+          <div className="border-b border-border dark:border-gray-600">
+            <nav className="flex space-x-8 px-6 overflow-x-auto">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === tab.id
+                      ? 'border-accent text-accent-dark dark:text-accent-light'
+                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {activeTab === 'personal' && renderPersonalInfo()}
+            {activeTab === 'professional' && renderProfessionalProfile()}
+          </div>
         </div>
       </div>
 

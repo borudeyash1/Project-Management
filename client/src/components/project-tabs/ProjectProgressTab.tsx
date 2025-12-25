@@ -2,6 +2,8 @@ import React from 'react';
 import { TrendingUp, CheckCircle, Clock, AlertCircle, Target, Calendar } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
+import { useTranslation } from 'react-i18next';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 interface ProjectProgressTabProps {
   project: any;
@@ -9,6 +11,7 @@ interface ProjectProgressTabProps {
 
 const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   const tasks = project?.tasks || [];
   const totalTasks = tasks.length;
@@ -28,11 +31,11 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
     <div className="space-y-6">
       {/* Overall Progress */}
       <GlassmorphicCard className="p-6">
-        <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Overall Progress</h3>
+        <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.overallProgress')}</h3>
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Project Completion</span>
+            <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.projectCompletion')}</span>
             <span className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`}>{project?.progress || 0}%</span>
           </div>
           <div className={`w-full rounded-full h-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
@@ -47,35 +50,35 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
           <div className={`text-center p-4 rounded-lg ${isDarkMode ? 'bg-green-900/20' : 'bg-green-50'}`}>
             <CheckCircle className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
             <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>{completedTasks}</p>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Completed</p>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.completed')}</p>
           </div>
           <div className={`text-center p-4 rounded-lg ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
             <Clock className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`} />
             <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`}>{inProgressTasks}</p>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>In Progress</p>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.inProgress')}</p>
           </div>
           <div className={`text-center p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
             <Target className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
             <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{pendingTasks}</p>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pending</p>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.pending')}</p>
           </div>
           <div className={`text-center p-4 rounded-lg ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}>
             <AlertCircle className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
             <p className={`text-2xl font-bold ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{blockedTasks}</p>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Blocked</p>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.blocked')}</p>
           </div>
         </div>
       </GlassmorphicCard>
 
       {/* Timeline Progress */}
       <GlassmorphicCard className="p-6">
-        <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Timeline Progress</h3>
+        <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.timelineProgress')}</h3>
 
         <div className="space-y-4">
           <div className={`flex items-center justify-between p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
             <div className="flex items-center gap-3">
               <Calendar className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
-              <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Start Date</span>
+              <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.startDate')}</span>
             </div>
             <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               {project?.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not set'}
@@ -85,7 +88,7 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
           <div className={`flex items-center justify-between p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
             <div className="flex items-center gap-3">
               <Calendar className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
-              <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Due Date</span>
+              <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.dueDate')}</span>
             </div>
             <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               {project?.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'Not set'}
@@ -94,25 +97,25 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
 
           {daysRemaining !== null && (
             <div className={`flex items-center justify-between p-4 rounded-lg ${daysRemaining < 0
-                ? (isDarkMode ? 'bg-red-900/20' : 'bg-red-50')
-                : daysRemaining < 7
-                  ? (isDarkMode ? 'bg-orange-900/20' : 'bg-orange-50')
-                  : (isDarkMode ? 'bg-green-900/20' : 'bg-green-50')
+              ? (isDarkMode ? 'bg-red-900/20' : 'bg-red-50')
+              : daysRemaining < 7
+                ? (isDarkMode ? 'bg-orange-900/20' : 'bg-orange-50')
+                : (isDarkMode ? 'bg-green-900/20' : 'bg-green-50')
               }`}>
               <div className="flex items-center gap-3">
                 <Clock className={`w-5 h-5 ${daysRemaining < 0
-                    ? (isDarkMode ? 'text-red-400' : 'text-red-600')
-                    : daysRemaining < 7
-                      ? (isDarkMode ? 'text-orange-400' : 'text-orange-600')
-                      : (isDarkMode ? 'text-green-400' : 'text-green-600')
-                  }`} />
-                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Days Remaining</span>
-              </div>
-              <span className={`font-bold ${daysRemaining < 0
                   ? (isDarkMode ? 'text-red-400' : 'text-red-600')
                   : daysRemaining < 7
                     ? (isDarkMode ? 'text-orange-400' : 'text-orange-600')
                     : (isDarkMode ? 'text-green-400' : 'text-green-600')
+                  }`} />
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.daysRemaining')}</span>
+              </div>
+              <span className={`font-bold ${daysRemaining < 0
+                ? (isDarkMode ? 'text-red-400' : 'text-red-600')
+                : daysRemaining < 7
+                  ? (isDarkMode ? 'text-orange-400' : 'text-orange-600')
+                  : (isDarkMode ? 'text-green-400' : 'text-green-600')
                 }`}>
                 {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days`}
               </span>
@@ -123,19 +126,19 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
 
       {/* Task Completion Rate */}
       <GlassmorphicCard className="p-6">
-        <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Task Completion Rate</h3>
+        <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.taskCompletionRate')}</h3>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Total Tasks</span>
+            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.totalTasks')}</span>
             <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{totalTasks}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Completed Tasks</span>
+            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.completedTasks')}</span>
             <span className={`font-semibold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>{completedTasks}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Completion Rate</span>
+            <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.completionRate')}</span>
             <span className={`font-semibold ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`}>{completionRate}%</span>
           </div>
 
@@ -153,26 +156,26 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
       {/* Budget Progress */}
       {project?.budget && (
         <GlassmorphicCard className="p-6">
-          <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Budget Progress</h3>
+          <h3 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.budgetProgress')}</h3>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Estimated Budget</span>
+              <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.estimatedBudget')}</span>
               <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 ${project.budget.estimated?.toLocaleString() || '0'}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Actual Spent</span>
+              <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.actualSpent')}</span>
               <span className={`font-semibold ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`}>
                 ${project.budget.actual?.toLocaleString() || '0'}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Remaining</span>
+              <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.remaining')}</span>
               <span className={`font-semibold ${(project.budget.estimated - project.budget.actual) < 0
-                  ? (isDarkMode ? 'text-red-400' : 'text-red-600')
-                  : (isDarkMode ? 'text-green-400' : 'text-green-600')
+                ? (isDarkMode ? 'text-red-400' : 'text-red-600')
+                : (isDarkMode ? 'text-green-400' : 'text-green-600')
                 }`}>
                 ${((project.budget.estimated || 0) - (project.budget.actual || 0)).toLocaleString()}
               </span>
@@ -182,8 +185,8 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
               <div className={`w-full rounded-full h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}>
                 <div
                   className={`h-3 rounded-full transition-all ${project.budget.actual > project.budget.estimated
-                      ? 'bg-red-600'
-                      : 'bg-accent'
+                    ? 'bg-red-600'
+                    : 'bg-accent'
                     }`}
                   style={{
                     width: `${Math.min(
@@ -207,8 +210,8 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
             {project.milestones.map((milestone: any, idx: number) => (
               <div key={idx} className={`flex items-center gap-3 p-3 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${milestone.completed
-                    ? (isDarkMode ? 'bg-green-900/20' : 'bg-green-100')
-                    : (isDarkMode ? 'bg-gray-700' : 'bg-gray-100')
+                  ? (isDarkMode ? 'bg-green-900/20' : 'bg-green-100')
+                  : (isDarkMode ? 'bg-gray-700' : 'bg-gray-100')
                   }`}>
                   {milestone.completed ? (
                     <CheckCircle className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
@@ -232,6 +235,33 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
           </div>
         </GlassmorphicCard>
       )}
+
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          progressQuery: {
+            overall: project?.progress || 0,
+            tasks: {
+              total: totalTasks,
+              completed: completedTasks,
+              pending: pendingTasks,
+              blocked: blockedTasks
+            },
+            budget: project?.budget ? {
+              estimated: project.budget.estimated,
+              spent: project.budget.actual,
+              remaining: (project.budget.estimated || 0) - (project.budget.actual || 0)
+            } : null,
+            milestones: project?.milestones?.map((m: any) => ({
+              name: m.name,
+              completed: m.completed,
+              dueDate: m.dueDate
+            })) || [],
+            daysRemaining: daysRemaining
+          }
+        }}
+      />
     </div>
   );
 };

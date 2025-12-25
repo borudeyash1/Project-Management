@@ -5,6 +5,8 @@ import { ApiResponse } from '../types';
 import { createActivity } from '../utils/activityUtils';
 import { getCalendarService } from '../services/sartthi/calendarService';
 import { getMailService } from '../services/sartthi/mailService';
+import { getSlackService } from '../services/sartthi/slackService';
+import { notifySlackForTask, notifySlackTaskCompleted, notifySlackTaskUpdated } from '../utils/slackNotifications';
 import User from '../models/User';
 
 // GET /api/tasks?projectId=...&status=...&priority=...
@@ -108,6 +110,8 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       links,
       requiresLink,
       requiresFile,
+      slackChannelId, // Added for Slack integration
+      slackAccountId,
     } = req.body;
 
     // Only title is required now - project and workspace are optional
@@ -184,6 +188,17 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       }
     }
 
+    // Sartthi Integration: Slack Notification
+    if (slackChannelId) {
+      try {
+        const slackService = getSlackService();
+        const message = `*New Task Created: ${task.title}*\n${task.description || 'No description'}\nPriority: ${task.priority}\nDue: ${task.dueDate ? new Date(task.dueDate as any).toLocaleDateString() : 'No due date'}\n*Project:* ${project ? project.name : 'No Project'}\n<https://sartthi.com/projects/${projectId || ''}/tasks|View Task>`;
+        await slackService.postMessage(authUser._id, slackChannelId, message, undefined, slackAccountId);
+      } catch (error) {
+        console.error('Failed to send Slack notification', error);
+      }
+    }
+
     const response: ApiResponse = {
       success: true,
       message: 'Task created successfully',
@@ -251,7 +266,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     if (taskType !== undefined) task.taskType = taskType;
     if (requiresFile !== undefined) task.requiresFile = requiresFile;
     if (requiresLink !== undefined) task.requiresLink = requiresLink;
-    
+
     // Handle verification and rating fields
     if (rating !== undefined) task.rating = rating;
     if (ratingDetails !== undefined) task.ratingDetails = ratingDetails;
@@ -272,6 +287,9 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         'Task',
         String(task._id)
       );
+
+      // Notify via Slack
+      await notifySlackTaskCompleted(task, authUser._id);
     } else {
       await createActivity(
         authUser._id,
@@ -281,6 +299,17 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         'Task',
         String(task._id)
       );
+
+      // Notify via Slack
+      const changes = [];
+      if (status !== undefined) changes.push(`Status: ${status}`);
+      if (priority !== undefined) changes.push(`Priority: ${priority}`);
+      if (assignee !== undefined) changes.push('Assignee changed');
+      if (dueDate !== undefined) changes.push('Due date changed');
+
+      if (changes.length > 0) {
+        await notifySlackTaskUpdated(task, authUser._id, changes.join(', '));
+      }
     }
 
     // Sartthi Integration: Calendar Sync
@@ -350,7 +379,7 @@ export const reassignTask = async (req: Request, res: Response): Promise<void> =
     }
 
     const { assignedTo } = req.body;
-    
+
     console.log('👥 [REASSIGN TASK] Task:', req.params.id, 'New Assignee:', assignedTo);
 
     if (!assignedTo) {

@@ -7,7 +7,7 @@ import {
   CheckCircle, AlertCircle, Play, Pause, Square, X,
   CheckSquare, Type, List, Activity, Folder, Download,
   Upload, Link as LinkIcon, Award, Flame, ArrowUp, ArrowDown, RefreshCw,
-  Sparkles, Rocket, TrendingDown, Monitor, Package
+  Sparkles, Rocket, TrendingDown, Monitor, Package, Home
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PlanStatus } from './FeatureRestriction';
@@ -32,11 +32,13 @@ import ContentBanner from './ContentBanner';
 import { useTranslation } from 'react-i18next';
 import AIChatbot from './AIChatbot';
 import ProfileSummaryWidget from './dashboard/ProfileSummaryWidget';
+import { useDock } from '../context/DockContext';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface QuickTask {
   _id: string;
   title: string;
-  type: 'task' | 'note' | 'checklist';
+  type: 'task' | 'note' | 'checklist' | 'reminder' | 'milestone' | 'event';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: Date;
   project?: string;
@@ -125,7 +127,8 @@ const HomePage: React.FC = () => {
   const { userPlan, canUseAI } = useFeatureAccess();
   const { isDarkMode, preferences } = useTheme();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { dockPosition } = useDock();
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [quickTasks, setQuickTasks] = useState<QuickTask[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
@@ -139,7 +142,7 @@ const HomePage: React.FC = () => {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [newTaskType, setNewTaskType] = useState<'task' | 'note' | 'checklist'>('task');
+  const [newTaskType, setNewTaskType] = useState<'task' | 'note' | 'checklist' | 'reminder' | 'milestone' | 'event'>('task');
   const [productivityData, setProductivityData] = useState<number[]>([65, 72, 68, 85, 78, 90, 88]);
   const [workspaces, setWorkspaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -177,7 +180,10 @@ const HomePage: React.FC = () => {
       setQuickTasks(
         (response.quickTasks || []).map((task: any) => ({
           ...task,
-          type: task.type || 'task',
+          // Map category to type if it's one of our special types
+          type: (task.category && ['reminder', 'milestone', 'event'].includes(task.category))
+            ? task.category
+            : (task.type || 'task'),
           priority: task.priority || 'medium',
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
         })),
@@ -261,6 +267,8 @@ const HomePage: React.FC = () => {
     try {
       const payload: any = {
         title: newTaskTitle,
+        type: 'task', // Backend requirement
+        category: newTaskType === 'task' ? 'general' : newTaskType, // Use category to store the specific type
       };
 
       if (state.currentWorkspace) {
@@ -333,10 +341,13 @@ const HomePage: React.FC = () => {
 
   const getTaskTypeIcon = (type: string) => {
     switch (type) {
-      case 'note': return <Type className="w-4 h-4" />;
-      case 'checklist': return <List className="w-4 h-4" />;
+      case 'note': return <Type className="w-4 h-4 text-gray-500" />;
+      case 'checklist': return <List className="w-4 h-4 text-gray-500" />;
+      case 'reminder': return <Bell className="w-4 h-4 text-orange-500" />;
+      case 'milestone': return <Flag className="w-4 h-4 text-red-500" />;
+      case 'event': return <Calendar className="w-4 h-4 text-blue-500" />;
       case 'task':
-      default: return <CheckSquare className="w-4 h-4" />;
+      default: return <CheckSquare className="w-4 h-4 text-accent" />;
     }
   };
 
@@ -384,96 +395,80 @@ const HomePage: React.FC = () => {
     <div className={`min-h-screen pb-8 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
       <ContentBanner route="/" />
 
-      <div className="max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* Glassmorphic Page Header - Same as Notes Page */}
+      <GlassmorphicPageHeader
+        icon={Home}
+        title={t('home.welcomeBack', { name: state.userProfile?.fullName?.split(' ')[0] })}
+        subtitle={new Date().toLocaleDateString(i18n.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        className="w-full !rounded-none !border-x-0 !mb-0"
+      >
+        <button
+          onClick={() => setIsAIModalOpen(true)}
+          className="group relative px-6 py-3 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+            boxShadow: `0 10px 25px -5px ${accentColor}40`
+          }}
+        >
+          <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+          <Bot className="w-5 h-5 relative z-10" />
+          <span className="relative z-10">{t('home.aiAssistant')}</span>
+        </button>
+        <button
+          onClick={loadDashboardData}
+          className={`p-3 rounded-2xl border transition-all ${isDarkMode
+            ? 'bg-white/5 border-gray-700/70 text-gray-300 hover:bg-white/10'
+            : 'bg-white/50 border-white/50 text-gray-600 hover:bg-white shadow-sm'
+            }`}
+        >
+          <RefreshCw className="w-5 h-5" />
+        </button>
+      </GlassmorphicPageHeader>
 
-        {/* Hero Section with Glassmorphism */}
-        <div className={`relative overflow-hidden rounded-3xl p-8 ${isDarkMode
-          ? 'bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 border border-white/10 backdrop-blur-xl'
-          : 'bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 border border-white/50 backdrop-blur-xl shadow-2xl'
-          }`}>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -mr-48 -mt-48" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-pink-500/20 to-orange-500/20 rounded-full blur-3xl -ml-48 -mb-48" />
-
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <h1 className={`text-4xl md:text-5xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>
-                  Welcome back, {state.userProfile?.fullName?.split(' ')[0]}
-                  <span className="ml-3 inline-block animate-wave">👋</span>
-                </h1>
-              </div>
-              <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} flex items-center gap-2`}>
-                <Sparkles className="w-5 h-5 text-yellow-500" />
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsAIModalOpen(true)}
-                className="group relative px-6 py-3 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
-                style={{
-                  background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-                  boxShadow: `0 10px 25px -5px ${accentColor}40`
-                }}
-              >
-                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
-                <Bot className="w-5 h-5 relative z-10" />
-                <span className="relative z-10">AI Assistant</span>
-              </button>
-              <button
-                onClick={loadDashboardData}
-                className={`p-3 rounded-2xl border transition-all ${isDarkMode
-                  ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
-                  : 'bg-white/50 border-white/50 text-gray-600 hover:bg-white shadow-sm'
-                  }`}
-              >
-                <RefreshCw className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className={`w-full space-y-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6' :
+        dockPosition === 'right' ? 'pr-[71px] pl-4 sm:pl-6' :
+          'px-4 sm:px-6'
+        } py-4 sm:py-6`}>
 
         {/* Stats Grid - Beautiful Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
               id: 'tasks',
-              label: 'Active Tasks',
+              label: t('home.activeTasks'),
               value: quickTasks.filter(t => !t.completed).length,
               total: totalTasks,
               icon: CheckSquare,
               gradient: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-              trend: `${taskCompletionRate}% completed`,
+              trend: t('home.percentCompleted', { percent: taskCompletionRate }),
               trendUp: taskCompletionRate > 50
             },
             {
               id: 'projects',
-              label: 'Active Projects',
+              label: t('home.activeProjects'),
               value: activeProjects.length,
               total: projects.length,
               icon: Rocket,
-              gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-              trend: `${projects.filter(p => p.status === 'completed').length} completed`,
+              gradient: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+              trend: t('home.tasksCompleted', { count: projects.filter(p => p.status === 'completed').length }),
               trendUp: true
             },
             {
               id: 'team',
-              label: 'Team Members',
+              label: t('home.teamMembers'),
               value: totalTeamMembers,
               icon: Users,
-              gradient: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
-              trend: `${activeProjects.length} active projects`,
+              gradient: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+              trend: t('home.projectsActive', { count: activeProjects.length }),
               trendUp: true
             },
             {
               id: 'progress',
-              label: 'Avg Progress',
+              label: t('home.avgProgress'),
               value: `${Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))}%`,
               icon: TrendingUp,
-              gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              trend: 'On track',
+              gradient: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
+              trend: t('home.onTrack'),
               trendUp: true
             }
           ].map((stat, index) => (
@@ -481,8 +476,8 @@ const HomePage: React.FC = () => {
               key={index}
               onClick={() => setExpandedCard(stat.id as any)}
               className={`group relative overflow-hidden rounded-2xl p-6 border transition-all duration-500 hover:scale-105 cursor-pointer ${isDarkMode
-                ? 'bg-gray-800/50 border-gray-700/50 hover:border-gray-600 backdrop-blur-sm'
-                : 'bg-white/80 border-gray-200/50 hover:shadow-2xl backdrop-blur-sm'
+                ? 'bg-gray-800/50 border-gray-700/70 hover:border-gray-600 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-300/60 hover:shadow-2xl backdrop-blur-sm'
                 }`}
             >
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `${stat.gradient}10` }} />
@@ -515,15 +510,16 @@ const HomePage: React.FC = () => {
         {latestRelease && (
           <div className={`relative overflow-hidden rounded-2xl border ${isDarkMode
             ? 'bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border-indigo-500/20'
-            : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200/50 shadow-lg'
-            }`}>
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            : 'border-gray-200 shadow-sm'
+            }`}
+            style={!isDarkMode ? { background: `linear-gradient(135deg, #ffffff 60%, ${accentColor}15 100%)` } : undefined}>
+            <div className="absolute top-0 right-0 w-64 h-64 opacity-10 rounded-full blur-3xl -mr-32 -mt-32" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }} />
 
             <div className="relative z-10 p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Icon */}
                 <div className="flex-shrink-0">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-xl">
+                  <div className="p-4 rounded-2xl shadow-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                     <Monitor className="w-12 h-12 text-white" />
                   </div>
                 </div>
@@ -532,9 +528,9 @@ const HomePage: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Sartthi Desktop
+                      {t('home.sartthiDesktop')}
                     </h3>
-                    <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full">
+                    <span className="px-2 py-1 text-xs font-bold text-white rounded-full" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                       v{latestRelease.version}
                     </span>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
@@ -544,7 +540,7 @@ const HomePage: React.FC = () => {
                   </div>
 
                   <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Experience the full power of Sartthi with our native desktop application. Faster, more powerful, and works offline.
+                    {t('home.downloadSartthiDesktop')}
                   </p>
 
                   {/* Features */}
@@ -592,11 +588,12 @@ const HomePage: React.FC = () => {
                     <a
                       href={latestRelease.downloadUrl}
                       download
-                      className="group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+                      className="group relative px-6 py-3 text-gray-900 border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
+                      style={{ background: `linear-gradient(135deg, #ffffff 20%, ${accentColor}15 100%)` }}
                     >
                       <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
                       <Download className="w-5 h-5 relative z-10" />
-                      <span className="relative z-10">Download for Windows</span>
+                      <span className="relative z-10">{t('home.downloadNow')}</span>
                     </a>
                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       <div className="font-medium">Windows 10/11</div>
@@ -616,7 +613,7 @@ const HomePage: React.FC = () => {
               <Zap className="w-5 h-5 text-white" />
             </div>
             <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Sartthi Ecosystem
+              {t('home.sartthiEcosystem')}
             </h2>
           </div>
           <SartthiAppsWidget />
@@ -635,8 +632,8 @@ const HomePage: React.FC = () => {
 
             {/* Quick Tasks */}
             <div className={`rounded-2xl border p-6 ${isDarkMode
-              ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-              : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+              ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
+              : 'bg-white/80 border-gray-200 backdrop-blur-sm'
               }`}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -645,7 +642,7 @@ const HomePage: React.FC = () => {
                   </div>
                   <div>
                     <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Quick Tasks
+                      {t('home.quickTasks')}
                     </h3>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {quickTasks.filter(t => !t.completed).length} pending
@@ -661,7 +658,7 @@ const HomePage: React.FC = () => {
                   }}
                 >
                   <Plus className="w-4 h-4 inline mr-1.5" />
-                  Add Task
+                  {t('home.addTask')}
                 </button>
               </div>
 
@@ -683,6 +680,34 @@ const HomePage: React.FC = () => {
                     }}
                     autoFocus
                   />
+
+                  {/* Type Selectors */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {[
+                      { id: 'task', label: 'Task', icon: CheckSquare },
+                      { id: 'reminder', label: 'Reminder', icon: Bell },
+                      { id: 'milestone', label: 'Milestone', icon: Flag },
+                      { id: 'event', label: 'Event', icon: Calendar }
+                    ].map(type => (
+                      <button
+                        key={type.id}
+                        onClick={() => setNewTaskType(type.id as any)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${newTaskType === type.id
+                          ? 'bg-accent text-white'
+                          : isDarkMode
+                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        style={{
+                          backgroundColor: newTaskType === type.id ? accentColor : undefined
+                        }}
+                      >
+                        <type.icon className="w-3 h-3" />
+                        {type.label}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="flex gap-2">
                     <button
                       onClick={handleAddQuickTask}
@@ -710,7 +735,7 @@ const HomePage: React.FC = () => {
                     key={task._id}
                     className={`group p-4 rounded-xl border transition-all hover:scale-[1.02] ${task.completed
                       ? isDarkMode
-                        ? 'bg-gray-700/20 border-gray-700/50 opacity-60'
+                        ? 'bg-gray-700/20 border-gray-700/70 opacity-60'
                         : 'bg-gray-50 border-gray-200 opacity-60'
                       : isDarkMode
                         ? 'bg-gray-700/30 border-gray-600'
@@ -735,16 +760,33 @@ const HomePage: React.FC = () => {
                         }}
                       >
                         {task.completed && <CheckCircle className="w-4 h-4 text-white" />}
+                        {!task.completed && task.type !== 'task' && (
+                          <div className="flex items-center justify-center w-full h-full">
+                            {/* Small icon inside checkbox for special types if not completed */}
+                            {getTaskTypeIcon(task.type)}
+                          </div>
+                        )}
                       </button>
                       <div className="flex-1 min-w-0">
-                        <p className={`font-medium ${task.completed
-                          ? 'line-through text-gray-500'
-                          : isDarkMode
-                            ? 'text-gray-200'
-                            : 'text-gray-900'
-                          }`}>
-                          {task.title}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className={`font-medium ${task.completed
+                            ? 'line-through text-gray-500'
+                            : isDarkMode
+                              ? 'text-gray-200'
+                              : 'text-gray-900'
+                            }`}>
+                            {task.title}
+                          </p>
+                          {task.type !== 'task' && (
+                            <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${task.type === 'reminder' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                              task.type === 'milestone' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                task.type === 'event' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                  'bg-gray-100 text-gray-700'
+                              }`}>
+                              {task.type}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(task.priority)}`}>
                         {task.priority}
@@ -756,7 +798,7 @@ const HomePage: React.FC = () => {
                   <div className="text-center py-12">
                     <CheckSquare className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
                     <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      No tasks yet. Create one to get started!
+                      {t('home.noTasksYet')}
                     </p>
                   </div>
                 )}
@@ -765,20 +807,20 @@ const HomePage: React.FC = () => {
 
             {/* Active Projects */}
             <div className={`rounded-2xl border p-6 ${isDarkMode
-              ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-              : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+              ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
+              : 'bg-white/80 border-gray-200 backdrop-blur-sm'
               }`}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                  <div className="p-2 rounded-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                     <Rocket className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Active Projects
+                      {t('home.activeProjects')}
                     </h3>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {activeProjects.length} in progress
+                      {t('home.activeProjectsCount', { count: activeProjects.length })}
                     </p>
                   </div>
                 </div>
@@ -787,7 +829,7 @@ const HomePage: React.FC = () => {
                   className={`text-sm font-medium flex items-center gap-1 transition-colors`}
                   style={{ color: accentColor }}
                 >
-                  View All
+                  {t('home.viewAll')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -863,19 +905,19 @@ const HomePage: React.FC = () => {
 
             {/* Recent Activity (Moved to Left) */}
             <div className={`rounded-2xl border p-6 ${isDarkMode
-              ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-              : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+              ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
+              : 'bg-white/80 border-gray-200 backdrop-blur-sm'
               }`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+                <div className="p-2 rounded-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Recent Activity
+                    {t('home.recentActivity')}
                   </h3>
                   <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Latest updates
+                    {t('home.latestUpdates')}
                   </p>
                 </div>
               </div>

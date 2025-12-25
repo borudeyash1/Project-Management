@@ -207,26 +207,25 @@ const NotesPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1">
-        <div
-          className="p-6 transition-all duration-300"
-          style={{
-            paddingLeft: dockPosition === 'left' ? 'calc(1.5rem + 100px)' : undefined,
-            paddingRight: dockPosition === 'right' ? 'calc(1.5rem + 100px)' : undefined
-          }}
-        >
-          {/* Glassmorphic Page Header */}
-          <GlassmorphicPageHeader
-            icon={FileText}
-            title={t('notes.title')}
-            subtitle={t('notes.subtitle')}
-          />
+        {/* Glassmorphic Page Header */}
+        <GlassmorphicPageHeader
+          icon={FileText}
+          title={t('notes.title')}
+          subtitle={t('notes.subtitle')}
+          className="w-full !rounded-none !border-x-0 !mb-0"
+        />
+
+        <div className={`p-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :
+          dockPosition === 'right' ? 'pr-[71px]' :
+            ''
+          }`}>
 
           {/* Layout */}
           {isLoading ? (
             /* Loading Skeleton */
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse">
               {/* Sidebar Skeleton */}
-              <div className={`lg:col-span-1 rounded-2xl border p-6 h-[calc(100vh-300px)] ${isDarkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white/80 border-gray-200/50'
+              <div className={`lg:col-span-1 rounded-2xl border p-6 h-[calc(100vh-300px)] ${isDarkMode ? 'bg-gray-800/50 border-gray-700/70' : 'bg-white/80 border-gray-300/60'
                 }`}>
                 <div className="h-12 bg-gradient-to-r from-yellow-200 to-amber-200 dark:from-yellow-900/30 dark:to-amber-900/30 rounded-xl mb-4" />
                 <div className="space-y-3">
@@ -237,7 +236,7 @@ const NotesPage: React.FC = () => {
               </div>
 
               {/* Editor Skeleton */}
-              <div className={`lg:col-span-3 rounded-2xl border p-6 h-[calc(100vh-300px)] ${isDarkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white/80 border-gray-200/50'
+              <div className={`lg:col-span-3 rounded-2xl border p-6 h-[calc(100vh-300px)] ${isDarkMode ? 'bg-gray-800/50 border-gray-700/70' : 'bg-white/80 border-gray-300/60'
                 }`}>
                 <div className="flex gap-3 mb-6">
                   <div className="h-10 w-40 bg-gradient-to-r from-purple-200 to-purple-300 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl" />
@@ -251,8 +250,8 @@ const NotesPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Notes List Sidebar */}
               <div className={`lg:col-span-1 rounded-2xl border p-6 max-h-[calc(100vh-300px)] overflow-y-auto custom-scrollbar ${isDarkMode
-                ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-                : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+                ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-300/60 backdrop-blur-sm'
                 }`}>
                 <button
                   onClick={() => {
@@ -264,7 +263,7 @@ const NotesPage: React.FC = () => {
                   style={{
                     background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
                   }}
-                  className="w-full flex items-center justify-center gap-2 hover:opacity-90 text-white px-4 py-3 rounded-xl font-bold transition-all shadow-lg mb-4"
+                  className="w-full flex items-center justify-center gap-2 hover:opacity-90 text-white px-4 py-3 rounded-xl font-bold transition-all mb-4"
                 >
                   <Plus size={20} />
                   {t('notes.newNote')}
@@ -291,12 +290,12 @@ const NotesPage: React.FC = () => {
                           key={note._id}
                           onClick={() => handleSelectNote(note)}
                           className={`p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.02] relative ${selectedNote?._id === note._id
-                              ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700] shadow-lg'
-                              : isMeetingNote
-                                ? `${isDarkMode
-                                  ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-900/40 hover:to-purple-900/40 border-2 border-blue-700/50'
-                                  : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200'}`
-                                : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
+                            ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#E6C200]/20 border-2 border-[#FFD700]'
+                            : isMeetingNote
+                              ? `${isDarkMode
+                                ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-900/40 hover:to-purple-900/40 border-2 border-blue-700/50'
+                                : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200'}`
+                              : `${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-50 hover:bg-gray-100 border-2 border-gray-100'}`
                             }`}
                         >
                           {isMeetingNote && (
@@ -312,8 +311,8 @@ const NotesPage: React.FC = () => {
                           </p>
                           {isMeetingNote && (
                             <span className={`inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-semibold ${isDarkMode
-                                ? 'bg-blue-900/50 text-blue-300'
-                                : 'bg-blue-100 text-blue-700'
+                              ? 'bg-blue-900/50 text-blue-300'
+                              : 'bg-blue-100 text-blue-700'
                               }`}>
                               Meeting
                             </span>
@@ -327,8 +326,8 @@ const NotesPage: React.FC = () => {
 
               {/* Editor */}
               <div className={`lg:col-span-3 rounded-2xl border p-8 ${isDarkMode
-                ? 'bg-gray-800/50 border-gray-700/50 backdrop-blur-sm'
-                : 'bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-lg'
+                ? 'bg-gray-800/50 border-gray-700/70 backdrop-blur-sm'
+                : 'bg-white/80 border-gray-300/60 backdrop-blur-sm'
                 }`}>
                 {selectedNote || title || content || isCreatingNew ? (
                   <>
@@ -340,10 +339,10 @@ const NotesPage: React.FC = () => {
                             setAiAction('generate');
                             setShowAIModal(true);
                           }}
-                          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-purple-500/30"
+                          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all-500/30"
                         >
                           <Sparkles size={18} />
-                          <span>Ask AI to Write</span>
+                          <span>{t('notes.askAIToWrite')}</span>
                         </button>
                         <button
                           onClick={() => {
@@ -351,20 +350,20 @@ const NotesPage: React.FC = () => {
                             setShowAIModal(true);
                           }}
                           disabled={!content}
-                          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-xl font-semibold transition-all-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Wand2 size={18} />
-                          <span>Refine with AI</span>
+                          <span>{t('notes.refineWithAI')}</span>
                         </button>
                         <button
                           onClick={() => navigate('/notes/meeting')}
                           style={{
                             background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
                           }}
-                          className="flex items-center gap-2 text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:opacity-90"
+                          className="flex items-center gap-2 text-white px-4 py-2.5 rounded-xl font-semibold transition-all hover:opacity-90"
                         >
                           <Mic size={18} />
-                          <span>New Meeting Note</span>
+                          <span>{t('notes.newMeetingNote')}</span>
                         </button>
                       </div>
                       <div className="flex items-center gap-2">
@@ -382,7 +381,7 @@ const NotesPage: React.FC = () => {
                         )}
                         <button
                           onClick={selectedNote ? handleSaveNote : handleCreateNote}
-                          className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-yellow-500/30"
+                          className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-4 py-2.5 rounded-xl font-semibold transition-all-500/30"
                         >
                           <Save size={18} />
                           {selectedNote ? t('common.save') : t('common.create')}
@@ -415,10 +414,10 @@ const NotesPage: React.FC = () => {
                       <FileText className={`w-16 h-16 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     </div>
                     <h3 className={`text-3xl font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      No Note Selected
+                      {t('notes.noNoteSelected')}
                     </h3>
                     <p className={`text-center mb-8 max-w-md text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Select an existing note from the sidebar or create a new one to get started
+                      {t('notes.selectNotePrompt')}
                     </p>
                     <button
                       onClick={() => {
@@ -427,10 +426,10 @@ const NotesPage: React.FC = () => {
                         setContent('');
                         setIsCreatingNew(true);
                       }}
-                      className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-yellow-500/30 hover:scale-105"
+                      className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-8 py-4 rounded-xl font-bold transition-all-500/30 hover:scale-105"
                     >
                       <Plus size={24} />
-                      Create New Note
+                      {t('notes.createNewNote')}
                     </button>
                   </div>
                 )}
@@ -443,13 +442,13 @@ const NotesPage: React.FC = () => {
       {/* AI Modal */}
       {showAIModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`rounded-2xl shadow-2xl max-w-2xl w-full p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`rounded-2xl max-w-2xl w-full p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {aiAction === 'generate' ? 'Generate Note with AI' : 'Refine Note with AI'}
+              {aiAction === 'generate' ? t('notes.generateNoteWithAI') : 'Refine Note with AI'}
             </h2>
             <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {aiAction === 'generate'
-                ? 'Tell the AI what you want to write about, and it will generate a detailed note for you.'
+                ? t('notes.aiPromptPlaceholder')
                 : 'Tell the AI how you want to improve your note (e.g., "make it more concise", "add more details", "fix grammar").'}
             </p>
 
@@ -463,7 +462,7 @@ const NotesPage: React.FC = () => {
               }}
               placeholder={
                 aiAction === 'generate'
-                  ? 'e.g., "Write a comprehensive guide on project management best practices"'
+                  ? t('notes.aiPromptExample')
                   : 'e.g., "Make it more concise and professional"'
               }
               className={`w-full h-32 px-4 py-3 border-2 rounded-xl focus:border-[#FFD700] focus:outline-none resize-none ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-200 text-gray-900'}`}
@@ -487,7 +486,7 @@ const NotesPage: React.FC = () => {
                 ) : (
                   <>
                     <Sparkles size={20} />
-                    {aiAction === 'generate' ? 'Generate' : 'Refine'}
+                    {aiAction === 'generate' ? t('notes.generate') : 'Refine'}
                   </>
                 )}
               </button>
@@ -509,7 +508,7 @@ const NotesPage: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`rounded-2xl shadow-2xl max-w-md w-full p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`rounded-2xl max-w-md w-full p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                 <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />

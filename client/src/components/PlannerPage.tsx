@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  Plus, Calendar, Clock, Target, Users, CheckCircle,
+  Plus, Calendar, Clock, Target, Users, CheckCircle, Briefcase,
   AlertCircle, Star, Flag, Tag, MessageSquare, FileText,
   ChevronLeft, ChevronRight, Filter, Search, MoreVertical,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot, X, Bell,
@@ -60,8 +61,9 @@ const PlannerPage: React.FC = () => {
   const { t } = useTranslation();
   const { canUseAI } = useFeatureAccess();
   const { isDarkMode } = useTheme();
+  const [searchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<'board' | 'list' | 'gantt' | 'calendar'>('calendar');
+  const [activeTab, setActiveTab] = useState<'myWork' | 'board' | 'list' | 'gantt' | 'calendar'>('myWork');
   const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -80,6 +82,13 @@ const PlannerPage: React.FC = () => {
     reminder: '15min' as '15min' | '30min' | '1hour' | '1day',
     tags: [] as string[]
   });
+
+  useEffect(() => {
+    const view = searchParams.get('view');
+    if (view && ['myWork', 'board', 'list', 'gantt', 'calendar'].includes(view)) {
+      setActiveTab(view as any);
+    }
+  }, [searchParams]);
 
   // Mock data - replace with actual API calls
   useEffect(() => {
@@ -396,33 +405,33 @@ const PlannerPage: React.FC = () => {
         }}
       >
         <GlassmorphicPageHeader
-          title={t('planner.myWork')}
+          title={t('planner.title')}
           subtitle={t('planner.description')}
           icon={Target}
-          className="w-full mb-8"
+          className="w-full mb-6"
           decorativeGradients={{
             topRight: 'rgba(124, 58, 237, 0.2)',
             bottomLeft: 'rgba(59, 130, 246, 0.2)'
           }}
         />
 
-        {/* Toolbar */}
-        <GlassmorphicCard className="p-4 mb-6 flex flex-col xl:flex-row items-center justify-between gap-4">
-          {/* View Tab Toggle */}
-          <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800/50 rounded-xl overflow-x-auto w-full xl:w-auto">
+        {/* View Tab Toggle - Moved Below Header */}
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-gray-800/50 rounded-xl overflow-x-auto border border-gray-300/60 dark:border-gray-700/70 backdrop-blur-sm">
             {[
-              { id: 'board', label: 'Board', icon: Layout },
-              { id: 'list', label: 'List', icon: ListIcon },
-              { id: 'gantt', label: 'Gantt', icon: BarChart2 },
-              { id: 'calendar', label: 'Calendar', icon: Calendar }
+              { id: 'board', label: t('planner.views.board'), icon: Layout },
+              { id: 'list', label: t('planner.views.list'), icon: ListIcon },
+              { id: 'gantt', label: t('planner.views.gantt'), icon: BarChart2 },
+              { id: 'calendar', label: t('planner.views.calendar'), icon: Calendar },
+              { id: 'myWork', label: t('planner.views.myWork'), icon: Briefcase }
             ].map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${activeTab === tab.id
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${activeTab === tab.id
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ring-1 ring-black/5 dark:ring-white/10'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
                     }`}
                 >
@@ -433,9 +442,9 @@ const PlannerPage: React.FC = () => {
             })}
           </div>
 
-          <div className="flex items-center gap-3 w-full xl:w-auto justify-end">
+          <div className="flex items-center gap-3">
             {activeTab === 'calendar' && (
-              <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+              <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-300/60 dark:border-gray-700/70 backdrop-blur-sm">
                 {[
                   { id: 'day', label: t('planner.day') },
                   { id: 'week', label: t('planner.week') },
@@ -445,7 +454,7 @@ const PlannerPage: React.FC = () => {
                     key={mode.id}
                     onClick={() => setCalendarView(mode.id as any)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${calendarView === mode.id
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                       }`}
                   >
@@ -466,13 +475,13 @@ const PlannerPage: React.FC = () => {
                 });
                 setShowTaskModal(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover shadow-lg shadow-accent/20 transition-all font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover/20 transition-all font-medium whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
               {t('planner.addTask')}
             </button>
           </div>
-        </GlassmorphicCard>
+        </div>
       </div>
 
       <div
@@ -484,6 +493,21 @@ const PlannerPage: React.FC = () => {
       >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
+            {activeTab === 'myWork' && (
+              <GlassmorphicCard className="p-6">
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                    <Briefcase className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {t('planner.views.myWork')}
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                    View and manage all tasks assigned to you across different projects.
+                  </p>
+                </div>
+              </GlassmorphicCard>
+            )}
             {activeTab === 'calendar' && (
               <GlassmorphicCard className="p-6">
                 {/* Calendar Header */}
@@ -669,7 +693,7 @@ const PlannerPage: React.FC = () => {
                           status === 'in-progress' ? 'bg-blue-500' :
                             status === 'completed' ? 'bg-green-500' : 'bg-red-500'
                           }`} />
-                        {status.replace('-', ' ')}
+                        {t(`planner.board.${status.replace('-', '')}`)}
                       </h3>
                       <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
                         {tasks.filter(t => t.status === status).length}
@@ -720,12 +744,12 @@ const PlannerPage: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Task</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priority</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Project</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.status')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('tasks.taskName')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.priority')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.dueDate')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.project')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -787,10 +811,10 @@ const PlannerPage: React.FC = () => {
             {activeTab === 'gantt' && (
               <GlassmorphicCard className="p-6 overflow-hidden">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Project Timeline</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('planner.gantt.title')}</h3>
                   <div className="flex gap-2">
                     <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><ChevronLeft className="w-4 h-4" /></button>
-                    <span className="text-sm font-medium">March 2024</span>
+                    <span className="text-sm font-medium">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                     <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><ChevronRight className="w-4 h-4" /></button>
                   </div>
                 </div>
@@ -820,7 +844,7 @@ const PlannerPage: React.FC = () => {
                               <div
                                 className={`absolute top-1 bottom-1 rounded-md ${task.status === 'completed' ? 'bg-green-500/50' :
                                   task.priority === 'urgent' ? 'bg-red-500/50' : 'bg-blue-500/50'
-                                  } opacity-80 backdrop-blur-sm border border-white/10`}
+                                  } opacity-80 backdrop-blur-sm border border-gray-700/70`}
                                 style={{
                                   left: `${(index * 15) % 60}%`,
                                   width: `${Math.max(10, task.estimatedDuration ? task.estimatedDuration * 5 : 20)}%`
@@ -861,7 +885,7 @@ const PlannerPage: React.FC = () => {
                 <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-3`}>
                   {t('planner.aiSuggestion')}
                 </p>
-                <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg px-3 py-2 text-sm font-medium transition-all shadow-lg shadow-purple-500/20">
+                <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg px-3 py-2 text-sm font-medium transition-all-500/20">
                   {t('planner.askAI')}
                 </button>
               </GlassmorphicCard>
@@ -1084,7 +1108,7 @@ const PlannerPage: React.FC = () => {
               <button
                 onClick={handleCreateTask}
                 disabled={!newTask.title || !newTask.dueDate || !newTask.dueTime}
-                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-accent/20"
+                className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all/20"
               >
                 Create Task
               </button>

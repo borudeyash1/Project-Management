@@ -21,26 +21,26 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
     dispatch({ type: 'SET_MODE', payload: mode });
     if (workspaceId) {
       dispatch({ type: 'SET_WORKSPACE', payload: workspaceId });
-      
+
       const workspace = state.workspaces.find(w => w._id === workspaceId);
       if (workspace) {
         navigate(`/workspace/${workspaceId}/overview`);
-        dispatch({ 
-          type: 'ADD_TOAST', 
-          payload: { 
-            message: t('switcher.switchedTo', { name: workspace.name }), 
-            type: 'success' 
-          } 
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            message: t('switcher.switchedTo', { name: workspace.name }),
+            type: 'success'
+          }
         });
       }
     } else if (mode === 'Personal') {
       navigate('/home');
-      dispatch({ 
-        type: 'ADD_TOAST', 
-        payload: { 
-          message: t('switcher.switchedToPersonal'), 
-          type: 'success' 
-        } 
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          message: t('switcher.switchedToPersonal'),
+          type: 'success'
+        }
       });
     }
     setIsOpen(false);
@@ -70,7 +70,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
     <>
       <div className={`workspace-switcher-menu ${className}`}>
         <div className="workspace-switcher-item">
-          <div 
+          <div
             className={`workspace-switcher-link ${isDarkMode ? 'dark' : 'light'}`}
             onMouseEnter={() => setIsOpen(true)}
             onMouseLeave={() => setIsOpen(false)}
@@ -84,7 +84,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
             </svg>
           </div>
 
-          <div 
+          <div
             className={`workspace-switcher-submenu ${isDarkMode ? 'dark' : 'light'}`}
             onMouseEnter={() => setIsOpen(true)}
             onMouseLeave={() => setIsOpen(false)}
@@ -116,9 +116,8 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
               <div key={workspace._id} className="workspace-submenu-item">
                 <div
                   onClick={() => handleModeChange('Workspace', workspace._id)}
-                  className={`workspace-submenu-link ${
-                    state.mode === 'Workspace' && state.currentWorkspace === workspace._id ? 'active' : ''
-                  }`}
+                  className={`workspace-submenu-link ${state.mode === 'Workspace' && state.currentWorkspace === workspace._id ? 'active' : ''
+                    }`}
                 >
                   <Building className="workspace-submenu-icon" />
                   <div className="workspace-submenu-content">
@@ -129,7 +128,7 @@ const WorkspaceModeSwitcher: React.FC<WorkspaceModeSwitcherProps> = ({ className
                       )}
                     </div>
                     <div className="workspace-submenu-desc">
-                      {t('switcher.members', { count: workspace.memberCount })} • {workspace.type}
+                      {t('switcher.members', { count: workspace.memberCount })} • {t('workspaceType.' + (workspace.type || 'freelance').toLowerCase())}
                     </div>
                   </div>
                   {state.mode === 'Workspace' && state.currentWorkspace === workspace._id && (

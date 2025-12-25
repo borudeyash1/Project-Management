@@ -33,6 +33,7 @@ export const getMyNotifications = async (
         !notif.title?.toLowerCase().includes('rejected') &&
         (!notif.metadata || !notif.metadata.joinRequestId)
       ) {
+        // ... (existing JoinRequest logic) ...
         // Try to find matching join request
         const joinRequest = await JoinRequest.findOne({
           workspace: notif.relatedId,
@@ -62,6 +63,67 @@ export const getMyNotifications = async (
           // No matching join request - mark for deletion
           notificationsToDelete.push(notif._id.toString());
           console.log(`🗑️ Marked stale notification ${notif._id} for deletion`);
+        }
+      }
+
+      // --- Sync Workspace Invitation Status ---
+      // User requested to fetch status from workspaceinvitations collection
+      if (
+        notif.title?.toLowerCase().includes('invitation') ||
+        notif.message?.toLowerCase().includes('invited you')
+      ) {
+        const WorkspaceInvitation = (await import('../models/WorkspaceInvitation')).default;
+        const Workspace = (await import('../models/Workspace')).default;
+
+        let finalStatus = null;
+
+        // 1. Check strict membership FIRST (Source of Truth)
+        if (notif.relatedId && req.user?._id) {
+          const isMember = await Workspace.exists({
+            _id: notif.relatedId,
+            'members.user': req.user._id
+          });
+          if (isMember) {
+            finalStatus = 'accepted';
+          }
+        }
+
+        // 2. If not found as member, check Invitation record
+        if (!finalStatus) {
+          let invitation = null;
+          // Try getting invitation by stored ID
+          if (notif.metadata?.invitationId) {
+            invitation = await WorkspaceInvitation.findById(notif.metadata.invitationId);
+          }
+
+          // If not found, look up by workspace and user ID (invitee)
+          if (!invitation && notif.relatedId && req.user?._id) {
+            invitation = await WorkspaceInvitation.findOne({
+              workspace: notif.relatedId,
+              invitee: req.user._id
+            }).sort({ createdAt: -1 });
+          }
+
+          if (invitation) {
+            finalStatus = invitation.status;
+          }
+        }
+
+        // 3. Update Notification if we found a conclusive status
+        if (finalStatus) {
+          // Inject the real status from the collection into the notification metadata
+          if (!notif.metadata) notif.metadata = {};
+
+          // Only update if status is different
+          if (notif.metadata.status !== finalStatus) {
+            notif.metadata.status = finalStatus; // e.g., 'pending', 'accepted', 'declined'
+
+            // Persist this sync to DB
+            await Notification.updateOne(
+              { _id: notif._id },
+              { $set: { 'metadata.status': finalStatus } }
+            );
+          }
         }
       }
     }

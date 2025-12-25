@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import aiService from "../services/aiService";
-import geminiMeetingService from "../services/gemini-meeting";
+import deepSeekMeetingService from "../services/deepseek-meeting";
 
 interface ChatRequest {
   message: string;
@@ -121,12 +121,9 @@ export const handleMilestoneSuggestion = async (
   }
 };
 
-/**
- * Health check for AI service
- */
 export const healthCheck = async (req: Request, res: Response) => {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.DEEPSEEK_API_KEY;
     const isConfigured = !!apiKey;
 
     return res.status(200).json({
@@ -134,6 +131,7 @@ export const healthCheck = async (req: Request, res: Response) => {
       data: {
         status: "operational",
         aiConfigured: isConfigured,
+        model: "DeepSeek V3",
         timestamp: new Date().toISOString(),
       },
     });
@@ -147,7 +145,8 @@ export const healthCheck = async (req: Request, res: Response) => {
 };
 
 /**
- * Handle meeting notes processing
+ * Handle meeting summary generation (OPTIONAL - user must explicitly request)
+ * This is NOT automatic - only triggered when user clicks "Generate AI Summary"
  */
 export const handleMeetingNotesProcessing = async (
   req: Request,
@@ -171,8 +170,20 @@ export const handleMeetingNotesProcessing = async (
       });
     }
 
-    // Process the transcript
-    const result = await geminiMeetingService.processMeetingTranscript(
+    // Check if this is a cached result (set by middleware)
+    if (req.aiCredits?.cached && req.aiCredits.cachedResult) {
+      console.log('[AI Controller] Serving cached meeting summary');
+      return res.status(200).json({
+        success: true,
+        data: req.aiCredits.cachedResult,
+        cached: true,
+        creditsUsed: 0,
+        message: 'Showing cached summary from earlier',
+      });
+    }
+
+    // Process the transcript with AI
+    const result = await deepSeekMeetingService.processMeetingTranscript(
       transcript
     );
 
@@ -184,10 +195,18 @@ export const handleMeetingNotesProcessing = async (
       });
     }
 
-    // Return successful result
+    // Deduct credits and cache result (handled by middleware helper)
+    const { deductAICredits } = await import('../middleware/aiCredits');
+    const creditInfo = await deductAICredits(req, res, result);
+
+    // Return successful result with credit info
     return res.status(200).json({
       success: true,
       data: result,
+      cached: false,
+      creditsUsed: 100, // meeting_summary cost
+      creditsRemaining: creditInfo.newBalance,
+      warning: creditInfo.warning,
     });
   } catch (error: any) {
     console.error("Error in handleMeetingNotesProcessing:", error);
@@ -198,3 +217,4 @@ export const handleMeetingNotesProcessing = async (
     });
   }
 };
+

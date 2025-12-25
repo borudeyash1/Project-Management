@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
 import TaskVerificationModal from '../TaskVerificationModal';
+import { ContextAIButton } from '../ai/ContextAIButton';
 
 interface TaskFile {
   _id: string;
@@ -81,8 +82,8 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   const { isDarkMode } = useTheme();
 
   const inputClassName = `w-full px-3 py-2 border rounded-lg text-sm ${isDarkMode
-      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
     }`;
 
   const labelClassName = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -423,7 +424,7 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
             tasks.filter(t => t.status !== 'verified').map((task) => (
               <div
                 key={task._id}
-                className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-300 bg-white'
+                className={`border rounded-lg p-4 transition-shadow ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-300 bg-white'
                   }`}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -590,8 +591,8 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                               className="w-4 h-4 text-accent-dark rounded"
                             />
                             <span className={`flex-1 text-sm ${subtask.completed
-                                ? 'line-through text-gray-500'
-                                : isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                              ? 'line-through text-gray-500'
+                              : isDarkMode ? 'text-gray-300' : 'text-gray-700'
                               }`}>
                               {subtask.title}
                             </span>
@@ -1070,6 +1071,29 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
         }}
         onVerify={handleVerificationComplete}
         taskTitle={verifyingTask?.title || ''}
+      />
+
+      {/* Context-Aware AI Assistant */}
+      <ContextAIButton
+        pageData={{
+          analytics: {
+            total: tasks.length,
+            pending: tasks.filter(t => t.status === 'pending').length,
+            inProgress: tasks.filter(t => t.status === 'in-progress').length,
+            completed: tasks.filter(t => t.status === 'completed' || t.status === 'verified').length,
+            highPriority: tasks.filter(t => (t.priority === 'high' || t.priority === 'critical') && t.status !== 'completed' && t.status !== 'verified').length
+          },
+          upcomingDeadlines: tasks
+            .filter(t => t.status !== 'completed' && t.status !== 'verified')
+            .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+            .slice(0, 5)
+            .map(t => ({
+              title: t.title,
+              assignedTo: t.assignedToName,
+              dueDate: t.dueDate,
+              priority: t.priority
+            }))
+        }}
       />
     </div>
   );

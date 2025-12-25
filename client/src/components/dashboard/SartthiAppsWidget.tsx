@@ -58,11 +58,12 @@ const AppCard: React.FC<{
     loading?: boolean;
 }> = ({ icon: Icon, title, description, isConnected, data, onConnect, onExpand, onOpenApp, color, link, loading }) => {
     const { isDarkMode } = useTheme();
+    const { t } = useTranslation();
 
     return (
         <div className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${isDarkMode
-            ? 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
-            : 'bg-white border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-md'
+            ? 'bg-gray-800/50 border-gray-700/70 hover:border-gray-600'
+            : 'bg-white border-gray-200 hover:border-blue-200'
             }`}>
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${color} opacity-[0.03] rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110`} />
 
@@ -74,12 +75,12 @@ const AppCard: React.FC<{
                     {isConnected ? (
                         <span className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                             <CheckCircle2 className="w-3 h-3" />
-                            Connected
+                            {t('home.connected')}
                         </span>
                     ) : (
                         <span className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-1 rounded-full bg-gray-500/10 text-gray-500">
                             <Lock className="w-3 h-3" />
-                            Not Connected
+                            {t('home.notConnected')}
                         </span>
                     )}
                 </div>
@@ -107,7 +108,7 @@ const AppCard: React.FC<{
                             {!isConnected && (
                                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                                     <p className="text-xs text-blue-700 dark:text-blue-300">
-                                        Connect your Sartthi account to access {title}
+                                        {t('home.connectAccountMessage')} {title}
                                     </p>
                                 </div>
                             )}
@@ -121,7 +122,7 @@ const AppCard: React.FC<{
                                             }`}
                                     >
                                         <Maximize2 className="w-4 h-4" />
-                                        View Details
+                                        {t('home.viewDetails')}
                                     </button>
                                 )}
                                 <button
@@ -133,11 +134,11 @@ const AppCard: React.FC<{
                                 >
                                     {isConnected ? (
                                         <>
-                                            Open {title.split(' ')[1]} <ExternalLink className="w-4 h-4" />
+                                            {title.includes('Mail') ? t('home.openMail') : title.includes('Calendar') ? t('home.openCalendar') : t('home.openVault')} <ExternalLink className="w-4 h-4" />
                                         </>
                                     ) : (
                                         <>
-                                            Connect Account <ArrowRight className="w-4 h-4" />
+                                            {t('home.connectAccount')} <ArrowRight className="w-4 h-4" />
                                         </>
                                     )}
                                 </button>
@@ -166,7 +167,7 @@ const DetailModal: React.FC<{
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div
                 className={`relative w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-                    } shadow-2xl`}
+                    }`}
             >
                 {/* Header */}
                 <div className={`sticky top-0 z-10 px-6 py-4 border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -346,7 +347,7 @@ const SartthiAppsWidget: React.FC = () => {
                     </div>
                 ))
             ) : (
-                <div className="text-xs text-gray-400">No recent emails</div>
+                <div className="text-xs text-gray-400">{t('home.noRecentEmails')}</div>
             )}
         </>
     ) : null;
@@ -364,7 +365,7 @@ const SartthiAppsWidget: React.FC = () => {
                     </div>
                 ))
             ) : (
-                <div className="text-xs text-gray-400">No upcoming events</div>
+                <div className="text-xs text-gray-400">{t('home.noUpcomingEvents')}</div>
             )}
         </>
     ) : null;
@@ -390,8 +391,8 @@ const SartthiAppsWidget: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AppCard
                     icon={Mail}
-                    title="Sartthi Mail"
-                    description="Secure, intelligent email platform for seamless communication."
+                    title={t('home.sartthiMail')}
+                    description={t('home.sartthiMailDesc')}
                     isConnected={!!mailData?.account}
                     data={mailContent}
                     onConnect={() => handleConnect('mail')}
@@ -404,8 +405,8 @@ const SartthiAppsWidget: React.FC = () => {
 
                 <AppCard
                     icon={CalendarIcon}
-                    title="Sartthi Calendar"
-                    description="Schedule meetings and manage your time efficiently."
+                    title={t('home.sartthiCalendar')}
+                    description={t('home.sartthiCalendarDesc')}
                     isConnected={!!calendarData?.account}
                     data={calendarContent}
                     onConnect={() => handleConnect('calendar')}
@@ -418,8 +419,8 @@ const SartthiAppsWidget: React.FC = () => {
 
                 <AppCard
                     icon={HardDrive}
-                    title="Sartthi Vault"
-                    description="Secure cloud storage for all your project files and assets."
+                    title={t('home.sartthiVault')}
+                    description={t('home.sartthiVaultDesc')}
                     isConnected={!!vaultData?.account}
                     data={vaultContent}
                     onConnect={() => handleConnect('vault')}
@@ -435,7 +436,7 @@ const SartthiAppsWidget: React.FC = () => {
             <DetailModal
                 isOpen={expandedView === 'mail'}
                 onClose={() => setExpandedView(null)}
-                title="Sartthi Mail"
+                title={t('home.sartthiMail')}
                 icon={Mail}
                 color="from-blue-500 to-cyan-500"
             >
@@ -468,7 +469,7 @@ const SartthiAppsWidget: React.FC = () => {
                                         onClick={() => handleOpenEmail(email.id)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
                                             ? 'bg-gray-700/30 border-gray-600 hover:border-blue-500'
-                                            : 'bg-white border-gray-200 hover:border-blue-500 hover:shadow-md'
+                                            : 'bg-white border-gray-200 hover:border-blue-500'
                                             }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
@@ -514,7 +515,7 @@ const SartthiAppsWidget: React.FC = () => {
             <DetailModal
                 isOpen={expandedView === 'calendar'}
                 onClose={() => setExpandedView(null)}
-                title="Sartthi Calendar"
+                title={t('home.sartthiCalendar')}
                 icon={CalendarIcon}
                 color="from-purple-500 to-pink-500"
             >
@@ -547,7 +548,7 @@ const SartthiAppsWidget: React.FC = () => {
                                         onClick={() => handleOpenEvent(event.id)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
                                             ? 'bg-gray-700/30 border-gray-600 hover:border-purple-500'
-                                            : 'bg-white border-gray-200 hover:border-purple-500 hover:shadow-md'
+                                            : 'bg-white border-gray-200 hover:border-purple-500'
                                             }`}
                                     >
                                         <div className="flex items-start gap-3">
@@ -593,7 +594,7 @@ const SartthiAppsWidget: React.FC = () => {
             <DetailModal
                 isOpen={expandedView === 'vault'}
                 onClose={() => setExpandedView(null)}
-                title="Sartthi Vault"
+                title={t('home.sartthiVault')}
                 icon={HardDrive}
                 color="from-green-500 to-emerald-500"
             >
@@ -642,7 +643,7 @@ const SartthiAppsWidget: React.FC = () => {
                                         onClick={() => handleOpenFile(file.id)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
                                             ? 'bg-gray-700/30 border-gray-600 hover:border-green-500'
-                                            : 'bg-white border-gray-200 hover:border-green-500 hover:shadow-md'
+                                            : 'bg-white border-gray-200 hover:border-green-500'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">

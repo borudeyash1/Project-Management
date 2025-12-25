@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Users, Send, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
+import { useTranslation } from 'react-i18next';
 
 interface Request {
   _id: string;
@@ -45,11 +46,12 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
   onManualDeadlineChange
 }) => {
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   // Helper classes for consistent styling
   const inputClassName = `w-full px-3 py-2 border rounded-lg text-sm ${isDarkMode
-      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
     }`;
 
   const labelClassName = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -318,9 +320,9 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
           <GlassmorphicCard className="p-6 mb-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Manual Task Management</h3>
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.manualTaskManagement')}</h3>
                 <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Directly reassign tasks or change deadlines for your team
+                  {t('projects.manualTaskDesc')}
                 </p>
               </div>
             </div>
@@ -330,19 +332,19 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               <div className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-300'}`}>
                 <h4 className={`font-medium mb-3 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Users className="w-4 h-4 text-purple-600" />
-                  Reassign Task
+                  {t('projects.reassignTask')}
                 </h4>
                 <div className="space-y-3">
                   <div>
                     <label className={labelClassName}>
-                      Select Task
+                      {t('projects.selectTask')}
                     </label>
                     <select
                       value={manualReassignTaskId}
                       onChange={(e) => setManualReassignTaskId(e.target.value)}
                       className={inputClassName}
                     >
-                      <option value="">Choose a task...</option>
+                      <option value="">{t('projects.chooseTask')}</option>
                       {tasks.map((task) => (
                         <option key={task._id} value={task._id}>
                           {task.title} - Assigned to: {task.assignedToName || 'Unassigned'}
@@ -352,14 +354,14 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                   </div>
                   <div>
                     <label className={labelClassName}>
-                      Reassign To
+                      {t('projects.reassignTo')}
                     </label>
                     <select
                       value={manualReassignTo}
                       onChange={(e) => setManualReassignTo(e.target.value)}
                       className={inputClassName}
                     >
-                      <option value="">Select team member...</option>
+                      <option value="">{t('projects.selectTeamMember')}</option>
                       {teamMembers.map((member: any) => {
                         const userId = typeof member.user === 'object' ? member.user._id : member.user;
                         const userName = typeof member.user === 'object'
@@ -378,7 +380,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                     className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
                   >
                     <Users className="w-4 h-4" />
-                    Reassign Task
+                    {t('projects.reassignTask')}
                   </button>
                 </div>
               </div>
@@ -387,19 +389,19 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               <div className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-300'}`}>
                 <h4 className={`font-medium mb-3 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Clock className="w-4 h-4 text-orange-600" />
-                  Change Deadline
+                  {t('projects.changeDeadline')}
                 </h4>
                 <div className="space-y-3">
                   <div>
                     <label className={labelClassName}>
-                      Select Task
+                      {t('projects.selectTask')}
                     </label>
                     <select
                       value={manualDeadlineTaskId}
                       onChange={(e) => setManualDeadlineTaskId(e.target.value)}
                       className={inputClassName}
                     >
-                      <option value="">Choose a task...</option>
+                      <option value="">{t('projects.chooseTask')}</option>
                       {tasks.map((task) => (
                         <option key={task._id} value={task._id}>
                           {task.title} - Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No deadline'}
@@ -409,7 +411,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                   </div>
                   <div>
                     <label className={labelClassName}>
-                      New Deadline
+                      {t('projects.newDeadline')}
                     </label>
                     <input
                       type="date"
@@ -423,7 +425,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                     className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center justify-center gap-2"
                   >
                     <Clock className="w-4 h-4" />
-                    Update Deadline
+                    {t('projects.updateDeadline')}
                   </button>
                 </div>
               </div>
@@ -434,9 +436,9 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
           <GlassmorphicCard className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pending Requests</h3>
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.pendingRequests')}</h3>
                 <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Review and approve/reject employee requests ({pendingApprovals.length} pending)
+                  {t('projects.reviewRequests', { count: pendingApprovals.length })}
                 </p>
               </div>
             </div>
@@ -446,8 +448,8 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
               {pendingApprovals.length === 0 ? (
                 <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   <CheckCircle className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}`} />
-                  <p className="font-medium">No pending requests</p>
-                  <p className="text-sm mt-1">All requests have been processed</p>
+                  <p className="font-medium">{t('projects.noPendingRequests')}</p>
+                  <p className="text-sm mt-1">{t('projects.allRequestsProcessed')}</p>
                 </div>
               ) : (
                 pendingApprovals.map((request) => (
@@ -552,8 +554,8 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                             onClick={() => handleApprove(request)}
                             disabled={verifyText.toUpperCase() !== 'VERIFY'}
                             className={`flex-1 px-4 py-2 rounded-lg text-white flex items-center justify-center gap-2 ${verifyText.toUpperCase() === 'VERIFY'
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-gray-400 cursor-not-allowed'
+                              ? 'bg-green-600 hover:bg-green-700'
+                              : 'bg-gray-400 cursor-not-allowed'
                               }`}
                           >
                             <CheckCircle className="w-4 h-4" />

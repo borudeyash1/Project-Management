@@ -55,7 +55,7 @@ const ProjectCard = ({
         "border-yellow-500/20 bg-white hover:bg-yellow-50",
         // dark styles
         "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-        "transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-yellow-500/40"
+        "transition-all duration-300 hover:scale-105 hover:border-yellow-500/40"
       )}
     >
       <img 

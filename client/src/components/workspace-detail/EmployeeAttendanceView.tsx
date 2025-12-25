@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import apiService from '../../services/api';
 import { Clock, MapPin, Calendar as CalendarIcon, CheckCircle, XCircle, Home, Users } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
@@ -20,6 +21,7 @@ interface AttendanceRecord {
 }
 
 const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspaceId, config: initialConfig }) => {
+  const { t } = useTranslation();
   const { dispatch, state } = useApp();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [attendanceHistory, setAttendanceHistory] = useState<Map<string, AttendanceRecord>>(new Map());
@@ -40,14 +42,14 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
     const loadConfig = async () => {
       try {
         const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/config`);
-        
+
         let cfg = null;
         if (response.data.success && response.data.data) {
           cfg = response.data.data;
         } else if (response.data.workspace) {
           cfg = response.data;
         }
-        
+
         if (cfg) {
           console.log('📥 [EMPLOYEE VIEW] Loaded config:', cfg);
           setConfig(cfg);
@@ -56,7 +58,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         console.error('Failed to load config:', error);
       }
     };
-    
+
     loadConfig();
   }, [workspaceId]);
 
@@ -104,17 +106,17 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
     try {
       const today = format(new Date(), 'yyyy-MM-dd');
       const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/date/${today}`);
-      
+
       console.log('📅 [TODAY ATTENDANCE] Response:', response.data);
-      
+
       const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
       const myRecord = records.find((r: any) => {
         const recordUserId = typeof r.user === 'object' ? r.user._id : r.user;
         return recordUserId === userId;
       });
-      
+
       console.log('📅 [TODAY ATTENDANCE] My Record:', myRecord);
-      
+
       if (myRecord && myRecord.slots && myRecord.slots.length > 0) {
         const slot = myRecord.slots[0];
         setTodayAttendance({
@@ -135,24 +137,24 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
   const loadAttendanceHistory = async () => {
     try {
       console.log('📊 [ATTENDANCE HISTORY] Loading for user:', userId);
-      
+
       // Load last 30 days of attendance
       const history = new Map<string, AttendanceRecord>();
-      
+
       for (let i = 0; i < 30; i++) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = format(date, 'yyyy-MM-dd');
-        
+
         try {
           const response = await apiService.get(`/workspace-attendance/workspace/${workspaceId}/date/${dateStr}`);
           const records = Array.isArray(response.data) ? response.data : (response.data.data || []);
-          
+
           const myRecord = records.find((r: any) => {
             const recordUserId = typeof r.user === 'object' ? r.user._id : r.user;
             return recordUserId === userId;
           });
-          
+
           if (myRecord && myRecord.slots && myRecord.slots.length > 0) {
             const slot = myRecord.slots[0];
             history.set(dateStr, {
@@ -167,7 +169,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
           // Skip if no data for this date
         }
       }
-      
+
       console.log('📊 [ATTENDANCE HISTORY] Loaded:', history.size, 'days');
       setAttendanceHistory(history);
     } catch (error) {
@@ -217,8 +219,8 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         const Δλ = ((employeeLng - configLng) * Math.PI) / 180;
 
         const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                  Math.cos(φ1) * Math.cos(φ2) *
-                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+          Math.cos(φ1) * Math.cos(φ2) *
+          Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const distance = R * c; // Distance in meters
 
@@ -243,7 +245,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
             accuracy: pos.coords.accuracy
           });
           setLocationFetched({ ...locationFetched, [type]: true });
-          
+
           dispatch({
             type: 'ADD_TOAST',
             payload: {
@@ -292,8 +294,8 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
   const scanFace = async (type: 'check-in' | 'check-out') => {
     try {
       // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user', width: 640, height: 480 } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: 640, height: 480 }
       });
 
       dispatch({
@@ -324,7 +326,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
-      
+
       if (!ctx) {
         throw new Error('Failed to get canvas context');
       }
@@ -346,13 +348,13 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         }
       });
 
-      const response = await apiService.post('/users/verify-face', { 
-        capturedImage 
+      const response = await apiService.post('/users/verify-face', {
+        capturedImage
       });
 
       if (response.data.success && response.data.data.matched) {
         setFaceScanned({ ...faceScanned, [type]: true });
-        
+
         dispatch({
           type: 'ADD_TOAST',
           payload: {
@@ -375,7 +377,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       }
     } catch (error: any) {
       console.error('Face scan error:', error);
-      
+
       let errorMessage = 'Face verification failed';
       if (error.name === 'NotAllowedError') {
         errorMessage = 'Camera access denied. Please allow camera access.';
@@ -384,7 +386,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -402,7 +404,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       setMarking(true);
 
       const today = format(new Date(), 'yyyy-MM-dd');
-      
+
       const requestData = {
         date: today,
         userId: userId,
@@ -413,9 +415,9 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
 
       console.log('📝 [MARK ATTENDANCE] Request:', requestData);
       console.log('📝 [MARK ATTENDANCE] Endpoint:', `/workspace-attendance/workspace/${workspaceId}/mark-manual`);
-      
+
       const response = await apiService.post(`/workspace-attendance/workspace/${workspaceId}/mark-manual`, requestData);
-      
+
       console.log('✅ [MARK ATTENDANCE] Response:', response);
 
       dispatch({
@@ -439,7 +441,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       console.error('❌ [MARK ATTENDANCE] Error:', error);
       console.error('❌ [MARK ATTENDANCE] Error response:', error.response);
       console.error('❌ [MARK ATTENDANCE] Error data:', error.response?.data);
-      
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
@@ -493,28 +495,28 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
           <Clock className="w-5 h-5" />
-          Attendance Timings
+          {t('workspace.attendance.timings')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Check-In Window</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('workspace.attendance.checkInWindow')}</div>
             <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
               {config?.checkInTime?.start || '09:00'} - {config?.checkInTime?.end || '10:00'}
             </div>
             {isInCheckInWindow && (
               <div className="mt-2 text-xs text-green-600 dark:text-green-400 font-semibold">
-                ✓ Window is OPEN
+                ✓ {t('workspace.attendance.windowOpen')}
               </div>
             )}
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Check-Out Window</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('workspace.attendance.checkOutWindow')}</div>
             <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
               {config?.checkOutTime?.start || '17:00'} - {config?.checkOutTime?.end || '18:00'}
             </div>
             {isInCheckOutWindow && (
               <div className="mt-2 text-xs text-green-600 dark:text-green-400 font-semibold">
-                ✓ Window is OPEN
+                ✓ {t('workspace.attendance.windowOpen')}
               </div>
             )}
           </div>
@@ -523,8 +525,8 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
 
       {/* Mark Attendance Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Today's Attendance</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('workspace.attendance.todaysAttendance')}</h3>
+
         {todayAttendance ? (
           <div className="space-y-4">
             <div className={`p-4 rounded-lg ${getStatusColor(todayAttendance.status)}`}>
@@ -532,11 +534,11 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 <div>
                   <div className="font-semibold text-lg capitalize">{todayAttendance.status.replace('-', ' ')}</div>
                   <div className="text-sm mt-1">
-                    Marked at: {todayAttendance.markedAt ? format(new Date(todayAttendance.markedAt), 'hh:mm a') : 'N/A'}
+                    {t('workspace.attendance.markedAt')}: {todayAttendance.markedAt ? format(new Date(todayAttendance.markedAt), 'hh:mm a') : 'N/A'}
                   </div>
                   {todayAttendance.isManual && (
                     <div className="text-xs mt-1 font-semibold">
-                      ⚠️ Marked manually by owner
+                      ⚠️ {t('workspace.attendance.markedManually')}
                     </div>
                   )}
                 </div>
@@ -545,10 +547,10 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 {todayAttendance.status === 'work-from-home' && <Home className="w-8 h-8" />}
               </div>
             </div>
-            
+
             {todayAttendance.isManual && (
               <div className="text-sm text-gray-600 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
-                Your attendance has been marked manually by the workspace owner. You cannot change it.
+                {t('workspace.attendance.manualMarkingMessage')}
               </div>
             )}
           </div>
@@ -557,20 +559,20 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
             {/* Check-In Section */}
             <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">Check-In</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{t('workspace.attendance.checkIn')}</h4>
                 {isInCheckInWindow ? (
                   <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-semibold">
-                    OPEN
+                    {t('workspace.attendance.open')}
                   </span>
                 ) : (
                   <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
-                    CLOSED
+                    {t('workspace.attendance.closed')}
                   </span>
                 )}
               </div>
 
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Window: {config?.checkInTime?.start} - {config?.checkInTime?.end}
+                {t('workspace.attendance.window')}: {config?.checkInTime?.start} - {config?.checkInTime?.end}
               </div>
 
               {/* Location Status */}
@@ -578,11 +580,11 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 <div className="flex items-center gap-2 flex-1">
                   <MapPin className="w-4 h-4" />
                   <div className="flex-1">
-                    <span className="text-sm block">Location</span>
+                    <span className="text-sm block">{t('workspace.attendance.location')}</span>
                     {locationFetched['check-in'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ Verified</span>
+                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
                     ) : (
-                      <span className="text-xs text-gray-500">Not fetched</span>
+                      <span className="text-xs text-gray-500">{t('workspace.attendance.notFetched')}</span>
                     )}
                   </div>
                 </div>
@@ -591,7 +593,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                   disabled={!isInCheckInWindow || marking || locationFetched['check-in']}
                   className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {locationFetched['check-in'] ? 'Fetched' : 'Fetch'}
+                  {locationFetched['check-in'] ? t('workspace.attendance.fetched') : t('workspace.attendance.fetch')}
                 </button>
               </div>
 
@@ -600,11 +602,11 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 <div className="flex items-center gap-2 flex-1">
                   <Users className="w-4 h-4" />
                   <div className="flex-1">
-                    <span className="text-sm block">Face Scan</span>
+                    <span className="text-sm block">{t('workspace.attendance.faceScan')}</span>
                     {faceScanned['check-in'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ Verified</span>
+                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
                     ) : (
-                      <span className="text-xs text-gray-500">Not scanned</span>
+                      <span className="text-xs text-gray-500">{t('workspace.attendance.notScanned')}</span>
                     )}
                   </div>
                 </div>
@@ -613,7 +615,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                   disabled={!isInCheckInWindow || marking || faceScanned['check-in']}
                   className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {faceScanned['check-in'] ? 'Scanned' : 'Scan'}
+                  {faceScanned['check-in'] ? t('workspace.attendance.scanned') : t('workspace.attendance.scan')}
                 </button>
               </div>
 
@@ -623,15 +625,15 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 disabled={!isInCheckInWindow || marking || !canMarkAttendance || !locationFetched['check-in'] || !faceScanned['check-in']}
                 className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
-                {marking ? 'Marking...' : 'Mark Check-In'}
+                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.markCheckIn')}
               </button>
 
               {/* Verification Status Message */}
               {(!locationFetched['check-in'] || !faceScanned['check-in']) && isInCheckInWindow && (
                 <div className="text-xs text-center text-gray-600 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-                  {!locationFetched['check-in'] && !faceScanned['check-in'] && 'Fetch location and scan face to enable'}
-                  {locationFetched['check-in'] && !faceScanned['check-in'] && 'Scan face to enable'}
-                  {!locationFetched['check-in'] && faceScanned['check-in'] && 'Fetch location to enable'}
+                  {!locationFetched['check-in'] && !faceScanned['check-in'] && t('workspace.attendance.fetchLocationScanFace')}
+                  {locationFetched['check-in'] && !faceScanned['check-in'] && t('workspace.attendance.scanFace')}
+                  {!locationFetched['check-in'] && faceScanned['check-in'] && t('workspace.attendance.fetchLocation')}
                 </div>
               )}
 
@@ -642,27 +644,27 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" />
-                {marking ? 'Marking...' : 'Work From Home'}
+                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.workFromHome')}
               </button>
             </div>
 
             {/* Check-Out Section */}
             <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">Check-Out</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{t('workspace.attendance.checkOut')}</h4>
                 {isInCheckOutWindow ? (
                   <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-semibold">
-                    OPEN
+                    {t('workspace.attendance.open')}
                   </span>
                 ) : (
                   <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
-                    CLOSED
+                    {t('workspace.attendance.closed')}
                   </span>
                 )}
               </div>
 
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Window: {config?.checkOutTime?.start} - {config?.checkOutTime?.end}
+                {t('workspace.attendance.window')}: {config?.checkOutTime?.start} - {config?.checkOutTime?.end}
               </div>
 
               {/* Location Status */}
@@ -670,11 +672,11 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 <div className="flex items-center gap-2 flex-1">
                   <MapPin className="w-4 h-4" />
                   <div className="flex-1">
-                    <span className="text-sm block">Location</span>
+                    <span className="text-sm block">{t('workspace.attendance.location')}</span>
                     {locationFetched['check-out'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ Verified</span>
+                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
                     ) : (
-                      <span className="text-xs text-gray-500">Not fetched</span>
+                      <span className="text-xs text-gray-500">{t('workspace.attendance.notFetched')}</span>
                     )}
                   </div>
                 </div>
@@ -683,7 +685,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                   disabled={!isInCheckOutWindow || marking || locationFetched['check-out']}
                   className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {locationFetched['check-out'] ? 'Fetched' : 'Fetch'}
+                  {locationFetched['check-out'] ? t('workspace.attendance.fetched') : t('workspace.attendance.fetch')}
                 </button>
               </div>
 
@@ -692,11 +694,11 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 <div className="flex items-center gap-2 flex-1">
                   <Users className="w-4 h-4" />
                   <div className="flex-1">
-                    <span className="text-sm block">Face Scan</span>
+                    <span className="text-sm block">{t('workspace.attendance.faceScan')}</span>
                     {faceScanned['check-out'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ Verified</span>
+                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
                     ) : (
-                      <span className="text-xs text-gray-500">Not scanned</span>
+                      <span className="text-xs text-gray-500">{t('workspace.attendance.notScanned')}</span>
                     )}
                   </div>
                 </div>
@@ -705,7 +707,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                   disabled={!isInCheckOutWindow || marking || faceScanned['check-out']}
                   className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {faceScanned['check-out'] ? 'Scanned' : 'Scan'}
+                  {faceScanned['check-out'] ? t('workspace.attendance.scanned') : t('workspace.attendance.scan')}
                 </button>
               </div>
 
@@ -715,15 +717,15 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 disabled={!isInCheckOutWindow || marking || !canMarkAttendance || !locationFetched['check-out'] || !faceScanned['check-out']}
                 className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
-                {marking ? 'Marking...' : 'Mark Check-Out'}
+                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.markCheckOut')}
               </button>
 
               {/* Verification Status Message */}
               {(!locationFetched['check-out'] || !faceScanned['check-out']) && isInCheckOutWindow && (
                 <div className="text-xs text-center text-gray-600 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-                  {!locationFetched['check-out'] && !faceScanned['check-out'] && 'Fetch location and scan face to enable'}
-                  {locationFetched['check-out'] && !faceScanned['check-out'] && 'Scan face to enable'}
-                  {!locationFetched['check-out'] && faceScanned['check-out'] && 'Fetch location to enable'}
+                  {!locationFetched['check-out'] && !faceScanned['check-out'] && t('workspace.attendance.fetchLocationScanFace')}
+                  {locationFetched['check-out'] && !faceScanned['check-out'] && t('workspace.attendance.scanFace')}
+                  {!locationFetched['check-out'] && faceScanned['check-out'] && t('workspace.attendance.fetchLocation')}
                 </div>
               )}
 
@@ -734,7 +736,7 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
                 className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" />
-                {marking ? 'Marking...' : 'Work From Home'}
+                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.workFromHome')}
               </button>
             </div>
           </div>
@@ -745,9 +747,9 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
           <CalendarIcon className="w-5 h-5" />
-          Attendance History
+          {t('workspace.attendance.history')}
         </h3>
-        
+
         <div className="flex justify-center">
           <DayPicker
             mode="single"
@@ -763,15 +765,15 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
         <div className="mt-6 flex items-center justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-green-200 dark:bg-green-900/50"></div>
-            <span className="text-gray-700 dark:text-gray-300">Present</span>
+            <span className="text-gray-700 dark:text-gray-300">{t('workspace.attendance.present')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-red-200 dark:bg-red-900/50"></div>
-            <span className="text-gray-700 dark:text-gray-300">Absent</span>
+            <span className="text-gray-700 dark:text-gray-300">{t('workspace.attendance.absent')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-blue-200 dark:bg-blue-900/50"></div>
-            <span className="text-gray-700 dark:text-gray-300">WFH</span>
+            <span className="text-gray-700 dark:text-gray-300">{t('workspace.attendance.wfh')}</span>
           </div>
         </div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Briefcase, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface Workspace {
     _id: string;
@@ -16,8 +17,10 @@ interface WorkspacesWidgetProps {
 }
 
 const WorkspacesWidget: React.FC<WorkspacesWidgetProps> = ({ workspaces, loading }) => {
-    const { isDarkMode } = useTheme();
+    const { isDarkMode, preferences } = useTheme();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+    const accentColor = preferences.accentColor || '#3b82f6';
 
     if (loading) {
         return (
@@ -38,16 +41,17 @@ const WorkspacesWidget: React.FC<WorkspacesWidgetProps> = ({ workspaces, loading
         <div className={`rounded-2xl border p-6 h-full flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <div className="flex justify-between items-center mb-4 shrink-0">
                 <div className="flex items-center gap-2">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                        <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${accentColor}20` }}>
+                        <Briefcase className="w-5 h-5" style={{ color: accentColor }} />
                     </div>
-                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Workspaces</h3>
+                    <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('home.workspaces')}</h3>
                 </div>
                 <button
                     onClick={() => navigate('/workspace')}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                    className="text-sm font-medium hover:underline transition-colors"
+                    style={{ color: accentColor }}
                 >
-                    View All
+                    {t('home.viewAll')}
                 </button>
             </div>
 
