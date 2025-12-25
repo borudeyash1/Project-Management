@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Calendar, Plus, Clock, Users, Filter, Clock3, Calendar as CalendarIcon, X, Check, Clock as ClockIcon } from 'lucide-react';
+import { Calendar, Plus, Clock, Users, Filter, Clock3, Calendar as CalendarIcon, X, Check, Clock as ClockIcon, Hash } from 'lucide-react';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
-import { getPlannerEvents, PlannerEvent, updateEventParticipation } from '../services/plannerService';
+import { getPlannerEvents, PlannerEvent, updateEventParticipation, createPlannerEvent } from '../services/plannerService';
+import { apiService } from '../services/api';
 
 const PlannerPage: React.FC = () => {
   const [events, setEvents] = useState<PlannerEvent[]>([]);
@@ -16,8 +17,38 @@ const PlannerPage: React.FC = () => {
     start: new Date(),
     end: new Date(new Date().setHours(new Date().getHours() + 1)),
     allDay: false,
-    color: '#3b82f6', // blue-500
+    color: '#3b82f6',
+    slackChannelId: ''
   });
+  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string }>>([]);
+  const [hasSlackConnected, setHasSlackConnected] = useState(false);
+
+  useEffect(() => {
+    checkSlackConnection();
+  }, []);
+
+  const checkSlackConnection = async () => {
+    try {
+      const response = await apiService.get('/sartthi-accounts/slack');
+      if (response.success && response.data.accounts && response.data.accounts.length > 0) {
+        setHasSlackConnected(true);
+        fetchSlackChannels();
+      }
+    } catch (error) {
+      console.error('Failed to check Slack connection:', error);
+    }
+  };
+
+  const fetchSlackChannels = async () => {
+    try {
+      const response = await apiService.get('/slack/channels');
+      if (response.success) {
+        setSlackChannels(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Slack channels:', error);
+    }
+  };
 
   // Fetch events from the API
   const fetchEvents = useCallback(async () => {
@@ -62,20 +93,31 @@ const PlannerPage: React.FC = () => {
 
   // Handle creating a new event
   const handleCreateEvent = async () => {
-    // In a real app, you would call createPlannerEvent here
-    console.log('Creating event:', newEvent);
-    // Reset form and close modal
-    setIsCreatingEvent(false);
-    setNewEvent({
-      title: '',
-      description: '',
-      start: new Date(),
-      end: new Date(new Date().setHours(new Date().getHours() + 1)),
-      allDay: false,
-      color: '#3b82f6',
-    });
-    // Refresh events
-    await fetchEvents();
+    try {
+      const eventData = {
+        ...newEvent,
+        createdBy: '', // Will be set by backend from auth
+      };
+      await createPlannerEvent(eventData as any);
+
+      // Reset form and close modal
+      setIsCreatingEvent(false);
+      setNewEvent({
+        title: '',
+        description: '',
+        start: new Date(),
+        end: new Date(new Date().setHours(new Date().getHours() + 1)),
+        allDay: false,
+        color: '#3b82f6',
+        slackChannelId: ''
+      });
+
+      // Refresh events
+      await fetchEvents();
+    } catch (error) {
+      console.error('Failed to create event:', error);
+      setError('Failed to create event. Please try again.');
+    }
   };
 
   // Generate days for the week view
@@ -386,6 +428,31 @@ const PlannerPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* Slack Channel */}
+                {hasSlackConnected && slackChannels.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">
+                      <Hash className="w-4 h-4 inline mr-1" />
+                      Slack Channel (Optional)
+                    </label>
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent focus:border-accent dark:bg-gray-700 dark:text-white"
+                      value={newEvent.slackChannelId || ''}
+                      onChange={(e) => setNewEvent({ ...newEvent, slackChannelId: e.target.value })}
+                    >
+                      <option value="">Don't post to Slack</option>
+                      {slackChannels.map((channel) => (
+                        <option key={channel.id} value={channel.id}>
+                          #{channel.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Post this event to a Slack channel when created
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 flex justify-end space-x-3">
