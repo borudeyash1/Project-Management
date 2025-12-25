@@ -311,6 +311,18 @@ export interface Project {
   createdAt: Date;
   updatedAt: Date;
   tasks?: any[]; // For storing project tasks
+  integrations?: {
+    github?: {
+      repos: Array<{
+        _id: string;
+        owner: string;
+        repo: string;
+        fullName: string;
+        autoCreateTasks: boolean;
+        syncStatus: boolean;
+      }>;
+    };
+  };
 }
 
 export interface ProjectTeamMember {

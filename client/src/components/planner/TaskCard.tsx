@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, User, MessageSquare, Paperclip, Flag, CheckCircle } from 'lucide-react';
+import { Clock, User, MessageSquare, Paperclip, Flag, CheckCircle, Github, GitPullRequest, CircleDot } from 'lucide-react';
 import { Task } from '../../context/PlannerContext';
 import { getCompletedSubtasksCount, getTotalSubtasksCount, getTaskTags, getTaskComments, getTaskAttachments, getTaskAssignees } from '../../utils/taskHelpers';
 
@@ -90,6 +90,32 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
               <Paperclip className="w-3 h-3" />
               {attachments.length}
             </span>
+          )}
+          {task.githubPr && (
+            <a
+              href={task.githubPr.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-blue-600 transition-colors group"
+              onClick={(e) => e.stopPropagation()}
+              title={`GitHub PR #${task.githubPr.number}: ${task.githubPr.title}`}
+            >
+              <GitPullRequest className={`w-3 h-3 ${task.githubPr.state === 'merged' ? 'text-purple-500' : task.githubPr.state === 'closed' ? 'text-red-500' : 'text-green-500'}`} />
+              <span className="font-mono group-hover:underline">#{task.githubPr.number}</span>
+            </a>
+          )}
+          {task.githubIssue && !task.githubPr && (
+            <a
+              href={task.githubIssue.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-blue-600 transition-colors group"
+              onClick={(e) => e.stopPropagation()}
+              title={`GitHub Issue #${task.githubIssue.number}: ${task.githubIssue.title}`}
+            >
+              <CircleDot className={`w-3 h-3 ${task.githubIssue.state === 'closed' ? 'text-purple-600' : 'text-green-600'}`} />
+              <span className="font-mono group-hover:underline">#{task.githubIssue.number}</span>
+            </a>
           )}
         </div>
 

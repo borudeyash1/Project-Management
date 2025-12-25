@@ -15,15 +15,36 @@ import {
 import { useTranslation } from 'react-i18next';
 import ProjectPageSkeleton from './ProjectPageSkeleton';
 import { ContextAIButton } from '../ai/ContextAIButton';
+import { Github, Link as LinkIcon, X as XIcon } from 'lucide-react';
+import GitHubRepoSelector from '../github/GitHubRepoSelector';
+import GitHubSyncStatus from '../github/GitHubSyncStatus';
+import { apiService } from '../../services/api';
 
 const ProjectOverview: React.FC = () => {
   const { t } = useTranslation();
-  const { state } = useApp();
+  const { state, addToast } = useApp();
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [showGitHubModal, setShowGitHubModal] = useState(false);
 
   const project = state.projects.find(p => p._id === projectId);
+
+  const handleUnlinkRepo = async (repoId: string) => {
+    try {
+      if (!window.confirm(t('project.overview.confirmUnlinkRepo') || 'Are you sure you want to unlink this repository?')) return;
+
+      const response = await apiService.delete(`/projects/${projectId}/unlink-repo/${repoId}`);
+      if (response.success) {
+        addToast('Repository unlinked successfully', 'success');
+        window.location.reload();
+      } else {
+        addToast(response.message || 'Failed to unlink repository', 'error');
+      }
+    } catch (error: any) {
+      addToast(error.message || 'Error unlinking repository', 'error');
+    }
+  };
 
   // Simulate loading for smooth skeleton display
   useEffect(() => {
@@ -249,6 +270,71 @@ const ProjectOverview: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* GitHub Integration */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <Github className="w-5 h-5 text-gray-900 dark:text-gray-100" />
+            GitHub Repositories
+          </h2>
+          <button
+            onClick={() => setShowGitHubModal(true)}
+            className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
+          >
+            <LinkIcon className="w-4 h-4" />
+            Link Repository
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {(project as any).integrations?.github?.repos && (project as any).integrations.github.repos.length > 0 ? (
+            (project as any).integrations.github.repos.map((repo: any) => (
+              <GitHubSyncStatus
+                key={repo._id}
+                repo={repo}
+                onUnlink={() => handleUnlinkRepo(repo._id)}
+                onSync={() => { }} // Placeholder for now
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+              <Github className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-600 dark:text-gray-400 font-medium">No repositories linked</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Link a GitHub repository to auto-sync tasks and PRs</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* GitHub Modal */}
+      {showGitHubModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Link GitHub Repository</h3>
+              <button onClick={() => setShowGitHubModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <XIcon className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              <GitHubRepoSelector
+                projectId={projectId!}
+                linkedRepos={(project as any).integrations?.github?.repos || []}
+                onLink={(repo) => {
+                  // Refresh project data or manually update local state
+                  // For now simply close modal or show success
+                  // But really we should reload project context. 
+                  // Since useApp handles state, we might need to fetchProject again.
+                  // But we don't have updateProject in context visible here easily without calling API.
+                  // reloadPage(); instead?
+                  window.location.reload(); // Brute force refresh for now to pick up changes
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Context-Aware AI Assistant */}
       <ContextAIButton

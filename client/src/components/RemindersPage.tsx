@@ -5,7 +5,7 @@ import {
   Star, Flag, Tag, MessageSquare, FileText, Users,
   ChevronLeft, ChevronRight, Filter, Search,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
-  Target, TrendingUp, BarChart3, List, Download, Volume2, Repeat
+  Target, TrendingUp, BarChart3, List, Download, Volume2, Repeat, Github
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
@@ -187,6 +187,7 @@ const RemindersPage: React.FC = () => {
       case 'deadline': return <AlertCircle className="w-4 h-4" />;
       case 'milestone': return <Flag className="w-4 h-4" />;
       case 'personal': return <Star className="w-4 h-4" />;
+      case 'github_review': return <Github className="w-4 h-4" />;
       default: return <Bell className="w-4 h-4" />;
     }
   };
