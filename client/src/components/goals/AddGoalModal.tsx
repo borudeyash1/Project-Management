@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Hash } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { goalService, Goal } from '../../services/goalService';
+import { apiService } from '../../services/api';
 
 interface AddGoalModalProps {
   onClose: () => void;
@@ -19,8 +20,38 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({ onClose, onSuccess }) => {
     priority: 'medium',
     startDate: new Date().toISOString().split('T')[0],
     targetDate: '',
-    tags: ''
+    tags: '',
+    slackChannelId: ''
   });
+  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string }>>([]);
+  const [hasSlackConnected, setHasSlackConnected] = useState(false);
+
+  useEffect(() => {
+    checkSlackConnection();
+  }, []);
+
+  const checkSlackConnection = async () => {
+    try {
+      const response = await apiService.get('/sartthi-accounts/slack');
+      if (response.success && response.data.accounts && response.data.accounts.length > 0) {
+        setHasSlackConnected(true);
+        fetchSlackChannels();
+      }
+    } catch (error) {
+      console.error('Failed to check Slack connection:', error);
+    }
+  };
+
+  const fetchSlackChannels = async () => {
+    try {
+      const response = await apiService.get('/slack/channels');
+      if (response.success) {
+        setSlackChannels(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Slack channels:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +82,7 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({ onClose, onSuccess }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.name')}</label>
@@ -158,6 +189,31 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({ onClose, onSuccess }) => {
               onChange={e => setFormData({ ...formData, tags: e.target.value })}
             />
           </div>
+
+          {/* Slack Channel */}
+          {hasSlackConnected && slackChannels.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <Hash className="w-4 h-4 inline mr-1" />
+                Slack Channel (Optional)
+              </label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                value={formData.slackChannelId}
+                onChange={e => setFormData({ ...formData, slackChannelId: e.target.value })}
+              >
+                <option value="">Don't post to Slack</option>
+                {slackChannels.map((channel) => (
+                  <option key={channel.id} value={channel.id}>
+                    #{channel.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Post this goal to a Slack channel when created
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 mt-6">
             <button
