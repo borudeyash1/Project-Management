@@ -1,8 +1,12 @@
 import express from 'express';
 import { authenticate } from '../middleware/auth';
 import * as sartthiAccountsController from '../controllers/sartthiAccountsController';
+import { syncExistingAccounts } from '../controllers/syncAccountsController';
 
 const router = express.Router();
+
+// Sync existing connected accounts with modules field (migration endpoint)
+router.post('/sync', authenticate, syncExistingAccounts);
 
 // Get all connected accounts for a service
 router.get('/:service', authenticate, sartthiAccountsController.getAccounts);

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import ConnectMailPage from './pages/ConnectMailPage';
 import InboxPage from './pages/InboxPage';
 import OAuthLoginPage from './pages/OAuthLoginPage';
 import { ThemeProvider } from './context/ThemeContext';
@@ -140,7 +139,27 @@ function App() {
         {isMailConnected ? (
           <InboxPage user={user} />
         ) : (
-          <ConnectMailPage user={user} />
+          <div style={{ padding: '3rem 2rem', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+            <h1 style={{ marginBottom: '1rem' }}>Connect Gmail</h1>
+            <p style={{ marginBottom: '1.5rem', color: '#999', lineHeight: '1.6' }}>
+              Connect your Gmail account from the main Sartthi application to access your emails here.
+              You can connect multiple email accounts and switch between them easily.
+            </p>
+            <div style={{
+              background: 'rgba(99, 102, 241, 0.1)',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: '8px',
+              padding: '1rem',
+              marginTop: '2rem'
+            }}>
+              <p style={{ fontSize: '0.9rem', color: '#999', marginBottom: '0.75rem' }}>
+                💡 <strong>Tip:</strong> Go to the main Sartthi app → Settings → Connected Accounts → Sartthi Mail → Connect your Gmail
+              </p>
+              <p style={{ fontSize: '0.85rem', color: '#888', fontStyle: 'italic' }}>
+                Already connected? Click "Set Active" on your account to sync it with Sartthi Mail.
+              </p>
+            </div>
+          </div>
         )}
       </ToastProvider>
     </ThemeProvider>

@@ -570,6 +570,25 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                 newAccount.isActive = true;
                 newAccount.isPrimary = true;
                 await newAccount.save();
+
+                // Sync with legacy modules field for backward compatibility
+                if (['mail', 'calendar', 'vault'].includes(service)) {
+                    if (!user.modules) user.modules = {};
+
+                    const moduleKey = service as 'mail' | 'calendar' | 'vault';
+                    if (!user.modules[moduleKey]) {
+                        user.modules[moduleKey] = {
+                            isEnabled: false,
+                            refreshToken: undefined,
+                            connectedAt: undefined,
+                            lastSyncedAt: undefined
+                        };
+                    }
+
+                    user.modules[moduleKey]!.isEnabled = true;
+                    user.modules[moduleKey]!.refreshToken = newAccount.refreshToken;
+                    user.modules[moduleKey]!.connectedAt = newAccount.createdAt;
+                }
             }
 
             await user.save();
@@ -622,6 +641,25 @@ export const setActiveAccount = async (req: Request, res: Response): Promise<voi
             const serviceAccounts = user.connectedAccounts[service as ServiceType];
             if (serviceAccounts) {
                 serviceAccounts.activeAccountId = (account._id as mongoose.Types.ObjectId).toString();
+
+                // Sync with legacy modules field for backward compatibility
+                if (['mail', 'calendar', 'vault'].includes(service)) {
+                    if (!user.modules) user.modules = {};
+
+                    const moduleKey = service as 'mail' | 'calendar' | 'vault';
+                    if (!user.modules[moduleKey]) {
+                        user.modules[moduleKey] = {
+                            isEnabled: false,
+                            refreshToken: undefined,
+                            connectedAt: undefined,
+                            lastSyncedAt: undefined
+                        };
+                    }
+
+                    user.modules[moduleKey]!.isEnabled = true;
+                    user.modules[moduleKey]!.refreshToken = account.refreshToken;
+                }
+
                 await user.save();
             }
         }
@@ -691,6 +729,7 @@ export const disconnectAccount = async (req: Request, res: Response): Promise<vo
                         const moduleService = user.modules?.[service as 'mail' | 'calendar' | 'vault'];
                         if (moduleService) {
                             moduleService.isEnabled = false;
+                            moduleService.refreshToken = null;
                         }
                     }
                 }
