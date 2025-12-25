@@ -2191,8 +2191,8 @@ const ProjectViewDetailed: React.FC = () => {
     }
 
     // Use component-level currentUserRole which is derived correctly
-    // Restrict edit to strictly workspace owner as requested
-    const canEdit = currentUserRole === 'owner';
+    // Allow workspace owner, project managers, and project creator to edit
+    const canEdit = currentUserRole === 'owner' || isProjectManager || activeProject.createdBy === state.userProfile._id;
 
     switch (activeView) {
       case 'overview':
