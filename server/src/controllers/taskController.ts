@@ -218,9 +218,11 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     // 2. Fall back to project's primary channel
     else if (projectChannels.length > 0) {
       const primaryChannel = projectChannels.find(c => c.isPrimary) || projectChannels[0];
-      targetChannelId = primaryChannel.id;
-      targetChannelName = primaryChannel.name;
-      console.log('📤 [SLACK] Using project primary channel:', targetChannelName);
+      if (primaryChannel) {
+        targetChannelId = primaryChannel.id;
+        targetChannelName = primaryChannel.name;
+        console.log('📤 [SLACK] Using project primary channel:', targetChannelName);
+      }
     }
 
     // Send notification if we have a target channel
