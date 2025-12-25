@@ -189,14 +189,22 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     }
 
     // Sartthi Integration: Slack Notification
-    if (slackChannelId) {
+    // Check if project has Slack integration configured
+    if (project && project.integrations?.slack?.channelId) {
       try {
-        const slackService = getSlackService();
-        const message = `*New Task Created: ${task.title}*\n${task.description || 'No description'}\nPriority: ${task.priority}\nDue: ${task.dueDate ? new Date(task.dueDate as any).toLocaleDateString() : 'No due date'}\n*Project:* ${project ? project.name : 'No Project'}\n<https://sartthi.com/projects/${projectId || ''}/tasks|View Task>`;
-        await slackService.postMessage(authUser._id, slackChannelId, message, undefined, slackAccountId);
+        console.log('📤 [SLACK] Sending notification to channel:', project.integrations.slack.channelName);
+        await notifySlackForTask(
+          task,
+          authUser._id,
+          project.integrations.slack.channelId,
+          slackAccountId
+        );
+        console.log('✅ [SLACK] Notification sent successfully');
       } catch (error) {
-        console.error('Failed to send Slack notification', error);
+        console.error('❌ [SLACK] Failed to send notification:', error);
       }
+    } else {
+      console.log('ℹ️ [SLACK] No Slack channel configured for this project');
     }
 
     const response: ApiResponse = {
