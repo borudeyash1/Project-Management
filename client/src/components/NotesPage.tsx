@@ -426,7 +426,10 @@ const NotesPage: React.FC = () => {
                         setContent('');
                         setIsCreatingNew(true);
                       }}
-                      className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#E6C200] hover:from-[#E6C200] hover:to-[#FFD700] text-gray-900 px-8 py-4 rounded-xl font-bold transition-all-500/30 hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
+                      }}
+                      className="flex items-center gap-2 hover:opacity-90 text-white px-8 py-4 rounded-xl font-bold transition-all hover:scale-105"
                     >
                       <Plus size={24} />
                       {t('notes.createNewNote')}
