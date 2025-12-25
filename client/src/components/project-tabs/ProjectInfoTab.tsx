@@ -401,14 +401,12 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
           {/* Slack Integration */}
           <SlackChannelSelector
             projectId={project._id}
-            currentChannelId={formData.slackChannelId}
-            currentChannelName={formData.slackChannelName}
-            onSelect={(channelId, channelName) => {
-              setFormData({ ...formData, slackChannelId: channelId, slackChannelName: channelName });
+            currentChannels={project?.integrations?.slack?.channels || []}
+            onUpdate={(channels) => {
               // Auto-save integration changes
               onUpdate({
                 integrations: {
-                  slack: { channelId, channelName }
+                  slack: { channels }
                 }
               });
             }}

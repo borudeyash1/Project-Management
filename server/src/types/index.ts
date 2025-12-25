@@ -418,8 +418,11 @@ export interface IProject extends Document {
   progress: number;
   integrations?: {
     slack?: {
-      channelId?: string;
-      channelName?: string;
+      channels?: Array<{
+        id: string;
+        name: string;
+        isPrimary: boolean;
+      }>;
     };
     github?: {
       owner?: string;

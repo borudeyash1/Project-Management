@@ -189,21 +189,38 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     }
 
     // Sartthi Integration: Slack Notification
-    // Priority: Task-level channel > Project default channel
+    // Priority: Task-level channel > Project primary channel
     let targetChannelId = null;
     let targetChannelName = null;
 
+    // Get project's configured Slack channels
+    const projectChannels = project?.integrations?.slack?.channels || [];
+
     // 1. Check if user selected a specific channel for this task
-    if (slackChannelId && slackChannelId !== 'none' && slackChannelId !== "Don't post to Slack") {
-      targetChannelId = slackChannelId;
-      targetChannelName = 'Task-specific channel';
-      console.log('📤 [SLACK] Using task-specific channel:', slackChannelId);
+    if (slackChannelId && slackChannelId !== 'none' && slackChannelId !== "Don't post to Slack" && slackChannelId !== '') {
+      // Validate that the selected channel is configured in the project
+      const selectedChannel = projectChannels.find(c => c.id === slackChannelId);
+
+      if (selectedChannel) {
+        targetChannelId = selectedChannel.id;
+        targetChannelName = selectedChannel.name;
+        console.log('📤 [SLACK] Using task-specific channel:', targetChannelName);
+      } else {
+        console.warn('⚠️ [SLACK] Selected channel not configured in project, using primary channel');
+        // Fall back to primary if selected channel is not configured
+        const primaryChannel = projectChannels.find(c => c.isPrimary);
+        if (primaryChannel) {
+          targetChannelId = primaryChannel.id;
+          targetChannelName = primaryChannel.name;
+        }
+      }
     }
-    // 2. Fall back to project's default channel
-    else if (project && project.integrations?.slack?.channelId) {
-      targetChannelId = project.integrations.slack.channelId;
-      targetChannelName = project.integrations.slack.channelName;
-      console.log('📤 [SLACK] Using project default channel:', targetChannelName);
+    // 2. Fall back to project's primary channel
+    else if (projectChannels.length > 0) {
+      const primaryChannel = projectChannels.find(c => c.isPrimary) || projectChannels[0];
+      targetChannelId = primaryChannel.id;
+      targetChannelName = primaryChannel.name;
+      console.log('📤 [SLACK] Using project primary channel:', targetChannelName);
     }
 
     // Send notification if we have a target channel
@@ -221,7 +238,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
         console.error('❌ [SLACK] Failed to send notification:', error);
       }
     } else {
-      console.log('ℹ️ [SLACK] No Slack channel configured for this task');
+      console.log('ℹ️ [SLACK] No Slack channels configured for this project');
     }
 
     const response: ApiResponse = {

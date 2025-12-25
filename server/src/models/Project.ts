@@ -117,8 +117,11 @@ const projectSchema = new Schema<IProject>({
   },
   integrations: {
     slack: {
-      channelId: String,
-      channelName: String
+      channels: [{
+        id: String,
+        name: String,
+        isPrimary: { type: Boolean, default: false }
+      }]
     },
     github: {
       owner: String,
