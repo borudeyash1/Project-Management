@@ -115,6 +115,28 @@ const projectSchema = new Schema<IProject>({
     min: 0,
     max: 100
   },
+  integrations: {
+    slack: {
+      channelId: String,
+      channelName: String
+    },
+    github: {
+      owner: String,
+      repo: String,
+      fullName: String
+    },
+    dropbox: {
+      folderId: String,
+      folderPath: String
+    },
+    notion: {
+      pageIds: [String]
+    },
+    spotify: {
+      playlistId: String,
+      playlistName: String
+    }
+  },
   settings: {
     isPublic: {
       type: Boolean,
@@ -162,98 +184,98 @@ projectSchema.index({ priority: 1 });
 projectSchema.index({ dueDate: 1 });
 
 // Virtual for completion percentage
-projectSchema.virtual('completionPercentage').get(function() {
+projectSchema.virtual('completionPercentage').get(function () {
   return this.progress || 0;
 });
 
 // Virtual for member count
-projectSchema.virtual('teamMemberCount').get(function() {
+projectSchema.virtual('teamMemberCount').get(function () {
   return this.teamMembers.length;
 });
 
 // Method to add team member
-projectSchema.methods.addTeamMember = function(userId: string, role: string = 'member') {
-  const existingMember = this.teamMembers.find((member: any) => 
+projectSchema.methods.addTeamMember = function (userId: string, role: string = 'member') {
+  const existingMember = this.teamMembers.find((member: any) =>
     member.user.toString() === userId.toString()
   );
-  
+
   if (!existingMember) {
     this.teamMembers.push({
       user: userId,
       role: role
     });
   }
-  
+
   return this.save();
 };
 
 // Method to remove team member
-projectSchema.methods.removeTeamMember = function(userId: string) {
-  this.teamMembers = this.teamMembers.filter((member: any) => 
+projectSchema.methods.removeTeamMember = function (userId: string) {
+  this.teamMembers = this.teamMembers.filter((member: any) =>
     member.user.toString() !== userId.toString()
   );
   return this.save();
 };
 
 // Method to update team member role
-projectSchema.methods.updateMemberRole = function(userId: string, role: string) {
-  const member = this.teamMembers.find((member: any) => 
+projectSchema.methods.updateMemberRole = function (userId: string, role: string) {
+  const member = this.teamMembers.find((member: any) =>
     member.user.toString() === userId.toString()
   );
-  
+
   if (member) {
     member.role = role;
   }
-  
+
   return this.save();
 };
 
 // Method to check if user is team member
-projectSchema.methods.isTeamMember = function(userId: string) {
-  return this.teamMembers.some((member: any) => 
+projectSchema.methods.isTeamMember = function (userId: string) {
+  return this.teamMembers.some((member: any) =>
     member.user.toString() === userId.toString()
   );
 };
 
 // Method to upgrade project tier and optionally link to workspace
-projectSchema.methods.upgradeTier = async function(newTier: string, workspaceId?: string) {
+projectSchema.methods.upgradeTier = async function (newTier: string, workspaceId?: string) {
   this.tier = newTier;
-  
+
   // If workspace ID is provided, link the project to the workspace
   if (workspaceId) {
     this.workspace = workspaceId;
   }
-  
+
   // Apply any tier-specific updates here
   if (newTier !== 'free' && !this.workspace) {
     throw new Error('Workspace is required for paid plans');
   }
-  
+
   return this.save();
 };
 
 // Method to check if user has permission
-projectSchema.methods.hasPermission = function(userId: string, permission: string) {
-  const member = this.teamMembers.find((member: any) => 
+projectSchema.methods.hasPermission = function (userId: string, permission: string) {
+  const member = this.teamMembers.find((member: any) =>
     member.user.toString() === userId.toString()
   );
-  
+
   if (!member) return false;
-  
+
   // Owner has all permissions
   if (member.role === 'owner') return true;
-  
+
   return member.permissions[permission] || false;
 };
 
 // Method to update progress
-projectSchema.methods.updateProgress = function() {
+projectSchema.methods.updateProgress = function () {
   // Progress is already set, just save
   return this.save();
 };
 
 // Transform JSON output
-projectSchema.methods.toJSON = function() {
+projectSchema.methods.toJSON = function () {
   const projectObject = this.toObject();
   projectObject.completionPercentage = this.completionPercentage;
   projectObject.teamMemberCount = this.teamMemberCount;

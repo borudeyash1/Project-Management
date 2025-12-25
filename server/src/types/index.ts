@@ -416,6 +416,28 @@ export interface IProject extends Document {
     currency: string;
   };
   progress: number;
+  integrations?: {
+    slack?: {
+      channelId?: string;
+      channelName?: string;
+    };
+    github?: {
+      owner?: string;
+      repo?: string;
+      fullName?: string;
+    };
+    dropbox?: {
+      folderId?: string;
+      folderPath?: string;
+    };
+    notion?: {
+      pageIds?: string[];
+    };
+    spotify?: {
+      playlistId?: string;
+      playlistName?: string;
+    };
+  };
   teamMembers: Array<{
     user: string;
     role: 'project-manager' | 'developer' | 'designer' | 'tester' | 'analyst' | 'member';

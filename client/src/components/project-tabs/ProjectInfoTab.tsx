@@ -4,6 +4,7 @@ import {
   Clock, TrendingUp, Users, FileText, AlertCircle
 } from 'lucide-react';
 import { ContextAIButton } from '../ai/ContextAIButton';
+import SlackChannelSelector from '../integrations/SlackChannelSelector';
 
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +27,9 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
     dueDate: project?.dueDate ? new Date(project.dueDate).toISOString().split('T')[0] : '',
     budgetEstimated: project?.budget?.estimated || '',
     budgetActual: project?.budget?.actual || '',
-    tags: project?.tags?.join(', ') || ''
+    tags: project?.tags?.join(', ') || '',
+    slackChannelId: project?.integrations?.slack?.channelId || '',
+    slackChannelName: project?.integrations?.slack?.channelName || ''
   });
 
   const handleSave = () => {
@@ -43,7 +46,13 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
         actual: parseFloat(formData.budgetActual) || 0,
         currency: 'USD'
       },
-      tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)
+      tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
+      integrations: {
+        slack: {
+          channelId: formData.slackChannelId,
+          channelName: formData.slackChannelName
+        }
+      }
     };
 
     onUpdate(updates);
@@ -61,7 +70,9 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       dueDate: project?.dueDate ? new Date(project.dueDate).toISOString().split('T')[0] : '',
       budgetEstimated: project?.budget?.estimated || '',
       budgetActual: project?.budget?.actual || '',
-      tags: project?.tags?.join(', ') || ''
+      tags: project?.tags?.join(', ') || '',
+      slackChannelId: project?.integrations?.slack?.channelId || '',
+      slackChannelName: project?.integrations?.slack?.channelName || ''
     });
     setIsEditing(false);
   };
@@ -380,6 +391,29 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
               {t('project.info.membersCount', { count: project.team?.length || project.teamMemberCount || 0 })}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Integrations Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Integrations</h3>
+        <div className="space-y-6">
+          {/* Slack Integration */}
+          <SlackChannelSelector
+            projectId={project._id}
+            currentChannelId={formData.slackChannelId}
+            currentChannelName={formData.slackChannelName}
+            onSelect={(channelId, channelName) => {
+              setFormData({ ...formData, slackChannelId: channelId, slackChannelName: channelName });
+              // Auto-save integration changes
+              onUpdate({
+                integrations: {
+                  slack: { channelId, channelName }
+                }
+              });
+            }}
+            canEdit={canEdit}
+          />
         </div>
       </div>
 
