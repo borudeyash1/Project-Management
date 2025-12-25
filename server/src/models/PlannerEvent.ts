@@ -21,6 +21,7 @@ export interface IPlannerEvent extends Document {
   createdBy: Schema.Types.ObjectId;
   participants: IPlannerParticipant[];
   reminders: IPlannerReminder[];
+  slackChannelId?: string;
   deadlineNotifiedAt?: Date;
 }
 
@@ -94,6 +95,10 @@ const plannerEventSchema = new Schema<IPlannerEvent>(
     reminders: {
       type: [reminderSchema],
       default: [],
+    },
+    slackChannelId: {
+      type: String,
+      trim: true,
     },
     deadlineNotifiedAt: {
       type: Date,

@@ -68,58 +68,40 @@ export async function notifySlackForTask(
 
 /**
  * Send Slack notification when task is completed
- * @param task - The completed task
- * @param userId - ID of the user who completed the task
  */
 export async function notifySlackTaskCompleted(task: any, userId: string) {
     const slackService = getSlackService();
 
     try {
-        // Notify the task reporter if they have Slack connected
-        if (task.reporter && task.reporter.toString() !== userId.toString()) {
-            const reporterSlackAccount = await ConnectedAccount.findOne({
-                userId: task.reporter,
-                service: 'slack',
-                isActive: true
-            });
+        // Get user's connected Slack account
+        const slackAccount = await ConnectedAccount.findOne({
+            userId,
+            service: 'slack',
+            isActive: true
+        });
 
-            if (reporterSlackAccount) {
-                const slackUserId = (reporterSlackAccount as any).metadata?.user?.id;
-                const completedBy = await User.findById(userId);
+        if (!slackAccount) return;
 
-                if (slackUserId) {
-                    const blocks = [
-                        {
-                            type: 'section',
-                            text: {
-                                type: 'mrkdwn',
-                                text: `✅ *Task Completed: ${task.title}*\nCompleted by: ${(completedBy as any)?.name || 'Unknown'}`
-                            }
-                        },
-                        {
-                            type: 'actions',
-                            elements: [
-                                {
-                                    type: 'button',
-                                    text: {
-                                        type: 'plain_text',
-                                        text: 'View in Sartthi'
-                                    },
-                                    url: `${process.env.CLIENT_URL}/tasks/${task._id}`
-                                }
-                            ]
-                        }
-                    ];
+        const slackUserId = (slackAccount as any).metadata?.user?.id;
+        if (!slackUserId) return;
 
-                    await slackService.postMessage(
-                        task.reporter.toString(),
-                        slackUserId,
-                        `Task completed: ${task.title}`,
-                        blocks
-                    );
+        const message = `✅ Task completed: *${task.title}*`;
+        const blocks = [
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: message
                 }
             }
-        }
+        ];
+
+        await slackService.postMessage(
+            userId,
+            slackUserId,
+            message,
+            blocks
+        );
     } catch (error) {
         console.error('Failed to send task completion notification:', error);
     }
@@ -127,77 +109,239 @@ export async function notifySlackTaskCompleted(task: any, userId: string) {
 
 /**
  * Send Slack notification when task is updated
- * @param task - The updated task
- * @param userId - ID of the user who updated the task
- * @param changes - Description of what changed
  */
-export async function notifySlackTaskUpdated(
-    task: any,
+export async function notifySlackTaskUpdated(task: any, userId: string, changes: string) {
+    const slackService = getSlackService();
+
+    try {
+        // Get task assignee's Slack account
+        if (!task.assignee || task.assignee.toString() === userId.toString()) {
+            return; // Don't notify if no assignee or if assignee is the one making changes
+        }
+
+        const slackAccount = await ConnectedAccount.findOne({
+            userId: task.assignee,
+            service: 'slack',
+            isActive: true
+        });
+
+        if (!slackAccount) return;
+
+        const slackUserId = (slackAccount as any).metadata?.user?.id;
+        if (!slackUserId) return;
+
+        const message = `📝 Task updated: *${task.title}*\nChanges: ${changes}`;
+        const blocks = [
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: message
+                }
+            }
+        ];
+
+        await slackService.postMessage(
+            task.assignee.toString(),
+            slackUserId,
+            message,
+            blocks
+        );
+    } catch (error) {
+        console.error('Failed to send task update notification:', error);
+    }
+}
+
+/**
+ * Send Slack notification for a reminder
+ */
+export async function notifySlackForReminder(
+    reminder: any,
     userId: string,
-    changes: string
+    channelId?: string
 ) {
     const slackService = getSlackService();
 
     try {
-        // Notify assignee if they have Slack connected and they're not the one who updated
-        if (task.assignee && task.assignee.toString() !== userId.toString()) {
-            const assigneeSlackAccount = await ConnectedAccount.findOne({
-                userId: task.assignee,
-                service: 'slack',
-                isActive: true
-            });
+        if (!channelId) return;
 
-            if (assigneeSlackAccount) {
-                const slackUserId = (assigneeSlackAccount as any).metadata?.user?.id;
-                const updatedBy = await User.findById(userId);
-
-                if (slackUserId) {
-                    const blocks = [
-                        {
-                            type: 'section',
-                            text: {
-                                type: 'mrkdwn',
-                                text: `📝 *Task Updated: ${task.title}*\nUpdated by: ${(updatedBy as any)?.name || 'Unknown'}\nChanges: ${changes}`
-                            }
-                        },
-                        {
-                            type: 'section',
-                            fields: [
-                                {
-                                    type: 'mrkdwn',
-                                    text: `*Status:*\n${task.status}`
-                                },
-                                {
-                                    type: 'mrkdwn',
-                                    text: `*Priority:*\n${task.priority}`
-                                }
-                            ]
-                        },
-                        {
-                            type: 'actions',
-                            elements: [
-                                {
-                                    type: 'button',
-                                    text: {
-                                        type: 'plain_text',
-                                        text: 'View in Sartthi'
-                                    },
-                                    url: `${process.env.CLIENT_URL}/tasks/${task._id}`
-                                }
-                            ]
-                        }
-                    ];
-
-                    await slackService.postMessage(
-                        task.assignee.toString(),
-                        slackUserId,
-                        `Task updated: ${task.title}`,
-                        blocks
-                    );
+        const message = `🔔 *Reminder: ${reminder.title}*`;
+        const blocks = [
+            {
+                type: 'header',
+                text: {
+                    type: 'plain_text',
+                    text: '🔔 New Reminder',
+                    emoji: true
                 }
+            },
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: `*${reminder.title}*\n${reminder.description || '_No description_'}`
+                }
+            },
+            {
+                type: 'divider'
+            },
+            {
+                type: 'section',
+                fields: [
+                    {
+                        type: 'mrkdwn',
+                        text: `📅 *Due Date*\n${new Date(reminder.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                    },
+                    {
+                        type: 'mrkdwn',
+                        text: `⚡ *Priority*\n${reminder.priority.charAt(0).toUpperCase() + reminder.priority.slice(1)}`
+                    },
+                    {
+                        type: 'mrkdwn',
+                        text: `📋 *Type*\n${reminder.type.charAt(0).toUpperCase() + reminder.type.slice(1)}`
+                    }
+                ]
             }
-        }
+        ];
+
+        await slackService.postMessage(
+            userId,
+            channelId,
+            message,
+            blocks
+        );
     } catch (error) {
-        console.error('Failed to send task update notification:', error);
+        console.error('Failed to send reminder Slack notification:', error);
+    }
+}
+
+/**
+ * Send Slack notification for a goal
+ */
+export async function notifySlackForGoal(
+    goal: any,
+    userId: string,
+    channelId?: string
+) {
+    const slackService = getSlackService();
+
+    try {
+        if (!channelId) return;
+
+        const message = `🎯 *Goal: ${goal.title}*`;
+        const blocks = [
+            {
+                type: 'header',
+                text: {
+                    type: 'plain_text',
+                    text: '🎯 New Goal Created',
+                    emoji: true
+                }
+            },
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: `*${goal.title}*\n${goal.description || '_No description_'}`
+                }
+            },
+            {
+                type: 'divider'
+            },
+            {
+                type: 'section',
+                fields: [
+                    {
+                        type: 'mrkdwn',
+                        text: `📊 *Progress*\n${goal.progress}%`
+                    },
+                    {
+                        type: 'mrkdwn',
+                        text: `⚡ *Priority*\n${goal.priority.charAt(0).toUpperCase() + goal.priority.slice(1)}`
+                    },
+                    {
+                        type: 'mrkdwn',
+                        text: `📅 *Target Date*\n${new Date(goal.targetDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                    },
+                    {
+                        type: 'mrkdwn',
+                        text: `🏷️ *Category*\n${goal.category.charAt(0).toUpperCase() + goal.category.slice(1)}`
+                    }
+                ]
+            }
+        ];
+
+        await slackService.postMessage(
+            userId,
+            channelId,
+            message,
+            blocks
+        );
+    } catch (error) {
+        console.error('Failed to send goal Slack notification:', error);
+    }
+}
+
+/**
+ * Send Slack notification for a planner event
+ */
+export async function notifySlackForPlannerEvent(
+    event: any,
+    userId: string,
+    channelId?: string
+) {
+    const slackService = getSlackService();
+
+    try {
+        if (!channelId) return;
+
+        const message = `📅 *Event: ${event.title}*`;
+        const startDate = new Date(event.start);
+        const endDate = event.end ? new Date(event.end) : null;
+
+        const blocks = [
+            {
+                type: 'header',
+                text: {
+                    type: 'plain_text',
+                    text: '📅 New Event Scheduled',
+                    emoji: true
+                }
+            },
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: `*${event.title}*\n${event.description || '_No description_'}`
+                }
+            },
+            {
+                type: 'divider'
+            },
+            {
+                type: 'section',
+                fields: [
+                    {
+                        type: 'mrkdwn',
+                        text: `🕐 *Start*\n${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                    },
+                    {
+                        type: 'mrkdwn',
+                        text: endDate
+                            ? `🕐 *End*\n${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                            : `📌 *All Day*\n${event.allDay ? 'Yes' : 'No'}`
+                    }
+                ]
+            }
+        ];
+
+        await slackService.postMessage(
+            userId,
+            channelId,
+            message,
+            blocks
+        );
+    } catch (error) {
+        console.error('Failed to send planner event Slack notification:', error);
     }
 }
