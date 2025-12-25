@@ -37,7 +37,7 @@ const SCOPES = {
     github: ['repo', 'user'],
     dropbox: [],
     onedrive: ['Files.ReadWrite.All', 'offline_access'],
-    figma: ['file_read'],
+    figma: ['file_content:read'],
     notion: [], // Notion uses internal integration tokens usually, or specific flow
     zoom: ['meeting:write:admin'],
     vercel: [],
