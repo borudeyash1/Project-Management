@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Reminder } from '../models/Reminder';
 import { scheduleReminderTrigger } from '../services/reminderScheduler';
+import { notifySlackForReminder } from '../utils/slackNotifications';
 
 // Create a new reminder
 export const createReminder = async (req: Request, res: Response) => {
@@ -45,6 +46,15 @@ export const createReminder = async (req: Request, res: Response) => {
             }
           });
         }
+      }
+    }
+
+    // Send Slack notification if channel is configured
+    if (reminder.slackChannelId) {
+      try {
+        await notifySlackForReminder(reminder, userId, reminder.slackChannelId);
+      } catch (error) {
+        console.error('Failed to send Slack notification for reminder:', error);
       }
     }
 

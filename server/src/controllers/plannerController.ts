@@ -4,6 +4,7 @@ import PlannerEvent, { IPlannerEvent, IPlannerParticipant } from '../models/Plan
 import { AuthenticatedRequest } from '../types';
 import { sendEmail } from '../services/emailService';
 import { scheduleReminderTrigger, clearReminderTriggers } from '../services/reminderScheduler';
+import { notifySlackForPlannerEvent } from '../utils/slackNotifications';
 
 const formatDateTime = (value?: Date | string) => {
   if (!value) return 'N/A';
@@ -201,6 +202,15 @@ export const createPlannerEvent = async (req: AuthenticatedRequest, res: Respons
       `,
       userId.toString(),
     );
+
+    // Send Slack notification if channel is configured
+    if (event.slackChannelId) {
+      try {
+        await notifySlackForPlannerEvent(event, userId.toString(), event.slackChannelId);
+      } catch (error) {
+        console.error('Failed to send Slack notification for planner event:', error);
+      }
+    }
 
     res.status(201).json({ success: true, data: event });
   } catch (error) {
