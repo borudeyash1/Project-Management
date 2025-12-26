@@ -71,7 +71,7 @@ const GitHubRepoSelector: React.FC<GitHubRepoSelectorProps> = ({
     const handleLinkRepo = async (repo: GitHubRepo) => {
         setLinking(repo.id);
         try {
-            const response = await apiService.post(`/projects/${projectId}/link-repo`, {
+            const response = await apiService.post(`/github/projects/${projectId}/link-repo`, {
                 owner: repo.owner.login,
                 repo: repo.name,
                 autoCreateTasks: true,

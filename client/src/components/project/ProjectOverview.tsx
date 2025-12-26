@@ -35,7 +35,7 @@ const ProjectOverview: React.FC = () => {
     try {
       if (!window.confirm(t('project.overview.confirmUnlinkRepo') || 'Are you sure you want to unlink this repository?')) return;
 
-      const response = await apiService.delete(`/projects/${projectId}/unlink-repo/${repoId}`);
+      const response = await apiService.delete(`/github/projects/${projectId}/unlink-repo/${repoId}`);
       if (response.success) {
         addToast('Repository unlinked successfully', 'success');
         window.location.reload();
