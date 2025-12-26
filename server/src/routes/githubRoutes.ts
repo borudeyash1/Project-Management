@@ -1,6 +1,7 @@
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { getGitHubService } from '../services/sartthi/githubService';
+import { authenticate } from '../middleware/auth';
 import {
     linkRepoToProject,
     unlinkRepoFromProject,
@@ -12,6 +13,9 @@ import {
 
 const router = express.Router();
 
+// Apply authentication to all routes
+router.use(authenticate);
+
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100 // limit each IP to 100 requests per windowMs
@@ -20,7 +24,7 @@ const apiLimiter = rateLimit({
 // Get user's repositories
 router.get('/repos', apiLimiter, async (req, res) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = (req as any).user._id;
         const githubService = getGitHubService();
         const accountId = req.query.accountId as string;
         const repos = await githubService.getRepositories(String(userId), accountId);
@@ -42,7 +46,7 @@ router.get('/repos', apiLimiter, async (req, res) => {
 // Get pull requests for a repo
 router.get('/repos/:owner/:repo/pulls', apiLimiter, async (req, res) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = (req as any).user._id;
         const { owner, repo } = req.params;
         const accountId = req.query.accountId as string;
 

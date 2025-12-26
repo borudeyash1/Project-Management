@@ -9,7 +9,7 @@ export const linkRepoToProject = async (req: Request, res: Response) => {
     try {
         const { projectId } = req.params;
         const { owner, repo, autoCreateTasks, syncStatus } = req.body;
-        const userId = (req as any).user.id;
+        const userId = (req as any).user._id;
 
         const project = await Project.findById(projectId);
         if (!project) {
@@ -80,7 +80,7 @@ export const linkRepoToProject = async (req: Request, res: Response) => {
 export const unlinkRepoFromProject = async (req: Request, res: Response) => {
     try {
         const { projectId, repoId } = req.params;
-        const userId = (req as any).user.id; // Permission check needed
+        const userId = (req as any).user._id; // Permission check needed
 
         const project = await Project.findById(projectId);
         if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
@@ -131,7 +131,7 @@ export const linkPrToTask = async (req: Request, res: Response) => {
     try {
         const { taskId } = req.params;
         const { owner, repo, number, enableSync } = req.body;
-        const userId = (req as any).user.id;
+        const userId = (req as any).user._id;
 
         const task = await Task.findById(taskId);
         if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
@@ -167,7 +167,7 @@ export const createIssueFromTask = async (req: Request, res: Response) => {
     try {
         const { taskId } = req.params;
         const { repoId, title, body } = req.body; // repoId is ID of linked repo in project
-        const userId = (req as any).user.id;
+        const userId = (req as any).user._id;
 
         const task = await Task.findById(taskId).populate('project');
         if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
@@ -204,7 +204,7 @@ export const createIssueFromTask = async (req: Request, res: Response) => {
 export const getRecentCommits = async (req: Request, res: Response) => {
     try {
         const { projectId, author, limit = 20 } = req.query;
-        const userId = (req as any).user.id;
+        const userId = (req as any).user._id;
 
         const project = await Project.findById(projectId);
         if (!project) {
