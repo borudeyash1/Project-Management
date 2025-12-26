@@ -88,30 +88,41 @@ export const getSlackService = () => {
     ) => {
         const blocks = [
             {
+                type: 'header',
+                text: {
+                    type: 'plain_text',
+                    text: '📋 New Task Created',
+                    emoji: true
+                }
+            },
+            {
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text: `*${task.title}*\n${task.description || 'No description'}`
+                    text: `*${task.title}*\n${task.description || '_No description provided_'}`
                 }
+            },
+            {
+                type: 'divider'
             },
             {
                 type: 'section',
                 fields: [
                     {
                         type: 'mrkdwn',
-                        text: `*Status:*\n${task.status}`
+                        text: `📊 *Status*\n${task.status.charAt(0).toUpperCase() + task.status.slice(1)}`
                     },
                     {
                         type: 'mrkdwn',
-                        text: `*Priority:*\n${task.priority}`
+                        text: `⚡ *Priority*\n${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}`
                     },
                     {
                         type: 'mrkdwn',
-                        text: `*Assignee:*\n${task.assignee?.name || 'Unassigned'}`
+                        text: `👤 *Assignee*\n${task.assignee?.fullName || task.assignee?.name || 'Unassigned'}`
                     },
                     {
                         type: 'mrkdwn',
-                        text: `*Due Date:*\n${new Date(task.dueDate).toLocaleDateString()}`
+                        text: `📅 *Due Date*\n${task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'No due date'}`
                     }
                 ]
             },
@@ -122,7 +133,8 @@ export const getSlackService = () => {
                         type: 'button',
                         text: {
                             type: 'plain_text',
-                            text: 'Mark Complete'
+                            text: '✅ Mark Complete',
+                            emoji: true
                         },
                         style: 'primary',
                         value: `complete_${task._id}`,
@@ -132,7 +144,8 @@ export const getSlackService = () => {
                         type: 'button',
                         text: {
                             type: 'plain_text',
-                            text: 'Add Comment'
+                            text: '💬 Add Comment',
+                            emoji: true
                         },
                         value: `comment_${task._id}`,
                         action_id: 'task_comment'
@@ -141,7 +154,8 @@ export const getSlackService = () => {
                         type: 'button',
                         text: {
                             type: 'plain_text',
-                            text: 'View in Sartthi'
+                            text: 'View in Sartthi →',
+                            emoji: true
                         },
                         url: `${process.env.CLIENT_URL}/tasks/${task._id}`,
                         action_id: 'task_view'
@@ -150,7 +164,7 @@ export const getSlackService = () => {
             }
         ];
 
-        return postMessage(userId, channelId, `Task Update: ${task.title}`, blocks, accountId);
+        return postMessage(userId, channelId, `📋 New Task: ${task.title}`, blocks, accountId);
     };
 
     // New: Get user info

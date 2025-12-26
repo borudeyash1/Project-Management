@@ -24,6 +24,35 @@ export interface Task {
   attachments: any[];
   createdAt: Date;
   updatedAt: Date;
+  githubPr?: {
+    id: number;
+    url: string;
+    number: number;
+    title: string;
+    state: string;
+    repo: {
+      owner: string;
+      name: string;
+    };
+    author: {
+      login: string;
+      avatarUrl: string;
+    };
+    syncEnabled: boolean;
+  };
+  githubIssue?: {
+    id: number;
+    url: string;
+    number: number;
+    title: string;
+    state: string;
+    repo: {
+      owner: string;
+      name: string;
+    };
+    syncEnabled: boolean;
+  };
+  autoCreated?: boolean;
 }
 
 export interface Subtask {
@@ -212,7 +241,7 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
     globalTasks = updatedTasks;
     setTasks([...updatedTasks]);
-    
+
     // Then sync with server
     try {
       await apiService.put(`/tasks/${taskId}`, updates);
@@ -235,7 +264,7 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
     globalTasks = updatedTasks;
     setTasks([...updatedTasks]);
-    
+
     // Then sync with server
     try {
       await apiService.put(`/tasks/${taskId}`, { status: newStatus });
@@ -266,14 +295,14 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
       const updatedSubtasks = task.subtasks.map(st =>
         st._id === subtaskId ? { ...st, completed: !st.completed } : st
       );
-      
+
       // Update local state immediately for instant UI feedback
       const updatedTasks = tasks.map(t =>
         t._id === taskId ? { ...t, subtasks: updatedSubtasks } : t
       );
       globalTasks = updatedTasks;
       setTasks([...updatedTasks]);
-      
+
       // Then sync with server
       try {
         await apiService.put(`/tasks/${taskId}`, { subtasks: updatedSubtasks });

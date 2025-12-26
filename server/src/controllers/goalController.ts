@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Goal } from '../models/Goal';
+import { notifySlackForGoal } from '../utils/slackNotifications';
 
 // Create a new goal
 export const createGoal = async (req: Request, res: Response) => {
@@ -14,6 +15,15 @@ export const createGoal = async (req: Request, res: Response) => {
 
     const goal = new Goal(goalData);
     await goal.save();
+
+    // Send Slack notification if channel is configured
+    if (goal.slackChannelId) {
+      try {
+        await notifySlackForGoal(goal, userId, goal.slackChannelId);
+      } catch (error) {
+        console.error('Failed to send Slack notification for goal:', error);
+      }
+    }
 
     res.status(201).json({
       success: true,

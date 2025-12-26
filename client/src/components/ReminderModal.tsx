@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   X, Calendar, Clock, Bell, Tag, Users, MapPin, Link as LinkIcon,
-  Repeat, Paperclip, FileText, AlertCircle, Plus, Trash2
+  Repeat, Paperclip, FileText, AlertCircle, Plus, Trash2, Hash
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { apiService } from '../services/api';
 
 interface Reminder {
   _id?: string;
@@ -41,6 +42,7 @@ interface Reminder {
     size: number;
   }>;
   notes?: string;
+  slackChannelId?: string;
 }
 
 interface ReminderModalProps {
@@ -73,12 +75,30 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
     location: reminder?.location || '',
     meetingLink: reminder?.meetingLink || '',
     notes: reminder?.notes || '',
-    completed: reminder?.completed || false
+    completed: reminder?.completed || false,
+    slackChannelId: reminder?.slackChannelId || ''
   });
 
   const [newTag, setNewTag] = useState('');
   const [showRecurring, setShowRecurring] = useState(!!reminder?.recurring);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string }>>([]);
+
+  useEffect(() => {
+    fetchSlackChannels();
+  }, []);
+
+  const fetchSlackChannels = async () => {
+    try {
+      const response = await apiService.get('/slack/channels');
+      if (response.success && response.data) {
+        setSlackChannels(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Slack channels:', error);
+      // Silently fail - just don't show Slack option
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -468,6 +488,39 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
               </div>
             )}
           </div>
+
+          {/* Slack Channel */}
+          {slackChannels.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Hash className="w-4 h-4 inline mr-1" />
+                Slack Channel (Optional)
+              </label>
+              <select
+                value={formData.slackChannelId || ''}
+                onChange={(e) => setFormData({ ...formData, slackChannelId: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+              >
+                <option value="">Don't post to Slack</option>
+                {slackChannels.map((channel) => (
+                  <option key={channel.id} value={channel.id}>
+                    #{channel.name}
+                  </option>
+                ))}
+              </select>
+              {formData.slackChannelId && (
+                <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                  <Hash className="w-3 h-3" />
+                  <span>
+                    Will post to: <strong>#{slackChannels.find(c => c.id === formData.slackChannelId)?.name}</strong>
+                  </span>
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Post this reminder to a Slack channel when created
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">

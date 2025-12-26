@@ -158,7 +158,42 @@ const taskSchema: Schema<any> = new Schema<any>(
       number: Number,
       title: String,
       url: String,
-      state: String,
+      state: {
+        type: String,
+        enum: ['open', 'closed', 'merged'],
+      },
+      repo: String,  // owner/repo format
+      author: String,  // GitHub username
+      createdAt: Date,
+      updatedAt: Date,
+      syncEnabled: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    githubIssue: {
+      id: Number,
+      number: Number,
+      title: String,
+      url: String,
+      state: {
+        type: String,
+        enum: ['open', 'closed'],
+      },
+      repo: String,  // owner/repo format
+      syncEnabled: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    autoCreated: {
+      type: Boolean,
+      default: false,
+    },
+    autoCreatedFrom: {
+      type: String,
+      enum: ['github-pr', 'github-issue', 'slack', null],
+      default: null,
     },
     attachments: [
       {

@@ -59,7 +59,6 @@ const AICacheSchema: Schema = new Schema(
         expiresAt: {
             type: Date,
             required: true,
-            index: true,
         },
     },
     {

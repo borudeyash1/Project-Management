@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Calendar, Clock, Flag, Users, MapPin, Link as LinkIcon, FileText, Tag } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, Flag, Users, MapPin, Link as LinkIcon, FileText, Tag, Github } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ReminderCardProps {
@@ -78,6 +78,14 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
         return '#6b7280';
     }
   };
+
+  const getGitHubUrl = (text?: string) => {
+    if (!text) return null;
+    const match = text.match(/https:\/\/github\.com\/[^\s]+/);
+    return match ? match[0] : null;
+  };
+
+  const githubUrl = getGitHubUrl(reminder.description) || getGitHubUrl(reminder.notes);
 
   return (
     <div className="w-full max-w-[240px] h-80" style={{ perspective: '1000px' }}>
@@ -252,6 +260,22 @@ const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onToggleComplete,
                   onClick={(e) => e.stopPropagation()}
                 >
                   {t('reminders.meetingLink')}
+                </a>
+              </div>
+            )}
+
+            {/* GitHub Link */}
+            {(reminder.type === 'github_review' || githubUrl) && githubUrl && (
+              <div className="flex items-center gap-2 mt-2">
+                <Github className="w-4 h-4" />
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800 text-xs truncate"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View on GitHub
                 </a>
               </div>
             )}

@@ -117,13 +117,39 @@ const projectSchema = new Schema<IProject>({
   },
   integrations: {
     slack: {
-      channelId: String,
-      channelName: String
+      channels: [{
+        id: String,
+        name: String,
+        isPrimary: { type: Boolean, default: false }
+      }]
     },
     github: {
-      owner: String,
-      repo: String,
-      fullName: String
+      repos: [{
+        owner: String,
+        repo: String,
+        fullName: String,  // owner/repo format
+        autoCreateTasks: {
+          type: Boolean,
+          default: true,
+        },
+        syncStatus: {
+          type: Boolean,
+          default: true,
+        },
+        webhookId: String,  // GitHub webhook ID
+        linkedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        lastSyncAt: Date,
+        syncErrors: [{
+          message: String,
+          timestamp: {
+            type: Date,
+            default: Date.now,
+          },
+        }],
+      }],
     },
     dropbox: {
       folderId: String,

@@ -19,14 +19,14 @@ const isEmailConfigured = Boolean(smtpHost && smtpPort && smtpUser && smtpPasswo
 // Only create transporter if email is configured
 const transporter = isEmailConfigured
   ? nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
-      auth: {
-        user: smtpUser,
-        pass: smtpPassword,
-      },
-    })
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,
+    auth: {
+      user: smtpUser,
+      pass: smtpPassword,
+    },
+  })
   : null;
 
 interface EmailOptions {
@@ -58,6 +58,38 @@ const reserveEmailQuota = async (units: number) => {
   }
 };
 
+const userEmailStats = new Map<string, { count: number; lastSent: number; date: string }>();
+
+const checkUserRateLimit = (email: string) => {
+  const now = Date.now();
+  const today = new Date().toISOString().split('T')[0] || '';
+  const maxEmailsPerDay = 50; // Per user limit
+  const minInterval = 60000; // 1 minute between emails
+
+  // Initialize or reset if new day
+  const currentStats = userEmailStats.get(email);
+  if (!currentStats || currentStats.date !== today) {
+    userEmailStats.set(email, { count: 0, lastSent: 0, date: today });
+  }
+
+  const stats = userEmailStats.get(email)!;
+
+  // Check limits
+  if (stats.count >= maxEmailsPerDay) {
+    throw new Error(`Daily email limit reached for ${email}. Please try again tomorrow.`);
+  }
+
+  if (stats.lastSent > 0 && now - stats.lastSent < minInterval) {
+    const waitSeconds = Math.ceil((minInterval - (now - stats.lastSent)) / 1000);
+    throw new Error(`Please wait ${waitSeconds} seconds before sending another email.`);
+  }
+
+  // Update stats
+  stats.count++;
+  stats.lastSent = now;
+  userEmailStats.set(email, stats);
+};
+
 export const sendEmail = async (options: EmailOptions) => {
   try {
     console.log('🔍 [DEBUG] Email service called with options:', {
@@ -65,7 +97,7 @@ export const sendEmail = async (options: EmailOptions) => {
       subject: options.subject,
       from: emailFrom
     });
-    
+
     console.log('🔍 [DEBUG] Email configuration:', {
       SMTP_HOST: smtpHost || 'not set',
       SMTP_PORT: smtpPort || 'not set',
@@ -73,7 +105,7 @@ export const sendEmail = async (options: EmailOptions) => {
       SMTP_SECURE: smtpSecure,
       isConfigured: isEmailConfigured
     });
-    
+
     // If email is not configured, log warning and skip sending
     if (!isEmailConfigured || !transporter) {
       console.warn('⚠️ [DEBUG] Email service not configured. Skipping email send.');
@@ -82,8 +114,16 @@ export const sendEmail = async (options: EmailOptions) => {
     }
 
     const toList = Array.isArray(options.to) ? options.to : [options.to];
+
+    // Check user rate limits
+    // Note: If multiple recipients, we check each one. If any fail, we ideally abort or warn.
+    // For simplicity, we check the first one if it's a single user email (common case).
+    if (!Array.isArray(options.to)) {
+      checkUserRateLimit(options.to);
+    }
+
     await reserveEmailQuota(toList.length);
-    
+
     const mailOptions = {
       from: emailFromName ? `${emailFromName} <${emailFrom}>` : emailFrom,
       to: options.to,
@@ -101,6 +141,10 @@ export const sendEmail = async (options: EmailOptions) => {
       code: error?.code || 'Unknown code',
       response: error?.response || 'No response'
     });
+    // Propagate rate limit errors with specific message
+    if (error.message.includes('Daily email limit') || error.message.includes('Please wait')) {
+      throw error;
+    }
     throw new Error('Failed to send email');
   }
 };

@@ -53,44 +53,26 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   /* Slack Integration State */
   const [slackAccounts, setSlackAccounts] = useState<any[]>([]);
   const [selectedSlackAccount, setSelectedSlackAccount] = useState<string | null>(null);
-  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string; isPrivate: boolean }>>([]);
+  const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string; isPrimary: boolean }>>([]);
   const [selectedSlackChannel, setSelectedSlackChannel] = useState('');
 
   useEffect(() => {
     if (isOpen) {
-      fetchSlackAccounts().then(() => fetchSlackChannels());
+      fetchProjectChannels();
     }
-  }, [isOpen]);
+  }, [isOpen, projectId]);
 
-  const fetchSlackAccounts = async () => {
+  const fetchProjectChannels = async () => {
     try {
-      const response = await apiService.get('/sartthi-accounts/slack');
-      if (response.success && response.data.accounts) {
-        setSlackAccounts(response.data.accounts);
-        // Default to active account or first one
-        const active = response.data.activeAccount;
-        if (active) setSelectedSlackAccount(active._id);
-        else if (response.data.accounts.length > 0) setSelectedSlackAccount(response.data.accounts[0]._id);
+      // Fetch project details to get configured Slack channels
+      const response = await apiService.get(`/projects/${projectId}`);
+      if (response.success && response.data.integrations?.slack?.channels) {
+        setSlackChannels(response.data.integrations.slack.channels);
+      } else {
+        setSlackChannels([]);
       }
     } catch (error) {
-      console.error('Failed to fetch Slack accounts:', error);
-    }
-  };
-
-  const fetchSlackChannels = async (accountId?: string) => {
-    try {
-      const targetAccount = accountId || selectedSlackAccount;
-      // Wait for state update if targetAccount is null but accounts exist (initial load race condition handling)
-      // Actually best to pass it explicitly from the change handler
-
-      const url = targetAccount ? `/slack/channels?accountId=${targetAccount}` : '/slack/channels';
-      const response = await apiService.get(url);
-
-      if (response.success) {
-        setSlackChannels(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch Slack channels:', error);
+      console.error('Failed to fetch project Slack channels:', error);
       setSlackChannels([]);
     }
   };
@@ -310,18 +292,36 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 <User className="w-4 h-4 inline mr-1" />
                 {t('taskCreation.assignTo')} <span className="text-red-500">*</span>
               </label>
-              <select
-                value={taskData.assigneeId}
-                onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-              >
-                <option value="">{t('taskCreation.selectMember')}</option>
-                {teamMembers.map((member) => (
-                  <option key={member._id} value={member._id}>
-                    {member.name} - {member.role}
-                  </option>
-                ))}
-              </select>
+              {teamMembers.length > 0 ? (
+                <select
+                  value={taskData.assigneeId}
+                  onChange={(e) => setTaskData({ ...taskData, assigneeId: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
+                >
+                  <option value="">{t('taskCreation.selectMember')}</option>
+                  {teamMembers.map((member) => (
+                    <option key={member._id} value={member._id}>
+                      {member.name} - {member.role}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <div className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-sm">
+                    No team members available
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = `/project/${projectId}/team`;
+                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Team Members
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
@@ -452,34 +452,10 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               )}
             </div>
           </div>
-        </div>
 
-        {/* Slack Channel Selection */}
-        {(slackChannels.length > 0 || slackAccounts.length > 0) && (
-          <div className="space-y-3">
-            {/* Account Selector if multiple accounts exist */}
-            {slackAccounts.length > 1 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Select Slack Workspace
-                </label>
-                <select
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
-                  value={selectedSlackAccount || ''}
-                  onChange={(e) => {
-                    setSelectedSlackAccount(e.target.value);
-                    fetchSlackChannels(e.target.value);
-                  }}
-                >
-                  {slackAccounts.map(acc => (
-                    <option key={acc._id} value={acc._id}>
-                      {acc.providerName} ({acc.providerEmail})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
 
+          {/* Slack Channel Selection */}
+          {slackChannels.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Hash className="w-4 h-4 inline mr-1" />
@@ -490,35 +466,39 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 onChange={(e) => setSelectedSlackChannel(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-transparent"
               >
-                <option value="">Don't post to Slack</option>
+                <option value="">Use project default</option>
                 {slackChannels.map((channel) => (
                   <option key={channel.id} value={channel.id}>
-                    #{channel.name} {channel.isPrivate ? '🔒' : ''}
+                    #{channel.name} {channel.isPrimary ? '⭐' : ''}
                   </option>
                 ))}
               </select>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {slackChannels.length === 0
+                  ? 'No Slack channels configured. Add channels in Project Info → Integrations.'
+                  : 'Select a specific channel or use the project default (⭐)'}
+              </p>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Footer */}
-      <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
-        <button
-          onClick={onClose}
-          className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          {t('taskCreation.cancel')}
-        </button>
-        <button
-          onClick={handleSubmit}
-          className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-        >
-          {t('taskCreation.submit')}
-        </button>
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 px-6 py-4 flex items-center justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            {t('taskCreation.cancel')}
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+          >
+            {t('taskCreation.submit')}
+          </button>
+        </div>
       </div>
     </div>
-
   );
 };
 

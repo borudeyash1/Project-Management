@@ -18,6 +18,7 @@ export interface PlannerEvent {
     method: 'email' | 'notification' | 'both';
     minutesBefore: number;
   }>;
+  slackChannelId?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -25,6 +25,7 @@ export interface IGoal extends Document {
   project?: mongoose.Types.ObjectId;
   milestones: IMilestone[];
   tags: string[];
+  slackChannelId?: string;
   isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -107,6 +108,10 @@ const goalSchema = new Schema<IGoal>({
     type: String,
     trim: true
   }],
+  slackChannelId: {
+    type: String,
+    trim: true
+  },
   isPublic: {
     type: Boolean,
     default: false
@@ -123,11 +128,11 @@ goalSchema.index({ createdBy: 1, targetDate: 1 });
 goalSchema.index({ title: 'text', description: 'text', tags: 'text' });
 
 // Pre-save middleware to update progress based on milestones
-goalSchema.pre('save', function(next) {
+goalSchema.pre('save', function (next) {
   if (this.milestones && this.milestones.length > 0) {
     const completedMilestones = this.milestones.filter(m => m.completed).length;
     this.progress = Math.round((completedMilestones / this.milestones.length) * 100);
-    
+
     // Auto-complete goal if all milestones are done
     if (this.progress === 100 && this.status !== 'completed') {
       this.status = 'completed';

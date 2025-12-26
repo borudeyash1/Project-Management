@@ -389,8 +389,8 @@ class ApiService {
     return response.data || [];
   }
 
-  async markNotificationRead(id: string): Promise<AppNotification | undefined> {
-    const response = await this.patch<AppNotification>(`/notifications/${id}/read`);
+  async markNotificationRead(id: string, actionStatus?: 'accepted' | 'declined'): Promise<AppNotification | undefined> {
+    const response = await this.patch<AppNotification>(`/notifications/${id}/read`, { actionStatus });
     return response.data;
   }
 

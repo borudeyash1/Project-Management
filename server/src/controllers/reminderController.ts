@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Reminder } from '../models/Reminder';
 import { scheduleReminderTrigger } from '../services/reminderScheduler';
+import { notifySlackForReminder } from '../utils/slackNotifications';
 
 // Create a new reminder
 export const createReminder = async (req: Request, res: Response) => {
@@ -45,6 +46,15 @@ export const createReminder = async (req: Request, res: Response) => {
             }
           });
         }
+      }
+    }
+
+    // Send Slack notification if channel is configured
+    if (reminder.slackChannelId) {
+      try {
+        await notifySlackForReminder(reminder, userId, reminder.slackChannelId);
+      } catch (error) {
+        console.error('Failed to send Slack notification for reminder:', error);
       }
     }
 
@@ -165,6 +175,35 @@ export const updateReminder = async (req: Request, res: Response): Promise<void>
         message: 'Reminder not found'
       });
       return;
+    }
+
+    // Reschedule triggers for notifications if they exist
+    if (req.body.notifications && Array.isArray(req.body.notifications) && req.body.notifications.length > 0) {
+      for (const notif of req.body.notifications) {
+        let triggerTime: Date | undefined;
+
+        if (notif.time) {
+          triggerTime = new Date(notif.time);
+        } else if (notif.minutesBefore !== undefined) {
+          const dueDate = req.body.dueDate || reminder.dueDate;
+          triggerTime = new Date(new Date(dueDate).getTime() - (notif.minutesBefore * 60000));
+        }
+
+        if (triggerTime) {
+          await scheduleReminderTrigger({
+            entityType: 'custom',
+            entityId: String(reminder._id),
+            userIds: [String(userId)],
+            triggerType: 'custom',
+            triggerTime: triggerTime,
+            payload: {
+              message: `Reminder: ${reminder.title}`,
+              description: reminder.description,
+              notificationType: notif.type
+            }
+          });
+        }
+      }
     }
 
     res.status(200).json({

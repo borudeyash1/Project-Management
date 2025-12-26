@@ -58,14 +58,17 @@ const getHeaders = (accessToken: string) => ({
 interface IGitHubService {
     getRepositories(userId: string, accountId?: string): Promise<GitHubRepo[]>;
     getPullRequests(userId: string, owner: string, repo: string, accountId?: string): Promise<GitHubPR[]>;
+    getPullRequest(userId: string, owner: string, repo: string, number: number, accountId?: string): Promise<GitHubPR>;
+    getIssues(userId: string, owner: string, repo: string, accountId?: string): Promise<any[]>;
+    createIssue(userId: string, owner: string, repo: string, data: any, accountId?: string): Promise<any>;
+    addComment(userId: string, owner: string, repo: string, number: number, body: string, accountId?: string): Promise<any>;
+    addLabel(userId: string, owner: string, repo: string, number: number, labels: string[], accountId?: string): Promise<any>;
 }
 
 export const getGitHubService = (): IGitHubService => {
     return {
         async getRepositories(userId: string, accountId?: string): Promise<GitHubRepo[]> {
             const accessToken = await getAccessToken(userId, accountId);
-            // Fetch repos where the user is an owner or collaborator
-            // Using /user/repos?sort=updated for most relevant
             const response = await axios.get<GitHubRepo[]>(`${GITHUB_API_BASE}/user/repos?sort=updated&per_page=100`, {
                 headers: getHeaders(accessToken)
             });
@@ -77,6 +80,50 @@ export const getGitHubService = (): IGitHubService => {
             const response = await axios.get<GitHubPR[]>(`${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls?state=all&sort=updated&per_page=50`, {
                 headers: getHeaders(accessToken)
             });
+            return response.data;
+        },
+
+        async getPullRequest(userId: string, owner: string, repo: string, number: number, accountId?: string): Promise<GitHubPR> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.get<GitHubPR>(`${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls/${number}`, {
+                headers: getHeaders(accessToken)
+            });
+            return response.data;
+        },
+
+        async getIssues(userId: string, owner: string, repo: string, accountId?: string): Promise<any[]> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/issues?state=all&sort=updated&per_page=50`, {
+                headers: getHeaders(accessToken)
+            });
+            return response.data;
+        },
+
+        async createIssue(userId: string, owner: string, repo: string, data: any, accountId?: string): Promise<any> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.post(`${GITHUB_API_BASE}/repos/${owner}/${repo}/issues`, data, {
+                headers: getHeaders(accessToken)
+            });
+            return response.data;
+        },
+
+        async addComment(userId: string, owner: string, repo: string, number: number, body: string, accountId?: string): Promise<any> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.post(
+                `${GITHUB_API_BASE}/repos/${owner}/${repo}/issues/${number}/comments`,
+                { body },
+                { headers: getHeaders(accessToken) }
+            );
+            return response.data;
+        },
+
+        async addLabel(userId: string, owner: string, repo: string, number: number, labels: string[], accountId?: string): Promise<any> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.post(
+                `${GITHUB_API_BASE}/repos/${owner}/${repo}/issues/${number}/labels`,
+                { labels },
+                { headers: getHeaders(accessToken) }
+            );
             return response.data;
         }
     };

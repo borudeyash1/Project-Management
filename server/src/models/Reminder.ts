@@ -30,6 +30,7 @@ export interface IReminder extends Document {
   location?: string;
   meetingLink?: string;
   notes?: string;
+  slackChannelId?: string;
   expiresAt?: Date;
   isActive: boolean;
   createdAt: Date;
@@ -138,6 +139,10 @@ const reminderSchema = new Schema<IReminder>({
     type: String,
     trim: true,
     maxlength: 2000
+  },
+  slackChannelId: {
+    type: String,
+    trim: true
   },
   expiresAt: {
     type: Date,

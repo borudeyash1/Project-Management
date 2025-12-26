@@ -418,13 +418,28 @@ export interface IProject extends Document {
   progress: number;
   integrations?: {
     slack?: {
-      channelId?: string;
-      channelName?: string;
+      channels?: Array<{
+        id: string;
+        name: string;
+        isPrimary: boolean;
+      }>;
     };
     github?: {
-      owner?: string;
-      repo?: string;
-      fullName?: string;
+      repos?: Array<{
+        _id?: string;
+        owner: string;
+        repo: string;
+        fullName: string;
+        autoCreateTasks: boolean;
+        syncStatus: boolean;
+        webhookId?: string;
+        linkedAt: Date;
+        lastSyncAt?: Date;
+        syncErrors?: Array<{
+          message: string;
+          timestamp: Date;
+        }>;
+      }>;
     };
     dropbox?: {
       folderId?: string;
@@ -724,6 +739,7 @@ export interface INotification extends Document {
     [key: string]: any;
   };
   createdAt: Date;
+  actionStatus?: 'accepted' | 'declined' | 'pending';
 }
 
 // Error Types
