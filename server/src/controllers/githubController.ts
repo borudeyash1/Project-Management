@@ -16,27 +16,28 @@ export const linkRepoToProject = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'Project not found' });
         }
 
-        // Check permission (must be owner or admin/manager)
-        // For now assuming check is done or if member
-        if (!project.teamMembers.some(m => m.user.toString() === userId)) {
-            return res.status(403).json({ success: false, message: 'Not authorized' });
+        // Check permission - must be owner or project-manager
+        const userMember = project.teamMembers.find(m => m.user.toString() === userId.toString());
+        const allowedRoles = ['owner', 'project-manager'];
+        if (!userMember || !allowedRoles.includes(userMember.role)) {
+            return res.status(403).json({ success: false, message: 'Not authorized. Only project owners and managers can link repositories.' });
+        }
+
+        // Check if a repository is already linked (only one repo allowed)
+        if (project.integrations?.github?.repos && project.integrations.github.repos.length > 0) {
+            return res.status(400).json({ success: false, message: 'Only one repository can be linked per project. Please unlink the existing repository first.' });
         }
 
         const fullName = `${owner}/${repo}`;
-
-        // Check if already linked
-        if (project.integrations?.github?.repos?.some((r: any) => r.fullName === fullName)) {
-            return res.status(400).json({ success: false, message: 'Repository already linked' });
-        }
 
         // Verify repo access
         const githubService = getGitHubService();
         try {
             // Try to fetch repo details to verify access
-            await githubService.getRepositories(userId);
+            await githubService.getRepositories(userId.toString());
             // We could filter to check if specific repo is accessible, but getRepositories returns list.
             // A better check might be to try getting PRs or Issues for that repo.
-            await githubService.getPullRequests(userId, owner, repo);
+            await githubService.getPullRequests(userId.toString(), owner, repo);
         } catch (error) {
             return res.status(400).json({ success: false, message: 'Cannot verify repository access. Ensure GitHub is connected and you have access.' });
         }

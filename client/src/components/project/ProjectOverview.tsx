@@ -277,15 +277,22 @@ const ProjectOverview: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
             <Github className="w-5 h-5 text-gray-900 dark:text-gray-100" />
-            GitHub Repositories
+            GitHub Repository
           </h2>
-          <button
-            onClick={() => setShowGitHubModal(true)}
-            className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
-          >
-            <LinkIcon className="w-4 h-4" />
-            Link Repository
-          </button>
+          {/* Only show link button if no repo is linked */}
+          {!(project as any).integrations?.github?.repos || (project as any).integrations.github.repos.length === 0 ? (
+            <button
+              onClick={() => setShowGitHubModal(true)}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
+            >
+              <LinkIcon className="w-4 h-4" />
+              Link Repository
+            </button>
+          ) : (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              Only one repository can be linked per project
+            </span>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -301,7 +308,7 @@ const ProjectOverview: React.FC = () => {
           ) : (
             <div className="col-span-full text-center py-8 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
               <Github className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400 font-medium">No repositories linked</p>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">No repository linked</p>
               <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Link a GitHub repository to auto-sync tasks and PRs</p>
             </div>
           )}
@@ -326,6 +333,12 @@ const ProjectOverview: React.FC = () => {
               </button>
             </div>
             <div className="p-4 overflow-y-auto">
+              {/* Info message */}
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  <strong>Note:</strong> Only one repository can be linked per project. Only project owners and managers can link repositories.
+                </p>
+              </div>
               <GitHubRepoSelector
                 projectId={projectId!}
                 linkedRepos={(project as any).integrations?.github?.repos || []}
