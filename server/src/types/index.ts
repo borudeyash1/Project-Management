@@ -433,6 +433,9 @@ export interface IProject extends Document {
         autoCreateTasks: boolean;
         syncStatus: boolean;
         webhookId?: string;
+        webhookSecret?: string;
+        lastWebhookEvent?: Date;
+        autoSyncTasks?: boolean;
         linkedAt: Date;
         lastSyncAt?: Date;
         syncErrors?: Array<{

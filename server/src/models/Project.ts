@@ -137,6 +137,12 @@ const projectSchema = new Schema<IProject>({
           default: true,
         },
         webhookId: String,  // GitHub webhook ID
+        webhookSecret: String,  // Secret for webhook signature verification
+        lastWebhookEvent: Date,  // Timestamp of last webhook event received
+        autoSyncTasks: {
+          type: Boolean,
+          default: true,  // Auto-update task status from commits
+        },
         linkedAt: {
           type: Date,
           default: Date.now,

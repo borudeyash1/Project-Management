@@ -162,110 +162,168 @@ async function handlePushEvent(payload: any) {
 
     if (commits.length === 0) return;
 
-    // Import Task model
+    // Import models and utilities
     const Task = (await import('../models/Task')).default;
+    const Project = (await import('../models/Project')).default;
+    const { parseCommitMessage, calculateTitleSimilarity } = await import('../utils/commitParser');
 
+    // Find project linked to this repository
+    const project = await Project.findOne({
+        'integrations.github.repos.fullName': repo.full_name
+    });
+
+    if (!project) {
+        console.log(`[GitHub Webhook] No project found for repository ${repo.full_name}`);
+        return;
+    }
+
+    // Check if auto-sync is enabled for this repo
+    const linkedRepo = project.integrations?.github?.repos?.find(
+        (r: any) => r.fullName === repo.full_name
+    );
+
+    if (!linkedRepo?.autoSyncTasks) {
+        console.log(`[GitHub Webhook] Auto-sync disabled for ${repo.full_name}`);
+        return;
+    }
+
+    // Update last webhook event timestamp
+    linkedRepo.lastWebhookEvent = new Date();
+    await project.save();
+
+    // Process each commit
     for (const commit of commits) {
-        await linkCommitToTask(commit, repo, Task);
+        try {
+            await processCommitForTasks(commit, repo, project._id.toString(), Task, parseCommitMessage, calculateTitleSimilarity);
+        } catch (error) {
+            console.error(`[GitHub Webhook] Error processing commit ${commit.id}:`, error);
+        }
     }
 }
 
 /**
- * Parse task references from commit message
- * Supports: #TASK-123, TASK-123, #123
+ * Process a commit and link/update tasks
  */
-function parseTaskReferences(message: string): string[] {
-    const refs = new Set<string>();
+async function processCommitForTasks(
+    commit: any,
+    repo: any,
+    projectId: string,
+    Task: any,
+    parseCommitMessage: any,
+    calculateTitleSimilarity: any
+) {
+    const message = commit.message;
+    const parsed = parseCommitMessage(message);
 
-    // Pattern 1: #TASK-123 or TASK-123
-    const taskPattern = /#?([A-Z]+-\d+)/g;
-    let match;
-    while ((match = taskPattern.exec(message)) !== null) {
-        if (match[1]) refs.add(match[1]);
+    console.log(`[GitHub] Processing commit ${commit.id.substring(0, 7)}: "${message}"`);
+    console.log(`[GitHub] Found ${parsed.taskReferences.length} task references, suggested status: ${parsed.suggestedStatus || 'none'}`);
+
+    // Find tasks by direct reference
+    const tasksToUpdate: any[] = [];
+
+    for (const ref of parsed.taskReferences) {
+        const task = await Task.findOne({
+            project: projectId,
+            $or: [
+                { _id: ref.taskId },
+                { customId: ref.taskId }
+            ]
+        });
+
+        if (task) {
+            tasksToUpdate.push({ task, confidence: 1.0, matchType: 'direct' });
+            console.log(`[GitHub] Direct match: ${ref.taskId} -> Task ${task._id}`);
+        }
     }
 
-    // Pattern 2: #123 (simple number reference)
-    const numberPattern = /#(\d+)/g;
-    while ((match = numberPattern.exec(message)) !== null) {
-        if (match[1]) refs.add(match[1]);
-    }
+    // If no direct matches and we have title keywords, try fuzzy matching
+    if (tasksToUpdate.length === 0 && parsed.titleKeywords.length > 0) {
+        const projectTasks = await Task.find({
+            project: projectId,
+            status: { $nin: ['completed', 'done', 'verified'] } // Only match incomplete tasks
+        }).limit(50); // Limit to prevent performance issues
 
-    return Array.from(refs);
-}
-
-/**
- * Parse completion keywords from commit message
- * Supports: fixes #123, closes TASK-456, resolves #789
- */
-function parseCompletionKeywords(message: string): string[] {
-    const refs = new Set<string>();
-    const pattern = /(?:fixes|closes|resolves|completes)\s+#?([A-Z]+-\d+|\d+)/gi;
-
-    let match;
-    while ((match = pattern.exec(message)) !== null) {
-        if (match[1]) refs.add(match[1]);
-    }
-
-    return Array.from(refs);
-}
-
-/**
- * Link commit to task based on commit message
- */
-async function linkCommitToTask(commit: any, repo: any, Task: any) {
-    try {
-        const message = commit.message;
-        const taskRefs = parseTaskReferences(message);
-        const completionRefs = parseCompletionKeywords(message);
-
-        // Link commit to all referenced tasks
-        for (const taskRef of taskRefs) {
-            const task = await Task.findOne({
-                $or: [
-                    { _id: taskRef },
-                    { customId: taskRef },
-                    { title: { $regex: taskRef, $options: 'i' } }
-                ]
-            });
-
-            if (task) {
-                // Check if commit already linked
-                const existingCommit = task.commits?.find((c: any) => c.sha === commit.id);
-
-                if (!existingCommit) {
-                    task.commits = task.commits || [];
-                    task.commits.push({
-                        sha: commit.id,
-                        message: commit.message,
-                        author: commit.author?.username || commit.author?.name || 'Unknown',
-                        url: commit.url,
-                        timestamp: new Date(commit.timestamp)
-                    });
-
-                    await task.save();
-                    console.log(`[GitHub] Linked commit ${commit.id.substring(0, 7)} to task ${task._id}`);
-                }
+        for (const task of projectTasks) {
+            const similarity = calculateTitleSimilarity(parsed.titleKeywords, task.title);
+            if (similarity >= 0.6) { // 60% similarity threshold
+                tasksToUpdate.push({ task, confidence: similarity, matchType: 'fuzzy' });
+                console.log(`[GitHub] Fuzzy match: "${task.title}" (${Math.round(similarity * 100)}% confidence)`);
             }
         }
 
-        // Auto-complete tasks with completion keywords
-        for (const taskRef of completionRefs) {
-            const task = await Task.findOne({
-                $or: [
-                    { _id: taskRef },
-                    { customId: taskRef }
-                ]
-            });
+        // Sort by confidence and take top match only for fuzzy matches
+        if (tasksToUpdate.length > 0) {
+            tasksToUpdate.sort((a, b) => b.confidence - a.confidence);
+            tasksToUpdate.splice(1); // Keep only the best match
+        }
+    }
 
-            if (task && task.status !== 'completed' && task.status !== 'done') {
-                task.status = 'completed';
+    // Update matched tasks
+    for (const { task, confidence, matchType } of tasksToUpdate) {
+        await updateTaskFromCommit(task, commit, repo, parsed, confidence, matchType);
+    }
+
+    if (tasksToUpdate.length === 0) {
+        console.log(`[GitHub] No matching tasks found for commit ${commit.id.substring(0, 7)}`);
+    }
+}
+
+/**
+ * Update a task based on commit information
+ */
+async function updateTaskFromCommit(
+    task: any,
+    commit: any,
+    repo: any,
+    parsed: any,
+    confidence: number,
+    matchType: string
+) {
+    let updated = false;
+
+    // Link commit to task (if not already linked)
+    const existingCommit = task.commits?.find((c: any) => c.sha === commit.id);
+    if (!existingCommit) {
+        task.commits = task.commits || [];
+        task.commits.push({
+            sha: commit.id,
+            message: commit.message,
+            author: commit.author?.username || commit.author?.name || 'Unknown',
+            url: commit.url,
+            timestamp: new Date(commit.timestamp),
+            repo: repo.full_name,
+            autoLinked: true
+        });
+        updated = true;
+        console.log(`[GitHub] Linked commit ${commit.id.substring(0, 7)} to task ${task._id}`);
+    }
+
+    // Update task status based on keywords (only for high-confidence matches)
+    if (parsed.suggestedStatus && confidence >= 0.7) {
+        const statusMap: Record<string, string> = {
+            'completed': 'completed',
+            'in-progress': 'in-progress',
+            'testing': 'review', // Map testing to review status
+            'review': 'review'
+        };
+
+        const newStatus = statusMap[parsed.suggestedStatus];
+        if (newStatus && task.status !== newStatus && task.status !== 'completed' && task.status !== 'done') {
+            const oldStatus = task.status;
+            task.status = newStatus;
+
+            if (newStatus === 'completed') {
                 task.completedDate = new Date();
-                await task.save();
-                console.log(`[GitHub] Auto-completed task ${task._id} via commit keyword`);
+                task.progress = 100;
             }
+
+            updated = true;
+            console.log(`[GitHub] Updated task ${task._id} status: ${oldStatus} -> ${newStatus} (${matchType} match, ${Math.round(confidence * 100)}% confidence)`);
         }
-    } catch (error) {
-        console.error('[GitHub] Error linking commit to task:', error);
+    }
+
+    if (updated) {
+        await task.save();
     }
 }
 

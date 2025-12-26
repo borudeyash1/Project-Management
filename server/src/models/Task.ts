@@ -208,6 +208,13 @@ const taskSchema: Schema<any> = new Schema<any>(
           type: Date,
           required: true,
         },
+        repo: {
+          type: String, // owner/repo format
+        },
+        autoLinked: {
+          type: Boolean,
+          default: false, // true if linked via webhook, false if manual
+        },
       },
     ],
     autoCreated: {
