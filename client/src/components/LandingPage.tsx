@@ -1491,192 +1491,422 @@ const LandingPage: React.FC = () => {
           </div>
           
           {/* Pricing Cards */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {/* Free Plan */}
-            <div className="rounded-3xl p-8 border-2 border-gray-200 hover:shadow-lg transition-all" style={{ backgroundColor: '#F1F4F9' }}>
-              <div className="text-center mb-8">
-                <h3 className="text-base text-gray-700 mb-4 font-medium">Free</h3>
-                <div className="text-5xl font-bold text-gray-900 mb-6">$0</div>
-                <div className="w-full h-px bg-gray-300 mb-6"></div>
-                <p className="text-sm text-gray-700 font-medium">Get started for free</p>
+            <div className="rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all bg-white">
+              <div className="text-center mb-6 pt-2">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Free</h3>
+                <div className="mb-2">
+                  <span className="text-4xl font-bold text-gray-900">₹0</span>
+                  <span className="text-sm text-gray-500 ml-1">/month</span>
+                </div>
+                <p className="text-sm text-gray-600">Get started for free</p>
               </div>
               
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">All task functionality</span>
+              <ul className="space-y-3 mb-6 min-h-[400px]">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Personal workspace only</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">1 project with 5 members</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Notes making: all notes including sticky notes</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Limited task allotment types</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Projects: 1 project, no members</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Pay per workspace option</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Desktop application access</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Mobile app access</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Visualization: Board, Kanban, Timeline</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Reminder creation (no reminder mails)</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom reports & analytics</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Goals & objectives setting</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Multi-language support (14 languages)</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Appearance customization</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-gray-400">No collaborator option</span>
+                  <span className="text-xs leading-relaxed text-gray-400 line-through">No access: calendar, vault, mail</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-gray-400">No AI assistance</span>
+                  <span className="text-xs leading-relaxed text-gray-400 line-through">Ads included</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-gray-400">Ads present</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span className="text-gray-400">No desktop application</span>
+                  <span className="text-xs leading-relaxed text-gray-400 line-through">No AI assistant</span>
                 </li>
               </ul>
               
-              <div className="space-y-3">
-                <Link
-                  to="/register"
-                  className="block w-full py-3 px-6 rounded-full font-semibold text-center border-2 border-[#006397] text-[#006397] hover:bg-blue-50 transition-all"
-                >
-                  Get Started Free
-                </Link>
-              </div>
+              <Link
+                to="/register"
+                className="block w-full py-2.5 px-6 rounded-lg font-medium text-sm text-center border border-[#006397] text-[#006397] hover:bg-blue-50 transition-all"
+              >
+                Get Started Free
+              </Link>
             </div>
 
-            {/* Pro Plan - Recommended */}
-            <div className="rounded-3xl p-8 border-2 hover:shadow-2xl transition-all relative" style={{ backgroundColor: '#F1F4F9', borderColor: '#006397' }}>
-              <div className="text-center mb-8">
-                <h3 className="text-base text-gray-700 mb-4 font-medium">Pro</h3>
-                <div className="text-5xl font-bold text-gray-900 mb-6">$29</div>
-                <div className="w-full h-px bg-gray-300 mb-6"></div>
-                <p className="text-sm font-semibold" style={{ color: '#006397' }}>Recommended</p>
+            {/* Pro Plan */}
+            <div className="relative rounded-2xl p-6 border-2 border-[#006397] shadow-xl scale-[1.02] bg-white">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-[#006397] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                  Recommended
+                </span>
+              </div>
+
+              <div className="text-center mb-6 pt-2">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Pro</h3>
+                <div className="mb-2">
+                  <span className="text-4xl font-bold text-gray-900">₹449</span>
+                  <span className="text-sm text-gray-500 ml-1">/month</span>
+                </div>
+                <p className="text-sm text-gray-600">Recommended</p>
               </div>
               
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">5 workspaces, 5 projects each</span>
+              <ul className="space-y-3 mb-6 min-h-[400px]">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Workspaces: 1 personal + 2 additional</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">20 employees per project</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Projects: 2 per workspace</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">5 clients per workspace</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Members: 20 per workspace, 8 per project</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Complete project management</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Notes with meeting add-ons & handling</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Collaborator option available</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Meetings: live transcript, AI summary</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">AI access (limited tokens)</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Desktop application access</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Desktop application access</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Access: calendar, vault, mail</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">No ads</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">No ads</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span className="text-gray-400">No custom cloud storage</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">AI assistant with custom inputs (limited)</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Visualization: Board, Kanban</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Reminders with reminder mails</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Reports & analytics with AI insights</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Attendance & payroll functionality</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Workspace & project inbox</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom URL submission</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Leaderboard access</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Role-based access control</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Workload & deadline management</span>
+                </li>
+                <li>
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-xs leading-relaxed text-gray-700">Integrations</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Google Meet">
+                      <img src="https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000" alt="Google Meet" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Microsoft Teams">
+                      <img src="https://img.icons8.com/?size=100&id=keRbY8PNKlan&format=png&color=000000" alt="Microsoft Teams" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Zoom">
+                      <img src="https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000" alt="Zoom" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              
+              <Link
+                to="/register"
+                className="block w-full py-2.5 px-6 rounded-lg font-medium text-sm text-center bg-[#006397] text-white hover:bg-blue-700 shadow-md hover:shadow-lg transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* Premium Plan */}
+            <div className="rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all bg-white">
+              <div className="text-center mb-6 pt-2">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Premium</h3>
+                <div className="mb-2">
+                  <span className="text-4xl font-bold text-gray-900">Contact</span>
+                </div>
+                <p className="text-sm text-gray-600">For growing teams</p>
+              </div>
+              
+              <ul className="space-y-3 mb-6 min-h-[400px]">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Workspaces: 1 personal + 10 additional</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Projects: 5 per workspace</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Members: 50 per workspace, 20 per project</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Notes with meeting add-ons & handling</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Meetings: live transcript, AI summary</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Desktop application access</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Access: calendar, vault, mail</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">No ads</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">AI assistant: unlimited custom inputs</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Visualization: Board, Kanban</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Reminders with reminder mails</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Reports & analytics with AI insights</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Attendance & payroll functionality</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Workspace & project inbox</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom URL submission</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Leaderboard access</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Role-based access control</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Workload & deadline management</span>
+                </li>
+                <li>
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-xs leading-relaxed text-gray-700">Integrations</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Google Meet">
+                      <img src="https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000" alt="Google Meet" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Microsoft Teams">
+                      <img src="https://img.icons8.com/?size=100&id=keRbY8PNKlan&format=png&color=000000" alt="Microsoft Teams" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Zoom">
+                      <img src="https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000" alt="Zoom" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Slack">
+                      <img src="https://img.icons8.com/?size=100&id=19978&format=png&color=000000" alt="Slack" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="GitHub">
+                      <img src="https://img.icons8.com/?size=100&id=12599&format=png&color=000000" alt="GitHub" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Google Drive">
+                      <img src="https://img.icons8.com/?size=100&id=13630&format=png&color=000000" alt="Google Drive" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Dropbox">
+                      <img src="https://img.icons8.com/?size=100&id=13657&format=png&color=000000" alt="Dropbox" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
                 </li>
               </ul>
               
               <div className="space-y-3">
                 <Link
                   to="/pricing"
-                  className="block w-full py-3 px-6 rounded-full font-semibold text-center text-white hover:text-white transition-all shadow-md hover:shadow-lg hover:opacity-90"
-                  style={{ backgroundColor: '#006397' }}
+                  className="block w-full py-2.5 px-6 rounded-lg font-medium text-sm text-center border border-[#006397] text-[#006397] hover:bg-blue-50 transition-all"
                 >
-                  Get Started
+                  Contact Sales
                 </Link>
+                <p className="text-xs text-gray-600 text-center">
+                  or <Link to="/contact-us" className="text-[#006397] hover:underline">Contact us</Link>
+                </p>
               </div>
             </div>
 
             {/* Enterprise Plan */}
-            <div className="rounded-3xl p-8 border-2 border-gray-200 hover:shadow-lg transition-all" style={{ backgroundColor: '#F1F4F9' }}>
-              <div className="text-center mb-8">
-                <h3 className="text-base text-gray-700 mb-4 font-medium">Enterprise</h3>
-                <div className="text-5xl font-bold text-gray-900 mb-6">Custom</div>
-                <div className="w-full h-px bg-gray-300 mb-6"></div>
-                <p className="text-sm text-gray-700 font-medium">For large organizations</p>
+            <div className="rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all bg-white">
+              <div className="text-center mb-6 pt-2">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Enterprise</h3>
+                <div className="mb-2">
+                  <span className="text-4xl font-bold text-gray-900">Custom</span>
+                </div>
+                <p className="text-sm text-gray-600">For large organizations</p>
               </div>
               
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">10 workspaces, 20 projects each</span>
+              <ul className="space-y-3 mb-6 min-h-[400px]">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Tailored plan for company requirements</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">25-30 members per project</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom workspaces & projects</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Custom cloud storage integration</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom members & features</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">AI auto task scheduling</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">All Premium features included</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Real-time AI suggestions</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Dedicated account manager</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Custom role-based access control</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Priority support 24/7</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Advanced security features</span>
+                <li>
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-xs leading-relaxed text-gray-700">Integrations</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Google Meet">
+                      <img src="https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000" alt="Google Meet" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Microsoft Teams">
+                      <img src="https://img.icons8.com/?size=100&id=keRbY8PNKlan&format=png&color=000000" alt="Microsoft Teams" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Zoom">
+                      <img src="https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000" alt="Zoom" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Slack">
+                      <img src="https://img.icons8.com/?size=100&id=19978&format=png&color=000000" alt="Slack" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="GitHub">
+                      <img src="https://img.icons8.com/?size=100&id=12599&format=png&color=000000" alt="GitHub" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Google Drive">
+                      <img src="https://img.icons8.com/?size=100&id=13630&format=png&color=000000" alt="Google Drive" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5" title="Dropbox">
+                      <img src="https://img.icons8.com/?size=100&id=13657&format=png&color=000000" alt="Dropbox" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">Desktop application access</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom integrations available</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-gray-900 flex-shrink-0" />
-                  <span className="text-gray-900">No ads + dedicated support</span>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Advanced security features</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">Custom SLA agreements</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-gray-700">On-premise deployment option</span>
                 </li>
               </ul>
               
               <div className="space-y-3">
                 <Link
                   to="/pricing"
-                  className="block w-full py-3 px-6 rounded-full font-semibold text-center border-2 transition-all hover:bg-blue-50"
-                  style={{ borderColor: '#006397', color: '#006397' }}
+                  className="block w-full py-2.5 px-6 rounded-lg font-medium text-sm text-center border border-[#006397] text-[#006397] hover:bg-blue-50 transition-all"
                 >
                   Contact Sales
                 </Link>
-                <p className="text-sm text-gray-600 text-center">
-                  or <Link to="/contact" className="font-semibold hover:underline" style={{ color: '#006397' }}>Contact us</Link>
+                <p className="text-xs text-gray-600 text-center">
+                  or <Link to="/contact-us" className="text-[#006397] hover:underline">Contact us</Link>
                 </p>
               </div>
             </div>

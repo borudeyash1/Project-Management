@@ -22,7 +22,7 @@ const PricingPage: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Pricing plans matching the landing page reference
+  // Pricing plans matching the new requirements
   const pricingPlans = [
     {
       name: 'Free',
@@ -30,37 +30,101 @@ const PricingPage: React.FC = () => {
       description: 'Get started for free',
       recommended: false,
       features: [
-        { text: 'All task functionality', included: true },
-        { text: '1 project with 5 members', included: true },
-        { text: 'Limited task allotment types', included: true },
-        { text: 'Pay per workspace option', included: true },
-        { text: 'Mobile app access', included: true },
-        { text: 'No collaborator option', included: false },
-        { text: 'No AI assistance', included: false },
-        { text: 'Ads present', included: false },
-        { text: 'No desktop application', included: false }
+        { text: 'Personal workspace only', included: true },
+        { text: 'Notes making: all notes including sticky notes', included: true },
+        { text: 'Projects: 1 project, no members', included: true },
+        { text: 'Desktop application access', included: true },
+        { text: 'Visualization: Board, Kanban, Timeline', included: true },
+        { text: 'Reminder creation (no reminder mails)', included: true },
+        { text: 'Custom reports & analytics', included: true },
+        { text: 'Goals & objectives setting', included: true },
+        { text: 'Multi-language support (14 languages)', included: true },
+        { text: 'Appearance customization', included: true },
+        { text: 'No access: calendar, vault, mail', included: false },
+        { text: 'Ads included', included: false },
+        { text: 'No AI assistant', included: false }
       ],
       buttonText: 'Get Started Free',
       buttonStyle: 'outline'
     },
     {
       name: 'Pro',
-      price: 29,
+      price: 449,
       description: 'Recommended',
       recommended: true,
       features: [
-        { text: '5 workspaces, 5 projects each', included: true },
-        { text: '20 employees per project', included: true },
-        { text: '5 clients per workspace', included: true },
-        { text: 'Complete project management', included: true },
-        { text: 'Collaborator option available', included: true },
-        { text: 'AI access (limited tokens)', included: true },
+        { text: 'Workspaces: 1 personal + 2 additional', included: true },
+        { text: 'Projects: 2 per workspace', included: true },
+        { text: 'Members: 20 per workspace, 8 per project', included: true },
+        { text: 'Notes with meeting add-ons & handling', included: true },
+        { text: 'Meetings: live transcript, AI summary', included: true },
         { text: 'Desktop application access', included: true },
+        { text: 'Access: calendar, vault, mail', included: true },
         { text: 'No ads', included: true },
-        { text: 'No custom cloud storage', included: false }
+        { text: 'AI assistant with custom inputs (limited)', included: true },
+        { text: 'Visualization: Board, Kanban', included: true },
+        { text: 'Reminders with reminder mails', included: true },
+        { text: 'Reports & analytics with AI insights', included: true },
+        { text: 'Attendance & payroll functionality', included: true },
+        { text: 'Workspace & project inbox', included: true },
+        { text: 'Custom URL submission', included: true },
+        { text: 'Leaderboard access', included: true },
+        { text: 'Role-based access control', included: true },
+        { text: 'Workload & deadline management', included: true },
+        { 
+          text: 'Integrations', 
+          included: true,
+          integrations: [
+            { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
+            { icon: 'https://img.icons8.com/?size=100&id=keRbY8PNKlan&format=png&color=000000', name: 'Microsoft Teams' },
+            { icon: 'https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000', name: 'Zoom' }
+          ]
+        }
       ],
       buttonText: 'Get Started',
       buttonStyle: 'solid'
+    },
+    {
+      name: 'Premium',
+      price: 'Contact',
+      description: 'For growing teams',
+      recommended: false,
+      features: [
+        { text: 'Workspaces: 1 personal + 10 additional', included: true },
+        { text: 'Projects: 5 per workspace', included: true },
+        { text: 'Members: 50 per workspace, 20 per project', included: true },
+        { text: 'Notes with meeting add-ons & handling', included: true },
+        { text: 'Meetings: live transcript, AI summary', included: true },
+        { text: 'Desktop application access', included: true },
+        { text: 'Access: calendar, vault, mail', included: true },
+        { text: 'No ads', included: true },
+        { text: 'AI assistant: unlimited custom inputs', included: true },
+        { text: 'Visualization: Board, Kanban', included: true },
+        { text: 'Reminders with reminder mails', included: true },
+        { text: 'Reports & analytics with AI insights', included: true },
+        { text: 'Attendance & payroll functionality', included: true },
+        { text: 'Workspace & project inbox', included: true },
+        { text: 'Custom URL submission', included: true },
+        { text: 'Leaderboard access', included: true },
+        { text: 'Role-based access control', included: true },
+        { text: 'Workload & deadline management', included: true },
+        { 
+          text: 'Integrations', 
+          included: true,
+          integrations: [
+            { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
+            { icon: 'https://img.icons8.com/?size=100&id=keRbY8PNKlan&format=png&color=000000', name: 'Microsoft Teams' },
+            { icon: 'https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000', name: 'Zoom' },
+            { icon: 'https://img.icons8.com/?size=100&id=19978&format=png&color=000000', name: 'Slack' },
+            { icon: 'https://img.icons8.com/?size=100&id=12599&format=png&color=000000', name: 'GitHub' },
+            { icon: 'https://img.icons8.com/?size=100&id=13630&format=png&color=000000', name: 'Google Drive' },
+            { icon: 'https://img.icons8.com/?size=100&id=13657&format=png&color=000000', name: 'Dropbox' }
+          ]
+        }
+      ],
+      buttonText: 'Contact Sales',
+      buttonStyle: 'outline',
+      contactLink: true
     },
     {
       name: 'Enterprise',
@@ -68,15 +132,29 @@ const PricingPage: React.FC = () => {
       description: 'For large organizations',
       recommended: false,
       features: [
-        { text: '10 workspaces, 20 projects each', included: true },
-        { text: '25-30 members per project', included: true },
-        { text: 'Custom cloud storage integration', included: true },
-        { text: 'AI auto task scheduling', included: true },
-        { text: 'Real-time AI suggestions', included: true },
-        { text: 'Custom role-based access control', included: true },
+        { text: 'Tailored plan for company requirements', included: true },
+        { text: 'Custom workspaces & projects', included: true },
+        { text: 'Custom members & features', included: true },
+        { text: 'All Premium features included', included: true },
+        { text: 'Dedicated account manager', included: true },
+        { text: 'Priority support 24/7', included: true },
+        { 
+          text: 'Integrations', 
+          included: true,
+          integrations: [
+            { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
+            { icon: 'https://img.icons8.com/?size=100&id=keRbY8PNKlan&format=png&color=000000', name: 'Microsoft Teams' },
+            { icon: 'https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000', name: 'Zoom' },
+            { icon: 'https://img.icons8.com/?size=100&id=19978&format=png&color=000000', name: 'Slack' },
+            { icon: 'https://img.icons8.com/?size=100&id=12599&format=png&color=000000', name: 'GitHub' },
+            { icon: 'https://img.icons8.com/?size=100&id=13630&format=png&color=000000', name: 'Google Drive' },
+            { icon: 'https://img.icons8.com/?size=100&id=13657&format=png&color=000000', name: 'Dropbox' }
+          ]
+        },
+        { text: 'Custom integrations available', included: true },
         { text: 'Advanced security features', included: true },
-        { text: 'Desktop application access', included: true },
-        { text: 'No ads + dedicated support', included: true }
+        { text: 'Custom SLA agreements', included: true },
+        { text: 'On-premise deployment option', included: true }
       ],
       buttonText: 'Contact Sales',
       buttonStyle: 'outline',
@@ -152,8 +230,8 @@ const PricingPage: React.FC = () => {
           </div>
 
           {/* Pricing Cards - Now inside the same section */}
-          <div className="max-w-6xl mx-auto">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="max-w-7xl mx-auto mt-12">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {pricingPlans.map((plan, index) => {
               const finalPrice = typeof plan.price === 'number' && isYearly 
                 ? Math.round(plan.price * 12 * 0.9) 
@@ -162,57 +240,83 @@ const PricingPage: React.FC = () => {
               return (
                 <div
                   key={plan.name}
-                  className={`relative rounded-3xl p-8 transition-all duration-300 ${
+                  className={`relative rounded-2xl p-6 transition-all duration-300 bg-white ${
                     plan.recommended
-                      ? 'border-2 border-[#006397] shadow-2xl scale-105 z-10'
-                      : 'border-2 border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl'
+                      ? 'border-2 border-[#006397] shadow-xl scale-[1.02]'
+                      : 'border border-gray-200 shadow-md hover:shadow-lg'
                   }`}
                   style={{ 
-                    backgroundColor: plan.recommended ? '#ffffff' : '#F1F4F9',
                     animationDelay: `${index * 100}ms` 
                   }}
                 >
-                  {/* Plan Name */}
-                  <div className="text-center mb-6">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                  {/* Recommended Badge */}
+                  {plan.recommended && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-[#006397] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        Recommended
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Plan Header */}
+                  <div className="text-center mb-6 pt-2">
+                    <h3 className="text-base font-semibold text-gray-900 mb-3">
                       {plan.name}
                     </h3>
                     
                     {/* Price */}
-                    <div className="mb-4">
+                    <div className="mb-2">
                       {typeof finalPrice === 'number' ? (
-                        <span className="text-5xl font-bold text-gray-900">
-                          ${finalPrice}
-                        </span>
+                        <div>
+                          <span className="text-4xl font-bold text-gray-900">₹{finalPrice}</span>
+                          {!isYearly && <span className="text-sm text-gray-500 ml-1">/month</span>}
+                        </div>
                       ) : (
-                        <span className="text-5xl font-bold text-gray-900">
+                        <span className="text-4xl font-bold text-gray-900">
                           {finalPrice}
                         </span>
                       )}
                     </div>
                     
-                    {/* Description/Badge */}
-                    <div className={`inline-block px-4 py-1 text-sm font-semibold rounded-full mb-6 ${
-                      plan.recommended 
-                        ? 'bg-blue-100 text-[#006397]' 
-                        : 'text-gray-600'
-                    }`}>
+                    {/* Description */}
+                    <p className="text-sm text-gray-600">
                       {plan.description}
-                    </div>
+                    </p>
                   </div>
 
                   {/* Features List */}
-                  <div className="space-y-4 mb-8">
-                    {plan.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
-                        {feature.included ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        ) : (
-                          <X className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-3 mb-4 min-h-[400px]">
+                    {plan.features.map((feature: any, idx: number) => (
+                      <div key={idx}>
+                        <div className="flex items-start gap-2.5">
+                          {feature.included ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <X className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
+                          )}
+                          <span className={`text-xs leading-relaxed ${feature.included ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
+                            {feature.text}
+                          </span>
+                        </div>
+                        
+                        {/* Inline Integrations */}
+                        {feature.integrations && feature.integrations.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
+                            {feature.integrations.map((integration: any, intIdx: number) => (
+                              <div
+                                key={intIdx}
+                                className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5"
+                                title={integration.name}
+                              >
+                                <img 
+                                  src={integration.icon} 
+                                  alt={integration.name}
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                            ))}
+                          </div>
                         )}
-                        <span className={`text-sm ${feature.included ? 'text-gray-700' : 'text-gray-400'}`}>
-                          {feature.text}
-                        </span>
                       </div>
                     ))}
                   </div>
@@ -220,19 +324,19 @@ const PricingPage: React.FC = () => {
                   {/* CTA Button */}
                   <button
                     onClick={() => handleGetStarted(plan.name)}
-                    className={`w-full py-3 px-6 rounded-full font-semibold transition-all duration-300 ${
+                    className={`w-full py-2.5 px-6 rounded-lg font-medium text-sm transition-all duration-300 ${
                       plan.buttonStyle === 'solid'
-                        ? 'bg-[#006397] text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
-                        : 'bg-white text-[#006397] border-2 border-[#006397] hover:bg-blue-50'
+                        ? 'bg-[#006397] text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                        : 'bg-white text-[#006397] border border-[#006397] hover:bg-blue-50'
                     }`}
                   >
                     {plan.buttonText}
                   </button>
                   
-                  {/* Contact us link for Enterprise plan */}
+                  {/* Contact us link */}
                   {plan.contactLink && (
-                    <div className="text-center mt-4">
-                      <a href="/login" className="text-sm text-[#006397] hover:underline">
+                    <div className="text-center mt-3">
+                      <a href="/contact-us" className="text-xs text-[#006397] hover:underline">
                         or Contact us
                       </a>
                     </div>
