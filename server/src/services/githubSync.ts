@@ -137,13 +137,33 @@ export async function syncPRToTask(
         // Check if task already exists
         let task = await findTaskByPR(pr.number, repoFullName);
 
+        // Try to find task from branch name if not already linked
+        let linkedTaskFromBranch = null;
+        if (!task && (pr as any).head?.ref) {
+            const branchName = (pr as any).head.ref;
+            const taskRef = parseBranchName(branchName);
+
+            if (taskRef) {
+                linkedTaskFromBranch = await Task.findOne({
+                    $or: [
+                        { _id: taskRef },
+                        { customId: taskRef }
+                    ]
+                });
+
+                if (linkedTaskFromBranch) {
+                    console.log(`[GitHub Sync] Auto-linked PR #${pr.number} to task ${taskRef} from branch name`);
+                }
+            }
+        }
+
         // Find assignee by GitHub username
         const assigneeId = await findUserByGitHubUsername(pr.user.login);
 
         // Determine task status based on PR state
         let taskStatus = 'in-progress';
         if (pr.state === 'closed') {
-            taskStatus = pr.merged ? 'completed' : 'cancelled';
+            taskStatus = (pr as any).merged ? 'completed' : 'cancelled';
         }
 
         const taskData = {
@@ -536,4 +556,23 @@ export async function handleIssuesEvent(
     } catch (error) {
         console.error('[GitHub Sync] Error handling issue event:', error);
     }
+}
+
+
+/**
+ * Parse task reference from branch name
+ * Supports: feature/TASK-123, bugfix/TASK-456, TASK-789-description
+ */
+function parseBranchName(branchName: string): string | null {
+    // Pattern 1: feature/TASK-123, bugfix/TASK-456, hotfix/TASK-789
+    const prefixPattern = /(?:feature|bugfix|hotfix|fix|feat)\/([A-Z]+-\d+)/i;
+    let match = branchName.match(prefixPattern);
+    if (match && match[1]) return match[1];
+
+    // Pattern 2: TASK-123-description
+    const directPattern = /^([A-Z]+-\d+)/;
+    match = branchName.match(directPattern);
+    if (match && match[1]) return match[1];
+
+    return null;
 }

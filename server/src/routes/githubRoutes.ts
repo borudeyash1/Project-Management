@@ -6,7 +6,8 @@ import {
     unlinkRepoFromProject,
     updateRepoSettings,
     linkPrToTask,
-    createIssueFromTask
+    createIssueFromTask,
+    getRecentCommits
 } from '../controllers/githubController';
 
 const router = express.Router();
@@ -72,5 +73,8 @@ router.put('/projects/:projectId/repos/:repoId/settings', apiLimiter, updateRepo
 // Task Integration Routes
 router.post('/tasks/:taskId/link-pr', apiLimiter, linkPrToTask);
 router.post('/tasks/:taskId/create-issue', apiLimiter, createIssueFromTask);
+
+// Team Collaboration Routes
+router.get('/commits', apiLimiter, getRecentCommits);
 
 export default router;

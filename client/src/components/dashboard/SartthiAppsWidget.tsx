@@ -393,7 +393,7 @@ const SartthiAppsWidget: React.FC = () => {
                     icon={Mail}
                     title={t('home.sartthiMail')}
                     description={t('home.sartthiMailDesc')}
-                    isConnected={!!mailData?.account}
+                    isConnected={isMailConnected}
                     data={mailContent}
                     onConnect={() => handleConnect('mail')}
                     onExpand={() => setExpandedView('mail')}
@@ -407,7 +407,7 @@ const SartthiAppsWidget: React.FC = () => {
                     icon={CalendarIcon}
                     title={t('home.sartthiCalendar')}
                     description={t('home.sartthiCalendarDesc')}
-                    isConnected={!!calendarData?.account}
+                    isConnected={isCalendarConnected}
                     data={calendarContent}
                     onConnect={() => handleConnect('calendar')}
                     onExpand={() => setExpandedView('calendar')}
@@ -421,7 +421,7 @@ const SartthiAppsWidget: React.FC = () => {
                     icon={HardDrive}
                     title={t('home.sartthiVault')}
                     description={t('home.sartthiVaultDesc')}
-                    isConnected={!!vaultData?.account}
+                    isConnected={isVaultConnected}
                     data={vaultContent}
                     onConnect={() => handleConnect('vault')}
                     onExpand={() => setExpandedView('vault')}

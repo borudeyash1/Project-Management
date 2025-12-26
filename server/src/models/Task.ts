@@ -186,6 +186,30 @@ const taskSchema: Schema<any> = new Schema<any>(
         default: true,
       },
     },
+    commits: [
+      {
+        sha: {
+          type: String,
+          required: true,
+        },
+        message: {
+          type: String,
+          required: true,
+        },
+        author: {
+          type: String,
+          required: true,
+        },
+        url: {
+          type: String,
+          required: true,
+        },
+        timestamp: {
+          type: Date,
+          required: true,
+        },
+      },
+    ],
     autoCreated: {
       type: Boolean,
       default: false,

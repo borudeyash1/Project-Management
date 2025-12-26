@@ -154,11 +154,119 @@ async function handleIssueCommentEvent(payload: any) {
 }
 
 async function handlePushEvent(payload: any) {
-    // Optional: track commits
     const ref = payload.ref;
-    const commits = payload.commits;
+    const commits = payload.commits || [];
     const repo = payload.repository;
+
     console.log(`[GitHub Webhook] Push to ${repo.full_name}:${ref} (${commits.length} commits)`);
+
+    if (commits.length === 0) return;
+
+    // Import Task model
+    const Task = (await import('../models/Task')).default;
+
+    for (const commit of commits) {
+        await linkCommitToTask(commit, repo, Task);
+    }
+}
+
+/**
+ * Parse task references from commit message
+ * Supports: #TASK-123, TASK-123, #123
+ */
+function parseTaskReferences(message: string): string[] {
+    const refs = new Set<string>();
+
+    // Pattern 1: #TASK-123 or TASK-123
+    const taskPattern = /#?([A-Z]+-\d+)/g;
+    let match;
+    while ((match = taskPattern.exec(message)) !== null) {
+        if (match[1]) refs.add(match[1]);
+    }
+
+    // Pattern 2: #123 (simple number reference)
+    const numberPattern = /#(\d+)/g;
+    while ((match = numberPattern.exec(message)) !== null) {
+        if (match[1]) refs.add(match[1]);
+    }
+
+    return Array.from(refs);
+}
+
+/**
+ * Parse completion keywords from commit message
+ * Supports: fixes #123, closes TASK-456, resolves #789
+ */
+function parseCompletionKeywords(message: string): string[] {
+    const refs = new Set<string>();
+    const pattern = /(?:fixes|closes|resolves|completes)\s+#?([A-Z]+-\d+|\d+)/gi;
+
+    let match;
+    while ((match = pattern.exec(message)) !== null) {
+        if (match[1]) refs.add(match[1]);
+    }
+
+    return Array.from(refs);
+}
+
+/**
+ * Link commit to task based on commit message
+ */
+async function linkCommitToTask(commit: any, repo: any, Task: any) {
+    try {
+        const message = commit.message;
+        const taskRefs = parseTaskReferences(message);
+        const completionRefs = parseCompletionKeywords(message);
+
+        // Link commit to all referenced tasks
+        for (const taskRef of taskRefs) {
+            const task = await Task.findOne({
+                $or: [
+                    { _id: taskRef },
+                    { customId: taskRef },
+                    { title: { $regex: taskRef, $options: 'i' } }
+                ]
+            });
+
+            if (task) {
+                // Check if commit already linked
+                const existingCommit = task.commits?.find((c: any) => c.sha === commit.id);
+
+                if (!existingCommit) {
+                    task.commits = task.commits || [];
+                    task.commits.push({
+                        sha: commit.id,
+                        message: commit.message,
+                        author: commit.author?.username || commit.author?.name || 'Unknown',
+                        url: commit.url,
+                        timestamp: new Date(commit.timestamp)
+                    });
+
+                    await task.save();
+                    console.log(`[GitHub] Linked commit ${commit.id.substring(0, 7)} to task ${task._id}`);
+                }
+            }
+        }
+
+        // Auto-complete tasks with completion keywords
+        for (const taskRef of completionRefs) {
+            const task = await Task.findOne({
+                $or: [
+                    { _id: taskRef },
+                    { customId: taskRef }
+                ]
+            });
+
+            if (task && task.status !== 'completed' && task.status !== 'done') {
+                task.status = 'completed';
+                task.completedDate = new Date();
+                await task.save();
+                console.log(`[GitHub] Auto-completed task ${task._id} via commit keyword`);
+            }
+        }
+    } catch (error) {
+        console.error('[GitHub] Error linking commit to task:', error);
+    }
 }
 
 async function handleReleaseEvent(payload: any) {

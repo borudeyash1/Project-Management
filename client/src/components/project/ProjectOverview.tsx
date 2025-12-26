@@ -18,6 +18,7 @@ import { ContextAIButton } from '../ai/ContextAIButton';
 import { Github, Link as LinkIcon, X as XIcon } from 'lucide-react';
 import GitHubRepoSelector from '../github/GitHubRepoSelector';
 import GitHubSyncStatus from '../github/GitHubSyncStatus';
+import CommitsFeed from '../github/CommitsFeed';
 import { apiService } from '../../services/api';
 
 const ProjectOverview: React.FC = () => {
@@ -305,6 +306,13 @@ const ProjectOverview: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Team Commits Feed */}
+        {(project as any).integrations?.github?.repos && (project as any).integrations.github.repos.length > 0 && (
+          <div className="mt-6">
+            <CommitsFeed projectId={projectId!} limit={15} />
+          </div>
+        )}
       </div>
 
       {/* GitHub Modal */}

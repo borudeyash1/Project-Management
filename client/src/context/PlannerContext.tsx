@@ -52,6 +52,13 @@ export interface Task {
     };
     syncEnabled: boolean;
   };
+  commits?: Array<{
+    sha: string;
+    message: string;
+    author: string;
+    url: string;
+    timestamp: Date;
+  }>;
   autoCreated?: boolean;
 }
 

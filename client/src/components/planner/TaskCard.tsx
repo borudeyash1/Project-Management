@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, User, MessageSquare, Paperclip, Flag, CheckCircle, Github, GitPullRequest, CircleDot } from 'lucide-react';
+import { Clock, User, MessageSquare, Paperclip, Flag, CheckCircle, Github, GitPullRequest, CircleDot, GitCommit } from 'lucide-react';
 import { Task } from '../../context/PlannerContext';
 import { getCompletedSubtasksCount, getTotalSubtasksCount, getTaskTags, getTaskComments, getTaskAttachments, getTaskAssignees } from '../../utils/taskHelpers';
 
@@ -116,6 +116,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
               <CircleDot className={`w-3 h-3 ${task.githubIssue.state === 'closed' ? 'text-purple-600' : 'text-green-600'}`} />
               <span className="font-mono group-hover:underline">#{task.githubIssue.number}</span>
             </a>
+          )}
+          {task.commits && task.commits.length > 0 && (
+            <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400" title={`${task.commits.length} commit${task.commits.length !== 1 ? 's' : ''} linked`}>
+              <GitCommit className="w-3 h-3" />
+              <span className="text-xs">{task.commits.length}</span>
+            </span>
           )}
         </div>
 
