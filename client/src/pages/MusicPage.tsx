@@ -8,8 +8,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { spotifyService, SpotifyPlaybackState } from '../services/spotifyService';
-import { SpotifyLogo } from './icons/BrandLogos';
-import SharedNavbar from './SharedNavbar';
+import { SpotifyLogo } from '../components/icons/BrandLogos';
+import SharedNavbar from '../components/SharedNavbar';
 
 const formatTime = (ms: number) => {
     const s = Math.floor((ms / 1000) % 60);
@@ -195,7 +195,7 @@ const MusicPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
-            <SharedNavbar title="Spotify" />
+            <SharedNavbar />
 
             <div className="max-w-7xl mx-auto px-4 py-6 pb-24">
                 {/* Header */}
@@ -267,8 +267,8 @@ const MusicPage: React.FC = () => {
                     <button
                         onClick={() => setView('player')}
                         className={`px-4 py-2 font-medium transition-colors ${view === 'player'
-                                ? 'text-[#1DB954] border-b-2 border-[#1DB954]'
-                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            ? 'text-[#1DB954] border-b-2 border-[#1DB954]'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                             }`}
                     >
                         <Music size={18} className="inline mr-2" />
@@ -277,8 +277,8 @@ const MusicPage: React.FC = () => {
                     <button
                         onClick={() => setView('search')}
                         className={`px-4 py-2 font-medium transition-colors ${view === 'search'
-                                ? 'text-[#1DB954] border-b-2 border-[#1DB954]'
-                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            ? 'text-[#1DB954] border-b-2 border-[#1DB954]'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                             }`}
                     >
                         <Search size={18} className="inline mr-2" />
@@ -287,8 +287,8 @@ const MusicPage: React.FC = () => {
                     <button
                         onClick={() => setView('playlists')}
                         className={`px-4 py-2 font-medium transition-colors ${view === 'playlists'
-                                ? 'text-[#1DB954] border-b-2 border-[#1DB954]'
-                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            ? 'text-[#1DB954] border-b-2 border-[#1DB954]'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                             }`}
                     >
                         <ListMusic size={18} className="inline mr-2" />
