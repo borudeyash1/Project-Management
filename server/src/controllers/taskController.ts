@@ -578,3 +578,83 @@ export const reassignTask = async (req: Request, res: Response): Promise<void> =
     res.status(500).json({ success: false, message: 'Internal server error while reassigning task' });
   }
 };
+// Sync tasks from Notion (Two-way sync)
+export const syncProjectTasksFromNotion = async (req: Request, res: Response) => {
+  try {
+    const authUser = (req as any).user;
+    const { projectId } = req.params;
+
+    // Get Notion service
+    const notionService = getNotionService();
+
+    // 1. Get user's connected Notion account to find default database
+    const { ConnectedAccount } = require('../models/ConnectedAccount');
+    const notionAccount = await ConnectedAccount.findOne({
+      userId: authUser._id,
+      service: 'notion',
+      isActive: true
+    });
+
+    if (!notionAccount || !notionAccount.settings?.notion?.defaultDatabaseId) {
+      return res.status(400).json({
+        message: 'Notion not connected or default database not selected. Please configure in Settings.'
+      });
+    }
+
+    const databaseId = notionAccount.settings.notion.defaultDatabaseId;
+    const lastSyncedAt = notionAccount.lastSynced;
+
+    // 2. Fetch updates from Notion since last sync
+    const updates = await notionService.getDatabaseUpdates(
+      authUser._id,
+      databaseId,
+      lastSyncedAt ? new Date(lastSyncedAt) : undefined
+    );
+
+    if (updates.length === 0) {
+      return res.json({ message: 'No updates found in Notion', updatedCount: 0 });
+    }
+
+    // 3. Update Sartthi tasks matching the Notion pages
+    let updatedCount = 0;
+
+    for (const update of updates) {
+      // Map Notion status to Sartthi status
+      let sartthiStatus: string | undefined;
+      const notionStatus = update.status?.toLowerCase();
+
+      if (notionStatus === 'not started') sartthiStatus = 'pending';
+      else if (notionStatus === 'in progress') sartthiStatus = 'in-progress';
+      else if (notionStatus === 'done') sartthiStatus = 'completed';
+
+      if (sartthiStatus) {
+        // Find task by Notion page ID
+        const task = await Task.findOne({
+          'notionSync.pageId': update.id,
+          // Optionally filter by project if needed, but pageId is unique enough
+        });
+
+        if (task && task.status !== sartthiStatus) {
+          task.status = sartthiStatus;
+          task.notionSync.lastSyncedAt = new Date(); // Update sync timestamp
+          await task.save();
+          updatedCount++;
+        }
+      }
+    }
+
+    // Update account last sync time
+    notionAccount.lastSynced = new Date();
+    await notionAccount.save();
+
+    res.json({
+      success: true,
+      message: `Synced ${updatedCount} tasks from Notion`,
+      updatedCount
+    });
+
+  } catch (error: any) {
+    console.error('Error syncing from Notion:', error);
+    res.status(500).json({ message: error.message || 'Failed to sync from Notion' });
+  }
+};

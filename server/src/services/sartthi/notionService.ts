@@ -236,12 +236,65 @@ export const getNotionService = () => {
         }
     };
 
+    const getDatabaseUpdates = async (userId: string, databaseId: string, lastSyncedTime?: Date, accountId?: string) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+
+            const filter: any = {
+                and: [
+                    {
+                        property: 'last_edited_time',
+                        last_edited_time: {
+                            is_not_empty: true
+                        }
+                    }
+                ]
+            };
+
+            // If we have a last synced time, get only what changed since then
+            // Note: Notion is ISO 8601
+            if (lastSyncedTime) {
+                filter.and.push({
+                    property: 'last_edited_time',
+                    last_edited_time: {
+                        on_or_after: lastSyncedTime.toISOString()
+                    }
+                });
+            }
+
+            const response = await axios.post(`${NOTION_API_URL}/databases/${databaseId}/query`,
+                {
+                    filter: filter,
+                    page_size: 100 // Limit to 100 updates for now
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Notion-Version': '2022-06-28'
+                    }
+                }
+            );
+
+            return response.data.results.map((page: any) => ({
+                id: page.id,
+                status: page.properties?.Status?.status?.name || page.properties?.Status?.select?.name,
+                lastEditedTime: page.last_edited_time,
+                url: page.url
+            }));
+        } catch (error: any) {
+            console.error('Notion get database updates error:', error.response?.data || error.message);
+            // Don't throw for now, just return empty to avoid blocking
+            return [];
+        }
+    };
+
     return {
         search,
         createPage,
         updatePage,
         appendBlockChildren,
         createDatabase,
-        listDatabases
+        listDatabases,
+        getDatabaseUpdates
     };
 };

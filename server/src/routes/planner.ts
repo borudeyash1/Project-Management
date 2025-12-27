@@ -40,4 +40,6 @@ router.get('/calendar', getCalendarHandler);
 router.get('/timeline', getTimelineHandler);
 router.get('/kanban', getKanbanHandler);
 
+router.post('/projects/:projectId/sync/notion', authenticate, taskController.syncProjectTasksFromNotion);
+
 export default router;

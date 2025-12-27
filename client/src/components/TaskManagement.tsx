@@ -208,40 +208,42 @@ const TaskManagement: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [calendarDate, setCalendarDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
+  const [isSyncingNotion, setIsSyncingNotion] = useState(false);
 
   // Fetch tasks from API
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
       console.log('📋 [TASKS] Fetching tasks...');
-      
+
       // Fetch tasks from API
       const response = await apiService.get('/tasks');
       const tasksData = response.data || response || [];
-      
+
       // Filter out tasks with invalid/missing data to prevent errors
       const validTasks = tasksData.filter((task: any) => {
         // Must have basic required fields
         if (!task._id || !task.title) return false;
-        
+
         // If assignee exists, it must have required fields
         if (task.assignee && !task.assignee._id) return false;
-        
+
         // If project exists, it must have ALL required fields
         if (task.project) {
           if (!task.project._id || !task.project.name || !task.project.color) {
             return false;
           }
         }
-        
+
         return true;
       });
-      
+
       console.log('✅ [TASKS] Tasks loaded:', validTasks.length, '(filtered from', tasksData.length, ')');
       setTasks(validTasks);
       dispatch({ type: 'SET_TASKS', payload: validTasks });
-      
+
       // Set default columns if not already set
       if (columns.length === 0) {
         const defaultColumns: Column[] = [
@@ -344,35 +346,35 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleTaskUpdate = async (taskId: string, updates: Partial<Task>) => {
-  // Optimistic update - update UI immediately
-  setTasks((prevTasks: Task[]) =>
-    prevTasks.map((task: Task) =>
-      task._id === taskId
-        ? { ...task, ...updates }
-        : task
-    )
-  );
+    // Optimistic update - update UI immediately
+    setTasks((prevTasks: Task[]) =>
+      prevTasks.map((task: Task) =>
+        task._id === taskId
+          ? { ...task, ...updates }
+          : task
+      )
+    );
 
-  // Persist to database
-  try {
-    // Convert updates to API-compatible format
-    const apiUpdates: any = { ...updates };
-    if (apiUpdates.project && typeof apiUpdates.project === 'object') {
-      apiUpdates.project = apiUpdates.project._id;
+    // Persist to database
+    try {
+      // Convert updates to API-compatible format
+      const apiUpdates: any = { ...updates };
+      if (apiUpdates.project && typeof apiUpdates.project === 'object') {
+        apiUpdates.project = apiUpdates.project._id;
+      }
+      if (apiUpdates.assignee && typeof apiUpdates.assignee === 'object') {
+        apiUpdates.assignee = apiUpdates.assignee._id;
+      }
+
+      await apiService.updateTask(taskId, apiUpdates);
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      // Optionally: revert the optimistic update or show error toast
+      setToastMessage('Failed to update task');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
-    if (apiUpdates.assignee && typeof apiUpdates.assignee === 'object') {
-      apiUpdates.assignee = apiUpdates.assignee._id;
-    }
-    
-    await apiService.updateTask(taskId, apiUpdates);
-  } catch (error) {
-    console.error('Failed to update task:', error);
-    // Optionally: revert the optimistic update or show error toast
-    setToastMessage('Failed to update task');
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  }
-};
+  };
 
   const handleTaskCreate = (taskData: Partial<Task>) => {
     const newTask: Task = {
@@ -621,18 +623,18 @@ const TaskManagement: React.FC = () => {
   };
 
   const getPriorityIcon = (priority: string) => {
-  const icon = (() => {
-    switch (priority) {
-      case 'low': return <Circle className="w-3 h-3" />;
-      case 'medium': return <Square className="w-3 h-3" />;
-      case 'high': return <Triangle className="w-3 h-3" />;
-      case 'critical': return <AlertCircle className="w-3 h-3" />;
-      default: return <Circle className="w-3 h-3" />;
-    }
-  })();
-  
-  return <span className="pointer-events-none">{icon}</span>;
-};
+    const icon = (() => {
+      switch (priority) {
+        case 'low': return <Circle className="w-3 h-3" />;
+        case 'medium': return <Square className="w-3 h-3" />;
+        case 'high': return <Triangle className="w-3 h-3" />;
+        case 'critical': return <AlertCircle className="w-3 h-3" />;
+        default: return <Circle className="w-3 h-3" />;
+      }
+    })();
+
+    return <span className="pointer-events-none">{icon}</span>;
+  };
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
@@ -712,6 +714,35 @@ const TaskManagement: React.FC = () => {
     }
   };
 
+  const handleSyncFromNotion = async () => {
+    try {
+      setIsSyncingNotion(true);
+      // Use currently selected project or the first available project
+      // If 'all' is selected, we just pick the first one to satisfy the route param
+      // The backend logic actually finds tasks by Notion Page ID globally anyway
+      const projectIdToUse = filterProject !== 'all' ? filterProject : (projects[0]?._id || 'default');
+
+      const response = await apiService.post(`/planner/projects/${projectIdToUse}/sync/notion`, {});
+
+      if (response && response.success) {
+        setToastMessage(response.message || 'Synced from Notion successfully');
+        setShowToast(true);
+        // Refresh tasks to show updates
+        fetchTasks();
+      } else {
+        setToastMessage(response?.message || 'No updates found');
+        setShowToast(true);
+      }
+    } catch (error: any) {
+      console.error('Failed to sync from Notion:', error);
+      setToastMessage(error.message || 'Failed to sync from Notion');
+      setShowToast(true);
+    } finally {
+      setIsSyncingNotion(false);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
   const renderTaskBoard = () => (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -753,6 +784,16 @@ const TaskManagement: React.FC = () => {
           >
             <Plus className="w-4 h-4" />
             {t('tasks.newTask')}
+          </button>
+
+          <button
+            onClick={handleSyncFromNotion}
+            disabled={isSyncingNotion}
+            className="inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            title="Sync status updates from Notion"
+          >
+            <RefreshCw className={`w-4 h-4 ${isSyncingNotion ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Sync Notion</span>
           </button>
         </div>
       </div>
@@ -826,7 +867,7 @@ const TaskManagement: React.FC = () => {
                       }}
                     >
                       {/* Card Header */}
-                      <div 
+                      <div
                         className="w-full px-3 py-2 bg-white border-b-[3px] border-black"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
@@ -1006,7 +1047,7 @@ const TaskManagement: React.FC = () => {
                 }
               });
               const projects = Array.from(projectsMap.values());
-              
+
               return projects.map(project => {
                 const count = tasks.filter(t => t.project?._id === project._id).length;
                 const percentage = tasks.length > 0 ? (count / tasks.length) * 100 : 0;
@@ -1201,10 +1242,10 @@ const TaskManagement: React.FC = () => {
           ? { ...st, status: st.status === 'completed' ? 'pending' : 'completed' as 'pending' | 'in-progress' | 'completed' }
           : st
       );
-      
+
       // Update the task in the tasks array
       handleTaskUpdate(selectedTask._id, { subtasks: updatedSubtasks });
-      
+
       // Update selectedTask to reflect changes immediately
       setSelectedTask({
         ...selectedTask,
