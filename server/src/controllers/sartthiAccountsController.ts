@@ -217,6 +217,7 @@ const getProviderConfig = (service: ServiceType) => {
             tokenUrl: 'https://api.linear.app/oauth/token',
             clientId: process.env.LINEAR_CLIENT_ID || '',
             clientSecret: process.env.LINEAR_CLIENT_SECRET || '',
+            scope: SCOPES.linear.join(','),
             callbackUrl
         };
         default: return null;
