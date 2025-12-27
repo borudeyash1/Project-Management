@@ -46,9 +46,6 @@ const DropboxWidget: React.FC = () => {
     const [isCreatingFolder, setIsCreatingFolder] = useState(false);
     const [newFolderName, setNewFolderName] = useState('');
 
-    // Close widget if not active
-    if (!state.modals.dropboxWidget) return null;
-
     // --- Widget Drag Logic ---
     const handleMouseDown = (e: React.MouseEvent) => {
         // Prevent dragging if clicking buttons/inputs
@@ -103,6 +100,7 @@ const DropboxWidget: React.FC = () => {
         }
     };
 
+    // Only fetch if widget is open
     useEffect(() => {
         if (state.modals.dropboxWidget) {
             fetchFiles(currentPath);
@@ -219,6 +217,9 @@ const DropboxWidget: React.FC = () => {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     };
+
+    // IMPORTANT: Return null check MOVED to end to respect Hook Rules
+    if (!state.modals.dropboxWidget) return null;
 
     // --- Render ---
     return (

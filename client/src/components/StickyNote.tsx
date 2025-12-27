@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Save, GripHorizontal, Trash2 } from 'lucide-react';
+import { X, Save, GripHorizontal, Trash2, Maximize2, Minimize2 } from 'lucide-react';
 import { apiService } from '../services/api';
 
 interface StickyNoteProps {
@@ -30,6 +30,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isSaving, setIsSaving] = useState(false);
   const [noteId, setNoteId] = useState(id);
+  const [isExpanded, setIsExpanded] = useState(false); // [NEW]
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const colors = [
@@ -67,7 +68,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({
             savedNote = await apiService.post('/notes', noteData);
             setNoteId((savedNote as any)._id);
           }
-          
+
           if (onSave) onSave(savedNote);
           setIsSaving(false);
         } catch (error) {
@@ -79,6 +80,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({
   }, [title, content, currentColor, position]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, input')) return; // Avoid drag on controls
     setIsDragging(true);
     setDragOffset({
       x: e.clientX - position.x,
@@ -125,14 +127,19 @@ const StickyNote: React.FC<StickyNoteProps> = ({
     onClose();
   };
 
+
+
   return (
     <div
       style={{
         left: position.x,
         top: position.y,
         backgroundColor: currentColor,
+        width: isExpanded ? 400 : 256,
+        height: isExpanded ? 400 : 'auto',
+        minHeight: 200
       }}
-      className="fixed w-64 min-h-[200px] rounded-lg shadow-xl z-50 flex flex-col transition-shadow hover:shadow-2xl border border-gray-200/50"
+      className="fixed rounded-lg shadow-xl z-50 flex flex-col transition-all duration-200 hover:shadow-2xl border border-gray-200/50"
     >
       {/* Header / Drag Handle */}
       <div
@@ -142,6 +149,9 @@ const StickyNote: React.FC<StickyNoteProps> = ({
         <GripHorizontal size={16} className="text-gray-500" />
         <div className="flex items-center gap-1">
           {isSaving && <Save size={12} className="text-gray-500 animate-pulse" />}
+          <button onClick={() => setIsExpanded(!isExpanded)} className="p-1 hover:bg-black/10 rounded">
+            {isExpanded ? <Minimize2 size={12} className="text-gray-700" /> : <Maximize2 size={12} className="text-gray-700" />}
+          </button>
           <button onClick={onClose} className="p-1 hover:bg-black/10 rounded">
             <X size={14} className="text-gray-700" />
           </button>
