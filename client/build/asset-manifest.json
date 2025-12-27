@@ -1,17 +1,30 @@
 {
   "files": {
-    "main.css": "/static/css/main.21f35473.css",
-    "main.js": "/static/js/main.6e24cc37.js",
+    "main.css": "/static/css/main.433ded62.css",
+    "main.js": "/static/js/main.0c2ebaf7.js",
     "static/js/814.7ab3a6ab.chunk.js": "/static/js/814.7ab3a6ab.chunk.js",
     "static/js/52.e0d8b78b.chunk.js": "/static/js/52.e0d8b78b.chunk.js",
     "static/js/82.e308f072.chunk.js": "/static/js/82.e308f072.chunk.js",
     "static/js/239.3fe4d933.chunk.js": "/static/js/239.3fe4d933.chunk.js",
+    "reactPlayerHls.js": "/static/js/reactPlayerHls.660222fc.chunk.js",
+    "reactPlayerDash.js": "/static/js/reactPlayerDash.ecf7bbf0.chunk.js",
+    "reactPlayerMux.js": "/static/js/reactPlayerMux.e570e789.chunk.js",
+    "reactPlayerYouTube.js": "/static/js/reactPlayerYouTube.3bec0809.chunk.js",
+    "reactPlayerVimeo.js": "/static/js/reactPlayerVimeo.f0a7adf1.chunk.js",
+    "reactPlayerWistia.js": "/static/js/reactPlayerWistia.d5345ef7.chunk.js",
+    "reactPlayerSpotify.js": "/static/js/reactPlayerSpotify.2f1a08e3.chunk.js",
+    "reactPlayerTwitch.js": "/static/js/reactPlayerTwitch.e1ac7d8b.chunk.js",
+    "reactPlayerTiktok.js": "/static/js/reactPlayerTiktok.afa1b666.chunk.js",
+    "reactPlayerPreview.js": "/static/js/reactPlayerPreview.183ab146.chunk.js",
     "static/js/861.334626a8.chunk.js": "/static/js/861.334626a8.chunk.js",
+    "static/js/655.d0e2cfce.chunk.js": "/static/js/655.d0e2cfce.chunk.js",
+    "static/js/110.17a5c239.chunk.js": "/static/js/110.17a5c239.chunk.js",
+    "static/js/441.25a20cee.chunk.js": "/static/js/441.25a20cee.chunk.js",
     "static/js/729.87009c7b.chunk.js": "/static/js/729.87009c7b.chunk.js",
     "index.html": "/index.html"
   },
   "entrypoints": [
-    "static/css/main.21f35473.css",
-    "static/js/main.6e24cc37.js"
+    "static/css/main.433ded62.css",
+    "static/js/main.0c2ebaf7.js"
   ]
 }

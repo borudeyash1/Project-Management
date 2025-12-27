@@ -61,6 +61,25 @@ const handleSpotifyError = (res: Response, error: any, action: string) => {
     }
 };
 
+export const getProfile = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const token = await getSpotifyToken(userId);
+        if (!token) {
+            res.status(401).json({ message: 'Spotify not connected' });
+            return;
+        }
+
+        const response = await axios.get('https://api.spotify.com/v1/me', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        res.json(response.data);
+    } catch (error: any) {
+        handleSpotifyError(res, error, 'getProfile');
+    }
+};
+
 export const getAccessToken = async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;

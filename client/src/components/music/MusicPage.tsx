@@ -12,7 +12,7 @@ declare global {
 }
 
 const MusicPage: React.FC = () => {
-    const { state } = useApp();
+    const { state, dispatch } = useApp();
     const isSpotifyConnected = state.userProfile.connectedAccounts?.spotify?.activeAccountId;
     const [playlists, setPlaylists] = useState<any[]>([]);
     const [savedTracks, setSavedTracks] = useState<any[]>([]);
@@ -33,15 +33,22 @@ const MusicPage: React.FC = () => {
         }
     }, [isSpotifyConnected]);
 
-    // Handle Search
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!searchQuery.trim()) {
-            setSearchResults([]);
-            return;
-        }
+    // Handle Search with Debounce - Moved inside component
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery.trim()) {
+                performSearch(searchQuery);
+            } else {
+                setSearchResults([]);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const performSearch = async (query: string) => {
         try {
-            const res = await spotifyService.search(searchQuery);
+            const res = await spotifyService.search(query);
             setSearchResults(res.tracks?.items || []);
         } catch (error) {
             console.error('Search failed', error);
@@ -140,19 +147,16 @@ const MusicPage: React.FC = () => {
                     <h1 className="text-3xl font-bold mb-2">Music Library</h1>
                     <p className="text-gray-400">Your playlists and saved tracks</p>
                 </div>
-                <form onSubmit={handleSearch} className="relative w-96">
+                <div className="relative w-96">
                     <input
                         type="text"
                         placeholder="Search songs, artists, albums..."
                         value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            if (!e.target.value) setSearchResults([]);
-                        }}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-[#282828] border-none rounded-full py-3 px-6 pl-12 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#1DB954] transition-all"
                     />
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                </form>
+                </div>
             </header>
 
             {/* Search Results Overlay or Section */}
@@ -160,18 +164,45 @@ const MusicPage: React.FC = () => {
                 <div className="mb-12">
                     <h3 className="text-xl font-bold mb-4">Search Results</h3>
                     <div className="space-y-2">
-                        {searchResults.slice(0, 5).map((track: any) => (
+                        {searchResults.map((track: any) => (
                             <div
                                 key={track.id}
-                                onClick={() => spotifyService.play({ uris: [track.uri] })}
+                                onClick={async () => {
+                                    const res: any = await spotifyService.play({ uris: [track.uri], item: track });
+                                    if (res?.error === 'Premium Required') {
+                                        // Manually set playback state for Preview Mode
+                                        dispatch({
+                                            type: 'SET_PLAYBACK',
+                                            payload: {
+                                                is_playing: true,
+                                                item: track,
+                                                progress_ms: 0,
+                                                device: {
+                                                    name: 'Sartthi Preview',
+                                                    volume_percent: 50,
+                                                    id: 'preview',
+                                                    is_active: true,
+                                                    is_private_session: false,
+                                                    is_restricted: false,
+                                                    type: 'Computer'
+                                                },
+                                                currently_playing_type: 'track',
+                                                shuffle_state: false,
+                                                repeat_state: 'off',
+                                                timestamp: Date.now(),
+                                                context: null
+                                            }
+                                        });
+                                    }
+                                }}
                                 className="flex items-center gap-4 p-3 rounded-xl bg-gray-900/50 hover:bg-gray-800 transition-colors cursor-pointer group"
                             >
-                                <img src={track.album.images[2]?.url} className="w-12 h-12 rounded" alt={track.name} />
+                                <img src={track.album.images[0]?.url} className="w-16 h-16 rounded object-cover shadow-lg" alt={track.name} />
                                 <div className="flex-1">
-                                    <div className="font-bold group-hover:text-green-500 transition-colors">{track.name}</div>
+                                    <div className="font-bold text-lg group-hover:text-green-500 transition-colors">{track.name}</div>
                                     <div className="text-sm text-gray-400">{track.artists[0].name}</div>
                                 </div>
-                                <Play className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <Play className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity fill-current text-green-500" />
                             </div>
                         ))}
                     </div>

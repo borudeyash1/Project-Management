@@ -49,16 +49,29 @@ export const spotifyService = {
         const res = await apiService.get<{ token: string }>('/media/spotify/token');
         return res.data?.token || '';
     },
+    getProfile: async () => {
+        const res = await apiService.get<any>('/media/spotify/profile');
+        return res.data;
+    },
     getPlaybackState: async () => {
         const res = await apiService.get<SpotifyPlaybackState>('/media/spotify/player');
         return res.data;
     },
-    play: async (data?: { context_uri?: string; uris?: string[]; offset?: any; position_ms?: number; transfer_device_id?: string }) => {
+    play: async (data?: { context_uri?: string; uris?: string[]; offset?: any; position_ms?: number; transfer_device_id?: string; item?: any }) => {
         if (data?.transfer_device_id) {
-            await apiService.put('/media/spotify/player', { device_ids: [data.transfer_device_id], play: true }); // Transfer endpoints are different
+            await apiService.put('/media/spotify/player', { device_ids: [data.transfer_device_id], play: true });
         } else {
-            const res = await apiService.put('/media/spotify/player/play', data || {});
-            return res.data;
+            // If we have an item (from free user click), we might need to simulate state update if backend blocks 403
+            // But ideally, the backend should allow setting 'context' logic.
+            // For now, let's just trigger the PUT.
+            try {
+                const res = await apiService.put('/media/spotify/player/play', data || {});
+                return res.data;
+            } catch (error: any) {
+                // Return mock success if Premium Required, so frontend can handle preview
+                if (error.response?.status === 403) return { success: false, error: 'Premium Required' };
+                throw error;
+            }
         }
     },
     pause: async () => {
@@ -101,6 +114,11 @@ export const spotifyService = {
     },
     search: async (q: string, type: string = 'track,artist,album') => {
         const res = await apiService.get<any>(`/media/spotify/search?q=${encodeURIComponent(q)}&type=${type}`);
+        return res.data;
+    },
+    // YouTube Bridge
+    searchVideo: async (query: string) => {
+        const res = await apiService.get<any>(`/media/spotify/youtube/search?query=${encodeURIComponent(query)}`);
         return res.data;
     },
 

@@ -47,7 +47,8 @@
     "nodemailer": "^7.0.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "tsconfig-paths": "^4.2.0"
+    "tsconfig-paths": "^4.2.0",
+    "ytsr": "^3.8.4"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

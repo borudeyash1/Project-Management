@@ -9,7 +9,8 @@ router.use(protect);
 
 // Playback
 router.get('/player', spotifyController.getPlaybackState);
-router.get('/token', spotifyController.getAccessToken); // New endpoint for SDK
+router.get('/token', spotifyController.getAccessToken);
+router.get('/profile', spotifyController.getProfile); // Check subscription status
 router.put('/player', spotifyController.transferPlayback); // Transfer Playback
 router.put('/player/play', spotifyController.play);
 router.put('/player/pause', spotifyController.pause);
@@ -19,6 +20,10 @@ router.put('/player/seek', spotifyController.seek);
 router.put('/player/volume', spotifyController.setVolume);
 router.put('/player/shuffle', spotifyController.setShuffle);
 router.put('/player/repeat', spotifyController.setRepeat);
+
+// YouTube Bridge
+import * as videoController from '../controllers/media/videoController';
+router.get('/youtube/search', videoController.searchVideo);
 
 // Library & Search
 router.get('/playlists', protect, spotifyController.getPlaylists);

@@ -660,7 +660,9 @@ export interface AppState {
   clients: Client[];
   projects: Project[];
   tasks: Task[];
+
   notifications: Notification[];
+  playback: SpotifyPlaybackState | null; // Added for Global Player state
 }
 
 export interface Client {
@@ -766,4 +768,48 @@ export interface Notification {
     [key: string]: any;
   };
   createdAt: Date;
+}
+
+// Spotify Types
+export interface SpotifyPlaybackState {
+  device: {
+    id: string;
+    is_active: boolean;
+    is_private_session: boolean;
+    is_restricted: boolean;
+    name: string;
+    type: string;
+    volume_percent: number;
+  };
+  shuffle_state: boolean;
+  repeat_state: 'off' | 'track' | 'context';
+  timestamp: number;
+  context: {
+    external_urls: { spotify: string };
+    href: string;
+    type: string;
+    uri: string;
+  } | null;
+  progress_ms: number;
+  item: {
+    album: {
+      images: { height: number; url: string; width: number }[];
+      name: string;
+      uri: string;
+    };
+    artists: { name: string; uri: string }[];
+    duration_ms: number;
+    explicit: boolean;
+    external_ids: { isrc: string };
+    external_urls: { spotify: string };
+    href: string;
+    id: string;
+    is_local: boolean;
+    name: string;
+    popularity: number;
+    preview_url: string;
+    uri: string;
+  } | null;
+  currently_playing_type: 'track' | 'episode' | 'ad' | 'unknown';
+  is_playing: boolean;
 }
