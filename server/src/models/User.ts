@@ -600,6 +600,28 @@ const userSchema = new Schema<IUser>({
           type: Schema.Types.ObjectId,
           ref: 'ConnectedAccount'
         }]
+      },
+      notion: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
+      figma: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
       }
     },
     required: false,
