@@ -253,17 +253,34 @@ async function processCommitForTasks(
     const tasksToUpdate: any[] = [];
 
     for (const ref of parsed.taskReferences) {
-        const task = await Task.findOne({
-            project: projectId,
-            $or: [
-                { _id: ref.taskId },
+        console.log(`[GitHub] Looking for task with ID: ${ref.taskId}`);
+
+        // Try to match by MongoDB ObjectId or customId
+        const mongoose = await import('mongoose');
+        let query: any = {
+            project: projectId
+        };
+
+        // Check if it's a valid ObjectId format
+        if (mongoose.Types.ObjectId.isValid(ref.taskId)) {
+            console.log(`[GitHub] ${ref.taskId} is a valid ObjectId, searching by _id`);
+            query.$or = [
+                { _id: new mongoose.Types.ObjectId(ref.taskId) },
                 { customId: ref.taskId }
-            ]
-        });
+            ];
+        } else {
+            console.log(`[GitHub] ${ref.taskId} is not an ObjectId, searching by customId only`);
+            query.customId = ref.taskId;
+        }
+
+        console.log(`[GitHub] Query:`, JSON.stringify(query));
+        const task = await Task.findOne(query);
 
         if (task) {
             tasksToUpdate.push({ task, confidence: 1.0, matchType: 'direct' });
-            console.log(`[GitHub] Direct match: ${ref.taskId} -> Task ${task._id}`);
+            console.log(`[GitHub] ✅ Direct match: ${ref.taskId} -> Task ${task._id}`);
+        } else {
+            console.log(`[GitHub] ❌ No task found for ID: ${ref.taskId}`);
         }
     }
 
@@ -329,17 +346,23 @@ async function updateTaskFromCommit(
         console.log(`[GitHub] Linked commit ${commit.id.substring(0, 7)} to task ${task._id}`);
     }
 
-    // Update task status based on keywords (only for high-confidence matches)
+    // Update task status and progress based on keywords (only for high-confidence matches)
     if (parsed.suggestedStatus && confidence >= 0.7) {
         const statusMap: Record<string, string> = {
             'completed': 'completed',
             'in-progress': 'in-progress',
-            'testing': 'review', // Map testing to review status
-            'review': 'review'
+            'testing': 'review',
+            'review': 'review',
+            'blocked': 'blocked',
+            'partial': 'in-progress' // Map partial to in-progress but update progress %
         };
 
         const newStatus = statusMap[parsed.suggestedStatus];
-        if (newStatus && task.status !== newStatus && task.status !== 'completed' && task.status !== 'done') {
+
+        // Don't downgrade completed/verified tasks unless explicitly blocked
+        const isDowngrade = (task.status === 'completed' || task.status === 'done' || task.status === 'verified') && newStatus !== 'blocked';
+
+        if (newStatus && task.status !== newStatus && !isDowngrade) {
             const oldStatus = task.status;
             task.status = newStatus;
 
@@ -350,6 +373,16 @@ async function updateTaskFromCommit(
 
             updated = true;
             console.log(`[GitHub] Updated task ${task._id} status: ${oldStatus} -> ${newStatus} (${matchType} match, ${Math.round(confidence * 100)}% confidence)`);
+        }
+
+        // Update progress percentage if available
+        if (parsed.progressPercentage !== undefined && task.status !== 'completed' && task.status !== 'verified') {
+            // Only update progress if it's an increase or if explicitly setting specific progress
+            if (parsed.progressPercentage > (task.progress || 0)) {
+                console.log(`[GitHub] Updated task ${task._id} progress: ${task.progress || 0}% -> ${parsed.progressPercentage}%`);
+                task.progress = parsed.progressPercentage;
+                updated = true;
+            }
         }
     }
 

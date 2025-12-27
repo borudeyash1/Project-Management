@@ -1,59 +1,181 @@
 /**
- * Utility for parsing GitHub commit messages to extract task references and status keywords
+ * Enhanced Utility for parsing GitHub commit messages
+ * Features:
+ * - Extensive keyword detection (50+ keywords)
+ * - Typo tolerance using Levenshtein distance
+ * - Progress percentage calculation
+ * - Multi-status priority system
+ * - Abbreviation support
+ * - Partial completion detection
  */
 
 export interface TaskReference {
     taskId: string;
-    format: 'hash' | 'bracket' | 'plain'; // #TASK-123, [TASK-123], TASK-123
+    format: 'hash' | 'bracket' | 'plain' | 'objectid';
     position: number;
 }
 
 export interface StatusKeyword {
     keyword: string;
-    status: 'completed' | 'in-progress' | 'testing' | 'review';
-    confidence: number; // 0-1
+    status: 'completed' | 'in-progress' | 'partial' | 'testing' | 'review' | 'blocked';
+    confidence: number;
+    progressPercentage: number;
 }
 
 export interface ParsedCommit {
     taskReferences: TaskReference[];
     statusKeywords: StatusKeyword[];
-    suggestedStatus?: 'completed' | 'in-progress' | 'testing' | 'review';
-    titleKeywords: string[]; // For fuzzy matching against task titles
+    suggestedStatus?: 'completed' | 'in-progress' | 'partial' | 'testing' | 'review' | 'blocked';
+    progressPercentage?: number;
+    titleKeywords: string[];
 }
 
-// Status keyword mappings
+// Comprehensive status keyword mappings with progress percentages
 const STATUS_KEYWORDS = {
-    completed: [
-        'fix', 'fixes', 'fixed',
-        'close', 'closes', 'closed',
-        'resolve', 'resolves', 'resolved',
-        'complete', 'completes', 'completed',
-        'done', 'finished', 'implement', 'implemented'
-    ],
-    'in-progress': [
-        'working on', 'wip', 'started', 'starting',
-        'implementing', 'developing', 'building',
-        'adding', 'creating', 'updating'
-    ],
-    testing: [
-        'test', 'testing', 'tested',
-        'qa', 'verify', 'verifying'
-    ],
-    review: [
-        'review', 'ready for review', 'pr',
-        'pull request', 'needs review'
-    ]
+    completed: {
+        keywords: [
+            'done', 'finished', 'completed', 'complete',
+            'fixed', 'fix', 'fixes', 'fixxed', 'fixt', // typo variations
+            'resolved', 'resolve', 'resolves', 'resovled', 'resolvd',
+            'closed', 'close', 'closes', 'closd',
+            'implemented', 'implement', 'implements', 'implementd',
+            'merged', 'merge', 'deployed', 'deploy',
+            'finsihed', 'complted', 'finihsed' // common typos
+        ],
+        progress: 100
+    },
+    testing: {
+        keywords: [
+            'testing', 'test', 'tested', 'testin',
+            'qa', 'verify', 'verifying', 'verified',
+            'checking', 'check', 'checked',
+            'validating', 'validate', 'validated'
+        ],
+        progress: 85
+    },
+    review: {
+        keywords: [
+            'review', 'reviewing', 'reviewed',
+            'ready for review', 'needs review', 'pr ready',
+            'pull request', 'pr', 'code review'
+        ],
+        progress: 80
+    },
+    'in-progress': {
+        keywords: [
+            'working on', 'wip', 'workin on', 'workin',
+            'started', 'start', 'starting',
+            'implementing', 'develop', 'developing', 'developin',
+            'building', 'build', 'buildin',
+            'creating', 'create', 'creatin',
+            'adding', 'add', 'addin',
+            'updating', 'update', 'updatin',
+            'refactoring', 'refactor',
+            'improving', 'improve'
+        ],
+        progress: 60
+    },
+    partial: {
+        keywords: [
+            'partially', 'partial', 'partilly',
+            'halfway', 'half done', 'half way',
+            'progress on', 'some work on', 'made progress',
+            'initial', 'draft', 'wip on',
+            'ongoing', 'some fixes', 'partial fix'
+        ],
+        progress: 35
+    },
+    blocked: {
+        keywords: [
+            'blocked', 'blocked by', 'blockd',
+            'waiting for', 'waiting on',
+            'on hold', 'paused',
+            'stuck', 'need help', 'needs help',
+            'cant proceed', 'cannot proceed'
+        ],
+        progress: 0 // No progress change when blocked
+    }
+};
+
+// Common abbreviations
+const ABBREVIATIONS: Record<string, string[]> = {
+    'auth': ['authentication', 'authorize', 'authorization'],
+    'db': ['database'],
+    'api': ['application programming interface', 'endpoint'],
+    'ui': ['user interface', 'interface'],
+    'ux': ['user experience', 'experience'],
+    'repo': ['repository'],
+    'config': ['configuration'],
+    'impl': ['implement', 'implementation'],
+    'func': ['function', 'functionality'],
+    'btn': ['button'],
+    'msg': ['message'],
+    'err': ['error'],
+    'req': ['request'],
+    'res': ['response']
 };
 
 /**
+ * Calculate Levenshtein distance between two strings
+ * Used for typo tolerance
+ */
+function levenshteinDistance(str1: string, str2: string): number {
+    const len1 = str1.length;
+    const len2 = str2.length;
+
+    // Initialize matrix properly using Array.from to ensure TS knows array structure
+    const matrix: number[][] = Array.from({ length: len1 + 1 }, () => new Array(len2 + 1).fill(0));
+
+    for (let i = 0; i <= len1; i++) {
+        matrix[i]![0] = i;
+    }
+
+    for (let j = 0; j <= len2; j++) {
+        matrix[0]![j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            matrix[i]![j] = Math.min(
+                matrix[i - 1]![j]! + 1,      // deletion
+                matrix[i]![j - 1]! + 1,      // insertion
+                matrix[i - 1]![j - 1]! + cost // substitution
+            );
+        }
+    }
+
+    return matrix[len1]![len2]!;
+}
+
+/**
+ * Check if two words are similar (handles typos)
+ * Allows 1-2 character differences for words >5 characters
+ */
+function isSimilarWord(word1: string, word2: string): boolean {
+    const w1 = word1.toLowerCase();
+    const w2 = word2.toLowerCase();
+
+    if (w1 === w2) return true;
+
+    const distance = levenshteinDistance(w1, w2);
+    const maxLength = Math.max(w1.length, w2.length);
+
+    // Allow 1 char diff for words 5-8 chars, 2 char diff for words >8 chars
+    if (maxLength <= 4) return distance === 0;
+    if (maxLength <= 8) return distance <= 1;
+    return distance <= 2;
+}
+
+/**
  * Extract task references from commit message
- * Supports formats: #TASK-123, [TASK-123], TASK-123
+ * Supports: #TASK-123, [TASK-123], TASK-123, MongoDB ObjectIds
  */
 export function extractTaskReferences(message: string): TaskReference[] {
     const references: TaskReference[] = [];
 
     // Pattern 1: #TASK-123 or #123
-    const hashPattern = /#(TASK-\d+|\d+)/gi;
+    const hashPattern = /#(TASK-\\d+|\\d+)/gi;
     let hashMatch: RegExpExecArray | null;
     while ((hashMatch = hashPattern.exec(message)) !== null) {
         const capturedId = hashMatch[1] || '';
@@ -65,7 +187,7 @@ export function extractTaskReferences(message: string): TaskReference[] {
     }
 
     // Pattern 2: [TASK-123]
-    const bracketPattern = /\[(TASK-\d+)\]/gi;
+    const bracketPattern = /\\[(TASK-\\d+)\\]/gi;
     let bracketMatch: RegExpExecArray | null;
     while ((bracketMatch = bracketPattern.exec(message)) !== null) {
         const capturedId = bracketMatch[1] || '';
@@ -77,11 +199,10 @@ export function extractTaskReferences(message: string): TaskReference[] {
     }
 
     // Pattern 3: TASK-123 (standalone)
-    const plainPattern = /\b(TASK-\d+)\b/gi;
+    const plainPattern = /\\b(TASK-\\d+)\\b/gi;
     let plainMatch: RegExpExecArray | null;
     while ((plainMatch = plainPattern.exec(message)) !== null) {
         const capturedId = plainMatch[1] || '';
-        // Avoid duplicates from bracket pattern
         if (!references.some(ref => ref.taskId === capturedId && ref.position === plainMatch!.index)) {
             references.push({
                 taskId: capturedId,
@@ -91,34 +212,61 @@ export function extractTaskReferences(message: string): TaskReference[] {
         }
     }
 
+    // Pattern 4: MongoDB ObjectId (24 hex characters)
+    const objectIdPattern = /#([a-f0-9]{24})\\b/gi;
+    let objectIdMatch: RegExpExecArray | null;
+    while ((objectIdMatch = objectIdPattern.exec(message)) !== null) {
+        const capturedId = objectIdMatch[1] || '';
+        references.push({
+            taskId: capturedId,
+            format: 'objectid',
+            position: objectIdMatch.index
+        });
+    }
+
     return references;
 }
 
 /**
- * Detect status keywords in commit message
+ * Detect status keywords with typo tolerance
  */
 export function detectStatusKeywords(message: string): StatusKeyword[] {
-    const lowerMessage = message.toLowerCase();
     const keywords: StatusKeyword[] = [];
+    const messageLower = message.toLowerCase();
 
-    for (const [status, keywordList] of Object.entries(STATUS_KEYWORDS)) {
-        for (const keyword of keywordList) {
-            if (lowerMessage.includes(keyword)) {
-                // Calculate confidence based on keyword position and context
-                const position = lowerMessage.indexOf(keyword);
-                const isAtStart = position < 20; // Higher confidence if near start
-                const hasTaskRef = extractTaskReferences(message).length > 0;
+    // Priority order (highest to lowest)
+    const statusPriority: Array<keyof typeof STATUS_KEYWORDS> = [
+        'blocked', 'completed', 'testing', 'review', 'in-progress', 'partial'
+    ];
 
-                let confidence = 0.5;
-                if (isAtStart) confidence += 0.2;
-                if (hasTaskRef) confidence += 0.2;
-                if (keyword.length > 5) confidence += 0.1; // Longer keywords are more specific
+    for (const status of statusPriority) {
+        const config = STATUS_KEYWORDS[status];
 
+        for (const keyword of config.keywords) {
+            // Check for exact match or phrase match
+            if (messageLower.includes(keyword.toLowerCase())) {
                 keywords.push({
                     keyword,
                     status: status as any,
-                    confidence: Math.min(confidence, 1.0)
+                    confidence: 1.0,
+                    progressPercentage: config.progress
                 });
+                continue;
+            }
+
+            // Check for typo tolerance (single words only)
+            if (!keyword.includes(' ')) {
+                const words = messageLower.split(/\\s+/);
+                for (const word of words) {
+                    if (word.length > 3 && isSimilarWord(word, keyword)) {
+                        keywords.push({
+                            keyword: word,
+                            status: status as any,
+                            confidence: 0.9, // Slightly lower confidence for typo matches
+                            progressPercentage: config.progress
+                        });
+                    }
+                }
             }
         }
     }
@@ -127,92 +275,105 @@ export function detectStatusKeywords(message: string): StatusKeyword[] {
 }
 
 /**
- * Determine the most likely task status from detected keywords
+ * Determine suggested status based on detected keywords
+ * Uses priority system: blocked > completed > testing > review > in-progress > partial
  */
-export function determineSuggestedStatus(keywords: StatusKeyword[]): 'completed' | 'in-progress' | 'testing' | 'review' | undefined {
-    if (keywords.length === 0) return undefined;
+export function determineSuggestedStatus(keywords: StatusKeyword[]): {
+    status?: 'completed' | 'in-progress' | 'partial' | 'testing' | 'review' | 'blocked';
+    progress?: number;
+} {
+    if (keywords.length === 0) return {};
 
-    // Group by status and sum confidence scores
-    const statusScores: Record<string, number> = {};
-    for (const kw of keywords) {
-        statusScores[kw.status] = (statusScores[kw.status] || 0) + kw.confidence;
-    }
+    // Priority order
+    const priority = ['blocked', 'completed', 'testing', 'review', 'in-progress', 'partial'];
 
-    // Find status with highest confidence
-    let maxScore = 0;
-    let suggestedStatus: string | undefined;
-    for (const [status, score] of Object.entries(statusScores)) {
-        if (score > maxScore) {
-            maxScore = score;
-            suggestedStatus = status;
+    for (const status of priority) {
+        const match = keywords.find(k => k.status === status);
+        if (match) {
+            return {
+                status: match.status,
+                progress: match.progressPercentage
+            };
         }
     }
 
-    return suggestedStatus as any;
+    return {};
 }
 
 /**
- * Extract meaningful keywords from commit message for fuzzy task matching
+ * Extract keywords from commit message for fuzzy title matching
+ * Expands abbreviations
  */
 export function extractTitleKeywords(message: string): string[] {
     // Remove task references and common words
-    let cleaned = message
-        .replace(/#(TASK-\d+|\d+)/gi, '')
-        .replace(/\[(TASK-\d+)\]/gi, '')
-        .replace(/\b(TASK-\d+)\b/gi, '');
+    const cleaned = message
+        .replace(/#(TASK-\\d+|\\d+)/gi, '')
+        .replace(/\\[(TASK-\\d+)\\]/gi, '')
+        .replace(/\\b(TASK-\\d+)\\b/gi, '')
+        .toLowerCase();
 
-    // Remove status keywords
-    for (const keywordList of Object.values(STATUS_KEYWORDS)) {
-        for (const keyword of keywordList) {
-            cleaned = cleaned.replace(new RegExp(`\\b${keyword}\\b`, 'gi'), '');
+    const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might', 'must', 'can']);
+
+    const words = cleaned
+        .split(/[^a-z0-9]+/)
+        .filter(word => word.length > 2 && !stopWords.has(word));
+
+    // Expand abbreviations
+    const expanded: string[] = [];
+    for (const word of words) {
+        expanded.push(word);
+        if (ABBREVIATIONS[word]) {
+            expanded.push(...ABBREVIATIONS[word]);
         }
     }
 
-    // Extract words (3+ characters)
-    const words = cleaned
-        .toLowerCase()
-        .split(/\s+/)
-        .filter(word => word.length >= 3)
-        .filter(word => !['the', 'and', 'for', 'with', 'from'].includes(word));
-
-    return [...new Set(words)]; // Remove duplicates
+    return [...new Set(expanded)]; // Remove duplicates
 }
 
 /**
- * Main parsing function
+ * Calculate similarity between commit keywords and task title
+ * Enhanced with abbreviation support
+ */
+export function calculateTitleSimilarity(commitKeywords: string[], taskTitle: string): number {
+    if (commitKeywords.length === 0) return 0;
+
+    const titleWords = taskTitle
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter(word => word.length > 2);
+
+    let matches = 0;
+    for (const keyword of commitKeywords) {
+        for (const titleWord of titleWords) {
+            if (titleWord.includes(keyword) || keyword.includes(titleWord)) {
+                matches++;
+                break;
+            }
+            // Check with typo tolerance
+            if (isSimilarWord(keyword, titleWord)) {
+                matches += 0.8; // Slightly lower weight for fuzzy matches
+                break;
+            }
+        }
+    }
+
+    return matches / Math.max(commitKeywords.length, titleWords.length);
+}
+
+/**
+ * Main function to parse commit message
  */
 export function parseCommitMessage(message: string): ParsedCommit {
     const taskReferences = extractTaskReferences(message);
     const statusKeywords = detectStatusKeywords(message);
-    const suggestedStatus = determineSuggestedStatus(statusKeywords);
+    const { status, progress } = determineSuggestedStatus(statusKeywords);
     const titleKeywords = extractTitleKeywords(message);
 
     return {
         taskReferences,
         statusKeywords,
-        suggestedStatus,
+        suggestedStatus: status,
+        progressPercentage: progress,
         titleKeywords
     };
-}
-
-/**
- * Calculate similarity score between commit keywords and task title
- * Returns a score between 0 and 1
- */
-export function calculateTitleSimilarity(commitKeywords: string[], taskTitle: string): number {
-    if (commitKeywords.length === 0) return 0;
-
-    const taskWords = taskTitle
-        .toLowerCase()
-        .split(/\s+/)
-        .filter(word => word.length >= 3);
-
-    let matchCount = 0;
-    for (const keyword of commitKeywords) {
-        if (taskWords.some(word => word.includes(keyword) || keyword.includes(word))) {
-            matchCount++;
-        }
-    }
-
-    return matchCount / commitKeywords.length;
 }
