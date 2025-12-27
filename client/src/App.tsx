@@ -272,6 +272,7 @@ const AppContent: React.FC = () => {
     <div className="antialiased bg-bg dark:bg-gray-900 text-text dark:text-gray-100 font-inter selection-bg-primary">
       <StickyNotesContainer />
       <DropboxWidget />
+      <SpotifyWidget />
       <ToastContainer />
 
       <Routes>

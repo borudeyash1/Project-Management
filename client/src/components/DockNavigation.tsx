@@ -308,12 +308,14 @@ const DockNavigation: React.FC = () => {
             onMouseEnter={() => setHoveredIcon('spotify')}
             onMouseLeave={() => setHoveredIcon(null)}
           >
-            <button
+            <DockIcon
               onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'spotifyWidget' })}
-              className="p-3 bg-[#121212]/30 dark:bg-[#121212]/50 hover:bg-[#1DB954]/20 rounded-2xl backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-2 border border-[#1DB954]/20"
+              tooltip="Spotify"
+              active={state.modals.spotifyWidget}
+              className="text-[#1DB954]"
             >
-              <Music2 className="text-[#1DB954]" size={24} />
-            </button>
+              <Music2 size={22} />
+            </DockIcon>
 
             {/* Tooltip/Menu */}
             <AnimatePresence>
