@@ -280,7 +280,7 @@ const DockNavigation: React.FC = () => {
         </DockIcon>
 
         {/* Dropbox - Only if connected */}
-        {state.userProfile.connectedAccounts?.dropbox?.activeAccountId && (
+        {!!state.userProfile.connectedAccounts?.dropbox?.activeAccountId && (
           <div
             className="relative group"
             onMouseEnter={(e) => handleIconEnter('dropbox', e)}
