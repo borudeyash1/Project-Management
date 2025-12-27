@@ -291,18 +291,39 @@ async function processCommitForTasks(
             status: { $nin: ['completed', 'done', 'verified'] } // Only match incomplete tasks
         }).limit(50); // Limit to prevent performance issues
 
+        let candidates: { task: any, score: number }[] = [];
+
         for (const task of projectTasks) {
             const similarity = calculateTitleSimilarity(parsed.titleKeywords, task.title);
+            if (similarity > 0.3) { // Log anything remotely similar
+                candidates.push({ task, score: similarity });
+            }
+
             if (similarity >= 0.6) { // 60% similarity threshold
                 tasksToUpdate.push({ task, confidence: similarity, matchType: 'fuzzy' });
-                console.log(`[GitHub] Fuzzy match: "${task.title}" (${Math.round(similarity * 100)}% confidence)`);
             }
+        }
+
+        // Log candidates for debugging
+        if (candidates.length > 0) {
+            candidates.sort((a, b) => b.score - a.score);
+            console.log(`[GitHub] Fuzzy match candidates for keywords [${parsed.titleKeywords.join(', ')}]:`);
+            candidates.slice(0, 3).forEach(c =>
+                console.log(`   - "${c.task.title}" (Score: ${Math.round(c.score * 100)}%)`)
+            );
+        } else {
+            console.log(`[GitHub] No tasks found with >30% similarity for keywords: [${parsed.titleKeywords.join(', ')}]`);
         }
 
         // Sort by confidence and take top match only for fuzzy matches
         if (tasksToUpdate.length > 0) {
             tasksToUpdate.sort((a, b) => b.confidence - a.confidence);
-            tasksToUpdate.splice(1); // Keep only the best match
+            const bestMatch = tasksToUpdate[0];
+            tasksToUpdate.length = 0; // Clear array
+            tasksToUpdate.push(bestMatch); // Keep only best match
+            console.log(`[GitHub] ✅ Selected best match: "${bestMatch.task.title}" (${Math.round(bestMatch.confidence * 100)}%)`);
+        } else {
+            console.log(`[GitHub] ❌ No fuzzy match met the 60% threshold`);
         }
     }
 
