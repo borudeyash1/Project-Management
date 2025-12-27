@@ -19,28 +19,50 @@ const webhookLimiter = rateLimit({
 // Verify GitHub webhook signature
 const verifyGitHubSignature = (req: Request): boolean => {
     const signature = req.headers['x-hub-signature-256'] as string;
+
+    console.log('[GitHub Webhook] Verifying signature...');
+    console.log('[GitHub Webhook] Signature header:', signature ? 'Present' : 'Missing');
+
     if (!signature) {
+        console.error('[GitHub Webhook] No signature header found');
         return false;
     }
 
     const secret = process.env.GITHUB_WEBHOOK_SECRET;
     if (!secret) {
-        console.error('GITHUB_WEBHOOK_SECRET is not configured');
+        console.error('[GitHub Webhook] GITHUB_WEBHOOK_SECRET is not configured');
         return false;
     }
 
-    const payload = JSON.stringify(req.body);
+    console.log('[GitHub Webhook] Secret configured:', secret.substring(0, 10) + '...');
+
+    // GitHub sends the raw body, we need to use it as-is
+    // If body is already parsed, we need to re-stringify it
+    let payload: string;
+    if (typeof req.body === 'string') {
+        payload = req.body;
+    } else {
+        payload = JSON.stringify(req.body);
+    }
+
     const hmac = crypto.createHmac('sha256', secret);
     const digest = 'sha256=' + hmac.update(payload).digest('hex');
+
+    console.log('[GitHub Webhook] Expected signature:', digest.substring(0, 20) + '...');
+    console.log('[GitHub Webhook] Received signature:', signature.substring(0, 20) + '...');
 
     const signatureBuffer = Buffer.from(signature);
     const digestBuffer = Buffer.from(digest);
 
     if (signatureBuffer.length !== digestBuffer.length) {
+        console.error('[GitHub Webhook] Signature length mismatch');
         return false;
     }
 
-    return crypto.timingSafeEqual(signatureBuffer, digestBuffer);
+    const isValid = crypto.timingSafeEqual(signatureBuffer, digestBuffer);
+    console.log('[GitHub Webhook] Signature valid:', isValid);
+
+    return isValid;
 };
 
 // Main webhook endpoint
