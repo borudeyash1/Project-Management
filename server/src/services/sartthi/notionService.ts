@@ -58,11 +58,27 @@ export const getNotionService = () => {
             const token = await getAccessToken(userId, accountId);
 
             // Determine parent (database or page)
-            const parent = data.parentDatabase
-                ? { database_id: data.parentDatabase }
-                : data.parentPage
-                    ? { page_id: data.parentPage }
-                    : { page_id: 'root' }; // Will use workspace root if no parent specified
+            let parent;
+            if (data.parentDatabase) {
+                parent = { database_id: data.parentDatabase };
+            } else if (data.parentPage) {
+                parent = { page_id: data.parentPage };
+            } else {
+                // No parent specified, try to find a fallback
+                // First try to find a database (preferred for tasks)
+                const databases = await listDatabases(userId, accountId);
+                if (databases && databases.length > 0) {
+                    parent = { database_id: databases[0].id };
+                } else {
+                    // If no databases, try to find any page
+                    const pages = await search(userId, '', accountId);
+                    if (pages && pages.length > 0) {
+                        parent = { page_id: pages[0].id };
+                    } else {
+                        throw new Error('No Notion parent (page or database) found to sync to. Please select pages when authenticating Notion.');
+                    }
+                }
+            }
 
             const response = await axios.post(`${NOTION_API_URL}/pages`,
                 {
