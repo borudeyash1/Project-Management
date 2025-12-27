@@ -46,6 +46,21 @@ const getSpotifyToken = async (userId: string): Promise<string | null> => {
     return account.accessToken;
 };
 
+// Helper for error handling
+const handleSpotifyError = (res: Response, error: any, action: string) => {
+    if (error.response) {
+        const status = error.response.status;
+        // Don't log 403 Premium errors to console to avoid noise
+        if (status !== 403) {
+            console.error(`${action} Spotify error:`, error.response.data || error.message);
+        }
+        res.status(status).json(error.response.data?.error || { message: 'Spotify API Error' });
+    } else {
+        console.error(`${action} error:`, error.message);
+        res.status(500).json({ message: `Failed to ${action}` });
+    }
+};
+
 // --- Playback Controls ---
 
 export const getPlaybackState = async (req: Request, res: Response) => {
@@ -68,8 +83,7 @@ export const getPlaybackState = async (req: Request, res: Response) => {
 
         res.json(response.data);
     } catch (error: any) {
-        console.error('Get playback error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to get playback' });
+        handleSpotifyError(res, error, 'getPlaybackState');
     }
 };
 
@@ -95,12 +109,7 @@ export const play = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        if (error.response?.status === 404) {
-            res.status(404).json({ message: 'No active device found' });
-            return;
-        }
-        console.error('Play error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to play' });
+        handleSpotifyError(res, error, 'play');
     }
 };
 
@@ -119,8 +128,7 @@ export const pause = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Pause error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to pause' });
+        handleSpotifyError(res, error, 'pause');
     }
 };
 
@@ -139,8 +147,7 @@ export const next = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Next error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to skip' });
+        handleSpotifyError(res, error, 'next');
     }
 };
 
@@ -159,8 +166,7 @@ export const previous = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Previous error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to go back' });
+        handleSpotifyError(res, error, 'previous');
     }
 };
 
@@ -180,8 +186,7 @@ export const seek = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Seek error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to seek' });
+        handleSpotifyError(res, error, 'seek');
     }
 };
 
@@ -201,15 +206,14 @@ export const setVolume = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Set volume error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to set volume' });
+        handleSpotifyError(res, error, 'setVolume');
     }
 };
 
 export const setShuffle = async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
-        const { state } = req.body; // true or false
+        const { state } = req.body;
         const token = await getSpotifyToken(userId);
         if (!token) {
             res.status(401).json({ message: 'Spotify not connected' });
@@ -222,15 +226,14 @@ export const setShuffle = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Set shuffle error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to set shuffle' });
+        handleSpotifyError(res, error, 'setShuffle');
     }
 };
 
 export const setRepeat = async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user._id;
-        const { state } = req.body; // track, context, off
+        const { state } = req.body;
         const token = await getSpotifyToken(userId);
         if (!token) {
             res.status(401).json({ message: 'Spotify not connected' });
@@ -243,8 +246,7 @@ export const setRepeat = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Set repeat error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to set repeat' });
+        handleSpotifyError(res, error, 'setRepeat');
     }
 };
 
