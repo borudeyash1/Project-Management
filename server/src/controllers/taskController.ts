@@ -435,6 +435,31 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     const oldStatus = task.status;
     await task.save();
 
+    // Sync status change to Notion if task is synced
+    if (status !== undefined && (task as any).notionSync?.pageId) {
+      try {
+        const notionService = getNotionService();
+        const notionStatus = status === 'completed' ? 'Done' :
+          status === 'in-progress' ? 'In progress' :
+            'Not started';
+
+        await notionService.updatePage(
+          authUser._id,
+          (task as any).notionSync.pageId,
+          {
+            properties: {
+              Status: { status: { name: notionStatus } }
+            }
+          }
+        );
+
+        console.log(`✅ [NOTION] Synced status update to Notion: ${status} → ${notionStatus}`);
+      } catch (error) {
+        console.error('❌ [NOTION] Failed to sync status to Notion:', error);
+        // Don't fail the task update if Notion sync fails
+      }
+    }
+
     // Create activity for task update
     const isCompleted = oldStatus !== 'completed' && oldStatus !== 'verified' && (task.status === 'completed' || task.status === 'verified');
     if (isCompleted) {

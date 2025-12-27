@@ -234,6 +234,11 @@ mongoose
   .then(async () => {
     await ensureDefaultSubscriptionPlans();
     initializeSartthiServices();
+
+    // Start Notion sync poller for bidirectional sync
+    const { notionSyncPoller } = require('./services/sartthi/notionSyncPoller');
+    notionSyncPoller.start();
+
     console.log("Connected to MongoDB");
   })
   .catch((error) => {
