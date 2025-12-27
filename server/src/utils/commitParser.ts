@@ -312,7 +312,13 @@ export function extractTitleKeywords(message: string): string[] {
         .replace(/\\b(TASK-\\d+)\\b/gi, '')
         .toLowerCase();
 
-    const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might', 'must', 'can']);
+    const stopWords = new Set([
+        'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might', 'must', 'can',
+        // Common project management words (noise)
+        'issue', 'bug', 'task', 'ticket', 'feature', 'chore', 'refactor', 'work', 'job',
+        // Status keywords (should not be part of title match)
+        'fix', 'fixes', 'fixed', 'closed', 'close', 'closes', 'resolved', 'resolve', 'update', 'updated', 'updating', 'add', 'added', 'adding', 'implement', 'implemented'
+    ]);
 
     const words = cleaned
         .split(/[^a-z0-9]+/)

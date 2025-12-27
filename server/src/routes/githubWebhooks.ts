@@ -299,7 +299,7 @@ async function processCommitForTasks(
                 candidates.push({ task, score: similarity });
             }
 
-            if (similarity >= 0.6) { // 60% similarity threshold
+            if (similarity >= 0.5) { // 50% similarity threshold (lowered from 60%)
                 tasksToUpdate.push({ task, confidence: similarity, matchType: 'fuzzy' });
             }
         }
@@ -323,7 +323,7 @@ async function processCommitForTasks(
             tasksToUpdate.push(bestMatch); // Keep only best match
             console.log(`[GitHub] ✅ Selected best match: "${bestMatch.task.title}" (${Math.round(bestMatch.confidence * 100)}%)`);
         } else {
-            console.log(`[GitHub] ❌ No fuzzy match met the 60% threshold`);
+            console.log(`[GitHub] ❌ No fuzzy match met the 50% threshold`);
         }
     }
 
