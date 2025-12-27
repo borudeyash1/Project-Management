@@ -64,8 +64,7 @@ const ConnectedAccounts: React.FC = () => {
   const [notionDatabases, setNotionDatabases] = useState<NotionDatabase[]>([]);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('');
 
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
 
   // Zendesk Modal State
   const [showZendeskModal, setShowZendeskModal] = useState(false);
