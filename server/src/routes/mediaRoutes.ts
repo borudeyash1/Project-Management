@@ -9,6 +9,8 @@ router.use(protect);
 
 // Playback
 router.get('/player', spotifyController.getPlaybackState);
+router.get('/token', spotifyController.getAccessToken); // New endpoint for SDK
+router.put('/player', spotifyController.transferPlayback); // Transfer Playback
 router.put('/player/play', spotifyController.play);
 router.put('/player/pause', spotifyController.pause);
 router.post('/player/next', spotifyController.next);

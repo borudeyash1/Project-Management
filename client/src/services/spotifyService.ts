@@ -45,13 +45,21 @@ export interface SpotifyPlaybackState {
 
 export const spotifyService = {
     // Playback
+    getToken: async () => {
+        const res = await apiService.get<{ token: string }>('/media/spotify/token');
+        return res.data?.token || '';
+    },
     getPlaybackState: async () => {
         const res = await apiService.get<SpotifyPlaybackState>('/media/spotify/player');
         return res.data;
     },
-    play: async (data?: { context_uri?: string; uris?: string[]; offset?: any; position_ms?: number }) => {
-        const res = await apiService.put('/media/spotify/player/play', data || {});
-        return res.data;
+    play: async (data?: { context_uri?: string; uris?: string[]; offset?: any; position_ms?: number; transfer_device_id?: string }) => {
+        if (data?.transfer_device_id) {
+            await apiService.put('/media/spotify/player', { device_ids: [data.transfer_device_id], play: true }); // Transfer endpoints are different
+        } else {
+            const res = await apiService.put('/media/spotify/player/play', data || {});
+            return res.data;
+        }
     },
     pause: async () => {
         const res = await apiService.put('/media/spotify/player/pause', {});

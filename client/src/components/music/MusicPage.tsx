@@ -4,6 +4,13 @@ import { useApp } from '../../context/AppContext';
 import { spotifyService, SpotifyPlaybackState } from '../../services/spotifyService';
 import { Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Search, Heart, Clock, Music, Volume2, Mic2, ListMusic } from 'lucide-react';
 
+declare global {
+    interface Window {
+        onSpotifyWebPlaybackSDKReady: () => void;
+        Spotify: any;
+    }
+}
+
 const MusicPage: React.FC = () => {
     const { state } = useApp();
     const isSpotifyConnected = state.userProfile.connectedAccounts?.spotify?.activeAccountId;
@@ -15,6 +22,8 @@ const MusicPage: React.FC = () => {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [volume, setVolume] = useState(50);
     const [showVolume, setShowVolume] = useState(false);
+    const [player, setPlayer] = useState<any>(null);
+    const [deviceId, setDeviceId] = useState<string | null>(null);
 
     useEffect(() => {
         if (isSpotifyConnected) {
@@ -40,11 +49,53 @@ const MusicPage: React.FC = () => {
     };
 
     useEffect(() => {
-        if (isSpotifyConnected) {
-            loadData();
-        } else {
+        if (!isSpotifyConnected) {
             setLoading(false);
+            return;
         }
+
+        // Load SDK Script
+        const script = document.createElement("script");
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Initialize Player when SDK is ready
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            const player = new window.Spotify.Player({
+                name: 'Sartthi Web Player',
+                getOAuthToken: async (cb: any) => {
+                    const token = await spotifyService.getToken();
+                    cb(token);
+                },
+                volume: 0.5
+            });
+
+            player.addListener('ready', ({ device_id }: any) => {
+                console.log('Ready with Device ID', device_id);
+                setDeviceId(device_id);
+                // Auto-transfer playback to this device
+                spotifyService.play({ transfer_device_id: device_id });
+            });
+
+            player.addListener('not_ready', ({ device_id }: any) => {
+                console.log('Device ID has gone offline', device_id);
+            });
+
+            player.addListener('player_state_changed', (state: any) => {
+                if (!state) return;
+                setPlayback(state);
+            });
+
+            player.connect();
+            setPlayer(player);
+        };
+
+        loadData();
+
+        return () => {
+            player?.disconnect();
+        };
     }, [isSpotifyConnected]);
 
     const loadData = async () => {

@@ -61,7 +61,40 @@ const handleSpotifyError = (res: Response, error: any, action: string) => {
     }
 };
 
-// --- Playback Controls ---
+export const getAccessToken = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const token = await getSpotifyToken(userId);
+        if (!token) {
+            res.status(401).json({ message: 'Spotify not connected' });
+            return;
+        }
+        res.json({ token });
+    } catch (error: any) {
+        console.error('Get token error:', error.message);
+        res.status(500).json({ message: 'Failed to get token' });
+    }
+};
+
+export const transferPlayback = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const { device_ids, play } = req.body;
+        const token = await getSpotifyToken(userId);
+        if (!token) {
+            res.status(401).json({ message: 'Spotify not connected' });
+            return;
+        }
+
+        await axios.put('https://api.spotify.com/v1/me/player', { device_ids, play }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        res.json({ success: true });
+    } catch (error: any) {
+        handleSpotifyError(res, error, 'transferPlayback');
+    }
+};
 
 export const getPlaybackState = async (req: Request, res: Response) => {
     try {
