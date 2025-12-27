@@ -73,6 +73,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [newLink, setNewLink] = useState<{ [taskId: string]: string }>({});
   const [statusUpdate, setStatusUpdate] = useState<{ [taskId: string]: string }>({});
+  const [sliderValues, setSliderValues] = useState<{ [taskId: string]: number }>({});
   const [viewMode, setViewMode] = useState<'list' | 'kanban' | 'calendar' | 'gantt' | 'table' | 'dashboard' | 'workload'>('list');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [selectedTaskForModal, setSelectedTaskForModal] = useState<Task | null>(null);
@@ -545,29 +546,22 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             label="Task Status"
                             size="md"
                             className="w-full"
+                            // Use local slider value if dragging, otherwise derive from status
                             value={
-                              task.status === 'pending' ? 0 :
-                                task.status === 'in-progress' ? 0.33 :
-                                  task.status === 'completed' ? 0.66 :
-                                    task.status === 'blocked' ? 0 : 0
+                              sliderValues[task._id] ?? (
+                                task.status === 'pending' ? 0 :
+                                  task.status === 'in-progress' ? 0.33 :
+                                    task.status === 'completed' ? 0.66 :
+                                      task.status === 'blocked' ? 0 : 0
+                              )
                             }
                             onChange={(value: number | number[]) => {
+                              // Only update local state visually, DO NOT call API
                               const numValue = Array.isArray(value) ? value[0] : value;
-                              let newStatus: Task['status'] = 'pending';
-
-                              // Determine status based on slider position
-                              if (numValue <= 0.16) newStatus = 'pending';
-                              else if (numValue <= 0.5) newStatus = 'in-progress';
-                              else if (numValue <= 0.83) newStatus = 'completed';
-                              else newStatus = 'verified';
-
-                              // Only update if status actually changed
-                              if (newStatus !== task.status) {
-                                handleStatusChange(task._id, newStatus);
-                              }
+                              setSliderValues(prev => ({ ...prev, [task._id]: numValue }));
                             }}
                             onChangeEnd={(value: number | number[]) => {
-                              // Snap to nearest mark when released
+                              // Snap to nearest mark and CALL API only when released
                               const numValue = Array.isArray(value) ? value[0] : value;
                               let newStatus: Task['status'] = 'pending';
 
@@ -576,7 +570,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                               else if (numValue <= 0.83) newStatus = 'completed';
                               else newStatus = 'verified';
 
-                              // Ensure final status is set
+                              // Clear local override so it falls back to actual status
+                              const newSliderValues = { ...sliderValues };
+                              delete newSliderValues[task._id];
+                              setSliderValues(newSliderValues);
+
+                              // Only update if status actually changed
                               if (newStatus !== task.status) {
                                 handleStatusChange(task._id, newStatus);
                               }
@@ -594,14 +593,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             classNames={{
                               base: "gap-3",
                               track: "h-2 bg-gray-300 dark:bg-gray-600",
-                              filler: task.status === 'pending' ? "bg-gradient-to-r from-yellow-400 to-orange-500" :
-                                task.status === 'in-progress' ? "bg-gradient-to-r from-blue-400 to-blue-600" :
-                                  task.status === 'completed' ? "bg-gradient-to-r from-green-400 to-green-600" :
-                                    "bg-gray-400",
-                              thumb: task.status === 'pending' ? "w-5 h-5 bg-orange-500 shadow-lg" :
-                                task.status === 'in-progress' ? "w-5 h-5 bg-blue-500 shadow-lg" :
-                                  task.status === 'completed' ? "w-5 h-5 bg-green-500 shadow-lg" :
-                                    "w-5 h-5 bg-gray-500 shadow-lg",
+                              filler: (sliderValues[task._id] !== undefined ? sliderValues[task._id] : (task.status === 'pending' ? 0 : task.status === 'in-progress' ? 0.33 : task.status === 'completed' ? 0.66 : 0)) <= 0.16 ? "bg-gradient-to-r from-yellow-400 to-orange-500" :
+                                (sliderValues[task._id] !== undefined ? sliderValues[task._id] : (task.status === 'pending' ? 0 : task.status === 'in-progress' ? 0.33 : task.status === 'completed' ? 0.66 : 0)) <= 0.5 ? "bg-gradient-to-r from-blue-400 to-blue-600" :
+                                  "bg-gradient-to-r from-green-400 to-green-600",
+                              thumb: (sliderValues[task._id] !== undefined ? sliderValues[task._id] : (task.status === 'pending' ? 0 : task.status === 'in-progress' ? 0.33 : task.status === 'completed' ? 0.66 : 0)) <= 0.16 ? "w-5 h-5 bg-orange-500 shadow-lg" :
+                                (sliderValues[task._id] !== undefined ? sliderValues[task._id] : (task.status === 'pending' ? 0 : task.status === 'in-progress' ? 0.33 : task.status === 'completed' ? 0.66 : 0)) <= 0.5 ? "w-5 h-5 bg-blue-500 shadow-lg" :
+                                  "w-5 h-5 bg-green-500 shadow-lg",
                               label: "text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3",
                               mark: "text-xs font-medium"
                             }}

@@ -181,6 +181,18 @@ export interface IUser extends Document {
       activeAccountId?: string;
       accounts?: string[];
     };
+    jira?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    trello?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
+    monday?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
   };
   // Enhanced profile information for AI-powered insights
   profile?: {
@@ -433,6 +445,9 @@ export interface IProject extends Document {
         autoCreateTasks: boolean;
         syncStatus: boolean;
         webhookId?: string;
+        webhookSecret?: string;
+        lastWebhookEvent?: Date;
+        autoSyncTasks?: boolean;
         linkedAt: Date;
         lastSyncAt?: Date;
         syncErrors?: Array<{
@@ -611,6 +626,12 @@ export interface ITask extends Document {
   };
   verifiedBy?: string;
   verifiedAt?: Date;
+  notionSync?: {
+    pageId?: string;
+    url?: string;
+    lastSyncedAt?: Date;
+    syncEnabled?: boolean;
+  };
   isActive: boolean;
   subtaskCompletionPercentage: number;
   totalTimeLogged: number;

@@ -28,6 +28,10 @@ import WorkspaceDiscover from './components/WorkspaceDiscover';
 import WorkspaceOwner from './components/WorkspaceOwner';
 import WorkspaceMember from './components/WorkspaceMember';
 import ManageWorkspace from './components/ManageWorkspace';
+import DropboxWidget from './components/vault/DropboxWidget';
+import SpotifyWidget from './components/music/SpotifyWidget';
+import NotionWidget from './components/notion/NotionWidget'; // [NEW] Import
+import MusicPage from './components/music/MusicPage';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
@@ -86,6 +90,7 @@ import TermsConditions from './components/TermsConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ShippingPolicy from './components/ShippingPolicy';
 import ContactUs from './components/ContactUs';
+import DropboxBrowser from './components/vault/DropboxBrowser'; // [NEW] Import
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -165,6 +170,8 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
               <DockNavigation />
             </div>
 
+            {state.modals.dropboxWidget && <DropboxWidget />}
+            {state.modals.spotifyWidget && <SpotifyWidget />} {/* [NEW] */}
             {/* Empty space on right */}
             <div className="flex-1"></div>
           </div>
@@ -257,6 +264,8 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
+
+
 // App Content Component
 const AppContent: React.FC = () => {
   const { state, dispatch } = useApp();
@@ -264,6 +273,9 @@ const AppContent: React.FC = () => {
   return (
     <div className="antialiased bg-bg dark:bg-gray-900 text-text dark:text-gray-100 font-inter selection-bg-primary">
       <StickyNotesContainer />
+      <DropboxWidget />
+      <SpotifyWidget />
+      <NotionWidget /> {/* [NEW] Render Widget */}
       <ToastContainer />
 
       <Routes>
@@ -513,6 +525,24 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <InboxPage />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* [NEW] Dropbox Vault Route */}
+        <Route path="/dropbox" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <DropboxBrowser />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* [NEW] Spotify Music Route - Secured */}
+        <Route path="/music" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <MusicPage />
             </AppLayout>
           </ProtectedRoute>
         } />

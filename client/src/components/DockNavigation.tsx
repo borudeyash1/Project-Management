@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import {
@@ -20,7 +21,11 @@ import {
   Shield,
   Mail,
   FileEdit,
-  MessageCircle
+  MessageCircle,
+  HardDrive,
+  Music2,
+  FileText as NotionIcon, // Using FileText as generic Notion icon or import proper one if available
+  LayoutGrid
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { useDock } from '../context/DockContext';
@@ -41,6 +46,7 @@ interface NavItem {
 
 const DockNavigation: React.FC = () => {
   const { state, dispatch } = useApp();
+  const [hoveredIcon, setHoveredIcon] = useState<string | null>(null); // [NEW]
   const { dockPosition } = useDock();
   const location = useLocation();
   const navigate = useNavigate();
@@ -278,6 +284,83 @@ const DockNavigation: React.FC = () => {
           </svg>
         </DockIcon>
 
+        {/* Dropbox - Only if connected */}
+        {!!state.userProfile.connectedAccounts?.dropbox?.activeAccountId && (
+          <div
+            className="relative group"
+            onMouseEnter={(e) => handleIconEnter('dropbox', e)}
+            onMouseLeave={handleIconLeave}
+          >
+            <DockIcon
+              onClick={() => navigate('/dropbox')}
+              active={location.pathname === '/dropbox'}
+              tooltip="Dropbox"
+              className="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              <HardDrive className="w-5 h-5" />
+            </DockIcon>
+          </div>
+        )}
+
+        {/* [NEW] Notion Widget Toggle */}
+        {(state.userProfile.connectedAccounts?.notion?.activeAccountId ||
+          (state.userProfile.connectedAccounts?.notion?.accounts?.length ?? 0) > 0) && (
+            <DockIcon
+              onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_NOTION_WIDGET'))}
+              tooltip="Notion"
+              className="text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              {/* Using SVG for clearer Notion branding if Lucide doesn't have it */}
+              <NotionIcon className="w-5 h-5" />
+            </DockIcon>
+          )}
+
+        {/* Spotify */}
+        {state.userProfile.connectedAccounts?.spotify?.activeAccountId && (
+          <div
+            className="relative group"
+            onMouseEnter={() => setHoveredIcon('spotify')}
+            onMouseLeave={() => setHoveredIcon(null)}
+          >
+            <DockIcon
+              onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'spotifyWidget' })}
+              tooltip="Spotify"
+              active={state.modals.spotifyWidget}
+              className="text-[#1DB954]"
+            >
+              <Music2 size={22} />
+            </DockIcon>
+
+            {/* Tooltip/Menu */}
+            <AnimatePresence>
+              {hoveredIcon === 'spotify' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: -10 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#121212] border border-[#282828] rounded-xl shadow-2xl p-2 min-w-[150px] z-50 text-gray-200"
+                >
+                  <div className="text-xs font-semibold text-[#1DB954] mb-2 px-2 uppercase tracking-wider">Spotify</div>
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'spotifyWidget' })}
+                      className="text-left px-2 py-1.5 rounded-lg hover:bg-[#282828] text-sm flex items-center gap-2 transition-colors"
+                    >
+                      <Music2 size={14} /> Open Player
+                    </button>
+                    <button
+                      onClick={() => navigate('/music')}
+                      className="text-left px-2 py-1.5 rounded-lg hover:bg-[#282828] text-sm flex items-center gap-2 transition-colors"
+                    >
+                      <LayoutGrid size={14} /> Open Library
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
         {/* Settings */}
         <DockIcon
           onClick={() => navigate('/settings')}
@@ -335,6 +418,42 @@ const DockNavigation: React.FC = () => {
             >
               <FileText size={14} />
               {t('notes.allNotes')}
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Portal Dropbox Menu */}
+      {hoveredItem === 'dropbox' && hoveredRect && createPortal(
+        <div
+          className="fixed z-[9999] animate-in fade-in zoom-in-95 duration-200"
+          style={getMenuPositionStyle()}
+          onMouseEnter={handleMenuEnter}
+          onMouseLeave={handleMenuLeave}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[160px]">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: 'TOGGLE_MODAL', payload: 'dropboxWidget' });
+                setHoveredItem(null);
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <HardDrive size={14} className="text-[#0061FE]" />
+              Quick View
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/dropbox');
+                setHoveredItem(null);
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <FolderOpen size={14} />
+              Open Dropbox
             </button>
           </div>
         </div>,

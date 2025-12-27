@@ -6,7 +6,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useDock } from '../../context/DockContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
 import { ContextAIButton } from '../ai/ContextAIButton';
-import { getProjects as getWorkspaceProjects } from '../../services/projectService';
+import { getProjects as getWorkspaceProjects, createProject } from '../../services/projectService';
+import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
 import { apiService } from '../../services/api';
 import { format } from 'date-fns';
 import {
@@ -47,6 +48,7 @@ const WorkspaceOverview: React.FC = () => {
   const [loadingNotes, setLoadingNotes] = useState(true);
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats>({ present: 0, absent: 0, wfh: 0, total: 0 });
   const [loadingAttendance, setLoadingAttendance] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const workspaceProjects = state.projects.filter(
@@ -214,7 +216,7 @@ const WorkspaceOverview: React.FC = () => {
         </div>
         {isOwner && (
           <button
-            onClick={() => navigate(`/workspace/${state.currentWorkspace}/projects/new`)}
+            onClick={() => setShowCreateModal(true)}
             style={{
               background: `linear-gradient(135deg, ${preferences.accentColor} 0%, ${preferences.accentColor}dd 100%)`
             }}
@@ -486,6 +488,56 @@ const WorkspaceOverview: React.FC = () => {
       </div>
 
       {/* Context-Aware AI Assistant */}
+      <WorkspaceCreateProjectModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={async (projectData) => {
+          if (!state.currentWorkspace) return;
+          try {
+            const created = await createProject({
+              name: projectData.name,
+              description: projectData.description,
+              clientId: projectData.clientId,
+              projectManager: projectData.projectManagerId,
+              status: projectData.status,
+              priority: projectData.priority,
+              startDate: projectData.startDate,
+              dueDate: projectData.endDate,
+              budget: projectData.budget,
+              tags: projectData.tags,
+              workspaceId: state.currentWorkspace,
+            } as any);
+
+            // Add to global state
+            dispatch({
+              type: 'ADD_PROJECT',
+              payload: {
+                ...created,
+                createdBy: typeof created.createdBy === 'object' ? (created.createdBy as any)._id : created.createdBy
+              } as any
+            });
+
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'success',
+                message: t('workspace.projects.toastExtended.createSuccess', { name: projectData.name })
+              }
+            });
+          } catch (error: any) {
+            console.error('Failed to create project:', error);
+            dispatch({
+              type: 'ADD_TOAST',
+              payload: {
+                type: 'error',
+                message: error.message || 'Failed to create project'
+              }
+            });
+          }
+        }}
+        workspaceId={state.currentWorkspace || ''}
+      />
+
       <ContextAIButton
         pageData={{
           workspaceName: currentWorkspace?.name,

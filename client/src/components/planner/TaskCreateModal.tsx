@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, Flag, User, Tag, Repeat, Bell, FileText, Target, CheckSquare } from 'lucide-react';
+import { X, Calendar, Clock, Flag, User, Tag, Repeat, Bell, FileText as FileTextIcon, Target, CheckSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../context/PlannerContext';
+import { useApp } from '../../context/AppContext';
+import { notionSyncService } from '../../services/notionSyncService';
 
 interface TaskCreateModalProps {
   onClose: () => void;
@@ -12,15 +14,19 @@ interface TaskCreateModalProps {
 
 type TaskType = 'task' | 'reminder' | 'milestone' | 'subtask';
 
-const TaskCreateModal: React.FC<TaskCreateModalProps> = ({ 
-  onClose, 
+const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
+  onClose,
   defaultStatus = 'todo',
   defaultDate,
-  defaultTime 
+  defaultTime
 }) => {
   const { createTask } = usePlanner();
+  const { state } = useApp();
   const { t } = useTranslation();
-  
+
+  const notionConnected = state.userProfile?.connectedAccounts?.notion?.activeAccountId ||
+    (state.userProfile?.connectedAccounts?.notion?.accounts?.length ?? 0) > 0;
+
   const [taskType, setTaskType] = useState<TaskType>('task');
   const [formData, setFormData] = useState({
     title: '',
@@ -35,6 +41,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     recurrence: 'none' as 'none' | 'daily' | 'weekly' | 'monthly',
     reminder: '15min' as '15min' | '30min' | '1hour' | '1day' | 'none',
     clientVisible: false,
+    syncToNotion: false,
     project: '',
     milestone: ''
   });
@@ -46,7 +53,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     { id: 'task', label: t('planner.taskModal.types.task.label'), icon: CheckSquare, description: t('planner.taskModal.types.task.desc') },
     { id: 'reminder', label: t('planner.taskModal.types.reminder.label'), icon: Bell, description: t('planner.taskModal.types.reminder.desc') },
     { id: 'milestone', label: t('planner.taskModal.types.milestone.label'), icon: Target, description: t('planner.taskModal.types.milestone.desc') },
-    { id: 'subtask', label: t('planner.taskModal.types.subtask.label'), icon: FileText, description: t('planner.taskModal.types.subtask.desc') }
+    { id: 'subtask', label: t('planner.taskModal.types.subtask.label'), icon: FileTextIcon, description: t('planner.taskModal.types.subtask.desc') }
   ];
 
   const handleAddAssignee = () => {
@@ -85,7 +92,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       return;
     }
@@ -96,7 +103,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       dueDate = new Date(`${formData.dueDate}T${formData.dueTime}`);
     }
 
-    // Create the task with all form data
+    // Create the task with all form data (including syncToNotion flag)
     createTask({
       title: formData.title,
       description: formData.description,
@@ -108,9 +115,11 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       tags: formData.tags,
       subtasks: [],
       comments: [],
-      attachments: []
+      attachments: [],
+      // @ts-ignore - syncToNotion will be handled by backend
+      syncToNotion: formData.syncToNotion && notionConnected
     });
-    
+
     onClose();
   };
 
@@ -143,15 +152,13 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                       key={type.id}
                       type="button"
                       onClick={() => setTaskType(type.id as TaskType)}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        taskType === type.id
-                          ? 'border-accent bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-300 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
+                      className={`p-4 border-2 rounded-lg text-left transition-all ${taskType === type.id
+                        ? 'border-accent bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
                     >
-                      <Icon className={`w-6 h-6 mb-2 ${
-                        taskType === type.id ? 'text-accent-dark dark:text-accent-light' : 'text-gray-600'
-                      }`} />
+                      <Icon className={`w-6 h-6 mb-2 ${taskType === type.id ? 'text-accent-dark dark:text-accent-light' : 'text-gray-600'
+                        }`} />
                       <div className="font-medium text-gray-900 dark:text-white text-sm">
                         {type.label}
                       </div>
@@ -199,9 +206,9 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder={
                   taskType === 'reminder' ? t('planner.taskModal.fields.placeholders.reminder') :
-                  taskType === 'milestone' ? t('planner.taskModal.fields.placeholders.milestone') :
-                  taskType === 'subtask' ? t('planner.taskModal.fields.placeholders.subtask') :
-                  t('planner.taskModal.fields.placeholders.default')
+                    taskType === 'milestone' ? t('planner.taskModal.fields.placeholders.milestone') :
+                      taskType === 'subtask' ? t('planner.taskModal.fields.placeholders.subtask') :
+                        t('planner.taskModal.fields.placeholders.default')
                 }
                 required
               />
@@ -306,46 +313,46 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
 
             {/* Assignees - Show for Task, Subtask, and Milestone */}
             {(taskType === 'task' || taskType === 'subtask' || taskType === 'milestone') && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
-                <User className="w-4 h-4 inline mr-1" />
-                {t('planner.taskModal.fields.assignees')}
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={assigneeInput}
-                  onChange={(e) => setAssigneeInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAssignee())}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-                  placeholder={t('planner.taskModal.fields.enterAssignee')}
-                />
-                <button
-                  type="button"
-                  onClick={handleAddAssignee}
-                  className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
-                >
-                  {t('planner.taskModal.fields.add')}
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.assignees.map(assignee => (
-                  <span
-                    key={assignee}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded-full text-sm"
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-2">
+                  <User className="w-4 h-4 inline mr-1" />
+                  {t('planner.taskModal.fields.assignees')}
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={assigneeInput}
+                    onChange={(e) => setAssigneeInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAssignee())}
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
+                    placeholder={t('planner.taskModal.fields.enterAssignee')}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddAssignee}
+                    className="px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
                   >
-                    {assignee}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveAssignee(assignee)}
-                      className="hover:text-blue-900 dark:hover:text-blue-100"
+                    {t('planner.taskModal.fields.add')}
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.assignees.map(assignee => (
+                    <span
+                      key={assignee}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700 rounded-full text-sm"
                     >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
+                      {assignee}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAssignee(assignee)}
+                        className="hover:text-blue-900 dark:hover:text-blue-100"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
             )}
 
             {/* Tags - Show for all types */}
@@ -450,6 +457,32 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                 <label htmlFor="clientVisible" className="text-sm text-gray-700 dark:text-gray-700">
                   {t('planner.taskModal.fields.clientVisible')}
                 </label>
+              </div>
+            )}
+
+            {/* Notion Sync Toggle - Show for Task and Milestone only */}
+            {(taskType === 'task' || taskType === 'milestone') && (
+              <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <input
+                  type="checkbox"
+                  id="syncToNotion"
+                  checked={formData.syncToNotion}
+                  onChange={(e) => setFormData({ ...formData, syncToNotion: e.target.checked })}
+                  className="w-4 h-4 text-gray-900 dark:text-white rounded border-gray-300 focus:ring-gray-900 dark:focus:ring-white"
+                  disabled={!notionConnected}
+                />
+                <div className="flex-1">
+                  <label htmlFor="syncToNotion" className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <FileTextIcon className="w-4 h-4" />
+                    Sync to Notion
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {notionConnected
+                      ? 'Create a Notion page for this task'
+                      : 'Connect Notion in Settings to enable sync'
+                    }
+                  </p>
+                </div>
               </div>
             )}
           </div>

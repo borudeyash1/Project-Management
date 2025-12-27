@@ -63,6 +63,8 @@ interface IGitHubService {
     createIssue(userId: string, owner: string, repo: string, data: any, accountId?: string): Promise<any>;
     addComment(userId: string, owner: string, repo: string, number: number, body: string, accountId?: string): Promise<any>;
     addLabel(userId: string, owner: string, repo: string, number: number, labels: string[], accountId?: string): Promise<any>;
+    getCommits(userId: string, owner: string, repo: string, options?: { author?: string; per_page?: number }, accountId?: string): Promise<any[]>;
+    getBranches(userId: string, owner: string, repo: string, accountId?: string): Promise<any[]>;
 }
 
 export const getGitHubService = (): IGitHubService => {
@@ -124,6 +126,26 @@ export const getGitHubService = (): IGitHubService => {
                 { labels },
                 { headers: getHeaders(accessToken) }
             );
+            return response.data;
+        },
+
+        async getCommits(userId: string, owner: string, repo: string, options: { author?: string; per_page?: number } = {}, accountId?: string): Promise<any[]> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const params = new URLSearchParams();
+            if (options.author) params.append('author', options.author);
+            if (options.per_page) params.append('per_page', options.per_page.toString());
+
+            const response = await axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/commits?${params.toString()}`, {
+                headers: getHeaders(accessToken)
+            });
+            return response.data;
+        },
+
+        async getBranches(userId: string, owner: string, repo: string, accountId?: string): Promise<any[]> {
+            const accessToken = await getAccessToken(userId, accountId);
+            const response = await axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/branches`, {
+                headers: getHeaders(accessToken)
+            });
             return response.data;
         }
     };

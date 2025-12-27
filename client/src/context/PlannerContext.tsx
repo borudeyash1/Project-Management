@@ -52,6 +52,19 @@ export interface Task {
     };
     syncEnabled: boolean;
   };
+  commits?: Array<{
+    sha: string;
+    message: string;
+    author: string;
+    url: string;
+    timestamp: Date;
+  }>;
+  notionSync?: {
+    pageId?: string;
+    url?: string;
+    lastSyncedAt?: Date;
+    syncEnabled?: boolean;
+  };
   autoCreated?: boolean;
 }
 

@@ -24,8 +24,8 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
         mail: {
             icon: Mail,
             title: t('onboarding.mail.title'),
-            color: 'from-blue-500 to-cyan-500',
-            bgColor: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+            gradient: 'from-blue-500 to-cyan-500',
+            gradientStyle: { background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)' },
             steps: [
                 {
                     title: t('onboarding.mail.welcome'),
@@ -62,8 +62,8 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
         calendar: {
             icon: CalendarIcon,
             title: t('onboarding.calendar.title'),
-            color: 'from-purple-500 to-pink-500',
-            bgColor: 'bg-gradient-to-br from-purple-500 to-pink-500',
+            gradient: 'from-purple to-pink-500',
+            gradientStyle: { background: 'linear-gradient(135deg, #7C58FF 0%, #ec4899 100%)' },
             steps: [
                 {
                     title: t('onboarding.calendar.welcome'),
@@ -100,8 +100,8 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
         vault: {
             icon: HardDrive,
             title: t('onboarding.vault.title'),
-            color: 'from-green-500 to-emerald-500',
-            bgColor: 'bg-gradient-to-br from-green-500 to-emerald-500',
+            gradient: 'from-green-500 to-emerald-500',
+            gradientStyle: { background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)' },
             steps: [
                 {
                     title: t('onboarding.vault.welcome'),
@@ -176,7 +176,10 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                     }`}
             >
                 {/* Header */}
-                <div className={`${config.bgColor} p-6 text-white relative`}>
+                <div
+                    className={`bg-gradient-to-br ${config.gradient} p-6 text-white relative`}
+                    style={config.gradientStyle}
+                >
                     <button
                         onClick={handleSkip}
                         className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/20 transition-colors"
@@ -199,8 +202,11 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                 {/* Progress Bar */}
                 <div className="h-2 bg-gray-200 dark:bg-gray-700">
                     <div
-                        className={`h-full transition-all duration-300 ${config.bgColor}`}
-                        style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+                        className={`h-full transition-all duration-300 bg-gradient-to-br ${config.gradient}`}
+                        style={{
+                            ...config.gradientStyle,
+                            width: `${((currentStep + 1) / totalSteps) * 100}%`
+                        }}
                     />
                 </div>
 
@@ -231,11 +237,12 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                                 key={index}
                                 onClick={() => setCurrentStep(index)}
                                 className={`h-2 rounded-full transition-all ${index === currentStep
-                                    ? `w-8 ${config.bgColor}`
+                                    ? `w-8 bg-gradient-to-br ${config.gradient}`
                                     : index < currentStep
-                                        ? `w-2 ${config.bgColor} opacity-50`
+                                        ? `w-2 bg-gradient-to-br ${config.gradient} opacity-50`
                                         : `w-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`
                                     }`}
+                                style={index === currentStep ? config.gradientStyle : index < currentStep ? { ...config.gradientStyle, opacity: 0.5 } : {}}
                             />
                         ))}
                     </div>
@@ -271,7 +278,8 @@ const SartthiOnboardingGuide: React.FC<SartthiOnboardingGuideProps> = ({
                         )}
                         <button
                             onClick={handleNext}
-                            className={`px-6 py-2 rounded-lg font-medium text-white transition-all flex items-center gap-2 ${config.bgColor}`}
+                            className={`px-6 py-2 rounded-lg font-medium text-white transition-all flex items-center gap-2 bg-gradient-to-br ${config.gradient}`}
+                            style={config.gradientStyle}
                         >
                             {currentStep === totalSteps - 1 ? (
                                 <>

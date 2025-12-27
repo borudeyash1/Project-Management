@@ -208,16 +208,33 @@ export const getDashboardData = async (
       })
       .slice(0, 6);
 
-    // Calculate total unique team members across all workspaces (excluding current user)
+    // Calculate total unique team members across all workspaces AND projects (excluding current user)
     const allTeamMemberIds = new Set<string>();
+
+    const addMemberId = (id: any) => {
+      if (id) {
+        const strId = id.toString();
+        if (strId !== userId.toString()) {
+          allTeamMemberIds.add(strId);
+        }
+      }
+    };
+
+    // From Workspaces
     (workspaces || []).forEach((workspace: any) => {
       if (Array.isArray(workspace.members)) {
         workspace.members.forEach((member: any) => {
-          const memberId = member.user?._id?.toString() || member.user?.toString();
-          // Exclude the current user
-          if (memberId && memberId !== userId.toString()) {
-            allTeamMemberIds.add(memberId);
-          }
+          addMemberId(member.user?._id || member.user);
+        });
+      }
+    });
+
+    // From Projects
+    (projects || []).forEach((project: any) => {
+      const members = project.teamMembers || project.members || [];
+      if (Array.isArray(members)) {
+        members.forEach((member: any) => {
+          addMemberId(member.user?._id || member.user);
         });
       }
     });

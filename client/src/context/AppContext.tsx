@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { AppState, User, Workspace, Project, Task, Toast, Client } from '../types';
+import { AppState, User, Workspace, Project, Task, Toast, Client, SpotifyPlaybackState } from '../types';
 import apiService from '../services/api';
 
 // Initial state
@@ -81,7 +81,9 @@ const initialState: AppState = {
     client: false,
     pricing: false,
     requestChange: false,
-    notifications: false
+    notifications: false,
+    dropboxWidget: false,
+    spotifyWidget: false, // [NEW] added missing property
   },
   userProfile: emptyUser,
   settings: emptyUser.settings,
@@ -100,7 +102,8 @@ const initialState: AppState = {
   clients: [],
   projects: [],
   tasks: [],
-  notifications: []
+  notifications: [],
+  playback: null
 };
 
 // Action types
@@ -139,11 +142,15 @@ type AppAction =
   | { type: 'UPDATE_CLIENT'; payload: { clientId: string; updates: any } }
   | { type: 'DELETE_CLIENT'; payload: string }
   | { type: 'LOGOUT' }
-  | { type: 'SET_AUTH_LOADING'; payload: boolean };
+  | { type: 'LOGOUT' }
+  | { type: 'SET_AUTH_LOADING'; payload: boolean }
+  | { type: 'SET_PLAYBACK'; payload: SpotifyPlaybackState | null }; // Added Action
 
 // Reducer function
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case 'SET_PLAYBACK':
+      return { ...state, playback: action.payload };
     case 'SET_SECTION':
       return { ...state, currentSection: action.payload };
     case 'SET_WORKSPACE':

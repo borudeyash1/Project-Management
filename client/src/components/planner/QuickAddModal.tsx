@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckSquare, Bell, Flag, Calendar, Hash } from 'lucide-react';
+import { X, CheckSquare, Bell, Flag, Calendar, Hash, FileText } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { usePlanner } from '../../context/PlannerContext';
 import apiService from '../../services/api';
@@ -40,6 +40,11 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
   const [allDay, setAllDay] = useState(false);
   const [slackChannelId, setSlackChannelId] = useState('');
   const [slackChannels, setSlackChannels] = useState<Array<{ id: string; name: string }>>([]);
+
+  // Notion sync
+  const [syncToNotion, setSyncToNotion] = useState(false);
+  const notionConnected = (state.userProfile?.connectedAccounts?.notion?.accounts?.length ?? 0) > 0 ||
+    !!state.userProfile?.connectedAccounts?.notion?.activeAccountId;
 
   useEffect(() => {
     fetchSlackChannels();
@@ -95,7 +100,8 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
             priority,
             dueDate: dueDate ? new Date(`${dueDate}T${dueTime || '23:59'}`) : undefined,
             startDate: startDate ? new Date(startDate) : undefined,
-            subtasks: subtasks.map(st => ({ title: st, completed: false }))
+            subtasks: subtasks.map(st => ({ title: st, completed: false })),
+            syncToNotion: syncToNotion && notionConnected
           };
           if (selectedWorkspace) taskData.workspace = selectedWorkspace;
           if (project) taskData.project = project;
@@ -398,6 +404,32 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
                     Add
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Notion Sync (Task & Milestone) */}
+          {(activeType === 'task' || activeType === 'milestone') && (
+            <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+              <input
+                type="checkbox"
+                id="syncToNotion"
+                checked={syncToNotion}
+                onChange={(e) => setSyncToNotion(e.target.checked)}
+                className="w-4 h-4 text-accent rounded border-gray-300 focus:ring-accent"
+                disabled={!notionConnected}
+              />
+              <div className="flex-1">
+                <label htmlFor="syncToNotion" className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Sync to Notion
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {notionConnected
+                    ? 'Create a Notion page for this ' + activeType
+                    : 'Connect Notion in Settings to enable sync'
+                  }
+                </p>
               </div>
             </div>
           )}
