@@ -368,7 +368,7 @@ async function updateTaskFromCommit(
     }
 
     // Update task status and progress based on keywords (only for high-confidence matches)
-    if (parsed.suggestedStatus && confidence >= 0.7) {
+    if (parsed.suggestedStatus && confidence >= 0.5) {
         const statusMap: Record<string, string> = {
             'completed': 'completed',
             'in-progress': 'in-progress',
