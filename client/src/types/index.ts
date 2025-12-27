@@ -159,6 +159,15 @@ export interface User {
         connectedAt?: string;
       }>;
     };
+    dropbox?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
   };
   createdAt: Date;
   updatedAt: Date;

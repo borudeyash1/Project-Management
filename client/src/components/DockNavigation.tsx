@@ -20,7 +20,8 @@ import {
   Shield,
   Mail,
   FileEdit,
-  MessageCircle
+  MessageCircle,
+  HardDrive
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { useDock } from '../context/DockContext';
@@ -277,6 +278,18 @@ const DockNavigation: React.FC = () => {
             <line x1="12" y1="22.08" x2="12" y2="12" />
           </svg>
         </DockIcon>
+
+        {/* Dropbox - Only if connected */}
+        {state.userProfile.connectedAccounts?.dropbox?.activeAccountId && (
+          <DockIcon
+            onClick={() => navigate('/dropbox')}
+            active={location.pathname === '/dropbox'}
+            tooltip="Dropbox"
+            className="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+          >
+            <HardDrive className="w-5 h-5" />
+          </DockIcon>
+        )}
 
         {/* Settings */}
         <DockIcon

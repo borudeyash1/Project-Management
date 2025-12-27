@@ -61,6 +61,7 @@ import notionRoutes from "./routes/notionRoutes";
 import zoomRoutes from "./routes/zoomRoutes";
 import vercelRoutes from "./routes/vercelRoutes";
 import spotifyRoutes from "./routes/spotifyRoutes";
+import storageRoutes from "./routes/storageRoutes"; // [NEW] Storage Import
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 
@@ -188,6 +189,7 @@ app.use("/api/notion", notionRoutes);
 app.use("/api/zoom", zoomRoutes);
 app.use("/api/vercel", vercelRoutes);
 app.use("/api/spotify", spotifyRoutes);
+app.use("/api/storage", storageRoutes); // [NEW] Storage Route Mount
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

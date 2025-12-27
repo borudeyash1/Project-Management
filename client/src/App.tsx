@@ -85,6 +85,7 @@ import TermsConditions from './components/TermsConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ShippingPolicy from './components/ShippingPolicy';
 import ContactUs from './components/ContactUs';
+import DropboxBrowser from './components/vault/DropboxBrowser'; // [NEW] Import
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -511,6 +512,15 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <InboxPage />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* [NEW] Dropbox Vault Route */}
+        <Route path="/dropbox" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <DropboxBrowser />
             </AppLayout>
           </ProtectedRoute>
         } />
