@@ -23,7 +23,8 @@ import {
   FileEdit,
   MessageCircle,
   HardDrive,
-  Music2
+  Music2,
+  LayoutGrid
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { useDock } from '../context/DockContext';
@@ -330,6 +331,12 @@ const DockNavigation: React.FC = () => {
                       className="text-left px-2 py-1.5 rounded-lg hover:bg-[#282828] text-sm flex items-center gap-2 transition-colors"
                     >
                       <Music2 size={14} /> Open Player
+                    </button>
+                    <button
+                      onClick={() => navigate('/music')}
+                      className="text-left px-2 py-1.5 rounded-lg hover:bg-[#282828] text-sm flex items-center gap-2 transition-colors"
+                    >
+                      <LayoutGrid size={14} /> Open Library
                     </button>
                   </div>
                 </motion.div>

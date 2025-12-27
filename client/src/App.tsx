@@ -30,6 +30,7 @@ import WorkspaceMember from './components/WorkspaceMember';
 import ManageWorkspace from './components/ManageWorkspace';
 import DropboxWidget from './components/vault/DropboxWidget';
 import SpotifyWidget from './components/music/SpotifyWidget';
+import MusicPage from './components/music/MusicPage';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
@@ -528,6 +529,15 @@ const AppContent: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <DropboxBrowser />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* [NEW] Spotify Music Route - Secured */}
+        <Route path="/music" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <MusicPage />
             </AppLayout>
           </ProtectedRoute>
         } />
