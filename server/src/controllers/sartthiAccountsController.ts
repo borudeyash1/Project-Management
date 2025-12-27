@@ -592,6 +592,40 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     name: `${meResponse.data.first_name} ${meResponse.data.last_name}`,
                     picture: meResponse.data.pic_url
                 };
+            } else if (service === 'linear') {
+                const params = new URLSearchParams();
+                params.append('client_id', config.clientId || '');
+                params.append('client_secret', config.clientSecret || '');
+                params.append('code', code as string);
+                params.append('redirect_uri', config.callbackUrl);
+                params.append('grant_type', 'authorization_code');
+
+                tokenResponse = await axios.post(config.tokenUrl, params, {
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+                tokens = tokenResponse.data;
+
+                const query = `
+                query {
+                    viewer {
+                        id
+                        name
+                        email
+                    }
+                }
+            `;
+                const userResponse = await axios.post('https://api.linear.app/graphql', { query }, {
+                    headers: {
+                        'Authorization': `Bearer ${tokens.access_token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const viewer = userResponse.data.data.viewer;
+                userInfo = {
+                    id: viewer.id,
+                    email: viewer.email,
+                    name: viewer.name,
+                };
             } else if (service === 'vercel') {
                 // Vercel expects JSON body, not form-encoded
                 tokenResponse = await axios.post(config.tokenUrl, {
@@ -693,28 +727,6 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     email: meResponse.data.email,
                     name: meResponse.data.name,
                     picture: meResponse.data.picture
-                };
-            } else if (service === 'linear') {
-                const query = `
-                query {
-                    viewer {
-                        id
-                        name
-                        email
-                    }
-                }
-            `;
-                const userResponse = await axios.post('https://api.linear.app/graphql', { query }, {
-                    headers: {
-                        'Authorization': `Bearer ${tokens.access_token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const viewer = userResponse.data.data.viewer;
-                userInfo = {
-                    id: viewer.id,
-                    email: viewer.email,
-                    name: viewer.name,
                 };
             } else if (service === 'zendesk') {
                 if (!subdomain) throw new Error('Subdomain missing in state');
