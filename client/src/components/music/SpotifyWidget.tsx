@@ -27,7 +27,25 @@ const SpotifyWidget: React.FC = () => {
     const [view, setView] = useState<'player' | 'playlists' | 'search'>('player');
 
     // Data State
-    const [playback, setPlayback] = useState<SpotifyPlaybackState | null>(null);
+    const [isPremium, setIsPremium] = useState<boolean>(true); // Assume premium initially
+
+    // PREFER global state (set by MusicPage or Reducers) over local if dealing with Free User virtual playback
+    // or if we want optimistic updates to be reflected immediately.
+    // However, we still poll for updates for Premium users.
+    const [localPlayback, setLocalPlayback] = useState<SpotifyPlaybackState | null>(null);
+    const playback = (!state.userProfile?.connectedAccounts?.spotify?.activeAccountId ? null : (isPremium ? (localPlayback || state.playback) : state.playback));
+
+    // Wrapper for state updates to handle both Local (Premium optimistic) and Global (Free/Virtual) updates
+    const updatePlayback = (fn: (prev: SpotifyPlaybackState | null) => SpotifyPlaybackState | null) => {
+        const current = playback;
+        const next = fn(current);
+        if (isPremium) {
+            setLocalPlayback(next);
+        } else {
+            dispatch({ type: 'SET_PLAYBACK', payload: next });
+        }
+    };
+
     const [playlists, setPlaylists] = useState<any[]>([]);
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +59,7 @@ const SpotifyWidget: React.FC = () => {
         const fetchPlayback = async () => {
             try {
                 const data = await spotifyService.getPlaybackState();
-                setPlayback(data || null);
+                setLocalPlayback(data || null);
                 if (data?.item?.id) {
                     // Check if liked
                     const [saved] = await spotifyService.checkSaved(data.item.id);
@@ -60,7 +78,6 @@ const SpotifyWidget: React.FC = () => {
     const [player, setPlayer] = useState<any>(null);
     const [isPlayerReady, setIsPlayerReady] = useState(false);
     const [deviceId, setDeviceId] = useState<string | null>(null);
-    const [isPremium, setIsPremium] = useState<boolean>(true); // Assume premium initially
 
     useEffect(() => {
         if (!state.userProfile?.connectedAccounts?.spotify?.activeAccountId) return;
@@ -100,7 +117,7 @@ const SpotifyWidget: React.FC = () => {
                     });
 
                     player.addListener('player_state_changed', (state: any) => {
-                        if (state) setPlayback(state);
+                        if (state) setLocalPlayback(state);
                     });
 
                     player.connect();
@@ -160,7 +177,8 @@ const SpotifyWidget: React.FC = () => {
             if (playback?.is_playing) await spotifyService.pause();
             else await spotifyService.play();
             // Optimistic update
-            setPlayback(prev => prev ? { ...prev, is_playing: !prev.is_playing } : null);
+            // Optimistic update
+            updatePlayback(prev => prev ? { ...prev, is_playing: !prev.is_playing } : null);
         } catch (error) {
             handleControlError(error);
         }
@@ -190,7 +208,8 @@ const SpotifyWidget: React.FC = () => {
         try {
             const ms = Number(e.target.value);
             await spotifyService.seek(ms);
-            setPlayback(prev => prev ? { ...prev, progress_ms: ms } : null);
+            await spotifyService.seek(ms);
+            updatePlayback(prev => prev ? { ...prev, progress_ms: ms } : null);
         } catch (error) {
             handleControlError(error);
         }
@@ -230,7 +249,7 @@ const SpotifyWidget: React.FC = () => {
                 // Sync progress (optional: dispatch to redux if needed)
             }}
             onEnded={async () => {
-                setPlayback(prev => prev ? { ...prev, is_playing: false } : null);
+                updatePlayback(prev => prev ? { ...prev, is_playing: false } : null);
                 await spotifyService.pause();
             }}
         />

@@ -122,6 +122,53 @@ const MusicPage: React.FC = () => {
         }
     };
 
+    // Playback Wrapper with Fallback
+    const handlePlay = async (trackItem: any) => {
+        // Handle "Liked Songs" wrapper structure where track is nested in item.track
+        const track = trackItem.track || trackItem;
+
+        try {
+            const res: any = await spotifyService.play({ uris: [track.uri], item: track });
+            // If service returns strict error object (handling 403 inside service)
+            if (res?.error === 'Premium Required') {
+                throw new Error('Premium Required');
+            }
+        } catch (error: any) {
+            // Check for various Premium/Auth error indicators
+            if (
+                error?.response?.status === 403 ||
+                error?.message?.includes('Premium') ||
+                error?.message?.includes('Player command failed') // Generic SDK error often seen
+            ) {
+                console.log('Premium Check Failed - Switching to YouTube Bridge');
+                dispatch({
+                    type: 'SET_PLAYBACK',
+                    payload: {
+                        is_playing: true,
+                        item: track,
+                        progress_ms: 0,
+                        device: {
+                            name: 'Sartthi Preview',
+                            volume_percent: 50,
+                            id: 'preview',
+                            is_active: true,
+                            is_private_session: false,
+                            is_restricted: false,
+                            type: 'Computer'
+                        },
+                        currently_playing_type: 'track',
+                        shuffle_state: false,
+                        repeat_state: 'off',
+                        timestamp: Date.now(),
+                        context: null
+                    }
+                });
+            } else {
+                console.error("Playback failed", error);
+            }
+        }
+    };
+
     if (!isSpotifyConnected) {
         return (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
@@ -167,34 +214,7 @@ const MusicPage: React.FC = () => {
                         {searchResults.map((track: any) => (
                             <div
                                 key={track.id}
-                                onClick={async () => {
-                                    const res: any = await spotifyService.play({ uris: [track.uri], item: track });
-                                    if (res?.error === 'Premium Required') {
-                                        // Manually set playback state for Preview Mode
-                                        dispatch({
-                                            type: 'SET_PLAYBACK',
-                                            payload: {
-                                                is_playing: true,
-                                                item: track,
-                                                progress_ms: 0,
-                                                device: {
-                                                    name: 'Sartthi Preview',
-                                                    volume_percent: 50,
-                                                    id: 'preview',
-                                                    is_active: true,
-                                                    is_private_session: false,
-                                                    is_restricted: false,
-                                                    type: 'Computer'
-                                                },
-                                                currently_playing_type: 'track',
-                                                shuffle_state: false,
-                                                repeat_state: 'off',
-                                                timestamp: Date.now(),
-                                                context: null
-                                            }
-                                        });
-                                    }
-                                }}
+                                onClick={() => handlePlay(track)}
                                 className="flex items-center gap-4 p-3 rounded-xl bg-gray-900/50 hover:bg-gray-800 transition-colors cursor-pointer group"
                             >
                                 <img src={track.album.images[0]?.url} className="w-16 h-16 rounded object-cover shadow-lg" alt={track.name} />
@@ -345,7 +365,7 @@ const MusicPage: React.FC = () => {
                 {savedTracks.map((item: any) => (
                     <div
                         key={item.track.id}
-                        onClick={() => spotifyService.play({ uris: [item.track.uri] })}
+                        onClick={() => handlePlay(item)}
                         className="flex items-center gap-4 p-3 rounded-xl bg-gray-900/50 hover:bg-gray-800 transition-colors cursor-pointer group"
                     >
                         <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
