@@ -612,6 +612,17 @@ const userSchema = new Schema<IUser>({
           ref: 'ConnectedAccount'
         }]
       },
+      zendesk: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
       figma: {
         activeAccountId: {
           type: Schema.Types.ObjectId,

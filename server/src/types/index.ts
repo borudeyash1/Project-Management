@@ -193,6 +193,10 @@ export interface IUser extends Document {
       activeAccountId?: string;
       accounts?: string[];
     };
+    zendesk?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
   };
   // Enhanced profile information for AI-powered insights
   profile?: {
