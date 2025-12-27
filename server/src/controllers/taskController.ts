@@ -579,7 +579,7 @@ export const reassignTask = async (req: Request, res: Response): Promise<void> =
   }
 };
 // Sync tasks from Notion (Two-way sync)
-export const syncProjectTasksFromNotion = async (req: Request, res: Response) => {
+export const syncProjectTasksFromNotion = async (req: Request, res: Response): Promise<any> => {
   try {
     const authUser = (req as any).user;
     const { projectId } = req.params;
@@ -629,7 +629,7 @@ export const syncProjectTasksFromNotion = async (req: Request, res: Response) =>
 
       if (sartthiStatus) {
         // Find task by Notion page ID
-        const task = await Task.findOne({
+        const task: any = await Task.findOne({
           'notionSync.pageId': update.id,
           // Optionally filter by project if needed, but pageId is unique enough
         });

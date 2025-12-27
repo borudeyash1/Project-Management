@@ -1,5 +1,6 @@
 import express, { RequestHandler } from 'express';
 import { authenticate } from '../middleware/auth';
+import * as taskController from '../controllers/taskController';
 import {
   getPlannerEvents,
   createPlannerEvent,

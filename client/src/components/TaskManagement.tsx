@@ -208,7 +208,6 @@ const TaskManagement: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [calendarDate, setCalendarDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [isSyncingNotion, setIsSyncingNotion] = useState(false);
 
