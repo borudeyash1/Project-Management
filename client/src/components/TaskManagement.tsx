@@ -269,6 +269,16 @@ const TaskManagement: React.FC = () => {
   // Enable refresh button
   useRefreshData(fetchTasks, [fetchTasks]);
 
+  // Auto-refresh tasks every 30 seconds to show Notion sync updates
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      console.log('🔄 [AUTO-REFRESH] Fetching tasks for Notion sync updates...');
+      fetchTasks();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [fetchTasks]);
+
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {
     setColumns(prevColumns =>
