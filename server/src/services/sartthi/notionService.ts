@@ -240,32 +240,11 @@ export const getNotionService = () => {
         try {
             const token = await getAccessToken(userId, accountId);
 
-            const filter: any = {
-                and: [
-                    {
-                        property: 'last_edited_time',
-                        last_edited_time: {
-                            is_not_empty: true
-                        }
-                    }
-                ]
-            };
-
-            // If we have a last synced time, get only what changed since then
-            // Note: Notion is ISO 8601
-            if (lastSyncedTime) {
-                filter.and.push({
-                    property: 'last_edited_time',
-                    last_edited_time: {
-                        on_or_after: lastSyncedTime.toISOString()
-                    }
-                });
-            }
-
+            // Notion doesn't support filtering by last_edited_time in database queries
+            // So we fetch all pages and filter client-side
             const response = await axios.post(`${NOTION_API_URL}/databases/${databaseId}/query`,
                 {
-                    filter: filter,
-                    page_size: 100 // Limit to 100 updates for now
+                    page_size: 100 // Limit to 100 pages
                 },
                 {
                     headers: {
@@ -275,12 +254,24 @@ export const getNotionService = () => {
                 }
             );
 
-            return response.data.results.map((page: any) => ({
+            // Map and filter results
+            const allPages = response.data.results.map((page: any) => ({
                 id: page.id,
                 status: page.properties?.Status?.status?.name || page.properties?.Status?.select?.name,
                 lastEditedTime: page.last_edited_time,
                 url: page.url
             }));
+
+            // Filter by lastSyncedTime if provided
+            if (lastSyncedTime) {
+                const lastSyncedTimestamp = lastSyncedTime.getTime();
+                return allPages.filter((page: any) => {
+                    const pageEditedTime = new Date(page.lastEditedTime).getTime();
+                    return pageEditedTime > lastSyncedTimestamp;
+                });
+            }
+
+            return allPages;
         } catch (error: any) {
             console.error('Notion get database updates error:', error.response?.data || error.message);
             // Don't throw for now, just return empty to avoid blocking

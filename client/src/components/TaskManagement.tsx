@@ -31,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { apiService } from '../services/api';
 import { useRefreshData } from '../hooks/useRefreshData';
+import { useNotionSync } from '../hooks/useNotionSync';
 import { useCallback } from 'react';
 
 interface Task {
@@ -269,15 +270,27 @@ const TaskManagement: React.FC = () => {
   // Enable refresh button
   useRefreshData(fetchTasks, [fetchTasks]);
 
-  // Auto-refresh tasks every 30 seconds to show Notion sync updates
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      console.log('🔄 [AUTO-REFRESH] Fetching tasks for Notion sync updates...');
-      fetchTasks();
-    }, 30000); // 30 seconds
+  // WebSocket real-time sync (replaces constant polling)
+  useNotionSync({
+    onTaskUpdate: (event) => {
+      console.log(`📡 [REALTIME] Task updated from Notion:`, event);
 
-    return () => clearInterval(refreshInterval);
-  }, [fetchTasks]);
+      // Update the specific task in state without full refresh
+      setTasks((prevTasks: Task[]) =>
+        prevTasks.map((task: Task) =>
+          task._id === event.taskId
+            ? { ...task, status: event.newStatus as any }
+            : task
+        )
+      );
+
+      // Show toast notification
+      setToastMessage(`Task "${event.title}" updated from Notion`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    },
+    enabled: true
+  });
 
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {

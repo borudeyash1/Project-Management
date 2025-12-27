@@ -253,6 +253,30 @@ const server = app.listen(PORT, () => {
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });
 
+// Setup Socket.IO for real-time Notion sync
+import { Server as SocketIOServer } from 'socket.io';
+
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production'
+      ? ['https://sartthi.com', 'https://www.sartthi.com']
+      : ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true
+  }
+});
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log(`🔌 [WEBSOCKET] Client connected: ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    console.log(`🔌 [WEBSOCKET] Client disconnected: ${socket.id}`);
+  });
+});
+
+// Make io available globally for Notion poller
+(global as any).io = io;
+
 // Increase timeout to 10 minutes for large file uploads
 server.setTimeout(10 * 60 * 1000);
 

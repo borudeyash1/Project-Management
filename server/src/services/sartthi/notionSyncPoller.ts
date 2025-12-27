@@ -1,6 +1,6 @@
 import { getNotionService } from './notionService';
 
-const POLL_INTERVAL_MS = 60000; // 60 seconds
+const POLL_INTERVAL_MS = 15000; // 15 seconds (faster sync)
 
 interface NotionSyncPoller {
     start: () => void;
@@ -76,6 +76,22 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
                                 await task.save();
                                 updatedCount++;
                                 console.log(`✅ [NOTION POLLER] Updated task "${task.title}" to ${sartthiStatus}`);
+
+                                // Emit WebSocket event for real-time update
+                                try {
+                                    const io = (global as any).io;
+                                    if (io) {
+                                        io.emit('taskUpdated', {
+                                            taskId: task._id.toString(),
+                                            newStatus: sartthiStatus,
+                                            userId: userId.toString(),
+                                            title: task.title
+                                        });
+                                        console.log(`📡 [WEBSOCKET] Broadcasted task update: ${task.title}`);
+                                    }
+                                } catch (wsError) {
+                                    console.error('❌ [WEBSOCKET] Failed to emit event:', wsError);
+                                }
                             }
                         }
                     }
