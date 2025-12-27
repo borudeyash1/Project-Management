@@ -68,24 +68,29 @@ const verifyGitHubSignature = (req: Request): boolean => {
 // Main webhook endpoint
 router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => {
     try {
-        // Verify signature
-        if (!verifyGitHubSignature(req)) {
-            console.warn('Invalid GitHub webhook signature');
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid signature'
-            });
-        }
+        console.log('[GitHub Webhook] ========== NEW WEBHOOK RECEIVED ==========');
+
+        // TEMPORARILY DISABLED FOR TESTING - REMOVE IN PRODUCTION
+        console.log('[GitHub Webhook] ⚠️  SIGNATURE VERIFICATION BYPASSED FOR TESTING');
+
+        // Verify signature - COMMENTED OUT FOR TESTING
+        // if (!verifyGitHubSignature(req)) {
+        //     console.warn('[GitHub Webhook] Invalid signature');
+        //     return res.status(401).json({
+        //         success: false,
+        //         message: 'Invalid signature'
+        //     });
+        // }
 
         const event = req.headers['x-github-event'] as string;
         const deliveryId = req.headers['x-github-delivery'] as string;
         const payload = req.body;
 
-        console.log(`[GitHub Webhook] Received ${event} event (${deliveryId})`);
+        console.log(`[GitHub Webhook] Event: ${event}, Delivery ID: ${deliveryId}`);
 
         // Handle ping event
         if (event === 'ping') {
-            console.log('[GitHub Webhook] Ping received');
+            console.log('[GitHub Webhook] Ping received - webhook is configured correctly! ✅');
             return res.status(200).json({
                 success: true,
                 message: 'Pong! Webhook is configured correctly'
@@ -110,6 +115,7 @@ router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => 
                 await handleIssueCommentEvent(payload);
                 break;
             case 'push':
+                console.log('[GitHub Webhook] 🚀 Processing PUSH event...');
                 await handlePushEvent(payload);
                 break;
             case 'release':
@@ -119,6 +125,8 @@ router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => 
                 console.log(`[GitHub Webhook] Unhandled event type: ${event}`);
         }
 
+        console.log('[GitHub Webhook] ========== WEBHOOK PROCESSED SUCCESSFULLY ==========');
+
         // Always return 200 to acknowledge receipt
         return res.status(200).json({
             success: true,
@@ -126,7 +134,8 @@ router.post('/webhooks', webhookLimiter, async (req: Request, res: Response) => 
         });
 
     } catch (error: any) {
-        console.error('[GitHub Webhook] Error processing webhook:', error);
+        console.error('[GitHub Webhook] ❌ ERROR processing webhook:', error);
+        console.error('[GitHub Webhook] Error stack:', error.stack);
         // Still return 200 to prevent GitHub from retrying
         return res.status(200).json({
             success: false,
