@@ -366,6 +366,8 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
             // NOTE: Trello is weird. This might need frontend handling if it's fragment based.
         } else if (service === 'monday') {
             url += '&response_type=code';
+        } else if (service === 'linear') {
+            url += '&response_type=code&prompt=consent';
         }
 
         res.json({
