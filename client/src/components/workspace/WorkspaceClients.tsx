@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import AddClientModal from '../AddClientModal';
+import ClientDesignPortal from '../figma/ClientDesignPortal';
 import { Client as ClientType } from '../../types';
 import apiService from '../../services/api';
 import {
@@ -18,7 +19,8 @@ import {
   Building,
   User,
   FolderKanban,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 
 interface ClientView {
@@ -46,6 +48,7 @@ const WorkspaceClients: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<ClientView | null>(null);
   const [showClientProjects, setShowClientProjects] = useState(false);
+  const [showClientDesigns, setShowClientDesigns] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -177,8 +180,8 @@ const WorkspaceClients: React.FC = () => {
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100">{client.name}</h3>
                   <span className={`text-xs px-2 py-1 rounded-full ${client.status === 'active'
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600'
+                    : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
                     }`}>
                     {client.status}
                   </span>
@@ -212,7 +215,7 @@ const WorkspaceClients: React.FC = () => {
             </div>
 
             <div className="pt-4 border-t border-gray-300 dark:border-gray-600">
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-sm mb-3">
                 <button
                   onClick={() => {
                     setSelectedClient(client);
@@ -227,6 +230,18 @@ const WorkspaceClients: React.FC = () => {
                   ${(client.totalRevenue / 1000).toFixed(0)}k
                 </div>
               </div>
+
+              {/* View Designs Button */}
+              <button
+                onClick={() => {
+                  setSelectedClient(client);
+                  setShowClientDesigns(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-purple-600 dark:text-purple-400 border border-purple-300 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                View Designs
+              </button>
             </div>
 
             {isOwner && (
@@ -524,6 +539,17 @@ const WorkspaceClients: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Client Design Portal */}
+      {showClientDesigns && selectedClient && workspaceId && (
+        <ClientDesignPortal
+          clientId={selectedClient._id}
+          onClose={() => {
+            setShowClientDesigns(false);
+            setSelectedClient(null);
+          }}
+        />
       )}
     </div>
   );

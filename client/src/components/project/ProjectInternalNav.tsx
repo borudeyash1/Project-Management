@@ -13,7 +13,8 @@ import {
   Settings,
   Clock,
   Target,
-  FileText
+  FileText,
+  Palette
 } from 'lucide-react';
 
 interface ProjectTab {
@@ -88,6 +89,12 @@ const ProjectInternalNav: React.FC = () => {
       label: t('project.tabs.reports'),
       icon: BarChart3,
       path: `/project/${projectId}/reports`
+    },
+    {
+      id: 'design',
+      label: 'Design',
+      icon: Palette,
+      path: `/project/${projectId}/design`
     },
     {
       id: 'documents',

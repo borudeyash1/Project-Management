@@ -32,12 +32,14 @@ import DropboxWidget from './components/vault/DropboxWidget';
 import SpotifyWidget from './components/music/SpotifyWidget';
 import NotionWidget from './components/notion/NotionWidget'; // [NEW] Import
 import MusicPage from './pages/MusicPage';
+import ProjectDesignHub from './components/project/ProjectDesignHub';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
 import WorkspaceMembers from './components/workspace/WorkspaceMembers';
 import WorkspaceMembersInternal from './components/workspace/WorkspaceMembersInternal';
 import WorkspaceProjects from './components/workspace/WorkspaceProjects';
+import WorkspaceDesignTab from './components/workspace/WorkspaceDesignTab';
 import WorkspaceClients from './components/workspace/WorkspaceClients';
 import WorkspaceRequests from './components/workspace/WorkspaceRequests';
 import WorkspaceCollaborate from './components/workspace/WorkspaceCollaborate';
@@ -360,6 +362,7 @@ const AppContent: React.FC = () => {
           <Route path="workload" element={<ProjectViewDetailed />} />
           <Route path="attendance" element={<ProjectViewDetailed />} />
           <Route path="reports" element={<ProjectViewDetailed />} />
+          <Route path="design" element={<ProjectDesignHub />} />
           <Route path="documents" element={<ProjectViewDetailed />} />
           <Route path="inbox" element={<ProjectViewDetailed />} />
           <Route path="settings" element={<ProjectViewDetailed />} />
@@ -487,6 +490,7 @@ const AppContent: React.FC = () => {
             <WorkspaceAttendanceWrapper />
           } />
           <Route path="projects" element={<WorkspaceProjects />} />
+          <Route path="design" element={<WorkspaceDesignTab />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />
           <Route path="requests" element={<WorkspaceRequests />} />

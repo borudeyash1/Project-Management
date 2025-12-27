@@ -25,7 +25,7 @@ const ProjectLayout: React.FC = () => {
   // Tab order for determining slide direction
   const tabOrder = [
     'overview', 'info', 'team', 'tasks', 'timeline',
-    'progress', 'workload', 'reports', 'documents', 'inbox', 'settings'
+    'progress', 'workload', 'reports', 'design', 'documents', 'inbox', 'settings'
   ];
 
   // Determine slide direction based on navigation

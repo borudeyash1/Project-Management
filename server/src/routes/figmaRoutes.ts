@@ -43,4 +43,28 @@ router.get('/projects/:projectId/files', async (req, res) => {
     }
 });
 
+// Workspace-centric design management routes
+import * as figmaController from '../controllers/figmaController';
+
+// Workspace design library
+router.get('/workspace/:workspaceId/designs', figmaController.getWorkspaceDesigns);
+router.post('/workspace/:workspaceId/designs', figmaController.uploadFigmaFile);
+
+// Project designs
+router.get('/workspace/:workspaceId/project/:projectId/designs', figmaController.getProjectDesigns);
+
+// Client designs
+router.get('/workspace/:workspaceId/client/:clientId/designs', figmaController.getClientDesigns);
+
+// Design management
+router.put('/designs/:designId/status', figmaController.updateDesignStatus);
+router.delete('/designs/:designId', figmaController.deleteDesign);
+
+// Approval workflow
+router.post('/designs/:designId/frames/:frameId/approve', figmaController.approveDesign);
+router.get('/workspace/:workspaceId/designs/pending-approvals', figmaController.getPendingApprovals);
+
+// Comments
+router.post('/designs/:designId/frames/:frameId/comments', figmaController.addComment);
+
 export default router;

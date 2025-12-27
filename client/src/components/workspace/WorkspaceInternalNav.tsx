@@ -11,7 +11,8 @@ import {
   UserPlus,
   Briefcase,
   UserCircle,
-  Calendar
+  Calendar,
+  Palette
 } from 'lucide-react';
 
 interface WorkspaceTab {
@@ -60,6 +61,12 @@ const WorkspaceInternalNav: React.FC = () => {
       label: t('workspace.tabs.projects'),
       icon: FolderKanban,
       path: `/workspace/${activeWorkspaceId}/projects`
+    },
+    {
+      id: 'design',
+      label: 'Design',
+      icon: Palette,
+      path: `/workspace/${activeWorkspaceId}/design`
     },
     {
       id: 'clients',
