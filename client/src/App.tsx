@@ -30,6 +30,7 @@ import WorkspaceMember from './components/WorkspaceMember';
 import ManageWorkspace from './components/ManageWorkspace';
 import DropboxWidget from './components/vault/DropboxWidget';
 import SpotifyWidget from './components/music/SpotifyWidget';
+import NotionWidget from './components/notion/NotionWidget'; // [NEW] Import
 import MusicPage from './components/music/MusicPage';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
@@ -273,6 +274,7 @@ const AppContent: React.FC = () => {
       <StickyNotesContainer />
       <DropboxWidget />
       <SpotifyWidget />
+      <NotionWidget /> {/* [NEW] Render Widget */}
       <ToastContainer />
 
       <Routes>

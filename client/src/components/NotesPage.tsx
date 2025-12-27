@@ -12,6 +12,8 @@ import { useRefreshData } from '../hooks/useRefreshData';
 import { useApp } from '../context/AppContext';
 import { useDock } from '../context/DockContext'; import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import { useNavigate } from 'react-router-dom';
+import { notionSyncService } from '../services/notionSyncService';
+import { FileText as NotionIcon } from 'lucide-react';
 
 interface Note {
   _id: string;
@@ -24,7 +26,7 @@ interface Note {
 const NotesPage: React.FC = () => {
   const { t } = useTranslation();
   const { isDarkMode, preferences } = useTheme();
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const { dockPosition } = useDock();
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
@@ -38,6 +40,11 @@ const NotesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isSyncingToNotion, setIsSyncingToNotion] = useState(false);
+
+  // Check if Notion is connected
+  const notionConnected = state.userProfile?.connectedAccounts?.notion?.activeAccountId ||
+    (state.userProfile?.connectedAccounts?.notion?.accounts?.length ?? 0) > 0;
 
   const fetchNotes = useCallback(async () => {
     try {
@@ -197,6 +204,50 @@ const NotesPage: React.FC = () => {
       console.error('AI generation error:', error);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSyncToNotion = async () => {
+    if (!selectedNote || !title.trim()) {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          message: 'Please save the note first',
+          type: 'error'
+        }
+      });
+      return;
+    }
+
+    setIsSyncingToNotion(true);
+    try {
+      const syncResult = await notionSyncService.syncNote(selectedNote._id, {
+        title,
+        content
+      });
+
+      if (syncResult.success) {
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            message: 'Note synced to Notion successfully!',
+            type: 'success'
+          }
+        });
+      } else {
+        throw new Error(syncResult.message || 'Failed to sync');
+      }
+    } catch (error: any) {
+      console.error('Notion sync error:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          message: error.message || 'Failed to sync to Notion',
+          type: 'error'
+        }
+      });
+    } finally {
+      setIsSyncingToNotion(false);
     }
   };
 
@@ -365,6 +416,26 @@ const NotesPage: React.FC = () => {
                           <Mic size={18} />
                           <span>{t('notes.newMeetingNote')}</span>
                         </button>
+                        {/* Send to Notion Button */}
+                        {notionConnected && selectedNote && (
+                          <button
+                            onClick={handleSyncToNotion}
+                            disabled={isSyncingToNotion || !title.trim()}
+                            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2.5 rounded-xl font-semibold transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isSyncingToNotion ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white dark:border-gray-900 border-t-transparent rounded-full animate-spin" />
+                                <span>Syncing...</span>
+                              </>
+                            ) : (
+                              <>
+                                <NotionIcon size={18} />
+                                <span>Send to Notion</span>
+                              </>
+                            )}
+                          </button>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {selectedNote && (

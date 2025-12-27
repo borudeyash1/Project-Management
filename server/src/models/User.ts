@@ -567,6 +567,39 @@ const userSchema = new Schema<IUser>({
           type: Schema.Types.ObjectId,
           ref: 'ConnectedAccount'
         }]
+      },
+      jira: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
+      trello: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
+      monday: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
       }
     },
     required: false,

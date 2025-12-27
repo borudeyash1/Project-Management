@@ -43,5 +43,189 @@ export const getNotionService = () => {
         }
     };
 
-    return { search };
+    const createPage = async (
+        userId: string,
+        data: {
+            title: string;
+            content: any[];
+            properties?: Record<string, any>;
+            parentDatabase?: string;
+            parentPage?: string;
+        },
+        accountId?: string
+    ) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+
+            // Determine parent (database or page)
+            const parent = data.parentDatabase
+                ? { database_id: data.parentDatabase }
+                : data.parentPage
+                    ? { page_id: data.parentPage }
+                    : { page_id: 'root' }; // Will use workspace root if no parent specified
+
+            const response = await axios.post(`${NOTION_API_URL}/pages`,
+                {
+                    parent,
+                    properties: {
+                        title: {
+                            title: [{ text: { content: data.title } }]
+                        },
+                        ...data.properties
+                    },
+                    children: data.content
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Notion-Version': '2022-06-28',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            return {
+                pageId: response.data.id,
+                url: response.data.url
+            };
+        } catch (error: any) {
+            console.error('Notion create page error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const updatePage = async (
+        userId: string,
+        pageId: string,
+        data: {
+            properties?: Record<string, any>;
+            archived?: boolean;
+        },
+        accountId?: string
+    ) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+
+            await axios.patch(`${NOTION_API_URL}/pages/${pageId}`,
+                data,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Notion-Version': '2022-06-28',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            return { success: true };
+        } catch (error: any) {
+            console.error('Notion update page error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const appendBlockChildren = async (
+        userId: string,
+        blockId: string,
+        children: any[],
+        accountId?: string
+    ) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+
+            await axios.patch(`${NOTION_API_URL}/blocks/${blockId}/children`,
+                { children },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Notion-Version': '2022-06-28',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            return { success: true };
+        } catch (error: any) {
+            console.error('Notion append blocks error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const createDatabase = async (
+        userId: string,
+        data: {
+            title: string;
+            properties: Record<string, any>;
+            parentPage?: string;
+        },
+        accountId?: string
+    ) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+
+            const parent = data.parentPage
+                ? { page_id: data.parentPage }
+                : { type: 'page_id', page_id: 'root' };
+
+            const response = await axios.post(`${NOTION_API_URL}/databases`,
+                {
+                    parent,
+                    title: [{ text: { content: data.title } }],
+                    properties: data.properties
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Notion-Version': '2022-06-28',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            return {
+                databaseId: response.data.id,
+                url: response.data.url
+            };
+        } catch (error: any) {
+            console.error('Notion create database error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const listDatabases = async (userId: string, accountId?: string) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+
+            const response = await axios.post(`${NOTION_API_URL}/search`,
+                {
+                    filter: { property: 'object', value: 'database' },
+                    page_size: 100
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Notion-Version': '2022-06-28'
+                    }
+                }
+            );
+
+            return response.data.results.map((db: any) => ({
+                id: db.id,
+                title: db.title?.[0]?.plain_text || 'Untitled Database',
+                url: db.url
+            }));
+        } catch (error: any) {
+            console.error('Notion list databases error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    return {
+        search,
+        createPage,
+        updatePage,
+        appendBlockChildren,
+        createDatabase,
+        listDatabases
+    };
 };

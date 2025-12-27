@@ -63,14 +63,30 @@ const SCOPES = {
         'user-library-modify',
         'playlist-read-private',
         'playlist-read-collaborative'
+    ],
+    jira: [
+        'read:jira-user',
+        'read:jira-work',
+        'write:jira-work',
+        'offline_access'
+    ],
+    trello: [
+        'read',
+        'write',
+        'account'
+    ],
+    monday: [
+        'me',
+        'boards:read',
+        'boards:write'
     ]
 };
 
-type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify';
+type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday';
 
 // Validation helper
 const isValidService = (service: string): service is ServiceType => {
-    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify'].includes(service);
+    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday'].includes(service);
 };
 
 // Provider Config Helper
@@ -143,6 +159,27 @@ const getProviderConfig = (service: ServiceType) => {
             clientSecret: process.env.SPOTIFY_CLIENT_SECRET || '',
             authUrl: 'https://accounts.spotify.com/authorize',
             tokenUrl: 'https://accounts.spotify.com/api/token',
+            callbackUrl
+        };
+        case 'jira': return {
+            clientId: process.env.JIRA_CLIENT_ID || '',
+            clientSecret: process.env.JIRA_CLIENT_SECRET || '',
+            authUrl: 'https://auth.atlassian.com/authorize',
+            tokenUrl: 'https://auth.atlassian.com/oauth/token',
+            callbackUrl
+        };
+        case 'trello': return {
+            clientId: process.env.TRELLO_API_KEY || '',
+            clientSecret: process.env.TRELLO_SECRET || '',
+            authUrl: 'https://trello.com/1/authorize',
+            tokenUrl: '', // Trello uses different flow usually, but we'll try standard or handle in initiate
+            callbackUrl
+        };
+        case 'monday': return {
+            clientId: process.env.MONDAY_CLIENT_ID || '',
+            clientSecret: process.env.MONDAY_CLIENT_SECRET || '',
+            authUrl: 'https://auth.monday.com/oauth2/authorize',
+            tokenUrl: 'https://auth.monday.com/oauth2/token',
             callbackUrl
         };
         case 'spotify': return {
@@ -268,6 +305,18 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
             url += '&response_type=code';
         } else if (service === 'spotify') {
             url += '&response_type=code&show_dialog=true';
+        } else if (service === 'jira') {
+            url += '&response_type=code&prompt=consent&audience=api.atlassian.com';
+        } else if (service === 'trello') {
+            // Trello specific: https://trello.com/1/authorize?expiration=never&name=MyPersonalToken&scope=read&response_type=token&key={YourAPIKey}
+            // Note: Trello often returns token directly in fragment, need 'response_type=fragment' or handle differently.
+            // For server-side flow, Trello uses OAuth 1.0 which is complex.
+            // A simplified flow uses response_type=fragment (client side) or we use the Power-Up style.
+            // Let's try standard URL construction for now with 'return_url'
+            url = `${config.authUrl}?expiration=never&name=Sartthi&scope=read,write,account&response_type=fragment&key=${config.clientId}&return_url=${encodeURIComponent(config.callbackUrl)}`;
+            // NOTE: Trello is weird. This might need frontend handling if it's fragment based.
+        } else if (service === 'monday') {
+            url += '&response_type=code';
         }
 
         res.json({
@@ -533,6 +582,43 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     name: meResponse.data.display_name,
                     picture: meResponse.data.images?.[0]?.url
                 };
+
+                userInfo = {
+                    id: meResponse.data.accountId,
+                    email: meResponse.data.emailAddress,
+                    name: meResponse.data.displayName,
+                    picture: meResponse.data.avatarUrls['48x48']
+                };
+            } else if (service === 'monday') {
+                tokenResponse = await axios.post(config.tokenUrl, {
+                    code,
+                    client_id: config.clientId,
+                    client_secret: config.clientSecret,
+                    redirect_uri: config.callbackUrl // monday might not strictly need this if configured in app
+                });
+                tokens = tokenResponse.data;
+
+                const meResponse = await axios.post('https://api.monday.com/v2', {
+                    query: 'query { me { id email name photo_tiny } }'
+                }, {
+                    headers: { Authorization: tokens.access_token }
+                });
+
+                const me = meResponse.data.data.me;
+                userInfo = {
+                    id: me.id,
+                    email: me.email,
+                    name: me.name,
+                    picture: me.photo_tiny
+                };
+            } else if (service === 'trello') {
+                // Trello usually returns token in fragment, so server-side Exchange might fail if we expect 'code'.
+                // If we are here, we might be handling a manual token paste or a different flow.
+                // For now, let's assume we got a token passed as 'code' (not standard) or just throw error "Not implemented"
+                // to avoid crashing until we fix Trello flow.
+                // However, to satisfy "Implementation Plan", we will add a placeholder.
+                // Trello doesn't have a code->token exchange endpoint like OAuth2.
+                throw new Error('Trello authentication requires client-side token handling or OAuth 1.0a. Updates pending.');
             }
         }
 

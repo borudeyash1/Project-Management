@@ -6,6 +6,7 @@ import { createActivity } from '../utils/activityUtils';
 import { getCalendarService } from '../services/sartthi/calendarService';
 import { getMailService } from '../services/sartthi/mailService';
 import { getSlackService } from '../services/sartthi/slackService';
+import { getNotionService } from '../services/sartthi/notionService';
 import { notifySlackForTask, notifySlackTaskCompleted, notifySlackTaskUpdated } from '../utils/slackNotifications';
 import User from '../models/User';
 
@@ -112,6 +113,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       requiresFile,
       slackChannelId, // Added for Slack integration
       slackAccountId,
+      syncToNotion, // Added for Notion integration
     } = req.body;
 
     // Only title is required now - project and workspace are optional
@@ -241,6 +243,104 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       }
     } else {
       console.log('ℹ️ [SLACK] No Slack channels configured for this project');
+    }
+
+    // Sartthi Integration: Notion Sync
+    if (syncToNotion) {
+      try {
+        console.log('📝 [NOTION] Syncing task to Notion...');
+        const notionService = getNotionService();
+
+        // Build Notion blocks from task data
+        const notionBlocks: any[] = [];
+
+        if (description) {
+          notionBlocks.push({
+            object: 'block',
+            type: 'paragraph',
+            paragraph: {
+              rich_text: [{ type: 'text', text: { content: description } }]
+            }
+          });
+        }
+
+        // Add task metadata
+        notionBlocks.push({
+          object: 'block',
+          type: 'heading_3',
+          heading_3: {
+            rich_text: [{ type: 'text', text: { content: 'Task Details' } }]
+          }
+        });
+
+        const metadata = [
+          `Status: ${status || 'pending'}`,
+          `Priority: ${priority || 'medium'}`,
+          `Type: ${type || 'task'}`,
+        ];
+
+        if (dueDate) {
+          metadata.push(`Due Date: ${new Date(dueDate).toLocaleDateString()}`);
+        }
+
+        metadata.forEach(item => {
+          notionBlocks.push({
+            object: 'block',
+            type: 'bulleted_list_item',
+            bulleted_list_item: {
+              rich_text: [{ type: 'text', text: { content: item } }]
+            }
+          });
+        });
+
+        // Add subtasks if any
+        if (subtasks && subtasks.length > 0) {
+          notionBlocks.push({
+            object: 'block',
+            type: 'heading_3',
+            heading_3: {
+              rich_text: [{ type: 'text', text: { content: 'Subtasks' } }]
+            }
+          });
+
+          subtasks.forEach((subtask: any) => {
+            notionBlocks.push({
+              object: 'block',
+              type: 'to_do',
+              to_do: {
+                rich_text: [{ type: 'text', text: { content: subtask.title || subtask } }],
+                checked: false
+              }
+            });
+          });
+        }
+
+        const syncResult = await notionService.createPage(
+          authUser._id,
+          {
+            title,
+            content: notionBlocks,
+            properties: {
+              Status: { select: { name: status || 'pending' } },
+              Priority: { select: { name: priority || 'medium' } },
+            }
+          }
+        );
+
+        // Update task with Notion sync info
+        task.notionSync = {
+          pageId: syncResult.pageId,
+          url: syncResult.url,
+          lastSyncedAt: new Date(),
+          syncEnabled: true
+        };
+        await task.save();
+
+        console.log('✅ [NOTION] Task synced successfully:', syncResult.url);
+      } catch (error) {
+        console.error('❌ [NOTION] Failed to sync task:', error);
+        // Don't fail task creation if Notion sync fails
+      }
     }
 
     const response: ApiResponse = {

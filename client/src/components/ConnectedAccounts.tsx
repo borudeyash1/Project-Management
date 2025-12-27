@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 interface ConnectedAccount {
   _id: string;
-  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify';
+  service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'trello' | 'monday';
   providerEmail: string;
   providerName: string;
   providerAvatar?: string;
@@ -33,6 +33,9 @@ const ConnectedAccounts: React.FC = () => {
   const [notionAccounts, setNotionAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
 
   const [spotifyAccounts, setSpotifyAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [jiraAccounts, setJiraAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [trelloAccounts, setTrelloAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
+  const [mondayAccounts, setMondayAccounts] = useState<AccountsData>({ accounts: [], activeAccount: null });
 
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -118,6 +121,30 @@ const ConnectedAccounts: React.FC = () => {
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
       borderColor: 'border-green-500/20'
+    },
+    jira: {
+      icon: <div className="text-blue-600 font-bold text-lg">J</div>, // Replace with proper icon or import
+      title: 'Jira',
+      description: 'Project Management',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-600/10',
+      borderColor: 'border-blue-600/20'
+    },
+    trello: {
+      icon: <div className="text-blue-500 font-bold text-lg">T</div>,
+      title: 'Trello',
+      description: 'Project Management',
+      color: 'text-blue-500',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20'
+    },
+    monday: {
+      icon: <div className="text-red-500 font-bold text-lg">M</div>,
+      title: 'Monday.com',
+      description: 'Work OS',
+      color: 'text-red-500',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20'
     }
   };
 
@@ -128,7 +155,7 @@ const ConnectedAccounts: React.FC = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const [mail, calendar, vault, slack, github, dropbox, figma, notion, spotify] = await Promise.all([
+      const [mail, calendar, vault, slack, github, dropbox, figma, notion, spotify, jira, trello, monday] = await Promise.all([
         apiService.get('/sartthi-accounts/mail'),
         apiService.get('/sartthi-accounts/calendar'),
         apiService.get('/sartthi-accounts/vault'),
@@ -137,8 +164,10 @@ const ConnectedAccounts: React.FC = () => {
         apiService.get('/sartthi-accounts/dropbox'),
         apiService.get('/sartthi-accounts/figma'),
         apiService.get('/sartthi-accounts/notion'),
-
-        apiService.get('/sartthi-accounts/spotify')
+        apiService.get('/sartthi-accounts/spotify'),
+        apiService.get('/sartthi-accounts/jira'),
+        apiService.get('/sartthi-accounts/trello'),
+        apiService.get('/sartthi-accounts/monday')
       ]);
 
       if (mail.success) setMailAccounts(mail.data);
@@ -151,6 +180,9 @@ const ConnectedAccounts: React.FC = () => {
       if (notion.success) setNotionAccounts(notion.data);
 
       if (spotify.success) setSpotifyAccounts(spotify.data);
+      if (typeof jira !== 'undefined' && jira.success) setJiraAccounts(jira.data);
+      if (typeof trello !== 'undefined' && trello.success) setTrelloAccounts(trello.data);
+      if (typeof monday !== 'undefined' && monday.success) setMondayAccounts(monday.data);
     } catch (error) {
       console.error('Failed to fetch accounts:', error);
     } finally {
@@ -158,7 +190,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify') => {
+  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'trello' | 'monday') => {
     try {
       setActionLoading(`connect-${service}`);
       const response = await apiService.post(`/sartthi-accounts/${service}/connect`, {});
@@ -175,7 +207,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify', accountId: string) => {
+  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'trello' | 'monday', accountId: string) => {
     try {
       setActionLoading(`active-${accountId}`);
       const response = await apiService.put(`/sartthi-accounts/${service}/active`, { accountId });
@@ -191,7 +223,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'spotify', accountId: string) => {
+  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'zoom' | 'spotify' | 'jira' | 'trello' | 'monday', accountId: string) => {
     if (!window.confirm(t('connectedAccounts.confirmDisconnect'))) {
       return;
     }
@@ -212,7 +244,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const renderServiceSection = (
-    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify',
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'trello' | 'monday',
     accountsData: AccountsData
   ) => {
     const config = appConfig[service];
@@ -380,6 +412,9 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('notion', notionAccounts)}
 
       {renderServiceSection('spotify', spotifyAccounts)}
+      {renderServiceSection('jira', jiraAccounts)}
+      {renderServiceSection('trello', trelloAccounts)}
+      {renderServiceSection('monday', mondayAccounts)}
     </div>
   );
 };

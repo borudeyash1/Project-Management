@@ -59,6 +59,12 @@ export interface Task {
     url: string;
     timestamp: Date;
   }>;
+  notionSync?: {
+    pageId?: string;
+    url?: string;
+    lastSyncedAt?: Date;
+    syncEnabled?: boolean;
+  };
   autoCreated?: boolean;
 }
 

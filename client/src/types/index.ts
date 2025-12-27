@@ -177,6 +177,42 @@ export interface User {
         connectedAt?: string;
       }>;
     };
+    notion?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    jira?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    trello?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    monday?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
   };
   createdAt: Date;
   updatedAt: Date;
@@ -411,6 +447,12 @@ export interface Task {
   subtaskCompletionPercentage: number;
   totalTimeLogged: number;
   commentCount: number;
+  notionSync?: {
+    pageId?: string;
+    url?: string;
+    lastSyncedAt?: Date;
+    syncEnabled?: boolean;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

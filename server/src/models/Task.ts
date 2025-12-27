@@ -407,6 +407,21 @@ const taskSchema: Schema<any> = new Schema<any>(
     verifiedAt: {
       type: Date,
     },
+    notionSync: {
+      pageId: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
+      lastSyncedAt: {
+        type: Date,
+      },
+      syncEnabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
     isActive: {
       type: Boolean,
       default: true,

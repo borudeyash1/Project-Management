@@ -24,6 +24,7 @@ import {
   MessageCircle,
   HardDrive,
   Music2,
+  FileText as NotionIcon, // Using FileText as generic Notion icon or import proper one if available
   LayoutGrid
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
@@ -300,6 +301,19 @@ const DockNavigation: React.FC = () => {
             </DockIcon>
           </div>
         )}
+
+        {/* [NEW] Notion Widget Toggle */}
+        {(state.userProfile.connectedAccounts?.notion?.activeAccountId ||
+          (state.userProfile.connectedAccounts?.notion?.accounts?.length ?? 0) > 0) && (
+            <DockIcon
+              onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_NOTION_WIDGET'))}
+              tooltip="Notion"
+              className="text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              {/* Using SVG for clearer Notion branding if Lucide doesn't have it */}
+              <NotionIcon className="w-5 h-5" />
+            </DockIcon>
+          )}
 
         {/* Spotify */}
         {state.userProfile.connectedAccounts?.spotify?.activeAccountId && (
