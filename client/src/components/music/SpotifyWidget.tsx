@@ -81,29 +81,54 @@ const SpotifyWidget: React.FC = () => {
     }, [isDragging, dragOffset]);
 
     // Controls
+    const handleControlError = (error: any) => {
+        // Spotify returns 403 with reason "PREMIUM_REQUIRED" for free users
+        if (error?.response?.status === 403 || error?.message?.includes('Premium')) {
+            addToast('Remote playback requires Spotify Premium. Please play from the Spotify app.', 'error');
+        } else {
+            console.error(error);
+        }
+    };
+
     const togglePlay = async () => {
-        if (playback?.is_playing) await spotifyService.pause();
-        else await spotifyService.play();
-        // Optimistic update
-        setPlayback(prev => prev ? { ...prev, is_playing: !prev.is_playing } : null);
+        try {
+            if (playback?.is_playing) await spotifyService.pause();
+            else await spotifyService.play();
+            // Optimistic update
+            setPlayback(prev => prev ? { ...prev, is_playing: !prev.is_playing } : null);
+        } catch (error) {
+            handleControlError(error);
+        }
     };
 
     const handleSkip = async (dir: 'next' | 'prev') => {
-        if (dir === 'next') await spotifyService.next();
-        else await spotifyService.previous();
+        try {
+            if (dir === 'next') await spotifyService.next();
+            else await spotifyService.previous();
+        } catch (error) {
+            handleControlError(error);
+        }
     };
 
     const toggleLike = async () => {
-        if (!playback?.item) return;
-        await spotifyService.toggleSaved(playback.item.id, !isLiked);
-        setIsLiked(!isLiked);
-        addToast(isLiked ? 'Removed from Liked Songs' : 'Added to Liked Songs', 'success');
+        try {
+            if (!playback?.item) return;
+            await spotifyService.toggleSaved(playback.item.id, !isLiked);
+            setIsLiked(!isLiked);
+            addToast(isLiked ? 'Removed from Liked Songs' : 'Added to Liked Songs', 'success');
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleSeek = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const ms = Number(e.target.value);
-        await spotifyService.seek(ms);
-        setPlayback(prev => prev ? { ...prev, progress_ms: ms } : null);
+        try {
+            const ms = Number(e.target.value);
+            await spotifyService.seek(ms);
+            setPlayback(prev => prev ? { ...prev, progress_ms: ms } : null);
+        } catch (error) {
+            handleControlError(error);
+        }
     };
 
     const handleSearch = async (e: React.FormEvent) => {
@@ -118,8 +143,12 @@ const SpotifyWidget: React.FC = () => {
     };
 
     const playTrack = async (uri: string) => {
-        await spotifyService.play({ uris: [uri] });
-        setView('player');
+        try {
+            await spotifyService.play({ uris: [uri] });
+            setView('player');
+        } catch (error) {
+            handleControlError(error);
+        }
     };
 
     // --- Render Helpers ---

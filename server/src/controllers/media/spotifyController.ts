@@ -355,7 +355,26 @@ export const toggleSaved = async (req: Request, res: Response) => {
 
         res.json({ success: true });
     } catch (error: any) {
-        console.error('Toggle saved error:', error.response?.data || error.message);
         res.status(500).json({ message: 'Failed to toggle saved' });
+    }
+};
+
+export const getSavedTracks = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const token = await getSpotifyToken(userId);
+        if (!token) {
+            res.status(401).json({ message: 'Spotify not connected' });
+            return;
+        }
+
+        const response = await axios.get('https://api.spotify.com/v1/me/tracks?limit=50', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        res.json(response.data);
+    } catch (error: any) {
+        console.error('Get saved tracks error:', error.response?.data || error.message);
+        res.status(500).json({ message: 'Failed to get saved tracks' });
     }
 };

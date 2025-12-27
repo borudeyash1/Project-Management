@@ -97,6 +97,10 @@ export const spotifyService = {
     },
 
     // Saved Tracks
+    getSavedTracks: async () => {
+        const res = await apiService.get<any>('/media/spotify/tracks');
+        return res.data;
+    },
     checkSaved: async (ids: string) => {
         const res = await apiService.get<boolean[]>(`/media/spotify/tracks/contains?ids=${ids}`);
         return res.data || [];

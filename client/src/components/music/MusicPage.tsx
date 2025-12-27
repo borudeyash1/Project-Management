@@ -2,14 +2,42 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import { spotifyService, SpotifyPlaybackState } from '../../services/spotifyService';
-import { Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Search, Heart, Clock, Music } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Search, Heart, Clock, Music, Volume2, Mic2, ListMusic } from 'lucide-react';
 
 const MusicPage: React.FC = () => {
     const { state } = useApp();
     const isSpotifyConnected = state.userProfile.connectedAccounts?.spotify?.activeAccountId;
     const [playlists, setPlaylists] = useState<any[]>([]);
+    const [savedTracks, setSavedTracks] = useState<any[]>([]);
     const [playback, setPlayback] = useState<SpotifyPlaybackState | null>(null);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [volume, setVolume] = useState(50);
+    const [showVolume, setShowVolume] = useState(false);
+
+    useEffect(() => {
+        if (isSpotifyConnected) {
+            loadData();
+        } else {
+            setLoading(false);
+        }
+    }, [isSpotifyConnected]);
+
+    // Handle Search
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!searchQuery.trim()) {
+            setSearchResults([]);
+            return;
+        }
+        try {
+            const res = await spotifyService.search(searchQuery);
+            setSearchResults(res.tracks?.items || []);
+        } catch (error) {
+            console.error('Search failed', error);
+        }
+    };
 
     useEffect(() => {
         if (isSpotifyConnected) {
@@ -21,12 +49,14 @@ const MusicPage: React.FC = () => {
 
     const loadData = async () => {
         try {
-            const [playlistsData, playbackData] = await Promise.all([
+            const [playlistsData, playbackData, tracksData] = await Promise.all([
                 spotifyService.getPlaylists(),
-                spotifyService.getPlaybackState()
+                spotifyService.getPlaybackState(),
+                spotifyService.getSavedTracks()
             ]);
             setPlaylists(playlistsData?.items || []);
-            setPlayback(playbackData);
+            setPlayback(playbackData || null);
+            setSavedTracks(tracksData?.items || []);
         } catch (error) {
             console.error('Failed to load music data', error);
         } finally {
@@ -54,10 +84,49 @@ const MusicPage: React.FC = () => {
 
     return (
         <div className="h-full overflow-y-auto p-8 pb-32">
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Music Library</h1>
-                <p className="text-gray-400">Your playlists and saved tracks</p>
+            <header className="mb-8 flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold mb-2">Music Library</h1>
+                    <p className="text-gray-400">Your playlists and saved tracks</p>
+                </div>
+                <form onSubmit={handleSearch} className="relative w-96">
+                    <input
+                        type="text"
+                        placeholder="Search songs, artists, albums..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            if (!e.target.value) setSearchResults([]);
+                        }}
+                        className="w-full bg-[#282828] border-none rounded-full py-3 px-6 pl-12 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#1DB954] transition-all"
+                    />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                </form>
             </header>
+
+            {/* Search Results Overlay or Section */}
+            {searchResults.length > 0 && (
+                <div className="mb-12">
+                    <h3 className="text-xl font-bold mb-4">Search Results</h3>
+                    <div className="space-y-2">
+                        {searchResults.slice(0, 5).map((track: any) => (
+                            <div
+                                key={track.id}
+                                onClick={() => spotifyService.play({ uris: [track.uri] })}
+                                className="flex items-center gap-4 p-3 rounded-xl bg-gray-900/50 hover:bg-gray-800 transition-colors cursor-pointer group"
+                            >
+                                <img src={track.album.images[2]?.url} className="w-12 h-12 rounded" alt={track.name} />
+                                <div className="flex-1">
+                                    <div className="font-bold group-hover:text-green-500 transition-colors">{track.name}</div>
+                                    <div className="text-sm text-gray-400">{track.artists[0].name}</div>
+                                </div>
+                                <Play className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="h-px bg-gray-800 my-8" />
+                </div>
+            )}
 
             {/* Now Playing Hero */}
             {playback?.item && (
@@ -94,16 +163,69 @@ const MusicPage: React.FC = () => {
                             <span>{playback.item.album.name}</span>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => playback.is_playing ? spotifyService.pause() : spotifyService.play()}
-                                className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-400 text-black flex items-center justify-center transition-transform hover:scale-105"
-                            >
-                                {playback.is_playing ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current pl-1" />}
-                            </button>
-                            <button onClick={() => spotifyService.toggleSaved(playback.item!.id, true)} className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
-                                <Heart className="w-6 h-6" />
-                            </button>
+                        <div className="flex items-center gap-6">
+                            {/* Controls */}
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => spotifyService.setShuffle(!playback.shuffle_state)}
+                                    className={`p-2 rounded-full transition-colors ${playback.shuffle_state ? 'text-green-500' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    <Shuffle className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={() => spotifyService.previous()}
+                                    className="p-2 text-white hover:text-green-500 transition-colors"
+                                >
+                                    <SkipBack className="w-8 h-8 fill-current" />
+                                </button>
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            if (playback.is_playing) await spotifyService.pause();
+                                            else await spotifyService.play();
+                                        } catch (error: any) {
+                                            if (error?.response?.status === 403 || error?.message?.includes('Premium')) {
+                                                window.open(playback.item?.external_urls?.spotify || 'https://open.spotify.com', '_blank');
+                                            }
+                                        }
+                                    }}
+                                    className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-400 text-black flex items-center justify-center transition-transform hover:scale-105"
+                                >
+                                    {playback.is_playing ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current pl-1" />}
+                                </button>
+                                <button
+                                    onClick={() => spotifyService.next()}
+                                    className="p-2 text-white hover:text-green-500 transition-colors"
+                                >
+                                    <SkipForward className="w-8 h-8 fill-current" />
+                                </button>
+                                <button
+                                    onClick={() => spotifyService.setRepeat(playback.repeat_state === 'off' ? 'context' : 'off')}
+                                    className={`p-2 rounded-full transition-colors ${playback.repeat_state !== 'off' ? 'text-green-500' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    <Repeat className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="w-px h-12 bg-white/20 mx-2" />
+
+                            {/* Actions & Volume */}
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => spotifyService.toggleSaved(playback.item!.id, true)} className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                                    <Heart className="w-6 h-6" />
+                                </button>
+                                <div className="relative group flex items-center gap-2" onMouseEnter={() => setShowVolume(true)} onMouseLeave={() => setShowVolume(false)}>
+                                    <Volume2 className="w-6 h-6 text-gray-300 group-hover:text-white" />
+                                    <input
+                                        type="range"
+                                        min={0}
+                                        max={100}
+                                        defaultValue={playback.device.volume_percent}
+                                        onChange={(e) => spotifyService.setVolume(Number(e.target.value))}
+                                        className={`w-24 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-green-500 transition-all duration-300 ${showVolume ? 'opacity-100 w-24' : 'opacity-0 w-0 overflow-hidden'}`}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </motion.div>
@@ -132,6 +254,42 @@ const MusicPage: React.FC = () => {
                         <h4 className="font-bold truncate mb-1">{playlist.name}</h4>
                         <p className="text-sm text-gray-400 line-clamp-2">{playlist.description || `By ${playlist.owner.display_name}`}</p>
                     </motion.div>
+                ))}
+            </div>
+
+            {/* Liked Songs */}
+            <h3 className="text-xl font-bold mb-6 mt-8">Liked Songs</h3>
+            <div className="space-y-2">
+                {savedTracks.map((item: any) => (
+                    <div
+                        key={item.track.id}
+                        onClick={() => spotifyService.play({ uris: [item.track.uri] })}
+                        className="flex items-center gap-4 p-3 rounded-xl bg-gray-900/50 hover:bg-gray-800 transition-colors cursor-pointer group"
+                    >
+                        <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
+                            <img src={item.track.album.images[2]?.url} alt={item.track.name} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Play className="w-6 h-6 text-white fill-current" />
+                            </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="font-bold truncate group-hover:text-green-500 transition-colors">{item.track.name}</h4>
+                            <p className="text-sm text-gray-400 truncate">{item.track.artists.map((a: any) => a.name).join(', ')}</p>
+                        </div>
+                        <div className="text-sm text-gray-500 font-mono hidden md:block">
+                            {Math.floor(item.track.duration_ms / 60000)}:{((item.track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}
+                        </div>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                spotifyService.toggleSaved(item.track.id, false);
+                                setSavedTracks(prev => prev.filter(t => t.track.id !== item.track.id));
+                            }}
+                            className="p-2 text-green-500 hover:text-white transition-colors"
+                        >
+                            <Heart className="w-5 h-5 fill-current" />
+                        </button>
+                    </div>
                 ))}
             </div>
         </div>
