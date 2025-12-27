@@ -331,7 +331,11 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
             title,
             content: notionBlocks,
             properties: {
-              Status: { select: { name: status || 'pending' } },
+              Status: {
+                status: {
+                  name: status === 'completed' ? 'Done' : status === 'in-progress' ? 'In progress' : 'Not started'
+                }
+              },
               Priority: { select: { name: priority || 'medium' } },
             },
             parentDatabase: defaultDatabaseId // Use user's selected database
