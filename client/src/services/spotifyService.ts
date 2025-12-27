@@ -134,5 +134,9 @@ export const spotifyService = {
     toggleSaved: async (id: string, saved: boolean) => {
         const res = await apiService.put('/media/spotify/tracks/toggle', { id, saved });
         return res.data;
+    },
+    getDevices: async () => {
+        const res = await apiService.get<any>('/media/spotify/devices');
+        return res.data;
     }
 };

@@ -432,3 +432,23 @@ export const getSavedTracks = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Failed to get saved tracks' });
     }
 };
+
+export const getDevices = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const token = await getSpotifyToken(userId);
+        if (!token) {
+            res.status(401).json({ message: 'Spotify not connected' });
+            return;
+        }
+
+        const response = await axios.get('https://api.spotify.com/v1/me/player/devices', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        res.json(response.data);
+    } catch (error: any) {
+        console.error('Get devices error:', error.response?.data || error.message);
+        res.status(500).json({ message: 'Failed to get devices' });
+    }
+};

@@ -3,7 +3,7 @@ import {
     Play, Pause, SkipBack, SkipForward, Shuffle, Repeat,
     Volume2, VolumeX, Maximize2, Minimize2, Music2, Heart,
     ListMusic, X, GripHorizontal, Search, Disc, ChevronDown,
-    ChevronUp, Clock, User, Radio, TrendingUp, Crown
+    ChevronUp, Clock, User, Radio, TrendingUp, Crown, Smartphone, Monitor, Speaker
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { spotifyService, SpotifyPlaybackState } from '../../services/spotifyService';
@@ -15,6 +15,14 @@ const formatTime = (ms: number) => {
     const m = Math.floor((ms / 1000) / 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
 };
+
+// Spotify Logo Component
+const SpotifyLogo = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+    </svg>
+);
+
 
 const SpotifyWidget: React.FC = () => {
     const { state, dispatch, addToast } = useApp();
@@ -50,6 +58,9 @@ const SpotifyWidget: React.FC = () => {
     const [volume, setVolume] = useState(50);
     const [showVolume, setShowVolume] = useState(false);
     const [queue, setQueue] = useState<any[]>([]);
+    const [devices, setDevices] = useState<any[]>([]);
+    const [showDevices, setShowDevices] = useState(false);
+    const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
 
     // Polling interval
     useEffect(() => {
@@ -173,7 +184,7 @@ const SpotifyWidget: React.FC = () => {
         initPlayer();
     }, [state.userProfile?.connectedAccounts?.spotify?.activeAccountId]);
 
-    // Load playlists
+    // Load playlists and devices
     useEffect(() => {
         if (!state.userProfile?.connectedAccounts?.spotify?.activeAccountId) return;
         const loadPlaylists = async () => {
@@ -184,7 +195,22 @@ const SpotifyWidget: React.FC = () => {
                 console.error(error);
             }
         };
+        const loadDevices = async () => {
+            try {
+                const data = await spotifyService.getDevices();
+                setDevices(data.devices || []);
+                // Set current active device
+                const active = data.devices?.find((d: any) => d.is_active);
+                if (active) setSelectedDevice(active.id);
+            } catch (error) {
+                console.error(error);
+            }
+        };
         loadPlaylists();
+        loadDevices();
+        // Refresh devices every 10 seconds
+        const interval = setInterval(loadDevices, 10000);
+        return () => clearInterval(interval);
     }, [state.userProfile?.connectedAccounts?.spotify?.activeAccountId]);
 
     // Drag Logic
@@ -363,6 +389,27 @@ const SpotifyWidget: React.FC = () => {
         }
     };
 
+    const switchDevice = async (deviceId: string) => {
+        try {
+            await spotifyService.play({ transfer_device_id: deviceId });
+            setSelectedDevice(deviceId);
+            setShowDevices(false);
+            addToast('Switched playback device', 'success');
+        } catch (error) {
+            console.error('Device switch error:', error);
+            addToast('Failed to switch device', 'error');
+        }
+    };
+
+    const getDeviceIcon = (type: string) => {
+        switch (type.toLowerCase()) {
+            case 'computer': return <Monitor size={16} />;
+            case 'smartphone': return <Smartphone size={16} />;
+            case 'speaker': return <Speaker size={16} />;
+            default: return <Speaker size={16} />;
+        }
+    };
+
     if (!state.modals.spotifyWidget) return null;
 
     const YouTubePlayerComponent = !isPremium && (
@@ -396,7 +443,7 @@ const SpotifyWidget: React.FC = () => {
                             <img src={playback.item.album.images[0].url} alt="Art" className="w-full h-full object-cover" />
                         ) : (
                             <div className="bg-gradient-to-br from-[#1DB954] to-[#1ed760] w-full h-full flex items-center justify-center">
-                                <Music2 className="text-white" size={28} />
+                                <SpotifyLogo size={28} className="text-white" />
                             </div>
                         )}
                     </div>
@@ -435,7 +482,7 @@ const SpotifyWidget: React.FC = () => {
                 >
                     <div className="flex items-center gap-2">
                         <div className="relative">
-                            <Music2 size={16} className="text-[#1DB954]" />
+                            <SpotifyLogo size={16} className="text-[#1DB954]" />
                             {isPremium && (
                                 <Crown size={10} className="absolute -top-1 -right-1 text-yellow-400" />
                             )}
@@ -443,6 +490,50 @@ const SpotifyWidget: React.FC = () => {
                         <span className="text-xs font-bold tracking-wider bg-gradient-to-r from-[#1DB954] to-[#1ed760] bg-clip-text text-transparent">
                             SPOTIFY {!isPremium && '(FREE)'}
                         </span>
+
+                        {/* Device Selector */}
+                        {isPremium && devices.length > 0 && (
+                            <div className="relative ml-2">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowDevices(!showDevices);
+                                    }}
+                                    className="flex items-center gap-1 px-2 py-1 bg-[#282828]/50 hover:bg-[#282828] rounded-md text-xs text-gray-400 hover:text-white transition-colors"
+                                    title="Select Device"
+                                >
+                                    {getDeviceIcon(devices.find(d => d.id === selectedDevice)?.type || 'speaker')}
+                                    <ChevronDown size={12} />
+                                </button>
+
+                                {showDevices && (
+                                    <div className="absolute top-full left-0 mt-1 bg-[#282828] rounded-lg shadow-2xl border border-[#404040] min-w-[200px] z-50 overflow-hidden">
+                                        <div className="px-3 py-2 border-b border-[#404040] text-xs text-gray-400 font-semibold">
+                                            Select Device
+                                        </div>
+                                        <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                            {devices.map(device => (
+                                                <button
+                                                    key={device.id}
+                                                    onClick={() => switchDevice(device.id)}
+                                                    className={`w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#1a1a1a] transition-colors text-left ${device.id === selectedDevice ? 'bg-[#1DB954]/10 text-[#1DB954]' : 'text-gray-300'
+                                                        }`}
+                                                >
+                                                    {getDeviceIcon(device.type)}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-sm font-medium truncate">{device.name}</div>
+                                                        <div className="text-xs text-gray-500 capitalize">{device.type}</div>
+                                                    </div>
+                                                    {device.is_active && (
+                                                        <div className="w-2 h-2 bg-[#1DB954] rounded-full animate-pulse" />
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-1">
                         <button onClick={() => setIsMini(true)} className="p-1.5 hover:bg-[#282828]/50 rounded-lg text-gray-400 hover:text-white transition-colors">

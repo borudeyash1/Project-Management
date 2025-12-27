@@ -32,5 +32,6 @@ router.get('/search', protect, spotifyController.search);
 router.get('/tracks', protect, spotifyController.getSavedTracks);
 router.get('/tracks/contains', spotifyController.checkSaved);
 router.put('/tracks/toggle', spotifyController.toggleSaved);
+router.get('/devices', spotifyController.getDevices);
 
 export default router;
