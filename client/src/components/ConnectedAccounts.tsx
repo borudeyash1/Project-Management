@@ -13,6 +13,12 @@ interface ConnectedAccount {
   isActive: boolean;
   isPrimary: boolean;
   createdAt: string;
+  settings?: {
+    notion?: {
+      defaultDatabaseId?: string;
+      defaultDatabaseName?: string;
+    };
+  };
 }
 
 interface AccountsData {
@@ -159,6 +165,12 @@ const ConnectedAccounts: React.FC = () => {
   useEffect(() => {
     if (notionAccounts.accounts.length > 0) {
       fetchNotionDatabases();
+
+      // Pre-select saved default database
+      const activeAccount = notionAccounts.activeAccount || notionAccounts.accounts.find(a => a.isActive);
+      if (activeAccount && (activeAccount as any).settings?.notion?.defaultDatabaseId) {
+        setSelectedDatabase((activeAccount as any).settings.notion.defaultDatabaseId);
+      }
     }
   }, [notionAccounts]);
 
