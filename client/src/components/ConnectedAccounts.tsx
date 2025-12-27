@@ -64,6 +64,13 @@ const ConnectedAccounts: React.FC = () => {
   const [notionDatabases, setNotionDatabases] = useState<NotionDatabase[]>([]);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('');
 
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Zendesk Modal State
+  const [showZendeskModal, setShowZendeskModal] = useState(false);
+  const [zendeskSubdomain, setZendeskSubdomain] = useState('');
+
   const appConfig = {
     mail: {
       icon: <Mail className="w-6 h-6" />,
@@ -287,10 +294,17 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord') => {
+  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord', customParams?: any) => {
     try {
+      if (service === 'zendesk' && !customParams?.subdomain) {
+        setShowZendeskModal(true);
+        return;
+      }
+
       setActionLoading(`connect-${service}`);
-      const response = await apiService.post(`/sartthi-accounts/${service}/connect`, {});
+
+      const queryParams = customParams ? `?${new URLSearchParams(customParams).toString()}` : '';
+      const response = await apiService.post(`/sartthi-accounts/${service}/connect${queryParams}`, {});
 
       if (response.success && response.data.authUrl) {
         // Open OAuth flow in new window
@@ -432,6 +446,62 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('zendesk', zendeskAccounts)}
       {renderServiceSection('linear', linearAccounts)}
       {renderServiceSection('discord', discordAccounts)}
+      {/* Zendesk Subdomain Modal */}
+      {showZendeskModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Connect Zendesk</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Please enter your Zendesk subdomain to connect your account.
+                <br />
+                <span className="text-xs opacity-70">(e.g., if your URL is <b>company</b>.zendesk.com, enter <b>company</b>)</span>
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Subdomain
+                  </label>
+                  <div className="flex rounded-md shadow-sm">
+                    <input
+                      type="text"
+                      className="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      placeholder="d3v-yoursite"
+                      value={zendeskSubdomain}
+                      onChange={(e) => setZendeskSubdomain(e.target.value)}
+                    />
+                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 sm:text-sm">
+                      .zendesk.com
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    onClick={() => setShowZendeskModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (zendeskSubdomain) {
+                        handleConnect('zendesk', { subdomain: zendeskSubdomain });
+                        setShowZendeskModal(false);
+                      }
+                    }}
+                    disabled={!zendeskSubdomain}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Connect
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

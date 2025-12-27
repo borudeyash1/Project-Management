@@ -72,6 +72,10 @@ const SCOPES = {
         'manage:jira-webhook',
         'offline_access'
     ],
+    zendesk: [
+        'read',
+        'write'
+    ],
     trello: [
         'read',
         'write',
@@ -84,11 +88,11 @@ const SCOPES = {
     ]
 };
 
-type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday';
+type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday' | 'zendesk';
 
 // Validation helper
 const isValidService = (service: string): service is ServiceType => {
-    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday'].includes(service);
+    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday', 'zendesk'].includes(service);
 };
 
 // Provider Config Helper
@@ -191,6 +195,13 @@ const getProviderConfig = (service: ServiceType) => {
             tokenUrl: 'https://accounts.spotify.com/api/token',
             callbackUrl
         };
+        case 'zendesk': return {
+            clientId: process.env.ZENDESK_CLIENT_ID || '', // Needs to be set or passed dynamically
+            clientSecret: process.env.ZENDESK_CLIENT_SECRET || '',
+            authUrl: '', // Dynamic based on subdomain
+            tokenUrl: '', // Dynamic based on subdomain
+            callbackUrl
+        };
         default: return null;
     }
 };
@@ -279,7 +290,26 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
 
         // Generic OAuth 2.0 flow
         const state = crypto.randomBytes(32).toString('hex');
-        const stateData = Buffer.from(JSON.stringify({ userId, service, state })).toString('base64');
+        // Include subdomain in state for Zendesk
+        const subdomain = req.query.subdomain as string | undefined;
+        const statePayload: any = { userId, service, state };
+        if (service === 'zendesk' && subdomain) {
+            statePayload.subdomain = subdomain;
+        }
+        const stateData = Buffer.from(JSON.stringify(statePayload)).toString('base64');
+
+        if (service === 'zendesk') {
+            if (!subdomain) {
+                res.status(400).json({ success: false, message: 'Subdomain required for Zendesk' });
+                return;
+            }
+            // Construct dynamic Zendesk URL
+            const scope = SCOPES.zendesk.join(' ');
+            const authUrl = `https://${subdomain}.zendesk.com/oauth/authorizations/new?response_type=code&redirect_uri=${encodeURIComponent(config.callbackUrl)}&client_id=${config.clientId}&scope=${encodeURIComponent(scope)}&state=${stateData}`;
+
+            res.json({ success: true, data: { authUrl } });
+            return;
+        }
 
         let url = `${config.authUrl}?client_id=${config.clientId}&redirect_uri=${encodeURIComponent(config.callbackUrl)}&state=${stateData}`;
 
@@ -349,8 +379,9 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
         }
 
         // Decode state
+        // Decode state
         const stateData = JSON.parse(Buffer.from(state as string, 'base64').toString());
-        const { userId } = stateData;
+        const { userId, subdomain } = stateData;
 
         // Verify service matches
         if (stateData.service !== service) {
@@ -643,6 +674,33 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     name: meResponse.data.name,
                     picture: meResponse.data.picture
                 };
+            } else if (service === 'zendesk') {
+                if (!subdomain) throw new Error('Subdomain missing in state');
+
+                tokenResponse = await axios.post(`https://${subdomain}.zendesk.com/oauth/tokens`, {
+                    grant_type: 'authorization_code',
+                    code,
+                    client_id: config.clientId,
+                    client_secret: config.clientSecret,
+                    redirect_uri: config.callbackUrl,
+                    scope: 'read write'
+                });
+                tokens = tokenResponse.data;
+
+                const meResponse = await axios.get(`https://${subdomain}.zendesk.com/api/v2/users/me.json`, {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+
+                userInfo = {
+                    id: String(meResponse.data.user.id),
+                    email: meResponse.data.user.email,
+                    name: meResponse.data.user.name,
+                    picture: meResponse.data.user.photo?.content_url || ''
+                };
+
+                // Store subdomain in settings since we need it for future API calls
+                // existingAccount checks happen later, but new account creation is below.
+                // We'll need to modify the create/update logic to save 'settings.zendesk.subdomain'.
             }
         }
 
@@ -684,7 +742,8 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
             providerAvatar: userInfo.picture,
             isActive: false,
             isPrimary: false,
-            scopes: SCOPES[service as keyof typeof SCOPES]
+            scopes: SCOPES[service as keyof typeof SCOPES],
+            settings: service === 'zendesk' ? { zendesk: { subdomain } } : undefined
         });
 
         // Update user's connected accounts
