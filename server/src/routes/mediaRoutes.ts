@@ -19,10 +19,10 @@ router.put('/player/shuffle', spotifyController.setShuffle);
 router.put('/player/repeat', spotifyController.setRepeat);
 
 // Library & Search
-router.get('/spotify/playlists', protect, spotifyController.getPlaylists);
-router.get('/spotify/playlists/:playlistId/tracks', protect, spotifyController.getPlaylistTracks);
-router.get('/spotify/search', protect, spotifyController.search);
-router.get('/spotify/tracks', protect, spotifyController.getSavedTracks);
+router.get('/playlists', protect, spotifyController.getPlaylists);
+router.get('/playlists/:playlistId/tracks', protect, spotifyController.getPlaylistTracks);
+router.get('/search', protect, spotifyController.search);
+router.get('/tracks', protect, spotifyController.getSavedTracks);
 router.get('/tracks/contains', spotifyController.checkSaved);
 router.put('/tracks/toggle', spotifyController.toggleSaved);
 
