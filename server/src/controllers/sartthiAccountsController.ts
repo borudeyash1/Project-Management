@@ -683,14 +683,7 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     id: meResponse.data.id,
                     email: meResponse.data.email,
                     name: meResponse.data.display_name,
-                    picture: meResponse.data.images?.[0]?.url
-                };
-
-                userInfo = {
-                    id: meResponse.data.accountId,
-                    email: meResponse.data.emailAddress,
-                    name: meResponse.data.displayName,
-                    picture: meResponse.data.avatarUrls['48x48']
+                    picture: meResponse.data.images?.[0]?.url || ''
                 };
             } else if (service === 'monday') {
                 tokenResponse = await axios.post(config.tokenUrl, {
