@@ -53,7 +53,17 @@ const SCOPES = {
     notion: [], // Notion uses internal integration tokens usually, or specific flow
     zoom: ['meeting:write:admin'],
     vercel: [],
-    spotify: ['user-read-private', 'user-read-email']
+    spotify: [
+        'user-read-private',
+        'user-read-email',
+        'user-read-playback-state',
+        'user-modify-playback-state',
+        'user-read-currently-playing',
+        'user-library-read',
+        'user-library-modify',
+        'playlist-read-private',
+        'playlist-read-collaborative'
+    ]
 };
 
 type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify';
