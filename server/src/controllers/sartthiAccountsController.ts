@@ -65,9 +65,11 @@ const SCOPES = {
         'playlist-read-collaborative'
     ],
     jira: [
+        'read:me',
         'read:jira-user',
         'read:jira-work',
         'write:jira-work',
+        'manage:jira-webhook',
         'offline_access'
     ],
     trello: [
