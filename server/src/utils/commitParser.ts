@@ -40,7 +40,7 @@ const STATUS_KEYWORDS = {
             'closed', 'close', 'closes', 'closd',
             'implemented', 'implement', 'implements', 'implementd',
             'merged', 'merge', 'deployed', 'deploy',
-            'finsihed', 'complted', 'finihsed' // common typos
+            'finsihed', 'complted', 'finihsed', 'shipped', 'shipping', 'finalized', 'final'
         ],
         progress: 100
     },
@@ -49,7 +49,8 @@ const STATUS_KEYWORDS = {
             'testing', 'test', 'tested', 'testin',
             'qa', 'verify', 'verifying', 'verified',
             'checking', 'check', 'checked',
-            'validating', 'validate', 'validated'
+            'validating', 'validate', 'validated',
+            'testing out', 'trying out'
         ],
         progress: 85
     },
@@ -57,7 +58,8 @@ const STATUS_KEYWORDS = {
         keywords: [
             'review', 'reviewing', 'reviewed',
             'ready for review', 'needs review', 'pr ready',
-            'pull request', 'pr', 'code review'
+            'pull request', 'pr', 'code review', 'mr', 'merge request',
+            'waiting for review', 'pending review'
         ],
         progress: 80
     },
@@ -71,7 +73,9 @@ const STATUS_KEYWORDS = {
             'adding', 'add', 'addin',
             'updating', 'update', 'updatin',
             'refactoring', 'refactor',
-            'improving', 'improve'
+            'improving', 'improve',
+            'continuing', 'continue', 'resuming', 'resume', 'picking up',
+            'handling', 'handle'
         ],
         progress: 60
     },
@@ -81,7 +85,7 @@ const STATUS_KEYWORDS = {
             'halfway', 'half done', 'half way',
             'progress on', 'some work on', 'made progress',
             'initial', 'draft', 'wip on',
-            'ongoing', 'some fixes', 'partial fix'
+            'ongoing', 'some fixes', 'partial fix', 'getting there', 'almost done'
         ],
         progress: 35
     },
@@ -91,9 +95,20 @@ const STATUS_KEYWORDS = {
             'waiting for', 'waiting on',
             'on hold', 'paused',
             'stuck', 'need help', 'needs help',
-            'cant proceed', 'cannot proceed'
+            'cant proceed', 'cannot proceed',
+            'dependency', 'dependent on'
         ],
         progress: 0 // No progress change when blocked
+    },
+    todo: {
+        keywords: [
+            'reopen', 'reopened', 'reopening',
+            'revert', 'reverted', 'reverting',
+            'backlog', 'moved to backlog',
+            'reset', 'resetting',
+            'undo', 'undoing'
+        ],
+        progress: 0
     }
 };
 

@@ -31,6 +31,22 @@ const ProjectOverview: React.FC = () => {
 
   const project = state.projects.find(p => p._id === projectId);
 
+  // Calculate permissions
+  const userProfile = state.userProfile;
+  const isOwner = project && userProfile && project.createdBy === userProfile._id;
+
+  const isUserProjectManager = (proj: any, userId: string) => {
+    if (!proj || !userId) return false;
+    // Check if explicitly assigned as PM field
+    if (proj.projectManager === userId) return true;
+    // Check if in team with 'project-manager' role
+    return proj.team?.some((member: any) =>
+      member._id === userId && member.role === 'Project Manager'
+    );
+  };
+
+  const isProjectManager = project && userProfile && isUserProjectManager(project, userProfile._id);
+
   const handleUnlinkRepo = async (repoId: string) => {
     try {
       if (!window.confirm(t('project.overview.confirmUnlinkRepo') || 'Are you sure you want to unlink this repository?')) return;
@@ -279,15 +295,21 @@ const ProjectOverview: React.FC = () => {
             <Github className="w-5 h-5 text-gray-900 dark:text-gray-100" />
             GitHub Repository
           </h2>
-          {/* Only show link button if no repo is linked */}
+          {/* Only show link button if no repo is linked AND user is owner or manager */}
           {!(project as any).integrations?.github?.repos || (project as any).integrations.github.repos.length === 0 ? (
-            <button
-              onClick={() => setShowGitHubModal(true)}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
-            >
-              <LinkIcon className="w-4 h-4" />
-              Link Repository
-            </button>
+            (isOwner || isProjectManager) ? (
+              <button
+                onClick={() => setShowGitHubModal(true)}
+                className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
+              >
+                <LinkIcon className="w-4 h-4" />
+                Link Repository
+              </button>
+            ) : (
+              <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+                Only Project Managers can link repositories
+              </span>
+            )
           ) : (
             <span className="text-xs text-gray-500 dark:text-gray-400">
               Only one repository can be linked per project
@@ -309,7 +331,11 @@ const ProjectOverview: React.FC = () => {
             <div className="col-span-full text-center py-8 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
               <Github className="w-10 h-10 text-gray-400 mx-auto mb-3" />
               <p className="text-gray-600 dark:text-gray-400 font-medium">No repository linked</p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Link a GitHub repository to auto-sync tasks and PRs</p>
+              {(isOwner || isProjectManager) ? (
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Link a GitHub repository to auto-sync tasks and PRs</p>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Ask a Project Manager to link a repository</p>
+              )}
             </div>
           )}
         </div>

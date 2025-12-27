@@ -375,13 +375,16 @@ async function updateTaskFromCommit(
             'testing': 'review',
             'review': 'review',
             'blocked': 'blocked',
-            'partial': 'in-progress' // Map partial to in-progress but update progress %
+            'partial': 'in-progress', // Map partial to in-progress but update progress %
+            'todo': 'pending' // Allow re-opening tasks
         };
 
         const newStatus = statusMap[parsed.suggestedStatus];
 
-        // Don't downgrade completed/verified tasks unless explicitly blocked
-        const isDowngrade = (task.status === 'completed' || task.status === 'done' || task.status === 'verified') && newStatus !== 'blocked';
+        // Don't downgrade completed/verified tasks unless explicitly blocked or re-opened
+        const isDowngrade = (task.status === 'completed' || task.status === 'done' || task.status === 'verified')
+            && newStatus !== 'blocked'
+            && newStatus !== 'pending';
 
         if (newStatus && task.status !== newStatus && !isDowngrade) {
             const oldStatus = task.status;
