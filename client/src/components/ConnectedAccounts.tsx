@@ -40,6 +40,10 @@ const ConnectedAccounts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Notion databases
+  const [notionDatabases, setNotionDatabases] = useState<Array<{ id: string; title: string; url: string }>>([]);
+  const [selectedDatabase, setSelectedDatabase] = useState<string>('');
+
   const appConfig = {
     mail: {
       icon: <Mail className="w-6 h-6" />,
@@ -152,6 +156,12 @@ const ConnectedAccounts: React.FC = () => {
     fetchAccounts();
   }, []);
 
+  useEffect(() => {
+    if (notionAccounts.accounts.length > 0) {
+      fetchNotionDatabases();
+    }
+  }, [notionAccounts]);
+
   const fetchAccounts = async () => {
     try {
       setLoading(true);
@@ -187,6 +197,38 @@ const ConnectedAccounts: React.FC = () => {
       console.error('Failed to fetch accounts:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchNotionDatabases = async () => {
+    try {
+      const response = await apiService.get('/sartthi/notion/databases');
+      if (response.success && response.data) {
+        setNotionDatabases(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Notion databases:', error);
+    }
+  };
+
+  const handleSetDefaultDatabase = async (databaseId: string, databaseName: string) => {
+    try {
+      setActionLoading('set-notion-database');
+      const response = await apiService.post('/sartthi/notion/set-default-database', {
+        databaseId,
+        databaseName
+      });
+
+      if (response.success) {
+        setSelectedDatabase(databaseId);
+        // Show success message
+        alert('Default database set successfully!');
+      }
+    } catch (error: any) {
+      console.error('Failed to set default database:', error);
+      alert(error.response?.data?.message || 'Failed to set default database');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -410,6 +452,45 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('dropbox', dropboxAccounts)}
       {renderServiceSection('figma', figmaAccounts)}
       {renderServiceSection('notion', notionAccounts)}
+
+      {/* Notion Database Selector */}
+      {notionAccounts.accounts.length > 0 && notionDatabases.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 ml-12">
+          <div className="flex items-center gap-2 mb-3">
+            <FileText className="w-5 h-5 text-indigo-600" />
+            <h4 className="font-semibold text-gray-900 dark:text-white">Default Sync Database</h4>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Select which Notion database to sync tasks and notes to by default
+          </p>
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedDatabase}
+              onChange={(e) => {
+                const db = notionDatabases.find(d => d.id === e.target.value);
+                if (db) handleSetDefaultDatabase(db.id, db.title);
+              }}
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="">Select a database...</option>
+              {notionDatabases.map((db) => (
+                <option key={db.id} value={db.id}>
+                  {db.title}
+                </option>
+              ))}
+            </select>
+            {actionLoading === 'set-notion-database' && (
+              <Loader className="w-5 h-5 animate-spin text-indigo-600" />
+            )}
+            {selectedDatabase && actionLoading !== 'set-notion-database' && (
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            )}
+          </div>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+            This will be used when you check "Sync to Notion" when creating tasks or notes
+          </p>
+        </div>
+      )}
 
       {renderServiceSection('spotify', spotifyAccounts)}
       {renderServiceSection('jira', jiraAccounts)}

@@ -315,6 +315,16 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
           });
         }
 
+        // Fetch user's default database setting
+        const { ConnectedAccount } = require('../models/ConnectedAccount');
+        const notionAccount = await ConnectedAccount.findOne({
+          userId: authUser._id,
+          service: 'notion',
+          isActive: true
+        });
+
+        const defaultDatabaseId = notionAccount?.settings?.notion?.defaultDatabaseId;
+
         const syncResult = await notionService.createPage(
           authUser._id,
           {
@@ -323,7 +333,8 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
             properties: {
               Status: { select: { name: status || 'pending' } },
               Priority: { select: { name: priority || 'medium' } },
-            }
+            },
+            parentDatabase: defaultDatabaseId // Use user's selected database
           }
         );
 

@@ -21,6 +21,18 @@ export interface IConnectedAccount extends Document {
     isPrimary: boolean;
     lastSynced?: Date;
 
+    // Service-specific settings
+    settings?: {
+        notion?: {
+            defaultDatabaseId?: string;
+            defaultDatabaseName?: string;
+        };
+        slack?: {
+            defaultChannelId?: string;
+            defaultChannelName?: string;
+        };
+    };
+
     // Metadata
     scopes: string[];
     createdAt: Date;
@@ -88,6 +100,12 @@ const connectedAccountSchema = new Schema<IConnectedAccount>({
     },
     lastSynced: {
         type: Date
+    },
+
+    // Service-specific settings
+    settings: {
+        type: Schema.Types.Mixed,
+        default: {}
     },
 
     // OAuth scopes

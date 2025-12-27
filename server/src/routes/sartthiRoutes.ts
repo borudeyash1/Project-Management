@@ -19,5 +19,6 @@ router.patch('/notion/pages/:pageId', authenticate, notionController.updateNotio
 router.patch('/notion/blocks/:blockId/children', authenticate, notionController.appendNotionBlocks);
 router.post('/notion/databases', authenticate, notionController.createNotionDatabase);
 router.get('/notion/databases', authenticate, notionController.listNotionDatabases);
+router.post('/notion/set-default-database', authenticate, notionController.setDefaultDatabase);
 
 export default router;

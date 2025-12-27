@@ -170,3 +170,60 @@ export const listNotionDatabases = async (req: Request, res: Response): Promise<
         });
     }
 };
+
+export const setDefaultDatabase = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = (req as any).user._id;
+        const { databaseId, databaseName } = req.body;
+
+        if (!databaseId) {
+            res.status(400).json({
+                success: false,
+                message: 'Database ID is required'
+            });
+            return;
+        }
+
+        // Import ConnectedAccount model
+        const { ConnectedAccount } = require('../../models/ConnectedAccount');
+
+        // Find the active Notion account
+        const account = await ConnectedAccount.findOne({
+            userId,
+            service: 'notion',
+            isActive: true
+        });
+
+        if (!account) {
+            res.status(404).json({
+                success: false,
+                message: 'No active Notion account found'
+            });
+            return;
+        }
+
+        // Update settings
+        if (!account.settings) account.settings = {};
+        if (!account.settings.notion) account.settings.notion = {};
+
+        account.settings.notion.defaultDatabaseId = databaseId;
+        account.settings.notion.defaultDatabaseName = databaseName;
+
+        await account.save();
+
+        res.json({
+            success: true,
+            message: 'Default database set successfully',
+            data: {
+                databaseId,
+                databaseName
+            }
+        });
+    } catch (error: any) {
+        console.error('Set default database error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to set default database'
+        });
+    }
+};
