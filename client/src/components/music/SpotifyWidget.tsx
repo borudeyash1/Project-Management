@@ -198,9 +198,10 @@ const SpotifyWidget: React.FC = () => {
         const loadDevices = async () => {
             try {
                 const data = await spotifyService.getDevices();
-                setDevices(data.devices || []);
+                // API returns { devices: [...] } directly
+                setDevices(data?.devices || []);
                 // Set current active device
-                const active = data.devices?.find((d: any) => d.is_active);
+                const active = data?.devices?.find((d: any) => d.is_active);
                 if (active) setSelectedDevice(active.id);
             } catch (error) {
                 console.error(error);
@@ -368,11 +369,25 @@ const SpotifyWidget: React.FC = () => {
             addToast('Playing tracks requires Spotify Premium', 'info');
             return;
         }
+
         try {
-            await spotifyService.play({ uris: [uri] });
+            // If we have a selected device, play on that device
+            if (selectedDevice) {
+                await spotifyService.play({ uris: [uri], transfer_device_id: selectedDevice });
+            } else {
+                // Try to play, will use active device or fail
+                await spotifyService.play({ uris: [uri] });
+            }
             setView('player');
-        } catch (error) {
-            handleControlError(error);
+            addToast('Playing track...', 'success');
+        } catch (error: any) {
+            // If no device, show device selector
+            if (error?.response?.data?.error?.reason === 'NO_ACTIVE_DEVICE') {
+                addToast('Please select a device first', 'warning');
+                setShowDevices(true);
+            } else {
+                handleControlError(error);
+            }
         }
     };
 
@@ -381,11 +396,23 @@ const SpotifyWidget: React.FC = () => {
             addToast('Playing playlists requires Spotify Premium', 'info');
             return;
         }
+
         try {
-            await spotifyService.play({ context_uri: uri });
+            // If we have a selected device, play on that device
+            if (selectedDevice) {
+                await spotifyService.play({ context_uri: uri, transfer_device_id: selectedDevice });
+            } else {
+                await spotifyService.play({ context_uri: uri });
+            }
             setView('player');
-        } catch (error) {
-            handleControlError(error);
+            addToast('Playing playlist...', 'success');
+        } catch (error: any) {
+            if (error?.response?.data?.error?.reason === 'NO_ACTIVE_DEVICE') {
+                addToast('Please select a device first', 'warning');
+                setShowDevices(true);
+            } else {
+                handleControlError(error);
+            }
         }
     };
 
@@ -755,22 +782,43 @@ const SpotifyWidget: React.FC = () => {
                                 />
                             </form>
                             <div className="space-y-1">
+                                {searchResults.length === 0 && searchQuery && (
+                                    <div className="text-center text-gray-500 py-8">
+                                        <Search size={48} className="mx-auto mb-2 opacity-50" />
+                                        <p>No results found for "{searchQuery}"</p>
+                                    </div>
+                                )}
                                 {searchResults.map(track => (
                                     <div
                                         key={track.id}
                                         onClick={() => playTrack(track.uri)}
-                                        className="flex items-center gap-3 p-2.5 hover:bg-[#282828]/50 rounded-lg cursor-pointer group transition-all"
+                                        className="flex items-center gap-3 p-2.5 hover:bg-[#282828]/50 rounded-lg cursor-pointer group transition-all relative"
                                     >
-                                        <img src={track.album.images[2]?.url} className="w-12 h-12 rounded-md shadow-md" alt={track.name} />
+                                        <div className="relative flex-shrink-0">
+                                            <img
+                                                src={track.album.images[1]?.url || track.album.images[0]?.url}
+                                                className="w-14 h-14 rounded-md shadow-md"
+                                                alt={track.name}
+                                                onError={(e) => {
+                                                    e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23282828"/></svg>';
+                                                }}
+                                            />
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
+                                                <Play size={20} fill="white" className="text-white" />
+                                            </div>
+                                        </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-medium truncate group-hover:text-[#1DB954] transition-colors">
                                                 {track.name}
                                             </div>
                                             <div className="text-xs text-gray-400 truncate">
-                                                {track.artists[0].name}
+                                                {track.artists.map((a: any) => a.name).join(', ')}
+                                            </div>
+                                            <div className="text-xs text-gray-500 truncate">
+                                                {track.album.name}
                                             </div>
                                         </div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-500 flex-shrink-0">
                                             {formatTime(track.duration_ms)}
                                         </div>
                                     </div>

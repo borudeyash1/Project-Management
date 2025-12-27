@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Mail, Calendar, FileText, Slack, Github, HardDrive, Figma, Music,
-  AlertCircle, CheckCircle, ExternalLink, Loader, Plus, Trash2, Unlink, Link as LinkIcon,
-  Headphones, Zap, MessageSquare
-} from 'lucide-react';
+import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
+import { SpotifyLogo, DiscordLogo, LinearLogo, FigmaLogo, JiraLogo, ZendeskLogo, NotionLogo, DropboxLogo, GitHubLogo, SlackLogo } from './icons/BrandLogos';
+import {
+  Mail, Calendar, FileText,
+  AlertCircle, CheckCircle, ExternalLink, Loader, Plus, Trash2, Unlink, Link as LinkIcon,
+  Headphones, Zap, MessageSquare, HardDrive
+} from 'lucide-react';
 import CollapsibleIntegrationCard from './CollapsibleIntegrationCard';
 
 interface ConnectedAccount {
@@ -99,34 +101,34 @@ const ConnectedAccounts: React.FC = () => {
       apiConsole: 'https://console.cloud.google.com/apis/dashboard'
     },
     slack: {
-      icon: <Slack className="w-6 h-6" />,
+      icon: <SlackLogo className="w-6 h-6" />,
       title: 'Slack',
       description: t('connectedAccounts.slackDesc'),
-      color: 'text-purple-500',
+      color: 'text-[#4A154B]',
       bgColor: 'bg-purple-50 dark:bg-purple-900/10',
       borderColor: 'border-purple-500/20',
       apiConsole: 'https://api.slack.com/apps'
     },
     github: {
-      icon: <Github className="w-6 h-6" />,
+      icon: <GitHubLogo className="w-6 h-6" />,
       title: 'GitHub',
       description: t('connectedAccounts.githubDesc'),
-      color: 'text-gray-900 dark:text-white',
-      bgColor: 'bg-gray-50 dark:bg-gray-700/50',
-      borderColor: 'border-gray-500/20',
+      color: 'text-gray-900 dark:text-gray-100',
+      bgColor: 'bg-gray-100 dark:bg-gray-700',
+      borderColor: 'border-gray-400/20',
       apiConsole: 'https://github.com/settings/developers'
     },
     dropbox: {
-      icon: <HardDrive className="w-6 h-6" />,
+      icon: <DropboxLogo className="w-6 h-6" />,
       title: 'Dropbox',
       description: t('connectedAccounts.dropboxDesc'),
-      color: 'text-blue-600',
+      color: 'text-[#0061FE]',
       bgColor: 'bg-blue-50 dark:bg-blue-900/10',
-      borderColor: 'border-blue-600/20',
+      borderColor: 'border-blue-500/20',
       apiConsole: 'https://www.dropbox.com/developers/apps'
     },
     figma: {
-      icon: <Figma className="w-6 h-6" />,
+      icon: <FigmaLogo className="w-6 h-6" />,
       title: 'Figma',
       description: t('connectedAccounts.figmaDesc'),
       color: 'text-orange-500',
@@ -135,7 +137,7 @@ const ConnectedAccounts: React.FC = () => {
       apiConsole: 'https://www.figma.com/developers/api'
     },
     notion: {
-      icon: <FileText className="w-6 h-6" />,
+      icon: <NotionLogo className="w-6 h-6" />,
       title: 'Notion',
       description: t('connectedAccounts.notionDesc'),
       color: 'text-gray-900 dark:text-gray-100',
@@ -144,46 +146,46 @@ const ConnectedAccounts: React.FC = () => {
       apiConsole: 'https://www.notion.so/my-integrations'
     },
     spotify: {
-      icon: <Music className="w-6 h-6" />,
+      icon: <SpotifyLogo className="w-6 h-6" />,
       title: 'Spotify',
       description: 'Control music playback',
-      color: 'text-green-500',
+      color: 'text-[#1DB954]',
       bgColor: 'bg-green-50 dark:bg-green-900/10',
       borderColor: 'border-green-500/20',
       apiConsole: 'https://developer.spotify.com/dashboard'
     },
     jira: {
-      icon: <AlertCircle className="w-6 h-6" />,
+      icon: <JiraLogo className="w-6 h-6" />,
       title: 'Jira',
       description: 'Issue & project tracking',
-      color: 'text-blue-600',
+      color: 'text-[#2684FF]',
       bgColor: 'bg-blue-50 dark:bg-blue-900/10',
       borderColor: 'border-blue-600/20',
       apiConsole: 'https://developer.atlassian.com/console/myapps/'
     },
     zendesk: {
-      icon: <Headphones className="w-6 h-6" />,
+      icon: <ZendeskLogo className="w-6 h-6" />,
       title: 'Zendesk',
       description: 'Customer Service',
-      color: 'text-green-600',
+      color: 'text-gray-900 dark:text-gray-100',
       bgColor: 'bg-green-600/10',
       borderColor: 'border-green-600/20',
       apiConsole: 'https://developer.zendesk.com/'
     },
     linear: {
-      icon: <Zap className="w-6 h-6" />,
+      icon: <LinearLogo className="w-6 h-6" />,
       title: 'Linear',
       description: 'Issue Tracking',
-      color: 'text-purple-600',
+      color: 'text-[#5E6AD2]',
       bgColor: 'bg-purple-600/10',
       borderColor: 'border-purple-600/20',
       apiConsole: 'https://linear.app/settings/api'
     },
     discord: {
-      icon: <MessageSquare className="w-6 h-6" />,
+      icon: <DiscordLogo className="w-6 h-6" />,
       title: 'Discord',
       description: 'Team Communication',
-      color: 'text-indigo-500',
+      color: 'text-[#5865F2]',
       bgColor: 'bg-indigo-500/10',
       borderColor: 'border-indigo-500/20',
       apiConsole: 'https://discord.com/developers/applications'

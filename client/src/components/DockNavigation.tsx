@@ -35,6 +35,7 @@ import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import AIChatbot from './AIChatbot';
 import { useStickyNotes } from '../context/StickyNotesContext';
+import { SpotifyLogo, DropboxLogo, NotionLogo } from './icons/BrandLogos';
 
 interface NavItem {
   id: string;
@@ -295,9 +296,9 @@ const DockNavigation: React.FC = () => {
               onClick={() => navigate('/dropbox')}
               active={location.pathname === '/dropbox'}
               tooltip="Dropbox"
-              className="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+              className="text-[#0061FE] hover:bg-blue-50 dark:hover:bg-blue-900/20"
             >
-              <HardDrive className="w-5 h-5" />
+              <DropboxLogo size={22} />
             </DockIcon>
           </div>
         )}
@@ -310,8 +311,7 @@ const DockNavigation: React.FC = () => {
               tooltip="Notion"
               className="text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              {/* Using SVG for clearer Notion branding if Lucide doesn't have it */}
-              <NotionIcon className="w-5 h-5" />
+              <NotionLogo size={22} />
             </DockIcon>
           )}
 
@@ -328,7 +328,7 @@ const DockNavigation: React.FC = () => {
               active={state.modals.spotifyWidget}
               className="text-[#1DB954]"
             >
-              <Music2 size={22} />
+              <SpotifyLogo size={22} />
             </DockIcon>
 
             {/* Tooltip/Menu */}
