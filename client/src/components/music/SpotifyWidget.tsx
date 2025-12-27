@@ -30,7 +30,10 @@ const SpotifyWidget: React.FC = () => {
     // UI State
     const [isExpanded, setIsExpanded] = useState(false);
     const [isMini, setIsMini] = useState(true);
-    const [position, setPosition] = useState({ x: window.innerWidth - 100, y: window.innerHeight - 150 });
+    const [position, setPosition] = useState({
+        x: typeof window !== 'undefined' ? (window.innerWidth / 2) - 180 : 0,
+        y: typeof window !== 'undefined' ? (window.innerHeight / 2) - 100 : 0
+    });
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [view, setView] = useState<'player' | 'playlists' | 'search' | 'queue'>('player');
