@@ -25,6 +25,8 @@ interface DocArticle {
   category: string;
   subcategory?: string;
   videoUrl?: string;
+  featuredImage?: string;
+  learnMoreUrl?: string;
   order: number;
   isPublished: boolean;
   createdAt: string;
@@ -43,6 +45,8 @@ const AdminDocs: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [customCategory, setCustomCategory] = useState('');
+  const [contentHistory, setContentHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -83,27 +87,60 @@ const AdminDocs: React.FC = () => {
     }
   };
 
+  const saveToHistory = (content: string) => {
+    const newHistory = contentHistory.slice(0, historyIndex + 1);
+    newHistory.push(content);
+    setContentHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setCurrentArticle(prev => ({ ...prev, content: contentHistory[newIndex] }));
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < contentHistory.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setCurrentArticle(prev => ({ ...prev, content: contentHistory[newIndex] }));
+    }
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setCurrentArticle(prev => ({ ...prev, content: newContent }));
+    saveToHistory(newContent);
+  };
+
   const handleCreateNew = () => {
+    const initialContent = '';
     setCurrentArticle({
       title: '',
       slug: '',
-      content: '',
+      content: initialContent,
       category: 'getting-started',
       videoUrl: '',
       order: articles.length + 1,
-      isPublished: false
+      isPublished: true
     });
+    setContentHistory([initialContent]);
+    setHistoryIndex(0);
     setIsEditing(true);
   };
 
   const handleEdit = (article: DocArticle) => {
     setCurrentArticle(article);
+    setContentHistory([article.content]);
+    setHistoryIndex(0);
     setIsEditing(true);
   };
 
   const handleSave = async () => {
-    if (!currentArticle || !currentArticle.title || !currentArticle.slug || !currentArticle.content) {
-      addToast('Please fill in all required fields', 'error');
+    if (!currentArticle || !currentArticle.title || !currentArticle.slug || !currentArticle.content || !currentArticle.category) {
+      addToast('Please fill in all required fields (title, slug, category, content)', 'error');
       return;
     }
 
@@ -293,12 +330,252 @@ const AdminDocs: React.FC = () => {
 
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                  Featured Image URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={currentArticle?.featuredImage || ''}
+                  onChange={(e) => setCurrentArticle(prev => ({ ...prev, featuredImage: e.target.value }))}
+                  className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                    } focus:outline-none focus:ring-2 focus:ring-accent`}
+                  placeholder="https://images.unsplash.com/..."
+                />
+                {currentArticle?.featuredImage && (
+                  <img 
+                    src={currentArticle.featuredImage} 
+                    alt="Preview" 
+                    className="mt-2 w-full h-32 object-cover rounded-lg"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                  Learn More URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={currentArticle?.learnMoreUrl || ''}
+                  onChange={(e) => setCurrentArticle(prev => ({ ...prev, learnMoreUrl: e.target.value }))}
+                  className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                    } focus:outline-none focus:ring-2 focus:ring-accent`}
+                  placeholder="https://example.com/learn-more"
+                />
+                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  URL for the "Learn More" button on the docs page
+                </p>
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Content (Markdown) *
                 </label>
+                
+                {/* Formatting Toolbar */}
+                <div className={`flex flex-wrap gap-1 p-2 rounded-t-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}>
+                  {/* Undo/Redo */}
+                  <button
+                    type="button"
+                    onClick={handleUndo}
+                    disabled={historyIndex <= 0}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'} disabled:opacity-30 disabled:cursor-not-allowed`}
+                    title="Undo (Ctrl+Z)"
+                  >
+                    ↶
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleRedo}
+                    disabled={historyIndex >= contentHistory.length - 1}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'} disabled:opacity-30 disabled:cursor-not-allowed`}
+                    title="Redo (Ctrl+Y)"
+                  >
+                    ↷
+                  </button>
+
+                  <div className={`w-px ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} mx-1`} />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        const selectedText = textarea.value.substring(start, end) || 'Bold Text';
+                        const newText = textarea.value.substring(0, start) + `**${selectedText}**` + textarea.value.substring(end);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded font-bold ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Bold"
+                  >
+                    B
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        const selectedText = textarea.value.substring(start, end) || 'Italic Text';
+                        const newText = textarea.value.substring(0, start) + `*${selectedText}*` + textarea.value.substring(end);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded italic ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Italic"
+                  >
+                    I
+                  </button>
+
+                  <div className={`w-px ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} mx-1`} />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const selectedText = textarea.value.substring(start, textarea.value.indexOf('\n', start)) || 'Heading';
+                        const newText = textarea.value.substring(0, start) + `# ${selectedText}\n` + textarea.value.substring(start + selectedText.length);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Heading 1"
+                  >
+                    H1
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const selectedText = textarea.value.substring(start, textarea.value.indexOf('\n', start)) || 'Heading';
+                        const newText = textarea.value.substring(0, start) + `## ${selectedText}\n` + textarea.value.substring(start + selectedText.length);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Heading 2"
+                  >
+                    H2
+                  </button>
+
+                  <div className={`w-px ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} mx-1`} />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const newText = textarea.value.substring(0, start) + `\n- List item 1\n- List item 2\n- List item 3\n` + textarea.value.substring(start);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Bullet List"
+                  >
+                    • List
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const newText = textarea.value.substring(0, start) + `\n1. First item\n2. Second item\n3. Third item\n` + textarea.value.substring(start);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Numbered List"
+                  >
+                    1. List
+                  </button>
+
+                  <div className={`w-px ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} mx-1`} />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const newText = textarea.value.substring(0, start) + `\n\`\`\`\ncode here\n\`\`\`\n` + textarea.value.substring(start);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded font-mono ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Code Block"
+                  >
+                    {'</>'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        const selectedText = textarea.value.substring(start, end) || 'link text';
+                        const newText = textarea.value.substring(0, start) + `[${selectedText}](url)` + textarea.value.substring(end);
+                        handleContentChange(newText);
+                        setTimeout(() => textarea.focus(), 0);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Link"
+                  >
+                    🔗
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const imageUrl = prompt('Enter image URL:');
+                      if (imageUrl) {
+                        const textarea = document.querySelector('textarea[placeholder*="Heading"]') as HTMLTextAreaElement;
+                        if (textarea) {
+                          const start = textarea.selectionStart;
+                          const newText = textarea.value.substring(0, start) + `\n![Image description](${imageUrl})\n` + textarea.value.substring(start);
+                          handleContentChange(newText);
+                          setTimeout(() => textarea.focus(), 0);
+                        }
+                      }
+                    }}
+                    className={`px-3 py-1 rounded ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                    title="Insert Image"
+                  >
+                    🖼️
+                  </button>
+                </div>
+
                 <textarea
                   value={currentArticle?.content || ''}
-                  onChange={(e) => setCurrentArticle(prev => ({ ...prev, content: e.target.value }))}
-                  className={`w-full h-96 px-4 py-3 rounded-lg border ${isDarkMode
+                  onChange={(e) => handleContentChange(e.target.value)}
+                  className={`w-full h-96 px-4 py-3 rounded-b-lg border border-t-0 ${isDarkMode
                     ? 'bg-gray-700 border-gray-600 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
                     } focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm`}

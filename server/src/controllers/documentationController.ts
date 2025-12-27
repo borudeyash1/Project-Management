@@ -101,7 +101,7 @@ export const createDoc = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const { title, slug, content, category, subcategory, videoUrl, order, isPublished } = req.body;
+        const { title, slug, content, category, subcategory, videoUrl, featuredImage, learnMoreUrl, order, isPublished } = req.body;
 
         if (!title || !slug || !content || !category) {
             res.status(400).json({ success: false, message: 'Title, slug, content, and category are required' });
@@ -122,6 +122,8 @@ export const createDoc = async (req: Request, res: Response): Promise<void> => {
             category,
             subcategory,
             videoUrl,
+            featuredImage,
+            learnMoreUrl,
             order: order || 0,
             isPublished: isPublished || false,
             createdBy: authUser._id,
@@ -152,7 +154,7 @@ export const updateDoc = async (req: Request, res: Response): Promise<void> => {
         }
 
         const { id } = req.params;
-        const { title, slug, content, category, subcategory, videoUrl, order, isPublished } = req.body;
+        const { title, slug, content, category, subcategory, videoUrl, featuredImage, learnMoreUrl, order, isPublished } = req.body;
 
         const doc = await Documentation.findById(id);
         if (!doc) {
@@ -175,6 +177,8 @@ export const updateDoc = async (req: Request, res: Response): Promise<void> => {
         if (category !== undefined) doc.category = category;
         if (subcategory !== undefined) doc.subcategory = subcategory;
         if (videoUrl !== undefined) doc.videoUrl = videoUrl;
+        if (featuredImage !== undefined) doc.featuredImage = featuredImage;
+        if (learnMoreUrl !== undefined) doc.learnMoreUrl = learnMoreUrl;
         if (order !== undefined) doc.order = order;
         if (isPublished !== undefined) doc.isPublished = isPublished;
 
