@@ -81,7 +81,9 @@ const initialState: AppState = {
     client: false,
     pricing: false,
     requestChange: false,
-    notifications: false
+    requestChange: false,
+    notifications: false,
+    dropboxWidget: false
   },
   userProfile: emptyUser,
   settings: emptyUser.settings,

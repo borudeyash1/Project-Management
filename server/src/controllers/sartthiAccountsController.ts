@@ -41,7 +41,13 @@ const SCOPES = {
         'users:read'
     ],
     github: ['repo', 'user'],
-    dropbox: [],
+    dropbox: [
+        'account_info.read',
+        'files.metadata.read',
+        'files.metadata.write',
+        'files.content.read',
+        'files.content.write'
+    ],
     onedrive: ['Files.ReadWrite.All', 'offline_access'],
     figma: ['file_content:read'],
     notion: [], // Notion uses internal integration tokens usually, or specific flow

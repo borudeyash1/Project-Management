@@ -257,6 +257,8 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
+import DropboxWidget from './components/vault/DropboxWidget'; // [NEW]
+
 // App Content Component
 const AppContent: React.FC = () => {
   const { state, dispatch } = useApp();
@@ -264,6 +266,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="antialiased bg-bg dark:bg-gray-900 text-text dark:text-gray-100 font-inter selection-bg-primary">
       <StickyNotesContainer />
+      <DropboxWidget />
       <ToastContainer />
 
       <Routes>

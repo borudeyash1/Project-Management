@@ -631,6 +631,7 @@ export interface AppState {
     pricing: boolean;
     requestChange: boolean;
     notifications: boolean;
+    dropboxWidget: boolean; // [NEW]
   };
   userProfile: User;
   settings: UserSettings;

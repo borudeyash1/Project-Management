@@ -281,14 +281,20 @@ const DockNavigation: React.FC = () => {
 
         {/* Dropbox - Only if connected */}
         {state.userProfile.connectedAccounts?.dropbox?.activeAccountId && (
-          <DockIcon
-            onClick={() => navigate('/dropbox')}
-            active={location.pathname === '/dropbox'}
-            tooltip="Dropbox"
-            className="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+          <div
+            className="relative group"
+            onMouseEnter={(e) => handleIconEnter('dropbox', e)}
+            onMouseLeave={handleIconLeave}
           >
-            <HardDrive className="w-5 h-5" />
-          </DockIcon>
+            <DockIcon
+              onClick={() => navigate('/dropbox')}
+              active={location.pathname === '/dropbox'}
+              tooltip="Dropbox"
+              className="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              <HardDrive className="w-5 h-5" />
+            </DockIcon>
+          </div>
         )}
 
         {/* Settings */}
@@ -348,6 +354,42 @@ const DockNavigation: React.FC = () => {
             >
               <FileText size={14} />
               {t('notes.allNotes')}
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Portal Dropbox Menu */}
+      {hoveredItem === 'dropbox' && hoveredRect && createPortal(
+        <div
+          className="fixed z-[9999] animate-in fade-in zoom-in-95 duration-200"
+          style={getMenuPositionStyle()}
+          onMouseEnter={handleMenuEnter}
+          onMouseLeave={handleMenuLeave}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[160px]">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: 'TOGGLE_MODAL', payload: 'dropboxWidget' });
+                setHoveredItem(null);
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <HardDrive size={14} className="text-[#0061FE]" />
+              Quick View
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/dropbox');
+                setHoveredItem(null);
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <FolderOpen size={14} />
+              Open Dropbox
             </button>
           </div>
         </div>,
