@@ -51,19 +51,52 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
     const loadPlans = async () => {
       try {
         setLoading(true);
-        const response = await api.getSubscriptionPlans();
-        setPlans(response);
+        // Try new pricing plans API first
+        const response = await fetch('http://localhost:5000/api/pricing-plans');
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.length > 0) {
+          // Convert new pricing plan format to old subscription plan format for compatibility
+          const convertedPlans = data.data.map((plan: any) => ({
+            planKey: plan.planKey,
+            displayName: plan.displayName,
+            summary: plan.description,
+            monthlyPrice: typeof plan.price === 'number' ? plan.price : 0,
+            yearlyPrice: typeof plan.price === 'number' ? plan.price * 12 * 0.8 : 0, // 20% discount
+            limits: {
+              maxWorkspaces: plan.planKey === 'free' ? 1 : plan.planKey === 'pro' ? 3 : plan.planKey === 'premium' ? 11 : -1,
+              maxProjects: plan.planKey === 'free' ? 1 : plan.planKey === 'pro' ? 2 : plan.planKey === 'premium' ? 5 : -1,
+              maxTeamMembers: plan.planKey === 'free' ? 0 : plan.planKey === 'pro' ? 20 : plan.planKey === 'premium' ? 50 : -1
+            },
+            features: plan.features.reduce((acc: any, feature: any) => {
+              acc[feature.text.replace(/\s+/g, '')] = feature.included;
+              return acc;
+            }, {}),
+            order: plan.order || 0
+          }));
+          setPlans(convertedPlans);
+        } else {
+          // Fallback to old API
+          const oldResponse = await api.getSubscriptionPlans();
+          setPlans(oldResponse);
+        }
       } catch (error) {
         console.error('Failed to load subscription plans', error);
-        dispatch({
-          type: 'ADD_TOAST',
-          payload: {
-            id: Date.now().toString(),
-            type: 'error',
-            message: 'Unable to load subscription plans. Please try again.',
-            duration: 4000
-          }
-        });
+        // Try old API as fallback
+        try {
+          const oldResponse = await api.getSubscriptionPlans();
+          setPlans(oldResponse);
+        } catch (fallbackError) {
+          dispatch({
+            type: 'ADD_TOAST',
+            payload: {
+              id: Date.now().toString(),
+              type: 'error',
+              message: 'Unable to load subscription plans. Please try again.',
+              duration: 4000
+            }
+          });
+        }
       } finally {
         setLoading(false);
       }

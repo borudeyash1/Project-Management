@@ -77,6 +77,7 @@ import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
 import AdminDocs from './components/admin/AdminDocs';
+import AdminDocsImport from './components/admin/AdminDocsImport';
 import AdminContent from './components/admin/AdminContent';
 import CanvasEditorPage from './components/admin/CanvasEditorPage';
 import FolderDemo from './components/FolderDemo';
@@ -312,6 +313,7 @@ const AppContent: React.FC = () => {
         <Route path="/admin/releases" element={<ReleaseManagement />} />
         <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
         <Route path="/admin/docs" element={<AdminDocs />} />
+        <Route path="/admin/docs/import" element={<AdminDocsImport />} />
         <Route path="/admin/content" element={<AdminContent />} />
         <Route path="/admin/canvas-editor" element={<CanvasEditorPage />} />
 

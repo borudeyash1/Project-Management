@@ -132,14 +132,15 @@ router.get('/analytics/device-risk-detail', getDetailedDeviceRisk);
 router.get('/analytics/growth-metrics-detail', getDetailedGrowthMetrics);
 router.get('/analytics/device-security-detail', getDetailedDeviceSecurity);
 // Note: user-locations route temporarily disabled due to corrupted analyticsController.ts
-// Subscription management
-router.get('/subscriptions', authenticate, getAdminSubscriptionPlans);
-router.put('/subscriptions/:planKey', authenticate, updateSubscriptionPlan);
-router.post('/subscriptions/:planKey/coupons', authenticate, addSubscriptionCoupon);
-router.put('/subscriptions/:planKey/coupons/:code', authenticate, updateSubscriptionCoupon);
-router.delete('/subscriptions/:planKey/coupons/:code', authenticate, deleteSubscriptionCoupon);
-router.post('/subscriptions/:planKey/affiliates', authenticate, addSubscriptionAffiliate);
-router.put('/subscriptions/:planKey/affiliates/:code', authenticate, updateSubscriptionAffiliate);
-router.delete('/subscriptions/:planKey/affiliates/:code', authenticate, deleteSubscriptionAffiliate);
+
+// OLD Subscription management routes - DISABLED in favor of new PricingPlan routes
+// router.get('/subscriptions', authenticate, getAdminSubscriptionPlans);
+// router.put('/subscriptions/:planKey', authenticate, updateSubscriptionPlan);
+// router.post('/subscriptions/:planKey/coupons', authenticate, addSubscriptionCoupon);
+// router.put('/subscriptions/:planKey/coupons/:code', authenticate, updateSubscriptionCoupon);
+// router.delete('/subscriptions/:planKey/coupons/:code', authenticate, deleteSubscriptionCoupon);
+// router.post('/subscriptions/:planKey/affiliates', authenticate, addSubscriptionAffiliate);
+// router.put('/subscriptions/:planKey/affiliates/:code', authenticate, updateSubscriptionAffiliate);
+// router.delete('/subscriptions/:planKey/affiliates/:code', authenticate, deleteSubscriptionAffiliate);
 
 export default router;

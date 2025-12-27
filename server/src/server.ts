@@ -32,6 +32,7 @@ import desktopReleaseRoutes from "./routes/desktopRelease";
 import homeRoutes from "./routes/home";
 import plannerRoutes from "./routes/planner";
 import subscriptionsRoutes from "./routes/subscriptions";
+import pricingPlanRoutes from "./routes/pricingPlan.routes";
 import attendanceRoutes from "./routes/attendance";
 import workspaceAttendanceRoutes from "./routes/workspaceAttendance";
 import documentationRoutes from "./routes/documentation";
@@ -170,6 +171,7 @@ app.use("/api/home", homeRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/docs", documentationRoutes);
+app.use("/api", pricingPlanRoutes); // Keep this last since it has /admin/subscriptions routes
 app.use("/api/activities", activityRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/content", contentRoutes);

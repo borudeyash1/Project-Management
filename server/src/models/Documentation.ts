@@ -7,6 +7,8 @@ export interface IDocumentation extends Document {
     category: string;
     subcategory?: string;
     videoUrl?: string;
+    featuredImage?: string;
+    learnMoreUrl?: string;
     order: number;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -35,14 +37,21 @@ const DocumentationSchema: Schema = new Schema(
         category: {
             type: String,
             required: true,
-            enum: ['getting-started', 'user-guide', 'api-reference', 'tutorials', 'faq'],
-            default: 'getting-started',
+            trim: true,
         },
         subcategory: {
             type: String,
             trim: true,
         },
         videoUrl: {
+            type: String,
+            trim: true,
+        },
+        featuredImage: {
+            type: String,
+            trim: true,
+        },
+        learnMoreUrl: {
             type: String,
             trim: true,
         },

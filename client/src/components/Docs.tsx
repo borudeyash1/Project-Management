@@ -36,6 +36,7 @@ interface DocArticle {
   updatedAt: string;
   // New fields for enhanced documentation
   featuredImage?: string;
+  learnMoreUrl?: string;
   shortDescription?: string;
   overviewPoints?: string[];
   additionalDetails?: string;
@@ -94,16 +95,16 @@ const Docs: React.FC = () => {
   const loadDocs = async () => {
     try {
       setLoading(true);
-      let articles = await documentationService.getAllDocs();
+      const articles = await documentationService.getAllDocs();
       
-      // If no articles from API, use mock data
-      if (!articles || articles.length === 0) {
-        articles = getMockDocumentation();
-      }
+      // Use API data if available, otherwise use mock data
+      let articlesToUse = articles && articles.length > 0 ? articles : getMockDocumentation();
+      
+      console.log('📚 Loaded articles:', articlesToUse.length, 'from', (articles && articles.length > 0) ? 'database' : 'mock data');
       
       // Group articles by category
       const grouped: Record<string, DocArticle[]> = {};
-      articles.forEach(article => {
+      articlesToUse.forEach(article => {
         if (!grouped[article.category]) {
           grouped[article.category] = [];
         }
@@ -124,8 +125,9 @@ const Docs: React.FC = () => {
 
       setCategories(categoriesArray);
     } catch (error) {
-      console.error('Failed to load documentation:', error);
+      console.error('❌ Failed to load documentation from API:', error);
       // Use mock data on error
+      console.log('⚠️ Using mock data as fallback');
       const mockArticles = getMockDocumentation();
       const grouped: Record<string, DocArticle[]> = {};
       mockArticles.forEach(article => {
@@ -3527,12 +3529,32 @@ Task Level
                             </div>
                             <span className="text-sm font-medium text-gray-700">SARTTHI</span>
                           </div>
-                          <button className="ml-auto px-6 py-2 bg-[#006397] text-white rounded-lg hover:bg-[#005280] transition-colors flex items-center gap-2">
-                            Learn More
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </button>
+                          {currentArticle.learnMoreUrl ? (
+                            <a 
+                              href={currentArticle.learnMoreUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="ml-auto px-6 py-2 bg-[#006397] text-white rounded-lg hover:bg-[#005280] transition-colors flex items-center gap-2"
+                            >
+                              Learn More
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          ) : (
+                            <button 
+                              onClick={() => {
+                                const contentSection = document.querySelector('.prose');
+                                contentSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }}
+                              className="ml-auto px-6 py-2 bg-[#006397] text-white rounded-lg hover:bg-[#005280] transition-colors flex items-center gap-2"
+                            >
+                              Learn More
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -3583,6 +3605,45 @@ Task Level
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
+                          // Custom image renderer
+                          img({ src, alt }) {
+                            return (
+                              <img 
+                                src={src} 
+                                alt={alt || 'Image'} 
+                                className="w-full rounded-lg shadow-md my-4"
+                                loading="lazy"
+                              />
+                            );
+                          },
+                          // Custom link renderer (for videos)
+                          a({ href, children }) {
+                            // Check if it's a YouTube or Vimeo link
+                            const videoUrl = getVideoEmbedUrl(href || '');
+                            if (videoUrl) {
+                              return (
+                                <div className="my-6">
+                                  <iframe
+                                    src={videoUrl}
+                                    className="w-full aspect-video rounded-lg shadow-md"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                  />
+                                </div>
+                              );
+                            }
+                            // Regular link
+                            return (
+                              <a 
+                                href={href} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 underline"
+                              >
+                                {children}
+                              </a>
+                            );
+                          },
                           code({ className, children }) {
                             const match = /language-(\w+)/.exec(className || '');
                             if (match) {

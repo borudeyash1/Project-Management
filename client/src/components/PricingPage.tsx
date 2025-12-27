@@ -14,16 +14,41 @@ const PricingPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [isYearly, setIsYearly] = useState(false);
+  const [pricingPlans, setPricingPlans] = useState<any[]>([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
+    
+    // Fetch pricing plans from API
+    const fetchPricingPlans = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/pricing-plans');
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.length > 0) {
+          setPricingPlans(data.data);
+        } else {
+          // Fallback to default plans
+          setPricingPlans(getDefaultPlans());
+        }
+      } catch (error) {
+        console.error('Error fetching pricing plans:', error);
+        // Fallback to default plans
+        setPricingPlans(getDefaultPlans());
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+
+    fetchPricingPlans();
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Pricing plans matching the new requirements
-  const pricingPlans = [
+  const getDefaultPlans = () => [
     {
       name: 'Free',
       price: 0,
