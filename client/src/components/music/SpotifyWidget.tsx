@@ -173,10 +173,15 @@ const SpotifyWidget: React.FC = () => {
     };
 
     const togglePlay = async () => {
+        // Virtual Playback for Free Users
+        if (!isPremium) {
+            updatePlayback(prev => prev ? { ...prev, is_playing: !prev.is_playing } : null);
+            return;
+        }
+
         try {
             if (playback?.is_playing) await spotifyService.pause();
             else await spotifyService.play();
-            // Optimistic update
             // Optimistic update
             updatePlayback(prev => prev ? { ...prev, is_playing: !prev.is_playing } : null);
         } catch (error) {
@@ -185,6 +190,11 @@ const SpotifyWidget: React.FC = () => {
     };
 
     const handleSkip = async (dir: 'next' | 'prev') => {
+        if (!isPremium) {
+            // For now, no queue logic for free users, just ignore or show toast
+            addToast('Skipping not supported in preview mode yet', 'info');
+            return;
+        }
         try {
             if (dir === 'next') await spotifyService.next();
             else await spotifyService.previous();
@@ -200,14 +210,23 @@ const SpotifyWidget: React.FC = () => {
             setIsLiked(!isLiked);
             addToast(isLiked ? 'Removed from Liked Songs' : 'Added to Liked Songs', 'success');
         } catch (error) {
+            // Like might work for free users? It usually does.
             console.error(error);
         }
     };
 
     const handleSeek = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const ms = Number(e.target.value);
+
+        if (!isPremium) {
+            updatePlayback(prev => prev ? { ...prev, progress_ms: ms } : null);
+            return; // YouTube player handles its own seeking via prop update if we implemented it, 
+            // but react-player takes 'url' and 'playing'. Seeking is harder to sync one-way.
+            // Actually, we might need to expose a seek method or just let visual slider update.
+            return;
+        }
+
         try {
-            const ms = Number(e.target.value);
-            await spotifyService.seek(ms);
             await spotifyService.seek(ms);
             updatePlayback(prev => prev ? { ...prev, progress_ms: ms } : null);
         } catch (error) {
