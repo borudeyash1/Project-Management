@@ -85,21 +85,31 @@ const SCOPES = {
         'me',
         'boards:read',
         'boards:write'
+    ],
+    linear: [
+        'read',
+        'write'
     ]
 };
 
-type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday' | 'zendesk';
+type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday' | 'zendesk' | 'linear';
 
 // Validation helper
 const isValidService = (service: string): service is ServiceType => {
-    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday', 'zendesk'].includes(service);
+    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday', 'zendesk', 'linear'].includes(service);
 };
 
 // Provider Config Helper
 const getProviderConfig = (service: ServiceType) => {
-    const BASE_URL = process.env.NODE_ENV === 'production'
-        ? (process.env.FRONTEND_URL || 'https://sartthi.com')
-        : 'http://localhost:5000';
+    // Use GOOGLE_REDIRECT_URI base if available (it is set to http://localhost:5000/api/sartthi-accounts in dev)
+    // Otherwise fallback to logic
+    let BASE_URL = 'http://localhost:5000';
+    if (process.env.GOOGLE_REDIRECT_URI) {
+        // Remove /api/sartthi-accounts suffix to get base
+        BASE_URL = process.env.GOOGLE_REDIRECT_URI.replace('/api/sartthi-accounts', '');
+    } else if (process.env.NODE_ENV === 'production') {
+        BASE_URL = process.env.FRONTEND_URL || 'https://sartthi.com';
+    }
 
     const callbackUrl = `${BASE_URL}/api/sartthi-accounts/${service}/callback`;
 
@@ -200,6 +210,13 @@ const getProviderConfig = (service: ServiceType) => {
             clientSecret: process.env.ZENDESK_CLIENT_SECRET || '',
             authUrl: '', // Dynamic based on subdomain
             tokenUrl: '', // Dynamic based on subdomain
+            callbackUrl
+        };
+        case 'linear': return {
+            authUrl: 'https://linear.app/oauth/authorize',
+            tokenUrl: 'https://api.linear.app/oauth/token',
+            clientId: process.env.LINEAR_CLIENT_ID || '',
+            clientSecret: process.env.LINEAR_CLIENT_SECRET || '',
             callbackUrl
         };
         default: return null;
@@ -673,6 +690,28 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     email: meResponse.data.email,
                     name: meResponse.data.name,
                     picture: meResponse.data.picture
+                };
+            } else if (service === 'linear') {
+                const query = `
+                query {
+                    viewer {
+                        id
+                        name
+                        email
+                    }
+                }
+            `;
+                const userResponse = await axios.post('https://api.linear.app/graphql', { query }, {
+                    headers: {
+                        'Authorization': `Bearer ${tokens.access_token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const viewer = userResponse.data.data.viewer;
+                userInfo = {
+                    id: viewer.id,
+                    email: viewer.email,
+                    name: viewer.name,
                 };
             } else if (service === 'zendesk') {
                 if (!subdomain) throw new Error('Subdomain missing in state');

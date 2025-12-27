@@ -31,6 +31,12 @@ export interface IConnectedAccount extends Document {
             defaultChannelId?: string;
             defaultChannelName?: string;
         };
+        zendesk?: {
+            subdomain?: string;
+        };
+        linear?: {
+            // Placeholder for potential future settings
+        };
     };
 
     // Metadata

@@ -197,6 +197,10 @@ export interface IUser extends Document {
       activeAccountId?: string;
       accounts?: string[];
     };
+    linear?: {
+      activeAccountId?: string;
+      accounts?: string[];
+    };
   };
   // Enhanced profile information for AI-powered insights
   profile?: {

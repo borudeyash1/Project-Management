@@ -623,6 +623,17 @@ const userSchema = new Schema<IUser>({
           ref: 'ConnectedAccount'
         }]
       },
+      linear: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
+      },
       figma: {
         activeAccountId: {
           type: Schema.Types.ObjectId,
