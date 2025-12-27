@@ -232,7 +232,7 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
         if (service === 'onedrive') {
             url += '&response_type=code&response_mode=query';
         } else if (service === 'dropbox') {
-            url += '&response_type=code';
+            url += '&response_type=code&token_access_type=offline';
         } else if (service === 'slack') {
             url += '&user_scope=';
         } else if (service === 'figma') {
