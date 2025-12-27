@@ -31,7 +31,7 @@ import ManageWorkspace from './components/ManageWorkspace';
 import DropboxWidget from './components/vault/DropboxWidget';
 import SpotifyWidget from './components/music/SpotifyWidget';
 import NotionWidget from './components/notion/NotionWidget'; // [NEW] Import
-import MusicPage from './components/music/MusicPage';
+import MusicPage from './pages/MusicPage';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
