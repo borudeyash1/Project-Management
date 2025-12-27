@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import {
@@ -21,7 +22,8 @@ import {
   Mail,
   FileEdit,
   MessageCircle,
-  HardDrive
+  HardDrive,
+  Music2
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { useDock } from '../context/DockContext';
@@ -42,6 +44,7 @@ interface NavItem {
 
 const DockNavigation: React.FC = () => {
   const { state, dispatch } = useApp();
+  const [hoveredIcon, setHoveredIcon] = useState<string | null>(null); // [NEW]
   const { dockPosition } = useDock();
   const location = useLocation();
   const navigate = useNavigate();
@@ -294,6 +297,44 @@ const DockNavigation: React.FC = () => {
             >
               <HardDrive className="w-5 h-5" />
             </DockIcon>
+          </div>
+        )}
+
+        {/* Spotify */}
+        {state.userProfile.connectedAccounts?.spotify?.activeAccountId && (
+          <div
+            className="relative group"
+            onMouseEnter={() => setHoveredIcon('spotify')}
+            onMouseLeave={() => setHoveredIcon(null)}
+          >
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'spotifyWidget' })}
+              className="p-3 bg-[#121212]/30 dark:bg-[#121212]/50 hover:bg-[#1DB954]/20 rounded-2xl backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-2 border border-[#1DB954]/20"
+            >
+              <Music2 className="text-[#1DB954]" size={24} />
+            </button>
+
+            {/* Tooltip/Menu */}
+            <AnimatePresence>
+              {hoveredIcon === 'spotify' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: -10 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#121212] border border-[#282828] rounded-xl shadow-2xl p-2 min-w-[150px] z-50 text-gray-200"
+                >
+                  <div className="text-xs font-semibold text-[#1DB954] mb-2 px-2 uppercase tracking-wider">Spotify</div>
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => dispatch({ type: 'TOGGLE_MODAL', payload: 'spotifyWidget' })}
+                      className="text-left px-2 py-1.5 rounded-lg hover:bg-[#282828] text-sm flex items-center gap-2 transition-colors"
+                    >
+                      <Music2 size={14} /> Open Player
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 

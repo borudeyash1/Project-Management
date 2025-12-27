@@ -28,6 +28,8 @@ import WorkspaceDiscover from './components/WorkspaceDiscover';
 import WorkspaceOwner from './components/WorkspaceOwner';
 import WorkspaceMember from './components/WorkspaceMember';
 import ManageWorkspace from './components/ManageWorkspace';
+import DropboxWidget from './components/vault/DropboxWidget';
+import SpotifyWidget from './components/music/SpotifyWidget';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
 import WorkspaceLayout from './components/workspace/WorkspaceLayout';
 import WorkspaceOverview from './components/workspace/WorkspaceOverview';
@@ -165,6 +167,8 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
               <DockNavigation />
             </div>
 
+            {state.modals.dropboxWidget && <DropboxWidget />}
+            {state.modals.spotifyWidget && <SpotifyWidget />} {/* [NEW] */}
             {/* Empty space on right */}
             <div className="flex-1"></div>
           </div>
@@ -257,7 +261,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-import DropboxWidget from './components/vault/DropboxWidget'; // [NEW]
+
 
 // App Content Component
 const AppContent: React.FC = () => {

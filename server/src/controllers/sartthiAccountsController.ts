@@ -135,6 +135,13 @@ const getProviderConfig = (service: ServiceType) => {
             tokenUrl: 'https://accounts.spotify.com/api/token',
             callbackUrl
         };
+        case 'spotify': return {
+            clientId: process.env.SPOTIFY_CLIENT_ID || '',
+            clientSecret: process.env.SPOTIFY_CLIENT_SECRET || '',
+            authUrl: 'https://accounts.spotify.com/authorize',
+            tokenUrl: 'https://accounts.spotify.com/api/token',
+            callbackUrl
+        };
         default: return null;
     }
 };

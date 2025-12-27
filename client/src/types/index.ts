@@ -168,6 +168,15 @@ export interface User {
         connectedAt?: string;
       }>;
     };
+    spotify?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
   };
   createdAt: Date;
   updatedAt: Date;
@@ -631,7 +640,8 @@ export interface AppState {
     pricing: boolean;
     requestChange: boolean;
     notifications: boolean;
-    dropboxWidget: boolean; // [NEW]
+    dropboxWidget: boolean;
+    spotifyWidget: boolean;
   };
   userProfile: User;
   settings: UserSettings;

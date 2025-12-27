@@ -81,9 +81,9 @@ const initialState: AppState = {
     client: false,
     pricing: false,
     requestChange: false,
-    requestChange: false,
     notifications: false,
-    dropboxWidget: false
+    dropboxWidget: false,
+    spotifyWidget: false, // [NEW] added missing property
   },
   userProfile: emptyUser,
   settings: emptyUser.settings,
