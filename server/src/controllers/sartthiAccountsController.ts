@@ -89,14 +89,20 @@ const SCOPES = {
     linear: [
         'read',
         'write'
+    ],
+    discord: [
+        'identify',
+        'email',
+        'guilds',
+        'messages.read'
     ]
 };
 
-type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday' | 'zendesk' | 'linear';
+type ServiceType = 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'onedrive' | 'figma' | 'notion' | 'zoom' | 'vercel' | 'spotify' | 'jira' | 'trello' | 'monday' | 'zendesk' | 'linear' | 'discord';
 
 // Validation helper
 const isValidService = (service: string): service is ServiceType => {
-    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday', 'zendesk', 'linear'].includes(service);
+    return ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'zoom', 'vercel', 'spotify', 'jira', 'trello', 'monday', 'zendesk', 'linear', 'discord'].includes(service);
 };
 
 // Provider Config Helper
@@ -218,6 +224,14 @@ const getProviderConfig = (service: ServiceType) => {
             clientId: process.env.LINEAR_CLIENT_ID || '',
             clientSecret: process.env.LINEAR_CLIENT_SECRET || '',
             scope: SCOPES.linear.join(','),
+            callbackUrl
+        };
+        case 'discord': return {
+            clientId: process.env.DISCORD_CLIENT_ID || '',
+            clientSecret: process.env.DISCORD_CLIENT_SECRET || '',
+            authUrl: 'https://discord.com/api/oauth2/authorize',
+            tokenUrl: 'https://discord.com/api/oauth2/token',
+            scope: SCOPES.discord.join(' '), // Discord uses space delimiter
             callbackUrl
         };
         default: return null;
@@ -368,6 +382,8 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
         } else if (service === 'monday') {
             url += '&response_type=code';
         } else if (service === 'linear') {
+            url += '&response_type=code&prompt=consent';
+        } else if (service === 'discord') {
             url += '&response_type=code&prompt=consent';
         }
 
@@ -752,9 +768,32 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                     picture: meResponse.data.user.photo?.content_url || ''
                 };
 
-                // Store subdomain in settings since we need it for future API calls
-                // existingAccount checks happen later, but new account creation is below.
                 // We'll need to modify the create/update logic to save 'settings.zendesk.subdomain'.
+            } else if (service === 'discord') {
+                const params = new URLSearchParams();
+                params.append('client_id', config.clientId || '');
+                params.append('client_secret', config.clientSecret || '');
+                params.append('grant_type', 'authorization_code');
+                params.append('code', code as string);
+                params.append('redirect_uri', config.callbackUrl);
+
+                tokenResponse = await axios.post(config.tokenUrl, params, {
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+                tokens = tokenResponse.data;
+
+                const meResponse = await axios.get('https://discord.com/api/users/@me', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+
+                userInfo = {
+                    id: meResponse.data.id,
+                    email: meResponse.data.email,
+                    name: meResponse.data.username || meResponse.data.global_name,
+                    picture: meResponse.data.avatar
+                        ? `https://cdn.discordapp.com/avatars/${meResponse.data.id}/${meResponse.data.avatar}.png`
+                        : ''
+                };
             }
         }
 

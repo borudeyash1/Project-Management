@@ -54,13 +54,13 @@ const connectedAccountSchema = new Schema<IConnectedAccount>({
     },
     service: {
         type: String,
-        enum: ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'vercel', 'spotify', 'jira', 'zendesk', 'linear'],
+        enum: ['mail', 'calendar', 'vault', 'slack', 'github', 'dropbox', 'onedrive', 'figma', 'notion', 'vercel', 'spotify', 'jira', 'zendesk', 'linear', 'discord'],
         required: true,
         index: true
     },
     provider: {
         type: String,
-        enum: ['google', 'microsoft', 'slack', 'github', 'dropbox', 'figma', 'notion', 'vercel', 'spotify', 'jira', 'zendesk', 'linear'],
+        enum: ['google', 'microsoft', 'slack', 'github', 'dropbox', 'figma', 'notion', 'vercel', 'spotify', 'jira', 'zendesk', 'linear', 'discord'],
         required: true
     },
 
