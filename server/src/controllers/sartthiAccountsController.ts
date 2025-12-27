@@ -619,6 +619,28 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                 // However, to satisfy "Implementation Plan", we will add a placeholder.
                 // Trello doesn't have a code->token exchange endpoint like OAuth2.
                 throw new Error('Trello authentication requires client-side token handling or OAuth 1.0a. Updates pending.');
+            } else if (service === 'jira') {
+                // Exchange code for token
+                tokenResponse = await axios.post('https://auth.atlassian.com/oauth/token', {
+                    grant_type: 'authorization_code',
+                    client_id: config.clientId,
+                    client_secret: config.clientSecret,
+                    code,
+                    redirect_uri: config.callbackUrl
+                });
+                tokens = tokenResponse.data;
+
+                // Get User Info from Atlassian Me API
+                const meResponse = await axios.get('https://api.atlassian.com/me', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+
+                userInfo = {
+                    id: meResponse.data.account_id,
+                    email: meResponse.data.email,
+                    name: meResponse.data.name,
+                    picture: meResponse.data.picture
+                };
             }
         }
 

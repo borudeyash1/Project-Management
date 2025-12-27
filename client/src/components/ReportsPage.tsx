@@ -497,111 +497,7 @@ const ReportsPage: React.FC = () => {
               </GlassmorphicCard>
             </div>
 
-            {/* Filters */}
-            <GlassmorphicCard className="p-4">
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex items-center gap-3">
-                  <select
-                    value={reportType}
-                    onChange={(e) => setReportType(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  >
-                    <option value="all">{t('reports.allReports')}</option>
-                    <option value="productivity">{t('reports.types.productivity')}</option>
-                    <option value="time">{t('reports.types.time')}</option>
-                    <option value="team">{t('reports.types.team')}</option>
-                    <option value="financial">{t('reports.types.financial')}</option>
-                    <option value="project">{t('reports.types.project')}</option>
-                  </select>
 
-                  <select
-                    value={dateRange}
-                    onChange={(e) => setDateRange(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
-                  >
-                    <option value="7d">{t('reports.last7Days')}</option>
-                    <option value="30d">{t('reports.last30Days')}</option>
-                    <option value="90d">{t('reports.last90Days')}</option>
-                    <option value="1y">{t('reports.lastYear')}</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2 ml-auto">
-                  <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <RefreshCw className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <Filter className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </GlassmorphicCard>
-
-            {/* Reports List */}
-            <GlassmorphicCard>
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('reports.title')}</h2>
-              </div>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {getFilteredReports().map(report => (
-                  <div key={report._id} className="p-4 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${getReportColor(report.type)}`}>
-                        {getReportIcon(report.type)}
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-medium text-gray-900 dark:text-gray-100">{report.name}</h3>
-                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getReportColor(report.type)}`}>
-                            {report.type}
-                          </span>
-                          {report.isPublic && (
-                            <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium text-accent-dark bg-blue-100">
-                              {t('reports.public')}
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{report.description}</p>
-
-                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                          <span>{t('reports.created', { date: report.createdAt.toLocaleDateString() })}</span>
-                          <span>{t('reports.updated', { date: report.updatedAt.toLocaleDateString() })}</span>
-                          <div className="flex items-center gap-1">
-                            {report.tags.map(tag => (
-                              <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setSelectedReport(report)}
-                          className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {canExportReports() && (
-                          <button
-                            onClick={() => exportReport(report)}
-                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                        )}
-                        <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </GlassmorphicCard>
 
             {/* Enhanced Analytics Charts */}
             <EnhancedCharts
@@ -663,6 +559,102 @@ const ReportsPage: React.FC = () => {
                   <Calendar className="w-4 h-4 inline mr-2" />
                   {t('reports.quickActions.schedule')}
                 </button>
+              </div>
+            </GlassmorphicCard>
+
+            {/* Reports List - Moved to Right Sidebar */}
+            <GlassmorphicCard className="flex flex-col h-[600px]">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 shrink-0 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                    {t('reports.title')}
+                  </h3>
+                  <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">
+                    {getFilteredReports().length}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={reportType}
+                    onChange={(e) => setReportType(e.target.value as any)}
+                    className="w-full px-2 py-1.5 text-xs text-center border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="productivity">Productivity</option>
+                    <option value="time">Time</option>
+                    <option value="team">Team</option>
+                    <option value="financial">Financial</option>
+                    <option value="project">Project</option>
+                  </select>
+
+                  <select
+                    value={dateRange}
+                    onChange={(e) => setDateRange(e.target.value as any)}
+                    className="w-full px-2 py-1.5 text-xs text-center border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
+                  >
+                    <option value="7d">7 Days</option>
+                    <option value="30d">30 Days</option>
+                    <option value="90d">90 Days</option>
+                    <option value="1y">1 Year</option>
+                  </select>
+                </div>
+              </div>
+              <div className="overflow-y-auto custom-scrollbar flex-1 p-2 space-y-2">
+                {getFilteredReports().map(report => (
+                  <div key={report._id} onClick={() => setSelectedReport(report)} className="p-3 bg-gray-50/50 dark:bg-gray-700/30 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-600 group cursor-pointer">
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg shrink-0 ${getReportColor(report.type)}`}>
+                        {getReportIcon(report.type)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate pr-2">
+                            {report.name}
+                          </h4>
+                          <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                            {report.updatedAt.toLocaleDateString()}
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">
+                          {report.description}
+                        </p>
+
+                        <div className="flex items-center justify-between">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${getReportColor(report.type)}`}>
+                            {report.type}
+                          </span>
+
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelectedReport(report); }}
+                              className="p-1 text-gray-500 hover:text-blue-500"
+                              title={t('reports.view')}
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            {canExportReports() && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); exportReport(report); }}
+                                className="p-1 text-gray-500 hover:text-green-500"
+                                title={t('reports.download')}
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {getFilteredReports().length === 0 && (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+                    No reports found matching your filters.
+                  </div>
+                )}
               </div>
             </GlassmorphicCard>
           </div>

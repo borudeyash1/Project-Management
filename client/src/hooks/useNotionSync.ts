@@ -47,6 +47,12 @@ export const useNotionSync = ({ onTaskUpdate, enabled = true }: UseNotionSyncOpt
             onTaskUpdate(event);
         });
 
+        socket.on('taskCreated', (event: TaskUpdateEvent) => {
+            console.log(`📡 [WEBSOCKET] Received new task creation:`, event);
+            // Trigger full refresh for new tasks
+            onTaskUpdate(event);
+        });
+
         socket.on('connect_error', (error) => {
             console.error('❌ [WEBSOCKET] Connection error:', error);
         });

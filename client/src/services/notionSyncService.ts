@@ -241,11 +241,26 @@ export const notionSyncService = {
                 content
             });
 
-            if (response.data?.success) {
+            // Handle different response formats
+            // Check if response has data.success or if response itself indicates success
+            const res = response as any;
+            const isSuccess = res.data?.success ||
+                res.success ||
+                (res.data?.pageId || res.pageId);
+
+            const pageId = res.data?.data?.pageId ||
+                res.data?.pageId ||
+                res.pageId;
+
+            const url = res.data?.data?.url ||
+                res.data?.url ||
+                res.url;
+
+            if (isSuccess || pageId) {
                 return {
                     success: true,
-                    pageId: response.data.data.pageId,
-                    url: response.data.data.url
+                    pageId,
+                    url
                 };
             }
 

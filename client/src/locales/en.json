@@ -2111,6 +2111,13 @@
         "deleteDesc": "Permanently delete this workspace and all its data",
         "deleteBtn": "Delete"
       },
+      "privacyLegal": "Privacy & Legal",
+      "privacyPolicy": "Privacy Policy",
+      "privacyPolicyDesc": "Learn how we protect your data",
+      "viewPolicy": "View Policy",
+      "termsOfUse": "Terms of Use",
+      "termsOfUseDesc": "Review our terms and conditions",
+      "viewTerms": "View Terms",
       "saveSuccess": "Settings saved successfully",
       "saveChanges": "Save Changes"
     },
@@ -3553,5 +3560,21 @@
       "title": "No notifications",
       "message": "You're all caught up!"
     }
+  },
+  "connectedAccounts": {
+    "title": "Connected Accounts",
+    "subtitle": "Manage your integrated services",
+    "confirmDisconnect": "Are you sure you want to disconnect this account?",
+    "gmail": "Sartthi Mail",
+    "gmailDesc": "Connect your Gmail account",
+    "gcal": "Sartthi Calendar",
+    "gcalDesc": "Sync your calendar",
+    "gdrive": "Sartthi Vault",
+    "gdriveDesc": "Access your drive files",
+    "slackDesc": "Connect Slack workspace",
+    "githubDesc": "Connect GitHub repositories",
+    "dropboxDesc": "Sync Dropbox files",
+    "figmaDesc": "Connect Figma files",
+    "notionDesc": "Connect Notion workspace"
   }
 }

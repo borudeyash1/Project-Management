@@ -762,7 +762,14 @@
             "light": "明るい",
             "dark": "簡単",
             "system": "自動"
-        }
+        },
+        "privacyLegal": "プライバシー＆法務",
+        "privacyPolicy": "プライバシーポリシー",
+        "privacyPolicyDesc": "データの保護方法について",
+        "viewPolicy": "ポリシーを表示",
+        "termsOfUse": "利用規約",
+        "termsOfUseDesc": "利用規約を確認",
+        "viewTerms": "規約を表示"
     },
     "landing": {
         "trustedBy": "世界中の10,000以上のチームに信頼されています",
@@ -3877,5 +3884,31 @@
             "title": "通知はありません",
             "message": "最新の状態です。後でまた確認してください。"
         }
+    },
+    "connectedAccounts": {
+        "title": "接続されたアカウント",
+        "subtitle": "統合されたサービスを管理",
+        "confirmDisconnect": "このアカウントを切断してもよろしいですか？",
+        "gmail": "Sartthi メール",
+        "gmailDesc": "Gmailアカウントを接続",
+        "gcal": "Sartthi カレンダー",
+        "gcalDesc": "カレンダーを同期",
+        "gdrive": "Sartthi ボルト",
+        "gdriveDesc": "ドライブファイルにアクセス",
+        "slackDesc": "Slackワークスペースを接続",
+        "githubDesc": "GitHubリポジトリを接続",
+        "dropboxDesc": "Dropboxファイルを同期",
+        "figmaDesc": "Figmaファイルを接続",
+        "notionDesc": "Notionワークスペースを接続",
+        "spotify": "Spotify",
+        "spotifyDesc": "音楽再生をコントロール",
+        "jira": "Jira",
+        "jiraDesc": "課題とプロジェクトの追跡",
+        "zendesk": "Zendesk",
+        "zendeskDesc": "カスタマーサービス",
+        "linear": "Linear",
+        "linearDesc": "課題追跡",
+        "discord": "Discord",
+        "discordDesc": "チームコミュニケーション"
     }
 }

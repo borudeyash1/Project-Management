@@ -255,12 +255,27 @@ export const getNotionService = () => {
             );
 
             // Map and filter results
-            const allPages = response.data.results.map((page: any) => ({
-                id: page.id,
-                status: page.properties?.Status?.status?.name || page.properties?.Status?.select?.name,
-                lastEditedTime: page.last_edited_time,
-                url: page.url
-            }));
+            const allPages = response.data.results.map((page: any) => {
+                // Extract title from Name property (common in databases)
+                let title = '';
+                const nameProperty = page.properties?.Name || page.properties?.Title || page.properties?.title;
+
+                if (nameProperty) {
+                    if (nameProperty.title && nameProperty.title.length > 0) {
+                        title = nameProperty.title.map((t: any) => t.plain_text || t.text?.content || '').join('');
+                    } else if (nameProperty.rich_text && nameProperty.rich_text.length > 0) {
+                        title = nameProperty.rich_text.map((t: any) => t.plain_text || t.text?.content || '').join('');
+                    }
+                }
+
+                return {
+                    id: page.id,
+                    title: title || undefined,
+                    status: page.properties?.Status?.status?.name || page.properties?.Status?.select?.name,
+                    lastEditedTime: page.last_edited_time,
+                    url: page.url
+                };
+            });
 
             // Filter by lastSyncedTime if provided
             if (lastSyncedTime) {

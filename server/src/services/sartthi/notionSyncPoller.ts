@@ -55,8 +55,10 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
 
                     console.log(`📝 [NOTION POLLER] Found ${updates.length} updates for user ${userId}`);
 
-                    // Update matching tasks
+                    // Process each update from Notion
                     let updatedCount = 0;
+                    let createdCount = 0;
+
                     for (const update of updates) {
                         const notionStatus = update.status?.toLowerCase();
                         let sartthiStatus: string | undefined;
@@ -65,12 +67,14 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
                         else if (notionStatus === 'in progress') sartthiStatus = 'in-progress';
                         else if (notionStatus === 'done') sartthiStatus = 'completed';
 
-                        if (sartthiStatus) {
-                            const task: any = await Task.findOne({
-                                'notionSync.pageId': update.id
-                            });
+                        // Check if task already exists in Sartthi
+                        const task: any = await Task.findOne({
+                            'notionSync.pageId': update.id
+                        });
 
-                            if (task && task.status !== sartthiStatus) {
+                        if (task) {
+                            // Task exists - update status if changed
+                            if (sartthiStatus && task.status !== sartthiStatus) {
                                 task.status = sartthiStatus;
                                 task.notionSync.lastSyncedAt = new Date();
                                 await task.save();
@@ -93,10 +97,70 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
                                     console.error('❌ [WEBSOCKET] Failed to emit event:', wsError);
                                 }
                             }
+                        } else {
+                            // Task doesn't exist - create new task in Sartthi
+                            try {
+                                const { default: User } = require('../../models/User');
+                                const user = await User.findById(userId);
+
+                                if (!user) continue;
+
+                                // Get title from Notion page (from title property or use page ID)
+                                const taskTitle = update.title || `Task from Notion (${update.id.substring(0, 8)})`;
+
+                                // Create new task
+                                const newTask = new Task({
+                                    title: taskTitle,
+                                    description: 'Created from Notion database',
+                                    status: sartthiStatus || 'pending',
+                                    priority: 'medium',
+                                    reporter: userId,
+                                    workspace: user.activeWorkspace || user.workspaces?.[0],
+                                    type: 'task',
+                                    taskType: 'general',
+                                    progress: 0,
+                                    requiresLink: false,
+                                    requiresFile: false,
+                                    subtasks: [],
+                                    notionSync: {
+                                        pageId: update.id,
+                                        url: update.url,
+                                        lastSyncedAt: new Date()
+                                    }
+                                });
+
+                                await newTask.save();
+                                createdCount++;
+                                console.log(`🆕 [NOTION POLLER] Created new task from Notion: "${taskTitle}"`);
+
+                                // Emit WebSocket event for new task
+                                try {
+                                    const io = (global as any).io;
+                                    if (io) {
+                                        io.emit('taskCreated', {
+                                            taskId: newTask._id.toString(),
+                                            userId: userId.toString(),
+                                            title: taskTitle,
+                                            status: sartthiStatus || 'pending'
+                                        });
+                                        console.log(`📡 [WEBSOCKET] Broadcasted new task creation: ${taskTitle}`);
+                                    }
+                                } catch (wsError) {
+                                    console.error('❌ [WEBSOCKET] Failed to emit event:', wsError);
+                                }
+                            } catch (createError) {
+                                console.error(`❌ [NOTION POLLER] Failed to create task from Notion page ${update.id}:`, createError);
+                            }
                         }
                     }
 
                     // Update last sync time
+                    account.lastSynced = new Date();
+                    await account.save();
+
+                    if (updatedCount > 0 || createdCount > 0) {
+                        console.log(`✅ [NOTION POLLER] Synced for user ${userId}: ${updatedCount} updated, ${createdCount} created`);
+                    }
                     account.lastSynced = new Date();
                     await account.save();
 
