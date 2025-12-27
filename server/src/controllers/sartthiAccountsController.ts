@@ -49,7 +49,7 @@ const SCOPES = {
         'files.content.write'
     ],
     onedrive: ['Files.ReadWrite.All', 'offline_access'],
-    figma: ['file_content:read'],
+    figma: ['file_content:read', 'file_variables:read', 'current_user:read'],
     notion: [], // Notion uses internal integration tokens usually, or specific flow
     zoom: ['meeting:write:admin'],
     vercel: [],
