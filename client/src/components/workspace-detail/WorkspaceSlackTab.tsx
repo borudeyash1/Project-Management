@@ -21,8 +21,10 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
     const [messages, setMessages] = useState<SlackMessage[]>([]);
     const [loadingChannels, setLoadingChannels] = useState(true);
     const [loadingMessages, setLoadingMessages] = useState(false);
+    const [sendingMessage, setSendingMessage] = useState(false);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const slackConnected = !!state.userProfile?.connectedAccounts?.slack?.isActive; // Assuming isActive check or similar
 
@@ -76,27 +78,43 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
 
     const handleSendMessage = async (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (!newMessage.trim() || !selectedChannel) return;
+        if (!newMessage.trim() || !selectedChannel || sendingMessage) return;
 
-        const text = newMessage;
+        const text = newMessage.trim();
+        const tempId = `temp-${Date.now()}`;
         setNewMessage('');
+        setSendingMessage(true);
 
         try {
-            // Optimistic update
+            // Optimistic update with current user info
             const tempMessage: SlackMessage = {
                 type: 'message',
-                user: 'me', // Placeholder
+                user: state.userProfile?.fullName || 'You',
                 text: text,
-                ts: Date.now().toString()
+                ts: tempId
             };
             setMessages(prev => [...prev, tempMessage]);
 
-            await slackService.postMessage(selectedChannel.id, text);
-            // Refresh to get actual message with proper user info
-            fetchMessages(selectedChannel.id);
+            // Send message
+            const result = await slackService.postMessage(selectedChannel.id, text);
+
+            // Replace temp message with actual message
+            setMessages(prev => prev.map(msg =>
+                msg.ts === tempId
+                    ? { ...msg, ts: result.ts || msg.ts }
+                    : msg
+            ));
+
+            // Focus back on input
+            inputRef.current?.focus();
         } catch (error) {
             console.error('Failed to send message:', error);
-            // Maybe show error toast/revert
+            // Revert optimistic update and restore message
+            setMessages(prev => prev.filter(msg => msg.ts !== tempId));
+            setNewMessage(text);
+            // TODO: Show error toast
+        } finally {
+            setSendingMessage(false);
         }
     };
 
@@ -147,8 +165,8 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
                                     key={channel.id}
                                     onClick={() => setSelectedChannel(channel)}
                                     className={`w-full flex items-center px-2 py-1 rounded transition-colors ${selectedChannel?.id === channel.id
-                                            ? 'bg-[#1164A3] text-white'
-                                            : 'text-[#cfc3cf] hover:bg-[#350d36]'
+                                        ? 'bg-[#1164A3] text-white'
+                                        : 'text-[#cfc3cf] hover:bg-[#350d36]'
                                         }`}
                                 >
                                     {channel.isPrivate ? (
@@ -251,28 +269,51 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
                             <IconButton icon={<Hash className="w-4 h-4" />} />
                         </div>
                         <input
+                            ref={inputRef}
                             type="text"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(e)}
-                            placeholder={`Message #${selectedChannel?.name}`}
-                            className="w-full h-12 px-3 py-2 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSendMessage(e);
+                                }
+                            }}
+                            placeholder={`Message #${selectedChannel?.name || 'channel'}`}
+                            disabled={sendingMessage}
+                            className="w-full h-12 px-3 py-2 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         <div className="flex items-center justify-between p-1">
-                            <div className="flex items-center">
+                            <div className="flex items-center gap-1">
                                 <IconButton icon={<Plus className="w-4 h-4" />} />
                                 <IconButton icon={<Smile className="w-4 h-4" />} />
                                 <IconButton icon={<User className="w-4 h-4" />} />
+                                {sendingMessage && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 flex items-center gap-1">
+                                        <span className="inline-block w-1 h-1 bg-gray-400 rounded-full animate-pulse"></span>
+                                        Sending...
+                                    </span>
+                                )}
+                                {!sendingMessage && newMessage.trim() && (
+                                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                                        Press <kbd className="px-1 py-0.5 text-[10px] font-semibold bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">Enter</kbd> to send
+                                    </span>
+                                )}
                             </div>
                             <button
                                 onClick={() => handleSendMessage()}
-                                disabled={!newMessage.trim()}
-                                className={`p-1.5 rounded transition-colors ${newMessage.trim()
-                                        ? 'bg-[#007a5a] text-white hover:bg-[#148567]'
-                                        : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                                disabled={!newMessage.trim() || sendingMessage}
+                                className={`p-1.5 rounded transition-all ${newMessage.trim() && !sendingMessage
+                                    ? 'bg-[#007a5a] text-white hover:bg-[#148567] hover:scale-105'
+                                    : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
                                     }`}
+                                title="Send message"
                             >
-                                <Send className="w-4 h-4" />
+                                {sendingMessage ? (
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                    <Send className="w-4 h-4" />
+                                )}
                             </button>
                         </div>
                     </div>
