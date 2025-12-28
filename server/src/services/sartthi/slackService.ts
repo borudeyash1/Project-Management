@@ -265,6 +265,7 @@ export const getSlackService = () => {
     const getChannelHistory = async (userId: string, channelId: string, limit: number = 50, accountId?: string) => {
         try {
             const token = await getAccessToken(userId, accountId);
+            console.log('[SlackService] Fetching history for channel:', channelId, 'with limit:', limit);
             const response = await axios.get(`${SLACK_API_URL}/conversations.history`, {
                 headers: getHeaders(token),
                 params: {
@@ -273,7 +274,15 @@ export const getSlackService = () => {
                 }
             });
 
+            console.log('[SlackService] Slack API response:', {
+                ok: response.data.ok,
+                error: response.data.error,
+                messages_count: response.data.messages?.length || 0,
+                response_keys: Object.keys(response.data)
+            });
+
             if (!response.data.ok) {
+                console.error('[SlackService] Slack API error:', response.data.error);
                 throw new Error(response.data.error || 'Failed to fetch channel history');
             }
 

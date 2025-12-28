@@ -29,8 +29,16 @@ router.get('/channels/:channelId/messages', async (req, res) => {
         const slackService = getSlackService();
         const accountId = req.query.accountId as string;
 
+        console.log('[Slack API] Fetching messages for channel:', channelId);
         const history = await slackService.getChannelHistory(userId, channelId, 50, accountId);
-        return res.json({ success: true, data: history.messages });
+        console.log('[Slack API] Response structure:', {
+            ok: history.ok,
+            has_more: history.has_more,
+            messages_count: history.messages?.length || 0,
+            first_message: history.messages?.[0]
+        });
+
+        return res.json({ success: true, data: history.messages || [] });
     } catch (error: any) {
         console.error('Get Slack messages error:', error);
         return res.status(500).json({ success: false, message: error.message });
