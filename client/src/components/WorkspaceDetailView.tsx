@@ -6,7 +6,7 @@ import {
   ArrowLeft, Edit, Users, UserPlus, Building, FolderOpen,
   Search, Mail, Phone, MapPin, Globe, Eye, EyeOff,
   Save, X, Plus, Trash2, Check, Clock, Briefcase,
-  FileText, Tag, DollarSign, Calendar, User, Files
+  FileText, Tag, DollarSign, Calendar, User, Files, Headphones
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import WorkspaceEditTab from './workspace-detail/WorkspaceEditTab';
@@ -16,6 +16,7 @@ import WorkspaceClientsTab from './workspace-detail/WorkspaceClientsTab';
 import WorkspaceProjectsTab from './workspace-detail/WorkspaceProjectsTab';
 import VaultIntegration from './workspace-detail/VaultIntegration';
 import WorkspaceAttendanceTab from './workspace-detail/WorkspaceAttendanceTab';
+import WorkspaceZendeskTab from './workspace-detail/WorkspaceZendeskTab'; // [NEW]
 
 const WorkspaceDetailView: React.FC = () => {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ const WorkspaceDetailView: React.FC = () => {
   const { state } = useApp();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects' | 'documents' | 'attendance'>('edit');
+  const [activeTab, setActiveTab] = useState<'edit' | 'collaborate' | 'members' | 'clients' | 'projects' | 'documents' | 'attendance' | 'zendesk'>('edit');
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
   // Listen for client click events from ClientsTab
@@ -72,7 +73,8 @@ const WorkspaceDetailView: React.FC = () => {
     { id: 'clients', label: t('workspace.detail.tabs.clients'), icon: Briefcase },
     { id: 'projects', label: t('workspace.detail.tabs.projects'), icon: FolderOpen },
     { id: 'documents', label: t('workspace.detail.tabs.documents'), icon: Files },
-    { id: 'attendance', label: t('workspace.detail.tabs.attendance'), icon: Clock }
+    { id: 'attendance', label: t('workspace.detail.tabs.attendance'), icon: Clock },
+    { id: 'zendesk', label: 'Support', icon: Headphones } // Using generic Headphones icon for now
   ];
 
   return (
@@ -136,6 +138,7 @@ const WorkspaceDetailView: React.FC = () => {
           )}
           {activeTab === 'documents' && <VaultIntegration workspaceId={workspace._id} />}
           {activeTab === 'attendance' && <WorkspaceAttendanceTab workspaceId={workspace._id} />}
+          {activeTab === 'zendesk' && <WorkspaceZendeskTab workspaceId={workspaceId!} />}
         </div>
       </div>
     </div>

@@ -213,6 +213,26 @@ export interface User {
         connectedAt?: string;
       }>;
     };
+    zendesk?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    slack?: {
+      activeAccountId?: string;
+      isActive?: boolean;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+        isActive?: boolean;
+      }>;
+    };
   };
   createdAt: Date;
   updatedAt: Date;

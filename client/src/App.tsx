@@ -31,6 +31,9 @@ import ManageWorkspace from './components/ManageWorkspace';
 import DropboxWidget from './components/vault/DropboxWidget';
 import SpotifyWidget from './components/music/SpotifyWidget';
 import NotionWidget from './components/notion/NotionWidget'; // [NEW] Import
+import JiraWidget from './components/jira/JiraWidget'; // [NEW] Import
+import ZendeskWidget from './components/zendesk/ZendeskWidget'; // [NEW] Import
+import SlackWidget from './components/slack/SlackWidget'; // [NEW] Import
 import MusicPage from './pages/MusicPage';
 import ProjectDesignHub from './components/project/ProjectDesignHub';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
@@ -49,6 +52,9 @@ import WorkspaceSettings from './components/workspace/WorkspaceSettings';
 import WorkspaceInbox from './components/workspace/WorkspaceInbox';
 import WorkspaceProfile from './components/workspace/WorkspaceProfile';
 import WorkspaceAttendanceTab from './components/workspace-detail/WorkspaceAttendanceTab';
+import WorkspaceZendeskTab from './components/workspace-detail/WorkspaceZendeskTab'; // [NEW]
+import ZendeskTicketDetail from './components/zendesk/ZendeskTicketDetail'; // [NEW]
+import WorkspaceSlackTab from './components/workspace-detail/WorkspaceSlackTab'; // [NEW]
 import ProjectLayout from './components/project/ProjectLayout';
 import ProjectOverview from './components/project/ProjectOverview';
 import Profile from './components/Profile';
@@ -139,10 +145,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-// Workspace Attendance Wrapper to get workspaceId from route
 const WorkspaceAttendanceWrapper: React.FC = () => {
   const { workspaceId } = require('react-router-dom').useParams();
   return <WorkspaceAttendanceTab workspaceId={workspaceId || ''} />;
+};
+
+const WorkspaceZendeskWrapper: React.FC = () => {
+  const { workspaceId } = require('react-router-dom').useParams();
+  return <WorkspaceZendeskTab workspaceId={workspaceId || ''} />;
+};
+
+const WorkspaceSlackWrapper: React.FC = () => {
+  const { workspaceId } = require('react-router-dom').useParams();
+  return <WorkspaceSlackTab workspaceId={workspaceId || ''} />;
 };
 
 // Main App Layout Component with Flexible Dock Positioning
@@ -280,6 +295,9 @@ const AppContent: React.FC = () => {
       <DropboxWidget />
       <SpotifyWidget />
       <NotionWidget /> {/* [NEW] Render Widget */}
+      <JiraWidget /> {/* [NEW] Render Jira Widget */}
+      <ZendeskWidget /> {/* [NEW] Render Zendesk Widget */}
+      <SlackWidget /> {/* [NEW] Render Slack Widget */}
       <ToastContainer />
 
       <Routes>
@@ -495,6 +513,13 @@ const AppContent: React.FC = () => {
           <Route path="design" element={<WorkspaceDesignTab />} />
           <Route path="jira" element={<WorkspaceJiraTab />} />
           <Route path="notion" element={<WorkspaceNotionTab />} />
+          <Route path="notion" element={<WorkspaceNotionTab />} />
+          <Route path="zendesk">
+            <Route index element={<WorkspaceZendeskWrapper />} />
+            <Route path=":ticketId" element={<ZendeskTicketDetail />} />
+          </Route>
+          <Route path="slack" element={<WorkspaceSlackWrapper />} />
+          <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />
           <Route path="requests" element={<WorkspaceRequests />} />

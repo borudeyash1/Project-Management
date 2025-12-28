@@ -36,7 +36,9 @@ class JiraService {
                 },
                 params: {
                     startAt,
-                    maxResults
+                    maxResults,
+                    fields: ['summary', 'status', 'priority', 'issuetype', 'project', 'updated', 'created'],
+                    expand: ['names', 'renderedFields']
                 }
             });
 

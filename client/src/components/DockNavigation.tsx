@@ -35,7 +35,7 @@ import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import AIChatbot from './AIChatbot';
 import { useStickyNotes } from '../context/StickyNotesContext';
-import { SpotifyLogo, DropboxLogo, NotionLogo } from './icons/BrandLogos';
+import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo } from './icons/BrandLogos';
 
 interface NavItem {
   id: string;
@@ -314,6 +314,39 @@ const DockNavigation: React.FC = () => {
               <NotionLogo size={22} />
             </DockIcon>
           )}
+
+        {/* [NEW] Jira Widget Toggle */}
+        {!!state.userProfile.connectedAccounts?.jira?.activeAccountId && (
+          <DockIcon
+            onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_JIRA_WIDGET'))}
+            tooltip="Jira"
+            className="text-[#0052CC] hover:bg-[#DEEBFF] dark:hover:bg-[#0052CC]/20"
+          >
+            <JiraLogo size={22} />
+          </DockIcon>
+        )}
+
+        {/* [NEW] Zendesk Widget Toggle */}
+        {!!state.userProfile.connectedAccounts?.zendesk?.activeAccountId && (
+          <DockIcon
+            onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_ZENDESK_WIDGET'))}
+            tooltip="Zendesk"
+            className="text-[#03363D] hover:bg-[#03363D]/10 dark:hover:bg-[#03363D]/30 dark:text-gray-300"
+          >
+            <ZendeskLogo size={22} />
+          </DockIcon>
+        )}
+
+        {/* [NEW] Slack Widget Toggle */}
+        {!!state.userProfile.connectedAccounts?.slack?.activeAccountId && (
+          <DockIcon
+            onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_SLACK_WIDGET'))}
+            tooltip="Slack"
+            className="text-[#4A154B] hover:bg-[#4A154B]/10 dark:hover:bg-[#4A154B]/30 dark:text-gray-300"
+          >
+            <SlackLogo size={22} />
+          </DockIcon>
+        )}
 
         {/* Spotify */}
         {state.userProfile.connectedAccounts?.spotify?.activeAccountId && (

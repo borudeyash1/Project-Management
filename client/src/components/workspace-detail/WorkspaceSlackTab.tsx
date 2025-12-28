@@ -1,0 +1,291 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    Hash, Lock, Search, Plus, MoreVertical, Phone, Video,
+    Info, Smile, Paperclip, Send, User, MessageSquare
+} from 'lucide-react';
+import { slackService, SlackChannel, SlackMessage } from '../../services/slackService';
+import { useApp } from '../../context/AppContext';
+import { SlackLogo } from '../icons/BrandLogos';
+import LoadingAnimation from '../LoadingAnimation';
+
+interface WorkspaceSlackTabProps {
+    workspaceId: string;
+}
+
+const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) => {
+    const { t } = useTranslation();
+    const { state } = useApp();
+    const [channels, setChannels] = useState<SlackChannel[]>([]);
+    const [selectedChannel, setSelectedChannel] = useState<SlackChannel | null>(null);
+    const [messages, setMessages] = useState<SlackMessage[]>([]);
+    const [loadingChannels, setLoadingChannels] = useState(true);
+    const [loadingMessages, setLoadingMessages] = useState(false);
+    const [newMessage, setNewMessage] = useState('');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const slackConnected = !!state.userProfile?.connectedAccounts?.slack?.isActive; // Assuming isActive check or similar
+
+    useEffect(() => {
+        if (slackConnected) {
+            fetchChannels();
+        }
+    }, [slackConnected]);
+
+    useEffect(() => {
+        if (selectedChannel) {
+            fetchMessages(selectedChannel.id);
+        }
+    }, [selectedChannel]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const fetchChannels = async () => {
+        setLoadingChannels(true);
+        try {
+            const data = await slackService.getChannels();
+            setChannels(data);
+            if (data.length > 0 && !selectedChannel) {
+                setSelectedChannel(data[0]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch Slack channels:', error);
+        } finally {
+            setLoadingChannels(false);
+        }
+    };
+
+    const fetchMessages = async (channelId: string) => {
+        setLoadingMessages(true);
+        try {
+            const data = await slackService.getChannelMessages(channelId);
+            // API returns newest first, reverse for chat UI
+            setMessages([...data].reverse());
+        } catch (error) {
+            console.error('Failed to fetch Slack messages:', error);
+        } finally {
+            setLoadingMessages(false);
+        }
+    };
+
+    const handleSendMessage = async (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if (!newMessage.trim() || !selectedChannel) return;
+
+        const text = newMessage;
+        setNewMessage('');
+
+        try {
+            // Optimistic update
+            const tempMessage: SlackMessage = {
+                type: 'message',
+                user: 'me', // Placeholder
+                text: text,
+                ts: Date.now().toString()
+            };
+            setMessages(prev => [...prev, tempMessage]);
+
+            await slackService.postMessage(selectedChannel.id, text);
+            // Refresh to get actual message with proper user info
+            fetchMessages(selectedChannel.id);
+        } catch (error) {
+            console.error('Failed to send message:', error);
+            // Maybe show error toast/revert
+        }
+    };
+
+    if (!slackConnected) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 h-full">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-full flex items-center justify-center mb-4">
+                    <SlackLogo size={32} className="text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Slack Not Connected
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-sm mb-6">
+                    Connect your Slack workspace to chat and collaborate directly from here.
+                </p>
+            </div>
+        );
+    }
+
+    if (loadingChannels) {
+        return <div className="h-full flex items-center justify-center"><LoadingAnimation message="Loading Slack..." /></div>;
+    }
+
+    return (
+        <div className="flex h-full bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 select-none">
+            {/* Sidebar */}
+            <div className="w-64 bg-[#3F0E40] flex flex-col flex-shrink-0">
+                {/* Header */}
+                <div className="h-12 border-b border-[#5d2c5d] flex items-center px-4 hover:bg-[#350d36] transition-colors cursor-pointer">
+                    <h2 className="text-white font-bold text-sm truncate flex-1">sartthi-app</h2>
+                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-[#3F0E40] text-xs font-bold">
+                        S
+                    </div>
+                </div>
+
+                {/* Scroller */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar-dark py-2">
+                    <div className="px-4 py-2">
+                        <div className="flex items-center justify-between group mb-1">
+                            <span className="text-[#bfabbf] text-sm font-medium group-hover:text-white cursor-pointer transition-colors">
+                                Channels
+                            </span>
+                            <Plus className="w-4 h-4 text-[#bfabbf] opacity-0 group-hover:opacity-100 cursor-pointer hover:text-white transition-all" />
+                        </div>
+                        <div className="space-y-0.5">
+                            {channels.map(channel => (
+                                <button
+                                    key={channel.id}
+                                    onClick={() => setSelectedChannel(channel)}
+                                    className={`w-full flex items-center px-2 py-1 rounded transition-colors ${selectedChannel?.id === channel.id
+                                            ? 'bg-[#1164A3] text-white'
+                                            : 'text-[#cfc3cf] hover:bg-[#350d36]'
+                                        }`}
+                                >
+                                    {channel.isPrivate ? (
+                                        <Lock className="w-3.5 h-3.5 mr-2 opacity-70" />
+                                    ) : (
+                                        <Hash className="w-3.5 h-3.5 mr-2 opacity-70" />
+                                    )}
+                                    <span className="text-sm truncate">{channel.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Chat Area */}
+            <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#1A1D21]">
+                {/* Header */}
+                <div className="h-12 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 bg-white dark:bg-[#1A1D21]">
+                    <div className="flex items-center min-w-0">
+                        <div className="font-bold text-gray-900 dark:text-white truncate flex items-center">
+                            {selectedChannel?.isPrivate ? <Lock className="w-4 h-4 mr-1.5 text-gray-500" /> : <Hash className="w-4 h-4 mr-1.5 text-gray-500" />}
+                            {selectedChannel?.name}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
+                        <div className="flex -space-x-2">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-[#1A1D21]" />
+                            ))}
+                        </div>
+                        <span className="text-xs">24</span>
+                    </div>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+                    {loadingMessages ? (
+                        <div className="h-full flex items-center justify-center">
+                            <LoadingAnimation message="" />
+                        </div>
+                    ) : (
+                        messages.map((msg, index) => {
+                            // Basic block rendering for "Rich Task Notification"
+                            const isTaskNotification = msg.text?.includes('New Task Created');
+
+                            return (
+                                <div key={msg.ts} className="group flex gap-3 hover:bg-gray-50 dark:hover:bg-[#222529] -mx-4 px-4 py-1.5 transition-colors">
+                                    <div className="flex-shrink-0 mt-0.5">
+                                        <div className="w-9 h-9 rounded bg-[#E01E5A] flex items-center justify-center text-white font-bold text-sm">
+                                            {/* Avatar Placeholder */}
+                                            {(msg.user || 'U')[0].toUpperCase()}
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="font-bold text-gray-900 dark:text-white text-[15px] hover:underline cursor-pointer">
+                                                {msg.user || 'Unknown User'}
+                                            </span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:opacity-100 opacity-0 transition-opacity">
+                                                {new Date(parseFloat(msg.ts) * 1000).toLocaleTimeString()}
+                                            </span>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="text-[15px] text-gray-900 dark:text-[#D1D2D3] leading-relaxed">
+                                            {isTaskNotification ? (
+                                                <div className="ml-1 pl-3 border-l-4 border-[#2EB67D] mt-1 space-y-1">
+                                                    <div className="flex items-center gap-2 font-semibold">
+                                                        <span className="text-[#1A1D21] dark:text-white">📋 New Task Created</span>
+                                                    </div>
+                                                    <div className="text-gray-600 dark:text-gray-300">
+                                                        {msg.text.replace('📋 New Task: ', '')}
+                                                    </div>
+                                                    <div className="flex gap-2 mt-2">
+                                                        <button className="px-3 py-1 bg-[#2EB67D] text-white text-xs font-medium rounded hover:bg-[#259667]">Mark Complete</button>
+                                                        <button className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded">View in Sartthi</button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                msg.text
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="px-4 pb-4 bg-white dark:bg-[#1A1D21]">
+                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-gray-400 dark:focus-within:ring-gray-500 transition-all bg-white dark:bg-[#222529]">
+                        <div className="flex items-center gap-1 p-1 bg-gray-50 dark:bg-[#222529] border-b border-gray-200 dark:border-gray-600">
+                            <IconButton icon={<b className="serif font-bold">B</b>} />
+                            <IconButton icon={<i className="serif italic">I</i>} />
+                            <IconButton icon={<s className="serif line-through">S</s>} />
+                            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
+                            <IconButton icon={<Hash className="w-4 h-4" />} />
+                        </div>
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(e)}
+                            placeholder={`Message #${selectedChannel?.name}`}
+                            className="w-full h-12 px-3 py-2 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none"
+                        />
+                        <div className="flex items-center justify-between p-1">
+                            <div className="flex items-center">
+                                <IconButton icon={<Plus className="w-4 h-4" />} />
+                                <IconButton icon={<Smile className="w-4 h-4" />} />
+                                <IconButton icon={<User className="w-4 h-4" />} />
+                            </div>
+                            <button
+                                onClick={() => handleSendMessage()}
+                                disabled={!newMessage.trim()}
+                                className={`p-1.5 rounded transition-colors ${newMessage.trim()
+                                        ? 'bg-[#007a5a] text-white hover:bg-[#148567]'
+                                        : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                                    }`}
+                            >
+                                <Send className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const IconButton = ({ icon }: { icon: React.ReactNode }) => (
+    <button className="p-1 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+        {icon}
+    </button>
+);
+
+export default WorkspaceSlackTab;

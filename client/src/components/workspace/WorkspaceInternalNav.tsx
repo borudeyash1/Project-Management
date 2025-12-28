@@ -13,7 +13,10 @@ import {
   UserCircle,
   Calendar,
   Palette,
-  Trello
+  Trello,
+  FileText,
+  Headphones,
+  Hash
 } from 'lucide-react';
 
 interface WorkspaceTab {
@@ -74,6 +77,24 @@ const WorkspaceInternalNav: React.FC = () => {
       label: 'Jira',
       icon: Trello,
       path: `/workspace/${activeWorkspaceId}/jira`
+    },
+    {
+      id: 'notion',
+      label: 'Notion',
+      icon: FileText,
+      path: `/workspace/${activeWorkspaceId}/notion`
+    },
+    {
+      id: 'zendesk',
+      label: 'Zendesk',
+      icon: Headphones,
+      path: `/workspace/${activeWorkspaceId}/zendesk`
+    },
+    {
+      id: 'slack',
+      label: 'Slack',
+      icon: Hash,
+      path: `/workspace/${activeWorkspaceId}/slack`
     },
     {
       id: 'clients',

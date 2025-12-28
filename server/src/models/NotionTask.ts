@@ -51,7 +51,7 @@ const NotionTaskSchema: Schema = new Schema(
         },
         notionDatabaseId: {
             type: String,
-            required: true,
+            required: false, // Changed to false to allow loose pages
             index: true
         },
         labels: [{

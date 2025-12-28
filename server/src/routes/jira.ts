@@ -18,6 +18,7 @@ router.get('/workspace/:workspaceId/projects', jiraController.getJiraProjects);
 
 
 // Issue routes
+router.get('/issues', jiraController.getRecentIssues);
 router.put('/issues/:issueKey', jiraController.updateIssue);
 router.delete('/issues/:issueKey', jiraController.deleteIssue);
 router.post('/issues/:issueKey/transition', jiraController.transitionIssue);

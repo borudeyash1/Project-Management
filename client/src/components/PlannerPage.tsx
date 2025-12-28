@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import { zendeskService } from '../services/zendeskService';
+import { ZendeskLogo } from './icons/BrandLogos';
 
 interface Task {
   _id: string;
@@ -42,6 +44,8 @@ interface Task {
   }>;
   createdAt: Date;
   updatedAt: Date;
+  source?: 'system' | 'zendesk' | 'jira';
+  externalUrl?: string;
 }
 
 interface CalendarEvent {
@@ -92,136 +96,175 @@ const PlannerPage: React.FC = () => {
 
   // Mock data - replace with actual API calls
   useEffect(() => {
-    const mockTasks: Task[] = [
-      {
-        _id: '1',
-        title: 'Design review meeting',
-        description: 'Review the new UI designs with the team',
-        priority: 'high',
-        status: 'pending',
-        dueDate: new Date('2024-03-25T10:00:00'),
-        estimatedDuration: 2,
-        project: {
-          _id: 'p1',
-          name: 'E-commerce Platform',
+    const fetchPlannerData = async () => {
+      // Mock data
+      const mockTasks: Task[] = [
+        {
+          _id: '1',
+          title: 'Design review meeting',
+          description: 'Review the new UI designs with the team',
+          priority: 'high',
+          status: 'pending',
+          dueDate: new Date('2024-03-25T10:00:00'),
+          estimatedDuration: 2,
+          project: {
+            _id: 'p1',
+            name: 'E-commerce Platform',
+            color: 'bg-accent'
+          },
+          assignee: {
+            _id: 'u1',
+            name: 'John Doe',
+            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
+          },
+          tags: ['design', 'meeting'],
+          subtasks: [
+            { _id: 'st1', title: 'Prepare design files', completed: true },
+            { _id: 'st2', title: 'Send meeting invite', completed: false },
+            { _id: 'st3', title: 'Review feedback', completed: false }
+          ],
+          createdAt: new Date('2024-03-20'),
+          updatedAt: new Date('2024-03-20'),
+          source: 'system'
+        },
+        {
+          _id: '2',
+          title: 'Code review for authentication module',
+          description: 'Review the JWT authentication implementation',
+          priority: 'medium',
+          status: 'in-progress',
+          dueDate: new Date('2024-03-26T14:00:00'),
+          estimatedDuration: 3,
+          actualDuration: 1.5,
+          project: {
+            _id: 'p1',
+            name: 'E-commerce Platform',
+            color: 'bg-accent'
+          },
+          assignee: {
+            _id: 'u2',
+            name: 'Jane Smith',
+            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
+          },
+          tags: ['code', 'review', 'backend'],
+          subtasks: [
+            { _id: 'st4', title: 'Test authentication flow', completed: true },
+            { _id: 'st5', title: 'Review security implementation', completed: false }
+          ],
+          createdAt: new Date('2024-03-18'),
+          updatedAt: new Date('2024-03-22'),
+          source: 'system'
+        },
+        {
+          _id: '3',
+          title: 'Client presentation preparation',
+          description: 'Prepare slides and demo for client meeting',
+          priority: 'urgent',
+          status: 'pending',
+          dueDate: new Date('2024-03-27T09:00:00'),
+          estimatedDuration: 4,
+          project: {
+            _id: 'p2',
+            name: 'Mobile App',
+            color: 'bg-green-500'
+          },
+          assignee: {
+            _id: 'u3',
+            name: 'Bob Wilson',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
+          },
+          tags: ['presentation', 'client', 'demo'],
+          subtasks: [
+            { _id: 'st6', title: 'Create presentation slides', completed: false },
+            { _id: 'st7', title: 'Prepare demo environment', completed: false },
+            { _id: 'st8', title: 'Rehearse presentation', completed: false }
+          ],
+          createdAt: new Date('2024-03-21'),
+          updatedAt: new Date('2024-03-21'),
+          source: 'system'
+        }
+      ];
+
+      let allTasks = [...mockTasks];
+
+      // Fetch Zendesk Tickets
+      if (state.userProfile?.connectedAccounts?.zendesk?.activeAccountId) {
+        try {
+          const tickets = await zendeskService.getRecentTickets();
+          const zendeskTasks: Task[] = tickets.map(t => ({
+            _id: `zendesk-${t.id}`,
+            title: t.subject,
+            description: t.description,
+            priority: t.priority === 'urgent' ? 'urgent' : t.priority === 'high' ? 'high' : t.priority === 'normal' ? 'medium' : 'low',
+            status: (t.status === 'solved' || t.status === 'closed') ? 'completed' : t.status === 'open' ? 'in-progress' : 'pending',
+            dueDate: undefined,
+            tags: ['zendesk', t.status],
+            subtasks: [],
+            createdAt: new Date(t.created_at),
+            updatedAt: new Date(t.updated_at),
+            source: 'zendesk',
+            externalUrl: t.url,
+            project: {
+              _id: 'zendesk',
+              name: 'Zendesk Support',
+              color: 'bg-[#03363D]'
+            }
+          }));
+          allTasks = [...allTasks, ...zendeskTasks];
+        } catch (err) {
+          console.error("Failed to load Zendesk tickets for planner", err);
+        }
+      }
+
+      setTasks(allTasks);
+
+      const mockEvents: CalendarEvent[] = [
+        {
+          _id: 'e1',
+          title: 'Design review meeting',
+          start: new Date('2024-03-25T10:00:00'),
+          end: new Date('2024-03-25T12:00:00'),
+          type: 'meeting',
+          priority: 'high',
+          project: 'E-commerce Platform',
           color: 'bg-accent'
         },
-        assignee: {
-          _id: 'u1',
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
+        {
+          _id: 'e2',
+          title: 'Sprint Planning',
+          start: new Date('2024-03-26T09:00:00'),
+          end: new Date('2024-03-26T11:00:00'),
+          type: 'meeting',
+          priority: 'medium',
+          project: 'E-commerce Platform',
+          color: 'bg-purple-500'
         },
-        tags: ['design', 'meeting'],
-        subtasks: [
-          { _id: 'st1', title: 'Prepare design files', completed: true },
-          { _id: 'st2', title: 'Send meeting invite', completed: false },
-          { _id: 'st3', title: 'Review feedback', completed: false }
-        ],
-        createdAt: new Date('2024-03-20'),
-        updatedAt: new Date('2024-03-20')
-      },
-      {
-        _id: '2',
-        title: 'Code review for authentication module',
-        description: 'Review the JWT authentication implementation',
-        priority: 'medium',
-        status: 'in-progress',
-        dueDate: new Date('2024-03-26T14:00:00'),
-        estimatedDuration: 3,
-        actualDuration: 1.5,
-        project: {
-          _id: 'p1',
-          name: 'E-commerce Platform',
-          color: 'bg-accent'
-        },
-        assignee: {
-          _id: 'u2',
-          name: 'Jane Smith',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face'
-        },
-        tags: ['code', 'review', 'backend'],
-        subtasks: [
-          { _id: 'st4', title: 'Test authentication flow', completed: true },
-          { _id: 'st5', title: 'Review security implementation', completed: false }
-        ],
-        createdAt: new Date('2024-03-18'),
-        updatedAt: new Date('2024-03-22')
-      },
-      {
-        _id: '3',
-        title: 'Client presentation preparation',
-        description: 'Prepare slides and demo for client meeting',
-        priority: 'urgent',
-        status: 'pending',
-        dueDate: new Date('2024-03-27T09:00:00'),
-        estimatedDuration: 4,
-        project: {
-          _id: 'p2',
-          name: 'Mobile App',
+        {
+          _id: 'e3',
+          title: 'Client Presentation',
+          start: new Date('2024-03-27T09:00:00'),
+          end: new Date('2024-03-27T11:00:00'),
+          type: 'meeting',
+          priority: 'urgent',
+          project: 'Mobile App',
           color: 'bg-green-500'
         },
-        assignee: {
-          _id: 'u3',
-          name: 'Bob Wilson',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face'
-        },
-        tags: ['presentation', 'client', 'demo'],
-        subtasks: [
-          { _id: 'st6', title: 'Create presentation slides', completed: false },
-          { _id: 'st7', title: 'Prepare demo environment', completed: false },
-          { _id: 'st8', title: 'Rehearse presentation', completed: false }
-        ],
-        createdAt: new Date('2024-03-21'),
-        updatedAt: new Date('2024-03-21')
-      }
-    ];
+        {
+          _id: 'e4',
+          title: 'Project Deadline',
+          start: new Date('2024-03-30T17:00:00'),
+          end: new Date('2024-03-30T17:00:00'),
+          type: 'deadline',
+          priority: 'high',
+          project: 'E-commerce Platform',
+          color: 'bg-red-500'
+        }
+      ];
+      setEvents(mockEvents);
+    };
 
-    const mockEvents: CalendarEvent[] = [
-      {
-        _id: 'e1',
-        title: 'Design review meeting',
-        start: new Date('2024-03-25T10:00:00'),
-        end: new Date('2024-03-25T12:00:00'),
-        type: 'meeting',
-        priority: 'high',
-        project: 'E-commerce Platform',
-        color: 'bg-accent'
-      },
-      {
-        _id: 'e2',
-        title: 'Sprint Planning',
-        start: new Date('2024-03-26T09:00:00'),
-        end: new Date('2024-03-26T11:00:00'),
-        type: 'meeting',
-        priority: 'medium',
-        project: 'E-commerce Platform',
-        color: 'bg-purple-500'
-      },
-      {
-        _id: 'e3',
-        title: 'Client Presentation',
-        start: new Date('2024-03-27T09:00:00'),
-        end: new Date('2024-03-27T11:00:00'),
-        type: 'meeting',
-        priority: 'urgent',
-        project: 'Mobile App',
-        color: 'bg-green-500'
-      },
-      {
-        _id: 'e4',
-        title: 'Project Deadline',
-        start: new Date('2024-03-30T17:00:00'),
-        end: new Date('2024-03-30T17:00:00'),
-        type: 'deadline',
-        priority: 'high',
-        project: 'E-commerce Platform',
-        color: 'bg-red-500'
-      }
-    ];
-
-    setTasks(mockTasks);
-    setEvents(mockEvents);
-  }, []);
+    fetchPlannerData();
+  }, [state.userProfile?.connectedAccounts?.zendesk?.activeAccountId]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

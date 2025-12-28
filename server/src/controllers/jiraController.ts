@@ -125,99 +125,158 @@ const getJiraConfig = async (userId: string): Promise<{ baseUrl: string; email: 
     }
 };
 
-// Get workspace issues
+
+// Get workspace issues (LIVE from Jira)
 export const getWorkspaceIssues = async (req: Request, res: Response) => {
     try {
         const { workspaceId } = req.params;
-        const issues = await JiraIssue.find({ workspaceId })
-            .populate('assignee', 'name email avatar')
-            .populate('reporter', 'name email avatar')
-            .populate('projectId', 'name')
-            .sort({ updatedAt: -1 });
+        const userId = (req as any).user._id;
 
-        console.log(`[JIRA] Returning ${issues.length} Jira issues for workspace ${workspaceId}`);
-        console.log('[JIRA] Issue keys:', issues.map(i => i.issueKey).join(', '));
+        const config = await getJiraConfig(userId);
+        if (!config) {
+            return res.status(400).json({ success: false, message: 'Jira not connected' });
+        }
 
+        // Fetch "My Tasks" - Assigned to me OR Reported by me
+        const jql = 'assignee = currentUser() OR reporter = currentUser() ORDER BY updated DESC';
+        console.log(`[JIRA] Fetching LIVE workspace issues with JQL: ${jql}`);
+
+        const searchResult = await jiraService.searchIssues(jql, config);
+
+        // Map to structure compatible with frontend (mix of JiraIssue schema and needed props)
+        const issues = searchResult.issues.map((issue: any) => ({
+            _id: issue.key, // Use Key as ID for frontend routing/updates
+            issueKey: issue.key,
+            issueId: issue.id,
+            summary: issue.fields?.summary || 'Untitled Issue',
+            description: issue.fields?.description || '', // might be complex object, but frontend might expect string?
+            // If description is object (ADF), we might need to serialize or just pass it if frontend handles it.
+            // Sartthi Task expects string description. Jira returns ADF often.
+            // For now, let's try to extract text or leave it.
+
+            status: issue.fields?.status?.name || 'Unknown',
+            statusCategory: issue.fields?.status?.statusCategory?.key, // 'new', 'indeterminate', 'done'
+            priority: issue.fields?.priority?.name || 'Medium',
+            priorityIconUrl: issue.fields?.priority?.iconUrl,
+
+            project: {
+                name: issue.fields?.project?.name,
+                key: issue.fields?.project?.key,
+                avatarUrl: issue.fields?.project?.avatarUrls?.['48x48']
+            },
+
+            assignee: issue.fields?.assignee ? {
+                name: issue.fields.assignee.displayName,
+                avatar: issue.fields.assignee.avatarUrls?.['48x48'],
+                email: issue.fields.assignee.emailAddress
+            } : null,
+
+            updatedAt: issue.fields?.updated,
+            createdAt: issue.fields?.created,
+            workspaceId // Pass this back so filtering works if needed
+        }));
+
+        console.log(`[JIRA] Returning ${issues.length} LIVE Jira issues`);
         return res.json({ success: true, data: issues });
     } catch (error: any) {
+        console.error('Get workspace issues error:', error);
         return res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// Update workspace Jira issue
+// [NEW] Get recent issues for the authenticated user (Global Widget)
+export const getRecentIssues = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user._id;
+        const config = await getJiraConfig(userId);
+
+        if (!config) {
+            return res.status(400).json({ success: false, message: 'Jira not connected' });
+        }
+
+        // Fetch "Assigned to Me" issues from Jira directly
+        // JQL: assignee = currentUser() ORDER BY updated DESC
+        const jql = 'assignee = currentUser() ORDER BY updated DESC';
+        const searchResult = await jiraService.searchIssues(jql, config, 20); // Limit to 20
+
+        const issues = searchResult.issues.map((issue: any) => ({
+            id: issue.id,
+            key: issue.key,
+            summary: issue.fields?.summary || 'Untitled Issue',
+            status: {
+                name: issue.fields?.status?.name || 'Unknown',
+                color: issue.fields?.status?.statusCategory?.colorName || 'gray'
+            },
+            priority: {
+                name: issue.fields?.priority?.name || 'Medium',
+                iconUrl: issue.fields?.priority?.iconUrl
+            },
+            updated: issue.fields?.updated || new Date().toISOString(),
+            project: {
+                name: issue.fields?.project?.name || 'Unknown Project',
+                avatarUrl: issue.fields?.project?.avatarUrls?.['48x48']
+            },
+            type: {
+                name: issue.fields?.issuetype?.name || 'Task',
+                iconUrl: issue.fields?.issuetype?.iconUrl
+            }
+        }));
+
+        return res.json({ success: true, data: issues });
+    } catch (error: any) {
+        console.error('Get recent issues error:', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+// Update workspace Jira issue (LIVE)
 export const updateJiraIssue = async (req: Request, res: Response) => {
     try {
-        const { workspaceId, id } = req.params;
+        const { workspaceId, id } = req.params; // id is likely the Issue Key (e.g. SART-12) or ID
         const updates = req.body;
         const authUser = (req as any).user;
 
-        console.log(`[JIRA] Updating issue ${id} in workspace ${workspaceId}`, updates);
-
-        // Find the Jira issue
-        const issue = await JiraIssue.findOne({ _id: id, workspaceId });
-        if (!issue) {
-            return res.status(404).json({ success: false, message: 'Jira issue not found' });
+        if (!id) {
+            return res.status(400).json({ success: false, message: 'Issue key/id required' });
         }
 
-        console.log(`[JIRA] Found issue: ${issue.issueKey}`);
-        console.log(`[JIRA] Calling getJiraConfig for user: ${authUser._id}`);
+        console.log(`[JIRA] Updating LIVE issue ${id}`, updates);
 
-        // Get Jira config using the helper function
         const config = await getJiraConfig(authUser._id);
-
-        console.log(`[JIRA] Config result:`, config ? 'Retrieved successfully' : 'NULL - No config');
-
-        if (config) {
-            console.log(`[JIRA] Config details - baseUrl: ${config.baseUrl}, email: ${config.email}, hasToken: ${!!config.apiToken}`);
-            console.log(`[JIRA] Config retrieved successfully, syncing to Jira API...`);
-
-            try {
-                // Sync status change to Jira
-                if (updates.status) {
-                    console.log(`[JIRA] Syncing status: ${updates.status}`);
-                    await jiraService.syncTaskStatusToJira(issue.issueKey, updates.status, config);
-                    console.log(`[JIRA] Status synced successfully`);
-                }
-
-                // Sync other field updates to Jira
-                const fieldUpdates: any = {};
-                // Map title to summary (frontend uses 'title', Jira uses 'summary')
-                if (updates.title) fieldUpdates.title = updates.title;
-                if (updates.summary) fieldUpdates.title = updates.summary;
-                if (updates.description !== undefined) fieldUpdates.description = updates.description;
-                if (updates.priority) fieldUpdates.priority = updates.priority;
-                if (updates.dueDate) fieldUpdates.dueDate = updates.dueDate;
-
-                if (Object.keys(fieldUpdates).length > 0) {
-                    console.log(`[JIRA] Syncing field updates:`, fieldUpdates);
-                    await jiraService.syncTaskUpdatesToJira(issue.issueKey, fieldUpdates, config);
-                    console.log(`[JIRA] Field updates synced successfully`);
-                }
-
-                console.log(`✅ [JIRA] Synced updates to Jira API for ${issue.issueKey}`);
-            } catch (syncError: any) {
-                console.error(`❌ [JIRA] Failed to sync to Jira API:`, syncError.message);
-                // Continue to update local database even if Jira sync fails
-            }
-        } else {
-            console.warn(`[JIRA] Could not retrieve Jira config - user may not have Jira connected`);
+        if (!config) {
+            return res.status(400).json({ success: false, message: 'Jira not connected' });
         }
 
-        // Update local JiraIssue document
-        // Map title to summary for local storage
-        if (updates.title !== undefined) issue.summary = updates.title;
-        if (updates.summary !== undefined) issue.summary = updates.summary;
-        if (updates.description !== undefined) issue.description = updates.description;
-        if (updates.status !== undefined) issue.status = updates.status;
-        if (updates.priority !== undefined) issue.priority = updates.priority;
-        if (updates.dueDate !== undefined) issue.dueDate = updates.dueDate;
+        try {
+            // Sync status change to Jira
+            if (updates.status) {
+                console.log(`[JIRA] Syncing status: ${updates.status}`);
+                await jiraService.syncTaskStatusToJira(id, updates.status, config);
+            }
 
-        issue.lastSyncedAt = new Date();
-        await issue.save();
+            // Sync other field updates to Jira
+            const fieldUpdates: any = {};
+            if (updates.title) fieldUpdates.title = updates.title;
+            if (updates.summary) fieldUpdates.title = updates.summary;
+            if (updates.description !== undefined) fieldUpdates.description = updates.description;
+            if (updates.priority) fieldUpdates.priority = updates.priority;
+            if (updates.dueDate) fieldUpdates.dueDate = updates.dueDate;
 
-        console.log(`✅ [JIRA] Updated local JiraIssue document for ${issue.issueKey}`);
+            if (Object.keys(fieldUpdates).length > 0) {
+                console.log(`[JIRA] Syncing field updates:`, fieldUpdates);
+                await jiraService.syncTaskUpdatesToJira(id, fieldUpdates, config);
+            }
 
-        return res.json({ success: true, data: issue });
+            console.log(`✅ [JIRA] Live updated Jira issue ${id}`);
+
+            // Return success with echoed data
+            return res.json({ success: true, data: { _id: id, ...updates } });
+
+        } catch (syncError: any) {
+            console.error(`❌ [JIRA] Failed to sync to Jira API:`, syncError.message);
+            return res.status(500).json({ success: false, message: syncError.message });
+        }
     } catch (error: any) {
         console.error('[JIRA] Update error:', error);
         return res.status(500).json({ success: false, message: error.message });

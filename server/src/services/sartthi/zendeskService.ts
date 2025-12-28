@@ -102,5 +102,44 @@ export const zendeskService = {
             console.error('Error fetching Zendesk user:', error.response?.data || error.message);
             throw error;
         }
+    },
+    /**
+     * Get single ticket details
+     */
+    getTicketDetails: async (account: IConnectedAccount, ticketId: string | number): Promise<any> => {
+        try {
+            const subdomain = zendeskService.getSubdomain(account);
+            // Side-load users, groups, organizations for full context
+            const response = await axios.get(`https://${subdomain}.zendesk.com/api/v2/tickets/${ticketId}.json?include=users,groups,organizations`, {
+                headers: {
+                    Authorization: `Bearer ${account.accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data; // Returns { ticket: {}, users: [], groups: [], organizations: [] }
+        } catch (error: any) {
+            console.error('Error fetching Zendesk ticket details:', error.response?.data || error.message);
+            throw error;
+        }
+    },
+
+    /**
+     * Get ticket comments (conversation)
+     */
+    getTicketComments: async (account: IConnectedAccount, ticketId: string | number): Promise<any> => {
+        try {
+            const subdomain = zendeskService.getSubdomain(account);
+            // Side-load users to get author details
+            const response = await axios.get(`https://${subdomain}.zendesk.com/api/v2/tickets/${ticketId}/comments.json?include=users`, {
+                headers: {
+                    Authorization: `Bearer ${account.accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data; // Returns { comments: [], users: [] }
+        } catch (error: any) {
+            console.error('Error fetching Zendesk ticket comments:', error.response?.data || error.message);
+            throw error;
+        }
     }
 };

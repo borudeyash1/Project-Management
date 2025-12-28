@@ -261,6 +261,30 @@ export const getSlackService = () => {
         }
     };
 
+    // New: Get channel history
+    const getChannelHistory = async (userId: string, channelId: string, limit: number = 50, accountId?: string) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+            const response = await axios.get(`${SLACK_API_URL}/conversations.history`, {
+                headers: getHeaders(token),
+                params: {
+                    channel: channelId,
+                    limit
+                }
+            });
+
+            if (!response.data.ok) {
+                throw new Error(response.data.error || 'Failed to fetch channel history');
+            }
+
+            // We might want to reverse it so oldest is first for chat UI, or keep as is (newest first)
+            return response.data;
+        } catch (error: any) {
+            console.error('Slack getChannelHistory error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
     return {
         getChannels,
         postMessage,
@@ -268,6 +292,7 @@ export const getSlackService = () => {
         getUserInfo,
         getPermalink,
         addReaction,
-        getThreadMessages
+        getThreadMessages,
+        getChannelHistory
     };
 };

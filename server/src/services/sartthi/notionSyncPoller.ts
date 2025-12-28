@@ -73,13 +73,39 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
                         });
 
                         if (task) {
-                            // Task exists - update status if changed
+                            // Task exists - update fields if changed
+                            let hasUpdates = false;
+
+                            // Update Status
                             if (sartthiStatus && task.status !== sartthiStatus) {
                                 task.status = sartthiStatus;
+                                hasUpdates = true;
+                                console.log(`✅ [NOTION POLLER] Updated status for "${task.title}" to ${sartthiStatus}`);
+                            }
+
+                            // Update Title
+                            const taskTitle = update.title || task.title; // Fallback to existing if empty? No, update.title should be valid from service
+                            if (update.title && task.title !== update.title) {
+                                task.title = update.title;
+                                hasUpdates = true;
+                                console.log(`✅ [NOTION POLLER] Updated title for "${task.title}"`);
+                            }
+
+                            // Update Description
+                            // Only update description if it's not the default one, or if we have a new one
+                            // If current is default hardcoded, overwrite it.
+                            const newDiffers = update.description !== undefined && task.description !== update.description;
+                            const isDefault = task.description === 'Created from Notion database';
+
+                            if (newDiffers || (isDefault && update.description === '')) {
+                                task.description = update.description || '';
+                                hasUpdates = true;
+                            }
+
+                            if (hasUpdates) {
                                 task.notionSync.lastSyncedAt = new Date();
                                 await task.save();
                                 updatedCount++;
-                                console.log(`✅ [NOTION POLLER] Updated task "${task.title}" to ${sartthiStatus}`);
 
                                 // Emit WebSocket event for real-time update
                                 try {
@@ -87,9 +113,10 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
                                     if (io) {
                                         io.emit('taskUpdated', {
                                             taskId: task._id.toString(),
-                                            newStatus: sartthiStatus,
+                                            newStatus: task.status,
                                             userId: userId.toString(),
-                                            title: task.title
+                                            title: task.title,
+                                            description: task.description
                                         });
                                         console.log(`📡 [WEBSOCKET] Broadcasted task update: ${task.title}`);
                                     }
@@ -97,6 +124,7 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
                                     console.error('❌ [WEBSOCKET] Failed to emit event:', wsError);
                                 }
                             }
+
                         } else {
                             // Task doesn't exist - create new task in Sartthi
                             try {
@@ -105,13 +133,13 @@ export const createNotionSyncPoller = (): NotionSyncPoller => {
 
                                 if (!user) continue;
 
-                                // Get title from Notion page (from title property or use page ID)
+                                // Get title from update object (already robustly extracted by notionService)
                                 const taskTitle = update.title || `Task from Notion (${update.id.substring(0, 8)})`;
 
                                 // Create new task
                                 const newTask = new Task({
                                     title: taskTitle,
-                                    description: 'Created from Notion database',
+                                    description: update.description || '', // Use extracted description or empty
                                     status: sartthiStatus || 'pending',
                                     priority: 'medium',
                                     reporter: userId,

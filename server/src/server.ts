@@ -62,6 +62,7 @@ import jiraRoutes from "./routes/jira";
 import notionRoutes from "./routes/notionRoutes";
 import zoomRoutes from "./routes/zoomRoutes";
 import vercelRoutes from "./routes/vercelRoutes";
+import zendeskRoutes from "./routes/zendeskRoutes";
 
 import spotifyRoutes from "./routes/spotifyRoutes";
 import mediaRoutes from "./routes/mediaRoutes"; // [NEW]
@@ -192,6 +193,7 @@ app.use("/api/onedrive", onedriveRoutes);
 app.use("/api/figma", figmaRoutes);
 app.use("/api/jira", jiraRoutes);
 app.use("/api/notion", notionRoutes);
+app.use("/api/zendesk", zendeskRoutes);
 app.use("/api/zoom", zoomRoutes);
 app.use("/api/vercel", vercelRoutes);
 app.use("/api/spotify", spotifyRoutes);
@@ -238,12 +240,14 @@ mongoose
     initializeSartthiServices();
 
     // Start Notion sync poller for bidirectional sync
-    const { notionSyncPoller } = require('./services/sartthi/notionSyncPoller');
-    notionSyncPoller.start();
+    // [DISABLED] - User requested LIVE rendering without DB storage
+    // const { notionSyncPoller } = require('./services/sartthi/notionSyncPoller');
+    // notionSyncPoller.start();
 
     // Start Jira sync poller for bidirectional sync
-    const jiraPollerService = require('./services/jiraPollerService').default;
-    jiraPollerService.start();
+    // [DISABLED] - User requested LIVE rendering without DB storage
+    // const jiraPollerService = require('./services/jiraPollerService').default;
+    // jiraPollerService.start();
 
     console.log("Connected to MongoDB");
   })

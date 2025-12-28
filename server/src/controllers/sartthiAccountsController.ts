@@ -106,15 +106,18 @@ const isValidService = (service: string): service is ServiceType => {
 };
 
 // Provider Config Helper
-const getProviderConfig = (service: ServiceType) => {
+const getProviderConfig = (service: ServiceType, requestBaseUrl?: string) => {
     // Use GOOGLE_REDIRECT_URI base if available (it is set to http://localhost:5000/api/sartthi-accounts in dev)
     // Otherwise fallback to logic
-    let BASE_URL = 'http://localhost:5000';
-    if (process.env.GOOGLE_REDIRECT_URI) {
-        // Remove /api/sartthi-accounts suffix to get base
-        BASE_URL = process.env.GOOGLE_REDIRECT_URI.replace('/api/sartthi-accounts', '');
-    } else if (process.env.NODE_ENV === 'production') {
-        BASE_URL = process.env.FRONTEND_URL || 'https://sartthi.com';
+    let BASE_URL = requestBaseUrl || 'http://localhost:5000';
+
+    if (!requestBaseUrl) {
+        if (process.env.GOOGLE_REDIRECT_URI) {
+            // Remove /api/sartthi-accounts suffix to get base
+            BASE_URL = process.env.GOOGLE_REDIRECT_URI.replace('/api/sartthi-accounts', '');
+        } else if (process.env.NODE_ENV === 'production') {
+            BASE_URL = process.env.FRONTEND_URL || 'https://sartthi.com';
+        }
     }
 
     const callbackUrl = `${BASE_URL}/api/sartthi-accounts/${service}/callback`;
@@ -314,7 +317,12 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
             return;
         }
 
-        const config = getProviderConfig(service as ServiceType);
+        // Determine base URL from request to support both localhost and production
+        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        const host = req.get('host');
+        const dynamicBaseUrl = `${protocol}://${host}`;
+
+        const config = getProviderConfig(service as ServiceType, dynamicBaseUrl);
         if (!config) {
             res.status(500).json({ success: false, message: 'Provider configuration missing' });
             return;
@@ -455,7 +463,13 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
         } else {
             // Generic Logic
             if (!isValidService(service)) return; // TS guard
-            const config = getProviderConfig(service);
+
+            // Determine base URL from request to support both localhost and production
+            const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+            const host = req.get('host');
+            const dynamicBaseUrl = `${protocol}://${host}`;
+
+            const config = getProviderConfig(service, dynamicBaseUrl);
             if (!config) throw new Error('Config missing');
 
             let tokenResponse;

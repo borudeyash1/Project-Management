@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-    Plus, RefreshCw, LayoutGrid, List, Calendar, GanttChart, FileText
+    Plus, RefreshCw, LayoutGrid, List, Calendar, GanttChart, FileText, Download
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import apiService from '../../services/api';
 import { NotionPlannerProvider, useNotionPlanner } from '../../context/NotionPlannerContext';
+import NotionPagePicker from '../notion/NotionPagePicker';
 import BoardView from '../planner/views/BoardView';
 import ListView from '../planner/views/ListView';
 import CalendarView from '../planner/views/CalendarView';
@@ -28,6 +29,7 @@ const NotionTabContent: React.FC = () => {
     const [currentView, setCurrentView] = useState<ViewType>('board');
     const [searchQuery, setSearchQuery] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
+    const [showPicker, setShowPicker] = useState(false);
 
     const handleSync = async () => {
         try {
@@ -40,6 +42,11 @@ const NotionTabContent: React.FC = () => {
         } finally {
             setIsSyncing(false);
         }
+    };
+
+    const handleImportComplete = async () => {
+        await fetchData();
+        setShowPicker(false);
     };
 
     const viewButtons = [
@@ -60,7 +67,15 @@ const NotionTabContent: React.FC = () => {
     const stats = getStats();
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col pt-0">
+            {showPicker && workspaceId && (
+                <NotionPagePicker
+                    workspaceId={workspaceId}
+                    onClose={() => setShowPicker(false)}
+                    onImported={handleImportComplete}
+                />
+            )}
+
             {/* Header */}
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-6">
@@ -79,6 +94,13 @@ const NotionTabContent: React.FC = () => {
                     </div>
 
                     <div className="flex gap-2">
+                        <button
+                            onClick={() => setShowPicker(true)}
+                            className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center gap-2"
+                        >
+                            <Download size={18} />
+                            Import Pages
+                        </button>
                         <button
                             onClick={handleSync}
                             disabled={isSyncing}

@@ -15,13 +15,33 @@ export const getNotionService = () => {
         return account.accessToken;
     };
 
+    const getPage = async (userId: string, pageId: string, accountId?: string) => {
+        try {
+            const token = await getAccessToken(userId, accountId);
+            const response = await axios.get(`${NOTION_API_URL}/pages/${pageId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Notion-Version': '2022-06-28'
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('Notion get page error:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
     const search = async (userId: string, query: string = '', accountId?: string) => {
         try {
             const token = await getAccessToken(userId, accountId);
             const response = await axios.post(`${NOTION_API_URL}/search`,
                 {
                     query,
-                    filter: { property: 'object', value: 'page' },
+                    // filter: { property: 'object', value: 'page' }, // Removed to allow databases
+                    sort: {
+                        direction: 'descending',
+                        timestamp: 'last_edited_time'
+                    },
                     page_size: 20
                 },
                 {
@@ -31,12 +51,35 @@ export const getNotionService = () => {
                     }
                 }
             );
-            return response.data.results.map((item: any) => ({
-                id: item.id,
-                title: item.properties?.title?.title?.[0]?.plain_text || 'Untitled',
-                url: item.url,
-                icon: item.icon
-            }));
+            return response.data.results.map((item: any) => {
+                let title = 'Untitled';
+                // Robust title extraction
+                if (item.properties) {
+                    const titleProp = Object.values(item.properties).find((p: any) => p.type === 'title') as any;
+                    if (titleProp?.title?.[0]?.plain_text) {
+                        title = titleProp.title[0].plain_text;
+                    }
+                }
+                // Fallbacks
+                if (title === 'Untitled') {
+                    title = item.properties?.title?.title?.[0]?.plain_text ||
+                        item.title?.[0]?.plain_text ||
+                        (item.icon?.emoji ? 'Untitled Page' : 'Untitled');
+                }
+
+                return {
+                    id: item.id,
+                    title,
+                    url: item.url,
+                    icon: item.icon,
+                    // Include full object properties for import
+                    properties: item.properties,
+                    parent: item.parent,
+                    created_time: item.created_time,
+                    last_edited_time: item.last_edited_time,
+                    object: item.object
+                };
+            });
         } catch (error: any) {
             console.error('Notion search error:', error.response?.data || error.message);
             throw error;
@@ -256,24 +299,42 @@ export const getNotionService = () => {
 
             // Map and filter results
             const allPages = response.data.results.map((page: any) => {
-                // Extract title from Name property (common in databases)
+                // Robust title extraction
                 let title = '';
-                const nameProperty = page.properties?.Name || page.properties?.Title || page.properties?.title;
+                if (page.properties) {
+                    const titleProp = Object.values(page.properties).find((p: any) => p.type === 'title') as any;
+                    if (titleProp?.title) {
+                        title = titleProp.title.map((t: any) => t.plain_text || t.text?.content || '').join('');
+                    }
+                }
 
-                if (nameProperty) {
-                    if (nameProperty.title && nameProperty.title.length > 0) {
-                        title = nameProperty.title.map((t: any) => t.plain_text || t.text?.content || '').join('');
-                    } else if (nameProperty.rich_text && nameProperty.rich_text.length > 0) {
-                        title = nameProperty.rich_text.map((t: any) => t.plain_text || t.text?.content || '').join('');
+                // Fallback title extraction
+                if (!title) {
+                    const nameProperty = page.properties?.Name || page.properties?.Title || page.properties?.title;
+                    if (nameProperty) {
+                        if (nameProperty.title) title = nameProperty.title.map((t: any) => t.plain_text || t.text?.content || '').join('');
+                        else if (nameProperty.rich_text) title = nameProperty.rich_text.map((t: any) => t.plain_text || t.text?.content || '').join('');
+                    }
+                }
+
+                // Try to extract description (look for 'Description', 'Summary' text props)
+                let description = '';
+                if (page.properties) {
+                    const descProp = page.properties.Description || page.properties.Summary || page.properties.description || page.properties.summary;
+                    if (descProp && descProp.rich_text) {
+                        description = descProp.rich_text.map((t: any) => t.plain_text).join('');
                     }
                 }
 
                 return {
                     id: page.id,
-                    title: title || undefined,
-                    status: page.properties?.Status?.status?.name || page.properties?.Status?.select?.name,
+                    title: title || 'Untitled',
+                    description,
+                    status: page.properties?.Status?.status?.name || page.properties?.Status?.select?.name ||
+                        page.properties?.State?.status?.name || page.properties?.State?.select?.name,
                     lastEditedTime: page.last_edited_time,
-                    url: page.url
+                    url: page.url,
+                    properties: page.properties // Include all properties for finding keys later
                 };
             });
 
@@ -295,6 +356,7 @@ export const getNotionService = () => {
     };
 
     return {
+        getPage,
         search,
         createPage,
         updatePage,
