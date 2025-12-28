@@ -20,7 +20,7 @@ const SlackWidget: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const widgetRef = useRef<HTMLDivElement>(null);
 
-    const slackConnected = !!state.userProfile?.connectedAccounts?.slack?.isActive;
+    const slackConnected = !!state.userProfile?.connectedAccounts?.slack?.activeAccountId;
 
     useEffect(() => {
         const handleToggle = () => setIsOpen(prev => !prev);

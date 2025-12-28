@@ -26,7 +26,7 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const slackConnected = !!state.userProfile?.connectedAccounts?.slack?.isActive; // Assuming isActive check or similar
+    const slackConnected = !!state.userProfile?.connectedAccounts?.slack?.activeAccountId;
 
     useEffect(() => {
         if (slackConnected) {
