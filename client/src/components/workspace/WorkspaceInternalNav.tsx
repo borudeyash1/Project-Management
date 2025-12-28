@@ -16,7 +16,8 @@ import {
   Trello,
   FileText,
   Headphones,
-  Hash
+  Hash,
+  Target
 } from 'lucide-react';
 
 interface WorkspaceTab {
@@ -95,6 +96,12 @@ const WorkspaceInternalNav: React.FC = () => {
       label: 'Slack',
       icon: Hash,
       path: `/workspace/${activeWorkspaceId}/slack`
+    },
+    {
+      id: 'linear',
+      label: 'Linear',
+      icon: Target,
+      path: `/workspace/${activeWorkspaceId}/linear`
     },
     {
       id: 'clients',

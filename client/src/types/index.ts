@@ -233,6 +233,15 @@ export interface User {
         isActive?: boolean;
       }>;
     };
+    linear?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
   };
   createdAt: Date;
   updatedAt: Date;

@@ -55,6 +55,7 @@ import WorkspaceAttendanceTab from './components/workspace-detail/WorkspaceAtten
 import WorkspaceZendeskTab from './components/workspace-detail/WorkspaceZendeskTab'; // [NEW]
 import ZendeskTicketDetail from './components/zendesk/ZendeskTicketDetail'; // [NEW]
 import WorkspaceSlackTab from './components/workspace-detail/WorkspaceSlackTab'; // [NEW]
+import WorkspaceLinearTab from './components/workspace-detail/WorkspaceLinearTab'; // [NEW]
 import ProjectLayout from './components/project/ProjectLayout';
 import ProjectOverview from './components/project/ProjectOverview';
 import Profile from './components/Profile';
@@ -158,6 +159,11 @@ const WorkspaceZendeskWrapper: React.FC = () => {
 const WorkspaceSlackWrapper: React.FC = () => {
   const { workspaceId } = require('react-router-dom').useParams();
   return <WorkspaceSlackTab workspaceId={workspaceId || ''} />;
+};
+
+const WorkspaceLinearWrapper: React.FC = () => {
+  const { workspaceId } = require('react-router-dom').useParams();
+  return <WorkspaceLinearTab />;
 };
 
 // Main App Layout Component with Flexible Dock Positioning
@@ -519,6 +525,7 @@ const AppContent: React.FC = () => {
             <Route path=":ticketId" element={<ZendeskTicketDetail />} />
           </Route>
           <Route path="slack" element={<WorkspaceSlackWrapper />} />
+          <Route path="linear" element={<WorkspaceLinearWrapper />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />

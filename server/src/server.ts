@@ -63,6 +63,7 @@ import notionRoutes from "./routes/notionRoutes";
 import zoomRoutes from "./routes/zoomRoutes";
 import vercelRoutes from "./routes/vercelRoutes";
 import zendeskRoutes from "./routes/zendeskRoutes";
+import linearRoutes from "./routes/linearRoutes";
 
 import spotifyRoutes from "./routes/spotifyRoutes";
 import mediaRoutes from "./routes/mediaRoutes"; // [NEW]
@@ -194,6 +195,7 @@ app.use("/api/figma", figmaRoutes);
 app.use("/api/jira", jiraRoutes);
 app.use("/api/notion", notionRoutes);
 app.use("/api/zendesk", zendeskRoutes);
+app.use("/api/linear", linearRoutes);
 app.use("/api/zoom", zoomRoutes);
 app.use("/api/vercel", vercelRoutes);
 app.use("/api/spotify", spotifyRoutes);
