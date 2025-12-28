@@ -475,10 +475,20 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
             // Generic Logic
             if (!isValidService(service)) return; // TS guard
 
-            // Determine base URL from request to support both localhost and production
-            const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-            const host = req.get('host');
-            const dynamicBaseUrl = `${protocol}://${host}`;
+            // Determine base URL - MUST match what was used in initiateConnection
+            let dynamicBaseUrl = '';
+            if (process.env.FRONTEND_URL) {
+                dynamicBaseUrl = process.env.FRONTEND_URL;
+            } else {
+                const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+                const host = req.get('host');
+                dynamicBaseUrl = `${protocol}://${host}`;
+
+                // Force HTTPS for production domain
+                if (host?.includes('sartthi.com')) {
+                    dynamicBaseUrl = `https://${host}`;
+                }
+            }
 
             const config = getProviderConfig(service, dynamicBaseUrl);
             if (!config) throw new Error('Config missing');
