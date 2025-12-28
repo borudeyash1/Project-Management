@@ -350,6 +350,84 @@ export const updateParticipation = async (req: AuthenticatedRequest, res: Respon
 import Task from '../models/Task';
 import { Reminder } from '../models/Reminder';
 import Milestone from '../models/Milestone';
+import JiraIssue from '../models/JiraIssue';
+// import NotionTask from '../models/NotionTask';  // TODO: Create NotionTask model
+import User from '../models/User';
+
+
+
+// Helper: Map Jira status to planner status (exclude Review)
+function mapJiraStatusToPlanner(jiraStatus: string): string {
+  const statusMap: Record<string, string> = {
+    'To Do': 'To Do',
+    'Backlog': 'To Do',
+    'In Progress': 'In Progress',
+    'In Development': 'In Progress',
+    'Done': 'Done',
+    'Completed': 'Done',
+    'Closed': 'Done'
+  };
+  return statusMap[jiraStatus] || 'To Do';
+}
+
+// Helper: Map Notion status to planner status (exclude Review)
+function mapNotionStatusToPlanner(notionStatus: string): string {
+  const statusMap: Record<string, string> = {
+    'Not started': 'To Do',
+    'In progress': 'In Progress',
+    'Done': 'Done',
+    'Complete': 'Done'
+  };
+  return statusMap[notionStatus] || 'To Do';
+}
+
+// Helper: Transform Jira issue to task format
+function transformJiraIssueToTask(issue: any): any {
+  return {
+    _id: issue._id,
+    title: issue.summary,
+    description: issue.description || '',
+    status: mapJiraStatusToPlanner(issue.status),
+    priority: issue.priority || 'Medium',
+    dueDate: issue.dueDate,
+    startDate: null,
+    workspace: issue.workspaceId,
+    assignee: null,
+    reporter: null,
+    project: null,
+    isActive: true,
+    progress: issue.status === 'Done' ? 100 : issue.status === 'In Progress' ? 50 : 0,
+    // Sync metadata
+    source: 'jira',
+    externalId: issue.issueKey,
+    externalUrl: `https://sartthi.atlassian.net/browse/${issue.issueKey}`,
+    syncedAt: issue.lastSyncedAt
+  };
+}
+
+// Helper: Transform Notion task to task format
+function transformNotionTaskToTask(notionTask: any): any {
+  return {
+    _id: notionTask._id,
+    title: notionTask.title,
+    description: notionTask.description || '',
+    status: mapNotionStatusToPlanner(notionTask.status),
+    priority: notionTask.priority || 'Medium',
+    dueDate: notionTask.dueDate,
+    startDate: null,
+    workspace: notionTask.workspaceId,
+    assignee: null,
+    reporter: null,
+    project: null,
+    isActive: true,
+    progress: notionTask.status === 'Done' ? 100 : notionTask.status === 'In progress' ? 50 : 0,
+    // Sync metadata
+    source: 'notion',
+    externalId: notionTask.pageId,
+    externalUrl: `https://notion.so/${notionTask.pageId}`,
+    syncedAt: notionTask.lastSyncedAt
+  };
+}
 
 // Get all planner data (tasks, reminders, milestones, events)
 export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -383,6 +461,40 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
       .populate('reporter', 'fullName email avatarUrl')
       .populate('project', 'name')
       .sort({ dueDate: 1 });
+
+    // Fetch Jira issues if connected
+    let jiraTasks: any[] = [];
+    try {
+      const user = await User.findById(userId).select('connectedAccounts');
+      const hasJira = (user?.connectedAccounts?.jira?.accounts?.length ?? 0) > 0;
+
+      if (hasJira && workspaceId) {
+        const jiraIssues = await JiraIssue.find({ workspaceId });
+        jiraTasks = jiraIssues.map(transformJiraIssueToTask);
+        console.log(`[Planner] Fetched ${jiraTasks.length} Jira tasks for workspace ${workspaceId}`);
+      }
+    } catch (error) {
+      console.error('[Planner] Failed to fetch Jira tasks:', error);
+    }
+
+    // Fetch Notion tasks if connected
+    let notionTasks: any[] = [];
+    try {
+      const user = await User.findById(userId).select('connectedAccounts');
+      const hasNotion = (user?.connectedAccounts?.notion?.accounts?.length ?? 0) > 0;
+
+      if (hasNotion && workspaceId) {
+        // const notionPages = await NotionTask.find({ workspaceId });  // TODO: Create NotionTask model
+        const notionPages: any[] = [];  // Placeholder until model is created
+        notionTasks = notionPages.map(transformNotionTaskToTask);
+        console.log(`[Planner] Fetched ${notionTasks.length} Notion tasks for workspace ${workspaceId}`);
+      }
+    } catch (error) {
+      console.error('[Planner] Failed to fetch Notion tasks:', error);
+    }
+
+    // Merge all tasks (regular + Jira + Notion)
+    const allTasks = [...tasks, ...jiraTasks, ...notionTasks];
 
     // Fetch reminders
     const reminderQuery: any = { ...baseQuery, isActive: true };
@@ -425,7 +537,7 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
     res.json({
       success: true,
       data: {
-        tasks,
+        tasks: allTasks,  // Return merged tasks
         reminders,
         milestones,
         events

@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../../context/PlannerContext';
+import { useJiraPlanner } from '../../../context/JiraPlannerContext';
+import { useNotionPlanner } from '../../../context/NotionPlannerContext';
 import { Task } from '../../../context/PlannerContext';
 
 interface ListViewProps {
@@ -16,7 +18,16 @@ type SortDirection = 'asc' | 'desc';
 type GroupBy = 'none' | 'status' | 'priority' | 'assignee' | 'project';
 
 const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
-  const { tasks, updateTask, deleteTask, bulkUpdateTasks, loading } = usePlanner();
+  // Try JiraPlanner first, then NotionPlanner, fall back to regular Planner
+  const jiraContext = useJiraPlanner();
+  const notionContext = useNotionPlanner();
+  const plannerContext = usePlanner();
+
+  // Use whichever context is available
+  const { tasks, updateTask, deleteTask, bulkUpdateTasks, loading } = jiraContext || notionContext || plannerContext;
+
+  console.log('[ListView] Using', jiraContext ? 'JiraPlannerContext' : notionContext ? 'NotionPlannerContext' : 'PlannerContext');
+
   const { t } = useTranslation();
 
   const [sortField, setSortField] = useState<SortField>('dueDate');

@@ -726,16 +726,25 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                 });
                 tokens = tokenResponse.data;
 
+
                 // Get User Info from Atlassian Me API
                 const meResponse = await axios.get('https://api.atlassian.com/me', {
                     headers: { Authorization: `Bearer ${tokens.access_token}` }
                 });
 
+                // [NEW] Get Accessible Resources (Cloud ID)
+                const resourcesResponse = await axios.get('https://api.atlassian.com/oauth/token/accessible-resources', {
+                    headers: { Authorization: `Bearer ${tokens.access_token}` }
+                });
+
+                const cloudId = resourcesResponse.data[0]?.id; // Use first available site
+
                 userInfo = {
                     id: meResponse.data.account_id,
                     email: meResponse.data.email,
                     name: meResponse.data.name,
-                    picture: meResponse.data.picture
+                    picture: meResponse.data.picture,
+                    cloudId // Pass this to creation logic
                 };
             } else if (service === 'zendesk') {
                 if (!subdomain) throw new Error('Subdomain missing in state');
@@ -829,7 +838,7 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
             isActive: false,
             isPrimary: false,
             scopes: SCOPES[service as keyof typeof SCOPES],
-            settings: service === 'zendesk' ? { zendesk: { subdomain } } : undefined
+            settings: service === 'zendesk' ? { zendesk: { subdomain } } : service === 'jira' ? { jira: { cloudId: userInfo.cloudId } } : undefined
         });
 
         // Update user's connected accounts

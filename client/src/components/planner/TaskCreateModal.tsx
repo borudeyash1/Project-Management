@@ -27,6 +27,9 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   const notionConnected = state.userProfile?.connectedAccounts?.notion?.activeAccountId ||
     (state.userProfile?.connectedAccounts?.notion?.accounts?.length ?? 0) > 0;
 
+  const jiraConnected = state.userProfile?.connectedAccounts?.jira?.activeAccountId ||
+    (state.userProfile?.connectedAccounts?.jira?.accounts?.length ?? 0) > 0;
+
   const [taskType, setTaskType] = useState<TaskType>('task');
   const [formData, setFormData] = useState({
     title: '',
@@ -42,6 +45,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     reminder: '15min' as '15min' | '30min' | '1hour' | '1day' | 'none',
     clientVisible: false,
     syncToNotion: false,
+    syncToJira: false,
     project: '',
     milestone: ''
   });
@@ -117,7 +121,9 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       comments: [],
       attachments: [],
       // @ts-ignore - syncToNotion will be handled by backend
-      syncToNotion: formData.syncToNotion && notionConnected
+      syncToNotion: formData.syncToNotion && notionConnected,
+      // @ts-ignore - syncToJira will be handled by backend
+      syncToJira: formData.syncToJira && jiraConnected
     });
 
     onClose();
@@ -480,6 +486,32 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
                     {notionConnected
                       ? 'Create a Notion page for this task'
                       : 'Connect Notion in Settings to enable sync'
+                    }
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Jira Sync Toggle - Show for Task and Milestone only */}
+            {(taskType === 'task' || taskType === 'milestone') && (
+              <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                <input
+                  type="checkbox"
+                  id="syncToJira"
+                  checked={formData.syncToJira}
+                  onChange={(e) => setFormData({ ...formData, syncToJira: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-600"
+                  disabled={!jiraConnected}
+                />
+                <div className="flex-1">
+                  <label htmlFor="syncToJira" className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <CheckSquare className="w-4 h-4" />
+                    Sync to Jira
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {jiraConnected
+                      ? 'Create a Jira issue for this task'
+                      : 'Connect Jira in Settings to enable sync'
                     }
                   </p>
                 </div>

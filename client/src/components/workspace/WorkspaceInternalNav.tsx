@@ -12,7 +12,8 @@ import {
   Briefcase,
   UserCircle,
   Calendar,
-  Palette
+  Palette,
+  Trello
 } from 'lucide-react';
 
 interface WorkspaceTab {
@@ -67,6 +68,12 @@ const WorkspaceInternalNav: React.FC = () => {
       label: 'Design',
       icon: Palette,
       path: `/workspace/${activeWorkspaceId}/design`
+    },
+    {
+      id: 'jira',
+      label: 'Jira',
+      icon: Trello,
+      path: `/workspace/${activeWorkspaceId}/jira`
     },
     {
       id: 'clients',

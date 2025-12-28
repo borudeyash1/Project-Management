@@ -9,6 +9,8 @@ import { getSlackService } from '../services/sartthi/slackService';
 import { getNotionService } from '../services/sartthi/notionService';
 import { notifySlackForTask, notifySlackTaskCompleted, notifySlackTaskUpdated } from '../utils/slackNotifications';
 import User from '../models/User';
+import jiraService from '../services/jiraService';
+import JiraIssue from '../models/JiraIssue';
 
 // GET /api/tasks?projectId=...&status=...&priority=...
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
@@ -457,6 +459,65 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       } catch (error) {
         console.error('❌ [NOTION] Failed to sync status to Notion:', error);
         // Don't fail the task update if Notion sync fails
+      }
+    }
+
+    // Sync changes to Jira if task is from Jira
+    if ((task as any).source === 'jira' && (task as any).externalId) {
+      try {
+        const user = await User.findById(authUser._id).select('connectedAccounts');
+        const hasJira = (user?.connectedAccounts?.jira?.accounts?.length ?? 0) > 0;
+
+        if (hasJira) {
+          // Get Jira config
+          const jiraAccount: any = user?.connectedAccounts?.jira?.accounts?.[0];
+          if (!jiraAccount?.cloudId || !jiraAccount?.accessToken) {
+            console.warn('[JIRA] Missing Jira credentials');
+            throw new Error('Jira credentials not found');
+          }
+
+          const config = {
+            baseUrl: `https://api.atlassian.com/ex/jira/${jiraAccount.cloudId}`,
+            apiToken: jiraAccount.accessToken,
+            email: jiraAccount.email || ''
+          };
+
+          const issueKey = (task as any).externalId;
+
+          // Sync status change (transition)
+          if (status !== undefined) {
+            await jiraService.syncTaskStatusToJira(issueKey, status, config);
+          }
+
+          // Sync other field updates
+          const updates: any = {};
+          if (title !== undefined) updates.title = title;
+          if (description !== undefined) updates.description = description;
+          if (priority !== undefined) updates.priority = priority;
+          if (dueDate !== undefined) updates.dueDate = dueDate;
+
+          if (Object.keys(updates).length > 0) {
+            await jiraService.syncTaskUpdatesToJira(issueKey, updates, config);
+          }
+
+          // Update local JiraIssue document
+          await JiraIssue.findOneAndUpdate(
+            { issueKey },
+            {
+              summary: task.title,
+              description: task.description,
+              status: task.status,
+              priority: task.priority,
+              dueDate: task.dueDate,
+              lastSyncedAt: new Date()
+            }
+          );
+
+          console.log(`✅ [JIRA] Synced task updates to Jira: ${issueKey}`);
+        }
+      } catch (error) {
+        console.error('❌ [JIRA] Failed to sync to Jira:', error);
+        // Don't fail the task update if Jira sync fails
       }
     }
 

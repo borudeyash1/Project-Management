@@ -5,7 +5,7 @@ import { useApp } from '../../context/AppContext';
 
 interface ConnectionGuardProps {
     children: React.ReactNode;
-    service: 'figma' | 'slack' | 'github' | 'dropbox' | 'notion';
+    service: 'figma' | 'slack' | 'github' | 'dropbox' | 'notion' | 'jira';
     serviceName: string;
     serviceIcon?: React.ReactNode;
 }
@@ -23,20 +23,29 @@ const ConnectionGuard: React.FC<ConnectionGuardProps> = ({
 
     useEffect(() => {
         checkConnection();
-    }, []);
+    }, [state.userProfile]); // Re-check when user profile updates
 
     const checkConnection = async () => {
         try {
             // Check if user has the service connected
             const user = state.userProfile;
+
+            // Debug logging
+            console.log(`[${serviceName} Guard] Checking connection...`);
+            console.log(`[${serviceName} Guard] User:`, user?._id);
+            console.log(`[${serviceName} Guard] Connected Accounts:`, user?.connectedAccounts);
+
             const serviceAccount = (user?.connectedAccounts as any)?.[service];
+            console.log(`[${serviceName} Guard] ${service} Account:`, serviceAccount);
 
             if (!serviceAccount?.activeAccountId || !serviceAccount?.accounts?.length) {
+                console.log(`[${serviceName} Guard] ❌ Not connected`);
                 setIsConnected(false);
                 setIsChecking(false);
                 return;
             }
 
+            console.log(`[${serviceName} Guard] ✅ Connected`);
             setIsConnected(true);
             setIsChecking(false);
         } catch (error) {

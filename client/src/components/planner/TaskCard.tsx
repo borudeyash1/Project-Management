@@ -124,16 +124,31 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
             </span>
           )}
           {/* Notion Sync Badge */}
-          {task.notionSync?.pageId && (
+          {(task.notionSync?.pageId || (task.source === 'notion' && task.externalUrl)) && (
             <a
-              href={task.notionSync.url}
+              href={task.notionSync?.url || task.externalUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
               onClick={(e) => e.stopPropagation()}
-              title="Open in Notion"
+              title={`Open in Notion${task.externalId ? `: ${task.externalId}` : ''}`}
             >
               <FileText className="w-3 h-3" />
+            </a>
+          )}
+          {/* Jira Sync Badge */}
+          {task.source === 'jira' && task.externalUrl && (
+            <a
+              href={task.externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+              title={`Open in Jira: ${task.externalId}`}
+            >
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.571 11.513H0a5.218 5.218 0 0 0 5.232 5.215h2.13v2.057A5.215 5.215 0 0 0 12.575 24V12.518a1.005 1.005 0 0 0-1.005-1.005zm5.723-5.756H5.736a5.215 5.215 0 0 0 5.215 5.214h2.129v2.058a5.218 5.218 0 0 0 5.215 5.214V6.758a1.001 1.001 0 0 0-1.001-1.001zM23.013 0H11.455a5.215 5.215 0 0 0 5.215 5.215h2.129v2.057A5.215 5.215 0 0 0 24 12.483V1.005A1.001 1.001 0 0 0 23.013 0z" />
+              </svg>
             </a>
           )}
         </div>

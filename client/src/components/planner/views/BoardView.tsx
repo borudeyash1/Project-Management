@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import TaskCard from '../TaskCard';
 import TaskDetailModal from '../TaskDetailModal';
 import { usePlanner } from '../../../context/PlannerContext';
+import { useJiraPlanner } from '../../../context/JiraPlannerContext';
+import { useNotionPlanner } from '../../../context/NotionPlannerContext';
 import { useDock } from '../../../context/DockContext';
 import { Task } from '../../../context/PlannerContext';
 import QuickAddModal from '../QuickAddModal';
@@ -14,7 +16,16 @@ interface BoardViewProps {
 }
 
 const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
-  const { columns, addTask, moveTask, tasks, loading } = usePlanner();
+  // Try JiraPlanner first, then NotionPlanner, fall back to regular Planner
+  const jiraContext = useJiraPlanner();
+  const notionContext = useNotionPlanner();
+  const plannerContext = usePlanner();
+
+  // Use whichever context is available
+  const { columns, addTask, moveTask, tasks, loading } = jiraContext || notionContext || plannerContext;
+
+  console.log('[BoardView] Using', jiraContext ? 'JiraPlannerContext' : notionContext ? 'NotionPlannerContext' : 'PlannerContext');
+
   const { dockPosition } = useDock();
   const { t } = useTranslation();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);

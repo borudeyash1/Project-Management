@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Calendar, Clock, Flag, CheckSquare, Trash2, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlanner } from '../../context/PlannerContext';
+import { useJiraPlanner } from '../../context/JiraPlannerContext';
+import { useNotionPlanner } from '../../context/NotionPlannerContext';
 import { Task } from '../../context/PlannerContext';
 
 interface TaskDetailModalProps {
@@ -10,12 +12,21 @@ interface TaskDetailModalProps {
 }
 
 const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, onClose }) => {
-  const { tasks, updateTask, deleteTask, addSubtask, toggleSubtask } = usePlanner();
+  // Try JiraPlanner first, then NotionPlanner, fall back to regular Planner
+  const jiraContext = useJiraPlanner();
+  const notionContext = useNotionPlanner();
+  const plannerContext = usePlanner();
+
+  // Use whichever context is available
+  const { tasks, updateTask, deleteTask, addSubtask, toggleSubtask } = jiraContext || notionContext || plannerContext;
+
+  console.log('[TaskDetailModal] Using', jiraContext ? 'JiraPlannerContext' : notionContext ? 'NotionPlannerContext' : 'PlannerContext');
+
   const { t } = useTranslation();
-  
+
   // Get the live task from context to ensure real-time updates
   const task = tasks.find(t => t._id === initialTask._id) || initialTask;
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [newSubtask, setNewSubtask] = useState('');

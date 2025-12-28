@@ -40,6 +40,8 @@ import WorkspaceMembers from './components/workspace/WorkspaceMembers';
 import WorkspaceMembersInternal from './components/workspace/WorkspaceMembersInternal';
 import WorkspaceProjects from './components/workspace/WorkspaceProjects';
 import WorkspaceDesignTab from './components/workspace/WorkspaceDesignTab';
+import WorkspaceJiraTab from './components/workspace/WorkspaceJiraTab';
+import WorkspaceNotionTab from './components/workspace/WorkspaceNotionTab';
 import WorkspaceClients from './components/workspace/WorkspaceClients';
 import WorkspaceRequests from './components/workspace/WorkspaceRequests';
 import WorkspaceCollaborate from './components/workspace/WorkspaceCollaborate';
@@ -491,6 +493,8 @@ const AppContent: React.FC = () => {
           } />
           <Route path="projects" element={<WorkspaceProjects />} />
           <Route path="design" element={<WorkspaceDesignTab />} />
+          <Route path="jira" element={<WorkspaceJiraTab />} />
+          <Route path="notion" element={<WorkspaceNotionTab />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />
           <Route path="requests" element={<WorkspaceRequests />} />

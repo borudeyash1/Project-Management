@@ -1,5 +1,7 @@
 import React from 'react';
 import { usePlanner } from '../../../context/PlannerContext';
+import { useJiraPlanner } from '../../../context/JiraPlannerContext';
+import { useNotionPlanner } from '../../../context/NotionPlannerContext';
 import { TimelineTask, TimelineResource, DEFAULT_TASK_DURATION } from '../../../types/timeline';
 import TimelineView from '../timeline/TimelineView';
 import TaskDetailModal from '../TaskDetailModal';
@@ -10,7 +12,15 @@ interface TimelineViewWrapperProps {
 }
 
 const TimelineViewWrapper: React.FC<TimelineViewWrapperProps> = ({ searchQuery }) => {
-  const { tasks, updateTask } = usePlanner();
+  // Try JiraPlanner first, then NotionPlanner, fall back to regular Planner
+  const jiraContext = useJiraPlanner();
+  const notionContext = useNotionPlanner();
+  const plannerContext = usePlanner();
+
+  // Use whichever context is available
+  const { tasks, updateTask } = jiraContext || notionContext || plannerContext;
+
+  console.log('[TimelineView] Using', jiraContext ? 'JiraPlannerContext' : 'PlannerContext');
   const [selectedTask, setSelectedTask] = React.useState<any>(null);
   const [showTaskCreate, setShowTaskCreate] = React.useState(false);
 

@@ -58,6 +58,7 @@ import githubWebhooks from "./routes/githubWebhooks";
 import dropboxRoutes from "./routes/dropboxRoutes";
 import onedriveRoutes from "./routes/onedriveRoutes";
 import figmaRoutes from "./routes/figmaRoutes";
+import jiraRoutes from "./routes/jira";
 import notionRoutes from "./routes/notionRoutes";
 import zoomRoutes from "./routes/zoomRoutes";
 import vercelRoutes from "./routes/vercelRoutes";
@@ -189,6 +190,7 @@ app.use("/api/github", githubWebhooks);
 app.use("/api/dropbox", dropboxRoutes);
 app.use("/api/onedrive", onedriveRoutes);
 app.use("/api/figma", figmaRoutes);
+app.use("/api/jira", jiraRoutes);
 app.use("/api/notion", notionRoutes);
 app.use("/api/zoom", zoomRoutes);
 app.use("/api/vercel", vercelRoutes);
@@ -238,6 +240,10 @@ mongoose
     // Start Notion sync poller for bidirectional sync
     const { notionSyncPoller } = require('./services/sartthi/notionSyncPoller');
     notionSyncPoller.start();
+
+    // Start Jira sync poller for bidirectional sync
+    const jiraPollerService = require('./services/jiraPollerService').default;
+    jiraPollerService.start();
 
     console.log("Connected to MongoDB");
   })

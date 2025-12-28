@@ -65,6 +65,11 @@ export interface Task {
     lastSyncedAt?: Date;
     syncEnabled?: boolean;
   };
+  // Jira/Notion integration fields
+  source?: 'sartthi' | 'jira' | 'notion';
+  externalId?: string;  // Jira issue key or Notion page ID
+  externalUrl?: string; // Link to external source
+  syncedAt?: Date;      // Last sync timestamp
   autoCreated?: boolean;
 }
 

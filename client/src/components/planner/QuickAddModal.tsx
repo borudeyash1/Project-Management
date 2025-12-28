@@ -46,6 +46,11 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
   const notionConnected = (state.userProfile?.connectedAccounts?.notion?.accounts?.length ?? 0) > 0 ||
     !!state.userProfile?.connectedAccounts?.notion?.activeAccountId;
 
+  // Jira sync
+  const [syncToJira, setSyncToJira] = useState(false);
+  const jiraConnected = (state.userProfile?.connectedAccounts?.jira?.accounts?.length ?? 0) > 0 ||
+    !!state.userProfile?.connectedAccounts?.jira?.activeAccountId;
+
   useEffect(() => {
     fetchSlackChannels();
   }, []);
@@ -101,7 +106,8 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
             dueDate: dueDate ? new Date(`${dueDate}T${dueTime || '23:59'}`) : undefined,
             startDate: startDate ? new Date(startDate) : undefined,
             subtasks: subtasks.map(st => ({ title: st, completed: false })),
-            syncToNotion: syncToNotion && notionConnected
+            syncToNotion: syncToNotion && notionConnected,
+            syncToJira: syncToJira && jiraConnected
           };
           if (selectedWorkspace) taskData.workspace = selectedWorkspace;
           if (project) taskData.project = project;
@@ -428,6 +434,32 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ onClose, defaultDate, def
                   {notionConnected
                     ? 'Create a Notion page for this ' + activeType
                     : 'Connect Notion in Settings to enable sync'
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Jira Sync (Task & Milestone) */}
+          {(activeType === 'task' || activeType === 'milestone') && (
+            <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+              <input
+                type="checkbox"
+                id="syncToJira"
+                checked={syncToJira}
+                onChange={(e) => setSyncToJira(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-600"
+                disabled={!jiraConnected}
+              />
+              <div className="flex-1">
+                <label htmlFor="syncToJira" className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4" />
+                  Sync to Jira
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {jiraConnected
+                    ? 'Create a Jira issue for this ' + activeType
+                    : 'Connect Jira in Settings to enable sync'
                   }
                 </p>
               </div>
