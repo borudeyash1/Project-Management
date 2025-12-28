@@ -36,6 +36,8 @@ const SCOPES = {
     slack: [
         'channels:read',
         'groups:read',
+        'channels:history',
+        'groups:history',
         'chat:write',
         'chat:write.public',
         'users:read'
