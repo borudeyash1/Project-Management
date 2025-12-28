@@ -26,7 +26,9 @@ export const slackService = {
     },
 
     getChannelMessages: async (channelId: string): Promise<SlackMessage[]> => {
+        console.log('[SlackService] Fetching messages for channel:', channelId);
         const response = await apiService.get(`/slack/channels/${channelId}/messages`);
+        console.log('[SlackService] API response:', response);
         if (response.success) {
             return response.data;
         }

@@ -66,7 +66,9 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
     const fetchMessages = async (channelId: string) => {
         setLoadingMessages(true);
         try {
+            console.log('[Slack] Fetching messages for channel:', channelId);
             const data = await slackService.getChannelMessages(channelId);
+            console.log('[Slack] Received messages:', data);
             // API returns newest first, reverse for chat UI
             setMessages([...data].reverse());
         } catch (error) {
@@ -139,7 +141,7 @@ const WorkspaceSlackTab: React.FC<WorkspaceSlackTabProps> = ({ workspaceId }) =>
     }
 
     return (
-        <div className="flex h-full bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 select-none">
+        <div className="flex h-full bg-white dark:bg-gray-900 overflow-hidden border-l border-gray-200 dark:border-gray-700 select-none">
             {/* Sidebar */}
             <div className="w-64 bg-[#3F0E40] flex flex-col flex-shrink-0">
                 {/* Header */}
