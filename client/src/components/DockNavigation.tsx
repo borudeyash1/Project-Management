@@ -25,7 +25,8 @@ import {
   HardDrive,
   Music2,
   FileText as NotionIcon, // Using FileText as generic Notion icon or import proper one if available
-  LayoutGrid
+  LayoutGrid,
+  MessageSquare
 } from 'lucide-react';
 import { Dock, DockIcon } from './ui/Dock';
 import { useDock } from '../context/DockContext';
@@ -35,7 +36,7 @@ import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import AIChatbot from './AIChatbot';
 import { useStickyNotes } from '../context/StickyNotesContext';
-import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo } from './icons/BrandLogos';
+import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo, LinearLogo, DiscordLogo } from './icons/BrandLogos';
 
 interface NavItem {
   id: string;
@@ -347,6 +348,26 @@ const DockNavigation: React.FC = () => {
             <SlackLogo size={22} />
           </DockIcon>
         )}
+
+        {/* [NEW] Linear Widget Toggle */}
+        {!!state.userProfile.connectedAccounts?.linear?.activeAccountId && (
+          <DockIcon
+            onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_LINEAR_WIDGET'))}
+            tooltip="Linear"
+            className="text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 dark:text-blue-400"
+          >
+            <LinearLogo size={22} />
+          </DockIcon>
+        )}
+
+        {/* [NEW] Chat Widget Toggle */}
+        <DockIcon
+          onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_CHAT_WIDGET'))}
+          tooltip="Discord Chat"
+          className="text-[#5865f2] hover:bg-[#5865f2]/10 dark:hover:bg-[#5865f2]/20"
+        >
+          <DiscordLogo size={22} />
+        </DockIcon>
 
         {/* Spotify */}
         {state.userProfile.connectedAccounts?.spotify?.activeAccountId && (

@@ -644,6 +644,17 @@ const userSchema = new Schema<IUser>({
           type: Schema.Types.ObjectId,
           ref: 'ConnectedAccount'
         }]
+      },
+      discord: {
+        activeAccountId: {
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount',
+          default: undefined
+        },
+        accounts: [{
+          type: Schema.Types.ObjectId,
+          ref: 'ConnectedAccount'
+        }]
       }
     },
     required: false,

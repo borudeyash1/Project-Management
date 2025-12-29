@@ -33,7 +33,9 @@ import SpotifyWidget from './components/music/SpotifyWidget';
 import NotionWidget from './components/notion/NotionWidget'; // [NEW] Import
 import JiraWidget from './components/jira/JiraWidget'; // [NEW] Import
 import ZendeskWidget from './components/zendesk/ZendeskWidget'; // [NEW] Import
-import SlackWidget from './components/slack/SlackWidget'; // [NEW] Import
+import SlackWidget from './components/slack/SlackWidget';
+import LinearWidget from './components/linear/LinearWidget';
+import ChatWidget from './components/chat/ChatWidget'; // [NEW] Import
 import MusicPage from './pages/MusicPage';
 import ProjectDesignHub from './components/project/ProjectDesignHub';
 import WorkspaceDetailView from './components/WorkspaceDetailView';
@@ -56,6 +58,7 @@ import WorkspaceZendeskTab from './components/workspace-detail/WorkspaceZendeskT
 import ZendeskTicketDetail from './components/zendesk/ZendeskTicketDetail'; // [NEW]
 import WorkspaceSlackTab from './components/workspace-detail/WorkspaceSlackTab'; // [NEW]
 import WorkspaceLinearTab from './components/workspace-detail/WorkspaceLinearTab'; // [NEW]
+import DiscordPage from './components/chat/DiscordPage'; // [NEW]
 import ProjectLayout from './components/project/ProjectLayout';
 import ProjectOverview from './components/project/ProjectOverview';
 import Profile from './components/Profile';
@@ -304,6 +307,8 @@ const AppContent: React.FC = () => {
       <JiraWidget /> {/* [NEW] Render Jira Widget */}
       <ZendeskWidget /> {/* [NEW] Render Zendesk Widget */}
       <SlackWidget /> {/* [NEW] Render Slack Widget */}
+      <LinearWidget />
+      <ChatWidget onClose={() => { }} />
       <ToastContainer />
 
       <Routes>
@@ -526,6 +531,7 @@ const AppContent: React.FC = () => {
           </Route>
           <Route path="slack" element={<WorkspaceSlackWrapper />} />
           <Route path="linear" element={<WorkspaceLinearWrapper />} />
+          <Route path="chat" element={<DiscordPage />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="profile" element={<WorkspaceProfile />} />
           <Route path="clients" element={<WorkspaceClients />} />

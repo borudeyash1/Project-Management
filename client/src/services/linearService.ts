@@ -3,7 +3,9 @@ import { LinearTeam, LinearIssue, LinearProject, LinearWorkflowState } from '../
 
 export const linearService = {
     getTeams: async (): Promise<LinearTeam[]> => {
+        console.log('[Linear] Fetching teams...');
         const response = await apiService.get('/linear/teams');
+        console.log('[Linear] Teams response:', response);
         if (response.success) {
             return response.data;
         }
@@ -12,7 +14,9 @@ export const linearService = {
 
     getIssues: async (teamId?: string): Promise<LinearIssue[]> => {
         const endpoint = teamId ? `/linear/teams/${teamId}/issues` : '/linear/issues';
+        console.log('[Linear] Fetching issues from:', endpoint);
         const response = await apiService.get(endpoint);
+        console.log('[Linear] Issues response:', response);
         if (response.success) {
             return response.data;
         }

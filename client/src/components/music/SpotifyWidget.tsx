@@ -508,7 +508,7 @@ const SpotifyWidget: React.FC = () => {
                 {/* Header */}
                 <div
                     onMouseDown={handleMouseDown}
-                    className="h-10 flex items-center justify-between px-4 bg-gradient-to-r from-[#181818]/80 to-[#1a1a1a]/80 backdrop-blur-md border-b border-[#282828]/50 cursor-move select-none"
+                    className="h-10 flex items-center justify-between px-4 bg-[#282828] backdrop-blur-md border-b border-[#404040] cursor-move select-none"
                 >
                     <div className="flex items-center gap-2">
                         <div className="relative">
@@ -517,7 +517,7 @@ const SpotifyWidget: React.FC = () => {
                                 <Crown size={10} className="absolute -top-1 -right-1 text-yellow-400" />
                             )}
                         </div>
-                        <span className="text-xs font-bold tracking-wider bg-gradient-to-r from-[#1DB954] to-[#1ed760] bg-clip-text text-transparent">
+                        <span className="text-xs font-bold tracking-wider text-white">
                             SPOTIFY {!isPremium && '(FREE)'}
                         </span>
 
@@ -621,11 +621,11 @@ const SpotifyWidget: React.FC = () => {
                                         <div className="font-bold truncate text-base hover:underline cursor-pointer">
                                             {playback?.item?.name || 'Nothing Playing'}
                                         </div>
-                                        <div className="text-sm text-gray-400 truncate">
+                                        <div className="text-sm text-gray-300 truncate">
                                             {playback?.item?.artists.map(a => a.name).join(', ')}
                                         </div>
                                         {playback?.item?.album && (
-                                            <div className="text-xs text-gray-500 truncate">
+                                            <div className="text-xs text-gray-400 truncate">
                                                 {playback.item.album.name}
                                             </div>
                                         )}
@@ -635,9 +635,9 @@ const SpotifyWidget: React.FC = () => {
 
                             {isExpanded && (
                                 <div className="text-center space-y-1">
-                                    <div className="font-bold text-2xl truncate">{playback?.item?.name || 'Nothing Playing'}</div>
-                                    <div className="text-gray-400 truncate text-sm">{playback?.item?.artists.map(a => a.name).join(', ')}</div>
-                                    <div className="text-gray-500 truncate text-xs">{playback?.item?.album?.name}</div>
+                                    <div className="font-bold text-2xl truncate text-white">{playback?.item?.name || 'Nothing Playing'}</div>
+                                    <div className="text-gray-300 truncate text-sm">{playback?.item?.artists.map(a => a.name).join(', ')}</div>
+                                    <div className="text-gray-400 truncate text-xs">{playback?.item?.album?.name}</div>
                                 </div>
                             )}
 
@@ -655,7 +655,7 @@ const SpotifyWidget: React.FC = () => {
                                         background: `linear-gradient(to right, #1DB954 0%, #1DB954 ${((playback?.progress_ms || 0) / (playback?.item?.duration_ms || 1)) * 100}%, #374151 ${((playback?.progress_ms || 0) / (playback?.item?.duration_ms || 1)) * 100}%, #374151 100%)`
                                     }}
                                 />
-                                <div className="flex justify-between text-[10px] text-gray-400 font-mono">
+                                <div className="flex justify-between text-[10px] text-gray-300 font-mono">
                                     <span>{formatTime(playback?.progress_ms || 0)}</span>
                                     <span>{formatTime(playback?.item?.duration_ms || 0)}</span>
                                 </div>
@@ -761,10 +761,10 @@ const SpotifyWidget: React.FC = () => {
                                         alt={playlist.name}
                                     />
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-semibold truncate group-hover:text-[#1DB954] transition-colors">
+                                        <div className="text-sm font-semibold truncate text-white group-hover:text-[#1DB954] transition-colors">
                                             {playlist.name}
                                         </div>
-                                        <div className="text-xs text-gray-400 truncate">
+                                        <div className="text-xs text-gray-300 truncate">
                                             {playlist.tracks?.total || 0} tracks
                                         </div>
                                     </div>
@@ -811,13 +811,13 @@ const SpotifyWidget: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-sm font-medium truncate group-hover:text-[#1DB954] transition-colors">
+                                            <div className="text-sm font-medium truncate text-white group-hover:text-[#1DB954] transition-colors">
                                                 {track.name}
                                             </div>
-                                            <div className="text-xs text-gray-400 truncate">
+                                            <div className="text-xs text-gray-300 truncate">
                                                 {track.artists.map((a: any) => a.name).join(', ')}
                                             </div>
-                                            <div className="text-xs text-gray-500 truncate">
+                                            <div className="text-xs text-gray-400 truncate">
                                                 {track.album.name}
                                             </div>
                                         </div>

@@ -109,16 +109,18 @@ const isValidService = (service: string): service is ServiceType => {
 
 // Provider Config Helper
 const getProviderConfig = (service: ServiceType, requestBaseUrl?: string) => {
-    // Use GOOGLE_REDIRECT_URI base if available (it is set to http://localhost:5000/api/sartthi-accounts in dev)
-    // Otherwise fallback to logic
+    // For OAuth callbacks, we need the BACKEND URL (port 5000), not the frontend URL
+    // Use GOOGLE_REDIRECT_URI as the base since it points to the backend
     let BASE_URL = requestBaseUrl || 'http://localhost:5000';
 
     if (!requestBaseUrl) {
         if (process.env.GOOGLE_REDIRECT_URI) {
-            // Remove /api/sartthi-accounts suffix to get base
+            // GOOGLE_REDIRECT_URI is set to http://localhost:5000/api/sartthi-accounts
+            // Remove /api/sartthi-accounts suffix to get base backend URL
             BASE_URL = process.env.GOOGLE_REDIRECT_URI.replace('/api/sartthi-accounts', '');
         } else if (process.env.NODE_ENV === 'production') {
-            BASE_URL = process.env.FRONTEND_URL || 'https://sartthi.com';
+            // In production, use the production backend URL (not frontend)
+            BASE_URL = 'https://sartthi.com';
         }
     }
 
@@ -335,7 +337,7 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
             }
         }
 
-        const config = getProviderConfig(service as ServiceType, dynamicBaseUrl);
+        const config = getProviderConfig(service as ServiceType); // Don't pass dynamicBaseUrl - use backend URL
         if (!config) {
             res.status(500).json({ success: false, message: 'Provider configuration missing' });
             return;
@@ -407,6 +409,8 @@ export const initiateConnection = async (req: Request, res: Response): Promise<v
         } else if (service === 'discord') {
             url += '&response_type=code&prompt=consent';
         }
+
+        console.log(`[OAuth] Generated auth URL for ${service}:`, url);
 
         res.json({
             success: true,
@@ -492,7 +496,7 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
                 }
             }
 
-            const config = getProviderConfig(service, dynamicBaseUrl);
+            const config = getProviderConfig(service); // Use backend URL, not request host
             if (!config) throw new Error('Config missing');
 
             let tokenResponse;

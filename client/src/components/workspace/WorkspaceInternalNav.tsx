@@ -104,6 +104,12 @@ const WorkspaceInternalNav: React.FC = () => {
       path: `/workspace/${activeWorkspaceId}/linear`
     },
     {
+      id: 'chat',
+      label: 'Discord',
+      icon: MessageSquare,
+      path: `/workspace/${activeWorkspaceId}/chat`
+    },
+    {
       id: 'clients',
       label: t('workspace.tabs.clients'),
       icon: Briefcase,

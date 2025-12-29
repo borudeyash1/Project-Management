@@ -68,8 +68,11 @@ import linearRoutes from "./routes/linearRoutes";
 import spotifyRoutes from "./routes/spotifyRoutes";
 import mediaRoutes from "./routes/mediaRoutes"; // [NEW]
 import storageRoutes from "./routes/storageRoutes"; // [NEW] Storage Import
+import chatRoutes from "./routes/chatRoutes"; // [NEW] Chat Routes
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
+import { initializeSocket } from "./socket/chatSocket"; // [NEW] Socket.IO
+import { createServer } from "http"; // [NEW] HTTP Server
 
 // Load environment variables
 // Environment variables loaded in ./config/env
@@ -201,6 +204,7 @@ app.use("/api/vercel", vercelRoutes);
 app.use("/api/spotify", spotifyRoutes);
 app.use("/api/media/spotify", mediaRoutes); // [NEW] Media Routes
 app.use("/api/storage", storageRoutes); // [NEW] Storage Route Mount
+app.use("/api/chat", chatRoutes); // [NEW] Chat Routes
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -265,29 +269,13 @@ const server = app.listen(PORT, () => {
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });
 
-// Setup Socket.IO for real-time Notion sync
-import { Server as SocketIOServer } from 'socket.io';
+// Setup Socket.IO for real-time chat
+const io = initializeSocket(server);
 
-const io = new SocketIOServer(server, {
-  cors: {
-    origin: process.env.NODE_ENV === 'production'
-      ? ['https://sartthi.com', 'https://www.sartthi.com']
-      : ['http://localhost:3000', 'http://localhost:3001'],
-    credentials: true
-  }
-});
-
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  console.log(`🔌 [WEBSOCKET] Client connected: ${socket.id}`);
-
-  socket.on('disconnect', () => {
-    console.log(`🔌 [WEBSOCKET] Client disconnected: ${socket.id}`);
-  });
-});
-
-// Make io available globally for Notion poller
+// Make io available globally
 (global as any).io = io;
+
+console.log("✅ Socket.IO initialized for chat system");
 
 // Increase timeout to 10 minutes for large file uploads
 server.setTimeout(10 * 60 * 1000);
