@@ -21,18 +21,18 @@ const JiraTabContent: React.FC = () => {
     const { addToast } = useApp();
     const jiraContext = useJiraPlanner();
 
+    const [currentView, setCurrentView] = useState<ViewType>('board');
+    const [showPicker, setShowPicker] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSyncing, setIsSyncing] = useState(false);
+
     // JiraTabContent is always wrapped in JiraPlannerProvider, so context should exist
     if (!jiraContext) {
         return <div>Error: Jira context not available</div>;
     }
 
     const { fetchData, tasks, loading } = jiraContext;
-
-    const [currentView, setCurrentView] = useState<ViewType>('board');
-    const [showPicker, setShowPicker] = useState(false);
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isSyncing, setIsSyncing] = useState(false);
 
     const handleSync = async () => {
         try {

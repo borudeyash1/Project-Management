@@ -19,17 +19,17 @@ const NotionTabContent: React.FC = () => {
     const { addToast } = useApp();
     const notionContext = useNotionPlanner();
 
+    const [currentView, setCurrentView] = useState<ViewType>('board');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [showPicker, setShowPicker] = useState(false);
+
     // NotionTabContent is always wrapped in NotionPlannerProvider, so context should exist
     if (!notionContext) {
         return <div>Error: Notion context not available</div>;
     }
 
     const { fetchData, tasks, loading } = notionContext;
-
-    const [currentView, setCurrentView] = useState<ViewType>('board');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isSyncing, setIsSyncing] = useState(false);
-    const [showPicker, setShowPicker] = useState(false);
 
     const handleSync = async () => {
         try {
