@@ -63,6 +63,15 @@ const SharedNavbar: React.FC = () => {
     return location.pathname === path;
   };
 
+  const getAuthenticatedUrl = (url: string) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}token=${token}`;
+    }
+    return url;
+  };
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -112,7 +121,7 @@ const SharedNavbar: React.FC = () => {
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/2.png" alt="Sartthi Logo" className={`transition-all duration-500 ${scrolled ? 'h-8' : 'h-10'} w-auto`} />
+              <img src="/sartthi_logo.png" alt="Sartthi Logo" className={`transition-all duration-500 ${scrolled ? 'h-8' : 'h-10'} w-auto`} />
             </Link>
           </div>
 
@@ -137,7 +146,7 @@ const SharedNavbar: React.FC = () => {
                   product.external ? (
                     <a
                       key={product.url}
-                      href={product.url}
+                      href={getAuthenticatedUrl(product.url!)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="products-option"
@@ -299,7 +308,7 @@ const SharedNavbar: React.FC = () => {
               product.external ? (
                 <a
                   key={product.name}
-                  href={product.url}
+                  href={getAuthenticatedUrl(product.url!)}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsMobileMenuOpen(false)}

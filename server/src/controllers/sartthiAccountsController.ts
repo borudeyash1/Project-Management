@@ -114,7 +114,11 @@ const getProviderConfig = (service: ServiceType, requestBaseUrl?: string) => {
     let BASE_URL = requestBaseUrl || 'http://localhost:5000';
 
     if (!requestBaseUrl) {
-        if (process.env.GOOGLE_REDIRECT_URI) {
+        // [MODIFIED] For Slack, ALWAYS use production URL as that's what is configured in the console
+        if (service === 'slack') {
+            BASE_URL = 'https://sartthi.com';
+        }
+        else if (process.env.GOOGLE_REDIRECT_URI) {
             // GOOGLE_REDIRECT_URI is set to http://localhost:5000/api/sartthi-accounts
             // Remove /api/sartthi-accounts suffix to get base backend URL
             BASE_URL = process.env.GOOGLE_REDIRECT_URI.replace('/api/sartthi-accounts', '');
@@ -123,6 +127,9 @@ const getProviderConfig = (service: ServiceType, requestBaseUrl?: string) => {
             BASE_URL = 'https://sartthi.com';
         }
     }
+
+    // Ensure we don't have double slashes
+    if (BASE_URL.endsWith('/')) BASE_URL = BASE_URL.slice(0, -1);
 
     const callbackUrl = `${BASE_URL}/api/sartthi-accounts/${service}/callback`;
 

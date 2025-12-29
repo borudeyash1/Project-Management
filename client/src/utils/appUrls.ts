@@ -4,7 +4,12 @@
  * @returns The full URL to the app
  */
 export const getAppUrl = (app: 'mail' | 'calendar' | 'vault') => {
-    if (process.env.NODE_ENV === 'production') {
+    // Check if we are in production based on hostname or environment
+    const isProduction =
+        process.env.NODE_ENV === 'production' ||
+        (typeof window !== 'undefined' && window.location.hostname.includes('sartthi.com'));
+
+    if (isProduction) {
         switch (app) {
             case 'mail':
                 return 'https://mail.sartthi.com';

@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
+import {
   Linkedin, Facebook, Youtube, Github, ArrowUp, Instagram
 } from 'lucide-react';
 
@@ -47,33 +47,33 @@ const SharedFooter: React.FC = () => {
   };
 
   const socialLinks = [
-    { 
-      icon: <Instagram className="w-5 h-5" />, 
-      url: 'https://www.instagram.com/sartthi_online/', 
+    {
+      icon: <Instagram className="w-5 h-5" />,
+      url: 'https://www.instagram.com/sartthi_online/',
       label: 'Instagram',
       color: 'text-pink-600'
     },
-    { 
-      icon: <Linkedin className="w-5 h-5" />, 
-      url: 'https://www.linkedin.com/company/sartthi', 
+    {
+      icon: <Linkedin className="w-5 h-5" />,
+      url: 'https://www.linkedin.com/company/sartthi',
       label: 'LinkedIn',
       color: 'text-blue-600'
     },
-    { 
-      icon: <Facebook className="w-5 h-5" />, 
-      url: 'https://www.facebook.com/sartthi', 
+    {
+      icon: <Facebook className="w-5 h-5" />,
+      url: 'https://www.facebook.com/sartthi',
       label: 'Facebook',
       color: 'text-blue-700'
     },
-    { 
-      icon: <Youtube className="w-5 h-5" />, 
-      url: 'https://www.youtube.com/@sartthi', 
+    {
+      icon: <Youtube className="w-5 h-5" />,
+      url: 'https://www.youtube.com/@sartthi',
       label: 'YouTube',
       color: 'text-red-600'
     },
-    { 
-      icon: <Github className="w-5 h-5" />, 
-      url: 'https://github.com/sartthi', 
+    {
+      icon: <Github className="w-5 h-5" />,
+      url: 'https://github.com/sartthi',
       label: 'GitHub',
       color: 'text-gray-800'
     }
@@ -88,23 +88,23 @@ const SharedFooter: React.FC = () => {
             {/* Brand Section */}
             <div className="lg:col-span-2">
               <Link to="/" className="inline-flex items-center gap-2 mb-4">
-                <img src="/2.png" alt="Sartthi Logo" className="h-8 w-auto" />
+                <img src="/sartthi_logo.png" alt="Sartthi" className="h-8 w-auto mb-4" />
               </Link>
-              
+
               <p className="text-sm text-gray-600 mb-6 leading-relaxed max-w-sm">
                 Sartthi is a comprehensive project management platform designed to help teams collaborate, track progress, and deliver projects efficiently.
               </p>
-              
+
               <div className="flex flex-col gap-2">
-                <Link 
-                  to="/docs" 
+                <Link
+                  to="/docs"
                   className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#006397] transition-colors w-fit"
                 >
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
                   </svg>
                   <span>Documentation</span>
                 </Link>
@@ -117,8 +117,8 @@ const SharedFooter: React.FC = () => {
               <ul className="space-y-2.5">
                 {footerLinks.resources.map((link, index) => (
                   <li key={index}>
-                    <Link 
-                      to={link.path} 
+                    <Link
+                      to={link.path}
                       className="text-sm text-gray-600 hover:text-[#006397] transition-colors inline-block"
                     >
                       {link.label}
@@ -134,8 +134,8 @@ const SharedFooter: React.FC = () => {
               <ul className="space-y-2.5">
                 {footerLinks.support.map((link, index) => (
                   <li key={index}>
-                    <Link 
-                      to={link.path} 
+                    <Link
+                      to={link.path}
                       className="text-sm text-gray-600 hover:text-[#006397] transition-colors inline-block"
                     >
                       {link.label}
@@ -151,8 +151,8 @@ const SharedFooter: React.FC = () => {
               <ul className="space-y-2.5">
                 {footerLinks.company.map((link, index) => (
                   <li key={index}>
-                    <Link 
-                      to={link.path} 
+                    <Link
+                      to={link.path}
                       className="text-sm text-gray-600 hover:text-[#006397] transition-colors inline-block"
                     >
                       {link.label}
@@ -168,8 +168,8 @@ const SharedFooter: React.FC = () => {
               <ul className="space-y-2.5">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
-                    <Link 
-                      to={link.path} 
+                    <Link
+                      to={link.path}
                       className="text-sm text-gray-600 hover:text-[#006397] transition-colors inline-block"
                     >
                       {link.label}

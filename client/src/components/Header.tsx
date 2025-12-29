@@ -157,7 +157,7 @@ const Header: React.FC = () => {
 
         {/* Sartthi Logo */}
         <div className="flex items-center">
-          <img src="/2.png" alt="Sartthi Logo" className="h-6 w-auto m-2" />
+          <img src="/sartthi_logo.png" alt="Logo" className="h-8 w-auto" />
         </div>
 
         {/* Workspace Mode Switcher */}
