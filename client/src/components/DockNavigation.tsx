@@ -36,7 +36,7 @@ import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import AIChatbot from './AIChatbot';
 import { useStickyNotes } from '../context/StickyNotesContext';
-import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo, LinearLogo, DiscordLogo, FigmaLogo } from './icons/BrandLogos';
+import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo, LinearLogo, DiscordLogo, FigmaLogo, SartthiMailLogo, SartthiCalendarLogo, SartthiVaultLogo } from './icons/BrandLogos';
 
 interface NavItem {
   id: string;
@@ -263,7 +263,7 @@ const DockNavigation: React.FC = () => {
           onClick={() => handleAppClick('mail')}
           tooltip={t('navigation.sartthiMail')}
         >
-          <Mail className="w-5 h-5" />
+          <SartthiMailLogo size={20} />
         </DockIcon>
 
         {/* Sartthi Calendar */}
@@ -271,7 +271,7 @@ const DockNavigation: React.FC = () => {
           onClick={() => handleAppClick('calendar')}
           tooltip={t('navigation.sartthiCalendar')}
         >
-          <Calendar className="w-5 h-5" />
+          <SartthiCalendarLogo size={20} />
         </DockIcon>
 
         {/* Sartthi Vault */}
@@ -279,11 +279,7 @@ const DockNavigation: React.FC = () => {
           onClick={() => handleAppClick('vault')}
           tooltip={t('navigation.sartthiVault')}
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-            <line x1="12" y1="22.08" x2="12" y2="12" />
-          </svg>
+          <SartthiVaultLogo size={20} />
         </DockIcon>
 
         {/* Dropbox - Only if connected */}

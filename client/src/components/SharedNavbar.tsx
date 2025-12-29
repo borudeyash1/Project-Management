@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useApp } from '../context/AppContext';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Info, FileText, BadgeDollarSign, Grid, Globe, ChevronDown, Menu, X, Sparkles, LogIn, UserPlus, Palette, Languages } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getAppUrl } from '../utils/appUrls';
+import { SartthiMailLogo, SartthiCalendarLogo, SartthiVaultLogo, FigmaLogo, LinearLogo } from './icons/BrandLogos';
 
 const SharedNavbar: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
+  const { state } = useApp();
   const { i18n } = useTranslation();
   const location = useLocation();
   // Check if we are on a public page where we want to hide the theme toggle and language changer
   const isPublicPage = ['/', '/about', '/apps', '/docs', '/pricing', '/login', '/register', '/user-guide', '/ai', '/privacy-policy', '/terms-conditions', '/refund-policy', '/shipping-policy', '/contact-us'].some(path => location.pathname === path || location.pathname.startsWith('/docs'));
-  
+
   // Force light theme logic for public pages
   const effectiveDarkMode = isPublicPage ? false : isDarkMode;
 
@@ -50,9 +53,9 @@ const SharedNavbar: React.FC = () => {
   ];
 
   const products = [
-    { name: 'Sartthi Mail', icon: '📧', url: getAppUrl('mail'), description: 'Professional email', external: true },
-    { name: 'Calendar', icon: '📅', url: getAppUrl('calendar'), description: 'Smart scheduling', external: true },
-    { name: 'Vault', icon: '🔒', url: getAppUrl('vault'), description: 'Secure storage', external: true },
+    { name: 'Sartthi Mail', icon: <SartthiMailLogo size={20} />, url: getAppUrl('mail'), description: 'Professional email', external: true },
+    { name: 'Calendar', icon: <SartthiCalendarLogo size={20} />, url: getAppUrl('calendar'), description: 'Smart scheduling', external: true },
+    { name: 'Vault', icon: <SartthiVaultLogo size={20} />, url: getAppUrl('vault'), description: 'Secure storage', external: true },
     { name: 'Desktop', icon: '💻', path: '/desktop', description: 'Native app', external: false },
   ];
 
@@ -98,11 +101,11 @@ const SharedNavbar: React.FC = () => {
       fixed top-0 left-0 right-0 z-50 
       transition-all duration-500 ease-in-out
       ${scrolled || isAuthPage
-        ? 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-200' 
+        ? 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-200'
         : 'bg-transparent py-6'
       }
-    `} 
-    style={(scrolled || isAuthPage) ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
+    `}
+      style={(scrolled || isAuthPage) ? { boxShadow: '0 4px 6px -1px rgba(68, 160, 209, 0.1), 0 2px 4px -1px rgba(68, 160, 209, 0.06)' } : {}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
 
@@ -167,11 +170,10 @@ const SharedNavbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                  isActive(link.path)
-                    ? 'bg-yellow-50 text-gray-900 font-semibold'
-                    : 'text-gray-900 hover:bg-yellow-50 hover:text-gray-900'
-                }`}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${isActive(link.path)
+                  ? 'bg-yellow-50 text-gray-900 font-semibold'
+                  : 'text-gray-900 hover:bg-yellow-50 hover:text-gray-900'
+                  }`}
               >
                 {link.icon}
                 {link.label}
@@ -197,13 +199,12 @@ const SharedNavbar: React.FC = () => {
                         <button
                           key={lang.code}
                           onClick={() => handleLanguageChange(lang.code)}
-                          className={`w-full px-4 py-2 text-left flex items-center gap-3 ${
-                            i18n.language === lang.code
-                              ? 'bg-accent/10 text-accent'
-                              : effectiveDarkMode && !isPublicPage
-                                ? 'text-gray-200 hover:bg-gray-700'
-                                : 'text-gray-800 hover:bg-gray-50'
-                          } transition-colors`}
+                          className={`w-full px-4 py-2 text-left flex items-center gap-3 ${i18n.language === lang.code
+                            ? 'bg-accent/10 text-accent'
+                            : effectiveDarkMode && !isPublicPage
+                              ? 'text-gray-200 hover:bg-gray-700'
+                              : 'text-gray-800 hover:bg-gray-50'
+                            } transition-colors`}
                         >
                           <span className="text-lg">{lang.flag}</span>
                           <span className="text-sm font-medium">{lang.name}</span>
@@ -236,11 +237,10 @@ const SharedNavbar: React.FC = () => {
             </Link>
             <Link
               to="/register"
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${
-                scrolled
-                  ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
-                  : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${scrolled
+                ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+                : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+                }`}
             >
               <UserPlus size={18} />
               Register
@@ -268,10 +268,9 @@ const SharedNavbar: React.FC = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        } bg-white/95 border-b border-gray-200 shadow-sm`}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+          } bg-white/95 border-b border-gray-200 shadow-sm`}
       >
         <div className="px-4 pt-2 pb-6 space-y-1">
           {navLinks.map((link) => (
@@ -279,11 +278,10 @@ const SharedNavbar: React.FC = () => {
               key={link.path}
               to={link.path}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`block px-3 py-3 rounded-lg text-base font-medium transition-colors ${
-                isActive(link.path)
-                  ? 'bg-yellow-50 text-gray-900 font-semibold'
-                  : 'text-gray-700 hover:bg-yellow-50 hover:text-gray-900'
-              }`}
+              className={`block px-3 py-3 rounded-lg text-base font-medium transition-colors ${isActive(link.path)
+                ? 'bg-yellow-50 text-gray-900 font-semibold'
+                : 'text-gray-700 hover:bg-yellow-50 hover:text-gray-900'
+                }`}
             >
               <div className="flex items-center gap-3">
                 {link.icon}
@@ -291,6 +289,84 @@ const SharedNavbar: React.FC = () => {
               </div>
             </Link>
           ))}
+
+          <div className="my-4 border-t border-gray-100 dark:border-gray-700"></div>
+
+          {/* Sartthi Ecosystem */}
+          <div className="space-y-1">
+            <p className="px-3 text-xs font-semibold uppercase tracking-wider mb-2 text-gray-500">Sartthi Ecosystem</p>
+            {products.map((product) => (
+              product.external ? (
+                <a
+                  key={product.name}
+                  href={product.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-3 py-3 rounded-lg text-base font-medium transition-colors text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-600">{product.icon}</span>
+                    {product.name}
+                  </div>
+                </a>
+              ) : (
+                <Link
+                  key={product.name}
+                  to={product.path!}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-3 py-3 rounded-lg text-base font-medium transition-colors text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-600">{product.icon}</span>
+                    {product.name}
+                  </div>
+                </Link>
+              )
+            ))}
+          </div>
+
+          {/* Connected Apps Section */}
+          {state.userProfile?.connectedAccounts && (
+            <>
+              <div className="my-4 border-t border-gray-100 dark:border-gray-700"></div>
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider mb-2 text-gray-500">Workspace</p>
+
+              {/* Figma */}
+              {state.userProfile.connectedAccounts.figma?.activeAccountId && (
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('TOGGLE_FIGMA_WIDGET');
+                    window.dispatchEvent(event);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left block px-3 py-3 rounded-lg text-base font-medium transition-colors text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
+                >
+                  <div className="flex items-center gap-3">
+                    <FigmaLogo size={18} />
+                    Figma
+                  </div>
+                </button>
+              )}
+
+              {/* Linear */}
+              {state.userProfile.connectedAccounts.linear?.activeAccountId && (
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('TOGGLE_LINEAR_WIDGET');
+                    window.dispatchEvent(event);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left block px-3 py-3 rounded-lg text-base font-medium transition-colors text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
+                >
+                  <div className="flex items-center gap-3">
+                    <LinearLogo size={18} />
+                    Linear
+                  </div>
+                </button>
+              )}
+            </>
+          )}
 
           <div className="my-4 border-t border-white/20"></div>
 
@@ -313,7 +389,7 @@ const SharedNavbar: React.FC = () => {
               Register Now
             </Link>
           </div>
-          
+
           {/* Language Section - Hidden on public pages */}
           {!isPublicPage && (
             <div className={`mt-4 pt-4 border-t ${effectiveDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -325,11 +401,10 @@ const SharedNavbar: React.FC = () => {
                   <button
                     key={lang.code}
                     onClick={() => handleLanguageChange(lang.code)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      i18n.language === lang.code
-                        ? effectiveDarkMode ? 'bg-accent/20 text-accent' : 'bg-accent/10 text-accent'
-                        : effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${i18n.language === lang.code
+                      ? effectiveDarkMode ? 'bg-accent/20 text-accent' : 'bg-accent/10 text-accent'
+                      : effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
                   >
                     <span>{lang.flag}</span>
                     <span>{lang.name}</span>

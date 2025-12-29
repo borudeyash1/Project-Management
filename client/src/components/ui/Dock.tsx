@@ -275,33 +275,70 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
 
           {/* Content */}
           <div
+            ref={(node) => {
+              if (node) {
+                // Attach wheel listener directly to support non-passive behavior if needed, 
+                // though React onWheel is usually fine. Native listener gives more control.
+                node.onwheel = (e) => {
+                  if (e.deltaY !== 0) {
+                    node.scrollLeft += e.deltaY;
+                    e.preventDefault();
+                  }
+                };
+              }
+            }}
             style={{
               position: 'relative',
               zIndex: 10,
               display: 'flex',
               alignItems: isVertical ? 'flex-start' : 'center',
-              justifyContent: isTopOrBottom ? (isMobile ? 'flex-start' : 'center') : 'flex-start',
+              justifyContent: isTopOrBottom ? 'flex-start' : 'flex-start',
               flexDirection: isVertical ? 'column' : 'row',
               flexWrap: 'nowrap',
-              gap: isTopOrBottom ? (isMobile ? '0.5rem' : '0.75rem') : '0.75rem',
-              overflowX: isVertical ? 'hidden' : (isTopOrBottom && isMobile ? 'auto' : 'auto'),
+              gap: isTopOrBottom ? 0 : '0.75rem', // Gap handled by inner wrapper for Top/Bottom
+              overflowX: isVertical ? 'hidden' : 'auto', // Always auto for horizontal to allow scroll
               overflowY: isVertical ? 'auto' : 'hidden',
               scrollbarWidth: 'none',
               width: '100%',
               maxWidth: '100%',
               maxHeight: '100%',
-              paddingLeft: (isTopOrBottom && isMobile) ? '0.5rem' : '0',
-              paddingRight: (isTopOrBottom && isMobile) ? '0.5rem' : '0',
+              // Padding handled by inner wrapper for Top/Bottom
+              paddingLeft: (isTopOrBottom) ? '1rem' : '0',
+              paddingRight: (isTopOrBottom) ? '1rem' : '0',
               WebkitOverflowScrolling: 'touch'
             }}
             className="scrollbar-hide"
           >
-            {React.Children.map(children, (child) => {
-              if (React.isValidElement(child)) {
-                return React.cloneElement(child, { mouseX, dockPosition } as any);
-              }
-              return child;
-            })}
+
+            {/* Inner centering wrapper for horizontal docks */}
+            {isTopOrBottom ? (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center', // Items inside align center
+                  gap: isMobile ? '0.5rem' : '0.75rem',
+                  margin: '0 auto', // Centers this wrapper in the parent scroll view if space allows
+                  minWidth: 'min-content', // Allows growing
+                  // padding handled by parent scroll container
+                }}
+              >
+                {React.Children.map(children, (child) => {
+                  if (React.isValidElement(child)) {
+                    return React.cloneElement(child, { mouseX, dockPosition } as any);
+                  }
+                  return child;
+                })}
+              </div>
+            ) : (
+              // Vertical or other layouts remain direct children (preserving existing Vertical behavior)
+              React.Children.map(children, (child) => {
+                if (React.isValidElement(child)) {
+                  return React.cloneElement(child, { mouseX, dockPosition } as any);
+                }
+                return child;
+              })
+            )}
           </div>
 
           {/* Bottom Glow */}

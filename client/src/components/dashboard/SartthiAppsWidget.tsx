@@ -7,6 +7,8 @@ import { apiService } from '../../services/api';
 import SartthiAppGuide from './SartthiAppGuide';
 import SartthiOnboardingGuide from './SartthiOnboardingGuide';
 import { useApp } from '../../context/AppContext';
+import { getAppUrl } from '../../utils/appUrls';
+import { SartthiMailLogo, SartthiCalendarLogo, SartthiVaultLogo } from '../icons/BrandLogos';
 
 interface EmailData {
     account: { email: string; name: string; avatar?: string } | null;
@@ -174,33 +176,35 @@ const DetailModal: React.FC<{
                     }`}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className={`p-3 rounded-xl bg-gradient-to-br ${color}`}>
-                                <Icon className="w-6 h-6 text-white" />
+                            <div className="flex items-center gap-3">
+                                <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
+                                    <Icon className="w-8 h-8" />
+                                </div>
+                                <div>
+                                    <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        {title}
+                                    </h2>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Detailed view
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    {title}
-                                </h2>
-                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Detailed view
-                                </p>
-                            </div>
+                            <button
+                                onClick={onClose}
+                                className={`p-2 rounded-lg transition-colors ${isDarkMode
+                                    ? 'hover:bg-gray-700 text-gray-400 hover:text-white'
+                                    : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+                                    }`}
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
                         </div>
-                        <button
-                            onClick={onClose}
-                            className={`p-2 rounded-lg transition-colors ${isDarkMode
-                                ? 'hover:bg-gray-700 text-gray-400 hover:text-white'
-                                : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
-                                }`}
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
                     </div>
-                </div>
 
-                {/* Content */}
-                <div className="overflow-y-auto max-h-[calc(90vh-100px)] p-6">
-                    {children}
+                    {/* Content */}
+                    <div className="overflow-y-auto max-h-[calc(90vh-100px)] p-6">
+                        {children}
+                    </div>
                 </div>
             </div>
         </div>
@@ -296,19 +300,22 @@ const SartthiAppsWidget: React.FC = () => {
 
     const handleOpenEmail = (emailId: string) => {
         const token = localStorage.getItem('accessToken');
-        const url = `http://localhost:3001?token=${token}&emailId=${emailId}`;
+        const baseUrl = getAppUrl('mail');
+        const url = `${baseUrl}?token=${token}&emailId=${emailId}`;
         window.open(url, '_blank');
     };
 
     const handleOpenEvent = (eventId: string) => {
         const token = localStorage.getItem('accessToken');
-        const url = `http://localhost:3002?token=${token}&eventId=${eventId}`;
+        const baseUrl = getAppUrl('calendar');
+        const url = `${baseUrl}?token=${token}&eventId=${eventId}`;
         window.open(url, '_blank');
     };
 
     const handleOpenFile = (fileId: string) => {
         const token = localStorage.getItem('accessToken');
-        const url = `http://localhost:3003?token=${token}&fileId=${fileId}`;
+        const baseUrl = getAppUrl('vault');
+        const url = `${baseUrl}?token=${token}&fileId=${fileId}`;
         window.open(url, '_blank');
     };
 
@@ -390,46 +397,49 @@ const SartthiAppsWidget: React.FC = () => {
         <div className="mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AppCard
-                    icon={Mail}
+                    icon={SartthiMailLogo}
                     title={t('home.sartthiMail')}
                     description={t('home.sartthiMailDesc')}
                     isConnected={isMailConnected}
                     data={mailContent}
                     onConnect={() => handleConnect('mail')}
                     onExpand={() => setExpandedView('mail')}
-                    onOpenApp={() => handleOpenApp('mail', 'http://localhost:3001')}
+                    onOpenApp={() => handleOpenApp('mail', getAppUrl('mail'))}
                     color="from-blue-500 to-cyan-500"
-                    link="http://localhost:3001"
+                    link={getAppUrl('mail')}
                     loading={loading}
                 />
 
                 <AppCard
-                    icon={CalendarIcon}
+                    icon={SartthiCalendarLogo}
                     title={t('home.sartthiCalendar')}
                     description={t('home.sartthiCalendarDesc')}
                     isConnected={isCalendarConnected}
                     data={calendarContent}
                     onConnect={() => handleConnect('calendar')}
                     onExpand={() => setExpandedView('calendar')}
-                    onOpenApp={() => handleOpenApp('calendar', 'http://localhost:3002')}
+                    onOpenApp={() => handleOpenApp('calendar', getAppUrl('calendar'))}
                     color="from-purple-500 to-pink-500"
-                    link="http://localhost:3002"
+                    link={getAppUrl('calendar')}
                     loading={loading}
                 />
 
                 <AppCard
-                    icon={HardDrive}
+                    icon={SartthiVaultLogo}
                     title={t('home.sartthiVault')}
                     description={t('home.sartthiVaultDesc')}
                     isConnected={isVaultConnected}
                     data={vaultContent}
                     onConnect={() => handleConnect('vault')}
                     onExpand={() => setExpandedView('vault')}
-                    onOpenApp={() => handleOpenApp('vault', 'http://localhost:3003')}
+                    onOpenApp={() => handleOpenApp('vault', getAppUrl('vault'))}
                     color="from-green-500 to-emerald-500"
-                    link="http://localhost:3003"
+                    link={getAppUrl('vault')}
                     loading={loading}
                 />
+
+                {/* Mail Detail Modal and other modals remain mostly unchanged, just ensured handlers use getAppUrl logic above */}
+
             </div>
 
             {/* Mail Detail Modal */}
@@ -437,7 +447,7 @@ const SartthiAppsWidget: React.FC = () => {
                 isOpen={expandedView === 'mail'}
                 onClose={() => setExpandedView(null)}
                 title={t('home.sartthiMail')}
-                icon={Mail}
+                icon={SartthiMailLogo}
                 color="from-blue-500 to-cyan-500"
             >
                 {mailData?.account && (
@@ -516,7 +526,7 @@ const SartthiAppsWidget: React.FC = () => {
                 isOpen={expandedView === 'calendar'}
                 onClose={() => setExpandedView(null)}
                 title={t('home.sartthiCalendar')}
-                icon={CalendarIcon}
+                icon={SartthiCalendarLogo}
                 color="from-purple-500 to-pink-500"
             >
                 {calendarData?.account && (
@@ -595,7 +605,7 @@ const SartthiAppsWidget: React.FC = () => {
                 isOpen={expandedView === 'vault'}
                 onClose={() => setExpandedView(null)}
                 title={t('home.sartthiVault')}
-                icon={HardDrive}
+                icon={SartthiVaultLogo}
                 color="from-green-500 to-emerald-500"
             >
                 {vaultData?.account && (
@@ -701,19 +711,19 @@ const SartthiAppsWidget: React.FC = () => {
                 service="mail"
                 isOpen={showOnboarding === 'mail'}
                 onClose={() => setShowOnboarding(null)}
-                onComplete={() => handleOnboardingComplete('mail', 'http://localhost:3001')}
+                onComplete={() => handleOnboardingComplete('mail', getAppUrl('mail'))}
             />
             <SartthiOnboardingGuide
                 service="calendar"
                 isOpen={showOnboarding === 'calendar'}
                 onClose={() => setShowOnboarding(null)}
-                onComplete={() => handleOnboardingComplete('calendar', 'http://localhost:3002')}
+                onComplete={() => handleOnboardingComplete('calendar', getAppUrl('calendar'))}
             />
             <SartthiOnboardingGuide
                 service="vault"
                 isOpen={showOnboarding === 'vault'}
                 onClose={() => setShowOnboarding(null)}
-                onComplete={() => handleOnboardingComplete('vault', 'http://localhost:3003')}
+                onComplete={() => handleOnboardingComplete('vault', getAppUrl('vault'))}
             />
         </div>
     );

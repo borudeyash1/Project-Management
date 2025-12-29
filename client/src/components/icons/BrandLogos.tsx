@@ -83,3 +83,43 @@ export const VercelLogo = ({ size = 24, className = "" }: { size?: number; class
         <path d="M24 22.525H0l12-21.05 12 21.05z" />
     </svg>
 );
+
+// Sartthi Mail Logo
+export const SartthiMailLogo = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <defs>
+            <linearGradient id="mailGradient" x1="2" y1="4" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#4F46E5" />
+                <stop offset="100%" stopColor="#7C3AED" />
+            </linearGradient>
+        </defs>
+        <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z" fill="url(#mailGradient)" />
+    </svg>
+);
+
+// Sartthi Calendar Logo
+export const SartthiCalendarLogo = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <defs>
+            <linearGradient id="calendarGradient" x1="2" y1="3" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#EA580C" />
+                <stop offset="100%" stopColor="#DC2626" />
+            </linearGradient>
+        </defs>
+        <path d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V10H19V20ZM19 8H5V6H19V8ZM9 14H7V12H9V14ZM13 14H11V12H13V14ZM17 14H15V12H17V14ZM9 18H7V16H9V18ZM13 18H11V16H13V18ZM17 18H15V16H17V18Z" fill="url(#calendarGradient)" />
+    </svg>
+);
+
+// Sartthi Vault Logo
+export const SartthiVaultLogo = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <defs>
+            <linearGradient id="vaultGradient" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#059669" />
+                <stop offset="100%" stopColor="#0D9488" />
+            </linearGradient>
+        </defs>
+        <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 11.99H7V10H12V7.47L15 10.5L12 13.53V11.99Z" fill="url(#vaultGradient)" />
+    </svg>
+);
+
