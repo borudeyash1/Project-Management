@@ -441,6 +441,122 @@ export const getLinearService = () => {
         return data.issueUpdate.issue;
     };
 
+    /**
+     * Sync Issues for a user
+     */
+    const syncIssues = async (userId: string, workspaceId: string, accountId?: string): Promise<any[]> => {
+        try {
+            console.log('[Linear Service] Starting sync for user:', userId);
+            const token = await getAccessToken(userId, accountId);
+
+            // Get all issues assigned to user or created by user? 
+            // For now, let's fetch all issues assigned to the viewer
+            const query = `
+                query {
+                    viewer {
+                        assignedIssues(first: 100, filter: { state: { type: { neq: "completed" } } }) {
+                            nodes {
+                                id
+                                identifier
+                                title
+                                description
+                                state {
+                                    id
+                                    name
+                                    color
+                                    type
+                                }
+                                priority
+                                team {
+                                    id
+                                    name
+                                }
+                                project {
+                                    id
+                                    name
+                                }
+                                assignee {
+                                    id
+                                    name
+                                    email
+                                }
+                                createdAt
+                                updatedAt
+                                dueDate
+                                url
+                                labels {
+                                    nodes {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            `;
+
+            const data = await executeQuery(token, query);
+            const issues = data.viewer.assignedIssues.nodes;
+            console.log(`[Linear Service] Fetched ${issues.length} assigned issues`);
+
+            const syncedIssues = [];
+            const LinearIssue = require('../../models/LinearIssue').default;
+
+            for (const issue of issues) {
+                // Map priority number to label
+                const priorityMap: Record<number, string> = {
+                    0: 'No Priority',
+                    1: 'Urgent',
+                    2: 'High',
+                    3: 'Medium',
+                    4: 'Low'
+                };
+
+                const issueData = {
+                    identifier: issue.identifier,
+                    issueId: issue.id,
+                    title: issue.title,
+                    description: issue.description || '',
+                    state: {
+                        id: issue.state.id,
+                        name: issue.state.name,
+                        color: issue.state.color,
+                        type: issue.state.type
+                    },
+                    priority: issue.priority,
+                    priorityLabel: priorityMap[issue.priority] || 'No Priority',
+                    teamId: issue.team.id,
+                    teamName: issue.team.name,
+                    projectId: issue.project?.id,
+                    projectName: issue.project?.name,
+                    assigneeLinearId: issue.assignee?.id,
+                    assigneeName: issue.assignee?.name,
+                    // assignee: We could look up local user by email here
+                    createdAt: new Date(issue.createdAt),
+                    updatedAt: new Date(issue.updatedAt),
+                    dueDate: issue.dueDate ? new Date(issue.dueDate) : undefined,
+                    url: issue.url,
+                    labels: issue.labels?.nodes?.map((l: any) => l.name) || [],
+                    workspaceId: workspaceId,
+                    lastSyncedAt: new Date()
+                };
+
+                const upserted = await LinearIssue.findOneAndUpdate(
+                    { issueId: issue.id, workspaceId },
+                    issueData,
+                    { upsert: true, new: true }
+                );
+                syncedIssues.push(upserted);
+            }
+
+            return syncedIssues;
+
+        } catch (error: any) {
+            console.error('Sync Linear issues error:', error);
+            throw error;
+        }
+    };
+
     return {
         getViewer,
         getTeams,
@@ -449,6 +565,7 @@ export const getLinearService = () => {
         getProjects,
         getWorkflowStates,
         createIssue,
-        updateIssue
+        updateIssue,
+        syncIssues
     };
 };

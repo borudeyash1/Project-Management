@@ -353,6 +353,7 @@ import Milestone from '../models/Milestone';
 import JiraIssue from '../models/JiraIssue';
 // import NotionTask from '../models/NotionTask';  // TODO: Create NotionTask model
 import User from '../models/User';
+import LinearIssue from '../models/LinearIssue';
 
 
 
@@ -381,6 +382,13 @@ function mapNotionStatusToPlanner(notionStatus: string): string {
   return statusMap[notionStatus] || 'To Do';
 }
 
+// Helper: Map Linear status to planner status
+function mapLinearStatusToPlanner(linearState: string, type: string): string {
+  if (type === 'completed' || type === 'canceled') return 'Done';
+  if (type === 'started') return 'In Progress';
+  return 'To Do'; // backlog, unstarted, triage
+}
+
 // Helper: Transform Jira issue to task format
 function transformJiraIssueToTask(issue: any): any {
   return {
@@ -392,7 +400,7 @@ function transformJiraIssueToTask(issue: any): any {
     dueDate: issue.dueDate,
     startDate: null,
     workspace: issue.workspaceId,
-    assignee: null,
+    assignee: null, // Could map if email matches
     reporter: null,
     project: null,
     isActive: true,
@@ -426,6 +434,31 @@ function transformNotionTaskToTask(notionTask: any): any {
     externalId: notionTask.pageId,
     externalUrl: `https://notion.so/${notionTask.pageId}`,
     syncedAt: notionTask.lastSyncedAt
+  };
+}
+
+// Helper: Transform Linear issue to task format
+function transformLinearIssueToTask(issue: any): any {
+  return {
+    _id: issue._id,
+    title: issue.title,
+    description: issue.description || '',
+    status: mapLinearStatusToPlanner(issue.state.name, issue.state.type),
+    priority: issue.priorityLabel || 'Medium', // Map priority number if label missing
+    dueDate: issue.dueDate,
+    startDate: null,
+    workspace: issue.workspaceId,
+    assignee: null,
+    reporter: null,
+    project: issue.projectName ? { name: issue.projectName } : null,
+    isActive: true, // Only fetch active/relevant ones
+    progress: issue.state.type === 'completed' ? 100 : issue.state.type === 'started' ? 50 : 0,
+    // Sync metadata
+    source: 'linear',
+    externalId: issue.identifier,
+    externalUrl: issue.url,
+    syncedAt: issue.lastSyncedAt,
+    tags: issue.labels
   };
 }
 
@@ -493,8 +526,23 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
       console.error('[Planner] Failed to fetch Notion tasks:', error);
     }
 
-    // Merge all tasks (regular + Jira + Notion)
-    const allTasks = [...tasks, ...jiraTasks, ...notionTasks];
+    // Fetch Linear issues if connected
+    let linearTasks: any[] = [];
+    try {
+      const user = await User.findById(userId).select('connectedAccounts');
+      const hasLinear = (user?.connectedAccounts?.linear?.accounts?.length ?? 0) > 0;
+
+      if (hasLinear && workspaceId) {
+        const linearIssues = await LinearIssue.find({ workspaceId });
+        linearTasks = linearIssues.map(transformLinearIssueToTask);
+        console.log(`[Planner] Fetched ${linearTasks.length} Linear issues for workspace ${workspaceId}`);
+      }
+    } catch (error) {
+      console.error('[Planner] Failed to fetch Linear issues:', error);
+    }
+
+    // Merge all tasks (regular + Jira + Notion + Linear)
+    const allTasks = [...tasks, ...jiraTasks, ...notionTasks, ...linearTasks];
 
     // Fetch reminders
     const reminderQuery: any = { ...baseQuery, isActive: true };

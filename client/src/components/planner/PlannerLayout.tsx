@@ -6,8 +6,9 @@ import { useRefreshData } from '../../hooks/useRefreshData';
 import { usePlanner } from '../../context/PlannerContext';
 import {
   LayoutGrid, List, Calendar, Clock, Inbox, BarChart3,
-  Settings, Plus, Search, Filter, Command, Bell, Target
+  Settings, Plus, Search, Filter, Command, Bell, Target, RefreshCw
 } from 'lucide-react';
+import { linearService } from '../../services/linearService';
 import GlassmorphicPageHeader from '../ui/GlassmorphicPageHeader';
 import BoardView from './views/BoardView';
 import ListView from './views/ListView';
@@ -38,6 +39,7 @@ const PlannerLayout: React.FC = () => {
   }>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Enable refresh button
   useRefreshData(fetchData, [fetchData]);
@@ -79,6 +81,22 @@ const PlannerLayout: React.FC = () => {
     setTaskCreateDefaults({});
   };
 
+  const handleLinearSync = async () => {
+    if (isSyncing) return;
+    try {
+      setIsSyncing(true);
+      const workspaceId = state.currentWorkspace;
+      if (!workspaceId) return;
+
+      await linearService.syncIssues(workspaceId);
+      await fetchData(); // Refresh planner data
+    } catch (error) {
+      console.error('Linear sync failed:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'board':
@@ -110,7 +128,16 @@ const PlannerLayout: React.FC = () => {
           topRight: 'rgba(124, 58, 237, 0.2)',
           bottomLeft: 'rgba(59, 130, 246, 0.2)'
         }}
-      />
+      >
+        <button
+          onClick={handleLinearSync}
+          disabled={isSyncing}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSyncing ? 'opacity-70 cursor-not-allowed' : ''}`}
+        >
+          <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+          <span>{isSyncing ? 'Syncing...' : 'Sync Linear'}</span>
+        </button>
+      </GlassmorphicPageHeader>
 
       {/* View Switcher Row */}
       <div className={`pr-6 mb-6 mt-6 transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px]' :

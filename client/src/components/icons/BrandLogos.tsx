@@ -76,3 +76,10 @@ export const SlackLogo = ({ size = 24, className = "" }: { size?: number; classN
         <path d="M15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" fill="#ECB22E" />
     </svg>
 );
+
+// Vercel Logo
+export const VercelLogo = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M24 22.525H0l12-21.05 12 21.05z" />
+    </svg>
+);

@@ -77,5 +77,14 @@ export const linearService = {
             return response.data;
         }
         throw new Error(response.message || 'Failed to update issue');
+    },
+
+    syncIssues: async (workspaceId: string): Promise<LinearIssue[]> => {
+        console.log('[Linear] Syncing issues for workspace:', workspaceId);
+        const response = await apiService.post(`/linear/workspace/${workspaceId}/sync`, {});
+        if (response.success) {
+            return response.data;
+        }
+        throw new Error(response.message || 'Failed to sync Linear issues');
     }
 };

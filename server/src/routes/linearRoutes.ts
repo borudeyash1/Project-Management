@@ -156,4 +156,23 @@ router.put('/issues/:issueId', async (req, res) => {
     }
 });
 
+// POST /api/linear/workspace/:workspaceId/sync
+router.post('/workspace/:workspaceId/sync', async (req, res) => {
+    try {
+        const userId = (req as any).user._id;
+        const { workspaceId } = req.params;
+        const linearService = getLinearService();
+        const accountId = req.query.accountId as string;
+
+        console.log('[Linear API] Syncing issues for workspace:', workspaceId);
+        const issues = await linearService.syncIssues(userId, workspaceId, accountId);
+        console.log('[Linear API] Synced issues:', issues.length);
+
+        return res.json({ success: true, data: issues });
+    } catch (error: any) {
+        console.error('Sync Linear issues error:', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 export default router;

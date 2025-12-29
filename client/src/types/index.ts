@@ -15,6 +15,7 @@ export interface User {
   isActive: boolean;
   subscription: UserSubscription;
   settings: UserSettings;
+  profilePicture?: string; // Enhanced property for avatars
   // Enhanced profile information for AI-powered insights
   profile?: {
     // Professional Information
@@ -234,6 +235,24 @@ export interface User {
       }>;
     };
     linear?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    figma?: {
+      activeAccountId?: string;
+      accounts?: Array<{
+        id: string;
+        email: string;
+        name?: string;
+        connectedAt?: string;
+      }>;
+    };
+    vercel?: {
       activeAccountId?: string;
       accounts?: Array<{
         id: string;

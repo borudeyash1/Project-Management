@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import { apiService } from '../services/api';
-import { SpotifyLogo, DiscordLogo, LinearLogo, FigmaLogo, JiraLogo, ZendeskLogo, NotionLogo, DropboxLogo, GitHubLogo, SlackLogo } from './icons/BrandLogos';
+import { SpotifyLogo, DiscordLogo, LinearLogo, FigmaLogo, JiraLogo, ZendeskLogo, NotionLogo, DropboxLogo, GitHubLogo, SlackLogo, VercelLogo } from './icons/BrandLogos';
 import {
   Mail, Calendar, FileText,
   AlertCircle, CheckCircle, ExternalLink, Loader, Plus, Trash2, Unlink, Link as LinkIcon,
@@ -61,6 +61,7 @@ const ConnectedAccounts: React.FC = () => {
   const [zendeskAccounts, setZendeskAccounts] = useState<ServiceAccounts>({ accounts: [], activeAccount: null });
   const [linearAccounts, setLinearAccounts] = useState<ServiceAccounts>({ accounts: [], activeAccount: null });
   const [discordAccounts, setDiscordAccounts] = useState<ServiceAccounts>({ accounts: [], activeAccount: null });
+  const [vercelAccounts, setVercelAccounts] = useState<ServiceAccounts>({ accounts: [], activeAccount: null });
 
   // Notion specific state
   const [notionDatabases, setNotionDatabases] = useState<NotionDatabase[]>([]);
@@ -189,6 +190,15 @@ const ConnectedAccounts: React.FC = () => {
       bgColor: 'bg-indigo-500/10',
       borderColor: 'border-indigo-500/20',
       apiConsole: 'https://discord.com/developers/applications'
+    },
+    vercel: {
+      icon: <VercelLogo className="w-6 h-6" />,
+      title: 'Vercel',
+      description: 'Deploy web projects',
+      color: 'text-black dark:text-white',
+      bgColor: 'bg-black/5 dark:bg-white/10',
+      borderColor: 'border-gray-500/20',
+      apiConsole: 'https://vercel.com/account/tokens'
     }
   };
 
@@ -215,7 +225,7 @@ const ConnectedAccounts: React.FC = () => {
       const services = [
         'mail', 'calendar', 'vault', 'slack', 'github',
         'dropbox', 'figma', 'notion', 'spotify', 'jira',
-        'zendesk', 'linear', 'discord'
+        'zendesk', 'linear', 'discord', 'vercel'
       ] as const;
 
       // Use individual error handling for each request to prevent one failure from blocking others
@@ -246,6 +256,7 @@ const ConnectedAccounts: React.FC = () => {
             case 'zendesk': setZendeskAccounts(data); break;
             case 'linear': setLinearAccounts(data); break;
             case 'discord': setDiscordAccounts(data); break;
+            case 'vercel': setVercelAccounts(data); break;
           }
         }
       });
@@ -295,7 +306,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord', customParams?: any) => {
+  const handleConnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord' | 'vercel', customParams?: any) => {
     try {
       if (service === 'zendesk' && !customParams?.subdomain) {
         setShowZendeskModal(true);
@@ -319,7 +330,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord', accountId: string) => {
+  const handleSetActive = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord' | 'vercel', accountId: string) => {
     try {
       setActionLoading(`active-${accountId}`);
       const response = await apiService.put(`/sartthi-accounts/${service}/active`, { accountId });
@@ -335,7 +346,7 @@ const ConnectedAccounts: React.FC = () => {
     }
   };
 
-  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord', accountId: string) => {
+  const handleDisconnect = async (service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord' | 'vercel', accountId: string) => {
     if (!window.confirm(t('connectedAccounts.confirmDisconnect'))) {
       return;
     }
@@ -356,7 +367,7 @@ const ConnectedAccounts: React.FC = () => {
   };
 
   const renderServiceSection = (
-    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord',
+    service: 'mail' | 'calendar' | 'vault' | 'slack' | 'github' | 'dropbox' | 'figma' | 'notion' | 'spotify' | 'jira' | 'zendesk' | 'linear' | 'discord' | 'vercel',
     accountsData: AccountsData
   ) => {
     const config = appConfig[service];
@@ -447,6 +458,7 @@ const ConnectedAccounts: React.FC = () => {
       {renderServiceSection('zendesk', zendeskAccounts)}
       {renderServiceSection('linear', linearAccounts)}
       {renderServiceSection('discord', discordAccounts)}
+      {renderServiceSection('vercel', vercelAccounts)}
       {/* Zendesk Subdomain Modal */}
       {showZendeskModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">

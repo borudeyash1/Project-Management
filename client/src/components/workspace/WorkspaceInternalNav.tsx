@@ -7,18 +7,22 @@ import {
   LayoutDashboard,
   Users,
   FolderKanban,
-  MessageSquare,
+
   UserPlus,
   Briefcase,
   UserCircle,
   Calendar,
-  Palette,
-  Trello,
-  FileText,
-  Headphones,
-  Hash,
-  Target
+  MessageSquare,
 } from 'lucide-react';
+import {
+  FigmaLogo,
+  JiraLogo,
+  NotionLogo,
+  ZendeskLogo,
+  SlackLogo,
+  LinearLogo,
+  DiscordLogo
+} from '../icons/BrandLogos';
 
 interface WorkspaceTab {
   id: string;
@@ -69,44 +73,44 @@ const WorkspaceInternalNav: React.FC = () => {
     },
     {
       id: 'design',
-      label: 'Design',
-      icon: Palette,
+      label: 'Figma',
+      icon: FigmaLogo, // Changing generic Palette to actual Figma Logo
       path: `/workspace/${activeWorkspaceId}/design`
     },
     {
       id: 'jira',
       label: 'Jira',
-      icon: Trello,
+      icon: JiraLogo,
       path: `/workspace/${activeWorkspaceId}/jira`
     },
     {
       id: 'notion',
       label: 'Notion',
-      icon: FileText,
+      icon: NotionLogo,
       path: `/workspace/${activeWorkspaceId}/notion`
     },
     {
       id: 'zendesk',
       label: 'Zendesk',
-      icon: Headphones,
+      icon: ZendeskLogo,
       path: `/workspace/${activeWorkspaceId}/zendesk`
     },
     {
       id: 'slack',
       label: 'Slack',
-      icon: Hash,
+      icon: SlackLogo,
       path: `/workspace/${activeWorkspaceId}/slack`
     },
     {
       id: 'linear',
       label: 'Linear',
-      icon: Target,
+      icon: LinearLogo,
       path: `/workspace/${activeWorkspaceId}/linear`
     },
     {
       id: 'chat',
       label: 'Discord',
-      icon: MessageSquare,
+      icon: DiscordLogo,
       path: `/workspace/${activeWorkspaceId}/chat`
     },
     {

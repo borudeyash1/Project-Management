@@ -35,6 +35,7 @@ import JiraWidget from './components/jira/JiraWidget'; // [NEW] Import
 import ZendeskWidget from './components/zendesk/ZendeskWidget'; // [NEW] Import
 import SlackWidget from './components/slack/SlackWidget';
 import LinearWidget from './components/linear/LinearWidget';
+import FigmaWidget from './components/figma/FigmaWidget';
 import ChatWidget from './components/chat/ChatWidget'; // [NEW] Import
 import MusicPage from './pages/MusicPage';
 import ProjectDesignHub from './components/project/ProjectDesignHub';
@@ -308,7 +309,8 @@ const AppContent: React.FC = () => {
       <ZendeskWidget /> {/* [NEW] Render Zendesk Widget */}
       <SlackWidget /> {/* [NEW] Render Slack Widget */}
       <LinearWidget />
-      <ChatWidget onClose={() => { }} />
+      <FigmaWidget />
+      <ChatWidget />
       <ToastContainer />
 
       <Routes>

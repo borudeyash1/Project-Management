@@ -36,7 +36,7 @@ import { getAppUrl } from '../utils/appUrls';
 import AppInfoCard from './AppInfoCard';
 import AIChatbot from './AIChatbot';
 import { useStickyNotes } from '../context/StickyNotesContext';
-import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo, LinearLogo, DiscordLogo } from './icons/BrandLogos';
+import { SpotifyLogo, DropboxLogo, NotionLogo, JiraLogo, ZendeskLogo, SlackLogo, LinearLogo, DiscordLogo, FigmaLogo } from './icons/BrandLogos';
 
 interface NavItem {
   id: string;
@@ -357,6 +357,17 @@ const DockNavigation: React.FC = () => {
             className="text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 dark:text-blue-400"
           >
             <LinearLogo size={22} />
+          </DockIcon>
+        )}
+
+        {/* [NEW] Figma Widget Toggle */}
+        {!!state.userProfile.connectedAccounts?.figma?.activeAccountId && (
+          <DockIcon
+            onClick={() => window.dispatchEvent(new CustomEvent('TOGGLE_FIGMA_WIDGET'))}
+            tooltip="Figma"
+            className="text-[#0ACF83] hover:bg-[#0ACF83]/10 dark:hover:bg-[#0ACF83]/20"
+          >
+            <FigmaLogo size={22} />
           </DockIcon>
         )}
 
