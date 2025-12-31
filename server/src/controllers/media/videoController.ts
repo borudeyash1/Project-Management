@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import ytsr from 'ytsr';
+const ytsr = require('ytsr');
 
 export const searchVideo = async (req: Request, res: Response) => {
     try {

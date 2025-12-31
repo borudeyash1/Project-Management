@@ -82,6 +82,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Prefix matches
     if (path.startsWith('/docs')) return true;
     if (path.startsWith('/auth')) return true;
+    if (path.startsWith('/admin')) return true; // Admin pages default to light mode
+    if (path.startsWith('/my-admin')) return true; // Admin login page
     return false;
   };
 

@@ -48,7 +48,9 @@ const ReleaseManagement: React.FC = () => {
     releaseNotes: '',
     platform: 'windows' as 'windows' | 'macos' | 'linux',
     architecture: 'x64' as 'x64' | 'arm64' | 'universal',
-    isLatest: true
+    isLatest: true,
+    uploadType: 'file' as 'file' | 'url',
+    downloadUrl: ''
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -106,8 +108,14 @@ const ReleaseManagement: React.FC = () => {
   };
 
   const handleCreateRelease = async () => {
-    if (!selectedFile) {
+    // Validate based on upload type
+    if (formData.uploadType === 'file' && !selectedFile) {
       addToast('Please select a file', 'error');
+      return;
+    }
+
+    if (formData.uploadType === 'url' && !formData.downloadUrl) {
+      addToast('Please enter a download URL', 'error');
       return;
     }
 
@@ -120,19 +128,37 @@ const ReleaseManagement: React.FC = () => {
       setUploading(true);
       console.log('🔍 [RELEASES] Creating release...');
 
-      const formDataToSend = new FormData();
-      formDataToSend.append('file', selectedFile);
-      formDataToSend.append('version', formData.version);
-      formDataToSend.append('versionName', formData.versionName);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('releaseNotes', formData.releaseNotes);
-      formDataToSend.append('platform', formData.platform);
-      formDataToSend.append('architecture', formData.architecture);
-      formDataToSend.append('isLatest', formData.isLatest.toString());
+      let data;
 
-      const data = await api.uploadRelease(formDataToSend, (percent) => {
-        setUploadProgress(percent);
-      });
+      if (formData.uploadType === 'file') {
+        // File upload
+        const formDataToSend = new FormData();
+        formDataToSend.append('file', selectedFile!);
+        formDataToSend.append('version', formData.version);
+        formDataToSend.append('versionName', formData.versionName);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('releaseNotes', formData.releaseNotes);
+        formDataToSend.append('platform', formData.platform);
+        formDataToSend.append('architecture', formData.architecture);
+        formDataToSend.append('isLatest', formData.isLatest.toString());
+
+        data = await api.uploadRelease(formDataToSend, (percent) => {
+          setUploadProgress(percent);
+        });
+      } else {
+        // URL upload
+        const response = await api.post('/releases/create-from-url', {
+          version: formData.version,
+          versionName: formData.versionName,
+          description: formData.description,
+          releaseNotes: formData.releaseNotes,
+          platform: formData.platform,
+          architecture: formData.architecture,
+          isLatest: formData.isLatest,
+          downloadUrl: formData.downloadUrl
+        });
+        data = response;
+      }
 
       if (data?.success) {
         console.log('✅ [RELEASES] Release created successfully');
@@ -145,7 +171,9 @@ const ReleaseManagement: React.FC = () => {
           releaseNotes: '',
           platform: 'windows',
           architecture: 'x64',
-          isLatest: true
+          isLatest: true,
+          uploadType: 'file',
+          downloadUrl: ''
         });
         setSelectedFile(null);
         fetchReleases();
@@ -496,34 +524,71 @@ const ReleaseManagement: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Upload Type Selection */}
                 <div>
                   <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
-                    Upload File *
+                    Upload Type *
                   </label>
-                  <div className={`border-2 border-dashed ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-lg p-6`}>
-                    <input
-                      type="file"
-                      onChange={handleFileSelect}
-                      accept=".exe,.dmg,.pkg,.deb,.rpm,.appimage,.zip,.tar.gz"
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="flex flex-col items-center cursor-pointer"
-                    >
-                      <Upload className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-2`} />
-                      <span className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                        {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
-                      </span>
-                      {selectedFile && (
-                        <span className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
-                          {formatFileSize(selectedFile.size)}
-                        </span>
-                      )}
-                    </label>
-                  </div>
+                  <select
+                    value={formData.uploadType}
+                    onChange={(e) => setFormData({ ...formData, uploadType: e.target.value as 'file' | 'url' })}
+                    className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                  >
+                    <option value="file">File Upload</option>
+                    <option value="url">URL</option>
+                  </select>
                 </div>
+
+                {/* File Upload */}
+                {formData.uploadType === 'file' && (
+                  <div>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
+                      Upload File *
+                    </label>
+                    <div className={`border-2 border-dashed ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-lg p-6`}>
+                      <input
+                        type="file"
+                        onChange={handleFileSelect}
+                        accept=".exe,.dmg,.pkg,.deb,.rpm,.appimage,.zip,.tar.gz"
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <label
+                        htmlFor="file-upload"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        <Upload className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mb-2`} />
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
+                          {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
+                        </span>
+                        {selectedFile && (
+                          <span className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
+                            {formatFileSize(selectedFile.size)}
+                          </span>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* URL Input */}
+                {formData.uploadType === 'url' && (
+                  <div>
+                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
+                      Download URL *
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://example.com/app-v1.0.0.exe"
+                      value={formData.downloadUrl}
+                      onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
+                      className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                    />
+                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                      Enter the URL where the application can be downloaded from
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2">
                   <input

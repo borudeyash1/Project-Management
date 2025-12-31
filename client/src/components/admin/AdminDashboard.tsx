@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Users, Activity, Settings, LogOut, AlertTriangle, FileText, Megaphone, CreditCard } from 'lucide-react';
+import { Shield, Users, Activity, Settings, LogOut, AlertTriangle, FileText, Megaphone, CreditCard, Ticket } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import { validateAdminToken, clearExpiredTokens } from '../../utils/tokenUtils';
@@ -270,6 +270,15 @@ const AdminDashboard: React.FC = () => {
               <CreditCard className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-500'} mb-2`} />
               <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Subscriptions</p>
               <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage plans & billing</p>
+            </button>
+
+            <button
+              onClick={() => navigate('/admin/coupons')}
+              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
+            >
+              <Ticket className={`w-6 h-6 ${isDarkMode ? 'text-orange-400' : 'text-orange-500'} mb-2`} />
+              <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Coupons</p>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage discount codes</p>
             </button>
 
             <button

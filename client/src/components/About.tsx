@@ -274,7 +274,7 @@ const About: React.FC = () => {
       <section id="problem" className="py-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 pb-12">
-            <h2 className="text-sm text-[#006397] font-mono font-medium tracking-wider uppercase">Problem</h2>
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">Problem</span>
             <h3 className={`text-3xl md:text-5xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Managing projects shouldn't be this hard.
             </h3>
@@ -308,7 +308,7 @@ const About: React.FC = () => {
       <section id="solution" className="py-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 pb-12">
-            <h2 className="text-sm text-[#006397] font-mono font-medium tracking-wider uppercase">Solution</h2>
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">Solution</span>
             <h3 className={`text-3xl md:text-5xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Everything you need to manage projects
             </h3>
@@ -536,7 +536,7 @@ const About: React.FC = () => {
       <section id="how-it-works" className="py-16 bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 pb-12">
-            <h2 className="text-sm text-[#006397] font-mono font-medium tracking-wider uppercase">How it works</h2>
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">How it works</span>
             <h3 className={`text-3xl md:text-5xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Just 3 steps to get started
             </h3>
@@ -570,7 +570,7 @@ const About: React.FC = () => {
       <section id="features" className="py-16 bg-transparent">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 pb-12">
-            <h2 className="text-sm text-[#006397] font-mono font-medium tracking-wider uppercase">Features</h2>
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">Features</span>
             <h3 className={`text-3xl md:text-5xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Powerful Features for Modern Teams
             </h3>
@@ -642,7 +642,7 @@ const About: React.FC = () => {
       <section id="testimonials" className="py-16 bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 pb-12">
-            <h2 className="text-sm text-[#006397] font-mono font-medium tracking-wider uppercase">Testimonials</h2>
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">Testimonials</span>
             <h3 className={`text-3xl md:text-5xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               What our customers are saying
             </h3>

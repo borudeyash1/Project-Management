@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { 
   ArrowRight, CheckCircle, Star, Users, Shield, 
   Clock, Target, Sparkles, ChevronRight,
-  BarChart3, Calendar, Zap, TrendingUp, Award,
-  Code, Palette, Globe, Smartphone,
+  BarChart3, Calendar, Zap, TrendingUp,
+  Code, Globe, Smartphone,
   Play, Pause, ChevronDown
 } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
@@ -17,7 +17,13 @@ import { getRecentPosts } from '../data/blogData';
 const LandingPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [adminFeatureTab, setAdminFeatureTab] = useState(0);
+  const [adminFeatureTab, setAdminFeatureTab] = useState<number>(0);
+  
+  // Live mockup states for animations
+  const [liveTaskIndex, setLiveTaskIndex] = useState(0);
+  const [liveChatIndex, setLiveChatIndex] = useState(0);
+  const [liveProgress, setLiveProgress] = useState(87);
+  const [liveTime, setLiveTime] = useState(new Date());
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -77,6 +83,38 @@ const LandingPage: React.FC = () => {
     };
   }, []);
 
+  // Live mockup animations
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveTaskIndex(prev => (prev + 1) % 3);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveChatIndex(prev => (prev + 1) % 3);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveProgress(prev => {
+        const newProgress = prev + 1;
+        return newProgress > 100 ? 85 : newProgress;
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const features = [
     {
       icon: <Target className="w-6 h-6" />,
@@ -125,12 +163,13 @@ const LandingPage: React.FC = () => {
       }
   ];
 
-  const metrics = [
-    { value: "1K+", label: "Active Users", icon: <Users className="w-8 h-8" /> },
-    { value: "99.5%", label: "Uptime", icon: <TrendingUp className="w-8 h-8" /> },
-    { value: "10+", label: "Countries", icon: <Globe className="w-8 h-8" /> },
-    { value: "4.7/5", label: "User Rating", icon: <Star className="w-8 h-8" /> }
-  ];
+  // Metrics section is hidden - keeping data for potential future use
+  // const metrics = [
+  //   { value: "1K+", label: "Active Users", icon: <Users className="w-8 h-8" /> },
+  //   { value: "99.5%", label: "Uptime", icon: <TrendingUp className="w-8 h-8" /> },
+  //   { value: "10+", label: "Countries", icon: <Globe className="w-8 h-8" /> },
+  //   { value: "4.7/5", label: "User Rating", icon: <Star className="w-8 h-8" /> }
+  // ];
 
   const testimonials = [
     {
@@ -231,7 +270,8 @@ const LandingPage: React.FC = () => {
     }
   ];
 
-  const pricingPlans = [
+  // Pricing plans - keeping data for potential future use
+  /* const pricingPlans = [
     {
       name: "Free",
       price: "$0",
@@ -289,21 +329,23 @@ const LandingPage: React.FC = () => {
       highlighted: false,
       popular: false
     }
-  ];
+  ]; */
 
   const integrations = [
-    { name: "Slack", logo: "https://img.icons8.com/?size=100&id=19978&format=png&color=000000", category: "Communication" },
-    { name: "Google Drive", logo: "https://img.icons8.com/?size=100&id=13630&format=png&color=000000", category: "Cloud Storage" },
+    // ✅ FULLY WORKING INTEGRATIONS
     { name: "GitHub", logo: "https://img.icons8.com/?size=100&id=12599&format=png&color=000000", category: "Development" },
-    { name: "Custom AI API", logo: "https://img.icons8.com/?size=100&id=GVghUo9qfGPW&format=png&color=000000", category: "AI Integration" },
-    { name: "Zoom", logo: "https://img.icons8.com/?size=100&id=7csVZvHoQrLW&format=png&color=000000", category: "Meeting Links" },
     { name: "Dropbox", logo: "https://img.icons8.com/?size=100&id=13657&format=png&color=000000", category: "Cloud Storage" },
-    { name: "Microsoft Teams", logo: "https://img.icons8.com/?size=100&id=GcSqCxRXjzNd&format=png&color=000000", category: "Communication" },
-    { name: "OneDrive", logo: "https://img.icons8.com/?size=100&id=117559&format=png&color=000000", category: "Cloud Storage" },
+    { name: "Notion", logo: "https://img.icons8.com/?size=100&id=F6H2fsqXKBwH&format=png&color=000000", category: "Documentation" },
+    { name: "Spotify", logo: "https://img.icons8.com/?size=100&id=G9XXzb9XaEKX&format=png&color=000000", category: "Music" },
+    
+    // 🔜 PENDING INTEGRATIONS (Have API Keys)
+    { name: "Slack", logo: "https://img.icons8.com/?size=100&id=19978&format=png&color=000000", category: "Communication" },
     { name: "Jira", logo: "https://img.icons8.com/?size=100&id=oROcPah5ues6&format=png&color=000000", category: "Project Management" },
-    { name: "Google Meet", logo: "https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000", category: "Meeting Links" },
-    { name: "Notion", logo: "https://img.icons8.com/?size=100&id=HDd694003FZa&format=png&color=000000", category: "Documentation" },
-    { name: "OpenAI", logo: "https://img.icons8.com/?size=100&id=Nts60kQIvGqe&format=png&color=000000", category: "AI Integration" }
+    { name: "Figma", logo: "https://img.icons8.com/?size=100&id=zfHRZ6i1Wg0U&format=png&color=000000", category: "Design" },
+    { name: "Zendesk", logo: "https://img.icons8.com/?size=100&id=0IW4VY2jfCIg&format=png&color=000000", category: "Support" },
+    { name: "Linear", logo: "https://img.icons8.com/?size=100&id=6ASD5XtjsJc6&format=png&color=000000", category: "Project Management" },
+    { name: "Discord", logo: "https://img.icons8.com/?size=100&id=30998&format=png&color=000000", category: "Communication" },
+    { name: "Vercel", logo: "https://img.icons8.com/?size=100&id=2xFS7aynbwiR&format=png&color=000000", category: "Deployment" }
   ];
 
   const useCases = [
@@ -484,9 +526,10 @@ const LandingPage: React.FC = () => {
   const categories = ['General', 'Pricing & Plans', 'Features & Functionality', 'Security & Privacy', 'Support & Updates'];
   const filteredFaqs = faqs.filter(faq => faq.category === categories[activeTab]);
 
-  const companyLogos = [
-    "Google", "Microsoft", "Amazon", "Apple", "Meta", "Netflix", "Spotify", "Uber", "Airbnb", "Tesla"
-  ];
+  // Company logos section is hidden - keeping data for potential future use
+  // const companyLogos = [
+  //   "Google", "Microsoft", "Amazon", "Apple", "Meta", "Netflix", "Spotify", "Uber", "Airbnb", "Tesla"
+  // ];
 
   const blogPosts = getRecentPosts(3);
 
@@ -649,8 +692,8 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Trusted By Section */}
-      <section className="py-12 bg-[#F5F8FD] border-y border-gray-200">
+      {/* Trusted By Section - HIDDEN */}
+      {/* <section className="py-12 bg-[#F5F8FD] border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-gray-500 mb-8 font-semibold uppercase tracking-wider">
             Trusted by leading companies worldwide
@@ -665,11 +708,12 @@ const LandingPage: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Metrics Section with Animated Counters */}
-      <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+
+      {/* Metrics Section with Animated Counters - HIDDEN */}
+      {/* <section className="py-20 relative overflow-hidden" style={{ backgroundColor: 'rgb(245, 248, 253)' }}>
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {metrics.map((metric, index) => (
@@ -677,24 +721,25 @@ const LandingPage: React.FC = () => {
                 key={index} 
                 className="text-center transform hover:scale-110 transition-transform duration-300"
               >
-                <div className="flex justify-center mb-4 text-[#FFC700]">
+                <div className="flex justify-center mb-4 text-[#006397]">
                   {metric.icon}
                 </div>
-                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-[#FFC700] to-[#FFD700] bg-clip-text text-transparent">
+                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-[#006397] to-[#0088CC] bg-clip-text text-transparent">
                   {metric.value}
                 </div>
-                <div className="text-gray-300 font-medium">{metric.label}</div>
+                <div className="text-gray-600 font-medium">{metric.label}</div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
+
 
       {/* Features Section with Grid Layout */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F5F8FD] relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-blue-100 text-[#006397] rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[#006397] rounded-full text-sm font-semibold mb-4">
               Features
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -712,8 +757,8 @@ const LandingPage: React.FC = () => {
                 className="group relative p-8 bg-[#F5F8FD] rounded-2xl border-2 border-gray-100 hover:border-blue-300 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[rgba(0,99,151,0.8)] to-[rgba(0,99,151,0.3)] rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                <div className="w-16 h-16 bg-gradient-to-br from-[rgba(0,99,151,0.9)] via-[rgba(0,99,151,0.6)] to-[rgba(0,99,151,0.2)] rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#006397] transition-colors">
@@ -732,7 +777,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">
               Use Cases
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -749,8 +794,8 @@ const LandingPage: React.FC = () => {
                 key={index}
                 className="group relative bg-[#F5F8FD] rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                <div className="relative w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[rgba(0,99,151,0.3)] to-[rgba(0,99,151,0.1)] rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                <div className="relative w-20 h-20 bg-gradient-to-br from-[rgba(0,99,151,0.9)] via-[rgba(0,99,151,0.6)] to-[rgba(0,99,151,0.2)] rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   {useCase.icon}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
@@ -769,7 +814,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">
               Integrations
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -922,7 +967,7 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Feature Selector */}
-          <div className="flex justify-center mb-16">
+          <div className="flex justify-center mb-16 overflow-x-auto">
             <div className="radio-inputs">
               <label className="radio">
                 <input 
@@ -960,6 +1005,15 @@ const LandingPage: React.FC = () => {
                 />
                 <span className="name">Smart Attendance</span>
               </label>
+              <label className="radio">
+                <input 
+                  type="radio" 
+                  name="admin-feature"
+                  checked={adminFeatureTab === 4}
+                  onChange={() => setAdminFeatureTab(4)}
+                />
+                <span className="name">Integration Setup</span>
+              </label>
             </div>
           </div>
 
@@ -969,33 +1023,329 @@ const LandingPage: React.FC = () => {
             <div className="rounded-3xl overflow-hidden shadow-2xl" style={{ backgroundColor: '#F1F4F9' }}>
               <div className="p-8">
                 {/* Dynamic Feature UI Mockup */}
-                <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-6">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-6" style={{ minHeight: '520px' }}>
                   {/* Task Management UI */}
                   {adminFeatureTab === 0 && (
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">Project Board</h3>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-bold text-gray-900 text-base">Task Management</h3>
                         <div className="flex gap-2">
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-500 status-bounce"></div>
                           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                           <div className="w-3 h-3 rounded-full bg-red-500"></div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        {['To Do', 'In Progress', 'Done'].map((status, idx) => (
-                          <div key={idx} className="bg-gray-50 rounded-lg p-3">
-                            <div className="text-xs font-semibold text-gray-600 mb-2">{status}</div>
-                            <div className="space-y-2">
-                              {[1, 2].map((item) => (
-                                <div key={item} className="bg-white p-2 rounded shadow-sm border-l-2" style={{ borderColor: idx === 0 ? '#FFC700' : idx === 1 ? '#006397' : '#10B981' }}>
-                                  <div className="text-xs font-medium text-gray-900">Task {item}</div>
-                                  <div className="text-xs text-gray-500 mt-1">Due: Dec {20 + item}</div>
-                                </div>
-                              ))}
-                            </div>
+                      
+                      {/* View Tabs */}
+                      <div className="flex gap-2 mb-4">
+                        {[
+                          { name: 'Kanban', icon: '📋' },
+                          { name: 'Timeline', icon: '📅' },
+                          { name: 'List', icon: '📝' }
+                        ].map((view, idx) => (
+                          <div
+                            key={idx}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                              liveTaskIndex === idx
+                                ? 'bg-blue-500 text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                          >
+                            <span className="mr-1">{view.icon}</span>
+                            {view.name}
                           </div>
                         ))}
                       </div>
+                      
+                      {/* Kanban Board View */}
+                      {liveTaskIndex === 0 && (
+                      <div className="grid grid-cols-3 gap-3">
+                        {['To Do', 'In Progress', 'Done'].map((status, idx) => {
+                          // Diverse task types with icons, labels, and assignees
+                          const allTasks = [
+                            { 
+                              id: 1, 
+                              title: 'Fix Login Bug', 
+                              type: 'bug',
+                              due: 'Dec 21', 
+                              priority: 'high', 
+                              dots: 3,
+                              assignee: 'JD',
+                              assigneeColor: '#EF4444',
+                              label: 'Backend',
+                              labelColor: 'bg-red-100 text-red-700'
+                            },
+                            { 
+                              id: 2, 
+                              title: 'API Integration', 
+                              type: 'feature',
+                              due: 'Dec 22', 
+                              priority: 'medium', 
+                              dots: 2,
+                              assignee: 'SM',
+                              assigneeColor: '#3B82F6',
+                              label: 'Feature',
+                              labelColor: 'bg-blue-100 text-blue-700'
+                            },
+                            { 
+                              id: 3, 
+                              title: 'Homepage Design', 
+                              type: 'design',
+                              due: 'Dec 23', 
+                              priority: 'low', 
+                              dots: 1,
+                              assignee: 'AK',
+                              assigneeColor: '#8B5CF6',
+                              label: 'Design',
+                              labelColor: 'bg-purple-100 text-purple-700'
+                            },
+                            { 
+                              id: 4, 
+                              title: 'Database Setup', 
+                              type: 'code',
+                              due: 'Dec 24', 
+                              priority: 'high', 
+                              dots: 3,
+                              assignee: 'MJ',
+                              assigneeColor: '#10B981',
+                              label: 'DevOps',
+                              labelColor: 'bg-green-100 text-green-700'
+                            },
+                            { 
+                              id: 5, 
+                              title: 'User Testing', 
+                              type: 'test',
+                              due: 'Dec 25', 
+                              priority: 'medium', 
+                              dots: 2,
+                              assignee: 'LC',
+                              assigneeColor: '#F59E0B',
+                              label: 'QA',
+                              labelColor: 'bg-yellow-100 text-yellow-700'
+                            },
+                            { 
+                              id: 6, 
+                              title: 'Code Review', 
+                              type: 'code',
+                              due: 'Dec 26', 
+                              priority: 'low', 
+                              dots: 1,
+                              assignee: 'RP',
+                              assigneeColor: '#EC4899',
+                              label: 'Review',
+                              labelColor: 'bg-pink-100 text-pink-700'
+                            }
+                          ];
+                          
+                          // Rotate tasks through columns
+                          const getTasksForColumn = () => {
+                            return idx === 0 ? [allTasks[0], allTasks[1]] : idx === 1 ? [allTasks[2], allTasks[3]] : [allTasks[4], allTasks[5]];
+                          };
+                          
+                          const columnTasks = getTasksForColumn();
+                          
+                          // Task type icons
+                          const getTaskIcon = (type: string) => {
+                            switch(type) {
+                              case 'bug':
+                                return (
+                                  <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                );
+                              case 'feature':
+                                return (
+                                  <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                  </svg>
+                                );
+                              case 'design':
+                                return (
+                                  <svg className="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                  </svg>
+                                );
+                              case 'code':
+                                return (
+                                  <svg className="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                  </svg>
+                                );
+                              case 'test':
+                                return (
+                                  <svg className="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                  </svg>
+                                );
+                              default:
+                                return null;
+                            }
+                          };
+                          
+                          return (
+                            <div 
+                              key={idx} 
+                              className="bg-gray-50 rounded-xl p-3 transition-all duration-500 fade-in-up"
+                              style={{ animationDelay: `${idx * 0.1}s` }}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="text-xs font-bold text-gray-700">{status}</div>
+                                <div className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs font-semibold">
+                                  {columnTasks.length}
+                                </div>
+                              </div>
+                              <div className="space-y-2.5">
+                                {columnTasks.map((task, taskIdx) => (
+                                  <div 
+                                    key={task.id} 
+                                    className="task-card-animated bg-white p-3 rounded-lg shadow-sm border-l-4 transition-all hover:shadow-lg cursor-move group" 
+                                    style={{ 
+                                      borderColor: task.priority === 'high' ? '#EF4444' : task.priority === 'medium' ? '#F59E0B' : '#10B981',
+                                      animationDelay: `${taskIdx * 0.15}s`
+                                    }}
+                                  >
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div className="flex items-center gap-1.5 flex-1">
+                                        {getTaskIcon(task.type)}
+                                        <div className="text-xs font-semibold text-gray-900">{task.title}</div>
+                                      </div>
+                                      <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                                        task.priority === 'high' ? 'bg-red-500 status-bounce' : 
+                                        task.priority === 'medium' ? 'bg-yellow-500' : 
+                                        'bg-green-500'
+                                      }`}></div>
+                                    </div>
+                                    
+                                    <div className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${task.labelColor}`}>
+                                      {task.label}
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between">
+                                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {task.due}
+                                      </div>
+                                      <div 
+                                        className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                                        style={{ backgroundColor: task.assigneeColor }}
+                                      >
+                                        {task.assignee}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      )}
+
+                      {/* Timeline View */}
+                      {liveTaskIndex === 1 && (
+                        <div className="space-y-3 fade-in-up">
+                          <div className="text-xs font-semibold text-gray-600 mb-3">December 2025</div>
+                          {[
+                            { date: '21', day: 'Mon', tasks: [{ title: 'Fix Login Bug', color: '#EF4444', progress: 75 }] },
+                            { date: '22', day: 'Tue', tasks: [{ title: 'API Integration', color: '#3B82F6', progress: 45 }] },
+                            { date: '23', day: 'Wed', tasks: [{ title: 'Homepage Design', color: '#8B5CF6', progress: 90 }] },
+                            { date: '24', day: 'Thu', tasks: [{ title: 'Database Setup', color: '#10B981', progress: 30 }, { title: 'User Testing', color: '#F59E0B', progress: 60 }] }
+                          ].map((day, idx) => (
+                            <div key={idx} className="flex gap-3 fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                              <div className="flex flex-col items-center w-12 flex-shrink-0">
+                                <div className="text-xs font-semibold text-gray-500">{day.day}</div>
+                                <div className="text-2xl font-bold text-gray-900">{day.date}</div>
+                              </div>
+                              <div className="flex-1 space-y-2">
+                                {day.tasks.map((task, taskIdx) => (
+                                  <div key={taskIdx} className="bg-white rounded-lg p-3 shadow-sm border-l-4 hover:shadow-md transition-all" style={{ borderColor: task.color }}>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <div className="text-xs font-semibold text-gray-900">{task.title}</div>
+                                      <div className="text-xs font-bold" style={{ color: task.color }}>{task.progress}%</div>
+                                    </div>
+                                    <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                      <div 
+                                        className="h-full transition-all duration-1000"
+                                        style={{ 
+                                          width: `${task.progress}%`,
+                                          backgroundColor: task.color
+                                        }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* List View */}
+                      {liveTaskIndex === 2 && (
+                        <div className="space-y-2 fade-in-up">
+                          {[
+                            { title: 'Fix Login Bug', status: 'In Progress', priority: 'High', assignee: 'JD', color: '#EF4444', progress: 75 },
+                            { title: 'API Integration', status: 'To Do', priority: 'Medium', assignee: 'SM', color: '#3B82F6', progress: 45 },
+                            { title: 'Homepage Design', status: 'Done', priority: 'Low', assignee: 'AK', color: '#8B5CF6', progress: 100 },
+                            { title: 'Database Setup', status: 'In Progress', priority: 'High', assignee: 'MJ', color: '#10B981', progress: 30 },
+                            { title: 'User Testing', status: 'To Do', priority: 'Medium', assignee: 'LC', color: '#F59E0B', progress: 60 },
+                            { title: 'Code Review', status: 'Done', priority: 'Low', assignee: 'RP', color: '#EC4899', progress: 100 }
+                          ].map((task, idx) => (
+                            <div 
+                              key={idx} 
+                              className="bg-white rounded-lg p-3 shadow-sm border-l-4 hover:shadow-md transition-all fade-in-up"
+                              style={{ 
+                                borderColor: task.color,
+                                animationDelay: `${idx * 0.08}s`
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <div 
+                                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0"
+                                    style={{ backgroundColor: task.color }}
+                                  >
+                                    {task.assignee}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-semibold text-gray-900 mb-0.5">{task.title}</div>
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-xs px-2 py-0.5 rounded ${
+                                        task.status === 'Done' ? 'bg-green-100 text-green-700' :
+                                        task.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                                        'bg-gray-100 text-gray-700'
+                                      }`}>
+                                        {task.status}
+                                      </span>
+                                      <span className={`text-xs font-medium ${
+                                        task.priority === 'High' ? 'text-red-600' :
+                                        task.priority === 'Medium' ? 'text-yellow-600' :
+                                        'text-green-600'
+                                      }`}>
+                                        {task.priority}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full transition-all duration-500"
+                                      style={{ 
+                                        width: `${task.progress}%`,
+                                        backgroundColor: task.color
+                                      }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-xs font-bold text-gray-600 w-8 text-right">{task.progress}%</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1003,31 +1353,158 @@ const LandingPage: React.FC = () => {
                   {adminFeatureTab === 1 && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">Team Chat</h3>
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                          <span className="text-xs text-gray-600">5 Online</span>
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                          <h3 className="font-bold text-gray-900 text-base">Quick Chat</h3>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
+                          <div className="w-2 h-2 rounded-full bg-green-500 status-bounce"></div>
+                          <span className="text-xs text-green-700 font-medium">{3 + liveChatIndex} Online</span>
                         </div>
                       </div>
-                      <div className="space-y-3">
-                        {[
-                          { name: 'John Doe', msg: 'Updated the design files', time: '10:30 AM', avatar: 'JD' },
-                          { name: 'Sarah Smith', msg: 'Meeting at 2 PM today?', time: '10:45 AM', avatar: 'SS' },
-                          { name: 'Mike Johnson', msg: 'Task completed ✓', time: '11:00 AM', avatar: 'MJ' }
-                        ].map((chat, idx) => (
-                          <div key={idx} className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: '#006397' }}>
-                              {chat.avatar}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-gray-900">{chat.name}</span>
-                                <span className="text-xs text-gray-500">{chat.time}</span>
+                      <div className="space-y-2">
+                        {(() => {
+                          const allMessages = [
+                            { 
+                              name: 'Sarah Chen', 
+                              msg: 'Task "Homepage Redesign" assigned to you', 
+                              type: 'notification',
+                              time: '02:58 PM', 
+                              avatar: 'SC', 
+                              color: '#10B981', 
+                              isRead: true,
+                              icon: '📋'
+                            },
+                            { 
+                              name: 'John Doe', 
+                              msg: 'Uploaded design-mockup-v2.fig', 
+                              type: 'file',
+                              time: '02:59 PM', 
+                              avatar: 'JD', 
+                              color: '#006397', 
+                              isRead: true,
+                              icon: '📎',
+                              fileSize: '2.4 MB'
+                            },
+                            { 
+                              name: 'Mike Johnson', 
+                              msg: 'Great work on the API integration! 🎉', 
+                              type: 'message',
+                              time: '03:00 PM', 
+                              avatar: 'MJ', 
+                              color: '#F59E0B', 
+                              isRead: false,
+                              reactions: ['👍', '🔥']
+                            },
+                            { 
+                              name: 'Emma Wilson', 
+                              msg: 'Meeting starts in 15 minutes', 
+                              type: 'notification',
+                              time: '03:01 PM', 
+                              avatar: 'EW', 
+                              color: '#8B5CF6', 
+                              isRead: false,
+                              icon: '🔔'
+                            },
+                            { 
+                              name: 'Alex Chen', 
+                              msg: 'Code review completed ✓', 
+                              type: 'message',
+                              time: '03:02 PM', 
+                              avatar: 'AC', 
+                              color: '#EC4899', 
+                              isRead: false,
+                              reactions: ['✅']
+                            }
+                          ];
+                          
+                          // Show 3 messages at a time, rotating based on liveChatIndex
+                          const visibleMessages = [
+                            allMessages[liveChatIndex % allMessages.length],
+                            allMessages[(liveChatIndex + 1) % allMessages.length],
+                            allMessages[(liveChatIndex + 2) % allMessages.length]
+                          ];
+                          
+                          return visibleMessages.map((chat, idx) => (
+                            <div 
+                              key={`${chat.avatar}-${idx}`}
+                              className={`fade-in-up flex items-start gap-3 p-2.5 rounded-lg transition-all hover:bg-gray-50 cursor-pointer ${
+                                idx === visibleMessages.length - 1 ? 'bg-blue-50 continuous-pulse ring-1 ring-blue-200' : ''
+                              }`}
+                              style={{ animationDelay: `${idx * 0.15}s` }}
+                            >
+                              <div className="relative flex-shrink-0">
+                                <div 
+                                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm" 
+                                  style={{ backgroundColor: chat.color }}
+                                >
+                                  {chat.avatar}
+                                </div>
+                                {idx === visibleMessages.length - 1 && (
+                                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white status-bounce"></div>
+                                )}
                               </div>
-                              <div className="text-sm text-gray-600 mt-1 bg-gray-50 rounded-lg p-2">{chat.msg}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline gap-2 mb-1">
+                                  <span className="text-sm font-semibold text-gray-900 truncate">{chat.name}</span>
+                                  <span className="text-xs text-gray-400 flex-shrink-0">{chat.time}</span>
+                                  {chat.isRead && (
+                                    <span className="text-xs text-blue-500 ml-auto">✓✓</span>
+                                  )}
+                                </div>
+                                <div className={`text-sm rounded-lg px-3 py-2 shadow-sm border ${
+                                  chat.type === 'notification' ? 'bg-purple-50 border-purple-200 text-purple-900' :
+                                  chat.type === 'file' ? 'bg-blue-50 border-blue-200 text-blue-900' :
+                                  'bg-white border-gray-100 text-gray-700'
+                                }`}>
+                                  {chat.icon && <span className="mr-1">{chat.icon}</span>}
+                                  {chat.msg}
+                                  {chat.fileSize && (
+                                    <div className="text-xs text-blue-600 mt-1 font-medium">{chat.fileSize}</div>
+                                  )}
+                                  {chat.reactions && chat.reactions.length > 0 && (
+                                    <div className="flex gap-1 mt-2">
+                                      {chat.reactions.map((reaction, rIdx) => (
+                                        <span key={rIdx} className="text-xs bg-white px-2 py-0.5 rounded-full border border-gray-200">
+                                          {reaction}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                        {/* Typing indicator */}
+                        <div className="flex items-start gap-3 p-2.5 opacity-60 fade-in-up" style={{ animationDelay: '0.45s' }}>
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shadow-sm">
+                            <div className="flex gap-1">
+                              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
+                              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot" style={{ animationDelay: '0.4s' }}></div>
                             </div>
                           </div>
-                        ))}
+                          <div className="flex-1">
+                            <div className="text-sm text-gray-400 italic mt-2">Someone is typing...</div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Quick actions */}
+                      <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
+                        <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          Send Message
+                        </button>
+                        <button className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   )}
@@ -1036,33 +1513,134 @@ const LandingPage: React.FC = () => {
                   {adminFeatureTab === 2 && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">AI Analytics Dashboard</h3>
-                        <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">AI Powered</div>
+                        <h3 className="font-bold text-gray-900 text-base">AI Analytics Dashboard</h3>
+                        <div className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 rounded-full text-xs font-semibold continuous-pulse flex items-center gap-1.5">
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 7H7v6h6V7z"/>
+                            <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd"/>
+                          </svg>
+                          AI Powered
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 mb-4">
+                      
+                      {/* Metrics Cards */}
+                      <div className="grid grid-cols-2 gap-3">
                         {[
-                          { label: 'Productivity', value: '87%', trend: '+12%' },
-                          { label: 'On-Time Delivery', value: '94%', trend: '+5%' }
+                          { label: 'Productivity', value: liveProgress, trend: '+12%', color: 'blue' },
+                          { label: 'On-Time Delivery', value: 94, trend: '+5%', color: 'green' }
                         ].map((stat, idx) => (
-                          <div key={idx} className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4">
-                            <div className="text-xs text-gray-600">{stat.label}</div>
-                            <div className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</div>
-                            <div className="text-xs text-green-600 mt-1">{stat.trend}</div>
+                          <div 
+                            key={idx} 
+                            className="continuous-pulse bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-xs font-medium text-gray-500">{stat.label}</div>
+                              <div className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                stat.color === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                              }`}>
+                                {stat.trend}
+                              </div>
+                            </div>
+                            <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}%</div>
+                            <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div 
+                                className={`absolute top-0 left-0 h-full rounded-full transition-all duration-500 ${
+                                  stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gradient-to-r from-green-500 to-green-600'
+                                }`}
+                                style={{ 
+                                  width: `${stat.value}%`,
+                                  boxShadow: `0 0 10px ${stat.color === 'blue' ? 'rgba(59, 130, 246, 0.5)' : 'rgba(34, 197, 94, 0.5)'}`
+                                }}
+                              ></div>
+                            </div>
                           </div>
                         ))}
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="text-xs font-semibold text-gray-600 mb-3">Project Timeline Prediction</div>
-                        <div className="h-24 relative">
-                          <svg className="w-full h-full" viewBox="0 0 300 80">
+
+                      {/* Timeline Prediction Chart */}
+                      <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="text-sm font-semibold text-gray-700">Project Timeline Prediction</div>
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            Predicted
+                          </div>
+                        </div>
+                        <div className="h-28 relative">
+                          <svg className="w-full h-full" viewBox="0 0 300 100" preserveAspectRatio="none">
                             <defs>
                               <linearGradient id="aiGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                                 <stop offset="0%" stopColor="#006397" stopOpacity="0.3"/>
                                 <stop offset="100%" stopColor="#006397" stopOpacity="0"/>
                               </linearGradient>
+                              <filter id="glow">
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                <feMerge>
+                                  <feMergeNode in="coloredBlur"/>
+                                  <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                              </filter>
                             </defs>
-                            <polyline points="0,60 60,45 120,50 180,30 240,35 300,20" fill="url(#aiGradient)" stroke="#006397" strokeWidth="2"/>
+                            {/* Area fill */}
+                            <path 
+                              d="M0,70 L50,55 L100,60 L150,40 L200,45 L250,30 L300,25 L300,100 L0,100 Z" 
+                              fill="url(#aiGradient)"
+                              className="fade-in-up"
+                            />
+                            {/* Line */}
+                            <path 
+                              d="M0,70 L50,55 L100,60 L150,40 L200,45 L250,30 L300,25" 
+                              fill="none" 
+                              stroke="#006397" 
+                              strokeWidth="3"
+                              filter="url(#glow)"
+                              className="task-card-animated"
+                            />
+                            {/* Data points */}
+                            {[
+                              {x: 0, y: 70},
+                              {x: 50, y: 55},
+                              {x: 100, y: 60},
+                              {x: 150, y: 40},
+                              {x: 200, y: 45},
+                              {x: 250, y: 30},
+                              {x: 300, y: 25}
+                            ].map((point, idx) => (
+                              <circle 
+                                key={idx}
+                                cx={point.x} 
+                                cy={point.y} 
+                                r="4" 
+                                fill="#006397"
+                                className="continuous-pulse"
+                                style={{ animationDelay: `${idx * 0.1}s` }}
+                              />
+                            ))}
                           </svg>
+                          {/* Trend indicator */}
+                          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-green-100 rounded-full">
+                            <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <span className="text-xs font-semibold text-green-700">Improving</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* AI Insights */}
+                      <div className="bg-white rounded-xl p-4 border border-purple-200 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0 continuous-pulse">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-sm font-semibold text-gray-900 mb-1">AI Recommendation</div>
+                            <div className="text-xs text-gray-600">
+                              Based on current trends, consider allocating more resources to high-priority tasks to maintain {liveProgress}% productivity.
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1072,42 +1650,397 @@ const LandingPage: React.FC = () => {
                   {adminFeatureTab === 3 && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">Attendance Tracker</h3>
-                        <div className="text-xs text-gray-600">Today: Dec 19, 2025</div>
+                        <h3 className="font-bold text-gray-900 text-base">Attendance Tracker</h3>
+                        <div className="text-xs text-gray-500">
+                          Today: {liveTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </div>
                       </div>
-                      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-4 mb-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-xs text-gray-600">Check-in Status</div>
-                            <div className="text-2xl font-bold text-gray-900 mt-1">8:45 AM</div>
-                            <div className="flex items-center gap-2 mt-2">
-                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                              <span className="text-xs text-green-700">Face Verified</span>
+                      
+                      {/* Check-in Status Card with Face Scan */}
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 shadow-sm">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="text-xs font-medium text-gray-600 mb-1">Check-in Status</div>
+                            <div className="text-3xl font-bold text-gray-900 mb-2">
+                              {liveTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-green-500 status-bounce"></div>
+                              <span className="text-xs font-semibold text-green-700">Face Verified</span>
                             </div>
                           </div>
-                          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-md">
-                            <div className="text-3xl">👤</div>
+                          
+                          {/* Animated Face Scan */}
+                          <div className="relative w-20 h-20">
+                            {/* Face Icon with Pulse */}
+                            <div className="absolute inset-0 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-green-200 continuous-pulse">
+                              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            
+                            {/* Scanning Ring */}
+                            <div className="absolute inset-0 rounded-full border-2 border-green-500 opacity-50" style={{
+                              animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite'
+                            }}></div>
+                            
+                            {/* Scanning Line */}
+                            <div className="absolute inset-0 overflow-hidden rounded-full">
+                              <div 
+                                className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"
+                                style={{
+                                  animation: 'scan-vertical 3s ease-in-out infinite',
+                                  boxShadow: '0 0 10px rgba(34, 197, 94, 0.8)'
+                                }}
+                              ></div>
+                            </div>
+                            
+                            {/* Detection Points */}
+                            {[
+                              { top: '20%', left: '30%' },
+                              { top: '25%', right: '30%' },
+                              { top: '45%', left: '25%' },
+                              { top: '45%', right: '25%' },
+                              { top: '65%', left: '50%', transform: 'translateX(-50%)' }
+                            ].map((pos, idx) => (
+                              <div
+                                key={idx}
+                                className="absolute w-1.5 h-1.5 bg-green-500 rounded-full"
+                                style={{
+                                  ...pos,
+                                  animation: `pulse 2s ease-in-out infinite`,
+                                  animationDelay: `${idx * 0.2}s`,
+                                  boxShadow: '0 0 4px rgba(34, 197, 94, 0.8)'
+                                }}
+                              ></div>
+                            ))}
+                            
+                            {/* Corner Brackets */}
+                            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 80 80">
+                              <path d="M10,20 L10,10 L20,10" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
+                              <path d="M60,10 L70,10 L70,20" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
+                              <path d="M10,60 L10,70 L20,70" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
+                              <path d="M60,70 L70,70 L70,60" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
+                            </svg>
+                            
+                            {/* Verification Checkmark */}
+                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg status-bounce">
+                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Biometric Details */}
+                        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-green-200">
+                          <div className="bg-white rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-1">Confidence</div>
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
+                                  style={{ width: `${Math.min(liveProgress + 2, 99)}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-xs font-bold text-green-700">{Math.min(liveProgress + 2, 99)}%</span>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-1">Match Score</div>
+                            <div className="text-sm font-bold text-gray-900">{(Math.min(liveProgress + 2, 99) / 100).toFixed(3)}</div>
                           </div>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <div className="text-xs font-semibold text-gray-600 mb-2">Team Status</div>
-                        {[
-                          { name: 'Alice Brown', status: 'Present', time: '8:30 AM', location: 'Office' },
-                          { name: 'Bob Wilson', status: 'Present', time: '8:45 AM', location: 'Remote' },
-                          { name: 'Carol Davis', status: 'Absent', time: '-', location: '-' }
-                        ].map((member, idx) => (
-                          <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-2 h-2 rounded-full ${member.status === 'Present' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                <div className="text-xs text-gray-500">{member.location}</div>
+
+                      {/* Team Status */}
+                      <div>
+                        <div className="text-xs font-semibold text-gray-600 mb-3">Team Status</div>
+                        <div className="space-y-2">
+                          {(() => {
+                            const allMembers = [
+                              { name: 'Alice Brown', status: 'Office', time: '8:30 AM', color: '#10B981', avatar: 'AB' },
+                              { name: 'Bob Wilson', status: 'Remote', time: '8:45 AM', color: '#3B82F6', avatar: 'BW' },
+                              { name: 'Carol Davis', status: 'Absent', time: '-', color: '#EF4444', avatar: 'CD' },
+                              { name: 'David Lee', status: 'Office', time: '9:00 AM', color: '#10B981', avatar: 'DL' },
+                              { name: 'Emma White', status: 'Remote', time: '8:15 AM', color: '#3B82F6', avatar: 'EW' }
+                            ];
+
+                            const visibleMembers = [
+                              allMembers[liveChatIndex % allMembers.length],
+                              allMembers[(liveChatIndex + 1) % allMembers.length],
+                              allMembers[(liveChatIndex + 2) % allMembers.length]
+                            ];
+
+                            return visibleMembers.map((member, idx) => (
+                              <div 
+                                key={`${member.avatar}-${idx}`}
+                                className={`fade-in-up flex items-center justify-between bg-white rounded-lg p-3 border transition-all hover:shadow-md ${
+                                  member.status === 'Absent' ? 'border-red-200 bg-red-50' : 
+                                  member.status === 'Office' ? 'border-green-200' : 
+                                  'border-blue-200'
+                                }`}
+                                style={{ animationDelay: `${idx * 0.1}s` }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div 
+                                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm"
+                                    style={{ backgroundColor: member.color }}
+                                  >
+                                    {member.avatar}
+                                  </div>
+                                  <div>
+                                    <div className="text-sm font-semibold text-gray-900">{member.name}</div>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      <div className={`w-1.5 h-1.5 rounded-full ${
+                                        member.status === 'Office' ? 'bg-green-500 status-bounce' :
+                                        member.status === 'Remote' ? 'bg-blue-500 status-bounce' :
+                                        'bg-red-500'
+                                      }`}></div>
+                                      <span className={`text-xs font-medium ${
+                                        member.status === 'Office' ? 'text-green-700' :
+                                        member.status === 'Remote' ? 'text-blue-700' :
+                                        'text-red-700'
+                                      }`}>
+                                        {member.status}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-xs font-medium text-gray-600">{member.time}</div>
                               </div>
-                            </div>
-                            <div className="text-xs text-gray-600">{member.time}</div>
+                            ));
+                          })()}
+                        </div>
+                      </div>
+
+                      {/* Enhanced Location Verification */}
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 shadow-sm">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0 continuous-pulse">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
                           </div>
-                        ))}
+                          <div className="flex-1">
+                            <div className="text-sm font-semibold text-gray-900 mb-1">Location Verified</div>
+                            <div className="text-xs text-gray-600 mb-2">Workspace: Main Office, Floor 3</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-green-500 status-bounce"></div>
+                              <span className="text-xs text-green-700 font-medium">Within 50m radius</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* GPS Details */}
+                        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-blue-200">
+                          <div className="bg-white rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-0.5">Latitude</div>
+                            <div className="text-xs font-mono font-semibold text-gray-900">19.0760° N</div>
+                          </div>
+                          <div className="bg-white rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-0.5">Longitude</div>
+                            <div className="text-xs font-mono font-semibold text-gray-900">72.8777° E</div>
+                          </div>
+                          <div className="bg-white rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-0.5">Accuracy</div>
+                            <div className="text-xs font-semibold text-blue-700">±{15 + (liveProgress % 10)}m</div>
+                          </div>
+                          <div className="bg-white rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-0.5">Signal</div>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4].map((bar) => (
+                                <div 
+                                  key={bar}
+                                  className={`w-1 rounded-sm ${bar <= 3 ? 'bg-green-500' : 'bg-gray-300'}`}
+                                  style={{ height: `${bar * 3}px` }}
+                                ></div>
+                              ))}
+                              <span className="text-xs font-semibold text-green-700 ml-1">Strong</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Integration Setup UI */}
+                  {adminFeatureTab === 4 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-gray-900 text-base">Connect Integrations</h3>
+                        <div className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Easy Setup</div>
+                      </div>
+                      
+                      {/* Setup Steps */}
+                      <div className="space-y-2">
+                        {(() => {
+                          // Determine step status based on liveProgress
+                          const getStepStatus = (step: number) => {
+                            if (liveProgress >= 95) return 'complete';
+                            if (step === 1) return 'complete';
+                            if (step === 2 && liveProgress >= 90) return 'complete';
+                            if (step === 2) return 'active';
+                            return 'pending';
+                          };
+
+                          return [
+                            { step: 1, title: 'Choose Integration', desc: 'Select from 11+ integrations', icon: '🔌' },
+                            { step: 2, title: 'Authorize Access', desc: 'One-click OAuth connection', icon: '🔐' },
+                            { step: 3, title: 'Configure Settings', desc: 'Customize your preferences', icon: '⚙️' }
+                          ].map((item, idx) => {
+                            const status = getStepStatus(item.step);
+                            return (
+                              <div 
+                                key={idx} 
+                                className={`fade-in-up flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                                  status === 'complete' ? 'bg-green-50 border-green-300' :
+                                  status === 'active' ? 'bg-blue-50 border-blue-400 shadow-md continuous-pulse' :
+                                  'bg-gray-50 border-gray-200 opacity-60'
+                                }`}
+                                style={{ animationDelay: `${idx * 0.1}s` }}
+                              >
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all ${
+                                  status === 'complete' ? 'bg-green-500 text-white' :
+                                  status === 'active' ? 'bg-blue-500 text-white' :
+                                  'bg-gray-300 text-gray-600'
+                                }`}>
+                                  {status === 'complete' ? '✓' : item.step}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-semibold text-gray-900 text-sm">{item.title}</div>
+                                  <div className="text-xs text-gray-600 mt-0.5">{item.desc}</div>
+                                </div>
+                                <div className="text-xl flex-shrink-0">{item.icon}</div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+
+                      {/* OAuth Authorization - Rotating Integrations */}
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200 shadow-sm">
+                        <div className="text-xs font-semibold text-gray-700 mb-3">OAuth Authorization</div>
+                        {(() => {
+                          const allIntegrations = [
+                            { 
+                              name: 'GitHub', 
+                              desc: 'Code Repository',
+                              color: 'bg-gray-900',
+                              icon: (
+                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                              )
+                            },
+                            { 
+                              name: 'Slack', 
+                              desc: 'Team Communication',
+                              color: 'bg-purple-600',
+                              icon: (
+                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+                                </svg>
+                              )
+                            },
+                            { 
+                              name: 'Dropbox', 
+                              desc: 'Cloud Storage',
+                              color: 'bg-blue-600',
+                              icon: (
+                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M6 1.807L0 5.629l6 3.822 6-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6-3.822-6-3.822L0 13.274zm12 0l6 3.822 6-3.822-6-3.822-6 3.822zM6 18.371l6 3.822 6-3.822-6-3.822-6 3.822z"/>
+                                </svg>
+                              )
+                            }
+                          ];
+
+                          const currentIntegration = allIntegrations[liveChatIndex % allIntegrations.length];
+                          const connectionProgress = Math.min(liveProgress, 100);
+
+                          return (
+                            <div className="bg-white rounded-lg p-3 shadow-sm fade-in-up">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 rounded-lg ${currentIntegration.color} flex items-center justify-center flex-shrink-0 continuous-pulse`}>
+                                    {currentIntegration.icon}
+                                  </div>
+                                  <div>
+                                    <div className="text-sm font-semibold text-gray-900">{currentIntegration.name}</div>
+                                    <div className="text-xs text-gray-500">{currentIntegration.desc}</div>
+                                  </div>
+                                </div>
+                                {connectionProgress >= 95 ? (
+                                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold flex items-center gap-1.5">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full status-bounce"></div>
+                                    Connected
+                                  </div>
+                                ) : (
+                                  <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                                    Connecting...
+                                  </div>
+                                )}
+                              </div>
+                              {/* Connection Progress */}
+                              {connectionProgress < 95 && (
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="text-gray-600">Authorization Progress</span>
+                                    <span className="font-semibold text-blue-700">{connectionProgress}%</span>
+                                  </div>
+                                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
+                                      style={{ width: `${connectionProgress}%` }}
+                                    ></div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
+
+                      {/* Available Integrations */}
+                      <div>
+                        <div className="text-xs font-semibold text-gray-600 mb-3">Available Integrations</div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[
+                            { name: 'GitHub', color: 'bg-gray-900', icon: (
+                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                              </svg>
+                            )},
+                            { name: 'Dropbox', color: 'bg-blue-600', icon: (
+                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 1.807L0 5.629l6 3.822 6-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6-3.822-6-3.822L0 13.274zm12 0l6 3.822 6-3.822-6-3.822-6 3.822zM6 18.371l6 3.822 6-3.822-6-3.822-6 3.822z"/>
+                              </svg>
+                            )},
+                            { name: 'Spotify', color: 'bg-green-500', icon: (
+                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                              </svg>
+                            )},
+                            { name: 'Notion', color: 'bg-gray-800', icon: (
+                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/>
+                              </svg>
+                            )}
+                          ].map((integration, idx) => (
+                            <div 
+                              key={idx} 
+                              className="fade-in-up flex flex-col items-center gap-2 p-3 rounded-lg bg-white border border-gray-200 hover:shadow-md hover:border-blue-300 transition-all cursor-pointer"
+                              style={{ animationDelay: `${idx * 0.1}s` }}
+                            >
+                              <div className={`w-10 h-10 rounded-lg ${integration.color} flex items-center justify-center shadow-sm`}>
+                                {integration.icon}
+                              </div>
+                              <div className="text-xs text-gray-700 font-medium text-center">{integration.name}</div>
+                              <div className="w-2 h-2 bg-green-500 rounded-full status-bounce"></div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1151,6 +2084,14 @@ const LandingPage: React.FC = () => {
                       description: 'Advanced attendance system with face recognition and location verification for secure workspace management',
                       items: ['Face recognition', 'Location tracking', 'Attendance reports', 'Workspace verification'],
                       image: 'https://via.placeholder.com/600x400/006397/FFFFFF?text=Smart+Attendance+System'
+                    },
+                    {
+                      icon: '🔌',
+                      title: 'Integration Setup',
+                      heading: 'Connect your favorite tools effortlessly',
+                      description: 'Seamlessly integrate with 11+ popular tools using simple OAuth connections',
+                      items: ['One-click OAuth', '11+ integrations', 'GitHub, Dropbox, Spotify', 'Easy configuration'],
+                      image: 'https://via.placeholder.com/600x400/006397/FFFFFF?text=Integration+Setup'
                     }
                   ];
                   const current = features[adminFeatureTab];
@@ -1215,7 +2156,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="max-w-full mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">
               Testimonials
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -1372,10 +2313,9 @@ const LandingPage: React.FC = () => {
       </section>
 
 
-      {/* Why Choose Sartthi Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F1F4F9' }}>
+      {/* Why Choose Sartthi Section - HIDDEN */}
+      {/* <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F1F4F9' }}>
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Why Choose Sartthi?
@@ -1387,7 +2327,6 @@ const LandingPage: React.FC = () => {
 
 
 
-          {/* FlowingMenu */}
           <div style={{ height: '600px', position: 'relative', marginBottom: '4rem' }}>
             <FlowingMenu items={[
               { 
@@ -1417,10 +2356,8 @@ const LandingPage: React.FC = () => {
             ]} />
           </div>
 
-          {/* Feature Highlights */}
           <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left - Features List */}
               <div>
                 <h3 className="text-3xl font-bold text-gray-900 mb-8">
                   Everything You Need in One Platform
@@ -1443,7 +2380,6 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Right - CTA Card */}
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
                 <div className="text-center">
                   <div className="text-6xl mb-6">🚀</div>
@@ -1477,7 +2413,7 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       {/* Pricing Section - Reference Design */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
@@ -1501,7 +2437,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4" style={{ backgroundColor: '#FFF3CD', color: '#856404' }}>
+            <span className="inline-block px-4 py-2 bg-[rgba(0,99,151,0.1)] text-[rgb(0,99,151)] rounded-full text-sm font-semibold mb-4">
               Resources
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -1605,7 +2541,7 @@ const LandingPage: React.FC = () => {
             </div>
             <Link
               to="/contact"
-              className="px-8 py-3 bg-[#006397] text-white hover:text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+              className="px-8 py-3 bg-[#006397] text-white hover:text-white rounded-lg font-semibold hover:bg-[#005080] transition-all shadow-md hover:shadow-lg whitespace-nowrap"
             >
               Get In Touch
             </Link>
@@ -1700,6 +2636,124 @@ const LandingPage: React.FC = () => {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.5; }
         }
+
+        /* ========== LIVE MOCKUP ANIMATIONS ========== */
+        @keyframes slideInFromLeft {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.05);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes glow {
+          0%, 100% {
+            box-shadow: 0 0 5px rgba(0, 99, 151, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(0, 99, 151, 0.6), 0 0 30px rgba(0, 99, 151, 0.4);
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes typing {
+          0%, 100% {
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+
+        @keyframes fillProgress {
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
+        }
+
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-10px);
+          }
+          60% {
+            transform: translateY(-5px);
+          }
+        }
+
+        .task-card-animated {
+          animation: slideInFromLeft 0.6s ease-out forwards;
+        }
+
+        .continuous-glow {
+          animation: glow 2s ease-in-out infinite;
+        }
+
+        .continuous-pulse {
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        .typing-dot {
+          animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .status-bounce {
+          animation: bounce 2s ease-in-out infinite;
+        }
+
+        .fade-in-up {
+          animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .progress-fill {
+          animation: fillProgress 2s ease-out forwards;
+        }
+
+        @keyframes scan-vertical {
+          0% {
+            top: 0;
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            top: 100%;
+            opacity: 0;
+          }
+        }
         
         .animate-bounce-slow {
           animation: bounce-slow 3s ease-in-out infinite;
@@ -1741,14 +2795,14 @@ const LandingPage: React.FC = () => {
         .radio-inputs {
           position: relative;
           display: flex;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
           border-radius: 0.5rem;
           background-color: #eee;
           box-sizing: border-box;
           box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
           padding: 0.25rem;
           width: auto;
-          max-width: 800px;
+          max-width: 1000px;
           font-size: 14px;
         }
 

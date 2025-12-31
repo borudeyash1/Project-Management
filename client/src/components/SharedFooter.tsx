@@ -215,7 +215,7 @@ const SharedFooter: React.FC = () => {
         <button
           onClick={scrollToTop}
           aria-label="Scroll to top"
-          className="fixed bottom-8 right-8 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-[#006397] text-white shadow-lg hover:bg-blue-700 transition-all transform hover:scale-110 animate-fade-in"
+          className="fixed bottom-8 right-8 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-[#006397] text-white shadow-lg hover:bg-[#005080] transition-all transform hover:scale-110 animate-fade-in"
           style={{
             animation: 'fadeIn 0.4s ease-in-out'
           }}

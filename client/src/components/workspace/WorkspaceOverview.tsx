@@ -305,14 +305,76 @@ const WorkspaceOverview: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Chart Placeholder */}
+        {/* Project Progress */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {t('workspace.overview.projectProgress')}
           </h3>
-          <div className="h-64 flex items-center justify-center text-gray-600">
-            {t('workspace.overview.chartPlaceholder')}
-          </div>
+          {workspaceProjects.length > 0 ? (
+            <div className="space-y-4">
+              {workspaceProjects.slice(0, 5).map((project) => (
+                <div key={project._id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {project.name}
+                        </h4>
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                          project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                          project.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                          'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+                        }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        <span className="flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" />
+                          {project.completedTasksCount || 0}/{project.totalTasksCount || 0} tasks
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {project.teamMemberCount || 0} members
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-accent-dark">{project.progress}%</div>
+                    </div>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
+                      style={{ width: `${project.progress}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+              {workspaceProjects.length > 5 && (
+                <button
+                  onClick={() => navigate(`/workspace/${state.currentWorkspace}/projects`)}
+                  className="w-full py-2 text-sm text-accent-dark hover:text-blue-700 font-medium"
+                >
+                  View all {workspaceProjects.length} projects →
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="h-64 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <FolderKanban className="w-12 h-12 mb-3" />
+              <p className="text-sm">{t('workspace.overview.noProjects')}</p>
+              {isOwner && (
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="mt-4 px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90 transition-all text-sm font-medium"
+                >
+                  <Plus className="w-4 h-4 inline mr-1" />
+                  Create First Project
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* AI Notes Widget */}

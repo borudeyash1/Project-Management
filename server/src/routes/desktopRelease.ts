@@ -96,6 +96,64 @@ router.put(
   updateRelease
 );
 
+// Create release from URL (no file upload)
+router.post(
+  '/create-from-url',
+  authenticate,
+  [
+    body('version').notEmpty().withMessage('Version is required'),
+    body('versionName').notEmpty().withMessage('Version name is required'),
+    body('description').notEmpty().withMessage('Description is required'),
+    body('releaseNotes').notEmpty().withMessage('Release notes are required'),
+    body('platform').isIn(['windows', 'macos', 'linux']).withMessage('Invalid platform'),
+    body('architecture').isIn(['x64', 'arm64', 'universal']).withMessage('Invalid architecture'),
+    body('downloadUrl').isURL().withMessage('Valid download URL is required')
+  ],
+  validateRequest,
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const { version, versionName, description, releaseNotes, platform, architecture, isLatest, downloadUrl } = req.body;
+      const authUser = (req as any).user;
+
+      // Import the model
+      const DesktopRelease = require('../models/DesktopRelease').default;
+
+      // Extract filename from URL
+      const urlParts = downloadUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1] || `${platform}-${version}`;
+
+      const release = new DesktopRelease({
+        version,
+        versionName,
+        description,
+        releaseNotes,
+        platform,
+        architecture,
+        fileName,
+        fileSize: 0, // Unknown for URL-based releases
+        downloadUrl,
+        isLatest: isLatest || false,
+        isActive: true,
+        uploadedBy: authUser._id
+      });
+
+      await release.save();
+
+      res.status(201).json({
+        success: true,
+        message: 'Release created successfully from URL',
+        data: release
+      });
+    } catch (error: any) {
+      console.error('Create release from URL error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to create release from URL'
+      });
+    }
+  }
+);
+
 router.delete('/:id', authenticate, deleteRelease);
 router.get('/admin/stats', authenticate, getReleaseStats);
 
