@@ -6,6 +6,7 @@ import { TimelineTask, TimelineResource, DEFAULT_TASK_DURATION } from '../../../
 import TimelineView from '../timeline/TimelineView';
 import TaskDetailModal from '../TaskDetailModal';
 import QuickAddModal from '../QuickAddModal';
+import { useApp } from '../../../context/AppContext';
 
 interface TimelineViewWrapperProps {
   searchQuery: string;
@@ -21,17 +22,31 @@ const TimelineViewWrapper: React.FC<TimelineViewWrapperProps> = ({ searchQuery }
   const { tasks, updateTask } = jiraContext || notionContext || plannerContext;
 
   console.log('[TimelineView] Using', jiraContext ? 'JiraPlannerContext' : 'PlannerContext');
+  const { state } = useApp();
   const [selectedTask, setSelectedTask] = React.useState<any>(null);
   const [showTaskCreate, setShowTaskCreate] = React.useState(false);
+
+  const currentUserId = state.userProfile?._id;
 
   // Convert planner tasks to timeline tasks
   const timelineTasks: TimelineTask[] = React.useMemo(() => {
     return tasks
-      .filter(task =>
-        !searchQuery ||
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      .filter(task => {
+        // Filter by user assignment
+        if (currentUserId) {
+          const isAssignedToMe = 
+            task.assignee === currentUserId || 
+            task.assignee?._id === currentUserId ||
+            task.assignee?.toString() === currentUserId;
+          
+          if (!isAssignedToMe) return false;
+        }
+
+        // Filter by search query
+        return !searchQuery ||
+          task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      })
       .map(task => ({
         id: task._id,
         title: task.title,

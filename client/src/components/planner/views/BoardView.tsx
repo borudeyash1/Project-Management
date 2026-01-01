@@ -10,6 +10,7 @@ import { useDock } from '../../../context/DockContext';
 import { Task } from '../../../context/PlannerContext';
 import QuickAddModal from '../QuickAddModal';
 import BoardViewSkeleton from '../skeletons/BoardViewSkeleton';
+import { useApp } from '../../../context/AppContext';
 
 interface BoardViewProps {
   searchQuery: string;
@@ -27,12 +28,15 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   console.log('[BoardView] Using', jiraContext ? 'JiraPlannerContext' : notionContext ? 'NotionPlannerContext' : 'PlannerContext');
 
   const { dockPosition } = useDock();
+  const { state } = useApp();
   const { t } = useTranslation();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [draggedOverColumn, setDraggedOverColumn] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskCreate, setShowTaskCreate] = useState(false);
   const [taskCreateStatus, setTaskCreateStatus] = useState<string>('pending');
+
+  const currentUserId = state.userProfile?._id;
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
@@ -80,6 +84,16 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   const filteredTasks = (columnId: string) => {
     return tasks
       .filter(task => {
+        // Filter by user assignment
+        if (currentUserId) {
+          const isAssignedToMe = 
+            task.assignee === currentUserId || 
+            task.assignee?._id === currentUserId ||
+            task.assignee?.toString() === currentUserId;
+          
+          if (!isAssignedToMe) return false;
+        }
+
         // Handle legacy statuses mapping to new columns
         if (columnId === 'pending') return task.status === 'pending' || task.status === 'todo';
         if (columnId === 'review') return task.status === 'review' || task.status === 'in-review';

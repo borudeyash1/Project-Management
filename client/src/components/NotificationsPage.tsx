@@ -10,6 +10,7 @@ import { apiService } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useDock } from '../context/DockContext';
+import { useApp } from '../context/AppContext';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 
 interface Notification {
@@ -35,6 +36,7 @@ const NotificationsPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { dockPosition } = useDock();
+  const { addToast } = useApp();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,7 +158,7 @@ const NotificationsPage: React.FC = () => {
             : n
         )
       );
-      alert('Workspace invitation accepted!');
+      addToast('Workspace invitation accepted!', 'success');
     } catch (error: any) {
       console.error('Failed to accept invitation:', error);
       const errorMessage = error.response?.data?.message || error.message || error.toString();
@@ -172,7 +174,7 @@ const NotificationsPage: React.FC = () => {
           )
         );
       } else {
-        alert(errorMessage);
+        addToast(errorMessage, 'error');
       }
     } finally {
       setActionLoading(prev => {
@@ -198,10 +200,10 @@ const NotificationsPage: React.FC = () => {
             : n
         )
       );
-      alert('Workspace invitation declined');
+      addToast('Workspace invitation declined', 'info');
     } catch (error: any) {
       console.error('Failed to decline invitation:', error);
-      alert(error.response?.data?.message || 'Failed to decline invitation');
+      addToast(error.response?.data?.message || 'Failed to decline invitation', 'error');
     } finally {
       setActionLoading(prev => {
         const newSet = new Set(prev);
@@ -215,20 +217,33 @@ const NotificationsPage: React.FC = () => {
     const joinRequestId = notification.metadata?.joinRequestId;
     const workspaceId = notification.relatedId || notification.metadata?.workspaceId;
 
+    console.log('Approving join request:', { joinRequestId, workspaceId, notification });
+
     if (!joinRequestId || !workspaceId) {
-      alert('Cannot approve: Missing required information. Please refresh the page.');
+      addToast('Cannot approve: Missing required information. Please refresh the page.', 'error');
       return;
     }
 
     setActionLoading(prev => new Set(prev).add(notification._id));
     try {
-      await apiService.post(`/workspaces/${workspaceId}/join-requests/${joinRequestId}/approve`);
+      console.log(`Making API call: POST /workspaces/${workspaceId}/join-requests/${joinRequestId}/approve`);
+      const response = await apiService.post(`/workspaces/${workspaceId}/join-requests/${joinRequestId}/approve`);
+      console.log('Approve response:', response);
+      
       await deleteNotification(notification._id);
-      alert('Join request approved!');
+      addToast('Join request approved!', 'success');
       loadNotifications();
     } catch (error: any) {
       console.error('Failed to approve join request:', error);
-      alert(error.response?.data?.message || 'Failed to approve request');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        status: error.status,
+        data: error.data
+      });
+      
+      const errorMessage = error.message || error.data?.message || 'Failed to approve request';
+      addToast(errorMessage, 'error');
     } finally {
       setActionLoading(prev => {
         const newSet = new Set(prev);
@@ -242,20 +257,33 @@ const NotificationsPage: React.FC = () => {
     const joinRequestId = notification.metadata?.joinRequestId;
     const workspaceId = notification.relatedId || notification.metadata?.workspaceId;
 
+    console.log('Rejecting join request:', { joinRequestId, workspaceId, notification });
+
     if (!joinRequestId || !workspaceId) {
-      alert('Cannot reject: Missing required information. Please refresh the page.');
+      addToast('Cannot reject: Missing required information. Please refresh the page.', 'error');
       return;
     }
 
     setActionLoading(prev => new Set(prev).add(notification._id));
     try {
-      await apiService.post(`/workspaces/${workspaceId}/join-requests/${joinRequestId}/reject`);
+      console.log(`Making API call: POST /workspaces/${workspaceId}/join-requests/${joinRequestId}/reject`);
+      const response = await apiService.post(`/workspaces/${workspaceId}/join-requests/${joinRequestId}/reject`);
+      console.log('Reject response:', response);
+      
       await deleteNotification(notification._id);
-      alert('Join request rejected');
+      addToast('Join request rejected', 'info');
       loadNotifications();
     } catch (error: any) {
       console.error('Failed to reject join request:', error);
-      alert(error.response?.data?.message || 'Failed to reject request');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        status: error.status,
+        data: error.data
+      });
+      
+      const errorMessage = error.message || error.data?.message || 'Failed to reject request';
+      addToast(errorMessage, 'error');
     } finally {
       setActionLoading(prev => {
         const newSet = new Set(prev);
@@ -497,7 +525,7 @@ const NotificationsPage: React.FC = () => {
       <GlassmorphicPageHeader
         icon={Bell}
         title={t('navigation.notifications')}
-        subtitle={t('notifications.unreadTotal', { unread: unreadCount, total: notifications.length })}
+        subtitle={t('notifications.unreadTotal', { count: unreadCount })}
         className="w-full !rounded-none !border-x-0 !mb-0"
       >
         <div className="flex items-center gap-3">

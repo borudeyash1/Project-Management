@@ -25,6 +25,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '../../ui/context-menu';
+import { useApp } from '../../../context/AppContext';
 
 interface GanttViewProps {
   searchQuery: string;
@@ -32,6 +33,9 @@ interface GanttViewProps {
 
 const GanttView: React.FC<GanttViewProps> = ({ searchQuery }) => {
   const { tasks, updateTask, deleteTask } = usePlanner();
+  const { state } = useApp();
+
+  const currentUserId = state.userProfile?._id;
 
   // Map task status to Gantt status with colors
   const getStatusColor = (status: string): string => {
@@ -48,6 +52,17 @@ const GanttView: React.FC<GanttViewProps> = ({ searchQuery }) => {
   const features: GanttFeature[] = useMemo(() => {
     return tasks
       .filter(task => {
+        // Filter by user assignment
+        if (currentUserId) {
+          const isAssignedToMe = 
+            task.assignee === currentUserId || 
+            task.assignee?._id === currentUserId ||
+            task.assignee?.toString() === currentUserId;
+          
+          if (!isAssignedToMe) return false;
+        }
+
+        // Filter by search query
         const matchesSearch = !searchQuery || 
           task.title.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesSearch;

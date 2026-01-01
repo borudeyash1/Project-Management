@@ -70,6 +70,7 @@ import spotifyRoutes from "./routes/spotifyRoutes";
 import mediaRoutes from "./routes/mediaRoutes"; // [NEW]
 import storageRoutes from "./routes/storageRoutes"; // [NEW] Storage Import
 import chatRoutes from "./routes/chatRoutes"; // [NEW] Chat Routes
+import paymentRoutes from "./routes/payment.routes"; // [NEW] Payment Routes
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 import { initializeSocket } from "./socket/chatSocket"; // [NEW] Socket.IO
@@ -207,6 +208,7 @@ app.use("/api/spotify", spotifyRoutes);
 app.use("/api/media/spotify", mediaRoutes); // [NEW] Media Routes
 app.use("/api/storage", storageRoutes); // [NEW] Storage Route Mount
 app.use("/api/chat", chatRoutes); // [NEW] Chat Routes
+app.use("/api/payment", paymentRoutes); // [NEW] Payment Routes
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

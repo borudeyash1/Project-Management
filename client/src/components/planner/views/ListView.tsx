@@ -8,6 +8,7 @@ import { usePlanner } from '../../../context/PlannerContext';
 import { useJiraPlanner } from '../../../context/JiraPlannerContext';
 import { useNotionPlanner } from '../../../context/NotionPlannerContext';
 import { Task } from '../../../context/PlannerContext';
+import { useApp } from '../../../context/AppContext';
 
 interface ListViewProps {
   searchQuery: string;
@@ -29,6 +30,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   console.log('[ListView] Using', jiraContext ? 'JiraPlannerContext' : notionContext ? 'NotionPlannerContext' : 'PlannerContext');
 
   const { t } = useTranslation();
+  const { state } = useApp();
 
   const [sortField, setSortField] = useState<SortField>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -37,12 +39,25 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
   const [editingCell, setEditingCell] = useState<{ taskId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  // Filter tasks by search query
-  const filteredTasks = tasks.filter(task =>
-    !searchQuery ||
-    task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const currentUserId = state.userProfile?._id;
+
+  // Filter tasks by user assignment and search query
+  const filteredTasks = tasks.filter(task => {
+    // Filter by user assignment
+    if (currentUserId) {
+      const isAssignedToMe = 
+        task.assignee === currentUserId || 
+        task.assignee?._id === currentUserId ||
+        task.assignee?.toString() === currentUserId;
+      
+      if (!isAssignedToMe) return false;
+    }
+
+    // Filter by search query
+    return !searchQuery ||
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   // Sort tasks
   const sortedTasks = [...filteredTasks].sort((a, b) => {

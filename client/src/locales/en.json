@@ -2971,7 +2971,9 @@
     "tryNow": "Try Now",
     "signUp": "Sign Up",
     "signIn": "Sign In",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "approve": "Approve",
+    "reject": "Reject"
   },
   "planner": {
     "title": "My Work",
@@ -3025,7 +3027,8 @@
         "thu": "Thu",
         "fri": "Fri",
         "sat": "Sat"
-      }
+      },
+      "more": "+{{count}} more"
     },
     "list": {
       "groupBy": {
@@ -3536,6 +3539,7 @@
   "notifications": {
     "title": "Notifications",
     "unreadTotal": "{{count}} unread notifications",
+    "unreadNotifications": "{{count}} unread notifications",
     "markAllRead": "Mark all as read",
     "clearAll": "Clear all",
     "filters": {

@@ -6,16 +6,23 @@ import SharedFooter from './SharedFooter';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import ContentBanner from './ContentBanner';
+import RazorpayPaymentModal from './RazorpayPaymentModal';
+import { useApp } from '../context/AppContext';
 
 const PricingPage: React.FC = () => {
   useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { state } = useApp();
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [isYearly, setIsYearly] = useState(false);
   const [pricingPlans, setPricingPlans] = useState<any[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
+  
+  // Payment modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
 
   useEffect(() => {
     setIsVisible(true);
@@ -50,6 +57,7 @@ const PricingPage: React.FC = () => {
 
   const getDefaultPlans = () => [
     {
+      planKey: 'free',
       name: 'Free',
       price: 0,
       description: 'Get started for free',
@@ -73,6 +81,7 @@ const PricingPage: React.FC = () => {
       buttonStyle: 'outline'
     },
     {
+      planKey: 'pro',
       name: 'Pro',
       price: 449,
       description: 'Recommended',
@@ -110,10 +119,12 @@ const PricingPage: React.FC = () => {
       buttonStyle: 'solid'
     },
     {
+      planKey: 'premium',
       name: 'Premium',
       price: 'Contact',
       description: 'For growing teams',
       recommended: false,
+      contactLink: true,
       features: [
         { text: 'Workspaces: 1 personal + 10 additional', included: true },
         { text: 'Projects: 5 per workspace', included: true },
@@ -148,14 +159,15 @@ const PricingPage: React.FC = () => {
         }
       ],
       buttonText: 'Contact Sales',
-      buttonStyle: 'outline',
-      contactLink: true
+      buttonStyle: 'outline'
     },
     {
+      planKey: 'enterprise',
       name: 'Enterprise',
       price: 'Custom',
       description: 'For large organizations',
       recommended: false,
+      contactLink: true,
       features: [
         { text: 'Tailored plan for company requirements', included: true },
         { text: 'Custom workspaces & projects', included: true },
@@ -182,13 +194,54 @@ const PricingPage: React.FC = () => {
         { text: 'On-premise deployment option', included: true }
       ],
       buttonText: 'Contact Sales',
-      buttonStyle: 'outline',
-      contactLink: true
+      buttonStyle: 'outline'
     }
   ];
 
-  const handleGetStarted = (planName: string) => {
-    navigate('/login');
+  const handleGetStarted = (plan: any) => {
+    console.log('🔵 Get Started clicked for plan:', plan);
+    console.log('🔵 User profile:', state.userProfile);
+    console.log('🔵 Plan details:', { planKey: plan.planKey, price: plan.price, contactLink: plan.contactLink });
+    
+    // Check if user is logged in
+    if (!state.userProfile) {
+      console.log('❌ User not logged in, redirecting to /login');
+      navigate('/login');
+      return;
+    }
+
+    // Convert price to number if it's a numeric string
+    const numericPrice = typeof plan.price === 'string' && !isNaN(Number(plan.price)) 
+      ? Number(plan.price) 
+      : plan.price;
+
+    console.log('💰 Converted price:', numericPrice, 'Type:', typeof numericPrice);
+
+    // Free plan - redirect to dashboard
+    if (plan.planKey === 'free' || numericPrice === 0) {
+      console.log('✅ Free plan selected, redirecting to dashboard');
+      navigate('/');
+      return;
+    }
+
+    // Contact plans - only if contactLink is true OR price is non-numeric string like "Contact" or "Custom"
+    if (plan.contactLink || (typeof plan.price === 'string' && isNaN(Number(plan.price)))) {
+      console.log('📞 Contact plan selected, redirecting to /contact-us');
+      navigate('/contact-us');
+      return;
+    }
+
+    // Paid plans - open payment modal
+    console.log('💳 Paid plan selected, opening payment modal');
+    setSelectedPlan({ ...plan, price: numericPrice }); // Store with numeric price
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    console.log('✅ Payment successful!');
+    // Refresh user data or redirect to dashboard
+    navigate('/');
+    // You can also show a success message here
   };
 
   return (
@@ -348,7 +401,7 @@ const PricingPage: React.FC = () => {
 
                   {/* CTA Button */}
                   <button
-                    onClick={() => handleGetStarted(plan.name)}
+                    onClick={() => handleGetStarted(plan)}
                     className={`w-full py-2.5 px-6 rounded-lg font-medium text-sm transition-all duration-300 ${
                       plan.buttonStyle === 'solid'
                         ? 'bg-[#006397] text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
@@ -792,6 +845,28 @@ const PricingPage: React.FC = () => {
       </section>
 
       <SharedFooter />
+
+      {/* Razorpay Payment Modal */}
+      {(() => {
+        console.log('🔍 Modal render check:', { showPaymentModal, selectedPlan });
+        return showPaymentModal && selectedPlan ? (
+          <RazorpayPaymentModal
+            isOpen={showPaymentModal}
+            onClose={() => {
+              console.log('❌ Closing payment modal');
+              setShowPaymentModal(false);
+            }}
+            planKey={selectedPlan.planKey || selectedPlan.name.toLowerCase()}
+            planName={selectedPlan.displayName || selectedPlan.name}
+            amount={typeof selectedPlan.price === 'number' 
+              ? (isYearly ? Math.round(selectedPlan.price * 12 * 0.9) : selectedPlan.price)
+              : 0
+            }
+            billingCycle={isYearly ? 'yearly' : 'monthly'}
+            onSuccess={handlePaymentSuccess}
+          />
+        ) : null;
+      })()}
     </div>
   );
 };

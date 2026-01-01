@@ -167,3 +167,21 @@
 2025-12-31T16:40:50.928Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
 2025-12-31T16:40:50.931Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
 
+2026-01-01T02:02:26.139Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
+2026-01-01T02:02:26.140Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2026-01-01T02:43:20.625Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
+2026-01-01T02:43:20.630Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2026-01-01T03:01:14.667Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
+2026-01-01T03:01:14.668Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2026-01-01T03:01:26.098Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
+2026-01-01T03:01:26.101Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2026-01-01T03:01:31.528Z [ERROR] Google Auth Failed: No matching document found for id "6942e7692b74d7d2bcc1de91" version 37 modifiedPaths "lastLogin, loginHistory"
+VersionError: No matching document found for id "6942e7692b74d7d2bcc1de91" version 37 modifiedPaths "lastLogin, loginHistory"
+    at generateVersionError (C:\Users\suraj\Downloads\PMS\Project-Management\server\node_modules\mongoose\lib\model.js:571:10)
+    at model.save (C:\Users\suraj\Downloads\PMS\Project-Management\server\node_modules\mongoose\lib\model.js:629:28)
+    at googleAuth (C:\Users\suraj\Downloads\PMS\Project-Management\server\src\controllers\authController.ts:1001:16)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-01-01T03:31:17.603Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
+2026-01-01T03:31:17.605Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true
+2026-01-01T03:35:47.609Z [DEBUG] Google Auth Request: email=surajbagul240305@gmail.com, isRegistration=false
+2026-01-01T03:35:47.610Z [DEBUG] Env Check: hasJwtSecret=true, hasRefreshSecret=true

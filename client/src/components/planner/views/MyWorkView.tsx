@@ -26,9 +26,20 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
 
   const currentUserId = state.userProfile?._id;
 
-  // Show all non-completed tasks (assignee feature not implemented yet)
+  // Filter tasks to show only those assigned to the current user
   const myTasks = tasks.filter(task => {
+    // If no user is logged in, show no tasks
+    if (!currentUserId) return false;
+    
+    // Check if task is assigned to current user
+    // Handle different assignee formats: string ID, object with _id, or null/undefined
+    const isAssignedToMe = 
+      task.assignee === currentUserId || 
+      task.assignee?._id === currentUserId ||
+      task.assignee?.toString() === currentUserId;
+    
     return (
+      isAssignedToMe &&
       task.status !== 'done' &&
       task.status !== 'completed' &&
       (!searchQuery ||

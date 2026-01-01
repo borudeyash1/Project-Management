@@ -5,6 +5,7 @@ import { usePlanner } from '../../../context/PlannerContext';
 import { useJiraPlanner } from '../../../context/JiraPlannerContext';
 import { useNotionPlanner } from '../../../context/NotionPlannerContext';
 import { Task } from '../../../context/PlannerContext';
+import { useApp } from '../../../context/AppContext';
 
 interface CalendarViewProps {
   searchQuery: string;
@@ -24,15 +25,29 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
 
   console.log('[CalendarView] Using', jiraContext ? 'JiraPlannerContext' : notionContext ? 'NotionPlannerContext' : 'PlannerContext');
   const { t, i18n } = useTranslation();
+  const { state } = useApp();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [mode, setMode] = useState<CalendarMode>('month');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  // Filter tasks
-  const filteredTasks = tasks.filter(task =>
-    !searchQuery ||
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const currentUserId = state.userProfile?._id;
+
+  // Filter tasks by user assignment and search query
+  const filteredTasks = tasks.filter(task => {
+    // Filter by user assignment
+    if (currentUserId) {
+      const isAssignedToMe = 
+        task.assignee === currentUserId || 
+        task.assignee?._id === currentUserId ||
+        task.assignee?.toString() === currentUserId;
+      
+      if (!isAssignedToMe) return false;
+    }
+
+    // Filter by search query
+    return !searchQuery ||
+      task.title.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   // Get month days
   const getMonthDays = () => {
@@ -174,7 +189,7 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
                     } `}
                 >
-                  {t(`planner.calendar.${m} `)}
+                  {t(`planner.calendar.${m}`)}
                 </button>
               ))}
             </div>
@@ -190,7 +205,7 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
             <div className="grid grid-cols-7 border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
               {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => (
                 <div key={day} className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-700">
-                  {t(`planner.calendar.days.${day} `)}
+                  {t(`planner.calendar.days.${day}`)}
                 </div>
               ))}
             </div>
