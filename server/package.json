@@ -26,6 +26,7 @@
     "@google/generative-ai": "^0.24.1",
     "@types/nodemailer": "^7.0.3",
     "@types/passport": "^1.0.17",
+    "@types/socket.io": "^3.0.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
