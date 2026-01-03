@@ -377,15 +377,21 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     const userId = req.user!._id;
     const updateData = req.body;
 
+    // Find project - allow access if user is creator OR has owner/manager role
     const project = await Project.findOne({
       _id: id,
       isActive: true,
-      teamMembers: {
-        $elemMatch: {
-          user: userId,
-          role: { $in: ['owner', 'manager'] }
+      $or: [
+        { createdBy: userId },
+        {
+          teamMembers: {
+            $elemMatch: {
+              user: userId,
+              role: { $in: ['owner', 'manager'] }
+            }
+          }
         }
-      }
+      ]
     });
 
     if (!project) {
@@ -540,15 +546,22 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response): P
     const { id } = req.params;
     const userId = req.user!._id;
 
+    // Find project - allow access if user is creator OR has owner/manager role
     const project = await Project.findOne({
       _id: id,
-      teamMembers: {
-        $elemMatch: {
-          user: userId,
-          role: 'owner'
+      isActive: true,
+      $or: [
+        { createdBy: userId },
+        {
+          teamMembers: {
+            $elemMatch: {
+              user: userId,
+              role: { $in: ['owner', 'manager'] }
+            }
+          }
         }
-      }
-    });
+      ]
+    }).populate('workspace', 'owner');
 
     if (!project) {
       res.status(404).json({
@@ -556,6 +569,26 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response): P
         message: 'Project not found or access denied'
       });
       return;
+    }
+
+    // If project belongs to a workspace, also check if user is workspace owner
+    if (project.workspace) {
+      const workspaceOwner = (project.workspace as any).owner;
+      const isWorkspaceOwner = workspaceOwner && workspaceOwner.toString() === userId.toString();
+      
+      // Allow deletion if user is workspace owner, project creator, or has owner/manager role
+      const isCreator = project.createdBy.toString() === userId.toString();
+      const hasOwnerRole = (project as any).teamMembers?.some(
+        (member: any) => member.user.toString() === userId.toString() && ['owner', 'manager'].includes(member.role)
+      );
+
+      if (!isWorkspaceOwner && !isCreator && !hasOwnerRole) {
+        res.status(403).json({
+          success: false,
+          message: 'Only workspace owners, project creators, or project owners/managers can delete projects'
+        });
+        return;
+      }
     }
 
     // Soft delete by setting isActive to false

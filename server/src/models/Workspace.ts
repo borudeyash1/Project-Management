@@ -23,6 +23,24 @@ const workspaceSchema = new Schema<IWorkspace>({
     trim: true,
     maxlength: [50, 'Region cannot exceed 50 characters']
   },
+  contactInfo: {
+    email: {
+      type: String,
+      trim: true
+    },
+    phone: {
+      type: String,
+      trim: true
+    },
+    address: {
+      type: String,
+      trim: true
+    },
+    website: {
+      type: String,
+      trim: true
+    }
+  },
   owner: {
     type: String,
     required: true
@@ -81,7 +99,7 @@ const workspaceSchema = new Schema<IWorkspace>({
   settings: {
     isPublic: {
       type: Boolean,
-      default: false
+      default: true
     },
     allowMemberInvites: {
       type: Boolean,
@@ -142,6 +160,10 @@ const workspaceSchema = new Schema<IWorkspace>({
   isActive: {
     type: Boolean,
     default: true
+  },
+  isAIPowered: {
+    type: Boolean,
+    default: false
   },
   vaultFolderId: {
     type: Schema.Types.ObjectId,

@@ -45,23 +45,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
       </div>
 
       {/* Options Dropdown */}
-      <DropdownTransition
-        isOpen={isOpen}
-        className="options absolute left-0 right-0 mt-1 flex flex-col gap-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50"
-      >
-        {options.map((option) => (
-          <button
-            key={option.id}
-            onClick={() => handleOptionClick(option.value)}
-            className={`option text-left px-4 py-2 rounded-md text-sm transition-colors ${value === option.value
-              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 font-semibold'
-              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </DropdownTransition>
+      {isOpen && (
+        <div className="options absolute left-0 right-0 mt-1 flex flex-col gap-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl z-[9999]">
+          {options.map((option) => (
+            <button
+              key={option.id}
+              onClick={() => handleOptionClick(option.value)}
+              className={`option text-left px-4 py-2 rounded-md text-sm transition-colors ${value === option.value
+                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 font-semibold'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

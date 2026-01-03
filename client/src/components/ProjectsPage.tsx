@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import CreateProjectModal from './CreateProjectModal';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import GlassmorphicCard from './ui/GlassmorphicCard';
-import ConfirmDialog from './common/ConfirmDialog';
 import {
   getProjects,
   createProject as createProjectApi,
@@ -79,11 +78,17 @@ const ProjectsPage: React.FC = () => {
   const [processingProjectId, setProcessingProjectId] = useState<string | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // Rename State
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [projectToRename, setProjectToRename] = useState<{ id: string; name: string } | null>(null);
   const [newProjectName, setNewProjectName] = useState('');
+
+  // Complete Confirmation State
+  const [completeConfirmOpen, setCompleteConfirmOpen] = useState(false);
+  const [projectToComplete, setProjectToComplete] = useState<{ id: string; name: string } | null>(null);
+  const [completeConfirmText, setCompleteConfirmText] = useState('');
 
   const activeWorkspaceId = useMemo(() => {
     // If in Personal Mode, return 'personal' to load personal projects
@@ -249,9 +254,9 @@ const ProjectsPage: React.FC = () => {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: currency
+      currency: currency || 'INR'
     }).format(amount);
   };
 
@@ -304,6 +309,18 @@ const ProjectsPage: React.FC = () => {
   };
 
   const handleUpdateProjectStatus = async (projectId: string, status: Project['status']) => {
+    // Show confirmation modal for complete status
+    if (status === 'completed') {
+      const project = projects.find(p => p._id === projectId);
+      if (project) {
+        setProjectToComplete({ id: projectId, name: project.name });
+        setCompleteConfirmOpen(true);
+        setCompleteConfirmText('');
+      }
+      return;
+    }
+
+    // For other statuses, update directly
     try {
       setProcessingProjectId(projectId);
       await updateProjectApi(projectId, { status });
@@ -316,16 +333,47 @@ const ProjectsPage: React.FC = () => {
     }
   };
 
+  const confirmCompleteProject = async () => {
+    if (!projectToComplete) return;
+
+    // Validate confirmation text
+    if (completeConfirmText !== 'complete-this-project') {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: 'Please type "complete-this-project" to confirm' } });
+      return;
+    }
+
+    try {
+      setProcessingProjectId(projectToComplete.id);
+      await updateProjectApi(projectToComplete.id, { status: 'completed' });
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'success', message: t('messages.projectStatusUpdated') } });
+      await loadProjects();
+      setCompleteConfirmOpen(false);
+      setProjectToComplete(null);
+      setCompleteConfirmText('');
+    } catch (err: any) {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || t('messages.updateFailed') } });
+    } finally {
+      setProcessingProjectId(null);
+    }
+  };
+
   const handleDeleteProject = (projectId: string) => {
     const project = projects.find(p => p._id === projectId);
     if (project) {
       setProjectToDelete({ id: projectId, name: project.name });
       setDeleteConfirmOpen(true);
+      setDeleteConfirmText('');
     }
   };
 
   const confirmDeleteProject = async () => {
     if (!projectToDelete) return;
+
+    // Validate confirmation text
+    if (deleteConfirmText !== 'delete-this-project') {
+      dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: 'Please type "delete-this-project" to confirm' } });
+      return;
+    }
 
     try {
       setProcessingProjectId(projectToDelete.id);
@@ -334,6 +382,7 @@ const ProjectsPage: React.FC = () => {
       await loadProjects();
       setDeleteConfirmOpen(false);
       setProjectToDelete(null);
+      setDeleteConfirmText('');
     } catch (err: any) {
       dispatch({ type: 'ADD_TOAST', payload: { type: 'error', message: err.message || t('messages.deleteFailed') } });
     } finally {
@@ -526,9 +575,7 @@ const ProjectsPage: React.FC = () => {
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{project.description}</p>
                   </div>
-                  <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 relative z-10">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+                  {/* Three-dots menu hidden as per user request */}
                 </div>
 
                 {/* Tags with Gradient Backgrounds */}
@@ -601,7 +648,7 @@ const ProjectsPage: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-400">{t('projects.budget')}</span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatCurrency(project.budget.actual, project.budget.currency)} / {formatCurrency(project.budget.estimated, project.budget.currency)}
+                      {formatCurrency(project.budget.actual ?? 0, project.budget.currency)} / {formatCurrency(project.budget.estimated ?? 0, project.budget.currency)}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -624,16 +671,7 @@ const ProjectsPage: React.FC = () => {
                     <Eye className="w-4 h-4" />
                     {t('common.view')}
                   </button>
-                  <button
-                    onClick={() => handleRenameProject(project)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg ${isDarkMode
-                      ? 'text-gray-300 border-gray-600 hover:bg-gray-700'
-                      : 'text-gray-600 border-gray-300 hover:bg-gray-50'
-                      }`}
-                  >
-                    <Edit className="w-4 h-4" />
-                    {t('projects.rename')}
-                  </button>
+                  {/* Rename button hidden as per user request */}
                   {project.status !== 'completed' && (
                     <button
                       onClick={() => handleUpdateProjectStatus(project._id, 'completed')}
@@ -739,16 +777,14 @@ const ProjectsPage: React.FC = () => {
                         {new Date(project.endDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {formatCurrency(project.budget.actual, project.budget.currency)} / {formatCurrency(project.budget.estimated, project.budget.currency)}
+                        {formatCurrency(project.budget.actual ?? 0, project.budget.currency)} / {formatCurrency(project.budget.estimated ?? 0, project.budget.currency)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" onClick={() => handleViewProject(project._id)}>
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-600" onClick={() => handleRenameProject(project)} title="Rename">
-                            <Edit className="w-4 h-4" />
-                          </button>
+                          {/* Rename button hidden as per user request */}
                           {project.status !== 'completed' && (
                             <button
                               className={`text-green-500 hover:text-green-700 ${processingProjectId === project._id ? 'opacity-60 cursor-not-allowed' : ''}`}
@@ -798,8 +834,76 @@ const ProjectsPage: React.FC = () => {
               </button>
             )}
           </div>
-        )}
-      </div>
+      )}
+
+      {/* Complete Confirmation Modal */}
+      {completeConfirmOpen && projectToComplete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={`max-w-md w-full rounded-lg p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Complete Project
+            </h3>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              To complete this project, please confirm by entering the following:
+            </p>
+            
+            <div className="space-y-4">
+              {/* Project Name Display */}
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Project Name:
+                </label>
+                <div className={`px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
+                  {projectToComplete.name}
+                </div>
+              </div>
+
+              {/* Confirmation Input */}
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Type <span className="font-mono text-green-600">"complete-this-project"</span> to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={completeConfirmText}
+                  onChange={(e) => setCompleteConfirmText(e.target.value)}
+                  placeholder="complete-this-project"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent ${isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setCompleteConfirmOpen(false);
+                  setProjectToComplete(null);
+                  setCompleteConfirmText('');
+                }}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmCompleteProject}
+                disabled={completeConfirmText !== 'complete-this-project' || processingProjectId === projectToComplete.id}
+                className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {processingProjectId === projectToComplete.id ? 'Completing...' : 'Complete Project'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
 
       {/* Create Project Modal */}
       <CreateProjectModal
@@ -809,21 +913,73 @@ const ProjectsPage: React.FC = () => {
         isSubmitting={creatingProject}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteConfirmOpen}
-        onClose={() => {
-          setDeleteConfirmOpen(false);
-          setProjectToDelete(null);
-        }}
-        onConfirm={confirmDeleteProject}
-        title={t('projects.deleteProject')}
-        message={projectToDelete ? `${t('messages.confirmDeleteProject')} "${projectToDelete.name}"?` : ''}
-        confirmText={t('common.delete')}
-        cancelText={t('common.cancel')}
-        variant="danger"
-        loading={processingProjectId === projectToDelete?.id}
-      />
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmOpen && projectToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={`max-w-md w-full rounded-lg p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Delete Project
+            </h3>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              To delete this project, please confirm by entering the following:
+            </p>
+            
+            <div className="space-y-4">
+              {/* Project Name Display */}
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Project Name:
+                </label>
+                <div className={`px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
+                  {projectToDelete.name}
+                </div>
+              </div>
+
+              {/* Confirmation Input */}
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Type <span className="font-mono text-red-600">"delete-this-project"</span> to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="delete-this-project"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent ${isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setProjectToDelete(null);
+                  setDeleteConfirmText('');
+                }}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteProject}
+                disabled={deleteConfirmText !== 'delete-this-project' || processingProjectId === projectToDelete.id}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {processingProjectId === projectToDelete.id ? 'Deleting...' : 'Delete Project'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rename Modal */}
       {renameModalOpen && (

@@ -448,10 +448,10 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
                     <p className="text-gray-600">Workspaces</p>
                     <p className="font-semibold">{detailPlan.limits.maxWorkspaces === -1 ? 'Unlimited' : detailPlan.limits.maxWorkspaces}</p>
                   </div>
-                </div>
-                <div>
-                  <p className="text-gray-600">Team members</p>
-                  <p className="font-semibold">{detailPlan.limits.maxTeamMembers === -1 ? 'Unlimited' : detailPlan.limits.maxTeamMembers}</p>
+                  <div>
+                    <p className="text-gray-600">Team members</p>
+                    <p className="font-semibold">{detailPlan.limits.maxTeamMembers === -1 ? 'Unlimited' : detailPlan.limits.maxTeamMembers}</p>
+                  </div>
                 </div>
               </div>
             </div>

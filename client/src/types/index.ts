@@ -321,6 +321,12 @@ export interface Workspace {
   members: WorkspaceMember[];
   settings: WorkspaceSettings;
   subscription: WorkspaceSubscription;
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+    website?: string;
+  };
   isActive: boolean;
   memberCount: number;
   createdAt: Date;

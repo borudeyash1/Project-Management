@@ -247,8 +247,9 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
             />
           </div>
 
-          {/* Project and Assignee */}
-          <div className="grid grid-cols-2 gap-4">
+
+          {/* Project and Assignee - Hidden as they are known from context */}
+          {/* <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t('common.projects')}
@@ -290,7 +291,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
                 ))}
               </select>
             </div>
-          </div>
+          </div> */}
 
           {/* Tags */}
           <div>

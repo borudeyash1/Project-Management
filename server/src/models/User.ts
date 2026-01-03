@@ -105,7 +105,7 @@ const userSchema = new Schema<IUser>({
       },
       category: {
         type: String,
-        enum: ['technical', 'soft', 'management', 'creative', 'analytical'],
+        enum: ['technical', 'soft', 'language', 'other'],
         default: 'technical'
       }
     }],

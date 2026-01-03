@@ -134,7 +134,16 @@
   },
   "messages": {
     "noWorkspace": "No workspace selected",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "profileUpdated": "Profile updated successfully",
+    "profileUpdateFailed": "Failed to update profile",
+    "projectCreated": "Project created successfully",
+    "projectStatusUpdated": "Project status updated successfully",
+    "projectDeleted": "Project deleted successfully",
+    "updateFailed": "Failed to update project",
+    "createFailed": "Failed to create project",
+    "deleteFailed": "Failed to delete project",
+    "confirmDeleteProject": "Are you sure you want to delete"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -227,6 +236,7 @@
     "sartthiCalendarDesc": "Schedule meetings and manage your time efficiently.",
     "sartthiVaultDesc": "Secure cloud storage for all your project files and assets.",
     "edit": "Edit",
+    "complete": "Complete",
     "noRecentEmails": "No recent emails",
     "noUpcomingEvents": "No upcoming events",
     "connectAccountMessage": "Connect your Sartthi account to access"
@@ -445,6 +455,21 @@
     "manualTaskManagement": "Manual Task Management",
     "manualTaskDesc": "Directly reassign tasks or change deadlines for your team",
     "reassignTask": "Reassign Task",
+    "status": "Status",
+    "priority": "Priority",
+    "statusOptions": {
+      "planning": "Planning",
+      "active": "Active",
+      "on-hold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "priorityOptions": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
     "selectTask": "Select Task",
     "chooseTask": "Choose a task...",
     "reassignTo": "Reassign To",
@@ -1421,7 +1446,12 @@
       "connectionSuccess": "Account connected successfully"
     },
     "faceRecognition": {
+      "title": "Face Recognition",
+      "enableTitle": "Enable Face Recognition",
+      "enrollDescription": "Enroll your face for quick and secure attendance marking",
       "quickAttendance": "Quick and contactless attendance",
+      "secureStorage": "Secure encrypted storage",
+      "livenessDetection": "Liveness detection enabled",
       "enrollNow": "Enroll Face Now",
       "faceEnrolled": "Face Enrolled",
       "lastUpdated": "Last updated",
@@ -1464,9 +1494,20 @@
     "home": "Home",
     "work": "Work",
     "billing": "Billing",
-    "shipping": "Shipping"
+    "shipping": "Shipping",
+    "profile": {
+      "jobTitle": "Job Title",
+      "company": "Company",
+      "industry": "Industry",
+      "experience": "Experience Level",
+      "skills": "Skills",
+      "goals": {
+        "careerAspirations": "Career Aspirations"
+      }
+    }
   },
   "workspace": {
+    "discoverPublicWorkspaces": "Discover Public Workspaces",
     "tabs": {
       "overview": "Overview",
       "members": "Members",
@@ -1487,11 +1528,16 @@
     "projects": {
       "title": "Workspace Projects",
       "subtitle": "Manage projects associated with clients in this workspace",
+      "create": "Create Project",
       "createProject": "Create Project",
       "searchPlaceholder": "Search projects...",
+      "filterClient": "Filter by Client",
+      "noProjects": "No Projects Found",
+      "noProjectsDesc": "Create your first project to get started",
       "view": "View",
       "rename": "Rename",
       "delete": "Delete",
+      "statusLabel": "Status",
       "filter": {
         "allStatus": "All Status",
         "allPriority": "All Priority"
@@ -1534,10 +1580,41 @@
           "confirm": "Delete"
         }
       },
+      "modal": {
+        "createTitle": "Create New Project",
+        "nameLabel": "Project Name",
+        "namePlaceholder": "Enter project name",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Describe your project",
+        "clientLabel": "Client",
+        "clientPlaceholder": "Select a client (optional)",
+        "statusLabel": "Status",
+        "priorityLabel": "Priority",
+        "startDateLabel": "Start Date",
+        "dueDateLabel": "Due Date",
+        "budgetLabel": "Estimated Budget ($)",
+        "actualSpentLabel": "Actual Spent ($)",
+        "tagsLabel": "Tags (comma separated)",
+        "tagsPlaceholder": "e.g., Web, Mobile, Design",
+        "createBtn": "Create Project",
+        "cancel": "Cancel"
+      },
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
       "toastExtended": {
         "noWorkspace": "No workspace selected",
         "createSuccess": "Project {{name}} created successfully",
         "createError": "Failed to create project"
+      },
+      "toast": {
+        "created": "Project created successfully",
+        "updated": "Project updated successfully",
+        "deleted": "Project deleted successfully",
+        "nameRequired": "Project name is required"
       },
       "stats": {
         "totalProjects": "Total Projects",
@@ -2179,6 +2256,20 @@
         "demoteError": "Failed to demote collaborator"
       },
       "confirmDemote": "Are you sure you want to remove collaborator privileges for {{name}}? They will return to being a regular Member."
+    },
+    "detail": {
+      "tabs": {
+        "edit": "Edit",
+        "collaborate": "Collaborate",
+        "members": "Members",
+        "clients": "Clients",
+        "projects": "Projects",
+        "documents": "Documents",
+        "attendance": "Attendance"
+      },
+      "notFoundTitle": "Workspace Not Found",
+      "backToWorkspaces": "Back to Workspaces",
+      "noDescription": "No description available"
     }
   },
   "project": {
@@ -3563,6 +3654,11 @@
     "empty": {
       "title": "No notifications",
       "message": "You're all caught up!"
+    },
+    "status": {
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "processed": "Already Processed"
     }
   },
   "connectedAccounts": {

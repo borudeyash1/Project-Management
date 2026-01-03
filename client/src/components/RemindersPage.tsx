@@ -273,9 +273,22 @@ const RemindersPage: React.FC = () => {
 
   const handleSaveReminder = async (reminderData: Partial<Reminder>) => {
     try {
+      console.log('🔍 [DEBUG] Saving reminder with data:', reminderData);
+      
       // Transform the data to match backend schema
       const transformedData: any = {
-        ...reminderData,
+        title: reminderData.title,
+        description: reminderData.description,
+        type: reminderData.type,
+        priority: reminderData.priority,
+        dueDate: reminderData.dueDate,
+        tags: reminderData.tags || [],
+        location: (reminderData as any).location,
+        meetingLink: (reminderData as any).meetingLink,
+        notes: (reminderData as any).notes,
+        slackChannelId: (reminderData as any).slackChannelId,
+        // Add workspace field (required by backend)
+        workspace: state.currentWorkspace,
         // Transform notifications from minutesBefore to time
         notifications: reminderData.notifications?.map(notif => ({
           type: notif.type,
@@ -283,27 +296,43 @@ const RemindersPage: React.FC = () => {
           sent: notif.sent || false
         })),
         // Transform assignee to assignedTo (backend field name)
-        assignedTo: reminderData.assignee?._id,
+        assignedTo: reminderData.assignee?._id || state.userProfile?._id,
         // Transform project to just the ID
         project: reminderData.project?._id,
-        // Remove frontend-only fields
-        assignee: undefined
+        // Add recurring if present
+        recurring: reminderData.recurring
+        // Note: createdBy will be set by backend from authenticated user
       };
+
+      console.log('🔍 [DEBUG] Transformed data:', transformedData);
+      console.log('🔍 [DEBUG] Current workspace:', state.currentWorkspace);
+      console.log('🔍 [DEBUG] Current user:', state.userProfile?._id);
 
       if (selectedReminder) {
         // Update existing
+        console.log('🔍 [DEBUG] Updating reminder:', selectedReminder._id);
         const updated = await reminderService.updateReminder(selectedReminder._id, transformedData);
+        console.log('✅ [DEBUG] Reminder updated:', updated);
         setReminders(reminders.map(r =>
           r._id === selectedReminder._id ? updated : r
         ));
+        alert('Reminder updated successfully!');
       } else {
         // Create new
+        console.log('🔍 [DEBUG] Creating new reminder');
         const newReminder = await reminderService.createReminder(transformedData);
+        console.log('✅ [DEBUG] Reminder created:', newReminder);
         setReminders([...reminders, newReminder]);
+        alert('Reminder created successfully!');
       }
     } catch (err: any) {
-      console.error('Failed to save reminder:', err);
-      alert('Failed to save reminder. Please try again.');
+      console.error('❌ [ERROR] Failed to save reminder:', err);
+      console.error('❌ [ERROR] Error details:', {
+        message: err.message,
+        response: err.response,
+        data: err.data
+      });
+      alert(`Failed to save reminder: ${err.message || 'Unknown error'}. Check console for details.`);
     }
   };
 
@@ -398,7 +427,7 @@ const RemindersPage: React.FC = () => {
           'pl-6'
         }`}>
 
-        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4 relative z-20">
+        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4 relative z-[150] overflow-visible">
           <div className="flex items-center gap-3">
             {/* Notification Permission */}
             {permission === 'default' && (
@@ -418,7 +447,7 @@ const RemindersPage: React.FC = () => {
             )}
 
             {/* Export Button */}
-            <div className="relative">
+            <div className="relative z-[200]">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -427,7 +456,7 @@ const RemindersPage: React.FC = () => {
                 {t('buttons.export')}
               </button>
               {showExportMenu && (
-                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 py-1 z-50 shadow-xl">
+                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 py-1 z-[9999] shadow-xl">
                   <button
                     onClick={() => handleExport('all')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -471,7 +500,7 @@ const RemindersPage: React.FC = () => {
           }`}
       >
         {/* Search and Filters */}
-        <GlassmorphicCard className="p-4 mb-6">
+        <GlassmorphicCard className="p-4 mb-6 overflow-visible relative z-10">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -491,7 +520,7 @@ const RemindersPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 relative z-[200]">
               <CustomSelect
                 value={filterStatus}
                 onChange={(value) => setFilterStatus(value as any)}

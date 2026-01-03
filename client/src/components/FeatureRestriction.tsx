@@ -3,8 +3,8 @@ import {
   Lock, Crown, Zap, Star, ArrowRight, 
   CheckCircle, XCircle, AlertCircle 
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
-import PricingModal from './PricingModal';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
@@ -30,8 +30,7 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
     getRequiredPlanForFeature 
   } = useFeatureAccess();
   const { t } = useTranslation();
-  
-  const [showPricingModal, setShowPricingModal] = React.useState(false);
+  const navigate = useNavigate();
   
   const requiredPlan = getRequiredPlanForFeature(feature);
   const hasAccess = hasFeature(feature as any);
@@ -66,26 +65,17 @@ const FeatureRestriction: React.FC<FeatureRestrictionProps> = ({
   
   // For button-level restrictions, just disable the button
   return (
-    <>
-      <button
-        onClick={() => setShowPricingModal(true)}
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-          requiredPlan === 'pro' 
-            ? 'bg-accent hover:bg-accent-hover text-gray-900' 
-            : 'bg-purple-600 hover:bg-purple-700 text-white'
-        } ${className}`}
-      >
-        {getPlanIcon(requiredPlan)}
-        <span>{t('plans.upgradeTo', { plan: requiredPlan === 'pro' ? 'Pro' : 'Ultra' })}</span>
-      </button>
-      
-      {showPricingModal && (
-        <PricingModal 
-          isOpen={showPricingModal} 
-          onClose={() => setShowPricingModal(false)} 
-        />
-      )}
-    </>
+    <button
+      onClick={() => navigate('/pricing')}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+        requiredPlan === 'pro' 
+          ? 'bg-accent hover:bg-accent-hover text-gray-900' 
+          : 'bg-purple-600 hover:bg-purple-700 text-white'
+      } ${className}`}
+    >
+      {getPlanIcon(requiredPlan)}
+      <span>{t('plans.upgradeTo', { plan: requiredPlan === 'pro' ? 'Pro' : 'Ultra' })}</span>
+    </button>
   );
 };
 
@@ -125,7 +115,7 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
   const { userPlan, getPlanComparison } = useFeatureAccess();
   const { isDarkMode } = useTheme();
   const { t } = useTranslation();
-  const [showPricingModal, setShowPricingModal] = React.useState(false);
+  const navigate = useNavigate();
   
   const planInfo = getPlanComparison();
   
@@ -156,46 +146,37 @@ export const PlanStatus: React.FC<{ className?: string }> = ({ className = '' })
   };
   
   return (
-    <>
-      <div className={`flex items-center gap-3 p-4 rounded-lg border ${
-        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      } ${className}`}>
-        <div className={`p-2 rounded-lg ${getPlanColor(userPlan)}`}>
-          {getPlanIcon(userPlan)}
-        </div>
-        
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h4 className={`font-medium capitalize ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>{t('plans.plan', { plan: userPlan })}</h4>
-            {userPlan !== 'ultra' && (
-              <button
-                onClick={() => setShowPricingModal(true)}
-                className="text-sm text-accent-dark hover:text-blue-700 font-medium"
-              >
-                {t('plans.upgrade')}
-              </button>
-            )}
-          </div>
-          
-          <div className={`text-xs mt-1 ${
-            isDarkMode ? 'text-gray-600' : 'text-gray-600'
-          }`}>
-            {planInfo.limits.workspaces === -1 ? t('plans.unlimited') : planInfo.limits.workspaces} {t('plans.workspaces')} • 
-            {planInfo.limits.projects === -1 ? t('plans.unlimited') : planInfo.limits.projects} {t('plans.projects')} • 
-            {planInfo.limits.teamMembers === -1 ? t('plans.unlimited') : planInfo.limits.teamMembers} {t('plans.members')}
-          </div>
-        </div>
+    <div className={`flex items-center gap-3 p-4 rounded-lg border ${
+      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+    } ${className}`}>
+      <div className={`p-2 rounded-lg ${getPlanColor(userPlan)}`}>
+        {getPlanIcon(userPlan)}
       </div>
       
-      {showPricingModal && (
-        <PricingModal 
-          isOpen={showPricingModal} 
-          onClose={() => setShowPricingModal(false)} 
-        />
-      )}
-    </>
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <h4 className={`font-medium capitalize ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>{t('plans.plan', { plan: userPlan })}</h4>
+          {userPlan !== 'ultra' && (
+            <button
+              onClick={() => navigate('/pricing')}
+              className="text-sm text-accent-dark hover:text-blue-700 font-medium"
+            >
+              {t('plans.upgrade')}
+            </button>
+          )}
+        </div>
+        
+        <div className={`text-xs mt-1 ${
+          isDarkMode ? 'text-gray-600' : 'text-gray-600'
+        }`}>
+          {planInfo.limits.workspaces === -1 ? t('plans.unlimited') : planInfo.limits.workspaces} {t('plans.workspaces')} • 
+          {planInfo.limits.projects === -1 ? t('plans.unlimited') : planInfo.limits.projects} {t('plans.projects')} • 
+          {planInfo.limits.teamMembers === -1 ? t('plans.unlimited') : planInfo.limits.teamMembers} {t('plans.members')}
+        </div>
+      </div>
+    </div>
   );
 };
 

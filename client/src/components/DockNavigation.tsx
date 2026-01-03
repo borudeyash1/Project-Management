@@ -151,7 +151,7 @@ const DockNavigation: React.FC = () => {
       items.push({
         id: 'manage-workspace',
         label: 'Manage Workspace',
-        translationKey: 'workspace.settings',
+        translationKey: 'workspace.settings.title',
         icon: Shield,
         path: '/manage-workspace'
       });

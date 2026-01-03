@@ -243,7 +243,17 @@ const NotificationsPage: React.FC = () => {
       });
       
       const errorMessage = error.message || error.data?.message || 'Failed to approve request';
-      addToast(errorMessage, 'error');
+      
+      // If the error indicates the request is already processed or not found, delete the notification
+      if (errorMessage.toLowerCase().includes('already processed') || 
+          errorMessage.toLowerCase().includes('not found') ||
+          errorMessage.toLowerCase().includes('already been processed')) {
+        addToast('This request has already been processed', 'info');
+        await deleteNotification(notification._id);
+        loadNotifications();
+      } else {
+        addToast(errorMessage, 'error');
+      }
     } finally {
       setActionLoading(prev => {
         const newSet = new Set(prev);
@@ -283,7 +293,17 @@ const NotificationsPage: React.FC = () => {
       });
       
       const errorMessage = error.message || error.data?.message || 'Failed to reject request';
-      addToast(errorMessage, 'error');
+      
+      // If the error indicates the request is already processed or not found, delete the notification
+      if (errorMessage.toLowerCase().includes('already processed') || 
+          errorMessage.toLowerCase().includes('not found') ||
+          errorMessage.toLowerCase().includes('already been processed')) {
+        addToast('This request has already been processed', 'info');
+        await deleteNotification(notification._id);
+        loadNotifications();
+      } else {
+        addToast(errorMessage, 'error');
+      }
     } finally {
       setActionLoading(prev => {
         const newSet = new Set(prev);
@@ -401,8 +421,16 @@ const NotificationsPage: React.FC = () => {
         );
       }
 
-      // If neither, and it's a join request with an ID, show action buttons (for Owner)
-      if (notification.metadata?.joinRequestId) {
+      // Check if request is already processed (approved or rejected) - hide buttons
+      const isProcessed = status === 'approved' || status === 'rejected' || 
+                         title.toLowerCase().includes('approved') || 
+                         title.toLowerCase().includes('rejected') ||
+                         message.toLowerCase().includes('already processed') ||
+                         message.toLowerCase().includes('not found');
+
+      // If neither approved nor rejected, and it's a join request with an ID, show action buttons (for Owner)
+      // But only if the request hasn't been processed yet
+      if (notification.metadata?.joinRequestId && !isProcessed) {
         return (
           <div className="flex items-center gap-2 mt-2 action-buttons">
             <button
@@ -421,6 +449,18 @@ const NotificationsPage: React.FC = () => {
               <XIcon className="w-4 h-4" />
               {t('buttons.reject')}
             </button>
+          </div>
+        );
+      }
+
+      // If processed but no status badge shown yet, show a generic "Processed" message
+      if (isProcessed && notification.metadata?.joinRequestId) {
+        return (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="px-3 py-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-lg text-sm flex items-center gap-1">
+              <Info className="w-4 h-4" />
+              {t('notifications.status.processed')}
+            </span>
           </div>
         );
       }

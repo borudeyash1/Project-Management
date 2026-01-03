@@ -230,8 +230,8 @@ const AdvancedAnalytics: React.FC = () => {
     }
   };
 
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
+  const formatCurrency = (amount: number, currency: string = 'INR') => {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: currency
     }).format(amount);
@@ -667,7 +667,7 @@ const AdvancedAnalytics: React.FC = () => {
                   <div>
                     <span className="text-sm text-gray-600">Budget</span>
                     <p className="text-lg font-semibold text-gray-900">
-                      ${project.budget.actual.toLocaleString()} / ${project.budget.estimated.toLocaleString()}
+                      {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.actual ?? 0)} / {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.estimated ?? 0)}
                     </p>
                   </div>
                   <div>

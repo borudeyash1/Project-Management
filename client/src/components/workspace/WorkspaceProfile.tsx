@@ -325,9 +325,17 @@ const WorkspaceProfile: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.insights.type')}</p>
             <p className="text-2xl font-bold capitalize text-gray-900 dark:text-gray-100">{currentWorkspace.type}</p>
           </div>
-          <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900">
-            <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.insights.subscription')}</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{currentWorkspace.subscription.plan}</p>
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.insights.subscription')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{currentWorkspace.subscription.plan}</p>
+            </div>
+            <button
+              onClick={() => navigate('/pricing')}
+              className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-700 dark:text-orange-500 dark:hover:text-orange-400 transition-colors"
+            >
+              Upgrade
+            </button>
           </div>
         </div>
       </div>

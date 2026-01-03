@@ -33,6 +33,7 @@ interface Workspace {
   };
   createdAt: Date;
   hasPendingJoinRequest?: boolean;
+  isAIPowered?: boolean;
 }
 
 const WorkspaceDiscover: React.FC = () => {
@@ -313,20 +314,10 @@ const WorkspaceDiscover: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
-              {t('workspace.customWorkspace')}
-            </button>
-            <button
-              onClick={() => setShowAICreateModal(true)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-semibold ${isDarkMode
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
-                : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-purple-200 hover:bg-purple-50'
-                }`}
-            >
-              <Bot className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-purple-600'}`} />
-              <span>{t('workspace.aiPoweredWorkspace')}</span>
+              {t('workspace.createWorkspace')}
             </button>
           </div>
         </GlassmorphicCard>

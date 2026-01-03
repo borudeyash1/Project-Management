@@ -77,16 +77,24 @@ export const createReminder = async (req: Request, res: Response) => {
 export const getReminders = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { type, status, priority, search } = req.query;
+    const { type, status, priority, search, workspaceId } = req.query;
 
-    let query: any = { createdBy: userId };
+    let query: any = { 
+      createdBy: userId,
+      isActive: true  // Only fetch active reminders
+    };
+
+    // Filter by workspace if provided
+    if (workspaceId) {
+      query.workspace = workspaceId;
+    }
 
     if (type && type !== 'all') {
       query.type = type;
     }
 
     if (status && status !== 'all') {
-      query.status = status;
+      query.completed = status === 'completed';
     }
 
     if (priority && priority !== 'all') {
@@ -102,10 +110,12 @@ export const getReminders = async (req: Request, res: Response) => {
     }
 
     const reminders = await Reminder.find(query)
-      .populate('createdBy', 'name email avatar')
-      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'fullName email avatarUrl')
+      .populate('assignedTo', 'fullName email avatarUrl')
       .populate('project', 'name color')
-      .sort({ dueDate: 1 });
+      .populate('workspace', 'name')
+      .sort({ dueDate: 1 })
+      .lean();
 
     res.status(200).json({
       success: true,

@@ -12,7 +12,7 @@ interface CreateWorkspaceModalProps {
 }
 
 const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onClose }) => {
-  const { dispatch } = useApp();
+  const { dispatch, state } = useApp();
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -168,38 +168,52 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
     onClose();
   };
 
-  const renderPlans = () => (
-    <div className="mb-6">
-      <div className="grid gap-4 md:grid-cols-3">
-        {plans.map((plan) => (
-          <div key={plan.planKey} className="border rounded-xl p-4 shadow-sm bg-white">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold capitalize">{plan.displayName}</h3>
-              <span className="text-xs uppercase tracking-wide text-gray-600">{plan.planKey}</span>
+  const renderPlans = () => {
+    // Get user's current subscription from state (already available from component level)
+    const userPlan = (state.userProfile as any)?.subscription?.plan || (state.userProfile as any)?.plan || 'free';
+    
+    // Find the user's current plan
+    const currentPlan = plans.find(p => p.planKey === userPlan);
+    
+    if (!currentPlan) return null;
+    
+    return (
+      <div className="mb-6">
+        <div className="border rounded-xl p-4 shadow-sm bg-gradient-to-br from-yellow-50 to-orange-50">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-lg font-semibold capitalize">{currentPlan.displayName}</h3>
+              <span className="text-xs uppercase tracking-wide text-gray-600">{currentPlan.planKey}</span>
             </div>
-            <p className="text-sm text-gray-600 mt-2 line-clamp-3">{plan.summary}</p>
-            <div className="mt-3 text-sm">
-              <div className="flex justify-between">
-                <span>{t('workspace.title')}</span>
-                <span>{plan.limits.maxWorkspaces === -1 ? t('projects.unlimited') : plan.limits.maxWorkspaces}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t('team.members')}</span>
-                <span>{plan.limits.maxTeamMembers}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t('workspace.projectsLabel')}</span>
-                <span>{plan.limits.maxProjects}</span>
-              </div>
-            </div>
-            <div className="mt-3 text-sm text-gray-600">
-              ${plan.monthlyPrice.toFixed(2)}/mo or ${plan.yearlyPrice.toFixed(2)}/yr
+            <div className="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full">
+              YOUR PLAN
             </div>
           </div>
-        ))}
+          <p className="text-sm text-gray-700 mb-4">{currentPlan.summary}</p>
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {currentPlan.limits.maxWorkspaces === -1 ? '∞' : currentPlan.limits.maxWorkspaces}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">{t('workspace.title')}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {currentPlan.limits.maxTeamMembers}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">{t('team.members')}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {currentPlan.limits.maxProjects}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">{t('workspace.projectsLabel')}</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderStep1 = () => (
     <div className="space-y-6">

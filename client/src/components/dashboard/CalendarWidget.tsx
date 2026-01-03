@@ -78,6 +78,9 @@ const CalendarWidget: React.FC = () => {
             const allItems: CalendarEvent[] = [];
             const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            
+            // Get current user ID
+            const currentUserId = state.userProfile?._id;
 
             try {
                 const plannerData = await getPlannerData({
@@ -85,9 +88,20 @@ const CalendarWidget: React.FC = () => {
                     endDate: endOfMonth
                 });
 
-                // Map Events
+                // Map Events (filter by current user)
                 if (plannerData.events) {
                     plannerData.events.forEach((event: PlannerEvent) => {
+                        // Only show events assigned to current user
+                        if (currentUserId) {
+                            const eventWithAssignee = event as any;
+                            const isAssignedToMe = 
+                                eventWithAssignee.assignee === currentUserId || 
+                                eventWithAssignee.assignee?._id === currentUserId ||
+                                eventWithAssignee.assignee?.toString() === currentUserId;
+                            
+                            if (!isAssignedToMe) return;
+                        }
+
                         const dateObj = new Date(event.start);
                         const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
                         const timeStr = dateObj.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
@@ -102,10 +116,20 @@ const CalendarWidget: React.FC = () => {
                     });
                 }
 
-                // Map Tasks
+                // Map Tasks (filter by current user)
                 if (plannerData.tasks) {
                     plannerData.tasks.forEach((task: any) => {
                         if (task.dueDate) {
+                            // Only show tasks assigned to current user
+                            if (currentUserId) {
+                                const isAssignedToMe = 
+                                    task.assignee === currentUserId || 
+                                    task.assignee?._id === currentUserId ||
+                                    task.assignee?.toString() === currentUserId;
+                                
+                                if (!isAssignedToMe) return;
+                            }
+
                             const dateObj = new Date(task.dueDate);
                             const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
                             const timeStr = dateObj.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });

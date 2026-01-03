@@ -368,6 +368,12 @@ export interface IWorkspace extends Document {
   description?: string;
   type: 'team' | 'enterprise';
   region?: string;
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+    website?: string;
+  };
   owner: string;
   members: Array<{
     user: string;
@@ -411,6 +417,7 @@ export interface IWorkspace extends Document {
     maxStorageGB: number;
   };
   isActive: boolean;
+  isAIPowered?: boolean;
   memberCount: number;
   addMember(userId: string, role?: string): Promise<IWorkspace>;
   removeMember(userId: string): Promise<IWorkspace>;

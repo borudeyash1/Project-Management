@@ -81,6 +81,7 @@ class ApiService {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
           const errorData = await response.json();
+          console.error(`❌ [DEBUG] Error response data:`, errorData);
           errorMessage = errorData.message || errorMessage;
           if (errorData.error) {
             errorMessage += ` | Details: ${errorData.error}`;
@@ -94,6 +95,7 @@ class ApiService {
         } catch (parseError) {
           console.warn('Could not parse error response:', parseError);
         }
+        console.error(`❌ [DEBUG] Final error message:`, errorMessage);
         throw new Error(errorMessage);
       }
 
@@ -551,6 +553,11 @@ class ApiService {
   async getProjects(workspaceId?: string): Promise<Project[]> {
     const endpoint = workspaceId ? `/projects?workspaceId=${workspaceId}` : '/projects';
     const response = await this.request<Project[]>(endpoint);
+    return response.data!;
+  }
+
+  async getWorkspaceProjects(workspaceId: string): Promise<Project[]> {
+    const response = await this.request<Project[]>(`/projects/workspace/${workspaceId}`);
     return response.data!;
   }
 

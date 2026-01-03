@@ -44,7 +44,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       budget: {
         estimated: parseFloat(formData.budgetEstimated) || 0,
         actual: parseFloat(formData.budgetActual) || 0,
-        currency: 'USD'
+        currency: 'INR'
       },
       tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
       integrations: {
@@ -306,7 +306,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 />
               ) : (
                 <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  ${project.budget?.estimated?.toLocaleString() || '0'}
+                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget?.currency || 'INR' }).format(project.budget?.estimated || 0)}
                 </p>
               )}
             </div>
@@ -326,7 +326,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 />
               ) : (
                 <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  ${project.budget?.actual?.toLocaleString() || '0'}
+                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget?.currency || 'INR' }).format(project.budget?.actual || 0)}
                 </p>
               )}
             </div>

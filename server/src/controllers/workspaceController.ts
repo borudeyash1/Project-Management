@@ -31,7 +31,8 @@ export const createWorkspace: RequestHandler = async (req, res) => {
       description,
       type = 'team',
       region,
-      estimatedMembers = 0
+      estimatedMembers = 0,
+      createdBy
     } = req.body;
     const user = (req as AuthenticatedRequest).user!;
     const userId = user._id;
@@ -77,6 +78,7 @@ export const createWorkspace: RequestHandler = async (req, res) => {
       type,
       region,
       owner: userId,
+      isAIPowered: createdBy === 'ai-assistant',
       members: [{
         user: userId,
         role: 'owner',
@@ -121,9 +123,10 @@ export const discoverWorkspaces: RequestHandler = async (req, res) => {
     const authReq = req as AuthenticatedRequest;
     const currentUserId = authReq.user!._id;
 
-    // Get all active workspaces
+    // Get all active workspaces excluding AI-powered ones
     const workspaces = await Workspace.find({
-      isActive: { $ne: false }
+      isActive: { $ne: false },
+      isAIPowered: { $ne: true }
     })
       .populate('owner', 'fullName email avatarUrl')
       .sort({ createdAt: -1 });

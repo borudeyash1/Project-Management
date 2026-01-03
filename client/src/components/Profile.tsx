@@ -164,7 +164,7 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, addToast } = useApp();
   const { dockPosition } = useDock();
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
@@ -458,27 +458,15 @@ const Profile: React.FC = () => {
         setProfileData(prev => prev ? { ...prev, [field]: value } : null);
       }
 
-      setEditingField(null);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: t('messages.profileUpdated'),
-          duration: 3000
-        }
-      });
+      // Only close modal if not editing skills (allow adding multiple skills)
+      if (field !== 'profile.skills') {
+        setEditingField(null);
+      }
+      
+      addToast(t('messages.profileUpdated'), 'success');
     } catch (error) {
       console.error('Failed to update profile:', error);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'error',
-          message: t('messages.profileUpdateFailed'),
-          duration: 3000
-        }
-      });
+      addToast(t('messages.profileUpdateFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -1215,10 +1203,11 @@ const Profile: React.FC = () => {
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('profile.topSkills')}</h4>
           <button
             onClick={() => {
-              setEditingField('profile.skills');
-              setEditValue(JSON.stringify(profileData?.profile?.skills || []));
+              setEditingField('skills');
+              setEditValue('');
             }}
             className="text-accent-dark hover:text-blue-700"
+            title="Edit Skills & Learning"
           >
             <Edit className="w-4 h-4" />
           </button>
@@ -1337,9 +1326,135 @@ const Profile: React.FC = () => {
       {/* Edit Field Modal */}
       {editingField && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">{t('common.edit')} {t('profile.' + editingField)}</h3>
-            {editingField === 'profile.experience' ? (
+          <div className={`bg-white dark:bg-gray-800 rounded-xl ${editingField === 'skills' ? 'max-w-2xl' : 'max-w-md'} w-full p-6`}>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              {editingField === 'skills' ? 'Edit Skills & Learning' : t('common.edit') + ' ' + t(editingField.startsWith('profile.') ? editingField : 'profile.' + editingField)}
+            </h3>
+            {editingField === 'skills' ? (
+              <div className="mb-4">
+                {/* Add New Skill Form */}
+                <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Add New Skill</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Skill Name</label>
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        placeholder="e.g., JavaScript, Project Management"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Level</label>
+                        <select
+                          value={(profileData as any)?._tempSkillLevel || 'beginner'}
+                          onChange={(e) => {
+                            if (profileData) {
+                              setProfileData({ ...profileData, _tempSkillLevel: e.target.value } as any);
+                            }
+                          }}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        >
+                          <option value="beginner">Beginner</option>
+                          <option value="intermediate">Intermediate</option>
+                          <option value="advanced">Advanced</option>
+                          <option value="expert">Expert</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Category</label>
+                        <select
+                          value={(profileData as any)?._tempSkillCategory || 'technical'}
+                          onChange={(e) => {
+                            if (profileData) {
+                              setProfileData({ ...profileData, _tempSkillCategory: e.target.value } as any);
+                            }
+                          }}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        >
+                          <option value="technical">Technical</option>
+                          <option value="soft">Soft Skills</option>
+                          <option value="language">Language</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (!editValue.trim()) {
+                          alert('Please enter a skill name');
+                          return;
+                        }
+                        const newSkill = {
+                          name: editValue.trim(),
+                          level: (profileData as any)?._tempSkillLevel || 'beginner',
+                          category: (profileData as any)?._tempSkillCategory || 'technical'
+                        };
+                        const currentSkills = profileData?.profile?.skills || [];
+                        const updatedSkills = [...currentSkills, newSkill];
+                        handleSaveField('profile.skills', JSON.stringify(updatedSkills));
+                        setEditValue('');
+                      }}
+                      disabled={saving || !editValue.trim()}
+                      className="w-full px-3 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium disabled:opacity-50"
+                    >
+                      {saving ? 'Adding...' : '+ Add Skill'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Current Skills List */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Current Skills ({profileData?.profile?.skills?.length || 0})
+                  </h4>
+                  <div className="max-h-64 overflow-y-auto space-y-2">
+                    {(profileData?.profile?.skills || []).map((skill: any, index: number) => {
+                      const skillName = typeof skill === 'string' ? skill : skill.name || 'Unknown';
+                      const skillLevel = typeof skill === 'object' ? skill.level : 'intermediate';
+                      const skillCategory = typeof skill === 'object' ? skill.category : 'technical';
+                      
+                      return (
+                        <div
+                          key={skill._id || index}
+                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">{skillName}</span>
+                              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full capitalize">
+                                {skillLevel}
+                              </span>
+                              <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full capitalize">
+                                {skillCategory}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const updatedSkills = (profileData?.profile?.skills || []).filter((_: any, i: number) => i !== index);
+                              handleSaveField('profile.skills', JSON.stringify(updatedSkills));
+                            }}
+                            className="ml-2 p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                            title="Remove skill"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                    {(!profileData?.profile?.skills || profileData.profile.skills.length === 0) && (
+                      <p className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
+                        No skills added yet. Add your first skill above!
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : editingField === 'profile.experience' ? (
               <select
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
@@ -1359,7 +1474,7 @@ const Profile: React.FC = () => {
                 onChange={(e) => setEditValue(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 rows={4}
-                placeholder={`Enter ${editingField}`}
+                placeholder={t(editingField.startsWith('profile.') ? editingField : 'profile.' + editingField)}
               />
             ) : (
               <input
@@ -1367,25 +1482,27 @@ const Profile: React.FC = () => {
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder={`Enter ${editingField}`}
+                placeholder={t(editingField.startsWith('profile.') ? editingField : 'profile.' + editingField)}
               />
             )}
             <div className="flex gap-3">
-              <button
-                onClick={() => handleSaveField(editingField, editValue)}
-                disabled={saving}
-                className="flex-1 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
-              >
-                {saving ? t('common.saving') : t('common.save')}
-              </button>
+              {editingField !== 'skills' && (
+                <button
+                  onClick={() => handleSaveField(editingField, editValue)}
+                  disabled={saving}
+                  className="flex-1 px-4 py-2 bg-accent text-gray-900 dark:text-gray-100 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
+                >
+                  {saving ? t('common.saving') : t('common.save')}
+                </button>
+              )}
               <button
                 onClick={() => {
                   setEditingField(null);
                   setEditValue('');
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-700 transition-colors"
+                className={`${editingField === 'skills' ? 'flex-1' : 'flex-1'} px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
               >
-                Cancel
+                {editingField === 'skills' ? 'Close' : 'Cancel'}
               </button>
             </div>
           </div>

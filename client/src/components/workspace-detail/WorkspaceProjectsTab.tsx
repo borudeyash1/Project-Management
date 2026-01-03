@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import {
   Plus, FolderOpen, Edit, Trash2, X, Calendar, DollarSign,
   Users, Tag, AlertCircle, Eye, Briefcase, Clock, CheckCircle,
@@ -25,6 +26,11 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedProjectForStatus, setSelectedProjectForStatus] = useState<any | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<any | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [workspaceProjects, setWorkspaceProjects] = useState<any[]>([]);
   const [projectForm, setProjectForm] = useState({
     name: '',
     description: '',
@@ -38,23 +44,63 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
     tags: ''
   });
 
-  // Get projects and clients from AppContext
+  // Fetch projects when component mounts or workspaceId changes
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const projects = await api.getWorkspaceProjects(workspaceId);
+        // Store projects in local state instead of global state
+        setWorkspaceProjects(projects);
+      } catch (error) {
+        console.error('Failed to fetch workspace projects:', error);
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: 'Failed to load projects',
+            duration: 3000
+          }
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [workspaceId, dispatch]);
+
+  // Fetch clients for filtering
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const clients = await api.getClients(workspaceId);
+        dispatch({ type: 'SET_CLIENTS', payload: clients });
+      } catch (error) {
+        console.error('Failed to fetch clients:', error);
+      }
+    };
+
+    fetchClients();
+  }, [workspaceId, dispatch]);
+
+  // Get workspace and clients from AppContext
   const workspace = state.workspaces.find(w => w._id === workspaceId);
   const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
 
   // Filter projects based on user role
   // Owner sees all projects, employees see only projects they're assigned to
-  const allWorkspaceProjects = state.projects.filter(p => p.workspace === workspaceId);
-  const workspaceProjects = isWorkspaceOwner
-    ? allWorkspaceProjects
-    : allWorkspaceProjects.filter(p =>
+  const filteredByRole = isWorkspaceOwner
+    ? workspaceProjects
+    : workspaceProjects.filter(p =>
       (p as any).team?.some((member: any) => member._id === state.userProfile._id) ||
       p.createdBy === state.userProfile._id
     );
 
   const workspaceClients = state.clients || [];
 
-  const handleCreateProject = () => {
+  const handleCreateProject = async () => {
     if (!projectForm.name.trim()) {
       dispatch({
         type: 'ADD_TOAST',
@@ -68,108 +114,188 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
       return;
     }
 
-    const newProject = {
-      _id: `project_${Date.now()}`,
-      name: projectForm.name,
-      description: projectForm.description,
-      client: projectForm.client,
-      workspace: workspaceId,
-      createdBy: state.userProfile._id,
-      status: projectForm.status,
-      priority: projectForm.priority,
-      startDate: projectForm.startDate ? new Date(projectForm.startDate) : undefined,
-      dueDate: projectForm.dueDate ? new Date(projectForm.dueDate) : undefined,
-      budget: {
-        estimated: parseFloat(projectForm.budgetEstimated) || 0,
-        actual: parseFloat(projectForm.budgetActual) || 0,
-        currency: 'USD'
-      },
-      progress: 0,
-      team: [],
-      teamMembers: [],
-      milestones: [],
-      tags: projectForm.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
-      attachments: [],
-      settings: {
-        isPublic: false,
-        allowMemberInvites: true,
-        timeTracking: { enabled: true, requireApproval: false },
-        notifications: { taskUpdates: true, milestoneReminders: true, deadlineAlerts: true }
-      },
-      isActive: true,
-      teamMemberCount: 0,
-      completedTasksCount: 0,
-      totalTasksCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+    try {
+      const budgetEstimated = parseFloat(projectForm.budgetEstimated) || 0;
+      const budgetActual = parseFloat(projectForm.budgetActual) || 0;
+      
+      const projectData: any = {
+        name: projectForm.name,
+        description: projectForm.description,
+        workspace: workspaceId,
+        status: projectForm.status,
+        priority: projectForm.priority,
+        startDate: projectForm.startDate ? new Date(projectForm.startDate) : undefined,
+        dueDate: projectForm.dueDate ? new Date(projectForm.dueDate) : undefined,
+        tags: projectForm.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)
+      };
 
-    dispatch({
-      type: 'ADD_PROJECT',
-      payload: newProject as any
-    });
-
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: t('workspace.projects.toast.created'),
-        duration: 3000
+      // Add client if selected (send the client name, not empty string)
+      if (projectForm.client && projectForm.client.trim()) {
+        projectData.client = projectForm.client;
       }
-    });
 
-    setShowCreateModal(false);
-    setProjectForm({
-      name: '',
-      description: '',
-      client: '',
-      status: 'planning',
-      priority: 'medium',
-      startDate: new Date().toISOString().split('T')[0],
-      dueDate: '',
-      budgetEstimated: '',
-      budgetActual: '0',
-      tags: ''
-    });
-  };
-
-  const handleUpdateProjectStatus = (projectId: string, newStatus: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled' | 'abandoned') => {
-    dispatch({
-      type: 'UPDATE_PROJECT',
-      payload: {
-        projectId,
-        updates: { status: newStatus }
+      // Add budget if provided
+      if (budgetEstimated > 0 || budgetActual > 0) {
+        projectData.budget = {
+          amount: budgetEstimated,
+          spent: budgetActual,
+          currency: 'USD'
+        };
       }
-    });
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: t('workspace.projects.toast.updated'),
-        duration: 3000
-      }
-    });
-    setShowStatusModal(false);
-    setSelectedProjectForStatus(null);
-  };
 
-  const handleDeleteProject = (projectId: string) => {
-    if (window.confirm(t('workspace.projects.confirmDelete'))) {
+      // Create in database via API
+      const newProject = await api.createProject(projectData);
+
+      // Update global state
       dispatch({
-        type: 'DELETE_PROJECT',
-        payload: projectId
+        type: 'ADD_PROJECT',
+        payload: newProject
       });
+
+      // Also add to local state to show immediately
+      setWorkspaceProjects(prev => [...prev, newProject]);
+
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: t('workspace.projects.toast.deleted'),
+          message: t('workspace.projects.toast.created'),
           duration: 3000
         }
       });
+
+      setShowCreateModal(false);
+      setProjectForm({
+        name: '',
+        description: '',
+        client: '',
+        status: 'planning',
+        priority: 'medium',
+        startDate: new Date().toISOString().split('T')[0],
+        dueDate: '',
+        budgetEstimated: '',
+        budgetActual: '0',
+        tags: ''
+      });
+    } catch (error) {
+      console.error('Failed to create project:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to create project',
+          duration: 3000
+        }
+      });
+    }
+  };
+
+  const handleUpdateProjectStatus = async (projectId: string, newStatus: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled' | 'abandoned') => {
+    try {
+      // Update in database via API
+      await api.updateProject(projectId, { status: newStatus });
+      
+      // Update global state
+      dispatch({
+        type: 'UPDATE_PROJECT',
+        payload: {
+          projectId,
+          updates: { status: newStatus }
+        }
+      });
+      
+      // Update local state
+      setWorkspaceProjects(prev => 
+        prev.map(p => p._id === projectId ? { ...p, status: newStatus } : p)
+      );
+      
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: t('workspace.projects.toast.updated'),
+          duration: 3000
+        }
+      });
+      
+      setShowStatusModal(false);
+      setSelectedProjectForStatus(null);
+    } catch (error) {
+      console.error('Failed to update project status:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to update project status',
+          duration: 3000
+        }
+      });
+    }
+  };
+
+  const handleDeleteProject = async (project: any) => {
+    setProjectToDelete(project);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteProject = async () => {
+    if (deleteConfirmText !== 'DELETE') {
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Please type DELETE to confirm',
+          duration: 3000
+        }
+      });
+      return;
+    }
+
+    if (projectToDelete) {
+      try {
+        // Delete from database via API
+        await api.deleteProject(projectToDelete._id);
+        
+        // Update global state
+        dispatch({
+          type: 'DELETE_PROJECT',
+          payload: projectToDelete._id
+        });
+        
+        // Remove from local state
+        setWorkspaceProjects(prev => prev.filter(p => p._id !== projectToDelete._id));
+        
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'success',
+            message: t('workspace.projects.toast.deleted'),
+            duration: 3000
+          }
+        });
+
+        // Close modal and reset
+        setShowDeleteModal(false);
+        setProjectToDelete(null);
+        setDeleteConfirmText('');
+      } catch (error) {
+        console.error('Failed to delete project:', error);
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: 'Failed to delete project',
+            duration: 3000
+          }
+        });
+      }
     }
   };
 
@@ -209,8 +335,38 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
 
   // Filter projects by selected client
   const filteredProjects = selectedClientId
-    ? workspaceProjects.filter(p => p.client === workspaceClients.find(c => c._id === selectedClientId)?.name)
-    : workspaceProjects;
+    ? (() => {
+        const selectedClient = workspaceClients.find(c => c._id === selectedClientId);
+        
+        console.log('=== CLIENT FILTER DEBUG ===');
+        console.log('1. Selected Client ID:', selectedClientId);
+        console.log('2. All Clients:', workspaceClients.map(c => ({ id: c._id, name: c.name })));
+        console.log('3. Found Client:', selectedClient);
+        console.log('4. Total Projects:', filteredByRole.length);
+        console.log('5. Projects with clients:', filteredByRole.map(p => ({ 
+          name: p.name, 
+          client: p.client,
+          clientType: typeof p.client 
+        })));
+        
+        const filtered = filteredByRole.filter(p => {
+          // Normalize both strings for comparison (trim and lowercase)
+          const projectClient = (p.client || '').trim().toLowerCase();
+          const selectedClientName = (selectedClient?.name || '').trim().toLowerCase();
+          
+          const matches = projectClient === selectedClientName;
+          console.log(`  - "${p.name}": "${projectClient}" === "${selectedClientName}" = ${matches}`);
+          
+          return matches;
+        });
+        
+        console.log('6. Filtered Count:', filtered.length);
+        console.log('7. Filtered Projects:', filtered.map(p => p.name));
+        console.log('=== END DEBUG ===');
+        
+        return filtered;
+      })()
+    : filteredByRole;
 
   // Group projects by client
   const projectsByClient = filteredProjects.reduce((acc: Record<string, any[]>, project) => {
@@ -237,15 +393,6 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
               {t('workspace.projects.subtitle')} ({filteredProjects.length})
             </p>
           </div>
-          {isWorkspaceOwner && (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              {t('workspace.projects.create')}
-            </button>
-          )}
         </div>
 
         {/* Client Filter Badge */}
@@ -266,7 +413,12 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         )}
 
         {/* Projects List */}
-        {filteredProjects.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-3"></div>
+            <p className="text-gray-600">Loading projects...</p>
+          </div>
+        ) : filteredProjects.length === 0 ? (
           <div className="text-center py-12 text-gray-600">
             <FolderOpen className="w-12 h-12 mx-auto mb-3 text-gray-600" />
             <p className="font-medium">{t('workspace.projects.noProjects')}</p>
@@ -321,7 +473,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                           <div className="flex items-center gap-2">
                             <DollarSign className="w-4 h-4" />
                             <span>
-                              ${project.budget.actual?.toLocaleString()} / ${project.budget.estimated?.toLocaleString()}
+                              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.actual ?? 0)} / {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.estimated ?? 0)}
                             </span>
                           </div>
                         )}
@@ -367,7 +519,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                           {t('workspace.projects.statusLabel')}
                         </button>
                         <button
-                          onClick={() => handleDeleteProject(project._id)}
+                          onClick={() => handleDeleteProject(project)}
                           className="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -656,6 +808,68 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                   {t('workspace.projects.modal.cancel')}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && projectToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Delete Project</h3>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setProjectToDelete(null);
+                  setDeleteConfirmText('');
+                }}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete project <span className="font-medium text-gray-900">{projectToDelete.name}</span>?
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Type <span className="font-bold text-red-600">DELETE</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                placeholder="DELETE"
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={confirmDeleteProject}
+                disabled={deleteConfirmText !== 'DELETE'}
+                className={`flex-1 px-4 py-2 rounded-lg ${
+                  deleteConfirmText === 'DELETE'
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Delete Project
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setProjectToDelete(null);
+                  setDeleteConfirmText('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

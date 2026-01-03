@@ -162,13 +162,13 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
             <div className="flex items-center justify-between">
               <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.estimatedBudget')}</span>
               <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                ${project.budget.estimated?.toLocaleString() || '0'}
+                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.estimated || 0)}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('projects.actualSpent')}</span>
               <span className={`font-semibold ${isDarkMode ? 'text-blue-400' : 'text-accent-dark'}`}>
-                ${project.budget.actual?.toLocaleString() || '0'}
+                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.actual || 0)}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -177,7 +177,7 @@ const ProjectProgressTab: React.FC<ProjectProgressTabProps> = ({ project }) => {
                 ? (isDarkMode ? 'text-red-400' : 'text-red-600')
                 : (isDarkMode ? 'text-green-400' : 'text-green-600')
                 }`}>
-                ${((project.budget.estimated || 0) - (project.budget.actual || 0)).toLocaleString()}
+                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format((project.budget.estimated || 0) - (project.budget.actual || 0))}
               </span>
             </div>
 

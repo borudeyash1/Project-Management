@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { Save, Globe, Mail, Phone, MapPin, Eye, EyeOff } from 'lucide-react';
+import apiService from '../../services/api';
 
 interface WorkspaceEditTabProps {
   workspace: any;
@@ -16,16 +17,18 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
     description: workspace?.description || '',
     type: workspace?.type || 'team',
     region: workspace?.region || 'North America',
-    contactEmail: '',
-    contactPhone: '',
-    address: '',
-    website: '',
-    isPublic: (workspace as any)?.isPublic || false,
+    contactEmail: workspace?.contactInfo?.email || '',
+    contactPhone: workspace?.contactInfo?.phone || '',
+    address: workspace?.contactInfo?.address || '',
+    website: workspace?.contactInfo?.website || '',
+    isPublic: true, // Always true - workspaces are public by default
     allowMemberInvites: workspace?.settings?.allowMemberInvites || true,
     requireApproval: workspace?.settings?.requireApprovalForJoining || false
   });
 
-  const handleSave = () => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
     // Validate required fields
     if (!formData.name.trim()) {
       dispatch({
@@ -40,11 +43,11 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
       return;
     }
 
-    // Update workspace in global state
-    dispatch({
-      type: 'UPDATE_WORKSPACE',
-      payload: {
-        _id: workspace._id,
+    setIsSaving(true);
+
+    try {
+      // Prepare workspace data for API
+      const workspaceData: any = {
         name: formData.name,
         description: formData.description,
         type: formData.type,
@@ -55,26 +58,46 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
           address: formData.address,
           website: formData.website
         },
-        isPublic: formData.isPublic,
         settings: {
+          ...workspace.settings, // Preserve existing settings like defaultProjectPermissions
+          isPublic: true, // Always true - workspaces are public by default
           allowMemberInvites: formData.allowMemberInvites,
           requireApprovalForJoining: formData.requireApproval
-        },
-        updatedAt: new Date()
-      } as any
-    });
+        }
+      };
 
-    // TODO: Implement API call to persist changes to backend
-    
-    dispatch({
-      type: 'ADD_TOAST',
-      payload: {
-        id: Date.now().toString(),
-        type: 'success',
-        message: t('workspace.edit.success'),
-        duration: 3000
-      }
-    });
+      // Call API to update workspace in database
+      const updatedWorkspace = await apiService.updateWorkspace(workspace._id, workspaceData);
+
+      // Update workspace in global state
+      dispatch({
+        type: 'UPDATE_WORKSPACE',
+        payload: updatedWorkspace
+      });
+
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'success',
+          message: t('workspace.edit.success'),
+          duration: 3000
+        }
+      });
+    } catch (error: any) {
+      console.error('Failed to update workspace:', error);
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error?.message || 'Failed to update workspace. Please try again.',
+          duration: 4000
+        }
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -212,12 +235,12 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
         <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('workspace.edit.privacyTitle')}</h3>
         
         <div className="space-y-4">
-          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed opacity-75">
             <input
               type="checkbox"
-              checked={formData.isPublic}
-              onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
-              className="mt-1 rounded"
+              checked={true}
+              disabled={true}
+              className="mt-1 rounded cursor-not-allowed"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 font-medium text-gray-900">
@@ -227,15 +250,18 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
               <div className="text-sm text-gray-600 mt-1">
                 {t('workspace.edit.publicDesc')}
               </div>
+              <div className="text-xs text-gray-500 mt-2 italic">
+                All workspaces are public by default and this setting cannot be changed.
+              </div>
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed opacity-75">
             <input
               type="checkbox"
               checked={formData.allowMemberInvites}
-              onChange={(e) => setFormData({ ...formData, allowMemberInvites: e.target.checked })}
-              className="mt-1 rounded"
+              disabled={true}
+              className="mt-1 rounded cursor-not-allowed"
             />
             <div className="flex-1">
               <div className="font-medium text-gray-900">{t('workspace.edit.allowInvites')}</div>
@@ -245,12 +271,12 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-start gap-3 p-4 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed opacity-75">
             <input
               type="checkbox"
               checked={formData.requireApproval}
-              onChange={(e) => setFormData({ ...formData, requireApproval: e.target.checked })}
-              className="mt-1 rounded"
+              disabled={true}
+              className="mt-1 rounded cursor-not-allowed"
             />
             <div className="flex-1">
               <div className="font-medium text-gray-900">{t('workspace.edit.requireApproval')}</div>
@@ -266,10 +292,11 @@ const WorkspaceEditTab: React.FC<WorkspaceEditTabProps> = ({ workspace }) => {
       <div className="flex justify-end gap-3">
         <button
           onClick={handleSave}
-          className="inline-flex items-center gap-2 px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors"
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 px-6 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Save className="w-4 h-4" />
-          {t('workspace.edit.save')}
+          {isSaving ? 'Saving...' : t('workspace.edit.save')}
         </button>
       </div>
     </div>
