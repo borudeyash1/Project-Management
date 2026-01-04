@@ -91,6 +91,7 @@ import Analytics from './components/admin/Analytics';
 import AdminSettings from './components/admin/Settings';
 import ReleaseManagement from './components/admin/ReleaseManagement';
 import AdminSubscriptions from './components/admin/AdminSubscriptions';
+import AdminPayments from './components/admin/AdminPayments';
 import AdminCoupons from './components/admin/AdminCoupons';
 import AdminDocs from './components/admin/AdminDocs';
 import AdminDocsImport from './components/admin/AdminDocsImport';
@@ -348,6 +349,7 @@ const AppContent: React.FC = () => {
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/releases" element={<ReleaseManagement />} />
         <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+        <Route path="/admin/payments" element={<AdminPayments />} />
         <Route path="/admin/coupons" element={<AdminCoupons />} />
         <Route path="/admin/docs" element={<AdminDocs />} />
         <Route path="/admin/docs/import" element={<AdminDocsImport />} />

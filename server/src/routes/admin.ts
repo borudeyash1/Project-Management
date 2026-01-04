@@ -36,6 +36,7 @@ import {
   updateSubscriptionAffiliate,
   deleteSubscriptionAffiliate
 } from '../controllers/subscriptionController';
+import { getAllPayments } from '../controllers/paymentController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import {
@@ -142,5 +143,8 @@ router.get('/analytics/device-security-detail', getDetailedDeviceSecurity);
 // router.post('/subscriptions/:planKey/affiliates', authenticate, addSubscriptionAffiliate);
 // router.put('/subscriptions/:planKey/affiliates/:code', authenticate, updateSubscriptionAffiliate);
 // router.delete('/subscriptions/:planKey/affiliates/:code', authenticate, deleteSubscriptionAffiliate);
+
+// Payment management routes
+router.get('/payments/all', getAllPayments);
 
 export default router;

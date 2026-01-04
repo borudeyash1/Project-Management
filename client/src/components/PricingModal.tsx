@@ -8,12 +8,11 @@ import {
   Shield,
   Headphones,
   Gift,
-  ArrowRight,
-  ShieldCheck,
-  KeyRound
+  ArrowRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import api, { SubscriptionPlanData } from '../services/api';
+import RazorpayPaymentModal from './RazorpayPaymentModal';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -35,17 +34,12 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
   const [detailPlan, setDetailPlan] = useState<SubscriptionPlanData | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [otpStep, setOtpStep] = useState<'idle' | 'code-sent' | 'verified'>('idle');
-  const [otpCode, setOtpCode] = useState('');
-  const [otpError, setOtpError] = useState<string | null>(null);
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
-      setOtpStep('idle');
-      setOtpCode('');
-      setOtpError(null);
+      setShowPaymentModal(false);
+      setDetailPlan(null);
       return;
     }
     const loadPlans = async () => {
@@ -134,94 +128,71 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
     const planMeta = plans.find((plan) => plan.planKey === planKey) || null;
     setSelectedPlan(planKey);
     setDetailPlan(planMeta);
-    setOtpStep('idle');
-    setOtpCode('');
-    setOtpError(null);
   };
 
-  const handleSendVerification = async () => {
+  const handlePlanUpgrade = async () => {
     if (!detailPlan) return;
-    setOtpLoading(true);
-    setOtpError(null);
-    try {
-      await api.sendWorkspaceOtp();
-      setOtpStep('code-sent');
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'Verification code sent to your account email.',
-          duration: 3000
-        }
-      });
-    } catch (error: any) {
-      console.error('Failed to send OTP for plan upgrade', error);
-      setOtpError(error?.message || 'Failed to send verification code.');
-    } finally {
-      setOtpLoading(false);
-    }
-  };
 
-  const handleVerifyOtp = async () => {
-    if (!detailPlan) return;
-    if (!otpCode.trim()) {
-      setOtpError('Please enter the 6-digit code.');
-      return;
-    }
-    setOtpLoading(true);
-    try {
-      await api.verifyWorkspaceOtp(otpCode.trim());
-      setOtpStep('verified');
-      setOtpError(null);
-      dispatch({
-        type: 'ADD_TOAST',
-        payload: {
-          id: Date.now().toString(),
-          type: 'success',
-          message: 'OTP verified. You can now confirm the upgrade.',
-          duration: 3000
-        }
-      });
-    } catch (error: any) {
-      setOtpError(error?.message || 'Invalid verification code.');
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  const handleConfirmUpgrade = async () => {
-    if (!detailPlan) return;
-    if (otpStep !== 'verified') {
-      setOtpError('Please verify the code before upgrading.');
+    // For free plan, upgrade directly without payment
+    if (detailPlan.planKey === 'free') {
+      try {
+        const updatedUser = await api.upgradeSubscription(detailPlan.planKey, billingCycle);
+        dispatch({ type: 'SET_USER', payload: updatedUser });
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'success',
+            message: `Switched to ${detailPlan.displayName} plan`,
+            duration: 3500
+          }
+        });
+        onSelectPlan?.(detailPlan.planKey);
+        setDetailPlan(null);
+        onClose();
+      } catch (error: any) {
+        console.error('Failed to upgrade to free plan', error);
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'error',
+            message: error?.message || 'Failed to switch plan.',
+            duration: 4000
+          }
+        });
+      }
       return;
     }
 
-    setUpgradeLoading(true);
+    // For paid plans, open Razorpay payment modal
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSuccess = async () => {
+    console.log('✅ Payment successful!');
+    
+    // Refresh user data
     try {
-      const updatedUser = await api.upgradeSubscription(detailPlan.planKey, billingCycle);
+      const updatedUser = await api.getCurrentUser();
       dispatch({ type: 'SET_USER', payload: updatedUser });
+      
       dispatch({
         type: 'ADD_TOAST',
         payload: {
           id: Date.now().toString(),
           type: 'success',
-          message: `Upgraded to ${detailPlan.displayName} plan`,
+          message: `Successfully upgraded to ${detailPlan?.displayName} plan!`,
           duration: 3500
         }
       });
 
-      onSelectPlan?.(detailPlan.planKey);
+      onSelectPlan?.(detailPlan?.planKey as any);
       setDetailPlan(null);
-      setOtpStep('idle');
-      setOtpCode('');
-      setOtpError(null);
+      setShowPaymentModal(false);
       onClose();
     } catch (error: any) {
-      console.error('Failed to upgrade subscription', error);
-      setOtpError(error?.message || 'Failed to upgrade subscription.');
-    } finally {
-      setUpgradeLoading(false);
+      console.error('Failed to refresh user data after payment', error);
     }
   };
 
@@ -457,74 +428,37 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
             </div>
 
             <div className="space-y-3">
-              <p className="text-sm text-gray-600">Verification is required before we upgrade your workspace billing.</p>
-              {otpStep === 'idle' && (
-                <button
-                  onClick={handleSendVerification}
-                  disabled={otpLoading}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-accent text-gray-900 font-semibold hover:bg-accent-hover disabled:opacity-60"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  {otpLoading ? 'Sending...' : 'Send verification code'}
-                </button>
-              )}
-
-              {otpStep === 'code-sent' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Enter verification code</label>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
-                      className="mt-1 w-full px-3 py-2 border rounded-lg text-center tracking-widest text-lg"
-                      placeholder="123456"
-                    />
-                    {otpError && <p className="text-xs text-red-500 mt-1">{otpError}</p>}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleVerifyOtp}
-                      disabled={otpLoading}
-                      className="flex-1 px-4 py-2 rounded-lg bg-accent text-gray-900 hover:bg-accent-hover disabled:opacity-60"
-                    >
-                      {otpLoading ? 'Verifying...' : 'Verify code'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setOtpStep('idle');
-                        setOtpCode('');
-                        setOtpError(null);
-                      }}
-                      className="flex-1 px-4 py-2 rounded-lg border border-gray-300"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {otpStep === 'verified' && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-green-700 text-sm">
-                    <Check className="w-4 h-4" />
-                    <span>Verification complete. You can now bypass billing and upgrade.</span>
-                  </div>
-                  <button
-                    onClick={handleConfirmUpgrade}
-                    disabled={upgradeLoading}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600 disabled:opacity-60"
-                  >
-                    <KeyRound className="w-4 h-4" />
-                    {upgradeLoading ? 'Upgrading...' : `Bypass & upgrade to ${detailPlan.displayName}`}
-                  </button>
-                </div>
-              )}
+              <p className="text-sm text-gray-600">
+                {detailPlan.planKey === 'free' 
+                  ? 'Switch to the free plan to downgrade your subscription.'
+                  : 'Secure payment powered by Razorpay. Complete your upgrade in just a few clicks.'}
+              </p>
+              
+              <button
+                onClick={handlePlanUpgrade}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-60 shadow-lg hover:shadow-xl transition-all"
+              >
+                <Shield className="w-4 h-4" />
+                {detailPlan.planKey === 'free' ? 'Switch to Free Plan' : 'Proceed to Payment'}
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )
       }
+
+      {/* Razorpay Payment Modal */}
+      {showPaymentModal && detailPlan && detailPlan.planKey !== 'free' && (
+        <RazorpayPaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          planKey={detailPlan.planKey}
+          planName={detailPlan.displayName}
+          amount={billingCycle === 'monthly' ? detailPlan.monthlyPrice : detailPlan.yearlyPrice}
+          billingCycle={billingCycle}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
     </div >
   );
 };

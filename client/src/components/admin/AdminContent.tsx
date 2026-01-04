@@ -21,6 +21,7 @@ import { useApp } from '../../context/AppContext';
 import * as contentService from '../../services/contentService';
 import CustomPlacementModal from './CustomPlacementModal';
 import { ContentBanner } from '../../services/contentService';
+import AdminDockNavigation from './AdminDockNavigation';
 
 const AdminContent: React.FC = () => {
   const navigate = useNavigate();
@@ -930,6 +931,9 @@ const AdminContent: React.FC = () => {
           bannerPreviewUrl={currentBanner.imageUrl}
         />
       )}
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };

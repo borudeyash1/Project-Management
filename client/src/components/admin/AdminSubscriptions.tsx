@@ -21,6 +21,7 @@ interface SubscriptionPlanPayload {
   buttonText: string;
   buttonStyle: 'solid' | 'outline';
   contactLink?: boolean;
+  paymentEnabled?: boolean; // Enable/disable payment processing
 }
 
 const AdminSubscriptions: React.FC = () => {
@@ -389,12 +390,6 @@ const AdminSubscriptions: React.FC = () => {
               })}
             </section>
 
-        {/* Debug Info */}
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
-          <p className="font-bold">Debug Info:</p>
-          <p>Plans loaded: {plans.length}</p>
-          <p>Plan keys: {plans.map(p => p.planKey).join(', ')}</p>
-        </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {plans.map((plan) => (
@@ -444,7 +439,7 @@ const AdminSubscriptions: React.FC = () => {
               </div>
 
               {/* Recommended Toggle */}
-              <label className="flex items-center gap-2 mb-4">
+              <label className="flex items-center gap-2 mb-2">
                 <input
                   type="checkbox"
                   checked={plan.recommended}
@@ -453,6 +448,22 @@ const AdminSubscriptions: React.FC = () => {
                 />
                 <span className={`text-sm font-medium ${plan.recommended ? 'text-blue-600' : ''}`}>
                   Recommended
+                </span>
+              </label>
+
+              {/* Payment Enabled Toggle */}
+              <label className="flex items-center gap-2 mb-4">
+                <input
+                  type="checkbox"
+                  checked={plan.paymentEnabled !== false}
+                  onChange={(e) => updatePlanField(plan.planKey, 'paymentEnabled', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className={`text-sm font-medium ${plan.paymentEnabled !== false ? 'text-green-600' : 'text-gray-500'}`}>
+                  Payment Enabled
+                </span>
+                <span className="text-xs text-gray-500 ml-auto">
+                  {plan.paymentEnabled !== false ? '(Payment flow active)' : '(Payment disabled)'}
                 </span>
               </label>
 

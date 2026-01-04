@@ -18,6 +18,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useApp } from '../../context/AppContext';
 import api from '../../services/api';
+import AdminDockNavigation from './AdminDockNavigation';
 
 interface Coupon {
   _id?: string;
@@ -624,6 +625,9 @@ const AdminCoupons: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Admin Dock Navigation */}
+      <AdminDockNavigation />
     </div>
   );
 };

@@ -42,15 +42,70 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
+    console.log('📋 Pricing Plan from DB:', {
+      planKey: pricingPlan.planKey,
+      displayName: pricingPlan.displayName,
+      price: pricingPlan.price,
+      priceType: typeof pricingPlan.price
+    });
+
     // Calculate amount based on billing cycle
-    let amount = typeof pricingPlan.price === 'number' ? pricingPlan.price : 0;
+    // Handle both number and string prices
+    let amount = 0;
+    
+    if (typeof pricingPlan.price === 'number') {
+      amount = pricingPlan.price;
+    } else if (typeof pricingPlan.price === 'string') {
+      // Try to parse string to number
+      const parsed = parseFloat(pricingPlan.price);
+      if (!isNaN(parsed)) {
+        amount = parsed;
+      } else {
+        // Price is non-numeric string like "Contact" or "Custom"
+        res.status(400).json({
+          success: false,
+          message: `This plan requires custom pricing. Price: "${pricingPlan.price}". Please contact sales.`,
+          error: 'NON_NUMERIC_PRICE'
+        });
+        return;
+      }
+    }
     
     if (billingCycle === 'yearly') {
       amount = Math.round(amount * 12 * 0.9); // 10% discount for yearly
     }
 
+    console.log('💰 Payment Details:', {
+      planKey,
+      billingCycle,
+      priceFromDB: pricingPlan.price,
+      parsedAmount: amount,
+      calculatedAmount: amount,
+      amountInPaise: amount * 100
+    });
+
+    // Validate minimum amount (Razorpay requires minimum ₹1 = 100 paise)
+    if (amount < 1) {
+      res.status(400).json({
+        success: false,
+        message: `Invalid amount: ₹${amount}. Minimum amount is ₹1. Please check the plan pricing in admin panel.`,
+        error: 'Amount must be at least ₹1'
+      });
+      return;
+    }
+
     // Convert to paise (Razorpay uses smallest currency unit)
-    const amountInPaise = amount * 100;
+    const amountInPaise = Math.round(amount * 100);
+
+    // Razorpay minimum is 100 paise (₹1)
+    if (amountInPaise < 100) {
+      res.status(400).json({
+        success: false,
+        message: `Amount too low: ${amountInPaise} paise (₹${amount}). Minimum is 100 paise (₹1).`,
+        error: 'AMOUNT_TOO_LOW'
+      });
+      return;
+    }
 
     // Create Razorpay order
     const options = {
@@ -66,6 +121,8 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
         planName: pricingPlan.displayName
       }
     };
+
+    console.log('📤 Creating Razorpay order with options:', options);
 
     const order = await razorpayInstance.orders.create(options);
 
@@ -467,6 +524,83 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({
       success: false,
       message: 'Webhook processing failed',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Get all payment transactions (Admin only)
+ */
+export const getAllPayments = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Fetch all payment transactions with user details
+    const transactions = await PaymentTransaction.find()
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(1000);
+
+    // Fetch all active subscriptions (successful payments)
+    const subscriptions = await Subscription.find()
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(1000);
+
+    // Combine and format the data
+    const allPayments = [
+      // Payment transactions
+      ...transactions.map(txn => ({
+        _id: txn._id,
+        userId: txn.userId,
+        amount: txn.amount,
+        currency: txn.currency,
+        status: txn.status,
+        razorpayOrderId: txn.razorpayOrderId,
+        razorpayPaymentId: txn.razorpayPaymentId,
+        planKey: txn.planKey,
+        planName: txn.planName,
+        billingCycle: txn.billingCycle,
+        createdAt: txn.createdAt,
+        updatedAt: txn.updatedAt,
+        source: 'transaction'
+      })),
+      // Active subscriptions (mark as success)
+      ...subscriptions.map(sub => ({
+        _id: sub._id,
+        userId: sub.userId,
+        amount: sub.amount,
+        currency: sub.currency,
+        status: sub.status === 'active' ? 'success' : sub.status,
+        razorpayOrderId: sub.razorpayOrderId || '',
+        razorpayPaymentId: sub.razorpayPaymentId || '',
+        planKey: sub.planKey,
+        planName: sub.planName,
+        billingCycle: sub.billingCycle,
+        createdAt: sub.createdAt,
+        updatedAt: sub.updatedAt,
+        source: 'subscription'
+      }))
+    ];
+
+    // Sort by creation date (newest first)
+    allPayments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    res.status(200).json({
+      success: true,
+      data: {
+        transactions: allPayments,
+        count: allPayments.length,
+        breakdown: {
+          paymentTransactions: transactions.length,
+          activeSubscriptions: subscriptions.length
+        }
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fetching payments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch payment transactions',
       error: error.message
     });
   }

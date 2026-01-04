@@ -181,18 +181,18 @@ const Analytics: React.FC = () => {
               <div className="p-3 bg-accent/10 rounded-lg">
                 <Users className="w-6 h-6 text-accent" />
               </div>
-              <span className={`text-sm font-medium ${analytics.growth.weeklyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {analytics.growth.weeklyGrowthRate >= 0 ? '+' : ''}{analytics.growth.weeklyGrowthRate.toFixed(1)}%
+              <span className={`text-sm font-medium ${(analytics.growth?.weeklyGrowthRate || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {(analytics.growth?.weeklyGrowthRate || 0) >= 0 ? '+' : ''}{(analytics.growth?.weeklyGrowthRate || 0).toFixed(1)}%
               </span>
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {analytics.overview.totalUsers.toLocaleString()}
+              {(analytics.overview?.totalUsers || 0).toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Total Users
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
-              +{analytics.overview.usersLast30Days} this month
+              +{analytics.overview?.usersLast30Days || 0} this month
             </p>
           </div>
 
@@ -204,13 +204,13 @@ const Analytics: React.FC = () => {
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {analytics.overview.activeLast30Days.toLocaleString()}
+              {(analytics.overview?.activeLast30Days || 0).toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Active Users (30d)
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
-              {analytics.engagement.engagementRate.toFixed(1)}% engagement rate
+              {(analytics.engagement?.engagementRate || 0).toFixed(1)}% engagement rate
             </p>
           </div>
 
@@ -220,17 +220,17 @@ const Analytics: React.FC = () => {
                 <Target className="w-6 h-6 text-purple-500" />
               </div>
               <span className="text-sm font-medium text-purple-500">
-                {analytics.engagement.retentionRate.toFixed(1)}%
+                {(analytics.engagement?.retentionRate || 0).toFixed(1)}%
               </span>
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {analytics.predictions.nextMonthUsers.toLocaleString()}
+              {(analytics.predictions?.nextMonthUsers || 0).toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Predicted Next Month
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
-              {analytics.predictions.trend === 'growing' ? '📈 Growing' : '📉 Declining'}
+              {analytics.predictions?.trend === 'growing' ? '📈 Growing' : '📉 Declining'}
             </p>
           </div>
 
@@ -239,18 +239,18 @@ const Analytics: React.FC = () => {
               <div className="p-3 bg-red-500/10 rounded-lg">
                 <TrendingUp className="w-6 h-6 text-red-500" />
               </div>
-              <span className={`text-sm font-medium ${analytics.engagement.churnRate < 10 ? 'text-green-500' : 'text-red-500'}`}>
-                {analytics.engagement.churnRate.toFixed(1)}%
+              <span className={`text-sm font-medium ${(analytics.engagement?.churnRate || 0) < 10 ? 'text-green-500' : 'text-red-500'}`}>
+                {(analytics.engagement?.churnRate || 0).toFixed(1)}%
               </span>
             </div>
             <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {analytics.overview.inactive90Days.toLocaleString()}
+              {(analytics.overview?.inactive90Days || 0).toLocaleString()}
             </h3>
             <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>
               Dormant Users
             </p>
             <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-2`}>
-              Churn rate: {analytics.engagement.churnRate.toFixed(1)}%
+              Churn rate: {(analytics.engagement?.churnRate || 0).toFixed(1)}%
             </p>
           </div>
         </div>
@@ -258,10 +258,10 @@ const Analytics: React.FC = () => {
         {/* Charts */}
         <AnalyticsCharts
           isDarkMode={isDarkMode}
-          userGrowthTrend={analytics.growth.userGrowthTrend.map(t => ({ date: t.date, value: t.users }))}
-          deviceActivityTrend={analytics.devices.activityTrend.map(t => ({ date: t.date, value: t.active }))}
-          userDistribution={analytics.engagement.userDistribution}
-          devicesByRisk={analytics.devices.byRisk}
+          userGrowthTrend={(analytics.growth?.userGrowthTrend || []).map(t => ({ date: t.date, value: t.users }))}
+          deviceActivityTrend={(analytics.devices?.activityTrend || []).map(t => ({ date: t.date, value: t.active }))}
+          userDistribution={analytics.engagement?.userDistribution || { veryActive: 0, active: 0, inactive: 0, dormant: 0 }}
+          devicesByRisk={analytics.devices?.byRisk || { low: 0, medium: 0, high: 0, critical: 0 }}
           onChartClick={handleChartClick}
         />
 
@@ -282,20 +282,20 @@ const Analytics: React.FC = () => {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Daily Growth Rate</span>
-                <span className={`font-semibold ${analytics.growth.dailyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {analytics.growth.dailyGrowthRate >= 0 ? '+' : ''}{analytics.growth.dailyGrowthRate.toFixed(2)}%
+                <span className={`font-semibold ${(analytics.growth?.dailyGrowthRate || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {(analytics.growth?.dailyGrowthRate || 0) >= 0 ? '+' : ''}{(analytics.growth?.dailyGrowthRate || 0).toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Weekly Growth Rate</span>
-                <span className={`font-semibold ${analytics.growth.weeklyGrowthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {analytics.growth.weeklyGrowthRate >= 0 ? '+' : ''}{analytics.growth.weeklyGrowthRate.toFixed(2)}%
+                <span className={`font-semibold ${(analytics.growth?.weeklyGrowthRate || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {(analytics.growth?.weeklyGrowthRate || 0) >= 0 ? '+' : ''}{(analytics.growth?.weeklyGrowthRate || 0).toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Avg Daily Growth</span>
                 <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {analytics.growth.avgDailyGrowth} users/day
+                  {analytics.growth?.avgDailyGrowth || '0'} users/day
                 </span>
               </div>
             </div>
@@ -312,19 +312,19 @@ const Analytics: React.FC = () => {
               <div className="flex justify-between">
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Total Devices</span>
                 <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {analytics.devices.total}
+                  {analytics.devices?.total || 0}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Active Devices</span>
                 <span className="font-semibold text-green-500">
-                  {analytics.devices.active}
+                  {analytics.devices?.active || 0}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Suspicious Devices</span>
-                <span className={`font-semibold ${analytics.devices.suspicious > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                  {analytics.devices.suspicious}
+                <span className={`font-semibold ${(analytics.devices?.suspicious || 0) > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                  {analytics.devices?.suspicious || 0}
                 </span>
               </div>
             </div>

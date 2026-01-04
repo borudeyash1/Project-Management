@@ -21,6 +21,7 @@ export interface IPricingPlan extends Document {
   contactLink?: boolean;
   order: number;
   isActive: boolean;
+  paymentEnabled: boolean; // Enable/disable payment processing for this plan
 }
 
 const pricingPlanSchema = new Schema<IPricingPlan>({
@@ -74,6 +75,10 @@ const pricingPlanSchema = new Schema<IPricingPlan>({
   isActive: {
     type: Boolean,
     default: true
+  },
+  paymentEnabled: {
+    type: Boolean,
+    default: true // Payment enabled by default for all plans
   }
 }, {
   timestamps: true

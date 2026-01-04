@@ -11,7 +11,8 @@ import {
   LogOut,
   FileText,
   Megaphone,
-  Ticket
+  Ticket,
+  Wallet
 } from 'lucide-react';
 import { AdminDock, AdminDockIcon, AdminDockDivider } from '../ui/AdminDock';
 
@@ -31,6 +32,7 @@ const AdminDockNavigation: React.FC = () => {
     { id: 'devices', label: 'Devices', icon: ShieldCheck, path: '/admin/devices' },
     { id: 'users', label: 'Users', icon: Users2, path: '/admin/users' },
     { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, path: '/admin/subscriptions' },
+    { id: 'payments', label: 'Payments', icon: Wallet, path: '/admin/payments' },
     { id: 'coupons', label: 'Coupons', icon: Ticket, path: '/admin/coupons' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
     { id: 'releases', label: 'Releases', icon: Rocket, path: '/admin/releases' },

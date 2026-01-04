@@ -13,7 +13,7 @@ const PricingPage: React.FC = () => {
   useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [isYearly, setIsYearly] = useState(false);
@@ -224,16 +224,42 @@ const PricingPage: React.FC = () => {
       return;
     }
 
-    // Contact plans - only if contactLink is true OR price is non-numeric string like "Contact" or "Custom"
-    if (plan.contactLink || (typeof plan.price === 'string' && isNaN(Number(plan.price)))) {
+    // Check if this is a non-numeric price (Contact/Custom)
+    const isContactPrice = typeof plan.price === 'string' && isNaN(Number(plan.price));
+    
+    // Priority 1: If payment is ENABLED and price is numeric, open payment modal
+    if (plan.paymentEnabled !== false && !isContactPrice) {
+      console.log('💳 Payment enabled, opening payment modal');
+      setSelectedPlan({ ...plan, price: numericPrice });
+      setShowPaymentModal(true);
+      return;
+    }
+
+    // Priority 2: If payment is DISABLED, show message
+    if (plan.paymentEnabled === false && !isContactPrice) {
+      console.log('⚠️ Payment disabled for this plan');
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'info',
+          message: 'Payment processing is currently disabled for this plan. Please contact support.',
+          duration: 5000
+        }
+      });
+      return;
+    }
+
+    // Priority 3: Contact plans (non-numeric price OR contactLink)
+    if (isContactPrice || plan.contactLink) {
       console.log('📞 Contact plan selected, redirecting to /contact-us');
       navigate('/contact-us');
       return;
     }
 
-    // Paid plans - open payment modal
-    console.log('💳 Paid plan selected, opening payment modal');
-    setSelectedPlan({ ...plan, price: numericPrice }); // Store with numeric price
+    // Fallback: open payment modal
+    console.log('💳 Fallback: opening payment modal');
+    setSelectedPlan({ ...plan, price: numericPrice });
     setShowPaymentModal(true);
   };
 

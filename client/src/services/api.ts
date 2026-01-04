@@ -61,11 +61,16 @@ class ApiService {
       url += `${separator}${params.toString()}`;
     }
 
+    // Always get the latest token from localStorage
+    const currentToken = localStorage.getItem('accessToken');
+    
+    console.log('🔑 [DEBUG] Token from localStorage:', currentToken ? `${currentToken.substring(0, 20)}...` : 'NULL');
+    
     const config: RequestInit = {
       credentials: 'include', // Send cookies with request
       headers: {
         'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+        ...(currentToken && { Authorization: `Bearer ${currentToken}` }),
         ...options.headers,
       },
       ...options,
@@ -627,8 +632,9 @@ class ApiService {
       xhr.open('POST', `${this.baseURL}/releases`);
       xhr.withCredentials = true;
 
-      if (this.token) {
-        xhr.setRequestHeader('Authorization', `Bearer ${this.token}`);
+      const currentToken = localStorage.getItem('accessToken');
+      if (currentToken) {
+        xhr.setRequestHeader('Authorization', `Bearer ${currentToken}`);
       }
 
       if (onProgress) {
@@ -662,11 +668,12 @@ class ApiService {
   }
 
   async upload<T = any>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
+    const currentToken = localStorage.getItem('accessToken');
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'POST',
       credentials: 'include',
       headers: {
-        ...(this.token && { Authorization: `Bearer ${this.token}` })
+        ...(currentToken && { Authorization: `Bearer ${currentToken}` })
       },
       body: formData
     });
