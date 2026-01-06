@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { CreditCard, Shield, CheckCircle, X, Loader } from 'lucide-react';
+import { CreditCard, Shield, CheckCircle, X, Loader, AlertCircle } from 'lucide-react';
 import api from '../services/api';
+import { useApp } from '../context/AppContext';
+import BillingInfoForm from './BillingInfoForm';
 
 interface RazorpayPaymentModalProps {
   isOpen: boolean;
@@ -27,8 +29,17 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
   billingCycle,
   onSuccess
 }) => {
+  const { state, dispatch } = useApp();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showBillingForm, setShowBillingForm] = useState(false);
+  
+  // Coupon code state
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponError, setCouponError] = useState('');
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [discountedAmount, setDiscountedAmount] = useState(amount);
 
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -45,10 +56,115 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
     });
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    try {
+      setValidatingCoupon(true);
+      setCouponError('');
+
+      const response = await api.get(`/coupons/validate/${couponCode.trim().toUpperCase()}`);
+
+      if (response.success) {
+        const couponData = response.data;
+
+        // Check if coupon is applicable to this plan
+        if (couponData.applicablePlans && couponData.applicablePlans.length > 0) {
+          if (!couponData.applicablePlans.includes(planKey)) {
+            setCouponError('This coupon is not applicable to the selected plan');
+            setValidatingCoupon(false);
+            return;
+          }
+        }
+
+        // Check minimum purchase requirement
+        if (couponData.minPurchase && amount < couponData.minPurchase) {
+          setCouponError(`Minimum purchase of ₹${couponData.minPurchase} required`);
+          setValidatingCoupon(false);
+          return;
+        }
+
+        // Calculate discount
+        let discount = 0;
+        if (couponData.discountType === 'percentage') {
+          discount = (amount * couponData.discountValue) / 100;
+          // Apply max discount if specified
+          if (couponData.maxDiscount && discount > couponData.maxDiscount) {
+            discount = couponData.maxDiscount;
+          }
+        } else {
+          // Fixed amount discount
+          discount = couponData.discountValue;
+        }
+
+        const finalAmount = Math.max(0, amount - discount);
+
+        setAppliedCoupon({
+          ...couponData,
+          discount: discount
+        });
+        setDiscountedAmount(finalAmount);
+        setCouponError('');
+      }
+    } catch (error: any) {
+      setCouponError(error.response?.data?.message || error.message || 'Invalid coupon code');
+      setAppliedCoupon(null);
+      setDiscountedAmount(amount);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode('');
+    setAppliedCoupon(null);
+    setCouponError('');
+    setDiscountedAmount(amount);
+  };
+
   const handlePayment = async () => {
     try {
       setIsProcessing(true);
       setError(null);
+
+      // Fetch fresh user profile to check billing info
+      let billingInfo = state.userProfile?.billingInfo;
+      
+      console.log('🔍 Checking billing info from state:', billingInfo);
+      
+      // If billing info is not in state, fetch from API
+      if (!billingInfo || !billingInfo.isComplete) {
+        try {
+          console.log('📡 Fetching fresh profile data from API...');
+          const profileResponse = await api.get('/users/profile');
+          console.log('📥 Profile response:', profileResponse);
+          console.log('📋 Profile data:', profileResponse.data);
+          console.log('🏠 Billing info from API:', profileResponse.data?.billingInfo);
+          console.log('✔️ isComplete value:', profileResponse.data?.billingInfo?.isComplete);
+          
+          if (profileResponse.success && profileResponse.data?.billingInfo?.isComplete) {
+            billingInfo = profileResponse.data.billingInfo;
+            console.log('✅ Found complete billing info:', billingInfo);
+          } else {
+            console.log('❌ Billing info not complete, showing form');
+            // Show billing form if still not complete
+            setShowBillingForm(true);
+            setIsProcessing(false);
+            return;
+          }
+        } catch (error) {
+          console.error('❌ Error fetching profile:', error);
+          // If fetch fails, show billing form
+          setShowBillingForm(true);
+          setIsProcessing(false);
+          return;
+        }
+      } else {
+        console.log('✅ Using billing info from state');
+      }
 
       // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
@@ -57,10 +173,12 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
       }
 
       // Create order
-      console.log('📤 Creating payment order...', { planKey, billingCycle });
+      console.log('📤 Creating payment order...', { planKey, billingCycle, couponCode: appliedCoupon?.code });
       const orderResponse = await api.post('/payment/create-order', {
         planKey,
-        billingCycle
+        billingCycle,
+        couponCode: appliedCoupon?.code || null,
+        discountedAmount: appliedCoupon ? discountedAmount : null
       });
 
       console.log('📥 Order response:', orderResponse);
@@ -72,14 +190,14 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
       const orderData = orderResponse.data;
       console.log('💳 Order data:', orderData);
 
-      // Razorpay options
+      // Razorpay options with prefilled billing info
       const options = {
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency,
         name: 'Sartthi Project Management',
         description: `${planName} - ${billingCycle} subscription`,
-        image: '/logo.png', // Add your logo path
+        image: '/logo.png',
         order_id: orderData.orderId,
         handler: async function (response: any) {
           try {
@@ -89,7 +207,10 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               planKey,
-              billingCycle
+              billingCycle,
+              couponCode: appliedCoupon?.code || null,
+              discountAmount: appliedCoupon?.discount || 0,
+              originalAmount: amount
             });
 
             if (verifyResponse.success) {
@@ -109,14 +230,16 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
           }
         },
         prefill: {
-          name: '', // Will be filled from user data
-          email: '',
-          contact: ''
+          name: state.userProfile?.fullName || '',
+          email: billingInfo?.billingEmail || state.userProfile?.email || '',
+          contact: billingInfo?.phone || state.userProfile?.contactNumber || ''
         },
         notes: {
           planKey,
           planName,
-          billingCycle
+          billingCycle,
+          address: billingInfo?.address ? `${billingInfo.address.street}, ${billingInfo.address.city}, ${billingInfo.address.state} ${billingInfo.address.postalCode}` : '',
+          gstNumber: billingInfo?.gstNumber || ''
         },
         theme: {
           color: '#006397'
@@ -142,6 +265,29 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
       setError(error.message || 'Payment initiation failed');
       setIsProcessing(false);
     }
+  };
+
+  const handleBillingSuccess = async (billingData: any) => {
+    setShowBillingForm(false);
+    
+    // Refresh user profile in app state
+    try {
+      const profileResponse = await api.get('/users/profile');
+      if (profileResponse.success) {
+        // Update user profile in app state
+        dispatch({
+          type: 'SET_USER',
+          payload: profileResponse.data
+        });
+      }
+    } catch (error) {
+      console.error('Failed to refresh user profile:', error);
+    }
+    
+    // Automatically proceed to payment after billing info is saved
+    setTimeout(() => {
+      handlePayment();
+    }, 500);
   };
 
   if (!isOpen) return null;
@@ -181,10 +327,84 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
             <span className="text-gray-700 font-medium">Billing:</span>
             <span className="text-gray-900 font-semibold capitalize">{billingCycle}</span>
           </div>
+          
+          {/* Coupon Code Section */}
+          <div className="border-t border-gray-200 pt-3 mt-3 mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Have a coupon code?
+            </label>
+            {!appliedCoupon ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value.toUpperCase());
+                    setCouponError('');
+                  }}
+                  placeholder="Enter code"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                  disabled={validatingCoupon || isProcessing}
+                />
+                <button
+                  onClick={handleApplyCoupon}
+                  disabled={validatingCoupon || isProcessing || !couponCode.trim()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {validatingCoupon ? 'Validating...' : 'Apply'}
+                </button>
+              </div>
+            ) : (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium text-green-900">
+                        Coupon "{appliedCoupon.code}" applied!
+                      </p>
+                      <p className="text-xs text-green-700">
+                        {appliedCoupon.discountType === 'percentage' 
+                          ? `${appliedCoupon.discountValue}% discount` 
+                          : `₹${appliedCoupon.discountValue} off`}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRemoveCoupon}
+                    className="text-green-700 hover:text-green-900"
+                    disabled={isProcessing}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
+            {couponError && (
+              <div className="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                <span>{couponError}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Amount Breakdown */}
           <div className="border-t border-gray-200 pt-2 mt-2">
+            {appliedCoupon && (
+              <>
+                <div className="flex justify-between items-center mb-1 text-sm">
+                  <span className="text-gray-600">Original Amount:</span>
+                  <span className="text-gray-600 line-through">₹{amount}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2 text-sm">
+                  <span className="text-green-600">Discount:</span>
+                  <span className="text-green-600">-₹{appliedCoupon.discount.toFixed(2)}</span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between items-center">
               <span className="text-gray-900 font-bold text-lg">Total Amount:</span>
-              <span className="text-blue-600 font-bold text-2xl">₹{amount}</span>
+              <span className="text-blue-600 font-bold text-2xl">₹{discountedAmount.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -245,6 +465,16 @@ const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
           <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
         </p>
       </div>
+
+      {/* Billing Info Form Modal */}
+      <BillingInfoForm
+        isOpen={showBillingForm}
+        onClose={() => {
+          setShowBillingForm(false);
+          setIsProcessing(false);
+        }}
+        onSuccess={handleBillingSuccess}
+      />
     </div>
   );
 };

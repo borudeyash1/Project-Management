@@ -26,7 +26,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     if (!token) {
       res.status(401).json({
         success: false,
-        message: 'Access denied. No token provided.'
+        message: 'Login required to access this resource.'
       });
       return;
     }
@@ -93,7 +93,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     if (error.name === 'JsonWebTokenError') {
       res.status(401).json({
         success: false,
-        message: 'Invalid token.'
+        message: 'Your session is invalid. Please login again.'
       });
       return;
     }
@@ -101,7 +101,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     if (error.name === 'TokenExpiredError') {
       res.status(401).json({
         success: false,
-        message: 'Token has expired.'
+        message: 'Your session has expired. Please login again.'
       });
       return;
     }
@@ -122,7 +122,7 @@ export const authenticateQuery = async (req: Request, res: Response, next: NextF
     if (!token) {
       res.status(401).json({
         success: false,
-        message: 'Access denied. No token provided in query.'
+        message: 'Login required to access this resource.'
       });
       return;
     }
@@ -204,7 +204,7 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
     if (error.name === 'JsonWebTokenError') {
       res.status(401).json({
         success: false,
-        message: 'Invalid refresh token.'
+        message: 'Your session is invalid. Please login again.'
       });
       return;
     }
@@ -212,7 +212,7 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
     if (error.name === 'TokenExpiredError') {
       res.status(401).json({
         success: false,
-        message: 'Refresh token has expired.'
+        message: 'Your session has expired. Please login again.'
       });
       return;
     }

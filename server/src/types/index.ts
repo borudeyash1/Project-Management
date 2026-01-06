@@ -83,6 +83,22 @@ export interface IUser extends Document {
     isPro: boolean;
     trialEndsAt?: Date;
   };
+  billingInfo?: {
+    phone?: string;
+    address?: {
+      street?: string;
+      city?: string;
+      state?: string;
+      postalCode?: string;
+      country?: string;
+    };
+    companyName?: string;
+    gstNumber?: string;
+    preferredPaymentMethod?: 'card' | 'upi' | 'netbanking' | 'wallet';
+    billingEmail?: string;
+    lastUpdated?: Date;
+    isComplete?: boolean;
+  };
   settings: {
     themeColor: 'yellow' | 'blue' | 'green' | 'purple' | 'red';
     darkMode: boolean;
@@ -433,6 +449,7 @@ export interface IProject extends Document {
   name: string;
   description?: string;
   client?: string;
+  projectManager?: string;
   tier: 'free' | 'pro' | 'ultra' | 'enterprise';
   workspace?: string;
   createdBy: string;

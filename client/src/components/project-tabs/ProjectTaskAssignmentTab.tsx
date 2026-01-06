@@ -129,14 +129,12 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
       return;
     }
 
-    const assignedMember = projectTeam.find(m => m._id === taskForm.assignedTo);
-
     const newTask: Partial<Task> = {
       _id: `task_${Date.now()}`,
       title: taskForm.title,
       description: taskForm.description,
-      assignedTo: taskForm.assignedTo,
-      assignedToName: assignedMember?.name || 'Unknown',
+      assignedTo: taskForm.assignedTo, // This will be sent as 'assignee' to backend
+      assignedToName: '', // Will be populated from backend
       status: taskForm.status,
       priority: taskForm.priority,
       startDate: new Date(taskForm.startDate),
@@ -154,13 +152,22 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
   const handleUpdateTask = () => {
     if (!editingTask) return;
 
-    const assignedMember = projectTeam.find(m => m._id === taskForm.assignedTo);
+    const assignedMember = projectTeam.find(m => {
+      const userId = typeof m.user === 'object' ? m.user._id : m.user;
+      return userId === taskForm.assignedTo;
+    });
+
+    const userName = assignedMember 
+      ? (typeof assignedMember.user === 'object' 
+          ? (assignedMember.user.fullName || assignedMember.user.email || 'Unknown')
+          : (assignedMember.name || 'Unknown'))
+      : 'Unknown';
 
     const updates: Partial<Task> = {
       title: taskForm.title,
       description: taskForm.description,
       assignedTo: taskForm.assignedTo,
-      assignedToName: assignedMember?.name || 'Unknown',
+      assignedToName: userName,
       status: taskForm.status,
       priority: taskForm.priority,
       startDate: new Date(taskForm.startDate),
@@ -889,11 +896,17 @@ const ProjectTaskAssignmentTab: React.FC<ProjectTaskAssignmentTabProps> = ({
                   className={inputClassName}
                 >
                   <option value="">{t('project.tasks.modal.selectMember')}</option>
-                  {projectTeam.map((member) => (
-                    <option key={member._id} value={member._id}>
-                      {member.name} - {member.role}
-                    </option>
-                  ))}
+                  {projectTeam.map((member) => {
+                    const userId = typeof member.user === 'object' ? member.user._id : member.user;
+                    const userName = typeof member.user === 'object' 
+                      ? (member.user.fullName || member.user.email || 'Unknown User')
+                      : (member.name || 'Unknown User');
+                    return (
+                      <option key={userId} value={userId}>
+                        {userName} - {member.role}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 

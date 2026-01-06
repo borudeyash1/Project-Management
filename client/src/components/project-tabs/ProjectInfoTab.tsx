@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Edit, Save, X, Calendar, DollarSign, Tag, Briefcase,
   Clock, TrendingUp, Users, FileText, AlertCircle
 } from 'lucide-react';
 import { ContextAIButton } from '../ai/ContextAIButton';
 import SlackChannelSelector from '../integrations/SlackChannelSelector';
+import { useApp } from '../../context/AppContext';
+import apiService from '../../services/api';
 
 import { useTranslation } from 'react-i18next';
 
@@ -16,11 +18,13 @@ interface ProjectInfoTabProps {
 
 const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpdate }) => {
   const { t } = useTranslation();
+  const { state } = useApp();
   const [isEditing, setIsEditing] = useState(false);
+  const [clients, setClients] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: project?.name || '',
     description: project?.description || '',
-    client: project?.client || '',
+    client: typeof project?.client === 'string' ? project.client : (project?.client?._id || ''),
     status: project?.status || 'planning',
     priority: project?.priority || 'medium',
     startDate: project?.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
@@ -32,11 +36,26 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
     slackChannelName: project?.integrations?.slack?.channelName || ''
   });
 
+  // Fetch workspace clients
+  useEffect(() => {
+    const fetchClients = async () => {
+      if (project?.workspace) {
+        try {
+          const workspaceClients = await apiService.getClients(project.workspace);
+          setClients(workspaceClients);
+        } catch (error) {
+          console.error('Failed to fetch clients:', error);
+        }
+      }
+    };
+    fetchClients();
+  }, [project?.workspace]);
+
   const handleSave = () => {
     const updates = {
       name: formData.name,
       description: formData.description,
-      client: formData.client,
+      clientId: formData.client,
       status: formData.status,
       priority: formData.priority,
       startDate: formData.startDate ? new Date(formData.startDate) : undefined,
@@ -63,7 +82,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
     setFormData({
       name: project?.name || '',
       description: project?.description || '',
-      client: project?.client || '',
+      client: typeof project?.client === 'string' ? project.client : (project?.client?._id || ''),
       status: project?.status || 'planning',
       priority: project?.priority || 'medium',
       startDate: project?.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
@@ -170,14 +189,20 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 {t('project.info.client')}
               </label>
               {isEditing ? (
-                <input
-                  type="text"
+                <select
                   value={formData.client}
                   onChange={(e) => setFormData({ ...formData, client: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                />
+                >
+                  <option value="">{t('project.info.selectClient')}</option>
+                  {clients.map((client) => (
+                    <option key={client._id} value={client._id}>
+                      {client.name} - {client.company}
+                    </option>
+                  ))}
+                </select>
               ) : (
-                <p className="text-gray-900 dark:text-gray-100">{project.client || t('project.info.noClient')}</p>
+                <p className="text-gray-900 dark:text-gray-100">{typeof project.client === 'string' ? project.client : (project.client?.name || t('project.info.noClient'))}</p>
               )}
             </div>
           </div>
@@ -420,7 +445,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
         pageData={{
           projectInfo: {
             name: project.name,
-            client: project.client,
+            client: typeof project.client === 'string' ? project.client : (project.client?.name || ''),
             status: project.status,
             priority: project.priority,
             startDate: project.startDate,

@@ -370,8 +370,30 @@ const ProjectViewDetailed: React.FC = () => {
 
   // Helper to map backend Task to UI task shape used in tabs
   const mapBackendTaskToUi = (task: any, team: any[]): any => {
-    const assigneeId = task.assignee || '';
-    const assigneeMember = team?.find((m: any) => m.user === assigneeId || m._id === assigneeId);
+    const assigneeId = task.assignee?._id || task.assignee || '';
+    
+    // Find the team member - handle both populated and unpopulated user objects
+    const assigneeMember = team?.find((m: any) => {
+      const memberId = typeof m.user === 'object' ? m.user._id : m.user;
+      return memberId === assigneeId || m._id === assigneeId;
+    });
+
+    // Get the assignee name - handle both populated user object and direct name
+    let assigneeName = 'Unassigned';
+    if (task.assignee) {
+      // If assignee is populated from backend
+      if (typeof task.assignee === 'object' && task.assignee.fullName) {
+        assigneeName = task.assignee.fullName || task.assignee.email || 'Unknown';
+      }
+      // Otherwise try to get from team member
+      else if (assigneeMember) {
+        if (typeof assigneeMember.user === 'object') {
+          assigneeName = assigneeMember.user.fullName || assigneeMember.user.email || 'Unknown';
+        } else {
+          assigneeName = assigneeMember.name || 'Unknown';
+        }
+      }
+    }
 
     // Status and priority now match directly - no mapping needed
     const uiStatus = task.status || 'pending';
@@ -383,7 +405,7 @@ const ProjectViewDetailed: React.FC = () => {
       description: task.description || '',
       taskType: task.taskType || 'general',
       assignedTo: assigneeId,
-      assignedToName: assigneeMember?.name || assigneeMember?.fullName || 'Unassigned',
+      assignedToName: assigneeName,
       status: uiStatus,
       priority: uiPriority,
       startDate: task.startDate ? new Date(task.startDate) : new Date(),
@@ -2517,7 +2539,7 @@ const ProjectViewDetailed: React.FC = () => {
         return renderDocumentsView();
 
       case 'inbox':
-        return <WorkspaceInbox />;
+        return <WorkspaceInbox projectId={activeProject?._id} />;
 
       case 'settings':
         return (

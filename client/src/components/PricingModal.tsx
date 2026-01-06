@@ -13,6 +13,7 @@ import {
 import { useApp } from '../context/AppContext';
 import api, { SubscriptionPlanData } from '../services/api';
 import RazorpayPaymentModal from './RazorpayPaymentModal';
+import PricingCardSkeleton from './PricingCardSkeleton';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -256,7 +257,11 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, onSelectPl
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {loading && (
-              <div className="col-span-full text-center text-gray-600 py-8">Loading subscription plans...</div>
+              <>
+                <PricingCardSkeleton />
+                <PricingCardSkeleton />
+                <PricingCardSkeleton />
+              </>
             )}
             {!loading && sortedPlans.map((plan) => {
               const planKey = plan.planKey;

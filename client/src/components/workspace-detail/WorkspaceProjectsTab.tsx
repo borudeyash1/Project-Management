@@ -370,7 +370,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
 
   // Group projects by client
   const projectsByClient = filteredProjects.reduce((acc: Record<string, any[]>, project) => {
-    const clientName = project.client || 'No Client';
+    const clientName = typeof project.client === 'string' ? project.client : (project.client?.name || 'No Client');
     if (!acc[clientName]) {
       acc[clientName] = [];
     }

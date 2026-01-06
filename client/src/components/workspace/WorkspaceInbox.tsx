@@ -23,7 +23,11 @@ interface InboxMessage {
   createdAt: string;
 }
 
-const WorkspaceInbox: React.FC = () => {
+interface WorkspaceInboxProps {
+  projectId?: string; // Optional: if provided, only show project members
+}
+
+const WorkspaceInbox: React.FC<WorkspaceInboxProps> = ({ projectId }) => {
   const { t } = useTranslation();
   const { state } = useApp();
   const { dockPosition } = useDock();
@@ -50,7 +54,12 @@ const WorkspaceInbox: React.FC = () => {
       if (!currentWorkspaceId) return;
       setIsLoadingThreads(true);
       try {
-        const response = await apiService.get<any>(`/inbox/workspace/${currentWorkspaceId}/threads`);
+        // If projectId is provided, fetch only project members, otherwise fetch all workspace members
+        const endpoint = projectId 
+          ? `/inbox/project/${projectId}/threads`
+          : `/inbox/workspace/${currentWorkspaceId}/threads`;
+        
+        const response = await apiService.get<any>(endpoint);
         // Backend returns { success: true, data: [...] }, so access response.data.data
         const data = response.data?.data || response.data || [];
         setThreads(
@@ -64,14 +73,14 @@ const WorkspaceInbox: React.FC = () => {
           }))
         );
       } catch (error) {
-        console.error('Failed to load workspace inbox threads', error);
+        console.error('Failed to load inbox threads', error);
       } finally {
         setIsLoadingThreads(false);
       }
     };
 
     loadThreads();
-  }, [currentWorkspaceId]);
+  }, [currentWorkspaceId, projectId]);
 
   // Load messages when a thread is selected
   useEffect(() => {

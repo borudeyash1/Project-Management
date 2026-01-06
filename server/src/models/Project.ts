@@ -30,6 +30,14 @@ const projectSchema = new Schema<IProject>({
     type: String,
     required: true
   },
+  client: {
+    type: Schema.Types.ObjectId,
+    ref: 'Client'
+  },
+  projectManager: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
   teamMembers: [{
     user: {
       type: Schema.Types.ObjectId,

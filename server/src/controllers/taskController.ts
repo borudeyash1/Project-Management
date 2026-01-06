@@ -42,7 +42,9 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       filter.priority = priority;
     }
 
-    const tasks = await Task.find(filter).sort({ dueDate: 1, createdAt: -1 });
+    const tasks = await Task.find(filter)
+      .populate('assignee', 'fullName email avatarUrl')
+      .sort({ dueDate: 1, createdAt: -1 });
 
     const response: ApiResponse = {
       success: true,
@@ -66,7 +68,8 @@ export const getTaskById = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(req.params.id)
+      .populate('assignee', 'fullName email avatarUrl');
     if (!task) {
       res.status(404).json({ success: false, message: 'Task not found' });
       return;
@@ -360,6 +363,9 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       }
     }
 
+    // Populate assignee to return full user details
+    await task.populate('assignee', 'fullName email avatarUrl');
+
     const response: ApiResponse = {
       success: true,
       message: 'Task created successfully',
@@ -571,6 +577,9 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         await mailService.sendTaskAssignmentNotification(task, assigneeUser.email);
       }
     }
+
+    // Populate assignee before returning
+    await task.populate('assignee', 'fullName email avatarUrl');
 
     const response: ApiResponse = {
       success: true,

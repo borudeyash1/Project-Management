@@ -5,6 +5,7 @@ export interface User {
   email: string;
   username: string;
   phone?: string;
+  contactNumber?: string;
   designation?: string;
   department?: string;
   location?: string;
@@ -14,6 +15,22 @@ export interface User {
   lastLogin?: Date;
   isActive: boolean;
   subscription: UserSubscription;
+  billingInfo?: {
+    phone?: string;
+    address?: {
+      street?: string;
+      city?: string;
+      state?: string;
+      postalCode?: string;
+      country?: string;
+    };
+    companyName?: string;
+    gstNumber?: string;
+    preferredPaymentMethod?: 'card' | 'upi' | 'netbanking' | 'wallet';
+    billingEmail?: string;
+    lastUpdated?: Date;
+    isComplete?: boolean;
+  };
   settings: UserSettings;
   profilePicture?: string; // Enhanced property for avatars
   // Enhanced profile information for AI-powered insights

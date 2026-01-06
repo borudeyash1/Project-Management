@@ -433,6 +433,78 @@ const userSchema = new Schema<IUser>({
     },
     trialEndsAt: Date
   },
+  // Billing Information for Payments & Invoices
+  billingInfo: {
+    // Contact Information
+    phone: {
+      type: String,
+      trim: true,
+      match: [/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number']
+    },
+    // Address Information
+    address: {
+      street: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Street address cannot exceed 200 characters']
+      },
+      city: {
+        type: String,
+        trim: true,
+        maxlength: [100, 'City cannot exceed 100 characters']
+      },
+      state: {
+        type: String,
+        trim: true,
+        maxlength: [100, 'State cannot exceed 100 characters']
+      },
+      postalCode: {
+        type: String,
+        trim: true,
+        maxlength: [20, 'Postal code cannot exceed 20 characters']
+      },
+      country: {
+        type: String,
+        trim: true,
+        maxlength: [100, 'Country cannot exceed 100 characters'],
+        default: 'India'
+      }
+    },
+    // Business Information (Optional)
+    companyName: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Company name cannot exceed 200 characters']
+    },
+    gstNumber: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      match: [/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, 'Please enter a valid GST number']
+    },
+    // Payment Preferences
+    preferredPaymentMethod: {
+      type: String,
+      enum: ['card', 'upi', 'netbanking', 'wallet'],
+      default: null
+    },
+    // Billing Contact (if different from primary)
+    billingEmail: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+    },
+    // Metadata
+    lastUpdated: {
+      type: Date,
+      default: Date.now
+    },
+    isComplete: {
+      type: Boolean,
+      default: false
+    }
+  },
   // Sartthi Ecosystem Modules (Mail, Calendar, etc.)
   // DEPRECATED: Use connectedAccounts instead. Kept for backward compatibility during migration.
   modules: {

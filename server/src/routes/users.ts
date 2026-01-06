@@ -12,7 +12,8 @@ import {
   verifyFace,
   getPreferences,
   updatePreferences,
-  getUserById
+  getUserById,
+  updateBillingInfo
 } from '../controllers/userController';
 import { authenticate } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -93,6 +94,9 @@ router.post('/avatar', uploadAvatar);
 // Preferences routes
 router.get('/preferences', getPreferences);
 router.put('/preferences', validateRequest, updatePreferences);
+
+// Billing information route
+router.put('/billing-info', validateRequest, updateBillingInfo);
 
 // Get user by ID (for viewing other users' profiles) - MUST BE LAST
 router.get('/:userId', getUserById);

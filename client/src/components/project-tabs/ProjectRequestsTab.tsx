@@ -377,7 +377,7 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
                   </div>
                   <button
                     onClick={handleManualReassign}
-                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
+                    className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover flex items-center justify-center gap-2 font-medium"
                   >
                     <Users className="w-4 h-4" />
                     {t('projects.reassignTask')}

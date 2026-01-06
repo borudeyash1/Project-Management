@@ -140,6 +140,7 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       createdBy: user._id,
       teamMembers: teamMembersArray,
       client: client || clientId || undefined,
+      projectManager: projectManager || undefined,
       startDate: startDate ? new Date(startDate) : undefined,
       dueDate: dueDate ? new Date(dueDate) : undefined,
       priority: priority || 'medium',
@@ -153,6 +154,8 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
 
     // Populate the project with owner details
     await project.populate('teamMembers.user', 'fullName email avatarUrl');
+    await project.populate('client', 'name company email');
+    await project.populate('projectManager', 'fullName email avatarUrl');
 
     // Create activity
     await createActivity(
@@ -310,6 +313,8 @@ export const getWorkspaceProjects = async (req: AuthenticatedRequest, res: Respo
 
     const projects = await Project.find(projectQuery)
       .populate('teamMembers.user', 'fullName email avatarUrl')
+      .populate('client', 'name company email')
+      .populate('projectManager', 'fullName email avatarUrl')
       .sort({ createdAt: -1 });
 
     console.log('✅ [GET PROJECTS] Found', projects.length, 'projects');
@@ -344,7 +349,9 @@ export const getProject = async (req: AuthenticatedRequest, res: Response): Prom
         { 'teamMembers.user': userId }
       ]
     })
-      .populate('teamMembers.user', 'fullName email avatarUrl');
+      .populate('teamMembers.user', 'fullName email avatarUrl')
+      .populate('client', 'name company email')
+      .populate('projectManager', 'fullName email avatarUrl');
 
     if (!project) {
       res.status(404).json({

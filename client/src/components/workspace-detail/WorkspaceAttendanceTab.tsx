@@ -3,7 +3,7 @@ import apiService from '../../services/api';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { useDock } from '../../context/DockContext';
-import { Clock, Settings, Users, Calendar, MapPin } from 'lucide-react';
+import { Clock, Settings, Users, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import ManualAttendanceView from './ManualAttendanceView';
 import EmployeeAttendanceView from './EmployeeAttendanceView';
 import AttendanceConfigModal from './AttendanceConfigModal';
@@ -66,7 +66,7 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
   const workspace = state.workspaces.find(w => w._id === workspaceId);
   const isWorkspaceOwner = workspace?.owner === state.userProfile._id;
 
-  const [mode, setMode] = useState<'automatic' | 'manual'>('automatic');
+  const [mode, setMode] = useState<'automatic' | 'manual'>('manual');
   const [config, setConfig] = useState<AttendanceConfig | null>(null);
   const [showConfig, setShowConfig] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -254,7 +254,31 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
 
       {/* Content based on mode */}
       {mode === 'automatic' ? (
-        <OwnerAutomaticView workspaceId={workspaceId} config={config} />
+        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl p-12">
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-accent-dark" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+              {t('workspace.attendance.comingSoon.title') || 'Automatic Attendance - Coming Soon'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {t('workspace.attendance.comingSoon.description') || 'Automatic attendance tracking with face recognition and location verification is currently under development. This feature will allow employees to mark their attendance automatically during configured time windows.'}
+            </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+              <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">
+                {t('workspace.attendance.comingSoon.note') || '📌 For now, please use the Manual Attendance tab to mark attendance for your team members.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setMode('manual')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors font-semibold"
+            >
+              {t('workspace.attendance.comingSoon.switchToManual') || 'Switch to Manual Attendance'}
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       ) : (
         <OwnerManualView workspaceId={workspaceId} />
       )}

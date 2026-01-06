@@ -312,3 +312,117 @@ export const markConversationRead: RequestHandler = async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+// Get project threads (one per project member), including last message + unread count
+export const getProjectThreads: RequestHandler = async (req, res) => {
+  try {
+    const { projectId } = req.params as { projectId: string };
+    const { user } = req as AuthenticatedRequest;
+    const currentUserId = user!._id.toString();
+
+    console.log('🔍 [PROJECT INBOX] Getting threads for project:', projectId, 'User:', currentUserId);
+
+    // Import Project model
+    const Project = require('../models/Project').default;
+    
+    const project = await Project.findById(projectId)
+      .populate('teamMembers.user', 'fullName email username avatarUrl')
+      .populate('workspace');
+    
+    if (!project || project.isActive === false) {
+      res.status(404).json({ success: false, message: 'Project not found' });
+      return;
+    }
+
+    // Ensure current user is a member of this project
+    const isMember = project.teamMembers.some((m: any) => {
+      const userId = typeof m.user === 'object' ? m.user._id.toString() : m.user.toString();
+      return userId === currentUserId;
+    });
+    
+    if (!isMember) {
+      console.log('❌ [PROJECT INBOX] Access denied - user not a project member');
+      res.status(403).json({ success: false, message: 'Access denied' });
+      return;
+    }
+
+    const threads: any[] = [];
+    const workspaceId = typeof project.workspace === 'object' ? project.workspace._id.toString() : project.workspace.toString();
+
+    console.log('📋 [PROJECT INBOX] Project team members count:', project.teamMembers?.length || 0);
+
+    // Get all project team members except current user
+    console.log('👥 [PROJECT INBOX] Processing project team members...');
+    let memberCount = 0;
+    
+    for (const m of project.teamMembers as any[]) {
+      const otherUser = m.user;
+      if (!otherUser) {
+        console.log('⚠️ [PROJECT INBOX] Member has no user data, skipping');
+        continue;
+      }
+      
+      const otherUserId = typeof otherUser === 'object' ? otherUser._id?.toString() : otherUser.toString();
+      if (!otherUserId) {
+        console.log('⚠️ [PROJECT INBOX] Could not get user ID, skipping');
+        continue;
+      }
+      
+      if (otherUserId === currentUserId) {
+        console.log('⏭️ [PROJECT INBOX] Skipping current user');
+        continue;
+      }
+
+      const displayName =
+        typeof otherUser === 'object'
+          ? otherUser.fullName || otherUser.username || otherUser.email || 'Member'
+          : 'Member';
+      const avatarUrl = typeof otherUser === 'object' ? otherUser.avatarUrl : undefined;
+
+      // Last message between current user and this member in the workspace
+      const lastMessage = await Message.findOne({
+        workspace: workspaceId,
+        $or: [
+          { sender: currentUserId, recipient: otherUserId },
+          { sender: otherUserId, recipient: currentUserId },
+        ],
+      })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      // Unread count for current user from this member
+      const unreadCount = await Message.countDocuments({
+        workspace: workspaceId,
+        sender: otherUserId,
+        recipient: currentUserId,
+        readBy: { $ne: currentUserId },
+      });
+
+      threads.push({
+        userId: otherUserId,
+        name: displayName,
+        avatarUrl,
+        lastMessage: lastMessage?.content || '',
+        lastMessageTime: lastMessage?.createdAt || null,
+        unreadCount,
+      });
+      
+      memberCount++;
+      console.log(`✅ [PROJECT INBOX] Added member ${memberCount}:`, displayName);
+    }
+
+    console.log(`✅ [PROJECT INBOX] Total threads: ${threads.length}`);
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Project threads retrieved successfully',
+      data: threads,
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('❌ [PROJECT INBOX] Get threads error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+

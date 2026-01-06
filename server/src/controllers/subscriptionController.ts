@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import SubscriptionPlan from '../models/SubscriptionPlan';
+import Subscription from '../models/Subscription';
 import User from '../models/User';
 import { ApiResponse, AuthenticatedRequest } from '../types';
 
@@ -26,6 +27,48 @@ export const getPublicSubscriptionPlans = async (req: Request, res: Response): P
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve subscription plans'
+    });
+  }
+};
+
+export const getActiveSubscription = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?._id;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    // Find the most recent active subscription for the user
+    const subscription = await Subscription.findOne({
+      userId,
+      status: 'active',
+      endDate: { $gte: new Date() }
+    }).sort({ createdAt: -1 });
+
+    if (!subscription) {
+      res.status(200).json({
+        success: true,
+        message: 'No active subscription found',
+        data: null
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Active subscription retrieved successfully',
+      data: subscription
+    });
+  } catch (error: any) {
+    console.error('Get active subscription error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve active subscription'
     });
   }
 };

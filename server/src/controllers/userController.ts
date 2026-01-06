@@ -5,10 +5,17 @@ import { AuthenticatedRequest, ApiResponse } from '../types';
 // Get user profile
 export const getProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    console.log('📖 [PROFILE] Getting profile for user:', req.user?.email);
+    console.log('🏠 [PROFILE] User billingInfo:', req.user?.billingInfo);
+    
+    const jsonData = req.user?.toJSON();
+    console.log('📋 [PROFILE] toJSON result:', jsonData);
+    console.log('🏠 [PROFILE] billingInfo in JSON:', jsonData?.billingInfo);
+    
     const response: ApiResponse = {
       success: true,
       message: 'Profile retrieved successfully',
-      data: req.user?.toJSON()
+      data: jsonData
     };
 
     res.status(200).json(response);
@@ -716,6 +723,62 @@ export const getUserById = async (req: AuthenticatedRequest, res: Response): Pro
     res.status(500).json({
       success: false,
       message: 'Failed to fetch user profile'
+    });
+  }
+};
+
+// Update billing information
+export const updateBillingInfo = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { billingInfo } = req.body;
+    const user = req.user!;
+
+    if (!billingInfo) {
+      res.status(400).json({
+        success: false,
+        message: 'Billing information is required'
+      });
+      return;
+    }
+
+    // Validate required fields
+    if (!billingInfo.phone || !billingInfo.address?.street || !billingInfo.address?.city || 
+        !billingInfo.address?.state || !billingInfo.address?.postalCode || !billingInfo.billingEmail) {
+      res.status(400).json({
+        success: false,
+        message: 'Please provide all required billing information'
+      });
+      return;
+    }
+
+    // Update billing info
+    user.billingInfo = {
+      ...billingInfo,
+      lastUpdated: new Date(),
+      isComplete: true
+    };
+
+    console.log('💾 [BILLING] Saving billing info for user:', user.email);
+    console.log('📋 [BILLING] Billing data:', user.billingInfo);
+
+    user.markModified('billingInfo');
+    await user.save();
+    
+    console.log('✅ [BILLING] Billing info saved successfully');
+    console.log('🔍 [BILLING] Saved user billingInfo:', user.billingInfo);
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Billing information updated successfully',
+      data: user.toJSON()
+    };
+
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Update billing info error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
     });
   }
 };

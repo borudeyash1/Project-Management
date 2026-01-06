@@ -206,6 +206,15 @@ const PricingPage: React.FC = () => {
     // Check if user is logged in
     if (!state.userProfile) {
       console.log('❌ User not logged in, redirecting to /login');
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'warning',
+          message: 'Please login to proceed with payment and subscription.',
+          duration: 4000
+        }
+      });
       navigate('/login');
       return;
     }

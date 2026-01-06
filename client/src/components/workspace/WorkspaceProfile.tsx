@@ -22,6 +22,7 @@ const WorkspaceProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [userSubscription, setUserSubscription] = useState<any>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [facePreview, setFacePreview] = useState<string | null>(null);
@@ -34,13 +35,29 @@ const WorkspaceProfile: React.FC = () => {
   const [profileData, setProfileData] = useState({
     fullName: state.userProfile.fullName || '',
     email: state.userProfile.email || '',
-    phone: state.userProfile.phone || '',
-    bio: (state.userProfile as any).bio || ''
+    contactNumber: state.userProfile.contactNumber || '',
+    about: state.userProfile.about || ''
   });
 
   const memberRecord = currentWorkspace?.members?.find((member) => member.user === state.userProfile._id);
   const derivedRole = memberRecord?.role || (isOwner ? 'owner' : 'member');
   const displayRole = derivedRole === 'owner' ? t('workspace.profile.role.owner') : t('workspace.profile.role.member');
+
+  // Fetch user's active subscription
+  useEffect(() => {
+    const fetchUserSubscription = async () => {
+      try {
+        const response = await apiService.get('/subscriptions/active');
+        if (response.data.success && response.data.data) {
+          setUserSubscription(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user subscription:', error);
+      }
+    };
+
+    fetchUserSubscription();
+  }, []);
 
   // Fetch workspace members for inbox
   useEffect(() => {
@@ -167,8 +184,8 @@ const WorkspaceProfile: React.FC = () => {
     setProfileData({
       fullName: state.userProfile.fullName || '',
       email: state.userProfile.email || '',
-      phone: state.userProfile.phone || '',
-      bio: (state.userProfile as any).bio || ''
+      contactNumber: state.userProfile.contactNumber || '',
+      about: state.userProfile.about || ''
     });
     setIsEditMode(false);
   };
@@ -278,13 +295,13 @@ const WorkspaceProfile: React.FC = () => {
                 {isEditMode ? (
                   <input
                     type="tel"
-                    value={profileData.phone}
-                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                    value={profileData.contactNumber}
+                    onChange={(e) => setProfileData({ ...profileData, contactNumber: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 ) : (
                   <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {state.userProfile.phone || t('workspace.profile.notProvided')}
+                    {state.userProfile.contactNumber || t('workspace.profile.notProvided')}
                   </p>
                 )}
               </div>
@@ -303,8 +320,8 @@ const WorkspaceProfile: React.FC = () => {
             <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-200 mb-2">{t('workspace.profile.bioLabel')}</label>
               <textarea
-                value={profileData.bio}
-                onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                value={profileData.about}
+                onChange={(e) => setProfileData({ ...profileData, about: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('workspace.profile.bioPlaceholder')}
@@ -328,7 +345,9 @@ const WorkspaceProfile: React.FC = () => {
           <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-200">{t('workspace.profile.insights.subscription')}</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{currentWorkspace.subscription.plan}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 capitalize">
+                {userSubscription?.planKey || currentWorkspace.subscription?.plan || 'free'}
+              </p>
             </div>
             <button
               onClick={() => navigate('/pricing')}
@@ -340,8 +359,8 @@ const WorkspaceProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Face Scan Section */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6">
+      {/* Face Scan Section - Pending Implementation */}
+      {/* <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('workspace.profile.faceScan.title')}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-200 mb-4">
           {t('workspace.profile.faceScan.description')}
@@ -380,7 +399,7 @@ const WorkspaceProfile: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 

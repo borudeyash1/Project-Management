@@ -110,7 +110,7 @@ const ProjectsListSection: React.FC = () => {
                       <div className="font-medium">{project.name}</div>
                       <div className="text-xs text-slate-500">Marketing • {project.priority} priority</div>
                     </td>
-                    <td className="py-3 pr-3">{project.client}</td>
+                    <td className="py-3 pr-3">{typeof project.client === 'string' ? project.client : ((project.client as any)?.name || 'N/A')}</td>
                     <td className="py-3 pr-3">
                       <span className={`text-xs px-2 py-1 rounded-full border ${
                         project.status === 'active' ? 'bg-blue-50 text-accent-dark border-blue-200' :
@@ -142,7 +142,7 @@ const ProjectsListSection: React.FC = () => {
                       <button 
                         className="px-2 py-1 rounded-md border border-border hover:bg-slate-50"
                         onClick={() => {
-                          enterWorkspace(project.client || '');
+                          enterWorkspace(typeof project.client === 'string' ? project.client : ((project.client as any)?.name || ''));
                           enterProject(project.name);
                         }}
                       >

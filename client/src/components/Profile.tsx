@@ -13,6 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import FaceEnrollmentSection from './profile/FaceEnrollmentSection';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import BillingInfoForm from './BillingInfoForm';
 
 interface ProfileData {
   fullName: string;
@@ -200,6 +201,7 @@ const Profile: React.FC = () => {
     name: '',
     isDefault: false
   });
+  const [showBillingForm, setShowBillingForm] = useState(false);
 
   // Helper function to apply theme changes to the document
   const applyTheme = (theme: 'light' | 'dark' | 'system') => {
@@ -637,7 +639,8 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: 'personal', label: t('profile.personalInfo'), icon: User },
-    { id: 'professional', label: t('profile.professionalProfile'), icon: Target }
+    { id: 'professional', label: t('profile.professionalProfile'), icon: Target },
+    { id: 'billing', label: 'Billing Information', icon: CreditCard }
   ];
 
   const renderPersonalInfo = () => (
@@ -811,12 +814,12 @@ const Profile: React.FC = () => {
         </button>
       </div>
 
-      {/* Face Recognition Section */}
-      <FaceEnrollmentSection
+      {/* Face Recognition Section - Pending Implementation */}
+      {/* <FaceEnrollmentSection
         userId={state.userProfile._id}
         faceData={(state.userProfile as any).faceData}
         onUpdate={fetchProfileData}
-      />
+      /> */}
     </div>
   );
 
@@ -1255,6 +1258,132 @@ const Profile: React.FC = () => {
     </div>
   );
 
+  const renderBillingInfo = () => {
+    const billingInfo = state.userProfile?.billingInfo;
+    const isComplete = billingInfo?.isComplete;
+
+    return (
+      <div className="space-y-6">
+        {/* Header with Edit Button */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Billing Information
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Manage your billing details for payments and invoices
+            </p>
+          </div>
+          <button
+            onClick={() => setShowBillingForm(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Edit className="w-4 h-4" />
+            {isComplete ? 'Update' : 'Add'} Billing Info
+          </button>
+        </div>
+
+        {!isComplete ? (
+          /* Empty State */
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-xl p-8 text-center">
+            <CreditCard className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              No Billing Information
+            </h4>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Add your billing information to make payments easier and faster
+            </p>
+            <button
+              onClick={() => setShowBillingForm(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              Add Billing Information
+            </button>
+          </div>
+        ) : (
+          /* Billing Info Display */
+          <div className="space-y-4">
+            {/* Contact Information */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-blue-600" />
+                Contact Information
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Phone</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                    {billingInfo.phone || 'Not provided'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Billing Email</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                    {billingInfo.billingEmail || state.userProfile?.email}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Address Information */}
+            {billingInfo.address && (
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-600" />
+                  Billing Address
+                </h4>
+                <div className="text-gray-700 dark:text-gray-300">
+                  <p>{billingInfo.address.street}</p>
+                  <p>
+                    {billingInfo.address.city}, {billingInfo.address.state} {billingInfo.address.postalCode}
+                  </p>
+                  <p>{billingInfo.address.country}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Business Information */}
+            {(billingInfo.companyName || billingInfo.gstNumber) && (
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+                  <Building className="w-4 h-4 text-blue-600" />
+                  Business Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {billingInfo.companyName && (
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Company Name</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                        {billingInfo.companyName}
+                      </p>
+                    </div>
+                  )}
+                  {billingInfo.gstNumber && (
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">GST Number</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100 font-mono">
+                        {billingInfo.gstNumber}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Last Updated */}
+            {billingInfo.lastUpdated && (
+              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Last updated: {new Date(billingInfo.lastUpdated).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className={`transition-all duration-300 ${dockPosition === 'left' ? 'pl-[71px] pr-4 sm:pr-6 py-4 sm:py-6' :
@@ -1319,6 +1448,7 @@ const Profile: React.FC = () => {
           <div className="p-6">
             {activeTab === 'personal' && renderPersonalInfo()}
             {activeTab === 'professional' && renderProfessionalProfile()}
+            {activeTab === 'billing' && renderBillingInfo()}
           </div>
         </div>
       </div>
@@ -1758,6 +1888,16 @@ const Profile: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Billing Info Form Modal */}
+      <BillingInfoForm
+        isOpen={showBillingForm}
+        onClose={() => setShowBillingForm(false)}
+        onSuccess={() => {
+          setShowBillingForm(false);
+          fetchProfileData(); // Refresh profile data
+        }}
+      />
     </div>
   );
 };
