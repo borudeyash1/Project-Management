@@ -504,158 +504,13 @@
     "actualSpent": "वास्तविक खर्च"
   },
   "tasks": {
-    "title": "कार्ये",
-    "newTask": "नवीन कार्य",
-    "addTask": "कार्य जोडा",
-    "myTasks": "माझी कार्ये",
-    "allTasks": "सर्व कार्ये",
-    "assignedToMe": "मला सोपवलेली",
-    "createdByMe": "मी तयार केलेली",
-    "taskName": "कार्याचे नाव",
-    "taskDescription": "कार्याचे वर्णन",
-    "assignee": "नियुक्त व्यक्ती",
-    "assignTo": "ला सोपवा",
-    "dueDate": "अंतिम मुदत",
-    "priority": "प्राधान्य",
-    "status": "स्थिती",
-    "high": "उच्च",
-    "medium": "मध्यम",
-    "low": "कमी",
-    "urgent": "तातडीचे",
-    "todo": "करायचे आहे",
-    "inProgress": "प्रगतीपथावर",
-    "done": "पूर्ण झाले",
-    "blocked": "अवरोधित",
-    "review": "पुनरावलोकन",
-    "approved": "मंजूर",
-    "rejected": "नाकारले",
-    "overdue": "मुदत संपली",
-    "today": "आज",
-    "tomorrow": "उद्या",
-    "thisWeek": "या आठवड्यात",
-    "nextWeek": "पुढील आठवड्यात",
-    "subtasks": "उप-कार्ये",
-    "dependencies": "अवलंबित्व",
-    "labels": "लेबल्स",
-    "checklist": "चेकलिस्ट",
-    "timeTracking": "वेळ ट्रॅकिंग",
-    "estimatedTime": "अंदाजे वेळ",
-    "actualTime": "वास्तविक वेळ",
-    "startDate": "सुरुवात तारीख",
-    "startTime": "सुरुवात वेळ",
-    "endTime": "समाप्ती वेळ",
-    "filter": "फिल्टर",
-    "search": "कार्य शोधा...",
-    "daysLeft": "{{count}} दिवस बाकी",
-    "description": "तुमच्या प्रकल्पांमध्ये आणि वर्कस्पेसेसमध्ये कार्ये व्यवस्थापित करा.",
-    "newIdeasRequests": "नवीन कल्पना/विनंत्या",
-    "allAssignees": "सर्व नियुक्त व्यक्ती",
-    "templates": "कार्य टेम्पलेट्स",
-    "createTemplate": "टेम्पलेट तयार करा",
-    "useTemplate": "टेम्पलेट वापरा",
-    "views": {
-      "list": "सूची",
-      "board": "बोर्ड",
-      "calendar": "कॅलेंडर",
-      "timeline": "टाइमलाइन",
-      "taskTimeline": "कार्य टाइमलाइन",
-      "kanban": "कानबान",
-      "analytics": "विश्लेषण"
-    },
-    "subtitle": "प्रकल्प किंवा वर्कस्पेसमध्ये कार्ये व्यवस्थापित करा",
-    "noTasksInStatus": "या स्थितीत कोणतीही कार्ये नाहीत",
-    "dragOrCreate": "कार्ये येथे ड्रॅग करा किंवा नवीन कार्ये तयार करा",
-    "enterTitle": "कार्याचे शीर्षक प्रविष्ट करा",
-    "enterDescription": "कार्याचे वर्णन प्रविष्ट करा",
-    "selectAssignee": "नियुक्त व्यक्ती निवडा",
-    "tagsPlaceholder": "टॅग्ज जोडा...",
-    "unassigned": "असोपवलेले",
-    "noProject": "कोणताही प्रकल्प नाही",
-    "dropTasksHere": "कार्ये येथे टाका",
-    "assigned": "सोपवले",
-    "inProgressActive": "प्रगतीपथावर (सक्रिय)",
-    "qaQc": "QA/QC",
-    "recentlyCompleted": "अलीकडे पूर्ण झाले",
-    "taskTimeline": "कार्य टाइमलाइन",
-    "scale": "स्केल",
-    "day": "दिवस",
-    "week": "आठवडा",
-    "month": "महिना",
-    "currentTime": "सध्याची वेळ",
-    "completedTasks": "पूर्ण झालेली कार्ये",
-    "lastCompleted": "शेवटचे पूर्ण झालेले",
-    "quickActions": "जलद क्रिया",
-    "addManualNote": "मॅन्युअल नोट जोडा",
-    "createCustomNote": "सानुकूल नोट तयार करा",
-    "generateAINote": "एआय नोट तयार करा",
-    "aiPoweredAnalysis": "एआय-समर्थित विश्लेषण",
-    "viewAnalytics": "विश्लेषण पाहा",
-    "taskPerformanceInsights": "कार्य कामगिरी अंतर्दृष्टी",
-    "lastTaskCompleted": "शेवटचे पूर्ण झालेले कार्य",
-    "setStatus": "स्थिती सेट करा",
-    "backlog": "बॅकलॉग",
-    "noTasksIn": "मध्ये कार्ये नाहीत",
-    "reviewInternal": "पुनरावलोकन (अंतर्गत)",
-    "checkComments": "टिप्पण्या तपासा",
-    "dragTasksHere": "कार्ये येथे ड्रॅग करा",
-    "qaClient": "QA (क्लायंट)",
-    "publication": "प्रकाशन",
-    "activeTasks": "सक्रिय कार्ये",
-    "created": "तयार केले",
-    "rules": "नियम",
-    "fields": "फील्ड्स",
-    "templateList": {
-      "bugReport": {
-        "name": "बग रिपोर्ट",
-        "description": "सॉफ्टवेअर बग नोंदवा आणि ट्रॅक करा"
-      },
-      "featureRequest": {
-        "name": "वैशिष्ट्य विनंती",
-        "description": "नवीन वैशिष्ट्ये किंवा सुधारणांची विनंती करा"
-      },
-      "codeReview": {
-        "name": "कोड रिव्ह्यू",
-        "description": "कोड बदलांचे पुनरावलोकन करा आणि अभिप्राय द्या"
-      },
-      "designReview": {
-        "name": "डिझाइन रिव्ह्यू",
-        "description": "डिझाइन मॉकअप्स आणि प्रोटोटाइप्सचे पुनरावलोकन करा"
-      },
-      "testingTask": {
-        "name": "चाचणी कार्य",
-        "description": "सर्वसमावेशक चाचणी कार्य तयार करा"
-      },
-      "documentation": {
-        "name": "दस्तऐवजीकरण",
-        "description": "दस्तऐवज तयार करा किंवा अपडेट करा"
-      }
-    },
-    "categories": {
-      "development": "विकास",
-      "product": "उत्पादन",
-      "design": "डिझाइन",
-      "qa": "QA",
-      "general": "सामान्य"
-    },
-    "sections": {
-      "description": "वर्णन",
-      "subtasks": "उप-कार्ये",
-      "attachments": "संलग्नक",
-      "tags": "टॅग्ज",
-      "comments": "टिप्पण्या",
-      "activity": "क्रियाकलाप",
-      "milestones": "माइलस्टोन्स"
-    },
-    "actions": {
-      "editTask": "कार्य संपादित करा",
-      "duplicateTask": "कार्य डुप्लिकेट करा",
-      "deleteTask": "कार्य हटवा",
-      "addComment": "टिप्पणी जोडा",
-      "assignTask": "कार्य सोपवा",
-      "setDueDate": "अंतिम मुदत सेट करा",
-      "setPriority": "प्राधान्य सेट करा",
-      "addSubtask": "उप-कार्य जोडा"
-    }
+    "overdueBy": "{{days}} दिवसांनी उशीर झाला",
+    "overdueBy_other": "{{days}} दिवसांनी उशीर झाला",
+    "dueToday": "आज देय",
+    "dueTomorrow": "उद्या देय",
+    "dueInDays": "{{days}} दिवसांत देय",
+    "taskName": "कार्य",
+    "assignedTo": "ला सोपवले"
   },
   "settings": {
     "title": "सेटिंग्ज",
@@ -1428,17 +1283,15 @@
       "inbox": "इनबॉक्स"
     },
     "detail": {
+      "notFoundTitle": "वर्कस्पेस सापडले नाही",
+      "backToWorkspaces": "वर्कस्पेसेसवर परत जा",
       "tabs": {
-        "edit": "संपादित करा",
+        "edit": "वर्कस्पेस संपादित करा",
         "collaborate": "सहयोग",
         "members": "सदस्य",
         "clients": "क्लायंट्स",
-        "projects": "प्रकल्प",
-        "documents": "कागदपत्रे",
-        "attendance": "हजेरी"
+        "projects": "प्रकल्प"
       },
-      "notFoundTitle": "वर्कस्पेस सापडले नाही",
-      "backToWorkspaces": "वर्कस्पेसेसवर परत जा",
       "noDescription": "वर्णन नाही"
     },
     "nav": {
@@ -1628,18 +1481,6 @@
       "members": "सदस्य",
       "public": "सार्वजनिक",
       "private": "खाजगी"
-    },
-    "detail": {
-      "notFoundTitle": "वर्कस्पेस सापडले नाही",
-      "backToWorkspaces": "वर्कस्पेसेसवर परत जा",
-      "tabs": {
-        "edit": "वर्कस्पेस संपादित करा",
-        "collaborate": "सहयोग",
-        "members": "सदस्य",
-        "clients": "क्लायंट्स",
-        "projects": "प्रकल्प"
-      },
-      "noDescription": "वर्णन नाही"
     },
     "edit": {
       "infoTitle": "वर्कस्पेस माहिती",
@@ -2743,60 +2584,82 @@
     "newPassword": "नवीन पासवर्ड",
     "confirmNewPassword": "नवीन पासवर्डची पुष्टी करा"
   },
-  "tasks": {
-    "overdueBy": "{{days}} दिवसांनी उशीर झाला",
-    "overdueBy_other": "{{days}} दिवसांनी उशीर झाला",
-    "dueToday": "आज देय",
-    "dueTomorrow": "उद्या देय",
-    "dueInDays": "{{days}} दिवसांत देय",
-    "taskName": "कार्य",
-    "assignedTo": "ला सोपवले"
-  },
   "goals": {
-    "title": "उद्दिष्टे",
-    "subtitle": "वैयक्तिक आणि टीम उद्दिष्टे ट्रॅक आणि साध्य करा",
-    "addGoal": "उद्दिष्ट जोडा",
+    "title": "उद्दिष्टे आणि हेतू",
+    "subtitle": "वैयक्तिक आणि टीम उद्दिष्टे व्यवस्थापित आणि ट्रॅक करा",
     "newGoal": "नवीन उद्दिष्ट",
+    "searchPlaceholder": "उद्दिष्टे शोधा...",
     "totalGoals": "एकूण उद्दिष्टे",
     "completed": "पूर्ण झाले",
     "inProgress": "प्रगतीपथावर",
-    "searchPlaceholder": "उद्दिष्टे शोधा...",
+    "notStarted": "सुरू झाले नाही",
+    "avgProgress": "सरासरी प्रगती",
+    "progress": "प्रगती",
+    "due": "देय: {{date}}",
+    "overdue": "मुदत संपली",
+    "milestones": "माइलस्टोन्स",
+    "viewDetails": "तपशील पाहा",
+    "goalsCount": "उद्दिष्टे ({{count}})",
+    "aiAssistant": "एआय उद्दिष्ट सहाय्यक",
+    "recentActivity": "अलीकडील क्रियाकलाप",
+    "goalsByCategory": "श्रेणीनुसार उद्दिष्टे",
+    "categories": {
+      "productivity": "उत्पादकता",
+      "learning": "शिक्षण",
+      "health": "आरोग्य",
+      "financial": "आर्थिक",
+      "career": "करिअर",
+      "company": "कंपनी",
+      "project": "प्रकल्प",
+      "personal": "वैयक्तिक",
+      "team": "टीम"
+    },
+    "quickActions": "जलद क्रिया",
+    "actions": {
+      "createPersonalGoal": "वैयक्तिक उद्दिष्ट तयार करा",
+      "createTeamGoal": "टीम उद्दिष्ट तयार करा",
+      "viewAnalytics": "विश्लेषण पाहा",
+      "exportGoals": "उद्दिष्टे निर्यात करा"
+    },
+    "status": {
+      "not_started": "सुरू झाले नाही",
+      "in_progress": "प्रगतीपथावर",
+      "completed": "पूर्ण झाले",
+      "paused": "विराम दिला",
+      "cancelled": "रद्द केले"
+    },
+    "owner": "मालक",
+    "startDate": "सुरुवात तारीख",
+    "endDate": "समाप्ती तारीख",
+    "description": "वर्णन",
+    "keyResults": "प्रमुख परिणाम",
+    "addKeyResult": "प्रमुख परिणाम जोडा",
+    "editGoal": "उद्दिष्ट संपादित करा",
+    "deleteGoal": "उद्दिष्ट हटवा",
+    "noGoals": "अद्याप कोणतीही उद्दिष्टे नाहीत",
+    "createFirstGoal": "पहिले उद्दिष्ट तयार करा",
     "allTypes": "सर्व प्रकार",
     "allStatus": "सर्व स्थिती",
     "allCategories": "सर्व श्रेणी",
-    "goalsCount": "{{count}} उद्दिष्टे",
-    "noGoalsYet": "अद्याप कोणतीही उद्दिष्टे नाहीत",
-    "createFirstGoal": "प्रारंभ करण्यासाठी तुमचे पहिले उद्दिष्ट तयार करा",
-    "noMatchingGoals": "कोणतीही जुळणारी उद्दिष्टे नाहीत",
-    "tryDifferentFilters": "भिन्न फिल्टर्स वापरून पहा",
-    "milestones": "माइलस्टोन्स",
-    "due": "देय: {{date}}",
-    "startDate": "सुरुवात तारीख",
+    "milestonesCount": "{{completed}}/{{total}} माइलस्टोन्स",
+    "createdBy": "निर्माता: {{name}}",
+    "start": "सुरुवात: {{date}}",
+    "aiSuggestion": "उद्दिष्ट सेटिंग आणि साध्य करण्याच्या धोरणांसाठी एआय-व्युत्पन्न सूचना मिळवा.",
+    "askAi": "एआयला विचारा",
     "targetDate": "लक्ष्य तारीख",
     "createdByLabel": "निर्माता",
     "categoryLabel": "श्रेणी",
     "tags": "टॅग्ज",
-    "status": {
-      "notStarted": "सुरू झाले नाही",
-      "inProgress": "प्रगतीपथावर",
-      "completed": "पूर्ण झाले",
-      "paused": "विराम दिला",
-      "cancelled": "रद्द केले",
-      "not_started": "सुरू झाले नाही",
-      "in_progress": "प्रगतीपथावर"
-    },
+    "overallProgress": "एकूण प्रगती",
+    "completedDate": "पूर्ण झाले: {{date}}",
     "type": {
       "personal": "वैयक्तिक",
       "team": "टीम",
       "project": "प्रकल्प",
       "company": "कंपनी"
     },
-    "priority": {
-      "low": "कमी",
-      "medium": "मध्यम",
-      "high": "उच्च",
-      "urgent": "तातडीचे"
-    },
+    "create": "उद्दिष्ट तयार करा",
+    "typeLabel": "प्रकार",
     "category": {
       "productivity": "उत्पादकता",
       "learning": "शिक्षण",
@@ -2805,7 +2668,21 @@
       "career": "करिअर",
       "other": "इतर"
     },
-    "completingIn": "{{days}} दिवसांत पूर्ण होत आहे"
+    "sort": {
+      "due_date": "देय तारीख",
+      "created": "तयार केले",
+      "progress": "प्रगती",
+      "priority": "प्राधान्य"
+    },
+    "priority": {
+      "urgent": "तातडीचे",
+      "high": "उच्च",
+      "medium": "मध्यम",
+      "low": "कमी"
+    },
+    "noGoalsYet": "अद्याप कोणतीही उद्दिष्टे नाहीत",
+    "noMatchingGoals": "कोणतीही जुळणारी उद्दिष्टे नाहीत",
+    "tryDifferentFilters": "अधिक उद्दिष्टे पाहण्यासाठी फिल्टर समायोजित करा"
   },
   "buttons": {
     "save": "जतन करा",
@@ -2847,7 +2724,9 @@
     "tryNow": "आता प्रयत्न करा",
     "signUp": "साइन अप करा",
     "signIn": "साइन इन करा",
-    "logOut": "लॉग आउट करा"
+    "logOut": "लॉग आउट करा",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "माझे काम",
@@ -3235,106 +3114,6 @@
     "severity": "तीव्रता",
     "allSeverities": "सर्व तीव्रता",
     "noEvents": "कोणतेही इव्हेंट्स नाहीत"
-  },
-  "goals": {
-    "title": "उद्दिष्टे आणि हेतू",
-    "subtitle": "वैयक्तिक आणि टीम उद्दिष्टे व्यवस्थापित आणि ट्रॅक करा",
-    "newGoal": "नवीन उद्दिष्ट",
-    "searchPlaceholder": "उद्दिष्टे शोधा...",
-    "totalGoals": "एकूण उद्दिष्टे",
-    "completed": "पूर्ण झाले",
-    "inProgress": "प्रगतीपथावर",
-    "notStarted": "सुरू झाले नाही",
-    "avgProgress": "सरासरी प्रगती",
-    "progress": "प्रगती",
-    "due": "देय: {{date}}",
-    "overdue": "मुदत संपली",
-    "milestones": "माइलस्टोन्स",
-    "viewDetails": "तपशील पाहा",
-    "goalsCount": "उद्दिष्टे ({{count}})",
-    "aiAssistant": "एआय उद्दिष्ट सहाय्यक",
-    "recentActivity": "अलीकडील क्रियाकलाप",
-    "goalsByCategory": "श्रेणीनुसार उद्दिष्टे",
-    "categories": {
-      "productivity": "उत्पादकता",
-      "learning": "शिक्षण",
-      "health": "आरोग्य",
-      "financial": "आर्थिक",
-      "career": "करिअर",
-      "company": "कंपनी",
-      "project": "प्रकल्प",
-      "personal": "वैयक्तिक",
-      "team": "टीम"
-    },
-    "quickActions": "जलद क्रिया",
-    "actions": {
-      "createPersonalGoal": "वैयक्तिक उद्दिष्ट तयार करा",
-      "createTeamGoal": "टीम उद्दिष्ट तयार करा",
-      "viewAnalytics": "विश्लेषण पाहा",
-      "exportGoals": "उद्दिष्टे निर्यात करा"
-    },
-    "status": {
-      "not_started": "सुरू झाले नाही",
-      "in_progress": "प्रगतीपथावर",
-      "completed": "पूर्ण झाले",
-      "paused": "विराम दिला",
-      "cancelled": "रद्द केले"
-    },
-    "owner": "मालक",
-    "startDate": "सुरुवात तारीख",
-    "endDate": "समाप्ती तारीख",
-    "description": "वर्णन",
-    "keyResults": "प्रमुख परिणाम",
-    "addKeyResult": "प्रमुख परिणाम जोडा",
-    "editGoal": "उद्दिष्ट संपादित करा",
-    "deleteGoal": "उद्दिष्ट हटवा",
-    "noGoals": "अद्याप कोणतीही उद्दिष्टे नाहीत",
-    "createFirstGoal": "पहिले उद्दिष्ट तयार करा",
-    "allTypes": "सर्व प्रकार",
-    "allStatus": "सर्व स्थिती",
-    "allCategories": "सर्व श्रेणी",
-    "milestonesCount": "{{completed}}/{{total}} माइलस्टोन्स",
-    "createdBy": "निर्माता: {{name}}",
-    "start": "सुरुवात: {{date}}",
-    "aiSuggestion": "उद्दिष्ट सेटिंग आणि साध्य करण्याच्या धोरणांसाठी एआय-व्युत्पन्न सूचना मिळवा.",
-    "askAi": "एआयला विचारा",
-    "targetDate": "लक्ष्य तारीख",
-    "createdByLabel": "निर्माता",
-    "categoryLabel": "श्रेणी",
-    "tags": "टॅग्ज",
-    "overallProgress": "एकूण प्रगती",
-    "completedDate": "पूर्ण झाले: {{date}}",
-    "type": {
-      "personal": "वैयक्तिक",
-      "team": "टीम",
-      "project": "प्रकल्प",
-      "company": "कंपनी"
-    },
-    "create": "उद्दिष्ट तयार करा",
-    "typeLabel": "प्रकार",
-    "category": {
-      "productivity": "उत्पादकता",
-      "learning": "शिक्षण",
-      "health": "आरोग्य",
-      "financial": "आर्थिक",
-      "career": "करिअर",
-      "other": "इतर"
-    },
-    "sort": {
-      "due_date": "देय तारीख",
-      "created": "तयार केले",
-      "progress": "प्रगती",
-      "priority": "प्राधान्य"
-    },
-    "priority": {
-      "urgent": "तातडीचे",
-      "high": "उच्च",
-      "medium": "मध्यम",
-      "low": "कमी"
-    },
-    "noGoalsYet": "अद्याप कोणतीही उद्दिष्टे नाहीत",
-    "noMatchingGoals": "कोणतीही जुळणारी उद्दिष्टे नाहीत",
-    "tryDifferentFilters": "अधिक उद्दिष्टे पाहण्यासाठी फिल्टर समायोजित करा"
   },
   "notes": {
     "title": "नोट्स",

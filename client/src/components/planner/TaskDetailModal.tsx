@@ -31,6 +31,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, on
   const [editedTask, setEditedTask] = useState(task);
   const [newSubtask, setNewSubtask] = useState('');
 
+  // Check if this is a workspace task (read-only)
+  const isWorkspaceTask = !!(task.project || task.workspace);
+
   const handleSave = () => {
     updateTask(task._id, editedTask);
     setIsEditing(false);
@@ -74,7 +77,17 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, on
                 className="text-xl font-semibold w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             ) : (
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{task.title}</h2>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{task.title}</h2>
+                {isWorkspaceTask && (
+                  <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded text-xs text-yellow-800 dark:text-yellow-300">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Workspace Task - Read Only
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="flex items-center gap-2 ml-4">
@@ -95,15 +108,27 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, on
               </>
             ) : (
               <button
-                onClick={() => setIsEditing(true)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                onClick={() => !isWorkspaceTask && setIsEditing(true)}
+                disabled={isWorkspaceTask}
+                className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg ${
+                  isWorkspaceTask 
+                    ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50' 
+                    : 'text-gray-700 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+                title={isWorkspaceTask ? 'Cannot edit workspace tasks' : 'Edit task'}
               >
                 {t('planner.taskDetail.edit')}
               </button>
             )}
             <button
               onClick={handleDelete}
-              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+              disabled={isWorkspaceTask}
+              className={`p-2 rounded-lg ${
+                isWorkspaceTask
+                  ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50'
+                  : 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+              }`}
+              title={isWorkspaceTask ? 'Cannot delete workspace tasks' : 'Delete task'}
             >
               <Trash2 className="w-5 h-5" />
             </button>
@@ -153,30 +178,36 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task: initialTask, on
                       <input
                         type="checkbox"
                         checked={subtask.completed}
-                        onChange={() => subtask._id && toggleSubtask(task._id, subtask._id)}
-                        className="w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent"
+                        onChange={() => !isWorkspaceTask && subtask._id && toggleSubtask(task._id, subtask._id)}
+                        disabled={isWorkspaceTask}
+                        className={`w-4 h-4 text-accent-dark rounded border-gray-300 focus:ring-accent ${
+                          isWorkspaceTask ? 'cursor-not-allowed opacity-50' : ''
+                        }`}
+                        title={isWorkspaceTask ? 'Cannot update workspace task' : ''}
                       />
                       <span className={`flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white'}`}>
                         {subtask.title}
                       </span>
                     </div>
                   ))}
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newSubtask}
-                      onChange={(e) => setNewSubtask(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
-                      placeholder={t('planner.taskDetail.addSubtask')}
-                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    <button
-                      onClick={handleAddSubtask}
-                      className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
-                    >
-                      {t('planner.taskModal.fields.add')}
-                    </button>
-                  </div>
+                  {!isWorkspaceTask && (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newSubtask}
+                        onChange={(e) => setNewSubtask(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
+                        placeholder={t('planner.taskDetail.addSubtask')}
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                      <button
+                        onClick={handleAddSubtask}
+                        className="px-4 py-2 text-sm bg-accent text-gray-900 rounded-lg hover:bg-accent-hover"
+                      >
+                        {t('planner.taskModal.fields.add')}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -859,8 +859,13 @@
       "inbox": "Inbox",
       "settings": "Settings"
     },
+    "header": {
+      "share": "Share",
+      "settings": "Settings",
+      "addTask": "Add Task"
+    },
     "sidebar": {
-      "projectInfo": "Project Info",
+      "projectInfo": "Project Information",
       "status": "Status",
       "priority": "Priority",
       "progress": "Progress",
@@ -872,7 +877,327 @@
       "completed": "Completed",
       "inProgress": "In Progress",
       "overdue": "Overdue",
-      "moreMembers": "+{{count}} more"
+      "moreMembers": "+{{count}} more members"
+    },
+    "overview": {
+      "totalTasks": "Total Tasks",
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "teamMembers": "Team Members",
+      "projectProgress": "Project Progress",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "daysRemaining": "Days Remaining",
+      "milestones": "Milestones",
+      "recentActivity": "Recent Activity",
+      "quickActions": "Quick Actions",
+      "addTask": "Add Task",
+      "addMember": "Add Member",
+      "schedule": "Schedule",
+      "viewReports": "View Reports",
+      "notSet": "Not set"
+    },
+    "info": {
+      "title": "Project Information",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "projectName": "Project Name",
+      "client": "Client",
+      "noClient": "No client",
+      "description": "Description",
+      "noDescription": "No description",
+      "status": "Status",
+      "priority": "Priority",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "notSet": "Not set",
+      "estimatedBudget": "Estimated Budget",
+      "actualSpent": "Actual Spent",
+      "progress": "Progress",
+      "tags": "Tags",
+      "tagsPlaceholder": "Enter tags separated by commas",
+      "noTags": "No tags",
+      "teamSize": "Team Size",
+      "membersCount": "{{count}} members",
+      "notAvailable": "Project information not available"
+    },
+    "status": {
+      "planning": "Planning",
+      "active": "Active",
+      "onHold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "abandoned": "Abandoned"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "team": {
+      "title": "Project Team",
+      "subtitle": "Manage team members for this project ({{count}} members)",
+      "addMember": "Add Member",
+      "projectManager": "Project Manager",
+      "noMembers": "No team members yet",
+      "noMembersSubtitle": "Add members from your workspace to get started",
+      "added": "Added {{date}}",
+      "manager": "Manager",
+      "member": "Member",
+      "removeMember": "Remove member",
+      "makePM": "Make PM",
+      "modal": {
+        "title": "Add Team Member",
+        "selectMember": "Select Member from Workspace",
+        "allMembersAdded": "All workspace members are already in this project",
+        "chooseMember": "Choose a member...",
+        "role": "Role",
+        "ownerOnly": "Only workspace owner can assign project manager",
+        "pmExists": "This project already has a project manager",
+        "add": "Add Member",
+        "cancel": "Cancel"
+      }
+    },
+    "tasks": {
+      "title": "Task Assignment",
+      "subtitle": "Assign and manage tasks for your team ({{count}} tasks)",
+      "assignNew": "Assign New Task",
+      "noTasks": "No tasks assigned yet",
+      "noTasksSubtitle": "Create your first task to get started",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "subtasksCompleted": "{{completed}} / {{total}} Subtasks Completed",
+      "addSubtask": "Add subtask...",
+      "links": "Links",
+      "addLink": "Add link (https://...)",
+      "progress": "Progress",
+      "verifyTask": "Verify Task",
+      "rateAndFinish": "Rate & Finish",
+      "taskFinished": "Task Finished",
+      "accessRestricted": "Access Restricted",
+      "accessRestrictedSubtitle": "Only the Project Manager can assign and manage tasks.",
+      "types": {
+        "statusUpdate": "Status Update",
+        "fileSubmission": "File Required",
+        "linkSubmission": "Link Required",
+        "review": "Review",
+        "general": "General"
+      },
+      "rating": {
+        "title": "Task Performance Evaluation",
+        "evaluate": "Evaluate: {{title}}",
+        "assignedTo": "Assigned to: {{name}}",
+        "timeliness": "Timeliness",
+        "timelinessDesc": "Was the task completed on time? Did they meet the deadline?",
+        "quality": "Quality of Work",
+        "qualityDesc": "How well was the task executed? Does it meet requirements?",
+        "communication": "Communication",
+        "communicationDesc": "Did they provide updates? Were they responsive to feedback?",
+        "completeness": "Completeness",
+        "completenessDesc": "Were all subtasks completed? Any missing deliverables?",
+        "overall": "Overall Rating",
+        "average": "Average of all criteria",
+        "comments": "Additional Comments (Optional)",
+        "commentsPlaceholder": "Provide specific feedback about the task performance...",
+        "submit": "Submit Evaluation",
+        "cancel": "Cancel"
+      },
+      "modal": {
+        "title": {
+          "edit": "Edit Task",
+          "create": "Assign New Task"
+        },
+        "taskTitle": "Task Name *",
+        "taskTitlePlaceholder": "Enter task name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter task description",
+        "taskType": "Task Type *",
+        "taskTypeDesc": {
+          "general": "Regular task with subtasks and progress tracking",
+          "statusUpdate": "Employee provides status updates only",
+          "fileSubmission": "Employee must upload file(s) to complete",
+          "linkSubmission": "Employee must provide link(s) to complete",
+          "review": "Requires review and approval from PM"
+        },
+        "assignTo": "Assign To *",
+        "selectMember": "Select team member...",
+        "priority": "Priority",
+        "startDate": "Start Date",
+        "dueDate": "Due Date *",
+        "progress": "Progress ({{percent}}%)",
+        "progressDesc": "Progress is automatically calculated based on completed subtasks",
+        "update": "Update Task",
+        "assign": "Assign Task",
+        "cancel": "Cancel"
+      },
+      "alert": {
+        "fillRequired": "Please fill in all required fields",
+        "deleteConfirm": "Are you sure you want to delete this task?"
+      }
+    },
+    "employeeTasks": {
+      "title": "My Tasks",
+      "subtitle": "Tasks assigned to you ({{count}} tasks)",
+      "filter": {
+        "label": "Filter:",
+        "all": "All Tasks",
+        "pending": "Pending",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "verified": "Verified",
+        "blocked": "Blocked"
+      },
+      "views": {
+        "list": "List",
+        "kanban": "Kanban",
+        "calendar": "Calendar",
+        "gantt": "Gantt",
+        "table": "Table",
+        "dashboard": "Dashboard",
+        "workload": "Workload"
+      },
+      "stats": {
+        "total": "Total",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "overdue": "Overdue"
+      },
+      "noTasks": "No tasks found",
+      "noTasksSubtitle": {
+        "all": "You have no tasks assigned yet",
+        "filtered": "No {{status}} tasks"
+      },
+      "finished": "Finished",
+      "overdue": "⚠️ Overdue",
+      "subtasks": "Subtasks ({{completed}}/{{total}})",
+      "uploadRequired": "Upload Required Files",
+      "uploadDesc": "Upload files required for this task",
+      "uploadedFiles": "Uploaded Files:",
+      "remove": "Remove",
+      "markCompleted": "Mark as Completed",
+      "submitLinks": "Submit Required Links",
+      "add": "Add",
+      "submittedLinks": "Submitted Links:",
+      "provideStatus": "📝 Provide Status Update",
+      "statusPlaceholder": "Enter your status update here...",
+      "submitUpdate": "Submit Update",
+      "referenceLinks": "Reference Links",
+      "attachedFiles": "Attached Files",
+      "taskRating": "Task Rating",
+      "kanban": {
+        "pending": "Pending",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "verified": "Verified"
+      },
+      "dashboard": {
+        "totalTasks": "Total Tasks",
+        "totalTasksDesc": "All assigned tasks",
+        "completed": "Completed",
+        "completedDesc": "{{percent}}% completion rate",
+        "inProgress": "In Progress",
+        "inProgressDesc": "Active tasks",
+        "overdue": "Overdue",
+        "overdueDesc": "Need attention",
+        "distribution": "Task Distribution",
+        "priorityBreakdown": "Priority Breakdown",
+        "recentTasks": "Recent Tasks"
+      },
+      "workload": {
+        "title": "My Workload Overview",
+        "total": "Total Workload",
+        "capacity": "Capacity Used",
+        "avgProgress": "Avg. Progress",
+        "tasksByWeek": "Tasks by Week",
+        "weeks": {
+          "thisWeek": "This Week",
+          "nextWeek": "Next Week",
+          "later": "Later"
+        },
+        "moreTasks": "+{{count}} more tasks"
+      },
+      "modal": {
+        "description": "Description",
+        "progress": "Progress",
+        "subtasks": "Subtasks ({{completed}}/{{total}})",
+        "files": "Files ({{count}})",
+        "links": "Links ({{count}})",
+        "rating": "Task Rating",
+        "close": "Close"
+      }
+    },
+    "view": {
+      "timeline": {
+        "title": "Project Timeline",
+        "day": "Day",
+        "week": "Week",
+        "month": "Month",
+        "addEvent": "Add Event",
+        "noActivity": "No activity yet",
+        "noActivityDesc": "Activity will appear here as work progresses",
+        "milestones": "Milestones",
+        "noMilestones": "No milestones defined",
+        "due": "Due: {{date}}",
+        "complete": "{{percent}}% complete"
+      },
+      "documents": {
+        "title": "Documents",
+        "upload": "Upload",
+        "newFolder": "New Folder",
+        "totalFiles": "Total Files",
+        "storageUsed": "Storage Used",
+        "recentUploads": "Recent Uploads",
+        "allFiles": "All Files",
+        "images": "Images",
+        "docs": "Documents",
+        "recent": "Recent",
+        "noDocuments": "No documents yet",
+        "noDocumentsDesc": "Upload files to share with your team",
+        "uploadedBy": "Uploaded by {{name}}",
+        "download": "Download",
+        "share": "Share",
+        "folder": "Folder"
+      },
+      "analytics": {
+        "title": "Project Analytics",
+        "last7Days": "Last 7 Days",
+        "last30Days": "Last 30 Days",
+        "allTime": "All Time",
+        "completionRate": "Completion Rate",
+        "vsLastMonth": "+5% from last month",
+        "teamVelocity": "Team Velocity",
+        "tasksCompleted": "Tasks completed",
+        "budgetUsage": "Budget Usage",
+        "budgetDesc": "{{spent}} of {{total}}",
+        "teamWorkload": "Team Workload",
+        "avgWorkload": "Average workload",
+        "taskDist": "Task Status Distribution",
+        "teamPerf": "Team Performance",
+        "tasksStat": "{{completed}}/{{assigned}} tasks",
+        "budgetBreakdown": "Budget Breakdown",
+        "totalBudget": "Total Budget",
+        "spent": "Spent",
+        "remaining": "Remaining",
+        "activitySummary": "Activity Summary",
+        "tasksCreated": "Tasks Created",
+        "teamMembers": "Team Members"
+      },
+      "settings": {
+        "title": "Project Settings",
+        "comingSoon": "Project configuration and management settings coming soon!",
+        "attendanceLocation": "Attendance Office Location",
+        "attendanceDesc": "Set your primary office location. This will be used as a reference for automatic attendance verification for this project.",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "useCurrentLocation": "Use My Current Location",
+        "uiOnly": "(UI only for now) We can later connect this to backend attendance configuration."
+      },
+      "overview": {
+        "progress": "Progress",
+        "recentActivity": "Recent Activity"
+      }
     }
   },
   "about": {
@@ -1522,8 +1847,17 @@
     },
     "detail": {
       "tabs": {
+        "edit": "Edit",
+        "collaborate": "Collaborate",
+        "members": "Members",
+        "clients": "Clients",
+        "projects": "Projects",
+        "documents": "Documents",
         "attendance": "Attendance"
-      }
+      },
+      "notFoundTitle": "Workspace Not Found",
+      "backToWorkspaces": "Back to Workspaces",
+      "noDescription": "No description available"
     },
     "projects": {
       "title": "Workspace Projects",
@@ -1624,8 +1958,43 @@
       }
     },
     "profile": {
-      "title": "Workspace Profile",
-      "subtitle": "Manage your workspace profile and settings"
+      "tabs": {
+        "profile": "Profile"
+      },
+      "editProfile": "Edit Profile",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "emailCannotBeChanged": "Email cannot be changed",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Tell us about yourself...",
+      "selectWorkspace": "Select a workspace to view profile details.",
+      "workspaceLabel": "Workspace",
+      "noDescription": "No description available.",
+      "nameLabel": "Name",
+      "unnamedUser": "Unnamed User",
+      "emailLabel": "Email",
+      "notAvailable": "N/A",
+      "mobileLabel": "Mobile",
+      "notProvided": "Not Provided",
+      "currentRole": "Current Role",
+      "insights": {
+        "title": "Workspace Insights",
+        "members": "Members",
+        "type": "Workspace Type",
+        "subscription": "Subscription"
+      },
+      "faceScan": {
+        "title": "Face Scan Config",
+        "description": "Load your face details once, and attendance verification will be automatic. This is available for all members of this workspace.",
+        "instructions": "Position your face in the camera view to capture your face scan.",
+        "button": "Open Face Scan",
+        "buttonSaving": "Saving..."
+      },
+      "role": {
+        "owner": "Owner",
+        "member": "Member"
+      }
     },
     "overview": {
       "activeProjects": "Active Projects",
@@ -1704,39 +2073,104 @@
       "loading": "Loading..."
     },
     "members": {
+      "title": "Workspace Members",
+      "subtitle": "Invite members to join projects in this workspace. They will appear in project teammate lists.",
       "invite": "Invite Member",
+      "searchPlaceholder": "Search members by username or email...",
+      "noMembers": "No members yet",
+      "noMembersDesc": "Invite team members to collaborate on projects",
+      "noResults": "No matching members found",
+      "info": "There are {{count}} members in this workspace. Members can be assigned to projects and will receive notifications for project updates.",
+      "contactAdminTitle": "Contact Workspace Admin",
+      "contactAdminDesc": "Please contact the owner or an admin to modify members or settings for this workspace.",
+      "owner": "Workspace Owner",
+      "collaborator": "Collaborator",
       "joinRequestsTitle": "Join Requests",
-      "joinRequestsDesc": "Manage incoming requests to join the workspace",
-      "modal": {
-        "title": "Invite Members",
-        "emailLabel": "Email Address",
-        "emailPlaceholder": "Enter email address",
-        "emailDesc": "Send an invitation to this email address",
-        "searchLabel": "Search Users",
-        "searchPlaceholder": "Search by name or email",
-        "searchDesc": "Find existing users to add",
-        "cancel": "Cancel",
-        "send": "Send Invitation"
-      },
+      "joinRequestsDesc": "Approve or decline join requests from the workspace search page.",
       "pending": "Pending",
-      "noRequests": "No Pending Requests",
-      "noRequestsDesc": "There are no pending join requests at this time."
+      "noRequests": "No requests yet",
+      "noRequestsDesc": "Requests from workspace search will appear here.",
+      "accept": "Accept",
+      "decline": "Decline",
+      "modal": {
+        "title": "Invite Member",
+        "emailLabel": "Username or Email",
+        "emailPlaceholder": "Enter username or email",
+        "emailDesc": "User will receive an invitation to this workspace",
+        "searchLabel": "Search Platform Directory",
+        "searchPlaceholder": "Search by Name or Email",
+        "searchDesc": "Fetch users already on the platform without re-typing emails.",
+        "cancel": "Cancel",
+        "send": "Send Invite"
+      },
+      "toast": {
+        "enterEmail": "Please enter an email or username",
+        "sent": "Member invitation sent successfully!",
+        "accepted": "{{name}} added to workspace",
+        "acceptError": "Failed to accept request",
+        "declined": "Request declined",
+        "declineError": "Failed to decline request",
+        "removed": "Member removed from workspace"
+      },
+      "confirmDemote": "Are you sure you want to remove collaborator privileges for {{name}}? They will return to being a regular Member."
     },
     "clients": {
       "title": "Clients",
-      "subtitle": "Manage your client relationships",
+      "subtitle": "Manage client profiles and associate them with projects",
+      "add": "Add Client",
       "addClient": "Add Client",
+      "noClients": "No clients yet",
+      "noClientsDesc": "Add clients to start creating projects for them",
+      "viewProjects": "Click to View Projects →",
+      "searchPlaceholder": "Search clients...",
+      "projectsButton": "{{count}} Projects",
+      "edit": "Edit",
       "stats": {
         "totalClients": "Total Clients",
         "active": "Active",
         "totalProjects": "Total Projects",
         "totalRevenue": "Total Revenue"
       },
-      "searchPlaceholder": "Search clients...",
       "empty": {
         "title": "No Clients Found",
-        "startMessage": "Get started by adding your first client"
-      }
+        "searchMessage": "Try adjusting your search criteria",
+        "startMessage": "Add your first client to get started"
+      },
+      "modal": {
+        "addTitle": "Add Client",
+        "editTitle": "Edit Client",
+        "nameLabel": "Client Name *",
+        "namePlaceholder": "John Doe",
+        "companyLabel": "Company Name",
+        "companyPlaceholder": "Acme Corp",
+        "emailLabel": "Email Address *",
+        "emailPlaceholder": "john@example.com",
+        "phoneLabel": "Phone Number",
+        "phonePlaceholder": "123-456-7890",
+        "websiteLabel": "Website",
+        "websitePlaceholder": "https://example.com",
+        "addressLabel": "Address",
+        "addressPlaceholder": "123 Main St...",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Additional notes about the client...",
+        "cancel": "Cancel",
+        "addBtn": "Add Client",
+        "updateBtn": "Update Client",
+        "projectsTitle": "{{name}} - Projects",
+        "noProjectsTitle": "No Projects Yet",
+        "noProjectsMessage": "There are no projects assigned to this client"
+      },
+      "toast": {
+        "required": "Please fill in required fields (Name & Email)",
+        "created": "Client created successfully!",
+        "updated": "Client updated successfully!",
+        "deleted": "Client deleted successfully",
+        "noWorkspace": "No active workspace selected.",
+        "createSuccess": "Client '{{name}}' added successfully!",
+        "createError": "Failed to create client",
+        "loadError": "Failed to load clients"
+      },
+      "confirmDelete": "Are you sure you want to delete this client? This action cannot be undone."
     },
     "title": "Workspace",
     "enter6Digit": "Enter 6-digit code",
@@ -1993,106 +2427,6 @@
       },
       "confirmDemote": "Are you sure you want to remove collaborator privileges for {{name}}? They will return to being a regular Member."
     },
-    "members": {
-      "title": "Workspace Members",
-      "subtitle": "Invite members to join projects in this workspace. They will appear in project teammate lists.",
-      "invite": "Invite Member",
-      "searchPlaceholder": "Search members by username or email...",
-      "noMembers": "No members yet",
-      "noMembersDesc": "Invite team members to collaborate on projects",
-      "noResults": "No matching members found",
-      "info": "There are {{count}} members in this workspace. Members can be assigned to projects and will receive notifications for project updates.",
-      "contactAdminTitle": "Contact Workspace Admin",
-      "contactAdminDesc": "Please contact the owner or an admin to modify members or settings for this workspace.",
-      "owner": "Workspace Owner",
-      "collaborator": "Collaborator",
-      "joinRequestsTitle": "Join Requests",
-      "joinRequestsDesc": "Approve or decline join requests from the workspace search page.",
-      "pending": "Pending",
-      "noRequests": "No requests yet",
-      "noRequestsDesc": "Requests from workspace search will appear here.",
-      "accept": "Accept",
-      "decline": "Decline",
-      "modal": {
-        "title": "Invite Member",
-        "emailLabel": "Username or Email",
-        "emailPlaceholder": "Enter username or email",
-        "emailDesc": "User will receive an invitation to this workspace",
-        "searchLabel": "Search Platform Directory",
-        "searchPlaceholder": "Search by Name or Email",
-        "searchDesc": "Fetch users already on the platform without re-typing emails.",
-        "cancel": "Cancel",
-        "send": "Send Invite"
-      },
-      "toast": {
-        "enterEmail": "Please enter an email or username",
-        "sent": "Member invitation sent successfully!",
-        "accepted": "{{name}} added to workspace",
-        "acceptError": "Failed to accept request",
-        "declined": "Request declined",
-        "declineError": "Failed to decline request",
-        "removed": "Member removed from workspace"
-      },
-      "confirmDemote": "Are you sure you want to remove collaborator privileges for {{name}}? They will return to being a regular Member."
-    },
-    "clients": {
-      "title": "Clients",
-      "subtitle": "Manage client profiles and associate them with projects",
-      "add": "Add Client",
-      "addClient": "Add Client",
-      "noClients": "No clients yet",
-      "noClientsDesc": "Add clients to start creating projects for them",
-      "viewProjects": "Click to View Projects →",
-      "searchPlaceholder": "Search clients...",
-      "projectsButton": "{{count}} Projects",
-      "edit": "Edit",
-      "stats": {
-        "totalClients": "Total Clients",
-        "active": "Active",
-        "totalProjects": "Total Projects",
-        "totalRevenue": "Total Revenue"
-      },
-      "empty": {
-        "title": "No Clients Found",
-        "searchMessage": "Try adjusting your search criteria",
-        "startMessage": "Add your first client to get started"
-      },
-      "modal": {
-        "addTitle": "Add Client",
-        "editTitle": "Edit Client",
-        "nameLabel": "Client Name *",
-        "namePlaceholder": "John Doe",
-        "companyLabel": "Company Name",
-        "companyPlaceholder": "Acme Corp",
-        "emailLabel": "Email Address *",
-        "emailPlaceholder": "john@example.com",
-        "phoneLabel": "Phone Number",
-        "phonePlaceholder": "123-456-7890",
-        "websiteLabel": "Website",
-        "websitePlaceholder": "https://example.com",
-        "addressLabel": "Address",
-        "addressPlaceholder": "123 Main St...",
-        "notesLabel": "Notes",
-        "notesPlaceholder": "Additional notes about the client...",
-        "cancel": "Cancel",
-        "addBtn": "Add Client",
-        "updateBtn": "Update Client",
-        "projectsTitle": "{{name}} - Projects",
-        "noProjectsTitle": "No Projects Yet",
-        "noProjectsMessage": "There are no projects assigned to this client"
-      },
-      "toast": {
-        "required": "Please fill in required fields (Name & Email)",
-        "created": "Client created successfully!",
-        "updated": "Client updated successfully!",
-        "deleted": "Client deleted successfully",
-        "noWorkspace": "No active workspace selected.",
-        "createSuccess": "Client '{{name}}' added successfully!",
-        "createError": "Failed to create client",
-        "loadError": "Failed to load clients"
-      },
-      "confirmDelete": "Are you sure you want to delete this client? This action cannot be undone."
-    },
     "inbox": {
       "title": "Team Inbox",
       "subtitle": "Chat with your workspace members",
@@ -2106,45 +2440,6 @@
       "noMessages": "No messages yet. Say hello!",
       "typeMessage": "Type a message...",
       "selectChat": "Select a chat to start messaging"
-    },
-    "profile": {
-      "tabs": {
-        "profile": "Profile"
-      },
-      "editProfile": "Edit Profile",
-      "save": "Save",
-      "saving": "Saving...",
-      "cancel": "Cancel",
-      "emailCannotBeChanged": "Email cannot be changed",
-      "bioLabel": "Bio",
-      "bioPlaceholder": "Tell us about yourself...",
-      "selectWorkspace": "Select a workspace to view profile details.",
-      "workspaceLabel": "Workspace",
-      "noDescription": "No description available.",
-      "nameLabel": "Name",
-      "unnamedUser": "Unnamed User",
-      "emailLabel": "Email",
-      "notAvailable": "N/A",
-      "mobileLabel": "Mobile",
-      "notProvided": "Not Provided",
-      "currentRole": "Current Role",
-      "insights": {
-        "title": "Workspace Insights",
-        "members": "Members",
-        "type": "Workspace Type",
-        "subscription": "Subscription"
-      },
-      "faceScan": {
-        "title": "Face Scan Config",
-        "description": "Load your face details once, and attendance verification will be automatic. This is available for all members of this workspace.",
-        "instructions": "Position your face in the camera view to capture your face scan.",
-        "button": "Open Face Scan",
-        "buttonSaving": "Saving..."
-      },
-      "role": {
-        "owner": "Owner",
-        "member": "Member"
-      }
     },
     "settings": {
       "title": "Workspace Settings",
@@ -2256,376 +2551,6 @@
         "demoteError": "Failed to demote collaborator"
       },
       "confirmDemote": "Are you sure you want to remove collaborator privileges for {{name}}? They will return to being a regular Member."
-    },
-    "detail": {
-      "tabs": {
-        "edit": "Edit",
-        "collaborate": "Collaborate",
-        "members": "Members",
-        "clients": "Clients",
-        "projects": "Projects",
-        "documents": "Documents",
-        "attendance": "Attendance"
-      },
-      "notFoundTitle": "Workspace Not Found",
-      "backToWorkspaces": "Back to Workspaces",
-      "noDescription": "No description available"
-    }
-  },
-  "project": {
-    "tabs": {
-      "overview": "Overview",
-      "info": "Project Info",
-      "team": "Team",
-      "tasks": "Tasks & Board",
-      "timeline": "Timeline",
-      "progress": "Progress Tracker",
-      "workload": "Workload",
-      "attendance": "Attendance",
-      "reports": "Reports",
-      "documents": "Documents",
-      "inbox": "Inbox",
-      "settings": "Settings"
-    },
-    "header": {
-      "share": "Share",
-      "settings": "Settings",
-      "addTask": "Add Task"
-    },
-    "sidebar": {
-      "projectInfo": "Project Information",
-      "status": "Status",
-      "priority": "Priority",
-      "progress": "Progress",
-      "budget": "Budget",
-      "spent": "Spent",
-      "teamMembers": "Team Members",
-      "quickStats": "Quick Stats",
-      "totalTasks": "Total Tasks",
-      "completed": "Completed",
-      "inProgress": "In Progress",
-      "overdue": "Overdue",
-      "moreMembers": "+{{count}} more members"
-    },
-    "overview": {
-      "totalTasks": "Total Tasks",
-      "completed": "Completed",
-      "inProgress": "In Progress",
-      "teamMembers": "Team Members",
-      "projectProgress": "Project Progress",
-      "startDate": "Start Date",
-      "dueDate": "Due Date",
-      "daysRemaining": "Days Remaining",
-      "milestones": "Milestones",
-      "recentActivity": "Recent Activity",
-      "quickActions": "Quick Actions",
-      "addTask": "Add Task",
-      "addMember": "Add Member",
-      "schedule": "Schedule",
-      "viewReports": "View Reports",
-      "notSet": "Not set"
-    },
-    "info": {
-      "title": "Project Information",
-      "edit": "Edit",
-      "save": "Save",
-      "cancel": "Cancel",
-      "projectName": "Project Name",
-      "client": "Client",
-      "noClient": "No client",
-      "description": "Description",
-      "noDescription": "No description",
-      "status": "Status",
-      "priority": "Priority",
-      "startDate": "Start Date",
-      "dueDate": "Due Date",
-      "notSet": "Not set",
-      "estimatedBudget": "Estimated Budget",
-      "actualSpent": "Actual Spent",
-      "progress": "Progress",
-      "tags": "Tags",
-      "tagsPlaceholder": "Enter tags separated by commas",
-      "noTags": "No tags",
-      "teamSize": "Team Size",
-      "membersCount": "{{count}} members",
-      "notAvailable": "Project information not available"
-    },
-    "status": {
-      "planning": "Planning",
-      "active": "Active",
-      "onHold": "On Hold",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "abandoned": "Abandoned"
-    },
-    "priority": {
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "critical": "Critical"
-    },
-    "team": {
-      "title": "Project Team",
-      "subtitle": "Manage team members for this project ({{count}} members)",
-      "addMember": "Add Member",
-      "projectManager": "Project Manager",
-      "noMembers": "No team members yet",
-      "noMembersSubtitle": "Add members from your workspace to get started",
-      "added": "Added {{date}}",
-      "manager": "Manager",
-      "member": "Member",
-      "removeMember": "Remove member",
-      "makePM": "Make PM",
-      "modal": {
-        "title": "Add Team Member",
-        "selectMember": "Select Member from Workspace",
-        "allMembersAdded": "All workspace members are already in this project",
-        "chooseMember": "Choose a member...",
-        "role": "Role",
-        "ownerOnly": "Only workspace owner can assign project manager",
-        "pmExists": "This project already has a project manager",
-        "add": "Add Member",
-        "cancel": "Cancel"
-      }
-    },
-    "tasks": {
-      "title": "Task Assignment",
-      "subtitle": "Assign and manage tasks for your team ({{count}} tasks)",
-      "assignNew": "Assign New Task",
-      "noTasks": "No tasks assigned yet",
-      "noTasksSubtitle": "Create your first task to get started",
-      "startDate": "Start Date",
-      "dueDate": "Due Date",
-      "subtasksCompleted": "{{completed}} / {{total}} Subtasks Completed",
-      "addSubtask": "Add subtask...",
-      "links": "Links",
-      "addLink": "Add link (https://...)",
-      "progress": "Progress",
-      "verifyTask": "Verify Task",
-      "rateAndFinish": "Rate & Finish",
-      "taskFinished": "Task Finished",
-      "accessRestricted": "Access Restricted",
-      "accessRestrictedSubtitle": "Only the Project Manager can assign and manage tasks.",
-      "types": {
-        "statusUpdate": "Status Update",
-        "fileSubmission": "File Required",
-        "linkSubmission": "Link Required",
-        "review": "Review",
-        "general": "General"
-      },
-      "rating": {
-        "title": "Task Performance Evaluation",
-        "evaluate": "Evaluate: {{title}}",
-        "assignedTo": "Assigned to: {{name}}",
-        "timeliness": "Timeliness",
-        "timelinessDesc": "Was the task completed on time? Did they meet the deadline?",
-        "quality": "Quality of Work",
-        "qualityDesc": "How well was the task executed? Does it meet requirements?",
-        "communication": "Communication",
-        "communicationDesc": "Did they provide updates? Were they responsive to feedback?",
-        "completeness": "Completeness",
-        "completenessDesc": "Were all subtasks completed? Any missing deliverables?",
-        "overall": "Overall Rating",
-        "average": "Average of all criteria",
-        "comments": "Additional Comments (Optional)",
-        "commentsPlaceholder": "Provide specific feedback about the task performance...",
-        "submit": "Submit Evaluation",
-        "cancel": "Cancel"
-      },
-      "modal": {
-        "title": {
-          "edit": "Edit Task",
-          "create": "Assign New Task"
-        },
-        "taskTitle": "Task Name *",
-        "taskTitlePlaceholder": "Enter task name",
-        "description": "Description",
-        "descriptionPlaceholder": "Enter task description",
-        "taskType": "Task Type *",
-        "taskTypeDesc": {
-          "general": "Regular task with subtasks and progress tracking",
-          "statusUpdate": "Employee provides status updates only",
-          "fileSubmission": "Employee must upload file(s) to complete",
-          "linkSubmission": "Employee must provide link(s) to complete",
-          "review": "Requires review and approval from PM"
-        },
-        "assignTo": "Assign To *",
-        "selectMember": "Select team member...",
-        "priority": "Priority",
-        "startDate": "Start Date",
-        "dueDate": "Due Date *",
-        "progress": "Progress ({{percent}}%)",
-        "progressDesc": "Progress is automatically calculated based on completed subtasks",
-        "update": "Update Task",
-        "assign": "Assign Task",
-        "cancel": "Cancel"
-      },
-      "alert": {
-        "fillRequired": "Please fill in all required fields",
-        "deleteConfirm": "Are you sure you want to delete this task?"
-      }
-    },
-    "employeeTasks": {
-      "title": "My Tasks",
-      "subtitle": "Tasks assigned to you ({{count}} tasks)",
-      "filter": {
-        "label": "Filter:",
-        "all": "All Tasks",
-        "pending": "Pending",
-        "inProgress": "In Progress",
-        "completed": "Completed",
-        "verified": "Verified",
-        "blocked": "Blocked"
-      },
-      "views": {
-        "list": "List",
-        "kanban": "Kanban",
-        "calendar": "Calendar",
-        "gantt": "Gantt",
-        "table": "Table",
-        "dashboard": "Dashboard",
-        "workload": "Workload"
-      },
-      "stats": {
-        "total": "Total",
-        "inProgress": "In Progress",
-        "completed": "Completed",
-        "overdue": "Overdue"
-      },
-      "noTasks": "No tasks found",
-      "noTasksSubtitle": {
-        "all": "You have no tasks assigned yet",
-        "filtered": "No {{status}} tasks"
-      },
-      "finished": "Finished",
-      "overdue": "⚠️ Overdue",
-      "subtasks": "Subtasks ({{completed}}/{{total}})",
-      "uploadRequired": "Upload Required Files",
-      "uploadDesc": "Upload files required for this task",
-      "uploadedFiles": "Uploaded Files:",
-      "remove": "Remove",
-      "markCompleted": "Mark as Completed",
-      "submitLinks": "Submit Required Links",
-      "add": "Add",
-      "submittedLinks": "Submitted Links:",
-      "provideStatus": "📝 Provide Status Update",
-      "statusPlaceholder": "Enter your status update here...",
-      "submitUpdate": "Submit Update",
-      "referenceLinks": "Reference Links",
-      "attachedFiles": "Attached Files",
-      "taskRating": "Task Rating",
-      "kanban": {
-        "pending": "Pending",
-        "inProgress": "In Progress",
-        "completed": "Completed",
-        "verified": "Verified"
-      },
-      "dashboard": {
-        "totalTasks": "Total Tasks",
-        "totalTasksDesc": "All assigned tasks",
-        "completed": "Completed",
-        "completedDesc": "{{percent}}% completion rate",
-        "inProgress": "In Progress",
-        "inProgressDesc": "Active tasks",
-        "overdue": "Overdue",
-        "overdueDesc": "Need attention",
-        "distribution": "Task Distribution",
-        "priorityBreakdown": "Priority Breakdown",
-        "recentTasks": "Recent Tasks"
-      },
-      "workload": {
-        "title": "My Workload Overview",
-        "total": "Total Workload",
-        "capacity": "Capacity Used",
-        "avgProgress": "Avg. Progress",
-        "tasksByWeek": "Tasks by Week",
-        "weeks": {
-          "thisWeek": "This Week",
-          "nextWeek": "Next Week",
-          "later": "Later"
-        },
-        "moreTasks": "+{{count}} more tasks"
-      },
-      "modal": {
-        "description": "Description",
-        "progress": "Progress",
-        "subtasks": "Subtasks ({{completed}}/{{total}})",
-        "files": "Files ({{count}})",
-        "links": "Links ({{count}})",
-        "rating": "Task Rating",
-        "close": "Close"
-      }
-    },
-    "view": {
-      "timeline": {
-        "title": "Project Timeline",
-        "day": "Day",
-        "week": "Week",
-        "month": "Month",
-        "addEvent": "Add Event",
-        "noActivity": "No activity yet",
-        "noActivityDesc": "Activity will appear here as work progresses",
-        "milestones": "Milestones",
-        "noMilestones": "No milestones defined",
-        "due": "Due: {{date}}",
-        "complete": "{{percent}}% complete"
-      },
-      "documents": {
-        "title": "Documents",
-        "upload": "Upload",
-        "newFolder": "New Folder",
-        "totalFiles": "Total Files",
-        "storageUsed": "Storage Used",
-        "recentUploads": "Recent Uploads",
-        "allFiles": "All Files",
-        "images": "Images",
-        "docs": "Documents",
-        "recent": "Recent",
-        "noDocuments": "No documents yet",
-        "noDocumentsDesc": "Upload files to share with your team",
-        "uploadedBy": "Uploaded by {{name}}",
-        "download": "Download",
-        "share": "Share",
-        "folder": "Folder"
-      },
-      "analytics": {
-        "title": "Project Analytics",
-        "last7Days": "Last 7 Days",
-        "last30Days": "Last 30 Days",
-        "allTime": "All Time",
-        "completionRate": "Completion Rate",
-        "vsLastMonth": "+5% from last month",
-        "teamVelocity": "Team Velocity",
-        "tasksCompleted": "Tasks completed",
-        "budgetUsage": "Budget Usage",
-        "budgetDesc": "{{spent}} of {{total}}",
-        "teamWorkload": "Team Workload",
-        "avgWorkload": "Average workload",
-        "taskDist": "Task Status Distribution",
-        "teamPerf": "Team Performance",
-        "tasksStat": "{{completed}}/{{assigned}} tasks",
-        "budgetBreakdown": "Budget Breakdown",
-        "totalBudget": "Total Budget",
-        "spent": "Spent",
-        "remaining": "Remaining",
-        "activitySummary": "Activity Summary",
-        "tasksCreated": "Tasks Created",
-        "teamMembers": "Team Members"
-      },
-      "settings": {
-        "title": "Project Settings",
-        "comingSoon": "Project configuration and management settings coming soon!",
-        "attendanceLocation": "Attendance Office Location",
-        "attendanceDesc": "Set your primary office location. This will be used as a reference for automatic attendance verification for this project.",
-        "latitude": "Latitude",
-        "longitude": "Longitude",
-        "useCurrentLocation": "Use My Current Location",
-        "uiOnly": "(UI only for now) We can later connect this to backend attendance configuration."
-      },
-      "overview": {
-        "progress": "Progress",
-        "recentActivity": "Recent Activity"
-      }
     }
   },
   "team": {
@@ -2935,83 +2860,96 @@
   },
   "connectedAccounts": {
     "title": "Connected Accounts",
-    "subtitle": "Manage your connected Sartthi services. You can connect multiple accounts for each service.",
-    "sartthiMail": "Sartthi Mail",
-    "sartthiMailDesc": "Gmail integration for email management",
-    "sartthiCalendar": "Sartthi Calendar",
-    "sartthiCalendarDesc": "Google Calendar integration",
-    "sartthiVault": "Sartthi Vault",
-    "sartthiVaultDesc": "Secure file storage with Google Drive",
-    "addAccount": "Add Account",
-    "noAccounts": "No accounts connected",
-    "clickAddAccount": "Click \"Add Account\" to connect your first account",
-    "active": "Active",
-    "primary": "Primary",
-    "connected": "Connected",
-    "setActive": "Set Active",
+    "subtitle": "Manage your integrated services",
     "confirmDisconnect": "Are you sure you want to disconnect this account?",
-    "email": "Email",
-    "notAvailable": "Not available",
-    "connectedOn": "Connected on {{date}}",
-    "disconnect": "Disconnect",
-    "connect": "Connect",
-    "privacyTitle": "Privacy",
-    "privacyMessage": "We only access files in your \"Sartthi Vault\" folder. Your personal files remain private.",
-    "aboutTitle": "About Connected Accounts",
-    "aboutPoint1": "You can disconnect and reconnect accounts at any time",
-    "aboutPoint2": "Disconnecting will remove access but won't delete your data",
-    "aboutPoint3": "Your data remains in your Google account",
-    "aboutPoint4": "You can connect a different Google account after disconnecting",
-    "disconnectConfirm": "Are you sure you want to disconnect this account?",
-    "disconnectSuccess": "Account disconnected successfully",
-    "connectSuccess": "Account connected successfully",
-    "connectionError": "Failed to connect account. Please try again."
+    "gmail": "Sartthi Mail",
+    "gmailDesc": "Connect your Gmail account",
+    "gcal": "Sartthi Calendar",
+    "gcalDesc": "Sync your calendar",
+    "gdrive": "Sartthi Vault",
+    "gdriveDesc": "Access your drive files",
+    "slackDesc": "Connect Slack workspace",
+    "githubDesc": "Connect GitHub repositories",
+    "dropboxDesc": "Sync Dropbox files",
+    "figmaDesc": "Connect Figma files",
+    "notionDesc": "Connect Notion workspace"
   },
   "goals": {
-    "title": "Goals",
-    "subtitle": "Track and achieve your personal and team goals",
-    "addGoal": "Add Goal",
+    "title": "Goals & Objectives",
+    "subtitle": "Track and manage personal and team goals",
     "newGoal": "New Goal",
+    "searchPlaceholder": "Search goals...",
     "totalGoals": "Total Goals",
     "completed": "Completed",
     "inProgress": "In Progress",
-    "searchPlaceholder": "Search goals...",
+    "notStarted": "Not Started",
+    "avgProgress": "Avg Progress",
+    "progress": "Progress",
+    "due": "Due: {{date}}",
+    "overdue": "Overdue",
+    "milestones": "Milestones",
+    "viewDetails": "View Details",
+    "goalsCount": "Goals ({{count}})",
+    "aiAssistant": "AI Goal Assistant",
+    "recentActivity": "Recent Activity",
+    "goalsByCategory": "Goals by Category",
+    "categories": {
+      "productivity": "Productivity",
+      "learning": "Learning",
+      "health": "Health",
+      "financial": "Financial",
+      "career": "Career",
+      "company": "Company",
+      "project": "Project",
+      "personal": "Personal",
+      "team": "Team"
+    },
+    "quickActions": "Quick Actions",
+    "actions": {
+      "createPersonalGoal": "Create Personal Goal",
+      "createTeamGoal": "Create Team Goal",
+      "viewAnalytics": "View Analytics",
+      "exportGoals": "Export Goals"
+    },
+    "status": {
+      "not_started": "Not Started",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "paused": "Paused",
+      "cancelled": "Cancelled"
+    },
+    "owner": "Owner",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "description": "Description",
+    "keyResults": "Key Results",
+    "addKeyResult": "Add Key Result",
+    "editGoal": "Edit Goal",
+    "deleteGoal": "Delete Goal",
+    "noGoals": "No goals yet",
+    "createFirstGoal": "Create your first goal",
     "allTypes": "All Types",
     "allStatus": "All Status",
     "allCategories": "All Categories",
-    "goalsCount": "{{count}} Goals",
-    "noGoalsYet": "No goals yet",
-    "createFirstGoal": "Create your first goal to get started",
-    "noMatchingGoals": "No matching goals",
-    "tryDifferentFilters": "Try adjusting your filters",
-    "milestones": "Milestones",
-    "due": "Due: {{date}}",
-    "startDate": "Start Date",
+    "milestonesCount": "{{completed}}/{{total}} Milestones",
+    "createdBy": "Created by: {{name}}",
+    "start": "Start: {{date}}",
+    "aiSuggestion": "Get AI-powered suggestions for goal setting and achievement strategies.",
+    "askAi": "Ask AI",
     "targetDate": "Target Date",
     "createdByLabel": "Created By",
     "categoryLabel": "Category",
     "tags": "Tags",
-    "status": {
-      "notStarted": "Not Started",
-      "inProgress": "In Progress",
-      "completed": "Completed",
-      "paused": "Paused",
-      "cancelled": "Cancelled",
-      "not_started": "Not Started",
-      "in_progress": "In Progress"
-    },
+    "overallProgress": "Overall Progress",
+    "completedDate": "Completed: {{date}}",
     "type": {
       "personal": "Personal",
       "team": "Team",
       "project": "Project",
       "company": "Company"
     },
-    "priority": {
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "urgent": "Urgent"
-    },
+    "create": "Create Goal",
+    "typeLabel": "Type",
     "category": {
       "productivity": "Productivity",
       "learning": "Learning",
@@ -3020,7 +2958,21 @@
       "career": "Career",
       "other": "Other"
     },
-    "completingIn": "completing in {{days}} days"
+    "sort": {
+      "due_date": "Due Date",
+      "created": "Created Date",
+      "progress": "Progress",
+      "priority": "Priority"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "noGoalsYet": "No goals yet",
+    "noMatchingGoals": "No matching goals",
+    "tryDifferentFilters": "Try adjusting filters to see more goals"
   },
   "buttons": {
     "save": "Save",
@@ -3064,7 +3016,9 @@
     "signIn": "Sign In",
     "logOut": "Log Out",
     "approve": "Approve",
-    "reject": "Reject"
+    "reject": "Reject",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "My Work",
@@ -3455,106 +3409,6 @@
     "allSeverities": "All Severities",
     "noEvents": "No events"
   },
-  "goals": {
-    "title": "Goals & Objectives",
-    "subtitle": "Track and manage personal and team goals",
-    "newGoal": "New Goal",
-    "searchPlaceholder": "Search goals...",
-    "totalGoals": "Total Goals",
-    "completed": "Completed",
-    "inProgress": "In Progress",
-    "notStarted": "Not Started",
-    "avgProgress": "Avg Progress",
-    "progress": "Progress",
-    "due": "Due: {{date}}",
-    "overdue": "Overdue",
-    "milestones": "Milestones",
-    "viewDetails": "View Details",
-    "goalsCount": "Goals ({{count}})",
-    "aiAssistant": "AI Goal Assistant",
-    "recentActivity": "Recent Activity",
-    "goalsByCategory": "Goals by Category",
-    "categories": {
-      "productivity": "Productivity",
-      "learning": "Learning",
-      "health": "Health",
-      "financial": "Financial",
-      "career": "Career",
-      "company": "Company",
-      "project": "Project",
-      "personal": "Personal",
-      "team": "Team"
-    },
-    "quickActions": "Quick Actions",
-    "actions": {
-      "createPersonalGoal": "Create Personal Goal",
-      "createTeamGoal": "Create Team Goal",
-      "viewAnalytics": "View Analytics",
-      "exportGoals": "Export Goals"
-    },
-    "status": {
-      "not_started": "Not Started",
-      "in_progress": "In Progress",
-      "completed": "Completed",
-      "paused": "Paused",
-      "cancelled": "Cancelled"
-    },
-    "owner": "Owner",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "description": "Description",
-    "keyResults": "Key Results",
-    "addKeyResult": "Add Key Result",
-    "editGoal": "Edit Goal",
-    "deleteGoal": "Delete Goal",
-    "noGoals": "No goals yet",
-    "createFirstGoal": "Create your first goal",
-    "allTypes": "All Types",
-    "allStatus": "All Status",
-    "allCategories": "All Categories",
-    "milestonesCount": "{{completed}}/{{total}} Milestones",
-    "createdBy": "Created by: {{name}}",
-    "start": "Start: {{date}}",
-    "aiSuggestion": "Get AI-powered suggestions for goal setting and achievement strategies.",
-    "askAi": "Ask AI",
-    "targetDate": "Target Date",
-    "createdByLabel": "Created By",
-    "categoryLabel": "Category",
-    "tags": "Tags",
-    "overallProgress": "Overall Progress",
-    "completedDate": "Completed: {{date}}",
-    "type": {
-      "personal": "Personal",
-      "team": "Team",
-      "project": "Project",
-      "company": "Company"
-    },
-    "create": "Create Goal",
-    "typeLabel": "Type",
-    "category": {
-      "productivity": "Productivity",
-      "learning": "Learning",
-      "health": "Health",
-      "financial": "Financial",
-      "career": "Career",
-      "other": "Other"
-    },
-    "sort": {
-      "due_date": "Due Date",
-      "created": "Created Date",
-      "progress": "Progress",
-      "priority": "Priority"
-    },
-    "priority": {
-      "urgent": "Urgent",
-      "high": "High",
-      "medium": "Medium",
-      "low": "Low"
-    },
-    "noGoalsYet": "No goals yet",
-    "noMatchingGoals": "No matching goals",
-    "tryDifferentFilters": "Try adjusting filters to see more goals"
-  },
   "notes": {
     "title": "Notes",
     "subtitle": "Capture and organize your thoughts",
@@ -3660,21 +3514,5 @@
       "rejected": "Rejected",
       "processed": "Already Processed"
     }
-  },
-  "connectedAccounts": {
-    "title": "Connected Accounts",
-    "subtitle": "Manage your integrated services",
-    "confirmDisconnect": "Are you sure you want to disconnect this account?",
-    "gmail": "Sartthi Mail",
-    "gmailDesc": "Connect your Gmail account",
-    "gcal": "Sartthi Calendar",
-    "gcalDesc": "Sync your calendar",
-    "gdrive": "Sartthi Vault",
-    "gdriveDesc": "Access your drive files",
-    "slackDesc": "Connect Slack workspace",
-    "githubDesc": "Connect GitHub repositories",
-    "dropboxDesc": "Sync Dropbox files",
-    "figmaDesc": "Connect Figma files",
-    "notionDesc": "Connect Notion workspace"
   }
 }

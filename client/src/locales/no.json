@@ -2341,7 +2341,9 @@
     "tryNow": "Try Now",
     "signUp": "Sign Up",
     "signIn": "Sign In",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "My Work",

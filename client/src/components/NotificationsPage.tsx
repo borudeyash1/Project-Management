@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDock } from '../context/DockContext';
 import { useApp } from '../context/AppContext';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import browserNotificationService from '../services/browserNotificationService';
 
 interface Notification {
   _id: string;
@@ -44,6 +45,22 @@ const NotificationsPage: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [selectedNotifications, setSelectedNotifications] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState<Set<string>>(new Set());
+  const [browserNotificationsEnabled, setBrowserNotificationsEnabled] = useState(false);
+
+  // Request browser notification permission on mount
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      const granted = await browserNotificationService.requestPermission();
+      setBrowserNotificationsEnabled(granted);
+      if (granted) {
+        console.log('✅ Browser notifications enabled');
+      } else {
+        console.log('❌ Browser notifications denied');
+      }
+    };
+    
+    requestNotificationPermission();
+  }, []);
 
   useEffect(() => {
     loadNotifications();
@@ -53,11 +70,25 @@ const NotificationsPage: React.FC = () => {
     applyFilters();
   }, [notifications, filter, typeFilter]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = async (showBrowserNotif = false) => {
     try {
       setLoading(true);
       const response = await apiService.get('/notifications');
       const notifs = (response as any)?.data || [];
+      
+      // Check for new unread notifications
+      if (showBrowserNotif && browserNotificationsEnabled) {
+        const newUnreadNotifs = notifs.filter((n: Notification) => !n.read);
+        const previousUnreadIds = new Set(notifications.filter(n => !n.read).map(n => n._id));
+        
+        // Show browser notification for truly new notifications
+        newUnreadNotifs.forEach((notif: Notification) => {
+          if (!previousUnreadIds.has(notif._id)) {
+            showBrowserNotification(notif);
+          }
+        });
+      }
+      
       setNotifications(notifs);
     } catch (error) {
       console.error('Failed to load notifications:', error);
@@ -65,6 +96,54 @@ const NotificationsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Show browser notification based on notification type
+  const showBrowserNotification = (notification: Notification) => {
+    const { type, title, message, metadata } = notification;
+
+    switch (type) {
+      case 'task_assigned':
+        if (metadata?.taskId) {
+          browserNotificationService.showTaskNotification(title, metadata.taskId);
+        } else {
+          browserNotificationService.showGenericNotification(title, message, notification._id);
+        }
+        break;
+      
+      case 'workspace_invite':
+      case 'workspace_invitation':
+        if (metadata?.workspaceId) {
+          browserNotificationService.showWorkspaceInviteNotification(
+            title,
+            metadata.workspaceId
+          );
+        } else {
+          browserNotificationService.showGenericNotification(title, message, notification._id);
+        }
+        break;
+      
+      case 'mention':
+      case 'comment':
+        browserNotificationService.showMentionNotification(
+          message,
+          type,
+          metadata?.taskId || metadata?.projectId || notification._id
+        );
+        break;
+      
+      default:
+        browserNotificationService.showGenericNotification(title, message, notification._id);
+    }
+  };
+
+  // Poll for new notifications every 30 seconds
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      loadNotifications(true); // Pass true to show browser notifications
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [notifications, browserNotificationsEnabled]);
 
   const applyFilters = () => {
     let filtered = [...notifications];
@@ -323,7 +402,7 @@ const NotificationsPage: React.FC = () => {
   const handleViewTask = (notification: Notification) => {
     const taskId = notification.metadata?.taskId;
     if (taskId) {
-      navigate(`/tasks?taskId=${taskId}`);
+      navigate(`/planner`);
     }
   };
 
@@ -570,7 +649,7 @@ const NotificationsPage: React.FC = () => {
       >
         <div className="flex items-center gap-3">
           <button
-            onClick={loadNotifications}
+            onClick={() => loadNotifications()}
             disabled={loading}
             className={`p-3 rounded-xl ${isDarkMode
               ? 'hover:bg-gray-700/50 text-gray-300 backdrop-blur-sm'

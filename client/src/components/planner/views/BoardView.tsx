@@ -84,14 +84,23 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
   const filteredTasks = (columnId: string) => {
     return tasks
       .filter(task => {
-        // Filter by user assignment
+        // Filter by user assignment OR creation
         if (currentUserId) {
           const isAssignedToMe = 
             task.assignee === currentUserId || 
             task.assignee?._id === currentUserId ||
             task.assignee?.toString() === currentUserId;
           
-          if (!isAssignedToMe) return false;
+          const isCreatedByMe =
+            task.reporter === currentUserId ||
+            task.reporter?._id === currentUserId ||
+            task.reporter?.toString() === currentUserId ||
+            (task as any).createdBy === currentUserId ||
+            (task as any).createdBy?._id === currentUserId ||
+            (task as any).createdBy?.toString() === currentUserId;
+          
+          // Show task if user is assignee OR creator
+          if (!isAssignedToMe && !isCreatedByMe) return false;
         }
 
         // Handle legacy statuses mapping to new columns

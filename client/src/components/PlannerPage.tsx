@@ -744,12 +744,34 @@ const PlannerPage: React.FC = () => {
                     </div>
                     <div className="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
                       {tasks.filter(t => t.status === status).map(task => (
-                        <GlassmorphicCard key={task._id} className="p-3 cursor-grab active:cursor-grabbing hover:translate-y-[-2px] transition-transform">
+                        <GlassmorphicCard 
+                          key={task._id} 
+                          className={`p-3 transition-transform ${
+                            task.project 
+                              ? 'opacity-60 cursor-not-allowed' 
+                              : 'cursor-grab active:cursor-grabbing hover:translate-y-[-2px]'
+                          }`}
+                        >
+                          {task.project && (
+                            <div className="mb-2 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded text-[10px] text-yellow-800 dark:text-yellow-300 flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                              </svg>
+                              Workspace Task - Read Only
+                            </div>
+                          )}
                           <div className="flex justify-between items-start mb-2">
                             <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold ${getPriorityColor(task.priority)}`}>
                               {task.priority}
                             </span>
-                            <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                            <button 
+                              className={`${task.project 
+                                ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed' 
+                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                              }`}
+                              disabled={!!task.project}
+                              title={task.project ? 'Cannot edit workspace tasks' : 'More options'}
+                            >
                               <MoreVertical className="w-4 h-4" />
                             </button>
                           </div>
@@ -800,8 +822,10 @@ const PlannerPage: React.FC = () => {
                         <tr key={task._id} className="hover:bg-gray-50/30 dark:hover:bg-gray-800/30 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <button
-                              onClick={() => toggleTaskStatus(task._id)}
-                              className="flex items-center gap-2"
+                              onClick={() => !task.project && toggleTaskStatus(task._id)}
+                              className={`flex items-center gap-2 ${task.project ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                              disabled={!!task.project}
+                              title={task.project ? 'Cannot update workspace task status' : 'Toggle status'}
                             >
                               {task.status === 'completed' ? (
                                 <CheckCircle className="w-5 h-5 text-green-500" />
@@ -835,7 +859,14 @@ const PlannerPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <div className="flex items-center gap-3">
-                              <button className="text-gray-400 hover:text-blue-600 transition-colors">
+                              <button 
+                                className={`transition-colors ${task.project 
+                                  ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' 
+                                  : 'text-gray-400 hover:text-blue-600'
+                                }`}
+                                disabled={!!task.project}
+                                title={task.project ? 'Cannot edit workspace tasks' : 'Edit task'}
+                              >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button className="text-gray-400 hover:text-red-600 transition-colors">
@@ -941,20 +972,26 @@ const PlannerPage: React.FC = () => {
                 {getTasksForDate(new Date()).slice(0, 5).map(task => (
                   <div
                     key={task._id}
-                    className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
+                    className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                      task.project ? 'opacity-60' : ''
+                    } ${isDarkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
                   >
                     <button
-                      onClick={() => toggleTaskStatus(task._id)}
-                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${task.status === 'completed'
-                        ? 'bg-green-500 border-green-500 text-white'
-                        : isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                        }`}
+                      onClick={() => !task.project && toggleTaskStatus(task._id)}
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                        task.status === 'completed'
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                      } ${task.project ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                      disabled={!!task.project}
+                      title={task.project ? 'Cannot update workspace task' : 'Toggle status'}
                     >
                       {task.status === 'completed' && <CheckCircle className="w-3 h-3" />}
                     </button>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm ${task.status === 'completed' ? `line-through ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}` : isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                         {task.title}
+                        {task.project && <span className="ml-1 text-[10px] text-yellow-600 dark:text-yellow-400">🔒</span>}
                       </p>
                       <div className="flex items-center gap-1 mt-1">
                         <span className={`inline-flex px-1.5 py-0.5 rounded text-xs font-medium ${getPriorityColor(task.priority)}`}>

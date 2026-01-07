@@ -504,158 +504,13 @@
     "actualSpent": "Gasto real"
   },
   "tasks": {
-    "title": "Tareas",
-    "newTask": "Nueva tarea",
-    "addTask": "Agregar tarea",
-    "myTasks": "Mis tareas",
-    "allTasks": "Todas las tareas",
-    "assignedToMe": "Asignadas a mí",
-    "createdByMe": "Creadas por mí",
-    "taskName": "Nombre de la tarea",
-    "taskDescription": "Descripción de la tarea",
-    "assignee": "Asignado",
-    "assignTo": "Asignar a",
-    "dueDate": "Fecha de vencimiento",
-    "priority": "Prioridad",
-    "status": "Estado",
-    "high": "Alta",
-    "medium": "Media",
-    "low": "Baja",
-    "urgent": "Urgente",
-    "todo": "Por hacer",
-    "inProgress": "En progreso",
-    "done": "Hecho",
-    "blocked": "Bloqueado",
-    "review": "Revisión",
-    "approved": "Aprobado",
-    "rejected": "Rechazado",
-    "overdue": "Vencido",
-    "today": "Hoy",
-    "tomorrow": "Mañana",
-    "thisWeek": "Esta semana",
-    "nextWeek": "Próxima semana",
-    "subtasks": "Subtareas",
-    "dependencies": "Dependencias",
-    "labels": "Etiquetas",
-    "checklist": "Lista de verificación",
-    "timeTracking": "Seguimiento de tiempo",
-    "estimatedTime": "Tiempo estimado",
-    "actualTime": "Tiempo real",
-    "startDate": "Fecha de inicio",
-    "startTime": "Hora de inicio",
-    "endTime": "Hora de finalización",
-    "filter": "Filtrar",
-    "search": "Buscar tarea...",
-    "daysLeft": "{{count}} días restantes",
-    "description": "Administra tareas en tus proyectos y espacios de trabajo.",
-    "newIdeasRequests": "Nuevas ideas/Solicitudes",
-    "allAssignees": "Todos los asignados",
-    "templates": "Plantillas de tareas",
-    "createTemplate": "Crear plantilla",
-    "useTemplate": "Usar plantilla",
-    "views": {
-      "list": "Lista",
-      "board": "Tablero",
-      "calendar": "Calendario",
-      "timeline": "Línea de tiempo",
-      "taskTimeline": "Línea de tiempo de tareas",
-      "kanban": "Kanban",
-      "analytics": "Análisis"
-    },
-    "subtitle": "Administra tareas a través de proyectos o espacio de trabajo",
-    "noTasksInStatus": "No hay tareas en este estado",
-    "dragOrCreate": "Arrastra tareas aquí o crea nuevas tareas",
-    "enterTitle": "Ingresar título de tarea",
-    "enterDescription": "Ingresar descripción de tarea",
-    "selectAssignee": "Seleccionar asignado",
-    "tagsPlaceholder": "Agregar etiquetas...",
-    "unassigned": "Sin asignar",
-    "noProject": "Sin proyecto",
-    "dropTasksHere": "Soltar tareas aquí",
-    "assigned": "Asignado",
-    "inProgressActive": "En progreso (Activo)",
-    "qaQc": "QA/QC",
-    "recentlyCompleted": "Recientemente completado",
-    "taskTimeline": "Línea de tiempo de tareas",
-    "scale": "Escala",
-    "day": "Día",
-    "week": "Semana",
-    "month": "Mes",
-    "currentTime": "Hora actual",
-    "completedTasks": "Tareas completadas",
-    "lastCompleted": "Último completado",
-    "quickActions": "Acciones rápidas",
-    "addManualNote": "Agregar nota manual",
-    "createCustomNote": "Crear nota personalizada",
-    "generateAINote": "Generar nota IA",
-    "aiPoweredAnalysis": "Análisis impulsado por IA",
-    "viewAnalytics": "Ver análisis",
-    "taskPerformanceInsights": "Perspectivas de rendimiento de tareas",
-    "lastTaskCompleted": "Última tarea completada",
-    "setStatus": "Establecer estado",
-    "backlog": "Backlog",
-    "noTasksIn": "No hay tareas en",
-    "reviewInternal": "Revisión (Interna)",
-    "checkComments": "Revisar comentarios",
-    "dragTasksHere": "Arrastra tareas aquí",
-    "qaClient": "QA (Cliente)",
-    "publication": "Publicación",
-    "activeTasks": "Tareas activas",
-    "created": "Creado",
-    "rules": "Reglas",
-    "fields": "Campos",
-    "templateList": {
-      "bugReport": {
-        "name": "Informe de error",
-        "description": "Informar y rastrear errores de software"
-      },
-      "featureRequest": {
-        "name": "Solicitud de función",
-        "description": "Solicitar nuevas funciones o mejoras"
-      },
-      "codeReview": {
-        "name": "Revisión de código",
-        "description": "Revisar cambios de código y proporcionar comentarios"
-      },
-      "designReview": {
-        "name": "Revisión de diseño",
-        "description": "Revisar maquetas y prototipos de diseño"
-      },
-      "testingTask": {
-        "name": "Tarea de prueba",
-        "description": "Crear tarea de prueba completa"
-      },
-      "documentation": {
-        "name": "Documentación",
-        "description": "Crear o actualizar documentación"
-      }
-    },
-    "categories": {
-      "development": "Desarrollo",
-      "product": "Producto",
-      "design": "Diseño",
-      "qa": "QA",
-      "general": "General"
-    },
-    "sections": {
-      "description": "Descripción",
-      "subtasks": "Subtareas",
-      "attachments": "Adjuntos",
-      "tags": "Etiquetas",
-      "comments": "Comentarios",
-      "activity": "Actividad",
-      "milestones": "Hitos"
-    },
-    "actions": {
-      "editTask": "Editar tarea",
-      "duplicateTask": "Duplicar tarea",
-      "deleteTask": "Eliminar tarea",
-      "addComment": "Agregar comentario",
-      "assignTask": "Asignar tarea",
-      "setDueDate": "Establecer fecha de vencimiento",
-      "setPriority": "Establecer prioridad",
-      "addSubtask": "Agregar subtarea"
-    }
+    "overdueBy": "Atrasado por {{days}} días",
+    "overdueBy_other": "Atrasado por {{days}} días",
+    "dueToday": "Vence hoy",
+    "dueTomorrow": "Vence mañana",
+    "dueInDays": "Vence en {{days}} días",
+    "taskName": "Tarea",
+    "assignedTo": "Asignado a"
   },
   "settings": {
     "title": "Configuración",
@@ -1428,17 +1283,15 @@
       "inbox": "Bandeja de entrada"
     },
     "detail": {
+      "notFoundTitle": "Espacio de trabajo no encontrado",
+      "backToWorkspaces": "Volver a espacios de trabajo",
       "tabs": {
-        "edit": "Editar",
+        "edit": "Editar espacio de trabajo",
         "collaborate": "Colaborar",
         "members": "Miembros",
         "clients": "Clientes",
-        "projects": "Proyectos",
-        "documents": "Documentos",
-        "attendance": "Asistencia"
+        "projects": "Proyectos"
       },
-      "notFoundTitle": "Espacio de trabajo no encontrado",
-      "backToWorkspaces": "Volver a espacios de trabajo",
       "noDescription": "Sin descripción"
     },
     "nav": {
@@ -1628,18 +1481,6 @@
       "members": "Miembros",
       "public": "Público",
       "private": "Privado"
-    },
-    "detail": {
-      "notFoundTitle": "Espacio de trabajo no encontrado",
-      "backToWorkspaces": "Volver a espacios de trabajo",
-      "tabs": {
-        "edit": "Editar espacio de trabajo",
-        "collaborate": "Colaborar",
-        "members": "Miembros",
-        "clients": "Clientes",
-        "projects": "Proyectos"
-      },
-      "noDescription": "Sin descripción"
     },
     "edit": {
       "infoTitle": "Información del espacio de trabajo",
@@ -2743,60 +2584,82 @@
     "newPassword": "Nueva contraseña",
     "confirmNewPassword": "Confirmar nueva contraseña"
   },
-  "tasks": {
-    "overdueBy": "Atrasado por {{days}} días",
-    "overdueBy_other": "Atrasado por {{days}} días",
-    "dueToday": "Vence hoy",
-    "dueTomorrow": "Vence mañana",
-    "dueInDays": "Vence en {{days}} días",
-    "taskName": "Tarea",
-    "assignedTo": "Asignado a"
-  },
   "goals": {
     "title": "Metas y Objetivos",
-    "subtitle": "Rastrear y lograr objetivos personales y de equipo",
-    "addGoal": "Agregar objetivo",
+    "subtitle": "Gestionar y rastrear objetivos personales y de equipo",
     "newGoal": "Nuevo objetivo",
+    "searchPlaceholder": "Buscar objetivos...",
     "totalGoals": "Total de objetivos",
     "completed": "Completado",
     "inProgress": "En progreso",
-    "searchPlaceholder": "Buscar objetivos...",
+    "notStarted": "No iniciado",
+    "avgProgress": "Progreso promedio",
+    "progress": "Progreso",
+    "due": "Vencimiento: {{date}}",
+    "overdue": "Atrasado",
+    "milestones": "Hitos",
+    "viewDetails": "Ver detalles",
+    "goalsCount": "Objetivos ({{count}})",
+    "aiAssistant": "Asistente de objetivos IA",
+    "recentActivity": "Actividad reciente",
+    "goalsByCategory": "Objetivos por categoría",
+    "categories": {
+      "productivity": "Productividad",
+      "learning": "Aprendizaje",
+      "health": "Salud",
+      "financial": "Financiero",
+      "career": "Carrera",
+      "company": "Empresa",
+      "project": "Proyecto",
+      "personal": "Personal",
+      "team": "Equipo"
+    },
+    "quickActions": "Acciones rápidas",
+    "actions": {
+      "createPersonalGoal": "Crear objetivo personal",
+      "createTeamGoal": "Crear objetivo de equipo",
+      "viewAnalytics": "Ver análisis",
+      "exportGoals": "Exportar objetivos"
+    },
+    "status": {
+      "not_started": "No iniciado",
+      "in_progress": "En progreso",
+      "completed": "Completado",
+      "paused": "Pausado",
+      "cancelled": "Cancelado"
+    },
+    "owner": "Propietario",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de finalización",
+    "description": "Descripción",
+    "keyResults": "Resultados clave",
+    "addKeyResult": "Agregar resultado clave",
+    "editGoal": "Editar objetivo",
+    "deleteGoal": "Eliminar objetivo",
+    "noGoals": "Aún no hay objetivos",
+    "createFirstGoal": "Crear el primer objetivo",
     "allTypes": "Todos los tipos",
     "allStatus": "Todos los estados",
     "allCategories": "Todas las categorías",
-    "goalsCount": "{{count}} objetivos",
-    "noGoalsYet": "Aún no hay objetivos",
-    "createFirstGoal": "Cree su primer objetivo para comenzar",
-    "noMatchingGoals": "No hay objetivos coincidentes",
-    "tryDifferentFilters": "Pruebe diferentes filtros",
-    "milestones": "Hitos",
-    "due": "Vencimiento: {{date}}",
-    "startDate": "Fecha de inicio",
+    "milestonesCount": "{{completed}}/{{total}} Hitos",
+    "createdBy": "Creado por: {{name}}",
+    "start": "Inicio: {{date}}",
+    "aiSuggestion": "Obtenga sugerencias de IA para el establecimiento de objetivos y estrategias de logro.",
+    "askAi": "Preguntar a la IA",
     "targetDate": "Fecha objetivo",
     "createdByLabel": "Creado por",
     "categoryLabel": "Categoría",
     "tags": "Etiquetas",
-    "status": {
-      "notStarted": "No iniciado",
-      "inProgress": "En progreso",
-      "completed": "Completado",
-      "paused": "Pausado",
-      "cancelled": "Cancelado",
-      "not_started": "No iniciado",
-      "in_progress": "En progreso"
-    },
+    "overallProgress": "Progreso general",
+    "completedDate": "Completado el: {{date}}",
     "type": {
       "personal": "Personal",
       "team": "Equipo",
       "project": "Proyecto",
       "company": "Empresa"
     },
-    "priority": {
-      "low": "Baja",
-      "medium": "Media",
-      "high": "Alta",
-      "urgent": "Urgente"
-    },
+    "create": "Crear objetivo",
+    "typeLabel": "Tipo",
     "category": {
       "productivity": "Productividad",
       "learning": "Aprendizaje",
@@ -2805,7 +2668,21 @@
       "career": "Carrera",
       "other": "Otro"
     },
-    "completingIn": "Se completa en {{days}} días"
+    "sort": {
+      "due_date": "Fecha de vencimiento",
+      "created": "Fecha de creación",
+      "progress": "Progreso",
+      "priority": "Prioridad"
+    },
+    "priority": {
+      "urgent": "Urgente",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "noGoalsYet": "Aún no hay objetivos",
+    "noMatchingGoals": "No hay objetivos coincidentes",
+    "tryDifferentFilters": "Intente ajustar los filtros para ver más objetivos"
   },
   "buttons": {
     "save": "Guardar",
@@ -2847,7 +2724,9 @@
     "tryNow": "Probar ahora",
     "signUp": "Registrarse",
     "signIn": "Iniciar sesión",
-    "logOut": "Cerrar sesión"
+    "logOut": "Cerrar sesión",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "Mi trabajo",
@@ -3235,106 +3114,6 @@
     "severity": "Gravedad",
     "allSeverities": "Todas las gravedades",
     "noEvents": "No hay eventos"
-  },
-  "goals": {
-    "title": "Metas y Objetivos",
-    "subtitle": "Gestionar y rastrear objetivos personales y de equipo",
-    "newGoal": "Nuevo objetivo",
-    "searchPlaceholder": "Buscar objetivos...",
-    "totalGoals": "Total de objetivos",
-    "completed": "Completado",
-    "inProgress": "En progreso",
-    "notStarted": "No iniciado",
-    "avgProgress": "Progreso promedio",
-    "progress": "Progreso",
-    "due": "Vencimiento: {{date}}",
-    "overdue": "Atrasado",
-    "milestones": "Hitos",
-    "viewDetails": "Ver detalles",
-    "goalsCount": "Objetivos ({{count}})",
-    "aiAssistant": "Asistente de objetivos IA",
-    "recentActivity": "Actividad reciente",
-    "goalsByCategory": "Objetivos por categoría",
-    "categories": {
-      "productivity": "Productividad",
-      "learning": "Aprendizaje",
-      "health": "Salud",
-      "financial": "Financiero",
-      "career": "Carrera",
-      "company": "Empresa",
-      "project": "Proyecto",
-      "personal": "Personal",
-      "team": "Equipo"
-    },
-    "quickActions": "Acciones rápidas",
-    "actions": {
-      "createPersonalGoal": "Crear objetivo personal",
-      "createTeamGoal": "Crear objetivo de equipo",
-      "viewAnalytics": "Ver análisis",
-      "exportGoals": "Exportar objetivos"
-    },
-    "status": {
-      "not_started": "No iniciado",
-      "in_progress": "En progreso",
-      "completed": "Completado",
-      "paused": "Pausado",
-      "cancelled": "Cancelado"
-    },
-    "owner": "Propietario",
-    "startDate": "Fecha de inicio",
-    "endDate": "Fecha de finalización",
-    "description": "Descripción",
-    "keyResults": "Resultados clave",
-    "addKeyResult": "Agregar resultado clave",
-    "editGoal": "Editar objetivo",
-    "deleteGoal": "Eliminar objetivo",
-    "noGoals": "Aún no hay objetivos",
-    "createFirstGoal": "Crear el primer objetivo",
-    "allTypes": "Todos los tipos",
-    "allStatus": "Todos los estados",
-    "allCategories": "Todas las categorías",
-    "milestonesCount": "{{completed}}/{{total}} Hitos",
-    "createdBy": "Creado por: {{name}}",
-    "start": "Inicio: {{date}}",
-    "aiSuggestion": "Obtenga sugerencias de IA para el establecimiento de objetivos y estrategias de logro.",
-    "askAi": "Preguntar a la IA",
-    "targetDate": "Fecha objetivo",
-    "createdByLabel": "Creado por",
-    "categoryLabel": "Categoría",
-    "tags": "Etiquetas",
-    "overallProgress": "Progreso general",
-    "completedDate": "Completado el: {{date}}",
-    "type": {
-      "personal": "Personal",
-      "team": "Equipo",
-      "project": "Proyecto",
-      "company": "Empresa"
-    },
-    "create": "Crear objetivo",
-    "typeLabel": "Tipo",
-    "category": {
-      "productivity": "Productividad",
-      "learning": "Aprendizaje",
-      "health": "Salud",
-      "financial": "Financiero",
-      "career": "Carrera",
-      "other": "Otro"
-    },
-    "sort": {
-      "due_date": "Fecha de vencimiento",
-      "created": "Fecha de creación",
-      "progress": "Progreso",
-      "priority": "Prioridad"
-    },
-    "priority": {
-      "urgent": "Urgente",
-      "high": "Alta",
-      "medium": "Media",
-      "low": "Baja"
-    },
-    "noGoalsYet": "Aún no hay objetivos",
-    "noMatchingGoals": "No hay objetivos coincidentes",
-    "tryDifferentFilters": "Intente ajustar los filtros para ver más objetivos"
   },
   "notes": {
     "title": "Notas",

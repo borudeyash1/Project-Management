@@ -2284,7 +2284,9 @@
     "tryNow": "Kokeile nyt",
     "signUp": "Rekisteröidy",
     "signIn": "Kirjaudu sisään",
-    "logOut": "Kirjaudu ulos"
+    "logOut": "Kirjaudu ulos",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "Omat työt",

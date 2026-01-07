@@ -812,8 +812,6 @@ const ProjectViewDetailed: React.FC = () => {
 
       await apiService.put(`/tasks/${taskId}/reassign`, { assignedTo: newAssigneeId });
 
-      // Task list will refresh on next component mount
-
       dispatch({
         type: 'ADD_TOAST',
         payload: {

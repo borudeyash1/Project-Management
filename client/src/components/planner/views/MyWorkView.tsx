@@ -26,7 +26,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
 
   const currentUserId = state.userProfile?._id;
 
-  // Filter tasks to show only those assigned to the current user
+  // Filter tasks to show only those assigned to or created by the current user
   const myTasks = tasks.filter(task => {
     // If no user is logged in, show no tasks
     if (!currentUserId) return false;
@@ -38,8 +38,16 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       task.assignee?._id === currentUserId ||
       task.assignee?.toString() === currentUserId;
     
+    const isCreatedByMe =
+      task.reporter === currentUserId ||
+      task.reporter?._id === currentUserId ||
+      task.reporter?.toString() === currentUserId ||
+      (task as any).createdBy === currentUserId ||
+      (task as any).createdBy?._id === currentUserId ||
+      (task as any).createdBy?.toString() === currentUserId;
+    
     return (
-      isAssignedToMe &&
+      (isAssignedToMe || isCreatedByMe) &&
       task.status !== 'done' &&
       task.status !== 'completed' &&
       (!searchQuery ||

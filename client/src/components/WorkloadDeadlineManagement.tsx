@@ -172,6 +172,86 @@ const WorkloadDeadlineManagement: React.FC = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [showCreateRequest, setShowCreateRequest] = useState(false);
   const [requestType, setRequestType] = useState<'workload' | 'deadline'>('workload');
+  
+  // State for real data from API
+  const [workloadRequests, setWorkloadRequests] = useState<WorkloadRequest[]>([]);
+  const [deadlineExtensionRequests, setDeadlineExtensionRequests] = useState<DeadlineExtensionRequest[]>([]);
+
+  // Load requests from API
+  useEffect(() => {
+    loadRequests();
+  }, [state.currentProject]);
+
+  const loadRequests = async () => {
+    if (!state.currentProject) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/projects/${state.currentProject}/requests`);
+      const data = await response.json();
+      
+      if (data.success) {
+        const requests = data.data || [];
+        
+        // Separate workload and deadline requests - match database type values
+        const workload: WorkloadRequest[] = requests
+          .filter((r: any) => r.type === 'workload-reduction' || r.type === 'workload-increase')
+          .map((r: any) => ({
+            _id: r._id,
+            employeeId: r.requestedBy?._id || r.requestedBy,
+            employeeName: r.requestedBy?.fullName || 'Unknown',
+            employeeEmail: r.requestedBy?.email || '',
+            employeeAvatar: r.requestedBy?.avatar || '',
+            role: r.requestedBy?.role || 'Employee',
+            taskId: r.taskId?._id || r.taskId || '',
+            taskTitle: r.taskId?.title || r.taskName || 'N/A',
+            projectId: state.currentProject,
+            projectName: state.projects.find(p => p._id === state.currentProject)?.name || 'Current Project',
+            currentWorkload: r.currentWorkload || 0,
+            requestedWorkload: r.requestedWorkload || 0,
+            reason: r.reason || '',
+            status: r.status || 'pending',
+            submittedAt: new Date(r.createdAt),
+            reviewedAt: r.reviewedAt ? new Date(r.reviewedAt) : undefined,
+            reviewedBy: r.reviewedBy?.fullName || r.reviewedBy,
+            comments: r.comments || '',
+            attachments: []
+          }));
+        
+        const deadline: DeadlineExtensionRequest[] = requests
+          .filter((r: any) => r.type === 'deadline-extension')
+          .map((r: any) => ({
+            _id: r._id,
+            employeeId: r.requestedBy?._id || r.requestedBy,
+            employeeName: r.requestedBy?.fullName || 'Unknown',
+            employeeEmail: r.requestedBy?.email || '',
+            employeeAvatar: r.requestedBy?.avatar || '',
+            role: r.requestedBy?.role || 'Employee',
+            taskId: r.taskId?._id || r.taskId || '',
+            taskTitle: r.taskId?.title || r.taskName || 'N/A',
+            projectId: state.currentProject,
+            projectName: state.projects.find(p => p._id === state.currentProject)?.name || 'Current Project',
+            currentDeadline: new Date(r.currentDeadline),
+            requestedDeadline: new Date(r.requestedDeadline),
+            reason: r.reason || '',
+            status: r.status || 'pending',
+            submittedAt: new Date(r.createdAt),
+            reviewedAt: r.reviewedAt ? new Date(r.reviewedAt) : undefined,
+            reviewedBy: r.reviewedBy?.fullName || r.reviewedBy,
+            comments: r.comments || '',
+            attachments: []
+          }));
+        
+        setWorkloadRequests(workload);
+        setDeadlineExtensionRequests(deadline);
+      }
+    } catch (error) {
+      console.error('Failed to load requests:', error);
+      showMessage('error', 'Failed to load requests');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Utility functions
   const showMessage = (type: 'success' | 'error' | 'info', text: string) => {
@@ -182,11 +262,23 @@ const WorkloadDeadlineManagement: React.FC = () => {
   const handleRequestAction = async (requestId: string, action: 'approve' | 'reject', comments?: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      showMessage('success', `Request ${action}d successfully!`);
-      setShowRequestModal(false);
-      setSelectedRequest(null);
+      const endpoint = action === 'approve' ? 'approve' : 'reject';
+      const response = await fetch(`/api/projects/${state.currentProject}/requests/${requestId}/${endpoint}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comments })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showMessage('success', `Request ${action}d successfully!`);
+        setShowRequestModal(false);
+        setSelectedRequest(null);
+        loadRequests(); // Reload requests
+      } else {
+        showMessage('error', data.message || `Failed to ${action} request`);
+      }
     } catch (error) {
       showMessage('error', `Failed to ${action} request. Please try again.`);
     } finally {
@@ -236,110 +328,6 @@ const WorkloadDeadlineManagement: React.FC = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
-  const workloadRequests: WorkloadRequest[] = [
-    {
-      _id: 'wr1',
-      employeeId: 'u1',
-      employeeName: 'John Doe',
-      employeeEmail: 'john@example.com',
-      employeeAvatar: '',
-      role: 'UI/UX Designer',
-      taskId: 't1',
-      taskTitle: 'UI Design Implementation',
-      projectId: 'p1',
-      projectName: 'E-commerce Platform',
-      currentWorkload: 8,
-      requestedWorkload: 5,
-      reason: 'Current workload is too high, need to reduce tasks to maintain quality.',
-      status: 'pending',
-      submittedAt: new Date('2024-03-15'),
-      attachments: []
-    },
-    {
-      _id: 'wr2',
-      employeeId: 'u2',
-      employeeName: 'Jane Smith',
-      employeeEmail: 'jane@example.com',
-      employeeAvatar: '',
-      role: 'Backend Developer',
-      taskId: 't2',
-      taskTitle: 'Backend API Development',
-      projectId: 'p1',
-      projectName: 'E-commerce Platform',
-      currentWorkload: 6,
-      requestedWorkload: 8,
-      reason: 'I have capacity to take on more tasks to help with project delivery.',
-      status: 'approved',
-      submittedAt: new Date('2024-03-14'),
-      reviewedAt: new Date('2024-03-15'),
-      reviewedBy: 'Mike Johnson',
-      comments: 'Approved. Will redistribute tasks to other team members.',
-      attachments: []
-    },
-    {
-      _id: 'wr3',
-      employeeId: 'u3',
-      employeeName: 'Bob Wilson',
-      employeeEmail: 'bob@example.com',
-      employeeAvatar: '',
-      role: 'QA Engineer',
-      taskId: 't3',
-      taskTitle: 'Mobile App Testing',
-      projectId: 'p2',
-      projectName: 'Mobile App',
-      currentWorkload: 7,
-      requestedWorkload: 4,
-      reason: 'Testing workload is overwhelming, need to reduce to ensure thorough testing.',
-      status: 'rejected',
-      submittedAt: new Date('2024-03-13'),
-      reviewedAt: new Date('2024-03-14'),
-      reviewedBy: 'Mike Johnson',
-      comments: 'Rejected. Testing timeline cannot be extended further.',
-      attachments: []
-    }
-  ];
-
-  const deadlineExtensionRequests: DeadlineExtensionRequest[] = [
-    {
-      _id: 'der1',
-      employeeId: 'u1',
-      employeeName: 'John Doe',
-      employeeEmail: 'john@example.com',
-      employeeAvatar: '',
-      role: 'UI/UX Designer',
-      taskId: 't1',
-      taskTitle: 'UI Design Implementation',
-      projectId: 'p1',
-      projectName: 'E-commerce Platform',
-      currentDeadline: new Date('2024-03-20'),
-      requestedDeadline: new Date('2024-03-25'),
-      reason: 'Additional design revisions requested by client, need extra time.',
-      status: 'pending',
-      submittedAt: new Date('2024-03-15'),
-      attachments: []
-    },
-    {
-      _id: 'der2',
-      employeeId: 'u2',
-      employeeName: 'Jane Smith',
-      employeeEmail: 'jane@example.com',
-      employeeAvatar: '',
-      role: 'Backend Developer',
-      taskId: 't2',
-      taskTitle: 'Backend API Development',
-      projectId: 'p1',
-      projectName: 'E-commerce Platform',
-      currentDeadline: new Date('2024-03-18'),
-      requestedDeadline: new Date('2024-03-22'),
-      reason: 'Integration with third-party service is taking longer than expected.',
-      status: 'approved',
-      submittedAt: new Date('2024-03-14'),
-      reviewedAt: new Date('2024-03-15'),
-      reviewedBy: 'Mike Johnson',
-      comments: 'Approved. Third-party integration delays are understandable.',
-      attachments: []
-    }
-  ];
 
   const employeeWorkloads: EmployeeWorkload[] = [
     {

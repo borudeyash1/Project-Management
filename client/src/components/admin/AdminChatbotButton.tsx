@@ -12,7 +12,7 @@ const AdminChatbotButton: React.FC<AdminChatbotButtonProps> = ({ pageContext }) 
   return (
     <>
       {/* Floating Admin Chatbot Button */}
-      <div className="fixed bottom-24 right-6 z-40">
+      <div className="fixed bottom-20 right-28 z-40">
         <button
           onClick={() => setIsOpen(true)}
           className="group relative w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-300"

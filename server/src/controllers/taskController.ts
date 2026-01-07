@@ -11,6 +11,16 @@ import { notifySlackForTask, notifySlackTaskCompleted, notifySlackTaskUpdated } 
 import User from '../models/User';
 import jiraService from '../services/jiraService';
 import JiraIssue from '../models/JiraIssue';
+import {
+  notifyTaskAssigned,
+  notifyTaskReassigned,
+  notifyTaskStatusChanged,
+  notifyTaskPriorityChanged,
+  notifyTaskDeadlineChanged,
+  notifyTaskCompleted,
+  notifyTaskVerified,
+  notifyTaskDeleted,
+} from '../utils/notificationUtils';
 
 // GET /api/tasks?projectId=...&status=...&priority=...
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
@@ -179,6 +189,15 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       'Task',
       String(task._id)
     );
+
+    // Send notification to assignee if task is assigned
+    if (assignee) {
+      await notifyTaskAssigned(
+        String(task._id),
+        assignee,
+        authUser._id.toString()
+      );
+    }
 
     // Sartthi Integration: Calendar Sync
     const calendarService = getCalendarService();
@@ -417,6 +436,12 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       verifiedAt,
     } = req.body;
 
+    // Store old values for notifications
+    const oldStatus = task.status as string;
+    const oldPriority = task.priority as string;
+    const oldDueDate = task.dueDate as Date | undefined;
+    const oldAssignee = task.assignee;
+
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
     if (assignee !== undefined) task.assignee = assignee || undefined;
@@ -440,8 +465,41 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     if (verifiedBy !== undefined) task.verifiedBy = verifiedBy;
     if (verifiedAt !== undefined) task.verifiedAt = verifiedAt ? new Date(verifiedAt) : undefined;
 
-    const oldStatus = task.status;
     await task.save();
+
+    // Send notifications for changes
+    const taskId = String(task._id);
+    const userId = authUser._id.toString();
+
+    // Notify status change
+    if (status !== undefined && oldStatus !== status) {
+      await notifyTaskStatusChanged(taskId, oldStatus, status as string, userId);
+    }
+
+    // Notify priority change
+    if (priority !== undefined && oldPriority !== priority) {
+      await notifyTaskPriorityChanged(taskId, oldPriority, priority as string, userId);
+    }
+
+    // Notify deadline change
+    if (dueDate !== undefined && oldDueDate?.getTime() !== (task.dueDate as Date | undefined)?.getTime()) {
+      await notifyTaskDeadlineChanged(taskId, oldDueDate, task.dueDate as Date | undefined, userId);
+    }
+
+    // Notify assignee change (reassignment)
+    if (assignee !== undefined && oldAssignee?.toString() !== task.assignee?.toString()) {
+      await notifyTaskReassigned(
+        taskId,
+        oldAssignee?.toString(),
+        task.assignee?.toString() || '',
+        userId
+      );
+    }
+
+    // Notify verification
+    if (verifiedBy !== undefined && task.status === 'verified') {
+      await notifyTaskVerified(taskId, userId);
+    }
 
     // Sync status change to Notion if task is synced
     if (status !== undefined && (task as any).notionSync?.pageId) {
@@ -609,7 +667,16 @@ export const deleteTask = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
+    // Store task info before deletion for notification
+    const taskTitle: string = task.title as string;
+    const assigneeId = task.assignee?.toString();
+
     await task.deleteOne();
+
+    // Send notification to assignee if task was assigned
+    if (assigneeId) {
+      await notifyTaskDeleted(taskTitle, assigneeId, authUser._id.toString());
+    }
 
     const response: ApiResponse = {
       success: true,
@@ -647,9 +714,12 @@ export const reassignTask = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const oldAssignee = task.assignedTo;
-    task.assignedTo = assignedTo;
+    const oldAssignee = task.assignee;
+    task.assignee = assignedTo;
     await task.save();
+
+    // Populate the assignee field to return full user details
+    await task.populate('assignee', 'fullName email avatarUrl');
 
     // Create activity for task reassignment
     await createActivity(
@@ -659,7 +729,16 @@ export const reassignTask = async (req: Request, res: Response): Promise<void> =
       task.project?.toString() || ''
     );
 
-    console.log('✅ [REASSIGN TASK] Task reassigned successfully');
+    // Send notification to new assignee
+    const mailService = getMailService();
+    if (mailService && task.assignee) {
+      const assigneeUser = await User.findById(task.assignee);
+      if (assigneeUser && assigneeUser.email) {
+        await mailService.sendTaskAssignmentNotification(task, assigneeUser.email);
+      }
+    }
+
+    console.log('✅ [REASSIGN TASK] Task reassigned successfully from', oldAssignee, 'to', assignedTo);
 
     const response: ApiResponse = {
       success: true,

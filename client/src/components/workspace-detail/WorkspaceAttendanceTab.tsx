@@ -255,28 +255,95 @@ const WorkspaceAttendanceTab: React.FC<WorkspaceAttendanceTabProps> = ({ workspa
       {/* Content based on mode */}
       {mode === 'automatic' ? (
         <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl p-12">
-          <div className="text-center max-w-2xl mx-auto">
-            <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Clock className="w-10 h-10 text-accent-dark" />
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-yellow-600 dark:text-yellow-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              {t('workspace.attendance.comingSoon.title') || 'Automatic Attendance - Coming Soon'}
+            <h3 className="text-3xl font-bold text-yellow-600 dark:text-yellow-500 mb-8">
+              Coming Soon
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {t('workspace.attendance.comingSoon.description') || 'Automatic attendance tracking with face recognition and location verification is currently under development. This feature will allow employees to mark their attendance automatically during configured time windows.'}
-            </p>
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">
-                {t('workspace.attendance.comingSoon.note') || '📌 For now, please use the Manual Attendance tab to mark attendance for your team members.'}
-              </p>
+
+            {/* Features List */}
+            <div className="text-left space-y-6 mt-8">
+              <h4 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Automatic Attendance Features:
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Feature 1 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Face Recognition</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">AI-powered facial verification for secure attendance marking</p>
+                  </div>
+                </div>
+
+                {/* Feature 2 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Location Verification</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">GPS-based location tracking to ensure on-site attendance</p>
+                  </div>
+                </div>
+
+                {/* Feature 3 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Configurable Time Windows</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Set custom check-in/check-out times with grace periods</p>
+                  </div>
+                </div>
+
+                {/* Feature 4 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Real-time Notifications</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Instant alerts for late arrivals and absences</p>
+                  </div>
+                </div>
+
+                {/* Feature 5 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Automated Reports</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Generate detailed attendance reports automatically</p>
+                  </div>
+                </div>
+
+                {/* Feature 6 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Work From Home Support</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Flexible attendance marking for remote employees</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Note */}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-300 font-medium text-center">
+                  📌 For now, please use the Manual Attendance tab to mark attendance for your team members.
+                </p>
+              </div>
             </div>
-            <button
-              onClick={() => setMode('manual')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover transition-colors font-semibold"
-            >
-              {t('workspace.attendance.comingSoon.switchToManual') || 'Switch to Manual Attendance'}
-              <ArrowRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       ) : (

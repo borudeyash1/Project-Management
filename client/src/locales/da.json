@@ -504,158 +504,13 @@
     "actualSpent": "Faktisk forbrug"
   },
   "tasks": {
-    "title": "Opgaver",
-    "newTask": "Ny opgave",
-    "addTask": "Tilføj opgave",
-    "myTasks": "Mine opgaver",
-    "allTasks": "Alle opgaver",
-    "assignedToMe": "Tildelt til mig",
-    "createdByMe": "Oprettet af mig",
-    "taskName": "Opgavenavn",
-    "taskDescription": "Opgavebeskrivelse",
-    "assignee": "Ansvarlig",
-    "assignTo": "Tildel til",
-    "dueDate": "Forfaldsdato",
-    "priority": "Prioritet",
-    "status": "Status",
-    "high": "Høj",
-    "medium": "Mellem",
-    "low": "Lav",
-    "urgent": "Haster",
-    "todo": "At gøre",
-    "inProgress": "I gang",
-    "done": "Færdig",
-    "blocked": "Blokeret",
-    "review": "Gennemgang",
-    "approved": "Godkendt",
-    "rejected": "Afvist",
-    "overdue": "Overskredet",
-    "today": "I dag",
-    "tomorrow": "I morgen",
-    "thisWeek": "Denne uge",
-    "nextWeek": "Næste uge",
-    "subtasks": "Underopgaver",
-    "dependencies": "Afhængigheder",
-    "labels": "Etiketter",
-    "checklist": "Tjekliste",
-    "timeTracking": "Tidsregistrering",
-    "estimatedTime": "Estimeret tid",
-    "actualTime": "Faktisk tid",
-    "startDate": "Startdato",
-    "startTime": "Starttid",
-    "endTime": "Sluttid",
-    "filter": "Filter",
-    "search": "Søg opgaver...",
-    "daysLeft": "{{count}} dage tilbage",
-    "description": "Administrer opgaver på tværs af dine projekter og arbejdsområder.",
-    "newIdeasRequests": "Nye ideer/anmodninger",
-    "allAssignees": "Alle ansvarlige",
-    "templates": "Opgaveskabeloner",
-    "createTemplate": "Opret skabelon",
-    "useTemplate": "Brug skabelon",
-    "views": {
-      "list": "Liste",
-      "board": "Tavle",
-      "calendar": "Kalender",
-      "timeline": "Tidslinje",
-      "taskTimeline": "Opgave tidslinje",
-      "kanban": "Kanban",
-      "analytics": "Analyse"
-    },
-    "subtitle": "Administrer opgaver på tværs af dine projekter og arbejdsområder",
-    "noTasksInStatus": "Ingen opgaver med denne status",
-    "dragOrCreate": "Træk opgaver hertil eller opret en ny",
-    "enterTitle": "Indtast opgavetitel",
-    "enterDescription": "Indtast opgavebeskrivelse",
-    "selectAssignee": "Vælg ansvarlig",
-    "tagsPlaceholder": "Tilføj tags...",
-    "unassigned": "Ikke tildelt",
-    "noProject": "Intet projekt",
-    "dropTasksHere": "Slip opgaver her",
-    "assigned": "Tildelt",
-    "inProgressActive": "I gang (Aktiv)",
-    "qaQc": "QA/QC",
-    "recentlyCompleted": "Nyligt afsluttet",
-    "taskTimeline": "Opgave tidslinje",
-    "scale": "Skala",
-    "day": "Dag",
-    "week": "Uge",
-    "month": "Måned",
-    "currentTime": "Aktuel tid",
-    "completedTasks": "Fuldførte opgaver",
-    "lastCompleted": "Sidst afsluttet",
-    "quickActions": "Hurtige handlinger",
-    "addManualNote": "Tilføj manuel note",
-    "createCustomNote": "Opret brugerdefineret note",
-    "generateAINote": "Generer AI-note",
-    "aiPoweredAnalysis": "AI-drevet analyse",
-    "viewAnalytics": "Se analyse",
-    "taskPerformanceInsights": "Indsigter i opgaveydeevne",
-    "lastTaskCompleted": "Sidste opgave fuldført",
-    "setStatus": "Sæt status",
-    "backlog": "Backlog",
-    "noTasksIn": "Ingen opgaver i",
-    "reviewInternal": "Gennemgang (Intern)",
-    "checkComments": "Tjek kommentarer",
-    "dragTasksHere": "Træk opgaver hertil",
-    "qaClient": "QA (Kunde)",
-    "publication": "Udgivelse",
-    "activeTasks": "Aktive opgaver",
-    "created": "Oprettet den",
-    "rules": "Regler",
-    "fields": "Felter",
-    "templateList": {
-      "bugReport": {
-        "name": "Fejlrapport",
-        "description": "Rapporter og spor softwarefejl"
-      },
-      "featureRequest": {
-        "name": "Funktionsanmodning",
-        "description": "Anmod om nye funktioner eller forbedringer"
-      },
-      "codeReview": {
-        "name": "Kogegennemgang",
-        "description": "Gennemgå kodeændringer og giv feedback"
-      },
-      "designReview": {
-        "name": "Designgennemgang",
-        "description": "Gennemgå designudkast og prototyper"
-      },
-      "testingTask": {
-        "name": "Testopgave",
-        "description": "Opret omfattende testopgaver"
-      },
-      "documentation": {
-        "name": "Dokumentation",
-        "description": "Opret eller opdater dokumentation"
-      }
-    },
-    "categories": {
-      "development": "Udvikling",
-      "product": "Produkt",
-      "design": "Design",
-      "qa": "QA",
-      "general": "Generelt"
-    },
-    "sections": {
-      "description": "Beskrivelse",
-      "subtasks": "Underopgaver",
-      "attachments": "Vedhæftninger",
-      "tags": "Tags",
-      "comments": "Kommentarer",
-      "activity": "Aktivitet",
-      "milestones": "Milepæle"
-    },
-    "actions": {
-      "editTask": "Rediger opgave",
-      "duplicateTask": "Dupliker opgave",
-      "deleteTask": "Slet opgave",
-      "addComment": "Tilføj kommentar",
-      "assignTask": "Tildel opgave",
-      "setDueDate": "Sæt forfaldsdato",
-      "setPriority": "Sæt prioritet",
-      "addSubtask": "Tilføj underopgave"
-    }
+    "overdueBy": "{{days}} dage overskredet",
+    "overdueBy_other": "{{days}} dage overskredet",
+    "dueToday": "Deadline i dag",
+    "dueTomorrow": "Deadline i morgen",
+    "dueInDays": "Deadline om {{days}} dage",
+    "taskName": "Opgave",
+    "assignedTo": "Tildelt til"
   },
   "settings": {
     "title": "Indstillinger",
@@ -1428,18 +1283,16 @@
       "inbox": "Indbakke"
     },
     "detail": {
+      "notFoundTitle": "Arbejdsområde ikke fundet",
+      "backToWorkspaces": "Tilbage til arbejdsområder",
       "tabs": {
-        "edit": "Rediger",
+        "edit": "Rediger arbejdsområde",
         "collaborate": "Samarbejd",
         "members": "Medlemmer",
         "clients": "Kunder",
-        "projects": "Projekter",
-        "documents": "Dokumenter",
-        "attendance": "Fremmøde"
+        "projects": "Projekter"
       },
-      "notFoundTitle": "Arbejdsområde ikke fundet",
-      "backToWorkspaces": "Tilbage til arbejdsområder",
-      "noDescription": "Ingen beskrivelse tilgængelig"
+      "noDescription": "Ingen beskrivelse"
     },
     "nav": {
       "addMember": "Tilføj medlem"
@@ -1628,18 +1481,6 @@
       "members": "Medlemmer",
       "public": "Offentlig",
       "private": "Privat"
-    },
-    "detail": {
-      "notFoundTitle": "Arbejdsområde ikke fundet",
-      "backToWorkspaces": "Tilbage til arbejdsområder",
-      "tabs": {
-        "edit": "Rediger arbejdsområde",
-        "collaborate": "Samarbejd",
-        "members": "Medlemmer",
-        "clients": "Kunder",
-        "projects": "Projekter"
-      },
-      "noDescription": "Ingen beskrivelse"
     },
     "edit": {
       "infoTitle": "Arbejdsområde info",
@@ -2741,60 +2582,82 @@
     "newPassword": "Ny adgangskode",
     "confirmNewPassword": "Bekræft ny adgangskode"
   },
-  "tasks": {
-    "overdueBy": "{{days}} dage overskredet",
-    "overdueBy_other": "{{days}} dage overskredet",
-    "dueToday": "Deadline i dag",
-    "dueTomorrow": "Deadline i morgen",
-    "dueInDays": "Deadline om {{days}} dage",
-    "taskName": "Opgave",
-    "assignedTo": "Tildelt til"
-  },
   "goals": {
-    "title": "Mål",
-    "subtitle": "Spor og nå personlige og teammæssige mål",
-    "addGoal": "Tilføj mål",
+    "title": "Mål og Formål",
+    "subtitle": "Spor og administrer personlige og teammæssige mål",
     "newGoal": "Nyt mål",
-    "totalGoals": "Samlede mål",
+    "searchPlaceholder": "Søg efter mål...",
+    "totalGoals": "Antal mål i alt",
     "completed": "Fuldført",
     "inProgress": "I gang",
-    "searchPlaceholder": "Søg efter mål...",
+    "notStarted": "Ikke startet",
+    "avgProgress": "Gennemsnitlig fremgang",
+    "progress": "Fremgang",
+    "due": "Deadline: {{date}}",
+    "overdue": "Overskredet",
+    "milestones": "Milepæle",
+    "viewDetails": "Vis detaljer",
+    "goalsCount": "Mål ({{count}})",
+    "aiAssistant": "AI Målassistent",
+    "recentActivity": "Seneste aktivitet",
+    "goalsByCategory": "Mål efter kategori",
+    "categories": {
+      "productivity": "Produktivitet",
+      "learning": "Læring",
+      "health": "Sundhed",
+      "financial": "Økonomi",
+      "career": "Karriere",
+      "company": "Virksomhed",
+      "project": "Projekt",
+      "personal": "Personlig",
+      "team": "Team"
+    },
+    "quickActions": "Hurtige handlinger",
+    "actions": {
+      "createPersonalGoal": "Opret personligt mål",
+      "createTeamGoal": "Opret team-mål",
+      "viewAnalytics": "Vis analyse",
+      "exportGoals": "Eksporter mål"
+    },
+    "status": {
+      "not_started": "Ikke startet",
+      "in_progress": "I gang",
+      "completed": "Fuldført",
+      "paused": "Sat på pause",
+      "cancelled": "Annulleret"
+    },
+    "owner": "Ejer",
+    "startDate": "Startdato",
+    "endDate": "Slutdato",
+    "description": "Beskrivelse",
+    "keyResults": "Hovedresultater",
+    "addKeyResult": "Tilføj hovedresultat",
+    "editGoal": "Rediger mål",
+    "deleteGoal": "Slet mål",
+    "noGoals": "Ingen mål endnu",
+    "createFirstGoal": "Opret dit første mål",
     "allTypes": "Alle typer",
     "allStatus": "Alle statusser",
     "allCategories": "Alle kategorier",
-    "goalsCount": "{{count}} mål",
-    "noGoalsYet": "Ingen mål endnu",
-    "createFirstGoal": "Opret dit første mål for at komme i gang",
-    "noMatchingGoals": "Ingen matchende mål",
-    "tryDifferentFilters": "Juster venligst filtrene",
-    "milestones": "Milepæle",
-    "due": "Deadline: {{date}}",
-    "startDate": "Startdato",
+    "milestonesCount": "{{completed}}/{{total}} milepæle",
+    "createdBy": "Oprettet af: {{name}}",
+    "start": "Start: {{date}}",
+    "aiSuggestion": "Få AI-forslag til målretning og opnåelsesstrategier.",
+    "askAi": "Spørg AI",
     "targetDate": "Måldato",
     "createdByLabel": "Oprettet af",
     "categoryLabel": "Kategori",
     "tags": "Tags",
-    "status": {
-      "notStarted": "Ikke startet",
-      "inProgress": "I gang",
-      "completed": "Fuldført",
-      "paused": "Sat på pause",
-      "cancelled": "Annulleret",
-      "not_started": "Ikke startet",
-      "in_progress": "I gang"
-    },
+    "overallProgress": "Samlet fremgang",
+    "completedDate": "Fuldført den: {{date}}",
     "type": {
       "personal": "Personlig",
       "team": "Team",
       "project": "Projekt",
       "company": "Virksomhed"
     },
-    "priority": {
-      "low": "Lav",
-      "medium": "Mellem",
-      "high": "Høj",
-      "urgent": "Haster"
-    },
+    "create": "Opret mål",
+    "typeLabel": "Type",
     "category": {
       "productivity": "Produktivitet",
       "learning": "Læring",
@@ -2803,7 +2666,21 @@
       "career": "Karriere",
       "other": "Andet"
     },
-    "completingIn": "Fuldføres om {{days}} dage"
+    "sort": {
+      "due_date": "Deadline",
+      "created": "Oprettelsesdato",
+      "progress": "Fremgang",
+      "priority": "Prioritet"
+    },
+    "priority": {
+      "urgent": "Haster",
+      "high": "Høj",
+      "medium": "Mellem",
+      "low": "Lav"
+    },
+    "noGoalsYet": "Ingen mål endnu",
+    "noMatchingGoals": "Ingen matchende mål",
+    "tryDifferentFilters": "Prøv at justere dine filtre for at se flere mål"
   },
   "buttons": {
     "save": "Gem",
@@ -2845,7 +2722,9 @@
     "tryNow": "Prøv nu",
     "signUp": "Tilmeld dig",
     "signIn": "Log ind",
-    "logOut": "Log ud"
+    "logOut": "Log ud",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "Mit arbejde",
@@ -3233,106 +3112,6 @@
     "severity": "Alvorlighed",
     "allSeverities": "Alle alvorlighedsgrader",
     "noEvents": "Ingen begivenheder"
-  },
-  "goals": {
-    "title": "Mål og Formål",
-    "subtitle": "Spor og administrer personlige og teammæssige mål",
-    "newGoal": "Nyt mål",
-    "searchPlaceholder": "Søg efter mål...",
-    "totalGoals": "Antal mål i alt",
-    "completed": "Fuldført",
-    "inProgress": "I gang",
-    "notStarted": "Ikke startet",
-    "avgProgress": "Gennemsnitlig fremgang",
-    "progress": "Fremgang",
-    "due": "Deadline: {{date}}",
-    "overdue": "Overskredet",
-    "milestones": "Milepæle",
-    "viewDetails": "Vis detaljer",
-    "goalsCount": "Mål ({{count}})",
-    "aiAssistant": "AI Målassistent",
-    "recentActivity": "Seneste aktivitet",
-    "goalsByCategory": "Mål efter kategori",
-    "categories": {
-      "productivity": "Produktivitet",
-      "learning": "Læring",
-      "health": "Sundhed",
-      "financial": "Økonomi",
-      "career": "Karriere",
-      "company": "Virksomhed",
-      "project": "Projekt",
-      "personal": "Personlig",
-      "team": "Team"
-    },
-    "quickActions": "Hurtige handlinger",
-    "actions": {
-      "createPersonalGoal": "Opret personligt mål",
-      "createTeamGoal": "Opret team-mål",
-      "viewAnalytics": "Vis analyse",
-      "exportGoals": "Eksporter mål"
-    },
-    "status": {
-      "not_started": "Ikke startet",
-      "in_progress": "I gang",
-      "completed": "Fuldført",
-      "paused": "Sat på pause",
-      "cancelled": "Annulleret"
-    },
-    "owner": "Ejer",
-    "startDate": "Startdato",
-    "endDate": "Slutdato",
-    "description": "Beskrivelse",
-    "keyResults": "Hovedresultater",
-    "addKeyResult": "Tilføj hovedresultat",
-    "editGoal": "Rediger mål",
-    "deleteGoal": "Slet mål",
-    "noGoals": "Ingen mål endnu",
-    "createFirstGoal": "Opret dit første mål",
-    "allTypes": "Alle typer",
-    "allStatus": "Alle statusser",
-    "allCategories": "Alle kategorier",
-    "milestonesCount": "{{completed}}/{{total}} milepæle",
-    "createdBy": "Oprettet af: {{name}}",
-    "start": "Start: {{date}}",
-    "aiSuggestion": "Få AI-forslag til målretning og opnåelsesstrategier.",
-    "askAi": "Spørg AI",
-    "targetDate": "Måldato",
-    "createdByLabel": "Oprettet af",
-    "categoryLabel": "Kategori",
-    "tags": "Tags",
-    "overallProgress": "Samlet fremgang",
-    "completedDate": "Fuldført den: {{date}}",
-    "type": {
-      "personal": "Personlig",
-      "team": "Team",
-      "project": "Projekt",
-      "company": "Virksomhed"
-    },
-    "create": "Opret mål",
-    "typeLabel": "Type",
-    "category": {
-      "productivity": "Produktivitet",
-      "learning": "Læring",
-      "health": "Sundhed",
-      "financial": "Økonomi",
-      "career": "Karriere",
-      "other": "Andet"
-    },
-    "sort": {
-      "due_date": "Deadline",
-      "created": "Oprettelsesdato",
-      "progress": "Fremgang",
-      "priority": "Prioritet"
-    },
-    "priority": {
-      "urgent": "Haster",
-      "high": "Høj",
-      "medium": "Mellem",
-      "low": "Lav"
-    },
-    "noGoalsYet": "Ingen mål endnu",
-    "noMatchingGoals": "Ingen matchende mål",
-    "tryDifferentFilters": "Prøv at justere dine filtre for at se flere mål"
   },
   "notes": {
     "title": "Noter",

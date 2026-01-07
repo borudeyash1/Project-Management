@@ -134,7 +134,7 @@ export const ContextAIButton: React.FC<{ pageData?: any }> = ({ pageData }) => {
             {/* Floating AI Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                className="fixed bottom-20 right-6 z-50 p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
                 style={{
                     background: theme === 'dark'
                         ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'

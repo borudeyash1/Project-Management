@@ -279,35 +279,6 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            {onCreateTask && (
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors font-medium shadow-sm"
-              >
-                <Plus className="w-4 h-4" />
-                {t('project.tasks.addTask', 'Add Task')}
-              </button>
-            )}
-          </div>
-
-          {/* Status Filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">{t('project.employeeTasks.filter.label')}</span>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent"
-            >
-              <option value="all">{t('project.employeeTasks.filter.all')}</option>
-              <option value="pending">{t('project.employeeTasks.filter.pending')}</option>
-              <option value="in-progress">{t('project.employeeTasks.filter.inProgress')}</option>
-              <option value="completed">{t('project.employeeTasks.filter.completed')}</option>
-              <option value="verified">{t('project.employeeTasks.filter.verified')}</option>
-              <option value="blocked">{t('project.employeeTasks.filter.blocked')}</option>
-            </select>
-          </div>
-
           {/* View Mode Switcher */}
           <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 flex-wrap">
             <button
@@ -342,17 +313,6 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             >
               <CalendarDays className="w-4 h-4" />
               <span className="text-xs font-medium">{t('project.employeeTasks.views.calendar')}</span>
-            </button>
-            <button
-              onClick={() => setViewMode('gantt')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'gantt'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
-              title={t('project.employeeTasks.views.gantt')}
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span className="text-xs font-medium">{t('project.employeeTasks.views.gantt')}</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
@@ -390,31 +350,33 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
           </div>
         </div>
 
-        {/* Task Statistics */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-xs text-gray-600 mb-1">{t('project.employeeTasks.stats.total')}</p>
-            <p className="text-2xl font-bold text-gray-900">{myTasks.length}</p>
+        {/* Task Statistics - Only show in list view */}
+        {viewMode === 'list' && (
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-1">{t('project.employeeTasks.stats.total')}</p>
+              <p className="text-2xl font-bold text-gray-900">{myTasks.length}</p>
+            </div>
+            <div className="bg-blue-50 rounded-lg p-4">
+              <p className="text-xs text-accent-dark mb-1">{t('project.employeeTasks.stats.inProgress')}</p>
+              <p className="text-2xl font-bold text-blue-700">
+                {myTasks.filter(t => t.status === 'in-progress').length}
+              </p>
+            </div>
+            <div className="bg-green-50 rounded-lg p-4">
+              <p className="text-xs text-green-600 mb-1">{t('project.employeeTasks.stats.completed')}</p>
+              <p className="text-2xl font-bold text-green-700">
+                {myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length}
+              </p>
+            </div>
+            <div className="bg-red-50 rounded-lg p-4">
+              <p className="text-xs text-red-600 mb-1">{t('project.employeeTasks.stats.overdue')}</p>
+              <p className="text-2xl font-bold text-red-700">
+                {myTasks.filter(t => isOverdue(t.dueDate) && t.status !== 'completed' && t.status !== 'verified').length}
+              </p>
+            </div>
           </div>
-          <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-xs text-accent-dark mb-1">{t('project.employeeTasks.stats.inProgress')}</p>
-            <p className="text-2xl font-bold text-blue-700">
-              {myTasks.filter(t => t.status === 'in-progress').length}
-            </p>
-          </div>
-          <div className="bg-green-50 rounded-lg p-4">
-            <p className="text-xs text-green-600 mb-1">{t('project.employeeTasks.stats.completed')}</p>
-            <p className="text-2xl font-bold text-green-700">
-              {myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length}
-            </p>
-          </div>
-          <div className="bg-red-50 rounded-lg p-4">
-            <p className="text-xs text-red-600 mb-1">{t('project.employeeTasks.stats.overdue')}</p>
-            <p className="text-2xl font-bold text-red-700">
-              {myTasks.filter(t => isOverdue(t.dueDate) && t.status !== 'completed' && t.status !== 'verified').length}
-            </p>
-          </div>
-        </div>
+        )}
 
         {/* Tasks Display - Different Views */}
         {viewMode === 'list' && (
@@ -1169,68 +1131,60 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
 
         {/* Gantt Chart View */}
         {viewMode === 'gantt' && (
-          <div className="bg-white rounded-lg border border-gray-300 p-6 overflow-x-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('project.employeeTasks.views.gantt')}</h3>
+          <div className="bg-white rounded-lg border border-gray-300 p-6 overflow-hidden">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Gantt Timeline</h3>
 
-            <div className="min-w-[800px]">
-              {/* Timeline Header */}
-              <div className="flex border-b border-gray-300 pb-2 mb-4">
-                <div className="w-48 font-semibold text-sm text-gray-700">Task</div>
-                <div className="flex-1 grid grid-cols-7 gap-1 text-xs text-gray-600 text-center">
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                    <div key={day}>{day}</div>
+            <div className="overflow-x-auto">
+              <div className="min-w-[800px]">
+                {/* Timeline Header */}
+                <div className="flex border-b border-gray-200 mb-4 pb-2">
+                  <div className="w-1/4 font-medium text-sm text-gray-500">Task</div>
+                  <div className="w-3/4 flex justify-between text-xs text-gray-400">
+                    {Array.from({ length: 14 }).map((_, i) => (
+                      <div key={i} className="flex-1 text-center border-l border-gray-100">{i + 1}</div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Timeline Rows */}
+                <div className="space-y-4">
+                  {filteredTasks.map((task, index) => (
+                    <div key={task._id} className="flex items-center gap-4 group">
+                      <div className="w-1/4">
+                        <div className="text-sm font-medium text-gray-900 truncate">{task.title}</div>
+                        <div className="text-xs text-gray-500">{task.progress}% complete</div>
+                      </div>
+                      <div className="w-3/4 h-8 bg-gray-50 rounded-lg relative overflow-hidden">
+                        {task.dueDate && (
+                          <div
+                            className={`absolute top-1 bottom-1 rounded-md ${
+                              task.status === 'completed' ? 'bg-green-500/50' :
+                              task.status === 'in-progress' ? 'bg-blue-500/50' :
+                              task.status === 'blocked' ? 'bg-red-500/50' :
+                              task.priority === 'critical' ? 'bg-red-500/50' :
+                              task.priority === 'high' ? 'bg-orange-500/50' : 'bg-blue-500/50'
+                            } opacity-80 backdrop-blur-sm border border-gray-700/70`}
+                            style={{
+                              left: `${(index * 15) % 60}%`,
+                              width: `${Math.max(10, task.progress ? task.progress / 5 : 20)}%`
+                            }}
+                          >
+                            <div className="w-full h-full flex items-center px-2">
+                              <span className="text-[10px] font-medium text-white truncate">{task.status}</span>
+                            </div>
+                          </div>
+                        )}
+                        {/* Grid lines */}
+                        <div className="absolute inset-0 flex">
+                          {Array.from({ length: 14 }).map((_, i) => (
+                            <div key={i} className="flex-1 border-r border-gray-200/20"></div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-
-              {/* Task Rows */}
-              {filteredTasks.map(task => {
-                const startDate = new Date(task.startDate);
-                const dueDate = new Date(task.dueDate);
-                const today = new Date();
-                const daysDiff = Math.ceil((dueDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-                const startOffset = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-                return (
-                  <div
-                    key={task._id}
-                    className="flex items-center mb-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -mx-2"
-                    onClick={() => handleTaskClick(task)}
-                  >
-                    <div className="w-48 pr-4">
-                      <div className="text-sm font-medium text-gray-900 truncate">{task.title}</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        {task.taskType && (() => {
-                          const typeInfo = getTaskTypeInfo(task.taskType);
-                          return (
-                            <span className={`px-1.5 py-0.5 text-xs rounded ${typeInfo.color}`}>
-                              {typeInfo.icon}
-                            </span>
-                          );
-                        })()}
-                        <span className={`px-1.5 py-0.5 text-xs rounded ${getPriorityColor(task.priority)}`}>
-                          {task.priority}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex-1 relative h-8">
-                      <div
-                        className={`absolute h-6 rounded flex items-center px-2 text-xs text-white ${task.status === 'completed' ? 'bg-green-500' :
-                          task.status === 'in-progress' ? 'bg-accent' :
-                            task.status === 'blocked' ? 'bg-red-500' :
-                              'bg-gray-400'
-                          }`}
-                        style={{
-                          left: `${Math.max(0, (startOffset / 7) * 100)}%`,
-                          width: `${Math.min(100, (daysDiff / 7) * 100)}%`
-                        }}
-                      >
-                        <div className="truncate">{task.progress}%</div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         )}

@@ -23,6 +23,7 @@ interface AttendanceRecord {
 const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspaceId, config: initialConfig }) => {
   const { t } = useTranslation();
   const { dispatch, state } = useApp();
+  const [mode, setMode] = useState<'automatic' | 'manual'>('manual'); // Add mode state
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [attendanceHistory, setAttendanceHistory] = useState<Map<string, AttendanceRecord>>(new Map());
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null);
@@ -491,310 +492,190 @@ const EmployeeAttendanceView: React.FC<EmployeeAttendanceViewProps> = ({ workspa
 
   return (
     <div className="space-y-6">
-      {/* Attendance Timing Info */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-          <Clock className="w-5 h-5" />
-          {t('workspace.attendance.timings')}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('workspace.attendance.checkInWindow')}</div>
-            <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {config?.checkInTime?.start || '09:00'} - {config?.checkInTime?.end || '10:00'}
-            </div>
-            {isInCheckInWindow && (
-              <div className="mt-2 text-xs text-green-600 dark:text-green-400 font-semibold">
-                ✓ {t('workspace.attendance.windowOpen')}
-              </div>
-            )}
-          </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('workspace.attendance.checkOutWindow')}</div>
-            <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {config?.checkOutTime?.start || '17:00'} - {config?.checkOutTime?.end || '18:00'}
-            </div>
-            {isInCheckOutWindow && (
-              <div className="mt-2 text-xs text-green-600 dark:text-green-400 font-semibold">
-                ✓ {t('workspace.attendance.windowOpen')}
-              </div>
-            )}
-          </div>
+      {/* Mode Selection */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Attendance Mode</span>
+        <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+          <button
+            onClick={() => setMode('automatic')}
+            className={`px-6 py-2.5 text-sm font-medium transition-colors ${
+              mode === 'automatic'
+                ? 'bg-accent text-gray-900'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            Automatic
+          </button>
+          <button
+            onClick={() => setMode('manual')}
+            className={`px-6 py-2.5 text-sm font-medium transition-colors border-l border-gray-300 dark:border-gray-600 ${
+              mode === 'manual'
+                ? 'bg-accent text-gray-900'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            Manual
+          </button>
         </div>
       </div>
 
-      {/* Mark Attendance Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('workspace.attendance.todaysAttendance')}</h3>
+      {/* Content based on mode */}
+      {mode === 'automatic' ? (
+        /* Coming Soon Section */
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-12">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-yellow-600 dark:text-yellow-500" />
+            </div>
+            <h3 className="text-3xl font-bold text-yellow-600 dark:text-yellow-500 mb-8">
+              Coming Soon
+            </h3>
 
-        {todayAttendance ? (
-          <div className="space-y-4">
-            <div className={`p-4 rounded-lg ${getStatusColor(todayAttendance.status)}`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-lg capitalize">{todayAttendance.status.replace('-', ' ')}</div>
-                  <div className="text-sm mt-1">
-                    {t('workspace.attendance.markedAt')}: {todayAttendance.markedAt ? format(new Date(todayAttendance.markedAt), 'hh:mm a') : 'N/A'}
+            {/* Features List */}
+            <div className="text-left space-y-6 mt-8">
+              <h4 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Automatic Attendance Features:
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Feature 1 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
                   </div>
-                  {todayAttendance.isManual && (
-                    <div className="text-xs mt-1 font-semibold">
-                      ⚠️ {t('workspace.attendance.markedManually')}
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">One-Click Check-in/Check-out</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Mark your attendance with a single click during configured time windows</p>
+                  </div>
+                </div>
+
+                {/* Feature 2 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Face Recognition</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Secure facial verification to ensure authentic attendance marking</p>
+                  </div>
+                </div>
+
+                {/* Feature 3 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Location Verification</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">GPS-based verification to confirm you're at the office location</p>
+                  </div>
+                </div>
+
+                {/* Feature 4 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Work From Home Option</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Easily mark WFH attendance without location verification</p>
+                  </div>
+                </div>
+
+                {/* Feature 5 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Real-time Status Updates</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Instant confirmation and status updates when you mark attendance</p>
+                  </div>
+                </div>
+
+                {/* Feature 6 */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">✓</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Attendance History Calendar</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">View your complete attendance history in an interactive calendar</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Note */}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-300 font-medium text-center">
+                  📌 This feature is currently under development. Your manager can mark attendance manually for now.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Manual Attendance - Calendar View */
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5" />
+            Attendance History
+          </h3>
+
+          <div className="flex justify-center">
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
+              modifiers={modifiers}
+              modifiersStyles={modifiersStyles}
+              className="border-0"
+            />
+          </div>
+
+          {/* Legend */}
+          <div className="mt-6 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-green-200 dark:bg-green-900/50"></div>
+              <span className="text-gray-700 dark:text-gray-300">Present</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-red-200 dark:bg-red-900/50"></div>
+              <span className="text-gray-700 dark:text-gray-300">Absent</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-blue-200 dark:bg-blue-900/50"></div>
+              <span className="text-gray-700 dark:text-gray-300">WFH</span>
+            </div>
+          </div>
+
+          {/* Selected Date Details */}
+          {selectedDate && (
+            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+              <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                {format(selectedDate, 'MMMM d, yyyy')}
+              </div>
+              {(() => {
+                const record = attendanceHistory.get(format(selectedDate, 'yyyy-MM-dd'));
+                if (record) {
+                  return (
+                    <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(record.status)}`}>
+                      {record.status.replace('-', ' ').toUpperCase()}
+                      {record.isManual && ' (Manual)'}
                     </div>
-                  )}
-                </div>
-                {todayAttendance.status === 'present' && <CheckCircle className="w-8 h-8" />}
-                {todayAttendance.status === 'absent' && <XCircle className="w-8 h-8" />}
-                {todayAttendance.status === 'work-from-home' && <Home className="w-8 h-8" />}
-              </div>
+                  );
+                } else {
+                  return (
+                    <div className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                      NOT MARKED
+                    </div>
+                  );
+                }
+              })()}
             </div>
-
-            {todayAttendance.isManual && (
-              <div className="text-sm text-gray-600 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
-                {t('workspace.attendance.manualMarkingMessage')}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Check-In Section */}
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{t('workspace.attendance.checkIn')}</h4>
-                {isInCheckInWindow ? (
-                  <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-semibold">
-                    {t('workspace.attendance.open')}
-                  </span>
-                ) : (
-                  <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
-                    {t('workspace.attendance.closed')}
-                  </span>
-                )}
-              </div>
-
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {t('workspace.attendance.window')}: {config?.checkInTime?.start} - {config?.checkInTime?.end}
-              </div>
-
-              {/* Location Status */}
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                <div className="flex items-center gap-2 flex-1">
-                  <MapPin className="w-4 h-4" />
-                  <div className="flex-1">
-                    <span className="text-sm block">{t('workspace.attendance.location')}</span>
-                    {locationFetched['check-in'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
-                    ) : (
-                      <span className="text-xs text-gray-500">{t('workspace.attendance.notFetched')}</span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => fetchLocation('check-in')}
-                  disabled={!isInCheckInWindow || marking || locationFetched['check-in']}
-                  className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-                >
-                  {locationFetched['check-in'] ? t('workspace.attendance.fetched') : t('workspace.attendance.fetch')}
-                </button>
-              </div>
-
-              {/* Face Scan Status */}
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                <div className="flex items-center gap-2 flex-1">
-                  <Users className="w-4 h-4" />
-                  <div className="flex-1">
-                    <span className="text-sm block">{t('workspace.attendance.faceScan')}</span>
-                    {faceScanned['check-in'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
-                    ) : (
-                      <span className="text-xs text-gray-500">{t('workspace.attendance.notScanned')}</span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => scanFace('check-in')}
-                  disabled={!isInCheckInWindow || marking || faceScanned['check-in']}
-                  className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-                >
-                  {faceScanned['check-in'] ? t('workspace.attendance.scanned') : t('workspace.attendance.scan')}
-                </button>
-              </div>
-
-              {/* Mark Button */}
-              <button
-                onClick={() => markAttendance('check-in', false)}
-                disabled={!isInCheckInWindow || marking || !canMarkAttendance || !locationFetched['check-in'] || !faceScanned['check-in']}
-                className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
-              >
-                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.markCheckIn')}
-              </button>
-
-              {/* Verification Status Message */}
-              {(!locationFetched['check-in'] || !faceScanned['check-in']) && isInCheckInWindow && (
-                <div className="text-xs text-center text-gray-600 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-                  {!locationFetched['check-in'] && !faceScanned['check-in'] && t('workspace.attendance.fetchLocationScanFace')}
-                  {locationFetched['check-in'] && !faceScanned['check-in'] && t('workspace.attendance.scanFace')}
-                  {!locationFetched['check-in'] && faceScanned['check-in'] && t('workspace.attendance.fetchLocation')}
-                </div>
-              )}
-
-              {/* WFH Button */}
-              <button
-                onClick={() => markAttendance('check-in', true)}
-                disabled={!isInCheckInWindow || marking || !canMarkAttendance}
-                className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2"
-              >
-                <Home className="w-4 h-4" />
-                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.workFromHome')}
-              </button>
-            </div>
-
-            {/* Check-Out Section */}
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{t('workspace.attendance.checkOut')}</h4>
-                {isInCheckOutWindow ? (
-                  <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-semibold">
-                    {t('workspace.attendance.open')}
-                  </span>
-                ) : (
-                  <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
-                    {t('workspace.attendance.closed')}
-                  </span>
-                )}
-              </div>
-
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {t('workspace.attendance.window')}: {config?.checkOutTime?.start} - {config?.checkOutTime?.end}
-              </div>
-
-              {/* Location Status */}
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                <div className="flex items-center gap-2 flex-1">
-                  <MapPin className="w-4 h-4" />
-                  <div className="flex-1">
-                    <span className="text-sm block">{t('workspace.attendance.location')}</span>
-                    {locationFetched['check-out'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
-                    ) : (
-                      <span className="text-xs text-gray-500">{t('workspace.attendance.notFetched')}</span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => fetchLocation('check-out')}
-                  disabled={!isInCheckOutWindow || marking || locationFetched['check-out']}
-                  className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-                >
-                  {locationFetched['check-out'] ? t('workspace.attendance.fetched') : t('workspace.attendance.fetch')}
-                </button>
-              </div>
-
-              {/* Face Scan Status */}
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                <div className="flex items-center gap-2 flex-1">
-                  <Users className="w-4 h-4" />
-                  <div className="flex-1">
-                    <span className="text-sm block">{t('workspace.attendance.faceScan')}</span>
-                    {faceScanned['check-out'] ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ {t('workspace.attendance.verified')}</span>
-                    ) : (
-                      <span className="text-xs text-gray-500">{t('workspace.attendance.notScanned')}</span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => scanFace('check-out')}
-                  disabled={!isInCheckOutWindow || marking || faceScanned['check-out']}
-                  className="text-xs px-3 py-1 bg-accent text-gray-900 rounded hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-                >
-                  {faceScanned['check-out'] ? t('workspace.attendance.scanned') : t('workspace.attendance.scan')}
-                </button>
-              </div>
-
-              {/* Mark Button */}
-              <button
-                onClick={() => markAttendance('check-out', false)}
-                disabled={!isInCheckOutWindow || marking || !canMarkAttendance || !locationFetched['check-out'] || !faceScanned['check-out']}
-                className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
-              >
-                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.markCheckOut')}
-              </button>
-
-              {/* Verification Status Message */}
-              {(!locationFetched['check-out'] || !faceScanned['check-out']) && isInCheckOutWindow && (
-                <div className="text-xs text-center text-gray-600 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-                  {!locationFetched['check-out'] && !faceScanned['check-out'] && t('workspace.attendance.fetchLocationScanFace')}
-                  {locationFetched['check-out'] && !faceScanned['check-out'] && t('workspace.attendance.scanFace')}
-                  {!locationFetched['check-out'] && faceScanned['check-out'] && t('workspace.attendance.fetchLocation')}
-                </div>
-              )}
-
-              {/* WFH Button */}
-              <button
-                onClick={() => markAttendance('check-out', true)}
-                disabled={!isInCheckOutWindow || marking || !canMarkAttendance}
-                className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2"
-              >
-                <Home className="w-4 h-4" />
-                {marking ? t('workspace.attendance.marking') : t('workspace.attendance.workFromHome')}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Calendar View */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-          <CalendarIcon className="w-5 h-5" />
-          {t('workspace.attendance.history')}
-        </h3>
-
-        <div className="flex justify-center">
-          <DayPicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => date && setSelectedDate(date)}
-            modifiers={modifiers}
-            modifiersStyles={modifiersStyles}
-            className="border-0"
-          />
+          )}
         </div>
-
-        {/* Legend */}
-        <div className="mt-6 flex items-center justify-center gap-6 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-200 dark:bg-green-900/50"></div>
-            <span className="text-gray-700 dark:text-gray-300">{t('workspace.attendance.present')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-red-200 dark:bg-red-900/50"></div>
-            <span className="text-gray-700 dark:text-gray-300">{t('workspace.attendance.absent')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-200 dark:bg-blue-900/50"></div>
-            <span className="text-gray-700 dark:text-gray-300">{t('workspace.attendance.wfh')}</span>
-          </div>
-        </div>
-
-        {/* Selected Date Details */}
-        {selectedDate && attendanceHistory.has(format(selectedDate, 'yyyy-MM-dd')) && (
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-            <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              {format(selectedDate, 'MMMM d, yyyy')}
-            </div>
-            {(() => {
-              const record = attendanceHistory.get(format(selectedDate, 'yyyy-MM-dd'));
-              return record && (
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(record.status)}`}>
-                  {record.status.replace('-', ' ').toUpperCase()}
-                  {record.isManual && ' (Manual)'}
-                </div>
-              );
-            })()}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

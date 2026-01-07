@@ -189,14 +189,14 @@ const ProjectRequestsTab: React.FC<ProjectRequestsTabProps> = ({
 
     if (onManualReassign) {
       onManualReassign(manualReassignTaskId, manualReassignTo);
+      // Reset after successful reassignment
+      setManualReassignTaskId('');
+      setManualReassignTo('');
     } else {
       console.log('Reassigning task:', manualReassignTaskId, 'to:', manualReassignTo);
-      alert('Task reassigned successfully!');
+      // Only show alert if there's no callback (shouldn't happen in production)
+      alert('Task reassignment handler not configured');
     }
-
-    // Reset
-    setManualReassignTaskId('');
-    setManualReassignTo('');
   };
 
   const handleManualDeadlineChange = () => {

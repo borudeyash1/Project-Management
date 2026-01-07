@@ -481,19 +481,54 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
     }
 
     // Fetch tasks
-    const taskQuery: any = { ...baseQuery, isActive: true };
-    if (Object.keys(dateFilter).length > 0) {
+    // Include tasks from workspace OR tasks assigned to/created by the user (personal tasks)
+    const taskQuery: any = { isActive: true };
+    
+    if (workspaceId) {
+      // If workspace is specified, get workspace tasks OR user's personal tasks
       taskQuery.$or = [
-        { startDate: dateFilter },
-        { dueDate: dateFilter }
+        { workspace: workspaceId },
+        { assignee: userId, workspace: { $exists: false } }, // Personal tasks assigned to user
+        { reporter: userId, workspace: { $exists: false } },  // Personal tasks created by user
+        { createdBy: userId, workspace: { $exists: false } }  // Personal tasks created by user (alternative field)
+      ];
+    } else {
+      // If no workspace specified, get all user's tasks (personal and workspace)
+      taskQuery.$or = [
+        { assignee: userId },
+        { reporter: userId },
+        { createdBy: userId }
       ];
     }
+    
+    if (Object.keys(dateFilter).length > 0) {
+      taskQuery.$and = taskQuery.$and || [];
+      taskQuery.$and.push({
+        $or: [
+          { startDate: dateFilter },
+          { dueDate: dateFilter }
+        ]
+      });
+    }
+
+    console.log('[Planner] Task query:', JSON.stringify(taskQuery, null, 2));
 
     const tasks = await Task.find(taskQuery)
       .populate('assignee', 'fullName email avatarUrl')
       .populate('reporter', 'fullName email avatarUrl')
       .populate('project', 'name')
       .sort({ dueDate: 1 });
+
+    console.log(`[Planner] Found ${tasks.length} tasks for user ${userId}`);
+    console.log('[Planner] Task details:', tasks.map(t => ({
+      id: t._id,
+      title: t.title,
+      status: t.status,
+      assignee: (t.assignee as any)?._id,
+      reporter: (t.reporter as any)?._id,
+      workspace: t.workspace,
+      project: (t.project as any)?.name
+    })));
 
     // Fetch Jira issues if connected
     let jiraTasks: any[] = [];

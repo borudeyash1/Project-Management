@@ -2284,7 +2284,9 @@
     "tryNow": "Prova nu",
     "signUp": "Registrera dig",
     "signIn": "Logga in",
-    "logOut": "Logga ut"
+    "logOut": "Logga ut",
+    "viewTask": "View Task",
+    "viewWorkspace": "View Workspace"
   },
   "planner": {
     "title": "Mitt arbete",
