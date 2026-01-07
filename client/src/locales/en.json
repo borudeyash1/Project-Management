@@ -3,6 +3,7 @@
     "welcome": "Welcome",
     "loading": "Loading...",
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -1732,7 +1733,7 @@
     "professional": "Professional",
     "skills": "Skills & Learning",
     "workPreferences": "Work Preferences",
-    "goals": "Goals & Aspirations",
+    "goalsTab": "Goals & Aspirations",
     "preferences": "App Preferences",
     "addresses": "Addresses",
     "payments": "Payment Methods",
@@ -1820,15 +1821,8 @@
     "work": "Work",
     "billing": "Billing",
     "shipping": "Shipping",
-    "profile": {
-      "jobTitle": "Job Title",
-      "company": "Company",
-      "industry": "Industry",
-      "experience": "Experience Level",
-      "skills": "Skills",
-      "goals": {
-        "careerAspirations": "Career Aspirations"
-      }
+    "goals": {
+      "careerAspirations": "Career Aspirations"
     }
   },
   "workspace": {
@@ -1958,6 +1952,8 @@
       }
     },
     "profile": {
+      "title": "Workspace Profile",
+      "subtitle": "Manage your workspace profile and settings",
       "tabs": {
         "profile": "Profile"
       },

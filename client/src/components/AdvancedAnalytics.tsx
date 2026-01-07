@@ -256,7 +256,7 @@ const AdvancedAnalytics: React.FC = () => {
       name: 'E-commerce Platform',
       status: 'active',
       progress: 65,
-      budget: { estimated: 50000, actual: 25000, currency: 'USD' },
+      budget: { estimated: 50000, actual: 25000, currency: 'INR' },
       timeline: {
         startDate: new Date('2024-01-01'),
         endDate: new Date('2024-06-30'),
@@ -289,7 +289,7 @@ const AdvancedAnalytics: React.FC = () => {
       name: 'Mobile App',
       status: 'active',
       progress: 40,
-      budget: { estimated: 75000, actual: 30000, currency: 'USD' },
+      budget: { estimated: 75000, actual: 30000, currency: 'INR' },
       timeline: {
         startDate: new Date('2024-02-01'),
         endDate: new Date('2024-08-31'),
@@ -562,7 +562,7 @@ const AdvancedAnalytics: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Budget Used</p>
               <p className="text-2xl font-semibold text-gray-900">
-                ${projectAnalytics.reduce((acc, p) => acc + p.budget.actual, 0).toLocaleString()}
+                ₹{projectAnalytics.reduce((acc, p) => acc + p.budget.actual, 0).toLocaleString()}
               </p>
             </div>
             <DollarSign className="w-8 h-8 text-orange-600" />
@@ -667,7 +667,7 @@ const AdvancedAnalytics: React.FC = () => {
                   <div>
                     <span className="text-sm text-gray-600">Budget</span>
                     <p className="text-lg font-semibold text-gray-900">
-                      {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.actual ?? 0)} / {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.estimated ?? 0)}
+                      {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget.actual ?? 0)} / {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget.estimated ?? 0)}
                     </p>
                   </div>
                   <div>
@@ -780,7 +780,7 @@ const AdvancedAnalytics: React.FC = () => {
             <div>
               <span className="text-sm text-gray-600">Predicted Cost</span>
               <p className="text-lg font-semibold text-gray-900">
-                ${predictiveAnalytics.budgetForecast.predictedCost.toLocaleString()}
+                ₹{predictiveAnalytics.budgetForecast.predictedCost.toLocaleString()}
               </p>
             </div>
             <div>

@@ -895,7 +895,7 @@ const ProjectView: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Budget Used</p>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                  ${(project.spent / 1000).toFixed(0)}k
+                  ₹{(project.spent / 1000).toFixed(0)}k
                 </p>
               </div>
               <div className="p-3 bg-yellow-100 rounded-lg">

@@ -113,7 +113,7 @@ const SettingsSection: React.FC = () => {
     language: 'English',
     dateFormat: 'MM/DD/YYYY',
     timeFormat: '12h',
-    currency: 'USD'
+    currency: 'INR'
   });
 
   // Addresses state
@@ -487,6 +487,7 @@ const SettingsSection: React.FC = () => {
             onChange={(e) => setProfile({ ...profile, currency: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
           >
+            <option value="INR">INR (₹)</option>
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
             <option value="GBP">GBP (£)</option>

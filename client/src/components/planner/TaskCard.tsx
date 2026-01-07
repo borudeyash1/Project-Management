@@ -153,18 +153,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDragStart, onClick, draggab
           )}
         </div>
 
-        {/* Assignees */}
-        {assignees.length > 0 && (
-          <div className="flex -space-x-2">
-            {assignees.slice(0, 3).map((assignee: any, idx: number) => (
-              <div
-                key={idx}
-                className="w-6 h-6 rounded-full bg-accent border-2 border-white dark:border-gray-600 flex items-center justify-center text-gray-900 text-xs font-medium"
-                title={typeof assignee === 'object' ? (assignee.fullName || assignee.username) : assignee}
-              >
-                {typeof assignee === 'string' ? assignee[0].toUpperCase() : (assignee.fullName || assignee.username || 'U')[0].toUpperCase()}
-              </div>
-            ))}
+        {/* Reporter (who assigned the task) */}
+        {task.reporter && (
+          <div className="flex items-center gap-1">
+            <div
+              className="w-6 h-6 rounded-full bg-accent border-2 border-white dark:border-gray-600 flex items-center justify-center text-gray-900 text-xs font-medium"
+              title={`Allotted by: ${typeof task.reporter === 'object' ? (task.reporter.fullName || task.reporter.username) : task.reporter}`}
+            >
+              {typeof task.reporter === 'string' ? task.reporter[0].toUpperCase() : (task.reporter.fullName || task.reporter.username || 'U')[0].toUpperCase()}
+            </div>
           </div>
         )}
       </div>

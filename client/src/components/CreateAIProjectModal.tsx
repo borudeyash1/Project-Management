@@ -221,7 +221,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
         budget: {
           estimated: projectData.budget,
           actual: 0,
-          currency: 'USD'
+          currency: 'INR'
         },
         teamSize: projectData.teamSize,
         goals: projectData.goals,
@@ -339,7 +339,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Budget ($)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Budget (₹)</label>
             <input
               type="number"
               min="0"
@@ -530,7 +530,7 @@ const CreateAIProjectModal: React.FC<CreateAIProjectModalProps> = ({ isOpen, onC
           </div>
           <div>
             <span className="font-medium text-gray-700">Budget:</span>
-            <span className="ml-2 text-gray-600">${projectData.budget.toLocaleString()}</span>
+            <span className="ml-2 text-gray-600">₹{projectData.budget.toLocaleString()}</span>
           </div>
         </div>
 

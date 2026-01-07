@@ -32,7 +32,17 @@ router.get('/pricing-plans/:planKey', async (req, res) => {
 router.get('/admin/subscriptions', async (req, res) => {
   try {
     const plans = await PricingPlan.find().sort({ order: 1 });
-    res.json({ success: true, data: plans });
+    
+    // Convert prices from paise to rupees for admin display
+    const plansWithRupees = plans.map(plan => {
+      const planObj = plan.toObject();
+      if (typeof planObj.price === 'number') {
+        planObj.price = planObj.price / 100;
+      }
+      return planObj;
+    });
+    
+    res.json({ success: true, data: plansWithRupees });
   } catch (error) {
     console.error('Error fetching pricing plans:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch pricing plans' });
@@ -44,6 +54,11 @@ router.put('/admin/subscriptions/:planKey', async (req, res) => {
   try {
     const { planKey } = req.params;
     const updateData = req.body;
+
+    // Convert price from rupees to paise if it's a number
+    if (updateData.price && typeof updateData.price === 'number') {
+      updateData.price = Math.round(updateData.price * 100);
+    }
 
     const plan = await PricingPlan.findOneAndUpdate(
       { planKey },
@@ -61,7 +76,14 @@ router.put('/admin/subscriptions/:planKey', async (req, res) => {
 // Admin: Create pricing plan
 router.post('/admin/subscriptions', async (req, res) => {
   try {
-    const plan = new PricingPlan(req.body);
+    const planData = req.body;
+    
+    // Convert price from rupees to paise if it's a number
+    if (planData.price && typeof planData.price === 'number') {
+      planData.price = Math.round(planData.price * 100);
+    }
+    
+    const plan = new PricingPlan(planData);
     await plan.save();
     res.json({ success: true, data: plan, message: 'Plan created successfully' });
   } catch (error) {

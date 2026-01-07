@@ -144,9 +144,12 @@ interface SettingsData {
     };
     invoices: Array<{
       id: string;
+      orderId?: string;
       date: string;
       amount: number;
-      status: 'paid' | 'pending' | 'failed';
+      status: 'paid' | 'pending' | 'failed' | 'refunded';
+      planName?: string;
+      billingCycle?: string;
     }>;
     usage: {
       projects: number;
@@ -184,9 +187,151 @@ const Settings: React.FC = () => {
     try {
       setLoading(true);
       const response = await apiService.getSettings();
-      setSettingsData(response);
+      
+      // Fetch payment history
+      let paymentHistory: any[] = [];
+      try {
+        const paymentsResponse = await apiService.get('/payment/history');
+        if (paymentsResponse.success && paymentsResponse.data) {
+          paymentHistory = paymentsResponse.data.map((payment: any) => {
+            // Map payment status to display status
+            let displayStatus = 'failed';
+            if (payment.status === 'captured') {
+              displayStatus = 'paid';
+            } else if (payment.status === 'created' || payment.status === 'authorized') {
+              displayStatus = 'pending';
+            } else if (payment.status === 'refunded') {
+              displayStatus = 'refunded';
+            }
+            
+            return {
+              id: payment.razorpayOrderId || payment._id,
+              orderId: payment.razorpayOrderId,
+              date: payment.createdAt || payment.paymentDate,
+              amount: payment.amount / 100, // Convert from paise to rupees
+              status: displayStatus,
+              planName: payment.planName,
+              billingCycle: payment.billingCycle
+            };
+          });
+        }
+      } catch (paymentError) {
+        console.error('Failed to fetch payment history:', paymentError);
+      }
+      
+      // Fetch active subscription
+      let subscriptionData: any = null;
+      try {
+        const subResponse = await apiService.get('/payment/subscription');
+        if (subResponse.success && subResponse.data) {
+          subscriptionData = subResponse.data;
+        }
+      } catch (subError) {
+        console.error('Failed to fetch subscription:', subError);
+      }
+      
+      // Fetch project count
+      let projectCount = 0;
+      try {
+        const projectsResponse = await apiService.get('/projects');
+        if (projectsResponse.success && projectsResponse.data) {
+          projectCount = projectsResponse.data.length;
+        }
+      } catch (projError) {
+        console.error('Failed to fetch projects:', projError);
+      }
+      
+      // Fetch workspace count
+      let workspaceCount = 0;
+      try {
+        const workspacesResponse = await apiService.get('/workspaces');
+        if (workspacesResponse.success && workspacesResponse.data) {
+          workspaceCount = workspacesResponse.data.length;
+        }
+      } catch (wsError) {
+        console.error('Failed to fetch workspaces:', wsError);
+      }
+      
+      // Get plan limits based on user's plan
+      const userPlan = (state.userProfile?.subscription as any)?.plan || subscriptionData?.planKey || 'free';
+      const planLimits = {
+        free: { maxProjects: 1, maxStorage: 5, maxTeamMembers: 1 },
+        pro: { maxProjects: 25, maxStorage: 100, maxTeamMembers: 20 },
+        ultra: { maxProjects: 200, maxStorage: 1000, maxTeamMembers: 30 }
+      };
+      const limits = planLimits[userPlan as keyof typeof planLimits] || planLimits.free;
+      
+      // Merge all data with settings
+      if (response && paymentHistory.length > 0) {
+        setSettingsData({
+          ...response,
+          billing: {
+            ...response.billing,
+            plan: subscriptionData?.planKey || userPlan,
+            nextBillingDate: subscriptionData?.nextBillingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            invoices: paymentHistory,
+            usage: {
+              projects: projectCount,
+              maxProjects: limits.maxProjects,
+              storage: 0, // TODO: Calculate actual storage usage
+              maxStorage: limits.maxStorage,
+              teamMembers: workspaceCount,
+              maxTeamMembers: limits.maxTeamMembers
+            }
+          }
+        });
+      } else {
+        setSettingsData({
+          ...response,
+          billing: {
+            ...response.billing,
+            plan: subscriptionData?.planKey || userPlan,
+            nextBillingDate: subscriptionData?.nextBillingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            usage: {
+              projects: projectCount,
+              maxProjects: limits.maxProjects,
+              storage: 0,
+              maxStorage: limits.maxStorage,
+              teamMembers: workspaceCount,
+              maxTeamMembers: limits.maxTeamMembers
+            }
+          }
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch settings:', error);
+      
+      // Try to fetch payment history even if settings fail
+      let paymentHistory: any[] = [];
+      try {
+        const paymentsResponse = await apiService.get('/payment/history');
+        if (paymentsResponse.success && paymentsResponse.data) {
+          paymentHistory = paymentsResponse.data.map((payment: any) => {
+            // Map payment status to display status
+            let displayStatus = 'failed';
+            if (payment.status === 'captured') {
+              displayStatus = 'paid';
+            } else if (payment.status === 'created' || payment.status === 'authorized') {
+              displayStatus = 'pending';
+            } else if (payment.status === 'refunded') {
+              displayStatus = 'refunded';
+            }
+            
+            return {
+              id: payment.razorpayOrderId || payment._id,
+              orderId: payment.razorpayOrderId,
+              date: payment.createdAt || payment.paymentDate,
+              amount: payment.amount / 100, // Convert from paise to rupees
+              status: displayStatus,
+              planName: payment.planName,
+              billingCycle: payment.billingCycle
+            };
+          });
+        }
+      } catch (paymentError) {
+        console.error('Failed to fetch payment history:', paymentError);
+      }
+      
       // Use mock data for now
       setSettingsData({
         account: {
@@ -313,14 +458,7 @@ const Settings: React.FC = () => {
             last4: '4242',
             brand: 'Visa'
           },
-          invoices: [
-            {
-              id: 'INV-001',
-              date: '2024-01-15',
-              amount: 29.99,
-              status: 'paid'
-            }
-          ],
+          invoices: paymentHistory.length > 0 ? paymentHistory : [],
           usage: {
             projects: 8,
             maxProjects: 50,
@@ -877,48 +1015,6 @@ const Settings: React.FC = () => {
         </div>
       </GlassmorphicCard>
 
-      {/* Density */}
-      {/* Density */}
-      <GlassmorphicCard className="p-4">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.density')}</h3>
-        <div className="flex gap-3">
-          {['compact', 'comfortable', 'spacious'].map((density) => (
-            <button
-              key={density}
-              className={`px-4 py-2 rounded-lg border transition-colors ${preferences.density === density
-                ? 'bg-accent text-gray-900 border-accent-dark ring-2 ring-accent ring-offset-2 dark:ring-offset-gray-800'
-                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
-                }`}
-              onClick={async () => {
-                try {
-                  await updateThemePreferences({ density: density as 'compact' | 'comfortable' | 'spacious' });
-                  dispatch({
-                    type: 'ADD_TOAST',
-                    payload: {
-                      id: Date.now().toString(),
-                      type: 'success',
-                      message: t('settings.densityUpdated', { density }),
-                      duration: 2000
-                    }
-                  });
-                } catch (error) {
-                  dispatch({
-                    type: 'ADD_TOAST',
-                    payload: {
-                      id: Date.now().toString(),
-                      type: 'error',
-                      message: t('settings.densityError'),
-                      duration: 3000
-                    }
-                  });
-                }
-              }}
-            >
-              {t(`settings.${density}`)}
-            </button>
-          ))}
-        </div>
-      </GlassmorphicCard>
 
       {/* Accessibility */}
       {/* Accessibility */}
@@ -1063,23 +1159,54 @@ const Settings: React.FC = () => {
         <GlassmorphicCard className="p-4">
           <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.recentInvoices')}</h3>
           <div className="space-y-3">
-            {settingsData?.billing.invoices.map((invoice) => (
-              <div key={invoice.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.id}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{new Date(invoice.date).toLocaleDateString()}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900 dark:text-gray-100">${invoice.amount}</p>
-                  <span className={`px-2 py-1 text-xs rounded-full ${invoice.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                    invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                      'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                    }`}>
-                    {invoice.status}
-                  </span>
-                </div>
+            {settingsData?.billing.invoices && settingsData.billing.invoices.length > 0 ? (
+              settingsData.billing.invoices.map((invoice) => {
+                // Get status label and color
+                let statusLabel = 'Failed';
+                let statusColor = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+                
+                if (invoice.status === 'paid') {
+                  statusLabel = 'Success';
+                  statusColor = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+                } else if (invoice.status === 'pending') {
+                  statusLabel = 'Pending';
+                  statusColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+                } else if (invoice.status === 'refunded') {
+                  statusLabel = 'Refunded';
+                  statusColor = 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+                }
+                
+                return (
+                  <div key={invoice.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.orderId || invoice.id}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{new Date(invoice.date).toLocaleDateString()}</p>
+                        {invoice.planName && (
+                          <>
+                            <span className="text-gray-400">•</span>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {invoice.planName} ({invoice.billingCycle})
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right flex items-center gap-3">
+                      <p className="font-medium text-gray-900 dark:text-gray-100">₹{invoice.amount.toFixed(2)}</p>
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusColor}`}>
+                        {statusLabel}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">No payment history available</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Your payment records will appear here</p>
               </div>
-            ))}
+            )}
           </div>
         </GlassmorphicCard>
       </div>

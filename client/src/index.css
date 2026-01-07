@@ -27,6 +27,36 @@
   --warning-color: #D97706;
   --error-color: #DC2626;
   --info-color: #0284C7;
+
+  /* Font Size and Density Settings */
+  --base-font-size: 16px;
+  --spacing-unit: 1rem;
+}
+
+/* Apply font size setting */
+html[data-font-size="small"] {
+  --base-font-size: 14px;
+}
+
+html[data-font-size="medium"] {
+  --base-font-size: 16px;
+}
+
+html[data-font-size="large"] {
+  --base-font-size: 18px;
+}
+
+/* Apply density setting */
+html[data-density="compact"] {
+  --spacing-unit: 0.75rem;
+}
+
+html[data-density="comfortable"] {
+  --spacing-unit: 1rem;
+}
+
+html[data-density="spacious"] {
+  --spacing-unit: 1.5rem;
 }
 
 /* Dark Mode Variables */
@@ -70,11 +100,35 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: var(--base-font-size);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Spacing utilities that respect density setting */
+.p-responsive {
+  padding: var(--spacing-unit);
+}
+
+.px-responsive {
+  padding-left: var(--spacing-unit);
+  padding-right: var(--spacing-unit);
+}
+
+.py-responsive {
+  padding-top: var(--spacing-unit);
+  padding-bottom: var(--spacing-unit);
+}
+
+.m-responsive {
+  margin: var(--spacing-unit);
+}
+
+.gap-responsive {
+  gap: var(--spacing-unit);
 }
 
 .bg-primary {

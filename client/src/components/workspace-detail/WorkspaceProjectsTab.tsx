@@ -139,7 +139,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
         projectData.budget = {
           amount: budgetEstimated,
           spent: budgetActual,
-          currency: 'USD'
+          currency: 'INR'
         };
       }
 
@@ -473,7 +473,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
                           <div className="flex items-center gap-2">
                             <DollarSign className="w-4 h-4" />
                             <span>
-                              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.actual ?? 0)} / {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget.currency || 'INR' }).format(project.budget.estimated ?? 0)}
+                              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget.actual ?? 0)} / {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget.estimated ?? 0)}
                             </span>
                           </div>
                         )}
@@ -767,7 +767,7 @@ const WorkspaceProjectsTab: React.FC<WorkspaceProjectsTabProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Actual Spent ($)
+                    Actual Spent (₹)
                   </label>
                   <input
                     type="number"

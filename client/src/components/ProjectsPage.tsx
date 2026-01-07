@@ -133,7 +133,7 @@ const ProjectsPage: React.FC = () => {
           progress: project.progress ?? 0,
           startDate: new Date(start),
           endDate: new Date(due),
-          budget: (project as any).budget || { estimated: 0, actual: 0, currency: 'USD' },
+          budget: (project as any).budget || { estimated: 0, actual: 0, currency: 'INR' },
           team: Array.isArray(rawTeam)
             ? rawTeam.map((member: any) => ({
               _id: member.user?._id || member._id,

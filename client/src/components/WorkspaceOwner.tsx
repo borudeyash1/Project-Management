@@ -405,7 +405,7 @@ const WorkspaceOwner: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-semibold text-gray-900">${projects.reduce((sum, p) => sum + p.budget, 0).toLocaleString()}</p>
+              <p className="text-2xl font-semibold text-gray-900">₹{projects.reduce((sum, p) => sum + p.budget, 0).toLocaleString()}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
               <DollarSign className="w-6 h-6 text-green-600" />
@@ -510,7 +510,7 @@ const WorkspaceOwner: React.FC = () => {
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-4">
                 <span className="text-gray-600">{client.projects} projects</span>
-                <span className="text-gray-600">${client.totalValue.toLocaleString()}</span>
+                <span className="text-gray-600">₹{client.totalValue.toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-2">
                 <button className="text-accent-dark hover:text-blue-700">
@@ -698,7 +698,7 @@ const WorkspaceOwner: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <DollarSign className="w-4 h-4" />
-                  <span>${project.budget.toLocaleString()}</span>
+                  <span>₹{project.budget.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-4 h-4" />

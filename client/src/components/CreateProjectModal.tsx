@@ -23,7 +23,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
     budget: {
       estimated: 0,
       actual: 0,
-      currency: 'USD'
+      currency: 'INR'
     },
     tags: [] as string[]
   });
@@ -50,7 +50,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
       priority: 'medium',
       startDate: new Date().toISOString().split('T')[0],
       endDate: '',
-      budget: { estimated: 0, actual: 0, currency: 'USD' },
+      budget: { estimated: 0, actual: 0, currency: 'INR' },
       tags: []
     });
     onClose();
@@ -208,10 +208,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
           </div>
 
           {/* Budget */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
+          <div>
+            <div>
               <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                {t('projects.estimatedBudget')}
+                {t('projects.estimatedBudget')} (₹)
               </label>
               <input
                 type="number"
@@ -227,29 +227,6 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                 }`}
               />
-            </div>
-
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-700' : 'text-gray-700'}`}>
-                {t('projects.currency')}
-              </label>
-              <select
-                value={formData.budget.currency}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  budget: { ...prev.budget, currency: e.target.value }
-                }))}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-                <option value="INR">INR</option>
-              </select>
             </div>
           </div>
 

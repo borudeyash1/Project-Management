@@ -331,7 +331,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 />
               ) : (
                 <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget?.currency || 'INR' }).format(project.budget?.estimated || 0)}
+                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget?.estimated || 0)}
                 </p>
               )}
             </div>
@@ -351,7 +351,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 />
               ) : (
                 <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: project.budget?.currency || 'INR' }).format(project.budget?.actual || 0)}
+                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget?.actual || 0)}
                 </p>
               )}
             </div>
