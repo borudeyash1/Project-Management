@@ -275,7 +275,11 @@ const ProjectViewDetailed: React.FC = () => {
     if (path.includes('/info')) setActiveView('info');
     else if (path.includes('/team')) setActiveView('team');
     else if (path.includes('/tasks')) setActiveView('tasks');
-    else if (path.includes('/timeline')) setActiveView('timeline');
+    else if (path.includes('/timeline')) {
+      // Redirect timeline to overview since timeline tab is removed
+      navigate(path.replace('/timeline', '/overview'), { replace: true });
+      setActiveView('overview');
+    }
     else if (path.includes('/progress')) setActiveView('progress');
     else if (path.includes('/workload')) setActiveView('workload');
     else if (path.includes('/attendance')) setActiveView('attendance');
@@ -434,13 +438,21 @@ const ProjectViewDetailed: React.FC = () => {
           mapBackendTaskToUi(t, (activeProject as any)?.team || []),
         );
         setProjectTasks(uiTasks);
+        
+        // Update activeProject with loaded tasks
+        if (activeProject) {
+          setActiveProject({
+            ...activeProject,
+            tasks: uiTasks
+          });
+        }
       } catch (error) {
         console.error('[ProjectViewDetailed] Failed to load project tasks:', error);
       }
     };
 
     loadTasks();
-  }, [activeProject?._id, (activeProject as any)?.team]);
+  }, [activeProject?._id]);
 
   // Set projects from state
   useEffect(() => {
@@ -1026,7 +1038,7 @@ const ProjectViewDetailed: React.FC = () => {
       { id: 'info', label: t('project.tabs.info'), icon: FileText, visible: true },
       { id: 'team', label: t('project.tabs.team'), icon: Users, visible: canManageTeam },
       { id: 'tasks', label: t('project.tabs.tasks'), icon: CheckCircle, visible: true },
-      { id: 'timeline', label: t('project.tabs.timeline'), icon: Calendar, visible: true },
+      // Timeline tab removed
       { id: 'progress', label: t('project.tabs.progress'), icon: TrendingUp, visible: true },
       { id: 'workload', label: t('project.tabs.workload'), icon: Activity, visible: true },
       { id: 'attendance', label: t('project.tabs.attendance'), icon: ClockIcon, visible: true },
@@ -1036,8 +1048,11 @@ const ProjectViewDetailed: React.FC = () => {
       { id: 'settings', label: t('project.tabs.settings'), icon: Settings, visible: canManageTeam }
     ].filter(tab => tab.visible);
 
+    console.log('🔍 [ProjectViewDetailed] Tabs array:', tabs.map(t => t.id));
+
+
     return (
-      <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
+      <div key="project-tabs-v2" className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
         {/* Mobile View: Dropdown */}
         <div className="lg:hidden p-4">
           <label htmlFor="mobile-tab-select" className="sr-only">Select a tab</label>
@@ -1438,11 +1453,15 @@ const ProjectViewDetailed: React.FC = () => {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.budget')}</span>
-                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0))}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.spent')}</span>
-                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.spent || 0)}</span>
+                <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0))}
+                </span>
               </div>
             </div>
           </div>
@@ -2005,7 +2024,7 @@ const ProjectViewDetailed: React.FC = () => {
             </div>
           </div>
           <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative z-10">
-            {activeProject?.tasks.filter(t => t.status === 'completed').length || 0}
+            {Array.isArray(activeProject?.tasks) ? activeProject?.tasks.filter(t => t.status === 'completed').length : 0}
           </p>
           <p className={`text-sm mt-2 font-semibold relative z-10 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{t('projects.tasksCompleted')}</p>
         </GlassmorphicCard>
@@ -2019,12 +2038,16 @@ const ProjectViewDetailed: React.FC = () => {
             </div>
           </div>
           <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent relative z-10">
-            {activeProject?.budget && activeProject?.spent
-              ? Math.round((activeProject.spent / activeProject.budget) * 100)
-              : 0}%
+            {(() => {
+              const budgetEstimated = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0);
+              const budgetActual = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0);
+              return budgetEstimated && budgetActual && budgetEstimated > 0
+                ? Math.round((budgetActual / budgetEstimated) * 100)
+                : 0;
+            })()}%
           </p>
           <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {formatCurrency(activeProject?.spent || 0)} of {formatCurrency(activeProject?.budget || 0)}
+            {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0))} of {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0))}
           </p>
         </GlassmorphicCard>
 
@@ -2052,8 +2075,9 @@ const ProjectViewDetailed: React.FC = () => {
           <h4 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.taskStatusDistribution')}</h4>
           <div className="space-y-3">
             {['pending', 'in-progress', 'review', 'completed', 'blocked'].map((status) => {
-              const count = activeProject?.tasks.filter(t => t.status === status).length || 0;
-              const total = activeProject?.tasks.length || 1;
+              const tasks = (Array.isArray(activeProject?.tasks) ? activeProject?.tasks : []) as any[];
+              const count = tasks.filter(t => t.status === status).length;
+              const total = tasks.length || 1;
               const percentage = Math.round((count / total) * 100);
               return (
                 <div key={status}>
@@ -2129,8 +2153,8 @@ const ProjectViewDetailed: React.FC = () => {
               <div
                 className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
                 style={{
-                  width: `${activeProject?.budget && activeProject?.spent
-                    ? Math.min(Math.round((activeProject.spent / activeProject.budget) * 100), 100)
+                  width: `${activeProject?.budget && activeProject?.spent && activeProject.budget > 0
+                    ? Math.min(Math.round(((activeProject.spent || 0) / activeProject.budget) * 100), 100)
                     : 0}%`
                 }}
               />

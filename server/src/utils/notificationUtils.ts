@@ -745,3 +745,48 @@ export async function notifyTaskOverdue(taskId: string): Promise<void> {
     console.error('❌ [NOTIFICATION] Failed to notify task overdue:', error);
   }
 }
+
+/**
+ * Inbox Message Notification
+ */
+export async function notifyInboxMessage(
+  workspaceId: string,
+  senderId: string,
+  recipientId: string,
+  messageContent: string
+): Promise<void> {
+  try {
+    const sender: any = await User.findById(senderId);
+    const workspace: any = await Workspace.findById(workspaceId);
+    
+    if (!sender || !workspace) return;
+
+    // Don't notify the sender
+    if (senderId === recipientId) return;
+
+    const truncatedMessage = messageContent.length > 100 
+      ? messageContent.substring(0, 100) + '...' 
+      : messageContent;
+
+    await createNotification({
+      type: 'workspace',
+      title: 'New Message',
+      message: `${sender.fullName} sent you a message: "${truncatedMessage}"`,
+      userId: recipientId,
+      relatedId: workspaceId,
+      metadata: {
+        workspaceId,
+        workspaceName: workspace.name,
+        senderId,
+        senderName: sender.fullName,
+        messagePreview: truncatedMessage,
+        messageType: 'inbox',
+      }
+    });
+
+    console.log(`✅ [NOTIFICATION] Inbox message notification sent to user ${recipientId}`);
+  } catch (error) {
+    console.error('❌ [NOTIFICATION] Failed to notify inbox message:', error);
+  }
+}
+

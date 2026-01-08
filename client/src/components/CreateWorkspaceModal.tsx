@@ -347,7 +347,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({ isOpen, onC
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('workspace.verifyEmail')}</h3>
         <p className="text-gray-600">
-          {t('workspace.sentCode')} <strong>{formData.contactEmail}</strong>
+          {t('workspace.sentCode', { email: formData.contactEmail })}
         </p>
       </div>
 

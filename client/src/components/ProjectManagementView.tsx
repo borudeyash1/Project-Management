@@ -451,7 +451,7 @@ const ProjectManagementView: React.FC = () => {
       { id: 'manage-project', label: 'Manage Project', icon: Settings },
       { id: 'project-management', label: 'Project Management View', icon: BarChart3 },
       { id: 'dashboard', label: 'Dashboard', icon: Activity },
-      { id: 'timeline', label: 'Timeline View', icon: Clock },
+      // Timeline removed
       { id: 'project-info', label: 'Complete Project Info', icon: FileText },
       { id: 'assign-task', label: 'Assign Task', icon: Plus },
       { id: 'add-employees', label: 'Add Employees', icon: UserPlus },

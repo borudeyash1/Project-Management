@@ -895,7 +895,7 @@ const ProjectView: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Budget Used</p>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                  ₹{(project.spent / 1000).toFixed(0)}k
+                  ₹{((project.spent || 0) / 1000).toFixed(0)}k
                 </p>
               </div>
               <div className="p-3 bg-yellow-100 rounded-lg">
@@ -904,7 +904,7 @@ const ProjectView: React.FC = () => {
             </div>
             <div className="mt-4 flex items-center text-sm text-yellow-600">
               <TrendingUp className="w-4 h-4 mr-1" />
-              <span>{Math.round((project.spent / project.budget) * 100)}% of budget</span>
+              <span>{project.budget && project.spent ? Math.round(((project.spent || 0) / (project.budget || 1)) * 100) : 0}% of budget</span>
             </div>
           </div>
         </div>

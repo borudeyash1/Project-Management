@@ -3,6 +3,7 @@ import Workspace from '../models/Workspace';
 import Message from '../models/Message';
 import User from '../models/User';
 import { AuthenticatedRequest, ApiResponse } from '../types';
+import { notifyInboxMessage } from '../utils/notificationUtils';
 
 // Get workspace threads (one per other member), including last message + unread count
 export const getWorkspaceThreads: RequestHandler = async (req, res) => {
@@ -263,6 +264,9 @@ export const sendMessage: RequestHandler = async (req, res) => {
       content: content.trim(),
       readBy: [currentUserId],
     });
+
+    // Send notification to recipient
+    await notifyInboxMessage(workspaceId, currentUserId, otherUserId, content.trim());
 
     const response: ApiResponse = {
       success: true,

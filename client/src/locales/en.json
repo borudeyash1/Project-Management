@@ -364,6 +364,7 @@
     "dateDesc": "Date (Newest)"
   },
   "workspaceType": {
+    "team": "Team",
     "enterprise": "Enterprise",
     "startup": "Startup",
     "freelance": "Freelance",
@@ -2437,6 +2438,14 @@
       "typeMessage": "Type a message...",
       "selectChat": "Select a chat to start messaging"
     },
+    "sending": "Sending...",
+    "verifyOwnership": "Verify Ownership",
+    "verifyOwnershipDesc": "Please verify your email to confirm workspace ownership",
+    "verifyEmail": "Verify Email",
+    "sentCode": "Verification code sent to {{email}}",
+    "enterCode": "Enter 6-digit code",
+    "resend": "Resend Code",
+    "verifyCode": "Verify Code",
     "settings": {
       "title": "Workspace Settings",
       "subtitle": "Manage workspace configuration and preferences",

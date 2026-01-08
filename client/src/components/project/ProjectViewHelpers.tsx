@@ -272,8 +272,8 @@ export const RenderAnalyticsView: React.FC<RenderAnalyticsViewProps> = ({ active
             <DollarSign className="w-5 h-5 text-purple-600" />
           </div>
           <p className="text-3xl font-bold text-gray-900">
-            {activeProject?.budget && activeProject?.spent 
-              ? Math.round((activeProject.spent / activeProject.budget) * 100)
+            {activeProject?.budget && activeProject?.spent && activeProject.budget > 0
+              ? Math.round(((activeProject.spent || 0) / activeProject.budget) * 100)
               : 0}%
           </p>
           <p className="text-sm text-gray-600 mt-1">
@@ -380,8 +380,8 @@ export const RenderAnalyticsView: React.FC<RenderAnalyticsViewProps> = ({ active
                 <div 
                   className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
                   style={{ 
-                    width: `${activeProject?.budget && activeProject?.spent 
-                      ? Math.min(Math.round((activeProject.spent / activeProject.budget) * 100), 100)
+                    width: `${activeProject?.budget && activeProject?.spent && activeProject.budget > 0
+                      ? Math.min(Math.round(((activeProject.spent || 0) / activeProject.budget) * 100), 100)
                       : 0}%` 
                   }}
                 />
