@@ -146,6 +146,7 @@ server/migration-log.txt
 server/test-output.txt
 server/test-r2.log
 server/debug.log
+client/build/
 
 # HTML Webpack Plugin localStorage file
 .localstorage
