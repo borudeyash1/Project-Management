@@ -126,7 +126,7 @@ const SharedNavbar: React.FC = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
+          <div className="hidden xl:flex items-center space-x-4">
             {/* Products Animated Dropdown */}
             <div className="products-select" ref={productsDropdownRef}>
               <div className="products-selected">
@@ -189,7 +189,7 @@ const SharedNavbar: React.FC = () => {
               </Link>
             ))}
           </div>
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+          <div className="hidden xl:flex items-center space-x-4">
             {/* Language Selector - Hidden on public pages */}
             {!isPublicPage && (
               <div className="relative" ref={languageDropdownRef}>
@@ -257,7 +257,7 @@ const SharedNavbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="xl:hidden flex items-center gap-2">
             {!isPublicPage && (
               <button
                 onClick={toggleTheme}
@@ -278,7 +278,7 @@ const SharedNavbar: React.FC = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
           } bg-white/95 border-b border-gray-200 shadow-sm`}
       >
         <div className="px-4 pt-2 pb-6 space-y-1">
