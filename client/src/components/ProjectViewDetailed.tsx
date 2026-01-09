@@ -1008,37 +1008,12 @@ const ProjectViewDetailed: React.FC = () => {
       (activeProject as any)?.team?.some((m: any) => m._id === state.userProfile?._id && m.role === 'project-manager');
     const canManageTeam = isWorkspaceOwner || isProjectManager || currentUserRole === 'owner' || currentUserRole === 'manager';
 
-    const allTabs = [
-      { id: 'overview', label: t('project.tabs.overview'), icon: LayoutGrid, visible: true },
-      { id: 'info', label: t('project.tabs.info'), icon: FileText, visible: true },
-      { id: 'team', label: t('project.tabs.team'), icon: Users, visible: canManageTeam }, // Only owner/PM can see
-      { id: 'tasks', label: t('project.tabs.tasks'), icon: CheckCircle, visible: false }, // Tasks moved to board view in planner
-      { id: 'board', label: t('project.tabs.tasks'), icon: Layout, visible: true }, // Replaces tasks tab
-      { id: 'timeline', label: t('project.tabs.timeline'), icon: Calendar, visible: true },
-      { id: 'progress', label: t('project.tabs.progress'), icon: TrendingUp, visible: true },
-      { id: 'workload', label: t('project.tabs.workload'), icon: Activity, visible: true },
-      { id: 'attendance', label: t('project.tabs.attendance'), icon: ClockIcon, visible: true },
-      { id: 'reports', label: t('project.tabs.reports'), icon: BarChart3, visible: true },
-      { id: 'documents', label: t('project.tabs.documents'), icon: Folder, visible: true },
-      { id: 'inbox', label: t('project.tabs.inbox'), icon: Mail, visible: true },
-      { id: 'settings', label: t('project.tabs.settings'), icon: Settings, visible: canManageTeam }
-    ];
-
-    // Filter tabs based on visibility and handle special cases
-    // Note: 'tasks' id is kept in activeView state but we show 'board' UI logic for it in some cases
-    // To match original logic where 'tasks' came from URL, we map 'tasks' to 'board' tab label but keep id suitable for URL
-
-    // Correction: In original code, id was 'tasks'. Let's keep 'tasks' as primary.
-    // I noticed I changed id: 'tasks' to visible: false and added 'board'. 
-    // Let's stick to the original IDs to avoid breaking URL routing which expects 'tasks', 'timeline' etc.
-    // I'll just update the labels with t().
-
+    // Define available tabs (Timeline tab has been removed)
     const tabs = [
       { id: 'overview', label: t('project.tabs.overview'), icon: LayoutGrid, visible: true },
       { id: 'info', label: t('project.tabs.info'), icon: FileText, visible: true },
       { id: 'team', label: t('project.tabs.team'), icon: Users, visible: canManageTeam },
       { id: 'tasks', label: t('project.tabs.tasks'), icon: CheckCircle, visible: true },
-      // Timeline tab removed
       { id: 'progress', label: t('project.tabs.progress'), icon: TrendingUp, visible: true },
       { id: 'workload', label: t('project.tabs.workload'), icon: Activity, visible: true },
       { id: 'attendance', label: t('project.tabs.attendance'), icon: ClockIcon, visible: true },

@@ -22,11 +22,19 @@ const ProjectLayout: React.FC = () => {
   // Get all projects in the same workspace for the dropdown
   const workspaceProjects = state.projects.filter(p => p.workspace === project?.workspace);
 
-  // Tab order for determining slide direction
+  // Tab order for determining slide direction (timeline removed)
   const tabOrder = [
-    'overview', 'info', 'team', 'tasks', 'timeline',
+    'overview', 'info', 'team', 'tasks',
     'progress', 'workload', 'reports', 'design', 'inbox', 'settings'
   ];
+
+  // Redirect timeline to overview
+  useEffect(() => {
+    if (location.pathname.includes('/timeline')) {
+      const newPath = location.pathname.replace('/timeline', '/overview');
+      navigate(newPath, { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   // Determine slide direction based on navigation
   useEffect(() => {

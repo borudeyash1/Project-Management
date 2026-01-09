@@ -66,12 +66,7 @@ const ProjectInternalNav: React.FC = () => {
       icon: CheckSquare,
       path: `/project/${projectId}/tasks`
     },
-    {
-      id: 'timeline',
-      label: t('project.tabs.timeline'),
-      icon: Calendar,
-      path: `/project/${projectId}/timeline`
-    },
+    // Timeline tab removed
     {
       id: 'progress',
       label: t('project.tabs.progress'),
