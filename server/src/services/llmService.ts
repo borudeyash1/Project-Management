@@ -262,7 +262,7 @@ Intent:`;
       'sv': 'Swedish'
     };
 
-    const languageName = language ? (languageMap[language] || language) : undefined;
+    const languageName = language ? (languageMap[language] || language) : 'English'; // Default to English
 
     console.log('[LLM Service] Input language code:', language);
     console.log('[LLM Service] Mapped language name:', languageName);
@@ -323,7 +323,7 @@ Response (as AI Studio):`;
     }
 
     const requestBody = {
-      model: "deepseek-chat",
+      model: "deepseek-chat", // Switched to deepseek-chat for direct answers (no thinking process) and lower cost
       messages: [
         {
           role: "user",
@@ -331,11 +331,12 @@ Response (as AI Studio):`;
         },
       ],
       temperature: 0.7,
-      max_tokens: 2048,
+      max_tokens: 500, // Reduced from 2048 to save costs
       top_p: 0.95,
     };
 
     try {
+      console.log('[DeepSeek API] Sending request with model: deepseek-chat, max_tokens: 500');
       const response = await axios.post<DeepSeekResponse>(this.apiUrl, requestBody, {
         headers: {
           "Content-Type": "application/json",
@@ -344,15 +345,38 @@ Response (as AI Studio):`;
         timeout: 30000, // 30 second timeout
       });
 
+      console.log('[DeepSeek API] Response received:', {
+        hasChoices: !!response.data.choices,
+        choicesLength: response.data.choices?.length,
+        status: response.status
+      });
+
       if (response.data.choices && response.data.choices.length > 0) {
         const choice = response.data.choices[0];
+
+        console.log('[DeepSeek API] Choice structure:', {
+          hasMessage: !!choice?.message,
+          messageKeys: choice?.message ? Object.keys(choice.message) : [],
+          hasContent: !!choice?.message?.content
+        });
+
         const content = choice?.message?.content;
-        if (content && typeof content === "string") {
+        console.log('[DeepSeek API] Content length:', content?.length || 0);
+        console.log('[DeepSeek API] Content preview:', content?.substring(0, 100));
+
+        if (content && typeof content === "string" && content.trim().length > 0) {
           return content;
         }
       }
+
+      console.error('[DeepSeek API] Full response data:', JSON.stringify(response.data, null, 2));
       throw new Error("No response from DeepSeek API");
     } catch (error: any) {
+      console.error('[DeepSeek API] Error details:', {
+        hasResponse: !!error.response,
+        status: error.response?.status,
+        message: error.message
+      });
       if (error.response) {
         throw new Error(
           `DeepSeek API error: ${error.response.status} - ${error.response.data?.error?.message || "Unknown error"}`,

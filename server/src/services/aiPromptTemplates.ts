@@ -1,4 +1,4 @@
-import { PageContext, WorkspaceSubPage, ProjectSubPage, UserRole } from './contextAnalyzerService';
+import { PageContext, WorkspaceSubPage, ProjectSubPage, UserRole, GlobalPage } from './contextAnalyzerService';
 
 /**
  * AI Prompt Templates Service
@@ -22,10 +22,15 @@ class AIPromptTemplatesService {
                 context.userRole,
                 data
             );
-        } else {
+        } else if (context.pageType === 'project') {
             return this.generateProjectPrompt(
                 context.subPage as ProjectSubPage,
                 context.userRole,
+                data
+            );
+        } else {
+            return this.generateGlobalPrompt(
+                context.subPage as any,
                 data
             );
         }
@@ -99,25 +104,114 @@ class AIPromptTemplatesService {
         }
     }
 
+
+    /**
+     * Generate global/app-wide prompts
+     */
+    private generateGlobalPrompt(
+        subPage: GlobalPage,
+        data: any
+    ): PromptTemplate {
+        const baseSystem = `You are an AI assistant for personal productivity. Provide concise, actionable insights.`;
+
+        switch (subPage) {
+            case 'planner':
+                return this.globalPlannerPrompt(data);
+            case 'notifications':
+                return this.globalNotificationsPrompt(data);
+            case 'reminders':
+                return this.globalRemindersPrompt(data);
+            case 'goals':
+                return this.globalGoalsPrompt(data);
+            case 'settings':
+            case 'profile':
+                return this.globalProfilePrompt(data);
+            case 'reports':
+                return this.globalReportsPrompt(data);
+            case 'calendar':
+                return this.globalCalendarPrompt(data);
+            case 'home':
+                return this.globalHomePrompt(data);
+            case 'projects':
+                return this.globalProjectsPrompt(data);
+            case 'workspace':
+                return this.globalWorkspacePrompt(data);
+            case 'notes':
+                return this.globalNotesPrompt(data);
+            default:
+                return {
+                    systemPrompt: baseSystem,
+                    userPrompt: `Analyze this data: ${JSON.stringify(data)}`,
+                    focusAreas: ['general insights']
+                };
+        }
+    }
+
     // ==================== WORKSPACE PROMPTS ====================
 
     private workspaceOverviewPrompt(role: UserRole, data: any): PromptTemplate {
         const roleContext = this.getRoleContext(role);
 
-        return {
-            systemPrompt: `You are analyzing a workspace overview page. ${roleContext}`,
-            userPrompt: `
-Workspace: ${data.workspaceName}
-Members: ${data.memberCount}
-Active Projects: ${data.activeProjects || 0}
-Attendance Rate: ${data.attendanceRate || 0}%
+        // Serialize detailed data for the prompt context
+        const membersList = data.detailedMembers
+            ? data.detailedMembers.map((m: any) => `- ${m.name} (${m.role}): Currently ${m.attendance}`).join('\n')
+            : 'Detailed member data not available';
 
-Provide a brief summary (2-3 sentences) highlighting:
-1. Overall workspace health
-2. Key metrics and trends
-3. ${role === 'owner' || role === 'admin' ? 'Strategic recommendations' : 'Team collaboration status'}
+        const currentUserInfo = data.currentUser
+            ? `You are talking to: ${data.currentUser.name} (Role: ${data.currentUser.role}, Designation: ${data.currentUser.designation})`
+            : 'User profile not identified';
+
+        const projectsList = data.projects
+            ? data.projects.map((p: any) => `- ${p.name}: Status ${p.status}, Lead: ${p.lead}, Due: ${p.dueDate}, Progress: ${p.progress}%`).join('\n')
+            : 'Active project data not available';
+
+        return {
+            systemPrompt: `You are an intelligent AI assistant for a project management workspace.
+${roleContext}
+
+**TRAINING INSTRUCTIONS**:
+1. **Deep Context Awareness**: You have complete access to the specific Member List and Attendance data below. USE IT.
+   - If asked "Who is absent?", look at the list and name them.
+   - If asked "What is my role?", look at the "You are talking to" section.
+2. **Chain of Thought**: Before answering, scan the provided data explicitly.
+3. **Format**: Provide clean, direct text. **DO NOT** use markdown bolding (**text**) or italics (*text*) in your output.
+4. **Tone**: Professional, helpful, and concise.
+
+**FEW-SHOT EXAMPLES**:
+- User: "Who is absent today?"
+  AI: John Doe and Jane Smith are absent today.
+- User: "What is my role?"
+  AI: You are the Workspace Owner.
+- User: "How are the projects doing?"
+  AI: We have 3 active projects. The 'Website Redesign' is 60% done but currently 'planning'.
+- User: "Give me a summary."
+  AI: The workspace is active with 85% attendance. 3 members are working from home. There are 5 active projects.
+
+**DATA CONTEXT**:
+${currentUserInfo}
+
+**MEMBER LIST & ATTENDANCE STATUS**:
+${membersList}
+
+**ACTIVE PROJECTS SUMMARY**:
+${projectsList}
 `,
-            focusAreas: ['workspace health', 'team metrics', 'recommendations']
+            userPrompt: `
+Analyze the following Workspace Overview data:
+- Workspace Name: ${data.workspaceName}
+- Total Members: ${data.stats?.totalMembers || data.memberCount}
+- Active Projects: ${data.stats?.activeProjects || data.activeProjects || 0}
+- Attendance Rate: ${data.stats?.attendanceRate || data.attendanceRate || 0}%
+- Present Today: ${data.stats?.presentCount || 'N/A'}
+- WFH Today: ${data.stats?.wfhCount || 'N/A'}
+- Absent Today: ${data.stats?.absentCount || 'N/A'}
+
+Provide a smart, context-aware summary (3-4 sentences) highlighting:
+1. Real-time Attendance (mention specific numbers of who is present/absent)
+2. Project Activity overview
+3. A strategic insight based on your role as ${role}.
+`,
+            focusAreas: ['attendance analysis', 'team tracking', 'strategic insights']
         };
     }
 
@@ -367,6 +461,240 @@ Provide: 1) Performance summary 2) Trend analysis 3) Improvement areas 4) Succes
         };
     }
 
+    // ==================== GLOBAL PROMPTS ====================
+
+    private globalPlannerPrompt(data: any): PromptTemplate {
+        const tasks = data.tasks || {};
+        const events = data.events || {};
+        const reminders = data.reminders || {};
+        const goals = data.goals || {};
+        const timeAnalysis = data.timeAnalysis || {};
+        const integrations = data.integrations || {};
+
+        return {
+            systemPrompt: `You are an intelligent personal planner assistant. Analyze the user's schedule, tasks (local & external), events, reminders, and goals. Provide actionable daily planning insights, unifying work from Jira, Linear, Slack, and Sartthi.`,
+            userPrompt: `
+**Today's Schedule:**
+- Tasks Due: ${tasks.today?.length || 0} (${tasks.today?.map((t: any) => `${t.title} at ${t.due}`).join(', ') || 'None'})
+- Events: ${events.today?.length || 0} (${events.today?.map((e: any) => `${e.title} at ${e.start}`).join(', ') || 'None'})
+- Reminders: ${reminders.active?.length || 0} active
+
+**External Workload (Integrations):**
+- Jira: ${integrations.jira?.total || 0} active issues (${integrations.jira?.issues?.map((i: any) => `${i.key}`).join(', ') || 'None'})
+- Linear: ${integrations.linear?.total || 0} active issues (${integrations.linear?.issues?.map((i: any) => `${i.id}`).join(', ') || 'None'})
+- Slack: ${integrations.slack?.total || 0} tasks from Slack
+
+**This Week:**
+- Tasks: ${tasks.thisWeek?.length || 0} pending
+- Events: ${events.thisWeek?.length || 0} scheduled
+- Overdue Items: ${timeAnalysis.overdueCount || 0} tasks${reminders.overdue?.length ? ` + ${reminders.overdue.length} reminders` : ''}
+
+**Your Goals:**
+- Short-term: ${goals.shortTerm?.join(', ') || 'None set'}
+- Long-term: ${goals.longTerm?.join(', ') || 'None set'}
+
+**Busy Hours Today:** ${timeAnalysis.busyHours?.join(', ') || 'No events scheduled'}
+
+Provide:
+1. **Unified Morning Briefing**: Summary of work across ALL platforms (Sartthi, Jira, Linear, Slack).
+2. **Time Blocking**: Suggest when to work on tasks (prioritize urgent integration issues + local tasks).
+3. **Goal Check**: Which tasks align with my goals?
+4. **Energy Management**: High-focus vs low-energy suggestions.
+`,
+            focusAreas: ['unified planning', 'cross-platform prioritization', 'time management']
+        };
+    }
+
+    private globalNotificationsPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are an intelligent notification assistant. Help the user prioritize their attention.`,
+            userPrompt: `
+Unread Notifications (${data.unreadCount}):
+${data.latest?.map((n: any) => `- [${n.type}] ${n.message} (${n.time})`).join('\n') || 'No unread notifications.'}
+
+Provide:
+1. **Urgent Action**: Is there anything requiring immediate response? (Look for 'alert', 'error', 'urgent').
+2. **Summary**: A one-sentence summary of the activity found.
+`,
+            focusAreas: ['urgent items', 'notification summary']
+        };
+    }
+
+    private globalRemindersPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are a deadline assistant. ensure the user is one step ahead.`,
+            userPrompt: `
+Upcoming Deadlines:
+${data.upcomingDeadlines?.map((t: any) => `- ${t.title} (${t.date}, Priority: ${t.priority})`).join('\n') || 'No upcoming deadlines.'}
+
+Provide:
+1. **Critical Deadlines**: Any high priority items due soon?
+2. **Next Action**: What should be started today to meet these?
+`,
+            focusAreas: ['deadlines', 'preparation']
+        };
+    }
+
+    private globalGoalsPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are a career and goal coach. Monitor progress and keep the user on track.`,
+            userPrompt: `
+Short Term Goals: ${JSON.stringify(data.shortTerm)}
+Long Term Goals: ${JSON.stringify(data.longTerm)}
+
+Provide:
+1. **Focus Check**: Are current activities aligned with these goals?
+2. **Motivation**: A brief encouraging insight based on these aspirations.
+`,
+            focusAreas: ['goal progress', 'motivation']
+        };
+    }
+
+    private globalProfilePrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are an account settings assistant.`,
+            userPrompt: `
+User: ${data.name} (${data.email})
+Plan: ${data.plan}
+Preferences: ${JSON.stringify(data.preferences)}
+
+Suggest: 1) Account security 2) Plan utilization 3) Preference optimization
+`,
+            focusAreas: ['account settings', 'preferences']
+        };
+    }
+
+    private globalReportsPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are a personal productivity analyst. Analyze real performance metrics.`,
+            userPrompt: `
+Performance Data:
+- tasks Completed (Last 7 Days): ${data.completedCount}
+- Pending Tasks: ${data.pendingCount}
+- Productivity Score: ${data.productivityScore}
+- Summary: ${data.summary}
+
+Provide:
+1. **Performance Check**: Is the user's velocity (completed count) healthy?
+2. **Backlog Analysis**: Is the pending count growing too large?
+3. **Recommendation**: One improvement for next week.
+`,
+            focusAreas: ['productivity analysis', 'performance']
+        };
+    }
+
+    private globalHomePrompt(data: any): PromptTemplate {
+        const dashboard = data.dashboard || {};
+        const tasks = dashboard.taskSummary || {};
+        const projects = dashboard.projectSummary || {};
+        const notifications = dashboard.notifications || {};
+        const workspaces = dashboard.workspaces || {};
+        const team = dashboard.team || {};
+        const goals = dashboard.goals || {};
+
+        return {
+            systemPrompt: `You are an intelligent personal productivity dashboard assistant. Analyze the user's complete dashboard state and provide actionable insights to help them start their day efficiently.`,
+            userPrompt: `
+**Dashboard Overview:**
+
+**Tasks:**
+- Pending: ${tasks.totalPending || 0} tasks
+- Recent: ${tasks.myTasks?.slice(0, 3).map((t: any) => `${t.title} (${t.priority})`).join(', ') || 'None'}
+
+**Projects:**
+- Active: ${projects.projects?.length || 0} projects
+- Top Projects: ${projects.projects?.slice(0, 3).map((p: any) => `${p.name} (${p.progress}%)`).join(', ') || 'None'}
+
+**Notifications:**
+- Unread: ${notifications.unreadCount || 0}
+
+**Workspaces:**
+- Total: ${workspaces.total || 0}
+- Active: ${workspaces.list?.map((w: any) => `${w.name} (${w.members} members)`).join(', ') || 'None'}
+
+**Team:**
+- Total Collaborators: ${team.totalMembers || 0}
+
+**Goals:**
+- Short-term: ${goals.shortTerm?.length || 0} goals
+- Long-term: ${goals.longTerm?.length || 0} goals
+
+Provide:
+1. **Daily Focus**: What should I prioritize today based on pending tasks and project progress?
+2. **Critical Updates**: Any urgent notifications or deadlines I should address?
+3. **Quick Wins**: Low-hanging fruit I can complete quickly?
+4. **Goal Alignment**: Are my current activities aligned with my goals?
+`,
+            focusAreas: ['daily focus', 'prioritization', 'goal alignment']
+        };
+    }
+
+    private globalProjectsPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are a project portfolio manager. Summarize the status of active projects.`,
+            userPrompt: `
+Active Projects:
+${data.projects?.map((p: any) => `- ${p.name}: ${p.status} (${p.progress}%) - Workspace: ${p.workspace || 'N/A'}`).join('\n') || 'None'}
+
+Provide:
+1. **Portfolio Status**: A 2-sentence summary of overall progress.
+2. **Attention Needed**: Identify any projects with low progress or 'active' status but no movement.
+3. **Next Step**: A general recommendation for the portfolio.
+`,
+            focusAreas: ['portfolio health', 'project oversight']
+        };
+    }
+
+    private globalWorkspacePrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are a workspace manager. specific details about the user's workspaces.`,
+            userPrompt: `
+Workspaces:
+${data.workspaces?.map((w: any) => `- ${w.name}: ${w.memberCount} members (${w.plan} Plan)`).join('\n') || 'None'}
+
+Provide:
+1. **Workspace Summary**: Brief overview of the active workspaces.
+2. **Membership Insight**: Any large teams or solo workspaces?
+3. **Quick Action**: A suggestion for managing these workspaces.
+`,
+            focusAreas: ['workspace management', 'organization']
+        };
+    }
+
+    private globalNotesPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are an intelligent knowledge assistant. Summarize the content of the user's recent notes.`,
+            userPrompt: `
+User's Recent Notes (Title - Date - Content Preview):
+${data.recentNotes?.map((n: any) => `* **${n.title}** (${n.date}): "${n.preview}"`).join('\n') || 'No recent notes found.'}
+
+Please provide a **Content Summary**:
+1. **Key Topics**: What is the user working on or thinking about? (Summarize the themes found in the previews).
+2. **Recent Insights**: specific details mentioned (names, tools, ideas).
+3. **Consolidated View**: Synthesize these notes into a single cohesive paragraph.
+
+Do NOT give generic "organization tips". Analyze the ACTUAL TEXT provided above.
+`,
+            focusAreas: ['knowledge summarization', 'key topics']
+        };
+    }
+
+    private globalCalendarPrompt(data: any): PromptTemplate {
+        return {
+            systemPrompt: `You are a scheduling assistant. Help the user manage their time effectively.`,
+            userPrompt: `
+Upcoming Events (Next 7 Days):
+${data.upcomingEvents?.map((e: any) => `- ${e.title} (${e.start} - ${e.end})`).join('\n') || 'No upcoming events.'}
+
+Provide:
+1. **Schedule Summary**: A quick overview of the week's load.
+2. **Conflict Check**: Any overlapping or tight schedules?
+3. **Preparation**: Suggestions to prepare for upcoming meetings.
+`,
+            focusAreas: ['schedule', 'time management']
+        };
+    }
+
     // ==================== HELPER METHODS ====================
 
     private getRoleContext(role: UserRole): string {
@@ -396,8 +724,10 @@ Provide: 1) Performance summary 2) Trend analysis 3) Improvement areas 4) Succes
 
         if (pageType === 'workspace') {
             return this.getWorkspaceQuestions(subPage as WorkspaceSubPage, userRole);
-        } else {
+        } else if (pageType === 'project') {
             return this.getProjectQuestions(subPage as ProjectSubPage, userRole);
+        } else {
+            return this.getGlobalQuestions(subPage as GlobalPage);
         }
     }
 
@@ -419,7 +749,13 @@ Provide: 1) Performance summary 2) Trend analysis 3) Improvement areas 4) Succes
                 ['Which projects can I join?', 'What are the active projects?', 'Where is my expertise needed?'],
             profile: ['How can we optimize settings?', 'What features are underutilized?', 'Should we upgrade?'],
             clients: ['What are the client priorities?', 'Are there any issues?', 'How is client satisfaction?'],
-            inbox: ['What needs immediate response?', 'Who should I follow up with?', 'What are the priorities?']
+            inbox: ['What needs immediate response?', 'Who should I follow up with?', 'What are the priorities?'],
+            design: ['What are the latest designs?', 'Any feedback on mockups?', 'Design system updates?'],
+            jira: ['What are the Jira ticket updates?', 'Any blockers in Jira?', 'Sync status?'],
+            notion: ['What are the Notion docs?', 'Any new pages?', 'Workspace updates?'],
+            zendesk: ['What are the open tickets?', 'Customer feedback?', 'Support metrics?'],
+            slack: ['Any urgent messages?', 'Channel updates?', 'Team announcements?'],
+            linear: ['What are the Linear issues?', 'Cycle progress?', 'Bug tracking?']
         };
 
         return questions[subPage] || ['What insights can you provide?'];
@@ -445,7 +781,28 @@ Provide: 1) Performance summary 2) Trend analysis 3) Improvement areas 4) Succes
             progress: ['Are we on track?', 'What is our velocity?', 'What are the trends?'],
             timeline: ['Are we meeting deadlines?', 'What are the risks?', 'How can we accelerate?'],
             reports: ['What are the key insights?', 'How are we performing?', 'What should we improve?'],
-            documents: ['What documents are missing?', 'What needs review?', 'How is documentation quality?']
+            documents: ['What documents are missing?', 'What needs review?', 'How is documentation quality?'],
+            inbox: ['Any project messages?', 'Team updates?', 'Communication status?'],
+            design: ['Design progress?', 'Prototype status?', 'Feedback needed?']
+        };
+
+        return questions[subPage] || ['What insights can you provide?'];
+    }
+
+    private getGlobalQuestions(subPage: GlobalPage): string[] {
+        const questions: Record<GlobalPage, string[]> = {
+            home: ['What tasks should I focus on today?', 'Are there any urgent deadlines?', 'Summarize my updates.'],
+            projects: ['Which projects need attention?', 'What is the overall progress?', 'Show me at-risk projects.'],
+            workspace: ['How many active workspaces?', 'Show me invitations.', 'Summarize workspace health.'],
+            planner: ['What is my schedule for today?', 'Prioritize my tasks.', 'Do I have conflicts?'],
+            notifications: ['What is urgent?', 'Summarize recent notifications.', 'Clear non-urgent items.'],
+            reminders: ['What is due soon?', 'Show overdue items.', 'Create a reminder.'],
+            goals: ['How am I progressing on goals?', 'What is the next milestone?', 'Suggest a new goal.'],
+            settings: ['How can I secure my account?', 'Optimize my preferences.', 'Check subscription status.'],
+            profile: ['Update my profile info.', 'Check my activity stats.', 'Improve my profile.'],
+            reports: ['Summarize my productivity.', 'What are my peak hours?', 'Show performance trends.'],
+            calendar: ['What meetings do I have?', 'Schedule a focus block.', 'Show weekly overview.'],
+            notes: ['Summarize my recent notes.', 'Find notes about "Meeting".', 'Organize my ideas.']
         };
 
         return questions[subPage] || ['What insights can you provide?'];

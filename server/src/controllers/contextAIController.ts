@@ -49,10 +49,19 @@ export const analyzeContext = async (req: Request, res: Response) => {
                 userId,
                 pageData
             );
+        } else if (pageType === 'global') {
+            // New Global Page Handler
+            contextData = await contextAnalyzerService.analyzeContext({
+                pageType: 'global',
+                pageId,
+                subPage: subPage as any,
+                userRole: 'owner', // Default role for global context (personal)
+                userId
+            });
         } else {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid pageType. Must be "workspace" or "project"'
+                message: 'Invalid pageType. Must be "workspace", "project", or "global"'
             });
         }
 
@@ -63,10 +72,12 @@ export const analyzeContext = async (req: Request, res: Response) => {
         );
 
         // Call AI
+        console.log('[Context AI] Calling DeepSeek API for context analysis...');
         const aiResponse = await llmService.generateGeneralResponse(
             promptTemplate.userPrompt,
             promptTemplate.systemPrompt
         );
+        console.log('[Context AI] AI Response received, length:', aiResponse?.length || 0);
 
         // Get quick questions
         const quickQuestions = aiPromptTemplatesService.generateQuickQuestions(
@@ -81,9 +92,17 @@ export const analyzeContext = async (req: Request, res: Response) => {
             tokenEstimate: contextData.tokenEstimate
         };
 
+        console.log('[Context AI] Result structure:', {
+            hasSummary: !!result.summary,
+            summaryLength: result.summary?.length || 0,
+            focusAreasCount: result.focusAreas?.length || 0,
+            quickQuestionsCount: result.quickQuestions?.length || 0
+        });
+
         // Deduct credits and cache result
         const creditInfo = await deductAICredits(req, res, result);
 
+        console.log('[Context AI] Sending response to frontend...');
         return res.status(200).json({
             success: true,
             data: result,
@@ -141,6 +160,14 @@ export const askContextQuestion = async (req: Request, res: Response) => {
                 userId,
                 pageData
             );
+        } else if (pageType === 'global') {
+            contextData = await contextAnalyzerService.analyzeContext({
+                pageType: 'global',
+                pageId,
+                subPage: subPage as any,
+                userRole: 'owner',
+                userId
+            });
         } else {
             contextData = await contextAnalyzerService.analyzeProjectContext(
                 pageId,
@@ -235,6 +262,14 @@ export const suggestContextAction = async (req: Request, res: Response) => {
                 userId,
                 pageData
             );
+        } else if (pageType === 'global') {
+            contextData = await contextAnalyzerService.analyzeContext({
+                pageType: 'global',
+                pageId,
+                subPage: subPage as any,
+                userRole: 'owner',
+                userId
+            });
         } else {
             contextData = await contextAnalyzerService.analyzeProjectContext(
                 pageId,

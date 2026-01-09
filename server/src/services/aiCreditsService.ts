@@ -4,16 +4,16 @@ import mongoose from 'mongoose';
 
 /**
  * AI Credit Costs Configuration
- * Based on $1.20/day = 1200 credits
+ * Based on $1.20/month = 1200 credits
  */
 export const AI_CREDIT_COSTS = {
-    chatbot: 5,              // ~240 messages/day
-    meeting_summary: 100,    // ~12 summaries/day (or 6 hours of meetings at 30min each)
-    smart_decision: 50,      // ~24 analyses/day
-    report_generation: 30,   // ~40 reports/day
-    context_analysis: 15,    // ~80 context analyses/day
-    context_question: 10,    // ~120 questions/day
-    context_action: 10,      // ~120 action suggestions/day
+    chatbot: 5,              // ~240 messages/month
+    meeting_summary: 100,    // ~12 summaries/month
+    smart_decision: 50,      // ~24 analyses/month
+    report_generation: 30,   // ~40 reports/month
+    context_analysis: 15,    // ~80 context analyses/month
+    context_question: 10,    // ~120 questions/month
+    context_action: 10,      // ~120 action suggestions/month
 } as const;
 
 export type AIFeature = keyof typeof AI_CREDIT_COSTS;
@@ -37,20 +37,22 @@ const CACHE_TTL = {
 
 class AICreditsService {
     /**
-     * Get or create today's usage record for a user
+     * Get or create current month's usage record for a user
      */
-    async getTodayUsage(userId: mongoose.Types.ObjectId): Promise<IAIUsage> {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    async getMonthlyUsage(userId: mongoose.Types.ObjectId): Promise<IAIUsage> {
+        const currentMonth = new Date();
+        // Set to first day of current month at midnight
+        currentMonth.setDate(1);
+        currentMonth.setHours(0, 0, 0, 0);
 
-        let usage = await AIUsage.findOne({ userId, date: today });
+        let usage = await AIUsage.findOne({ userId, date: currentMonth });
 
         if (!usage) {
             usage = await AIUsage.create({
                 userId,
-                date: today,
+                date: currentMonth,
                 creditsUsed: 0,
-                creditsLimit: 1200,
+                creditsLimit: 1200, // $1.20/month
                 transactions: [],
                 warnings: {
                     fiftyPercent: false,
@@ -75,7 +77,7 @@ class AICreditsService {
         remaining: number;
         usagePercentage: number;
     }> {
-        const usage = await this.getTodayUsage(userId);
+        const usage = await this.getMonthlyUsage(userId);
         const required = AI_CREDIT_COSTS[feature];
         const remaining = usage.getRemainingCredits();
         const hasEnough = usage.hasEnoughCredits(required);
@@ -124,7 +126,7 @@ class AICreditsService {
             return { onCooldown: false };
         }
 
-        const usage = await this.getTodayUsage(userId);
+        const usage = await this.getMonthlyUsage(userId);
         const recentTransactions = usage.transactions.filter(
             (t) => t.feature === feature && !t.metadata?.cached
         );
@@ -166,7 +168,7 @@ class AICreditsService {
         newBalance: number;
         warning?: string;
     }> {
-        const usage = await this.getTodayUsage(userId);
+        const usage = await this.getMonthlyUsage(userId);
         const cost = AI_CREDIT_COSTS[feature];
 
         // If cached, don't deduct credits
@@ -209,13 +211,13 @@ class AICreditsService {
 
         if (usagePercentage >= 100 && !usage.warnings.hundredPercent) {
             usage.warnings.hundredPercent = true;
-            warning = 'Daily limit reached';
+            warning = 'Monthly limit reached';
         } else if (usagePercentage >= 80 && !usage.warnings.eightyPercent) {
             usage.warnings.eightyPercent = true;
-            warning = 'You are running low on AI capacity for today (80% used)';
+            warning = 'You are running low on AI capacity for this month (80% used)';
         } else if (usagePercentage >= 50 && !usage.warnings.fiftyPercent) {
             usage.warnings.fiftyPercent = true;
-            warning = 'You have used 50% of your daily AI capacity';
+            warning = 'You have used 50% of your monthly AI capacity';
         }
 
         await usage.save();
@@ -256,18 +258,20 @@ class AICreditsService {
             cached: boolean;
         }>;
     }> {
-        const usage = await this.getTodayUsage(userId);
+        const usage = await this.getMonthlyUsage(userId);
 
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
+        // Calculate first day of next month
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        nextMonth.setDate(1);
+        nextMonth.setHours(0, 0, 0, 0);
 
         return {
             creditsUsed: usage.creditsUsed,
             creditsRemaining: usage.getRemainingCredits(),
             creditsLimit: usage.creditsLimit,
             usagePercentage: usage.getUsagePercentage(),
-            resetsAt: tomorrow,
+            resetsAt: nextMonth,
             transactions: usage.transactions.map((t) => ({
                 feature: t.feature,
                 creditsDeducted: t.creditsDeducted,

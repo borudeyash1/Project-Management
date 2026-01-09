@@ -2,12 +2,48 @@ import React, { useState } from 'react';
 import { MessageCircle, X, Bot } from 'lucide-react';
 import AIChatbot from './AIChatbot';
 import { useDock } from '../context/DockContext';
+import { useApp } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
+
+import { useLocation } from 'react-router-dom';
 
 const ChatbotButton: React.FC = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { dockPosition } = useDock();
+  const location = useLocation();
+
+  const { state } = useApp();
+  const { userProfile } = state;
+
+  // Debugging logs
+  console.log('[ChatbotButton] User Plan:', userProfile?.subscription?.plan);
+  console.log('[ChatbotButton] Full Subscription:', userProfile?.subscription);
+  console.log('[ChatbotButton] Auth Loading:', state.isAuthLoading);
+
+  // Hide immediately if auth is loading to prevent flash
+  if (state.isAuthLoading) return null;
+
+  // Hide Chatbot if:
+  // 1. User is on a paid plan ('pro' or 'ultra') -> Global AI Assistant takes over
+  // 2. User/Member is on any workspace page -> Legacy logic to prevent clutter, but allows ContextAI to be the sole provider there
+  // Robust subscription check
+  const sub = userProfile?.subscription;
+  const plan = sub?.plan?.toLowerCase();
+  const isPaidPlan = plan === 'pro' || plan === 'ultra' || sub?.isPro === true;
+  const isWorkspacePage = location.pathname.startsWith('/workspace/');
+
+  console.log('[ChatbotButton] isPaidPlan:', isPaidPlan);
+  console.log('[ChatbotButton] isWorkspacePage:', isWorkspacePage);
+
+  // If user is paid, they get the new Global AI Assistant, so hide this legacy one everywhere.
+  if (isPaidPlan) return null;
+
+  // For free users, still hide it on workspace pages to avoid clutter (or if we want them to see NOTHING there?)
+  // Assuming the requirement "Hide 'yellow chatbot' in workspaces" applies to everyone to reduce clutter.
+  if (isWorkspacePage) {
+    return null;
+  }
 
   return (
     <>

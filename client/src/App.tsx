@@ -83,6 +83,7 @@ import PrivacyPage from './components/PrivacyPage';
 import TermsPage from './components/TermsPage';
 import ActivityPage from './components/ActivityPage';
 import ChatbotButton from './components/ChatbotButton';
+import ContextAIButton from './components/ai/ContextAIButton';
 import AdminLoginWrapper from './components/admin/AdminLoginWrapper';
 import AdminDashboard from './components/admin/AdminDashboard';
 import DeviceManagement from './components/admin/DeviceManagement';
@@ -194,6 +195,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
             {/* AI Button on left for top */}
             <div className="flex-1 flex justify-start">
               <ChatbotButton />
+              <ContextAIButton />
             </div>
 
             {/* Centered Dock */}
@@ -244,6 +246,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
             {/* AI Button on right */}
             <div className="flex-1 flex justify-end">
               <ChatbotButton />
+              <ContextAIButton />
             </div>
           </div>
         )}
@@ -291,6 +294,7 @@ const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
       <NotificationsPanel />
       <TaskDrawer />
       <ChatbotButton />
+      <ContextAIButton />
     </div>
   );
 };
@@ -601,7 +605,9 @@ const AppContent: React.FC = () => {
 
         <Route path="/notes" element={
           <ProtectedRoute>
-            <NotesPage />
+            <AppLayout>
+              <NotesPage />
+            </AppLayout>
           </ProtectedRoute>
         } />
 

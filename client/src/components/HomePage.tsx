@@ -403,7 +403,18 @@ const HomePage: React.FC = () => {
         className="w-full !rounded-none !border-x-0 !mb-0"
       >
         <button
-          onClick={() => setIsAIModalOpen(true)}
+          onClick={() => {
+            if (canUseAI()) {
+              // For Pro/Ultra users: Trigger the global Context AI button
+              const contextAIButton = document.querySelector('[data-context-ai-button]') as HTMLButtonElement;
+              if (contextAIButton) {
+                contextAIButton.click();
+              }
+            } else {
+              // For Free users: Open legacy chatbot
+              setIsAIModalOpen(true);
+            }
+          }}
           className="group relative px-6 py-3 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
@@ -996,8 +1007,8 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Chatbot Modal */}
-      {isAIModalOpen && (
+      {/* AI Chatbot Modal - Only for Free users */}
+      {!canUseAI() && isAIModalOpen && (
         <AIChatbot isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
       )}
 

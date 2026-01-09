@@ -2,11 +2,11 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IAIUsage extends Document {
     userId: mongoose.Types.ObjectId;
-    date: Date; // Reset daily
+    date: Date; // Reset monthly (first day of month)
     creditsUsed: number;
     creditsLimit: number;
     transactions: Array<{
-        feature: 'chatbot' | 'meeting_summary' | 'smart_decision' | 'report_generation';
+        feature: 'chatbot' | 'meeting_summary' | 'smart_decision' | 'report_generation' | 'context_analysis' | 'context_question' | 'context_action';
         creditsDeducted: number;
         timestamp: Date;
         metadata?: {
@@ -49,13 +49,13 @@ const AIUsageSchema: Schema = new Schema(
         },
         creditsLimit: {
             type: Number,
-            default: 1200, // $1.20 = 1200 credits
+            default: 1200, // $1.20/month
         },
         transactions: [
             {
                 feature: {
                     type: String,
-                    enum: ['chatbot', 'meeting_summary', 'smart_decision', 'report_generation'],
+                    enum: ['chatbot', 'meeting_summary', 'smart_decision', 'report_generation', 'context_analysis', 'context_question', 'context_action'],
                     required: true,
                 },
                 creditsDeducted: {

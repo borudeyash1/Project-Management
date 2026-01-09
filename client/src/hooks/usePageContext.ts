@@ -64,6 +64,19 @@ export const usePageContext = (): PageContext => {
             };
         }
 
+        // Match Global Pages (planner, notifications, etc.)
+        const globalPages = ['home', 'projects', 'workspace', 'planner', 'notifications', 'reminders', 'goals', 'settings', 'profile', 'reports', 'calendar', 'notes'];
+        const currentGlobal = globalPages.find(p => path.startsWith(`/${p}`));
+
+        if (currentGlobal) {
+            return {
+                pageType: 'global' as any, // 'global' wasn't in original type definition, might need to update PageType export or cast
+                pageId: 'global',
+                subPage: currentGlobal as any,
+                isContextAware: true
+            };
+        }
+
         // Not a context-aware page
         return {
             pageType: 'other' as PageType,

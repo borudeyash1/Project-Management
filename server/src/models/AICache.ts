@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 export interface IAICache extends Document {
     userId: mongoose.Types.ObjectId;
-    feature: 'chatbot' | 'meeting_summary' | 'smart_decision' | 'report_generation';
+    feature: 'chatbot' | 'meeting_summary' | 'smart_decision' | 'report_generation' | 'context_analysis' | 'context_question' | 'context_action';
     requestHash: string; // Hash of the input to detect duplicates
     inputData: any; // Original input for reference
     result: any; // Cached AI response
@@ -39,7 +39,7 @@ const AICacheSchema: Schema = new Schema(
         },
         feature: {
             type: String,
-            enum: ['chatbot', 'meeting_summary', 'smart_decision', 'report_generation'],
+            enum: ['chatbot', 'meeting_summary', 'smart_decision', 'report_generation', 'context_analysis', 'context_question', 'context_action'],
             required: true,
             index: true,
         },

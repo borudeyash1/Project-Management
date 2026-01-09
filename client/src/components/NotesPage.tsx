@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles, FileText, Wand2, Save, Trash2, Plus, Mic } from 'lucide-react';
-import SharedNavbar from './SharedNavbar';
-import SharedFooter from './SharedFooter';
-import ContentBanner from './ContentBanner';
-import Header from './Header';
-import DockNavigation from './DockNavigation';
 import { apiService } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useRefreshData } from '../hooks/useRefreshData';
 import { useApp } from '../context/AppContext';
-import { useDock } from '../context/DockContext'; import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
+import { useDock } from '../context/DockContext';
+import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import { useNavigate } from 'react-router-dom';
 import { notionSyncService } from '../services/notionSyncService';
 import { FileText as NotionIcon } from 'lucide-react';
@@ -252,9 +248,7 @@ const NotesPage: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
-      {/* Header */}
-      <Header />
+    <div className={`min-h-full flex flex-col ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20'}`}>
 
       {/* Main Content */}
       <main className="flex-1">
@@ -614,8 +608,6 @@ const NotesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Dock Navigation */}
-      <DockNavigation />
     </div>
   );
 };
