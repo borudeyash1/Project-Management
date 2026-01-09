@@ -481,24 +481,18 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
     }
 
     // Fetch tasks
-    // Include tasks from workspace OR tasks assigned to/created by the user (personal tasks)
+    // Include only tasks assigned to the user (not tasks created by or reported by the user)
     const taskQuery: any = { isActive: true };
     
     if (workspaceId) {
-      // If workspace is specified, get workspace tasks OR user's personal tasks
+      // If workspace is specified, get workspace tasks assigned to user OR user's personal tasks
       taskQuery.$or = [
-        { workspace: workspaceId },
+        { workspace: workspaceId, assignee: userId }, // Workspace tasks assigned to user
         { assignee: userId, workspace: { $exists: false } }, // Personal tasks assigned to user
-        { reporter: userId, workspace: { $exists: false } },  // Personal tasks created by user
-        { createdBy: userId, workspace: { $exists: false } }  // Personal tasks created by user (alternative field)
       ];
     } else {
-      // If no workspace specified, get all user's tasks (personal and workspace)
-      taskQuery.$or = [
-        { assignee: userId },
-        { reporter: userId },
-        { createdBy: userId }
-      ];
+      // If no workspace specified, get only tasks assigned to the user
+      taskQuery.assignee = userId;
     }
     
     if (Object.keys(dateFilter).length > 0) {

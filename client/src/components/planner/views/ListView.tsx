@@ -43,23 +43,15 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
 
   // Filter tasks by user assignment and search query
   const filteredTasks = tasks.filter(task => {
-    // Filter by user assignment OR creation
+    // Filter by user assignment only
     if (currentUserId) {
       const isAssignedToMe = 
         task.assignee === currentUserId || 
         task.assignee?._id === currentUserId ||
         task.assignee?.toString() === currentUserId;
       
-      const isCreatedByMe =
-        task.reporter === currentUserId ||
-        task.reporter?._id === currentUserId ||
-        task.reporter?.toString() === currentUserId ||
-        (task as any).createdBy === currentUserId ||
-        (task as any).createdBy?._id === currentUserId ||
-        (task as any).createdBy?.toString() === currentUserId;
-      
-      // Show task if user is assignee OR creator
-      if (!isAssignedToMe && !isCreatedByMe) return false;
+      // Show task only if user is assignee
+      if (!isAssignedToMe) return false;
     }
 
     // Filter by search query
