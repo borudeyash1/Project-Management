@@ -508,6 +508,7 @@
     "reviewLower": "review",
     "completedLower": "completed",
     "blockedLower": "blocked",
+    "blocked": "Blocked",
     "teamPerformance": "Team Performance",
     "budgetBreakdown": "Budget Breakdown",
     "totalBudget": "Total Budget",

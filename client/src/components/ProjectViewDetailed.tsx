@@ -246,6 +246,8 @@ const ProjectViewDetailed: React.FC = () => {
   const [officeLongitude, setOfficeLongitude] = useState('');
   const [projectProgress, setProjectProgress] = useState(0);
   const [projectStatus, setProjectStatus] = useState<'draft' | 'active' | 'paused' | 'completed' | 'archived'>('active');
+  const [projectBudget, setProjectBudget] = useState(0);
+  const [projectSpent, setProjectSpent] = useState(0);
 
   // Derive role from actual workspace and project membership
   const project = state.projects.find(p => p._id === projectId);
@@ -371,6 +373,30 @@ const ProjectViewDetailed: React.FC = () => {
 
     loadProjectFromAPI();
   }, [projectId, state.projects.length]);
+
+  // Initialize budget and spent from active project
+  useEffect(() => {
+    if (activeProject) {
+      const budgetAmount = typeof activeProject.budget === 'object' && activeProject.budget 
+        ? ((activeProject.budget as any).amount || 0) 
+        : (typeof activeProject.budget === 'number' ? activeProject.budget : 0);
+      
+      const spentAmount = typeof activeProject.budget === 'object' && activeProject.budget 
+        ? ((activeProject.budget as any).spent || 0) 
+        : ((activeProject as any).spent || 0);
+      
+      setProjectBudget(budgetAmount);
+      setProjectSpent(spentAmount);
+      setProjectProgress(activeProject.progress || 0);
+      setProjectStatus(activeProject.status || 'active');
+      
+      // Initialize office location if available
+      if ((activeProject as any).officeLocation) {
+        setOfficeLatitude((activeProject as any).officeLocation.latitude?.toString() || '');
+        setOfficeLongitude((activeProject as any).officeLocation.longitude?.toString() || '');
+      }
+    }
+  }, [activeProject]);
 
   // Helper to map backend Task to UI task shape used in tabs
   const mapBackendTaskToUi = (task: any, team: any[]): any => {
@@ -1124,7 +1150,7 @@ const ProjectViewDetailed: React.FC = () => {
             <div>
               <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Budget</p>
               <p className={`text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent`}>
-                {formatCurrency(activeProject?.budget || 0)}
+                {formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0)}
               </p>
             </div>
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
@@ -1132,7 +1158,7 @@ const ProjectViewDetailed: React.FC = () => {
             </div>
           </div>
           <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Spent: <span className="font-semibold">{formatCurrency(activeProject?.spent || 0)}</span>
+            Spent: <span className="font-semibold">{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0)}</span>
           </p>
         </GlassmorphicCard>
 
@@ -1429,13 +1455,13 @@ const ProjectViewDetailed: React.FC = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.budget')}</span>
                 <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0))}
+                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.amount || 0) : (activeProject?.budget || 0))}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.spent')}</span>
                 <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0))}
+                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.spent || 0) : (activeProject?.spent || 0))}
                 </span>
               </div>
             </div>
@@ -1963,17 +1989,6 @@ const ProjectViewDetailed: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t('projects.projectAnalytics')}</h3>
-        <div className="flex items-center gap-2">
-          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
-            {t('projects.last7Days')}
-          </button>
-          <button className="px-3 py-1 text-sm font-medium text-accent-dark bg-blue-50 rounded-lg">
-            {t('projects.last30Days')}
-          </button>
-          <button className="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
-            {t('projects.allTime')}
-          </button>
-        </div>
       </div>
 
       {/* Key Metrics */}
@@ -1982,11 +1997,11 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.completionRate')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+            <div className="p-3 rounded-xl bg-green-500">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
           </div>
-          <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent relative z-10">{activeProject?.progress}%</p>
+          <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 relative z-10">{activeProject?.progress}%</p>
           <p className="text-sm text-green-600 mt-2 font-semibold relative z-10">+5% from last month</p>
         </GlassmorphicCard>
 
@@ -1994,11 +2009,11 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.teamVelocity')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500">
+            <div className="p-3 rounded-xl bg-blue-500">
               <Activity className="w-5 h-5 text-white" />
             </div>
           </div>
-          <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative z-10">
+          <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 relative z-10">
             {Array.isArray(activeProject?.tasks) ? activeProject?.tasks.filter(t => t.status === 'completed').length : 0}
           </p>
           <p className={`text-sm mt-2 font-semibold relative z-10 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{t('projects.tasksCompleted')}</p>
@@ -2008,21 +2023,21 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.budgetUsage')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+            <div className="p-3 rounded-xl" style={{ backgroundColor: '#9333ea' }}>
               <DollarSign className="w-5 h-5 text-white" />
             </div>
           </div>
-          <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent relative z-10">
+          <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 relative z-10">
             {(() => {
-              const budgetEstimated = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0);
-              const budgetActual = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0);
-              return budgetEstimated && budgetActual && budgetEstimated > 0
-                ? Math.round((budgetActual / budgetEstimated) * 100)
+              const budgetAmount = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.amount || 0) : (activeProject?.budget || 0);
+              const budgetSpent = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.spent || 0) : (activeProject?.spent || 0);
+              return budgetAmount && budgetSpent && budgetAmount > 0
+                ? Math.round((budgetSpent / budgetAmount) * 100)
                 : 0;
             })()}%
           </p>
           <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0))} of {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0))}
+            {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.spent || 0) : (activeProject?.spent || 0))} of {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.amount || 0) : (activeProject?.budget || 0))}
           </p>
         </GlassmorphicCard>
 
@@ -2030,11 +2045,11 @@ const ProjectViewDetailed: React.FC = () => {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
           <div className="flex items-center justify-between mb-3 relative z-10">
             <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('projects.teamWorkload')}</p>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500">
+            <div className="p-3 rounded-xl bg-orange-500">
               <Users className="w-5 h-5 text-white" />
             </div>
           </div>
-          <p className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent relative z-10">
+          <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 relative z-10">
             {activeProject?.team.length
               ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
               : 0}%
@@ -2111,16 +2126,16 @@ const ProjectViewDetailed: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.totalBudget')}</span>
-            <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</span>
+            <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.spent')}</span>
-            <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
+            <span className="font-semibold text-red-600">{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.remaining')}</span>
             <span className="font-semibold text-green-600">
-              {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
+              {formatCurrency((typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0) - (typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0))}
             </span>
           </div>
           <div className={`pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -2128,9 +2143,13 @@ const ProjectViewDetailed: React.FC = () => {
               <div
                 className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
                 style={{
-                  width: `${activeProject?.budget && activeProject?.spent && activeProject.budget > 0
-                    ? Math.min(Math.round(((activeProject.spent || 0) / activeProject.budget) * 100), 100)
-                    : 0}%`
+                  width: `${(() => {
+                    const budgetAmount = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0;
+                    const budgetSpent = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0;
+                    return budgetAmount && budgetSpent && budgetAmount > 0
+                      ? Math.min(Math.round((budgetSpent / budgetAmount) * 100), 100)
+                      : 0;
+                  })()}%`
                 }}
               />
             </div>
@@ -2183,9 +2202,13 @@ const ProjectViewDetailed: React.FC = () => {
             completionRate: activeProject?.progress || 0,
             tasksCompleted: activeProject?.tasks.filter(t => t.status === 'completed').length || 0,
             totalTasks: activeProject?.tasks.length || 0,
-            budgetUsed: activeProject?.budget && activeProject?.spent
-              ? Math.round((activeProject.spent / activeProject.budget) * 100)
-              : 0 + '%',
+            budgetUsed: (() => {
+              const budgetAmount = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0;
+              const budgetSpent = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0;
+              return budgetAmount && budgetSpent
+                ? Math.round((budgetSpent / budgetAmount) * 100)
+                : 0;
+            })() + '%',
             teamMembers: activeProject?.team.length || 0,
             averageWorkload: activeProject?.team.length
               ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)
@@ -2688,6 +2711,128 @@ const ProjectViewDetailed: React.FC = () => {
                   Save Status & Progress
                 </button>
               </div>
+            </GlassmorphicCard>
+
+            {/* Budget & Spent */}
+            <GlassmorphicCard className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Budget & Spent</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Manage project budget and track spending
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <DollarSign className="w-4 h-4 inline mr-1" />
+                    Total Budget
+                  </label>
+                  <input
+                    type="number"
+                    value={projectBudget}
+                    onChange={(e) => setProjectBudget(parseFloat(e.target.value) || 0)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(projectBudget)}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <TrendingUp className="w-4 h-4 inline mr-1" />
+                    Amount Spent
+                  </label>
+                  <input
+                    type="number"
+                    value={projectSpent}
+                    onChange={(e) => setProjectSpent(parseFloat(e.target.value) || 0)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(projectSpent)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Budget Progress Bar */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Budget Utilization</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    {projectBudget > 0 ? Math.round((projectSpent / projectBudget) * 100) : 0}%
+                  </span>
+                </div>
+                <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      projectBudget > 0 && (projectSpent / projectBudget) > 0.9
+                        ? 'bg-red-500'
+                        : projectBudget > 0 && (projectSpent / projectBudget) > 0.75
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                    }`}
+                    style={{ width: `${projectBudget > 0 ? Math.min((projectSpent / projectBudget) * 100, 100) : 0}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span>Remaining: {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Math.max(0, projectBudget - projectSpent))}</span>
+                  {projectSpent > projectBudget && (
+                    <span className="text-red-600 dark:text-red-400 font-semibold">Over budget!</span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await apiService.put(`/projects/${activeProject?._id}`, {
+                      budget: {
+                        amount: projectBudget,
+                        spent: projectSpent,
+                        currency: 'INR'
+                      }
+                    });
+
+                    // Update local project state
+                    if (activeProject) {
+                      setActiveProject({
+                        ...activeProject,
+                        budget: {
+                          amount: projectBudget,
+                          spent: projectSpent,
+                          currency: 'INR'
+                        }
+                      } as any);
+                    }
+
+                    dispatch({
+                      type: 'ADD_TOAST',
+                      payload: {
+                        id: Date.now().toString(),
+                        type: 'success',
+                        message: 'Budget and spent updated successfully',
+                        duration: 3000
+                      }
+                    });
+                  } catch (error) {
+                    console.error('Failed to update budget:', error);
+                    dispatch({
+                      type: 'ADD_TOAST',
+                      payload: {
+                        id: Date.now().toString(),
+                        type: 'error',
+                        message: 'Failed to update budget',
+                        duration: 3000
+                      }
+                    });
+                  }
+                }}
+                className="w-full px-4 py-2 bg-accent text-gray-900 rounded-lg hover:bg-accent-hover font-medium"
+              >
+                Save Budget & Spent
+              </button>
             </GlassmorphicCard>
 
             {/* Attendance Office Location */}

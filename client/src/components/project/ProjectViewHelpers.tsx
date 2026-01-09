@@ -272,14 +272,18 @@ export const RenderAnalyticsView: React.FC<RenderAnalyticsViewProps> = ({ active
             <DollarSign className="w-5 h-5 text-purple-600" />
           </div>
           <p className="text-3xl font-bold text-gray-900">
-            {activeProject?.budget && activeProject?.spent && activeProject.budget > 0
-              ? Math.round(((activeProject.spent || 0) / activeProject.budget) * 100)
-              : 0}%
+            {(() => {
+              const budgetAmount = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0;
+              const budgetSpent = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0;
+              return budgetAmount && budgetSpent && budgetAmount > 0
+                ? Math.round((budgetSpent / budgetAmount) * 100)
+                : 0;
+            })()}%
           </p>
           <p className="text-sm text-gray-600 mt-1">
             {t('project.view.analytics.budgetDesc', { 
-              spent: formatCurrency(activeProject?.spent || 0),
-              total: formatCurrency(activeProject?.budget || 0)
+              spent: formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0),
+              total: formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0)
             })}
           </p>
         </div>
@@ -363,16 +367,16 @@ export const RenderAnalyticsView: React.FC<RenderAnalyticsViewProps> = ({ active
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-gray-700">{t('project.view.analytics.totalBudget')}</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(activeProject?.budget || 0)}</span>
+              <span className="font-semibold text-gray-900">{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-700">{t('project.view.analytics.spent')}</span>
-              <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
+              <span className="font-semibold text-red-600">{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-700">{t('project.view.analytics.remaining')}</span>
               <span className="font-semibold text-green-600">
-                {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
+                {formatCurrency((typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0) - (typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0))}
               </span>
             </div>
             <div className="pt-4 border-t border-gray-200">
@@ -380,9 +384,13 @@ export const RenderAnalyticsView: React.FC<RenderAnalyticsViewProps> = ({ active
                 <div 
                   className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
                   style={{ 
-                    width: `${activeProject?.budget && activeProject?.spent && activeProject.budget > 0
-                      ? Math.min(Math.round(((activeProject.spent || 0) / activeProject.budget) * 100), 100)
-                      : 0}%` 
+                    width: `${(() => {
+                      const budgetAmount = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0;
+                      const budgetSpent = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0;
+                      return budgetAmount && budgetSpent && budgetAmount > 0
+                        ? Math.min(Math.round((budgetSpent / budgetAmount) * 100), 100)
+                        : 0;
+                    })()}%` 
                   }}
                 />
               </div>

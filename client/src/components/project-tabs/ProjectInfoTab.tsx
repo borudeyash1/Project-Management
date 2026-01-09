@@ -29,8 +29,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
     priority: project?.priority || 'medium',
     startDate: project?.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
     dueDate: project?.dueDate ? new Date(project.dueDate).toISOString().split('T')[0] : '',
-    budgetEstimated: project?.budget?.estimated || '',
-    budgetActual: project?.budget?.actual || '',
+    budgetAmount: typeof project?.budget === 'object' ? (project.budget.amount || '') : (project?.budget || ''),
+    budgetSpent: typeof project?.budget === 'object' ? (project.budget.spent || '') : '',
     tags: project?.tags?.join(', ') || '',
     slackChannelId: project?.integrations?.slack?.channelId || '',
     slackChannelName: project?.integrations?.slack?.channelName || ''
@@ -61,8 +61,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       startDate: formData.startDate ? new Date(formData.startDate) : undefined,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       budget: {
-        estimated: parseFloat(formData.budgetEstimated) || 0,
-        actual: parseFloat(formData.budgetActual) || 0,
+        amount: parseFloat(formData.budgetAmount) || 0,
+        spent: parseFloat(formData.budgetSpent) || 0,
         currency: 'INR'
       },
       tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
@@ -87,8 +87,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       priority: project?.priority || 'medium',
       startDate: project?.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
       dueDate: project?.dueDate ? new Date(project.dueDate).toISOString().split('T')[0] : '',
-      budgetEstimated: project?.budget?.estimated || '',
-      budgetActual: project?.budget?.actual || '',
+      budgetAmount: typeof project?.budget === 'object' ? (project.budget.amount || '') : (project?.budget || ''),
+      budgetSpent: typeof project?.budget === 'object' ? (project.budget.spent || '') : '',
       tags: project?.tags?.join(', ') || '',
       slackChannelId: project?.integrations?.slack?.channelId || '',
       slackChannelName: project?.integrations?.slack?.channelName || ''
@@ -319,19 +319,22 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <DollarSign className="w-4 h-4 inline mr-1" />
-                {t('project.info.estimatedBudget')}
+                Budget
               </label>
               {isEditing ? (
                 <input
                   type="number"
-                  value={formData.budgetEstimated}
-                  onChange={(e) => setFormData({ ...formData, budgetEstimated: e.target.value })}
+                  value={formData.budgetAmount}
+                  onChange={(e) => setFormData({ ...formData, budgetAmount: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   placeholder="0"
                 />
               ) : (
                 <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget?.estimated || 0)}
+                  {(() => {
+                    const budgetAmount = typeof project.budget === 'object' && project.budget ? (project.budget.amount || 0) : (typeof project.budget === 'number' ? project.budget : 0);
+                    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetAmount);
+                  })()}
                 </p>
               )}
             </div>
@@ -339,19 +342,22 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <TrendingUp className="w-4 h-4 inline mr-1" />
-                {t('project.info.actualSpent')}
+                Spent
               </label>
               {isEditing ? (
                 <input
                   type="number"
-                  value={formData.budgetActual}
-                  onChange={(e) => setFormData({ ...formData, budgetActual: e.target.value })}
+                  value={formData.budgetSpent}
+                  onChange={(e) => setFormData({ ...formData, budgetSpent: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   placeholder="0"
                 />
               ) : (
                 <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(project.budget?.actual || 0)}
+                  {(() => {
+                    const budgetSpent = typeof project.budget === 'object' && project.budget ? (project.budget.spent || 0) : 0;
+                    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
+                  })()}
                 </p>
               )}
             </div>

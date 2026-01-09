@@ -9,7 +9,8 @@ import {
   TrendingUp,
   Calendar,
   Target,
-  Activity
+  Activity,
+  DollarSign
 } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
@@ -28,8 +29,10 @@ const ProjectOverview: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [showGitHubModal, setShowGitHubModal] = useState(false);
+  const [projectData, setProjectData] = useState<any>(null);
 
-  const project = state.projects.find(p => p._id === projectId);
+  // Use fetched data if available, otherwise fall back to state
+  const project = projectData || state.projects.find(p => p._id === projectId);
 
   // Calculate permissions
   const userProfile = state.userProfile;
@@ -63,14 +66,50 @@ const ProjectOverview: React.FC = () => {
     }
   };
 
-  // Simulate loading for smooth skeleton display
+  // Fetch fresh project data from API
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [projectId]);
+    const fetchProjectData = async () => {
+      if (!projectId) return;
+      
+      try {
+        setLoading(true);
+        
+        // Fetch both project and tasks in parallel
+        const [projectResponse, tasksResponse] = await Promise.all([
+          apiService.get(`/projects/${projectId}`),
+          apiService.get(`/tasks?projectId=${projectId}`).catch(() => ({ success: false, data: [] }))
+        ]);
+        
+        if (projectResponse.success && projectResponse.data) {
+          const projectDataFromApi = projectResponse.data;
+          
+          // Calculate task counts from actual tasks
+          const tasks = tasksResponse.success ? (tasksResponse.data || []) : [];
+          const totalTasksCount = tasks.length;
+          const completedTasksCount = tasks.filter((t: any) => t.status === 'completed' || t.status === 'done').length;
+          
+          // Calculate team member count
+          const teamMemberCount = projectDataFromApi.teamMembers?.length || projectDataFromApi.team?.length || 0;
+          
+          // Merge calculated counts with project data and store tasks
+          setProjectData({
+            ...projectDataFromApi,
+            totalTasksCount,
+            completedTasksCount,
+            teamMemberCount,
+            tasks // Store tasks for display
+          });
+        }
+      } catch (error: any) {
+        console.error('Failed to fetch project data:', error);
+        addToast('Failed to load project data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjectData();
+  }, [projectId, addToast]);
 
   if (loading) {
     return <ProjectPageSkeleton type="overview" />;
@@ -176,77 +215,121 @@ const ProjectOverview: React.FC = () => {
         </div>
       </div>
 
+      {/* Budget Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <DollarSign className="w-5 h-5" />
+            Budget
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-200">Total Budget</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {(() => {
+                const budgetAmount = typeof project.budget === 'object' && project.budget ? ((project.budget as any).amount || 0) : (typeof project.budget === 'number' ? project.budget : 0);
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetAmount);
+              })()}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-200">Spent</div>
+            <div className="text-2xl font-bold text-red-600">
+              {(() => {
+                const budgetSpent = typeof project.budget === 'object' && project.budget ? ((project.budget as any).spent || 0) : ((project as any).spent || 0);
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
+              })()}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-200">Remaining</div>
+            <div className="text-2xl font-bold text-green-600">
+              {(() => {
+                const budgetAmount = typeof project.budget === 'object' && project.budget ? ((project.budget as any).amount || 0) : (typeof project.budget === 'number' ? project.budget : 0);
+                const budgetSpent = typeof project.budget === 'object' && project.budget ? ((project.budget as any).spent || 0) : ((project as any).spent || 0);
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetAmount - budgetSpent);
+              })()}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Milestones */}
+        {/* Recent Tasks */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <Target className="w-5 h-5" />
-              {t('project.overview.milestones')}
+              <CheckCircle className="w-5 h-5" />
+              Recent Tasks
             </h2>
           </div>
-          {milestones.length > 0 ? (
+          {project.tasks && project.tasks.length > 0 ? (
             <div className="space-y-3">
-              {milestones.map((milestone: any, index: number) => (
-                <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className={`w-3 h-3 rounded-full ${milestone.status === 'completed' ? 'bg-green-500' :
-                    milestone.status === 'in-progress' ? 'bg-accent' :
-                      'bg-gray-300'
-                    }`} />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 dark:text-gray-100">{milestone.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-200">{milestone.date}</div>
+              {project.tasks.slice(0, 5).map((task: any) => (
+                <div key={task._id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div className={`w-3 h-3 rounded-full ${
+                    task.status === 'completed' || task.status === 'done' ? 'bg-green-500' :
+                    task.status === 'in-progress' ? 'bg-blue-500' :
+                    'bg-gray-300'
+                  }`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{task.title}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-200">
+                      {task.assignee?.fullName || task.assignee?.name || 'Unassigned'}
+                    </div>
                   </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${milestone.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-600' :
-                    milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-accent-light' :
-                      'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
-                    }`}>
-                    {milestone.status}
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    task.priority === 'high' || task.priority === 'urgent' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                    'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+                  }`}>
+                    {task.priority || 'low'}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('projects.noMilestones')}
+                No tasks yet. Create your first task to get started!
               </p>
             </div>
           )}
         </div>
 
-        {/* Recent Activity */}
+        {/* Team Members */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <Activity className="w-5 h-5" />
-              {t('project.overview.recentActivity')}
+              <Users className="w-5 h-5" />
+              Team Members
             </h2>
           </div>
-          {recentActivity.length > 0 ? (
+          {(project.teamMembers || project.team) && (project.teamMembers?.length > 0 || project.team?.length > 0) ? (
             <div className="space-y-3">
-              {recentActivity.map((activity: any, index: number) => (
-                <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Users className="w-4 h-4 text-accent-dark" />
+              {(project.teamMembers || project.team).slice(0, 5).map((member: any) => (
+                <div key={member._id || member.user?._id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                    {(member.user?.fullName || member.fullName || member.name || 'U')[0].toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900 dark:text-gray-100">
-                      <span className="font-medium">{activity.user}</span>
-                      {' '}{activity.action}{' '}
-                      <span className="font-medium">{activity.item}</span>
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{activity.time}</p>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
+                      {member.user?.fullName || member.fullName || member.name || 'Unknown'}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-200">
+                      {member.role || member.user?.email || member.email || 'Team Member'}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('projects.noRecentActivity')}
+                No team members yet. Add members to collaborate!
               </p>
             </div>
           )}
