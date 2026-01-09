@@ -5,7 +5,7 @@ import {
   Star, Flag, Tag, MessageSquare, FileText, Users,
   ChevronLeft, ChevronRight, Filter, Search,
   Edit, Trash2, Eye, Play, Pause, Square, Zap, Bot,
-  Target, TrendingUp, BarChart3, List, Download, Volume2, Repeat, Github
+  Target, TrendingUp, BarChart3, List, Volume2, Repeat, Github
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
@@ -14,7 +14,6 @@ import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import ReminderModal from './ReminderModal';
 import { useReminderNotifications, useReminderSnooze } from '../hooks/useReminderNotifications';
 import reminderService from '../services/reminderService';
-import { exportRemindersToPDF } from '../utils/pdfExport';
 import ReminderCard from './reminders/ReminderCard';
 import CustomSelect from './ui/CustomSelect';
 import GlassmorphicCard from './ui/GlassmorphicCard';
@@ -84,7 +83,6 @@ const RemindersPage: React.FC = () => {
   const [selectedReminder, setSelectedReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSnoozeMenu, setShowSnoozeMenu] = useState<string | null>(null);
-  const [showExportMenu, setShowExportMenu] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [teamMembers, setTeamMembers] = useState<Array<{ _id: string; name: string; avatar?: string }>>([]);
@@ -362,19 +360,6 @@ const RemindersPage: React.FC = () => {
     setShowSnoozeMenu(null);
   };
 
-  const handleExport = (type: 'all' | 'pending' | 'completed') => {
-    let remindersToExport = reminders;
-
-    if (type === 'pending') {
-      remindersToExport = reminders.filter(r => !r.completed);
-    } else if (type === 'completed') {
-      remindersToExport = reminders.filter(r => r.completed);
-    }
-
-    exportRemindersToPDF(remindersToExport, `reminders-${type}.pdf`);
-    setShowExportMenu(false);
-  };
-
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
@@ -427,7 +412,7 @@ const RemindersPage: React.FC = () => {
           'pl-6'
         }`}>
 
-        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4 relative z-[150] overflow-visible">
+        <GlassmorphicCard className="p-4 mb-6 flex flex-wrap items-center justify-between gap-4 relative z-10 overflow-visible">
           <div className="flex items-center gap-3">
             {/* Notification Permission */}
             {permission === 'default' && (
@@ -445,39 +430,6 @@ const RemindersPage: React.FC = () => {
                 {t('reminders.notificationsOn')}
               </span>
             )}
-
-            {/* Export Button */}
-            <div className="relative z-[200]">
-              <button
-                onClick={() => setShowExportMenu(!showExportMenu)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                {t('buttons.export')}
-              </button>
-              {showExportMenu && (
-                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 py-1 z-[9999] shadow-xl">
-                  <button
-                    onClick={() => handleExport('all')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    {t('reminders.exportAll')}
-                  </button>
-                  <button
-                    onClick={() => handleExport('pending')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    {t('reminders.exportPending')}
-                  </button>
-                  <button
-                    onClick={() => handleExport('completed')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    {t('reminders.exportCompleted')}
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
 
           <button

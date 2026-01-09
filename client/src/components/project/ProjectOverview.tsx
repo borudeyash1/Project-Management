@@ -9,7 +9,8 @@ import {
   TrendingUp,
   Calendar,
   Target,
-  Activity
+  Activity,
+  DollarSign
 } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
@@ -28,8 +29,10 @@ const ProjectOverview: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [showGitHubModal, setShowGitHubModal] = useState(false);
+  const [projectData, setProjectData] = useState<any>(null);
 
-  const project = state.projects.find(p => p._id === projectId);
+  // Use fetched data if available, otherwise fall back to state
+  const project = projectData || state.projects.find(p => p._id === projectId);
 
   // Calculate permissions
   const userProfile = state.userProfile;
@@ -63,14 +66,27 @@ const ProjectOverview: React.FC = () => {
     }
   };
 
-  // Simulate loading for smooth skeleton display
+  // Fetch fresh project data from API
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [projectId]);
+    const fetchProjectData = async () => {
+      if (!projectId) return;
+      
+      try {
+        setLoading(true);
+        const response = await apiService.get(`/projects/${projectId}`);
+        if (response.success && response.data) {
+          setProjectData(response.data);
+        }
+      } catch (error: any) {
+        console.error('Failed to fetch project data:', error);
+        addToast('Failed to load project data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjectData();
+  }, [projectId, addToast]);
 
   if (loading) {
     return <ProjectPageSkeleton type="overview" />;
@@ -171,6 +187,46 @@ const ProjectOverview: React.FC = () => {
             <div className="text-sm text-gray-600 dark:text-gray-200">{t('project.overview.daysRemaining')}</div>
             <div className="font-medium text-gray-900 dark:text-gray-100">
               {project.dueDate ? Math.ceil((new Date(project.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : '-'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Budget Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <DollarSign className="w-5 h-5" />
+            Budget
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-200">Total Budget</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {(() => {
+                const budgetAmount = typeof project.budget === 'object' && project.budget ? ((project.budget as any).amount || 0) : (typeof project.budget === 'number' ? project.budget : 0);
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetAmount);
+              })()}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-200">Spent</div>
+            <div className="text-2xl font-bold text-red-600">
+              {(() => {
+                const budgetSpent = typeof project.budget === 'object' && project.budget ? ((project.budget as any).spent || 0) : ((project as any).spent || 0);
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
+              })()}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-200">Remaining</div>
+            <div className="text-2xl font-bold text-green-600">
+              {(() => {
+                const budgetAmount = typeof project.budget === 'object' && project.budget ? ((project.budget as any).amount || 0) : (typeof project.budget === 'number' ? project.budget : 0);
+                const budgetSpent = typeof project.budget === 'object' && project.budget ? ((project.budget as any).spent || 0) : ((project as any).spent || 0);
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetAmount - budgetSpent);
+              })()}
             </div>
           </div>
         </div>

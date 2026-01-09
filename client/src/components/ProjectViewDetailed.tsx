@@ -1124,7 +1124,7 @@ const ProjectViewDetailed: React.FC = () => {
             <div>
               <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Budget</p>
               <p className={`text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent`}>
-                {formatCurrency(activeProject?.budget || 0)}
+                {formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0)}
               </p>
             </div>
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
@@ -1132,7 +1132,7 @@ const ProjectViewDetailed: React.FC = () => {
             </div>
           </div>
           <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Spent: <span className="font-semibold">{formatCurrency(activeProject?.spent || 0)}</span>
+            Spent: <span className="font-semibold">{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0)}</span>
           </p>
         </GlassmorphicCard>
 
@@ -1429,13 +1429,13 @@ const ProjectViewDetailed: React.FC = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.budget')}</span>
                 <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0))}
+                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.amount || 0) : (activeProject?.budget || 0))}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('project.sidebar.spent')}</span>
                 <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0))}
+                  {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.spent || 0) : (activeProject?.spent || 0))}
                 </span>
               </div>
             </div>
@@ -2014,15 +2014,15 @@ const ProjectViewDetailed: React.FC = () => {
           </div>
           <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent relative z-10">
             {(() => {
-              const budgetEstimated = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0);
-              const budgetActual = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0);
-              return budgetEstimated && budgetActual && budgetEstimated > 0
-                ? Math.round((budgetActual / budgetEstimated) * 100)
+              const budgetAmount = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.amount || 0) : (activeProject?.budget || 0);
+              const budgetSpent = typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.spent || 0) : (activeProject?.spent || 0);
+              return budgetAmount && budgetSpent && budgetAmount > 0
+                ? Math.round((budgetSpent / budgetAmount) * 100)
                 : 0;
             })()}%
           </p>
           <p className={`text-sm mt-2 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.actual || activeProject?.spent || 0) : (activeProject?.spent || 0))} of {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.estimated || 0) : (activeProject?.budget || 0))}
+            {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.spent || 0) : (activeProject?.spent || 0))} of {formatCurrency(typeof activeProject?.budget === 'object' ? ((activeProject?.budget as any)?.amount || 0) : (activeProject?.budget || 0))}
           </p>
         </GlassmorphicCard>
 
@@ -2111,16 +2111,16 @@ const ProjectViewDetailed: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.totalBudget')}</span>
-            <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(activeProject?.budget || 0)}</span>
+            <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.spent')}</span>
-            <span className="font-semibold text-red-600">{formatCurrency(activeProject?.spent || 0)}</span>
+            <span className="font-semibold text-red-600">{formatCurrency(typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{t('projects.remaining')}</span>
             <span className="font-semibold text-green-600">
-              {formatCurrency((activeProject?.budget || 0) - (activeProject?.spent || 0))}
+              {formatCurrency((typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0) - (typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0))}
             </span>
           </div>
           <div className={`pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -2128,9 +2128,13 @@ const ProjectViewDetailed: React.FC = () => {
               <div
                 className="bg-gradient-to-r from-green-600 to-red-600 h-3 rounded-full"
                 style={{
-                  width: `${activeProject?.budget && activeProject?.spent && activeProject.budget > 0
-                    ? Math.min(Math.round(((activeProject.spent || 0) / activeProject.budget) * 100), 100)
-                    : 0}%`
+                  width: `${(() => {
+                    const budgetAmount = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0;
+                    const budgetSpent = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0;
+                    return budgetAmount && budgetSpent && budgetAmount > 0
+                      ? Math.min(Math.round((budgetSpent / budgetAmount) * 100), 100)
+                      : 0;
+                  })()}%`
                 }}
               />
             </div>
@@ -2183,9 +2187,13 @@ const ProjectViewDetailed: React.FC = () => {
             completionRate: activeProject?.progress || 0,
             tasksCompleted: activeProject?.tasks.filter(t => t.status === 'completed').length || 0,
             totalTasks: activeProject?.tasks.length || 0,
-            budgetUsed: activeProject?.budget && activeProject?.spent
-              ? Math.round((activeProject.spent / activeProject.budget) * 100)
-              : 0 + '%',
+            budgetUsed: (() => {
+              const budgetAmount = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.amount || 0 : activeProject?.budget || 0;
+              const budgetSpent = typeof activeProject?.budget === 'object' ? (activeProject?.budget as any)?.spent || 0 : activeProject?.spent || 0;
+              return budgetAmount && budgetSpent
+                ? Math.round((budgetSpent / budgetAmount) * 100)
+                : 0;
+            })() + '%',
             teamMembers: activeProject?.team.length || 0,
             averageWorkload: activeProject?.team.length
               ? Math.round(activeProject.team.reduce((acc, m) => acc + m.workload, 0) / activeProject.team.length)

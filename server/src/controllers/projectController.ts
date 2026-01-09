@@ -145,7 +145,11 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
       dueDate: dueDate ? new Date(dueDate) : undefined,
       priority: priority || 'medium',
       status: status || 'planning',
-      budget: budget ? parseFloat(budget) : undefined,
+      budget: budget ? {
+        amount: parseFloat(budget),
+        currency: 'USD',
+        spent: 0
+      } : undefined,
       tags: tags || [],
       category
     });
@@ -455,8 +459,8 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     if (updateData.budget !== undefined) {
       if (typeof updateData.budget === 'number') {
         project.budget = {
-          estimated: updateData.budget,
-          actual: 0,
+          amount: updateData.budget,
+          spent: project.budget?.spent || 0,
           currency: 'USD'
         };
       } else if (typeof updateData.budget === 'object') {

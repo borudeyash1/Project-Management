@@ -1009,7 +1009,13 @@ const HomePage: React.FC = () => {
           data={{
             tasks: quickTasks.filter(t => !t.completed),
             projects: activeProjects,
-            teamMembers: projects.flatMap(p => Array.isArray(p.teamMembers) ? p.teamMembers : []),
+            teamMembers: Array.from(
+              new Map(
+                projects
+                  .flatMap(p => Array.isArray(p.teamMembers) ? p.teamMembers : [])
+                  .map(member => [member._id || member.email, member])
+              ).values()
+            ),
             avgProgress: Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / (projects.length || 1))
           }}
         />

@@ -460,8 +460,8 @@ export interface IProject extends Document {
   dueDate?: Date;
   completedDate?: Date;
   budget?: {
-    estimated?: number;
-    actual?: number;
+    amount?: number;
+    spent?: number;
     currency: string;
   };
   progress: number;
