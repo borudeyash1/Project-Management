@@ -19,7 +19,7 @@ const PricingPage: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [pricingPlans, setPricingPlans] = useState<any[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
-  
+
   // Payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -28,13 +28,13 @@ const PricingPage: React.FC = () => {
     setIsVisible(true);
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
-    
+
     // Fetch pricing plans from API
     const fetchPricingPlans = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/pricing-plans');
+        const response = await fetch('/api/pricing-plans');
         const data = await response.json();
-        
+
         if (data.success && data.data && data.data.length > 0) {
           setPricingPlans(data.data);
         } else {
@@ -51,7 +51,7 @@ const PricingPage: React.FC = () => {
     };
 
     fetchPricingPlans();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -105,8 +105,8 @@ const PricingPage: React.FC = () => {
         { text: 'Leaderboard access', included: true },
         { text: 'Role-based access control', included: true },
         { text: 'Workload & deadline management', included: true },
-        { 
-          text: 'Integrations', 
+        {
+          text: 'Integrations',
           included: true,
           integrations: [
             { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
@@ -144,8 +144,8 @@ const PricingPage: React.FC = () => {
         { text: 'Leaderboard access', included: true },
         { text: 'Role-based access control', included: true },
         { text: 'Workload & deadline management', included: true },
-        { 
-          text: 'Integrations', 
+        {
+          text: 'Integrations',
           included: true,
           integrations: [
             { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
@@ -175,8 +175,8 @@ const PricingPage: React.FC = () => {
         { text: 'All Premium features included', included: true },
         { text: 'Dedicated account manager', included: true },
         { text: 'Priority support 24/7', included: true },
-        { 
-          text: 'Integrations', 
+        {
+          text: 'Integrations',
           included: true,
           integrations: [
             { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
@@ -202,7 +202,7 @@ const PricingPage: React.FC = () => {
     console.log('🔵 Get Started clicked for plan:', plan);
     console.log('🔵 User profile:', state.userProfile);
     console.log('🔵 Plan details:', { planKey: plan.planKey, price: plan.price, contactLink: plan.contactLink });
-    
+
     // Check if user is logged in
     if (!state.userProfile) {
       console.log('❌ User not logged in, redirecting to /login');
@@ -220,8 +220,8 @@ const PricingPage: React.FC = () => {
     }
 
     // Convert price to number if it's a numeric string
-    const numericPrice = typeof plan.price === 'string' && !isNaN(Number(plan.price)) 
-      ? Number(plan.price) 
+    const numericPrice = typeof plan.price === 'string' && !isNaN(Number(plan.price))
+      ? Number(plan.price)
       : plan.price;
 
     console.log('💰 Converted price:', numericPrice, 'Type:', typeof numericPrice);
@@ -235,7 +235,7 @@ const PricingPage: React.FC = () => {
 
     // Check if this is a non-numeric price (Contact/Custom)
     const isContactPrice = typeof plan.price === 'string' && isNaN(Number(plan.price));
-    
+
     // Priority 1: If payment is ENABLED and price is numeric, open payment modal
     if (plan.paymentEnabled !== false && !isContactPrice) {
       console.log('💳 Payment enabled, opening payment modal');
@@ -288,11 +288,11 @@ const PricingPage: React.FC = () => {
       <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div 
+          <div
             className="absolute top-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
             style={{ transform: `translateY(${scrollY * 0.5}px)` }}
           ></div>
-          <div 
+          <div
             className="absolute top-0 right-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
           ></div>
@@ -305,11 +305,11 @@ const PricingPage: React.FC = () => {
               <Sparkles className="w-4 h-4 animate-pulse" />
               <span className="text-sm font-semibold">Flexible Pricing Plans</span>
             </div>
-            
+
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               Pricing
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
               Plans that scale with you. Start today, no credit card required
             </p>
@@ -321,14 +321,12 @@ const PricingPage: React.FC = () => {
               </span>
               <button
                 onClick={() => setIsYearly(!isYearly)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  isYearly ? 'bg-green-500' : 'bg-gray-300'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isYearly ? 'bg-green-500' : 'bg-gray-300'
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    isYearly ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isYearly ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
               <span className={`text-sm font-medium ${isYearly ? 'text-gray-900' : 'text-gray-500'}`}>
@@ -344,121 +342,119 @@ const PricingPage: React.FC = () => {
 
           {/* Pricing Cards - Now inside the same section */}
           <div className="max-w-7xl mx-auto mt-12">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {pricingPlans.map((plan, index) => {
-              const finalPrice = typeof plan.price === 'number' && isYearly 
-                ? Math.round(plan.price * 12 * 0.9) 
-                : plan.price;
-              
-              return (
-                <div
-                  key={plan.name}
-                  className={`relative rounded-2xl p-6 transition-all duration-300 bg-white ${
-                    plan.recommended
-                      ? 'border-2 border-[#006397] shadow-xl scale-[1.02]'
-                      : 'border border-gray-200 shadow-md hover:shadow-lg'
-                  }`}
-                  style={{ 
-                    animationDelay: `${index * 100}ms` 
-                  }}
-                >
-                  {/* Recommended Badge */}
-                  {plan.recommended && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-[#006397] text-white text-xs font-semibold px-3 py-1 rounded-full">
-                        Recommended
-                      </span>
-                    </div>
-                  )}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {pricingPlans.map((plan, index) => {
+                const finalPrice = typeof plan.price === 'number' && isYearly
+                  ? Math.round(plan.price * 12 * 0.9)
+                  : plan.price;
 
-                  {/* Plan Header */}
-                  <div className="text-center mb-6 pt-2">
-                    <h3 className="text-base font-semibold text-gray-900 mb-3">
-                      {plan.name}
-                    </h3>
-                    
-                    {/* Price */}
-                    <div className="mb-2">
-                      {typeof finalPrice === 'number' ? (
-                        <div>
-                          <span className="text-4xl font-bold text-gray-900">₹{finalPrice}</span>
-                          {!isYearly && <span className="text-sm text-gray-500 ml-1">/month</span>}
-                        </div>
-                      ) : (
-                        <span className="text-4xl font-bold text-gray-900">
-                          {finalPrice}
+                return (
+                  <div
+                    key={plan.name}
+                    className={`relative rounded-2xl p-6 transition-all duration-300 bg-white ${plan.recommended
+                        ? 'border-2 border-[#006397] shadow-xl scale-[1.02]'
+                        : 'border border-gray-200 shadow-md hover:shadow-lg'
+                      }`}
+                    style={{
+                      animationDelay: `${index * 100}ms`
+                    }}
+                  >
+                    {/* Recommended Badge */}
+                    {plan.recommended && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span className="bg-[#006397] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                          Recommended
                         </span>
-                      )}
-                    </div>
-                    
-                    {/* Description */}
-                    <p className="text-sm text-gray-600">
-                      {plan.description}
-                    </p>
-                  </div>
+                      </div>
+                    )}
 
-                  {/* Features List */}
-                  <div className="space-y-3 mb-4 min-h-[400px]">
-                    {plan.features.map((feature: any, idx: number) => (
-                      <div key={idx}>
-                        <div className="flex items-start gap-2.5">
-                          {feature.included ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                          ) : (
-                            <X className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
-                          )}
-                          <span className={`text-xs leading-relaxed ${feature.included ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
-                            {feature.text}
-                          </span>
-                        </div>
-                        
-                        {/* Inline Integrations */}
-                        {feature.integrations && feature.integrations.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
-                            {feature.integrations.map((integration: any, intIdx: number) => (
-                              <div
-                                key={intIdx}
-                                className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5"
-                                title={integration.name}
-                              >
-                                <img 
-                                  src={integration.icon} 
-                                  alt={integration.name}
-                                  className="w-full h-full object-contain"
-                                />
-                              </div>
-                            ))}
+                    {/* Plan Header */}
+                    <div className="text-center mb-6 pt-2">
+                      <h3 className="text-base font-semibold text-gray-900 mb-3">
+                        {plan.name}
+                      </h3>
+
+                      {/* Price */}
+                      <div className="mb-2">
+                        {typeof finalPrice === 'number' ? (
+                          <div>
+                            <span className="text-4xl font-bold text-gray-900">₹{finalPrice}</span>
+                            {!isYearly && <span className="text-sm text-gray-500 ml-1">/month</span>}
                           </div>
+                        ) : (
+                          <span className="text-4xl font-bold text-gray-900">
+                            {finalPrice}
+                          </span>
                         )}
                       </div>
-                    ))}
-                  </div>
 
-                  {/* CTA Button */}
-                  <button
-                    onClick={() => handleGetStarted(plan)}
-                    className={`w-full py-2.5 px-6 rounded-lg font-medium text-sm transition-all duration-300 ${
-                      plan.buttonStyle === 'solid'
-                        ? 'bg-[#006397] text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                        : 'bg-white text-[#006397] border border-[#006397] hover:bg-blue-50'
-                    }`}
-                  >
-                    {plan.buttonText}
-                  </button>
-                  
-                  {/* Contact us link */}
-                  {plan.contactLink && (
-                    <div className="text-center mt-3">
-                      <a href="/contact-us" className="text-xs text-[#006397] hover:underline">
-                        or Contact us
-                      </a>
+                      {/* Description */}
+                      <p className="text-sm text-gray-600">
+                        {plan.description}
+                      </p>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {/* Features List */}
+                    <div className="space-y-3 mb-4 min-h-[400px]">
+                      {plan.features.map((feature: any, idx: number) => (
+                        <div key={idx}>
+                          <div className="flex items-start gap-2.5">
+                            {feature.included ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                            ) : (
+                              <X className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
+                            )}
+                            <span className={`text-xs leading-relaxed ${feature.included ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
+                              {feature.text}
+                            </span>
+                          </div>
+
+                          {/* Inline Integrations */}
+                          {feature.integrations && feature.integrations.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
+                              {feature.integrations.map((integration: any, intIdx: number) => (
+                                <div
+                                  key={intIdx}
+                                  className="flex items-center justify-center w-6 h-6 bg-white border border-gray-200 rounded p-0.5"
+                                  title={integration.name}
+                                >
+                                  <img
+                                    src={integration.icon}
+                                    alt={integration.name}
+                                    className="w-full h-full object-contain"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* CTA Button */}
+                    <button
+                      onClick={() => handleGetStarted(plan)}
+                      className={`w-full py-2.5 px-6 rounded-lg font-medium text-sm transition-all duration-300 ${plan.buttonStyle === 'solid'
+                          ? 'bg-[#006397] text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                          : 'bg-white text-[#006397] border border-[#006397] hover:bg-blue-50'
+                        }`}
+                    >
+                      {plan.buttonText}
+                    </button>
+
+                    {/* Contact us link */}
+                    {plan.contactLink && (
+                      <div className="text-center mt-3">
+                        <a href="/contact-us" className="text-xs text-[#006397] hover:underline">
+                          or Contact us
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
         </div>
       </section>
 
@@ -468,179 +464,179 @@ const PricingPage: React.FC = () => {
           {/* Feature Lists - Continuous Snake Flow */}
           <div className="text-center mb-12">
             <p className="text-sm text-gray-600 mb-8">Recognized and recommended by top industry experts</p>
-            
+
             {/* Row 1 - Scrolling Left (Features 1-10) */}
             <div className="relative overflow-hidden mb-4 py-3">
               {/* Left fade gradient */}
               <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
               {/* Right fade gradient */}
               <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-              
+
               <div className="flex animate-marquee whitespace-nowrap gap-4">
-                  <div className="feature-card"><span>Workspace Management</span></div>
-                  <div className="feature-card"><span>Project Planning</span></div>
-                  <div className="feature-card"><span>Task Management</span></div>
-                  <div className="feature-card"><span>Team Collaboration</span></div>
-                  <div className="feature-card"><span>Client Portal</span></div>
-                  <div className="feature-card"><span>Time Tracking</span></div>
-                  <div className="feature-card"><span>Resource Allocation</span></div>
-                  <div className="feature-card"><span>Budget Management</span></div>
-                  <div className="feature-card"><span>Invoice Generation</span></div>
-                  <div className="feature-card"><span>Expense Tracking</span></div>
-                  {/* Duplicate for seamless loop */}
-                  <div className="feature-card"><span>Workspace Management</span></div>
-                  <div className="feature-card"><span>Project Planning</span></div>
-                  <div className="feature-card"><span>Task Management</span></div>
-                  <div className="feature-card"><span>Team Collaboration</span></div>
-                  <div className="feature-card"><span>Client Portal</span></div>
-                  <div className="feature-card"><span>Time Tracking</span></div>
-                  <div className="feature-card"><span>Resource Allocation</span></div>
-                  <div className="feature-card"><span>Budget Management</span></div>
-                  <div className="feature-card"><span>Invoice Generation</span></div>
-                  <div className="feature-card"><span>Expense Tracking</span></div>
-                  {/* Triple for ultra-smooth loop */}
-                  <div className="feature-card"><span>Workspace Management</span></div>
-                  <div className="feature-card"><span>Project Planning</span></div>
-                  <div className="feature-card"><span>Task Management</span></div>
-                  <div className="feature-card"><span>Team Collaboration</span></div>
-                  <div className="feature-card"><span>Client Portal</span></div>
-                  <div className="feature-card"><span>Time Tracking</span></div>
-                  <div className="feature-card"><span>Resource Allocation</span></div>
-                  <div className="feature-card"><span>Budget Management</span></div>
-                  <div className="feature-card"><span>Invoice Generation</span></div>
-                  <div className="feature-card"><span>Expense Tracking</span></div>
-                </div>
-              </div>
-
-              {/* Row 2 - Scrolling Right (Features 11-20) */}
-              <div className="relative overflow-hidden mb-4 py-3">
-                {/* Left fade gradient */}
-                <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                {/* Right fade gradient */}
-                <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                
-                <div className="flex animate-marquee-reverse whitespace-nowrap gap-4">
-                  <div className="feature-card"><span>Kanban Boards</span></div>
-                  <div className="feature-card"><span>Gantt Charts</span></div>
-                  <div className="feature-card"><span>Calendar View</span></div>
-                  <div className="feature-card"><span>Timeline View</span></div>
-                  <div className="feature-card"><span>File Sharing</span></div>
-                  <div className="feature-card"><span>Document Management</span></div>
-                  <div className="feature-card"><span>Version Control</span></div>
-                  <div className="feature-card"><span>Real-time Chat</span></div>
-                  <div className="feature-card"><span>Video Conferencing</span></div>
-                  <div className="feature-card"><span>Screen Sharing</span></div>
-                  {/* Duplicate for seamless loop */}
-                  <div className="feature-card"><span>Kanban Boards</span></div>
-                  <div className="feature-card"><span>Gantt Charts</span></div>
-                  <div className="feature-card"><span>Calendar View</span></div>
-                  <div className="feature-card"><span>Timeline View</span></div>
-                  <div className="feature-card"><span>File Sharing</span></div>
-                  <div className="feature-card"><span>Document Management</span></div>
-                  <div className="feature-card"><span>Version Control</span></div>
-                  <div className="feature-card"><span>Real-time Chat</span></div>
-                  <div className="feature-card"><span>Video Conferencing</span></div>
-                  <div className="feature-card"><span>Screen Sharing</span></div>
-                  {/* Triple for ultra-smooth loop */}
-                  <div className="feature-card"><span>Kanban Boards</span></div>
-                  <div className="feature-card"><span>Gantt Charts</span></div>
-                  <div className="feature-card"><span>Calendar View</span></div>
-                  <div className="feature-card"><span>Timeline View</span></div>
-                  <div className="feature-card"><span>File Sharing</span></div>
-                  <div className="feature-card"><span>Document Management</span></div>
-                  <div className="feature-card"><span>Version Control</span></div>
-                  <div className="feature-card"><span>Real-time Chat</span></div>
-                  <div className="feature-card"><span>Video Conferencing</span></div>
-                  <div className="feature-card"><span>Screen Sharing</span></div>
-                </div>
-              </div>
-
-              {/* Row 3 - Scrolling Left (Features 21-30) */}
-              <div className="relative overflow-hidden mb-4 py-3">
-                {/* Left fade gradient */}
-                <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                {/* Right fade gradient */}
-                <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                
-                <div className="flex animate-marquee whitespace-nowrap gap-4">
-                  <div className="feature-card"><span>Custom Workflows</span></div>
-                  <div className="feature-card"><span>Automation Rules</span></div>
-                  <div className="feature-card"><span>AI-Powered Insights</span></div>
-                  <div className="feature-card"><span>Analytics Dashboard</span></div>
-                  <div className="feature-card"><span>Reporting Tools</span></div>
-                  <div className="feature-card"><span>Performance Metrics</span></div>
-                  <div className="feature-card"><span>Goal Tracking</span></div>
-                  <div className="feature-card"><span>Milestone Management</span></div>
-                  <div className="feature-card"><span>Risk Assessment</span></div>
-                  <div className="feature-card"><span>Dependency Tracking</span></div>
-                  {/* Duplicate for seamless loop */}
-                  <div className="feature-card"><span>Custom Workflows</span></div>
-                  <div className="feature-card"><span>Automation Rules</span></div>
-                  <div className="feature-card"><span>AI-Powered Insights</span></div>
-                  <div className="feature-card"><span>Analytics Dashboard</span></div>
-                  <div className="feature-card"><span>Reporting Tools</span></div>
-                  <div className="feature-card"><span>Performance Metrics</span></div>
-                  <div className="feature-card"><span>Goal Tracking</span></div>
-                  <div className="feature-card"><span>Milestone Management</span></div>
-                  <div className="feature-card"><span>Risk Assessment</span></div>
-                  <div className="feature-card"><span>Dependency Tracking</span></div>
-                  {/* Triple for ultra-smooth loop */}
-                  <div className="feature-card"><span>Custom Workflows</span></div>
-                  <div className="feature-card"><span>Automation Rules</span></div>
-                  <div className="feature-card"><span>AI-Powered Insights</span></div>
-                  <div className="feature-card"><span>Analytics Dashboard</span></div>
-                  <div className="feature-card"><span>Reporting Tools</span></div>
-                  <div className="feature-card"><span>Performance Metrics</span></div>
-                  <div className="feature-card"><span>Goal Tracking</span></div>
-                  <div className="feature-card"><span>Milestone Management</span></div>
-                  <div className="feature-card"><span>Risk Assessment</span></div>
-                  <div className="feature-card"><span>Dependency Tracking</span></div>
-                </div>
-              </div>
-
-              {/* Row 4 - Scrolling Right (Features 31-40) */}
-              <div className="relative overflow-hidden py-3">
-                {/* Left fade gradient */}
-                <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                {/* Right fade gradient */}
-                <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                
-                <div className="flex animate-marquee-reverse whitespace-nowrap gap-4">
-                  <div className="feature-card"><span>Mobile Apps</span></div>
-                  <div className="feature-card"><span>Email Integration</span></div>
-                  <div className="feature-card"><span>API Access</span></div>
-                  <div className="feature-card"><span>Webhooks</span></div>
-                  <div className="feature-card"><span>Third-party Integrations</span></div>
-                  <div className="feature-card"><span>Role-based Permissions</span></div>
-                  <div className="feature-card"><span>Security & Compliance</span></div>
-                  <div className="feature-card"><span>Data Backup</span></div>
-                  <div className="feature-card"><span>Export & Import</span></div>
-                  <div className="feature-card"><span>24/7 Support</span></div>
-                  {/* Duplicate for seamless loop */}
-                  <div className="feature-card"><span>Mobile Apps</span></div>
-                  <div className="feature-card"><span>Email Integration</span></div>
-                  <div className="feature-card"><span>API Access</span></div>
-                  <div className="feature-card"><span>Webhooks</span></div>
-                  <div className="feature-card"><span>Third-party Integrations</span></div>
-                  <div className="feature-card"><span>Role-based Permissions</span></div>
-                  <div className="feature-card"><span>Security & Compliance</span></div>
-                  <div className="feature-card"><span>Data Backup</span></div>
-                  <div className="feature-card"><span>Export & Import</span></div>
-                  <div className="feature-card"><span>24/7 Support</span></div>
-                  {/* Triple for ultra-smooth loop */}
-                  <div className="feature-card"><span>Mobile Apps</span></div>
-                  <div className="feature-card"><span>Email Integration</span></div>
-                  <div className="feature-card"><span>API Access</span></div>
-                  <div className="feature-card"><span>Webhooks</span></div>
-                  <div className="feature-card"><span>Third-party Integrations</span></div>
-                  <div className="feature-card"><span>Role-based Permissions</span></div>
-                  <div className="feature-card"><span>Security & Compliance</span></div>
-                  <div className="feature-card"><span>Data Backup</span></div>
-                  <div className="feature-card"><span>Export & Import</span></div>
-                  <div className="feature-card"><span>24/7 Support</span></div>
-                </div>
+                <div className="feature-card"><span>Workspace Management</span></div>
+                <div className="feature-card"><span>Project Planning</span></div>
+                <div className="feature-card"><span>Task Management</span></div>
+                <div className="feature-card"><span>Team Collaboration</span></div>
+                <div className="feature-card"><span>Client Portal</span></div>
+                <div className="feature-card"><span>Time Tracking</span></div>
+                <div className="feature-card"><span>Resource Allocation</span></div>
+                <div className="feature-card"><span>Budget Management</span></div>
+                <div className="feature-card"><span>Invoice Generation</span></div>
+                <div className="feature-card"><span>Expense Tracking</span></div>
+                {/* Duplicate for seamless loop */}
+                <div className="feature-card"><span>Workspace Management</span></div>
+                <div className="feature-card"><span>Project Planning</span></div>
+                <div className="feature-card"><span>Task Management</span></div>
+                <div className="feature-card"><span>Team Collaboration</span></div>
+                <div className="feature-card"><span>Client Portal</span></div>
+                <div className="feature-card"><span>Time Tracking</span></div>
+                <div className="feature-card"><span>Resource Allocation</span></div>
+                <div className="feature-card"><span>Budget Management</span></div>
+                <div className="feature-card"><span>Invoice Generation</span></div>
+                <div className="feature-card"><span>Expense Tracking</span></div>
+                {/* Triple for ultra-smooth loop */}
+                <div className="feature-card"><span>Workspace Management</span></div>
+                <div className="feature-card"><span>Project Planning</span></div>
+                <div className="feature-card"><span>Task Management</span></div>
+                <div className="feature-card"><span>Team Collaboration</span></div>
+                <div className="feature-card"><span>Client Portal</span></div>
+                <div className="feature-card"><span>Time Tracking</span></div>
+                <div className="feature-card"><span>Resource Allocation</span></div>
+                <div className="feature-card"><span>Budget Management</span></div>
+                <div className="feature-card"><span>Invoice Generation</span></div>
+                <div className="feature-card"><span>Expense Tracking</span></div>
               </div>
             </div>
+
+            {/* Row 2 - Scrolling Right (Features 11-20) */}
+            <div className="relative overflow-hidden mb-4 py-3">
+              {/* Left fade gradient */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+              {/* Right fade gradient */}
+              <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+
+              <div className="flex animate-marquee-reverse whitespace-nowrap gap-4">
+                <div className="feature-card"><span>Kanban Boards</span></div>
+                <div className="feature-card"><span>Gantt Charts</span></div>
+                <div className="feature-card"><span>Calendar View</span></div>
+                <div className="feature-card"><span>Timeline View</span></div>
+                <div className="feature-card"><span>File Sharing</span></div>
+                <div className="feature-card"><span>Document Management</span></div>
+                <div className="feature-card"><span>Version Control</span></div>
+                <div className="feature-card"><span>Real-time Chat</span></div>
+                <div className="feature-card"><span>Video Conferencing</span></div>
+                <div className="feature-card"><span>Screen Sharing</span></div>
+                {/* Duplicate for seamless loop */}
+                <div className="feature-card"><span>Kanban Boards</span></div>
+                <div className="feature-card"><span>Gantt Charts</span></div>
+                <div className="feature-card"><span>Calendar View</span></div>
+                <div className="feature-card"><span>Timeline View</span></div>
+                <div className="feature-card"><span>File Sharing</span></div>
+                <div className="feature-card"><span>Document Management</span></div>
+                <div className="feature-card"><span>Version Control</span></div>
+                <div className="feature-card"><span>Real-time Chat</span></div>
+                <div className="feature-card"><span>Video Conferencing</span></div>
+                <div className="feature-card"><span>Screen Sharing</span></div>
+                {/* Triple for ultra-smooth loop */}
+                <div className="feature-card"><span>Kanban Boards</span></div>
+                <div className="feature-card"><span>Gantt Charts</span></div>
+                <div className="feature-card"><span>Calendar View</span></div>
+                <div className="feature-card"><span>Timeline View</span></div>
+                <div className="feature-card"><span>File Sharing</span></div>
+                <div className="feature-card"><span>Document Management</span></div>
+                <div className="feature-card"><span>Version Control</span></div>
+                <div className="feature-card"><span>Real-time Chat</span></div>
+                <div className="feature-card"><span>Video Conferencing</span></div>
+                <div className="feature-card"><span>Screen Sharing</span></div>
+              </div>
+            </div>
+
+            {/* Row 3 - Scrolling Left (Features 21-30) */}
+            <div className="relative overflow-hidden mb-4 py-3">
+              {/* Left fade gradient */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+              {/* Right fade gradient */}
+              <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+
+              <div className="flex animate-marquee whitespace-nowrap gap-4">
+                <div className="feature-card"><span>Custom Workflows</span></div>
+                <div className="feature-card"><span>Automation Rules</span></div>
+                <div className="feature-card"><span>AI-Powered Insights</span></div>
+                <div className="feature-card"><span>Analytics Dashboard</span></div>
+                <div className="feature-card"><span>Reporting Tools</span></div>
+                <div className="feature-card"><span>Performance Metrics</span></div>
+                <div className="feature-card"><span>Goal Tracking</span></div>
+                <div className="feature-card"><span>Milestone Management</span></div>
+                <div className="feature-card"><span>Risk Assessment</span></div>
+                <div className="feature-card"><span>Dependency Tracking</span></div>
+                {/* Duplicate for seamless loop */}
+                <div className="feature-card"><span>Custom Workflows</span></div>
+                <div className="feature-card"><span>Automation Rules</span></div>
+                <div className="feature-card"><span>AI-Powered Insights</span></div>
+                <div className="feature-card"><span>Analytics Dashboard</span></div>
+                <div className="feature-card"><span>Reporting Tools</span></div>
+                <div className="feature-card"><span>Performance Metrics</span></div>
+                <div className="feature-card"><span>Goal Tracking</span></div>
+                <div className="feature-card"><span>Milestone Management</span></div>
+                <div className="feature-card"><span>Risk Assessment</span></div>
+                <div className="feature-card"><span>Dependency Tracking</span></div>
+                {/* Triple for ultra-smooth loop */}
+                <div className="feature-card"><span>Custom Workflows</span></div>
+                <div className="feature-card"><span>Automation Rules</span></div>
+                <div className="feature-card"><span>AI-Powered Insights</span></div>
+                <div className="feature-card"><span>Analytics Dashboard</span></div>
+                <div className="feature-card"><span>Reporting Tools</span></div>
+                <div className="feature-card"><span>Performance Metrics</span></div>
+                <div className="feature-card"><span>Goal Tracking</span></div>
+                <div className="feature-card"><span>Milestone Management</span></div>
+                <div className="feature-card"><span>Risk Assessment</span></div>
+                <div className="feature-card"><span>Dependency Tracking</span></div>
+              </div>
+            </div>
+
+            {/* Row 4 - Scrolling Right (Features 31-40) */}
+            <div className="relative overflow-hidden py-3">
+              {/* Left fade gradient */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+              {/* Right fade gradient */}
+              <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-white via-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+
+              <div className="flex animate-marquee-reverse whitespace-nowrap gap-4">
+                <div className="feature-card"><span>Mobile Apps</span></div>
+                <div className="feature-card"><span>Email Integration</span></div>
+                <div className="feature-card"><span>API Access</span></div>
+                <div className="feature-card"><span>Webhooks</span></div>
+                <div className="feature-card"><span>Third-party Integrations</span></div>
+                <div className="feature-card"><span>Role-based Permissions</span></div>
+                <div className="feature-card"><span>Security & Compliance</span></div>
+                <div className="feature-card"><span>Data Backup</span></div>
+                <div className="feature-card"><span>Export & Import</span></div>
+                <div className="feature-card"><span>24/7 Support</span></div>
+                {/* Duplicate for seamless loop */}
+                <div className="feature-card"><span>Mobile Apps</span></div>
+                <div className="feature-card"><span>Email Integration</span></div>
+                <div className="feature-card"><span>API Access</span></div>
+                <div className="feature-card"><span>Webhooks</span></div>
+                <div className="feature-card"><span>Third-party Integrations</span></div>
+                <div className="feature-card"><span>Role-based Permissions</span></div>
+                <div className="feature-card"><span>Security & Compliance</span></div>
+                <div className="feature-card"><span>Data Backup</span></div>
+                <div className="feature-card"><span>Export & Import</span></div>
+                <div className="feature-card"><span>24/7 Support</span></div>
+                {/* Triple for ultra-smooth loop */}
+                <div className="feature-card"><span>Mobile Apps</span></div>
+                <div className="feature-card"><span>Email Integration</span></div>
+                <div className="feature-card"><span>API Access</span></div>
+                <div className="feature-card"><span>Webhooks</span></div>
+                <div className="feature-card"><span>Third-party Integrations</span></div>
+                <div className="feature-card"><span>Role-based Permissions</span></div>
+                <div className="feature-card"><span>Security & Compliance</span></div>
+                <div className="feature-card"><span>Data Backup</span></div>
+                <div className="feature-card"><span>Export & Import</span></div>
+                <div className="feature-card"><span>24/7 Support</span></div>
+              </div>
+            </div>
+          </div>
 
           {/* Trust Card */}
           <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl p-8 md:p-12">
@@ -650,22 +646,22 @@ const PricingPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-6">
                   <div className="flex -space-x-2">
                     <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
-                      <img 
-                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" 
+                      <img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex"
                         alt="User A"
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
-                      <img 
-                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Beth" 
+                      <img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Beth"
                         alt="User B"
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
-                      <img 
-                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" 
+                      <img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=David"
                         alt="User D"
                         className="w-full h-full object-cover"
                       />
@@ -676,7 +672,7 @@ const PricingPage: React.FC = () => {
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                         </svg>
                       ))}
                       <span className="text-sm text-gray-600 ml-1">(4.8 out of 5)</span>
@@ -723,7 +719,7 @@ const PricingPage: React.FC = () => {
                 <div className="text-sm text-[#006397] font-medium flex items-center gap-2">
                   Learn More
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
                   </svg>
                 </div>
                 <button
@@ -893,7 +889,7 @@ const PricingPage: React.FC = () => {
             }}
             planKey={selectedPlan.planKey || selectedPlan.name.toLowerCase()}
             planName={selectedPlan.displayName || selectedPlan.name}
-            amount={typeof selectedPlan.price === 'number' 
+            amount={typeof selectedPlan.price === 'number'
               ? (isYearly ? Math.round(selectedPlan.price * 12 * 0.9) : selectedPlan.price)
               : 0
             }
