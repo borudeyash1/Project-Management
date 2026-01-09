@@ -53,6 +53,20 @@ export const ContextAIButton: React.FC<{ pageData?: any }> = ({ pageData }) => {
         scrollToBottom();
     }, [messages, displayedText, isExpanded]);
 
+    // Update the last message content when streaming completes
+    useEffect(() => {
+        if (messages.length > 0) {
+            const lastMsg = messages[messages.length - 1];
+            if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
+                if (!isStreaming && displayedText && displayedText.length > 0) {
+                    setMessages(prev => prev.map((msg, idx) =>
+                        idx === prev.length - 1 ? { ...msg, content: displayedText, isStreaming: false } : msg
+                    ));
+                }
+            }
+        }
+    }, [isStreaming, displayedText]);
+
     // Don't show button if not valid context or free user
     if (!isContextAware || !isPaidPlan) {
         return null;
@@ -178,19 +192,7 @@ export const ContextAIButton: React.FC<{ pageData?: any }> = ({ pageData }) => {
         }
     };
 
-    // Update the last message content when streaming completes
-    useEffect(() => {
-        if (messages.length > 0) {
-            const lastMsg = messages[messages.length - 1];
-            if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-                if (!isStreaming && displayedText && displayedText.length > 0) {
-                    setMessages(prev => prev.map((msg, idx) =>
-                        idx === prev.length - 1 ? { ...msg, content: displayedText, isStreaming: false } : msg
-                    ));
-                }
-            }
-        }
-    }, [isStreaming, displayedText]);
+
 
 
     // Glassmorphic Container Classes
