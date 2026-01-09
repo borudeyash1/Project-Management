@@ -60,7 +60,11 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       priority: formData.priority,
       startDate: formData.startDate ? new Date(formData.startDate) : undefined,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-      budget: parseFloat(formData.budgetAmount) || 0,
+      budget: {
+        amount: parseFloat(formData.budgetAmount) || 0,
+        spent: parseFloat(formData.budgetSpent) || 0,
+        currency: 'INR'
+      },
       tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
       integrations: {
         slack: {
@@ -340,12 +344,22 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
                 <TrendingUp className="w-4 h-4 inline mr-1" />
                 Spent
               </label>
-              <p className="text-gray-900 dark:text-gray-100 font-medium">
-                {(() => {
-                  const budgetSpent = typeof project.budget === 'object' && project.budget ? (project.budget.spent || 0) : 0;
-                  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
-                })()}
-              </p>
+              {isEditing ? (
+                <input
+                  type="number"
+                  value={formData.budgetSpent}
+                  onChange={(e) => setFormData({ ...formData, budgetSpent: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder="0"
+                />
+              ) : (
+                <p className="text-gray-900 dark:text-gray-100 font-medium">
+                  {(() => {
+                    const budgetSpent = typeof project.budget === 'object' && project.budget ? (project.budget.spent || 0) : 0;
+                    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
+                  })()}
+                </p>
+              )}
             </div>
           </div>
 

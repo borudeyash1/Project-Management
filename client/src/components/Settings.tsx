@@ -1131,27 +1131,6 @@ const Settings: React.FC = () => {
         </div>
       </GlassmorphicCard>
 
-      {/* Payment Method */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-4">{t('settings.paymentMethod')}</h3>
-        {/* Payment Method */}
-        <GlassmorphicCard className="p-4">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">{t('settings.paymentMethod')}</h3>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-              <div>
-                <p className="font-medium text-gray-900 dark:text-gray-100">{settingsData?.billing.paymentMethod.brand} •••• {settingsData?.billing.paymentMethod.last4}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.expires', { date: '12/25' })}</p>
-              </div>
-            </div>
-            <button className="text-accent-dark hover:text-blue-700">
-              <Edit className="w-4 h-4" />
-            </button>
-          </div>
-        </GlassmorphicCard>
-      </div>
-
       {/* Invoices */}
       <div className="p-4 bg-gray-50 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-4">{t('settings.recentInvoices')}</h3>

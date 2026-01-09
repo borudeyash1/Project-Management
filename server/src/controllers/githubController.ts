@@ -16,11 +16,14 @@ export const linkRepoToProject = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'Project not found' });
         }
 
-        // Check permission - must be owner or project-manager
+        // Check permission - must be project creator, owner, or project-manager
+        const isCreator = project.createdBy.toString() === userId.toString();
         const userMember = project.teamMembers.find(m => m.user.toString() === userId.toString());
         const allowedRoles = ['owner', 'project-manager'];
-        if (!userMember || !allowedRoles.includes(userMember.role)) {
-            return res.status(403).json({ success: false, message: 'Not authorized. Only project owners and managers can link repositories.' });
+        const hasPermission = isCreator || (userMember && allowedRoles.includes(userMember.role));
+        
+        if (!hasPermission) {
+            return res.status(403).json({ success: false, message: 'Not authorized. Only project creators, owners, and managers can link repositories.' });
         }
 
         // Check if a repository is already linked (only one repo allowed)

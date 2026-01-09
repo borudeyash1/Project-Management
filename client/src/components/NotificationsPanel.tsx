@@ -271,14 +271,14 @@ const NotificationsPanel: React.FC = () => {
                         </p>
                         <div className="flex items-center gap-2">
                           {notif.type === 'workspace' && notif.relatedId && (
-                            notif.actionStatus || (notif.metadata?.status && ['accepted', 'declined'].includes(notif.metadata.status)) ? (
+                            ((notif.actionStatus && ['accepted', 'declined'].includes(notif.actionStatus)) || (notif.metadata?.status && ['accepted', 'declined'].includes(notif.metadata.status))) ? (
                               <span className={`px-3 py-1 text-xs font-medium rounded-full ${(notif.actionStatus || notif.metadata?.status) === 'accepted'
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                 : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                                 }`}>
                                 {(notif.actionStatus || notif.metadata?.status) === 'accepted' ? 'Accepted' : 'Declined'}
                               </span>
-                            ) : !notif.read && (
+                            ) : !notif.read && (notif.title?.toLowerCase().includes('invite') || notif.message?.toLowerCase().includes('invite')) && (
                               <div className="flex items-center gap-2">
                                 <button
                                   onClick={(e) => {

@@ -49,6 +49,10 @@ const WorkspaceOverview: React.FC = () => {
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats>({ present: 0, absent: 0, wfh: 0, total: 0 });
   const [loadingAttendance, setLoadingAttendance] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [recentTasks, setRecentTasks] = useState<any[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(true);
+  const hasFetchedRef = React.useRef(false);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const workspaceProjects = state.projects.filter(
@@ -89,41 +93,88 @@ const WorkspaceOverview: React.FC = () => {
     fetchAttendance();
   }, [state.currentWorkspace]);
 
-  // Fetch recent notes
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        const notes = await apiService.get('/notes') as unknown as Note[];
-        setRecentNotes(notes.slice(0, 3)); // Get 3 most recent
-        setLoadingNotes(false);
-      } catch (error) {
-        console.error('Failed to fetch notes:', error);
-        setLoadingNotes(false);
-      }
-    };
-    fetchNotes();
-  }, []);
-
   // Fetch workspace projects from backend to ensure data is synced
   useEffect(() => {
     const loadWorkspaceProjects = async () => {
-      if (!state.currentWorkspace) return;
+      if (!state.currentWorkspace || hasFetchedRef.current) return;
 
       try {
+        hasFetchedRef.current = true; // Mark as fetched immediately
+        setLoadingProjects(true);
+        setLoadingTasks(true);
+        
         console.log('[WorkspaceOverview] Fetching projects for workspace:', state.currentWorkspace);
         const projects = await getWorkspaceProjects(state.currentWorkspace);
         console.log('[WorkspaceOverview] Fetched projects:', projects.length);
 
-        // Transform projects to match state type (convert createdBy object to string)
-        const transformedProjects = projects.map((project: any) => ({
-          ...project,
-          createdBy: typeof project.createdBy === 'object' ? project.createdBy._id : project.createdBy
-        }));
+        // Fetch tasks for all projects to calculate counts
+        const projectsWithCounts = await Promise.all(
+          projects.map(async (project: any) => {
+            try {
+              const tasksResponse = await apiService.get(`/tasks?projectId=${project._id}`);
+              const tasks = tasksResponse.success ? (tasksResponse.data || []) : [];
+              
+              const totalTasksCount = tasks.length;
+              const completedTasksCount = tasks.filter((t: any) => 
+                t.status === 'completed' || t.status === 'done'
+              ).length;
+              
+              const teamMemberCount = project.teamMembers?.length || project.team?.length || 0;
+              
+              return {
+                ...project,
+                totalTasksCount,
+                completedTasksCount,
+                teamMemberCount,
+                createdBy: typeof project.createdBy === 'object' ? project.createdBy._id : project.createdBy,
+                tasks // Store tasks for recent tasks widget
+              };
+            } catch (error) {
+              console.error(`Failed to fetch tasks for project ${project._id}:`, error);
+              return {
+                ...project,
+                totalTasksCount: 0,
+                completedTasksCount: 0,
+                teamMemberCount: project.teamMembers?.length || project.team?.length || 0,
+                createdBy: typeof project.createdBy === 'object' ? project.createdBy._id : project.createdBy,
+                tasks: []
+              };
+            }
+          })
+        );
 
         // Update the projects in state
-        dispatch({ type: 'SET_PROJECTS', payload: transformedProjects });
+        dispatch({ type: 'SET_PROJECTS', payload: projectsWithCounts });
+        
+        // Extract recent tasks from all projects
+        const allTasks: any[] = [];
+        projectsWithCounts.forEach((project: any) => {
+          if (project.tasks && project.tasks.length > 0) {
+            const projectTasks = project.tasks.map((task: any) => ({
+              ...task,
+              projectName: project.name
+            }));
+            allTasks.push(...projectTasks);
+          }
+        });
+        
+        // Filter pending/in-progress tasks and sort by due date
+        const pendingTasks = allTasks
+          .filter(t => t.status !== 'completed' && t.status !== 'done')
+          .sort((a, b) => {
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+          })
+          .slice(0, 5);
+        
+        setRecentTasks(pendingTasks);
+        setLoadingTasks(false);
       } catch (error) {
         console.error('[WorkspaceOverview] Failed to load workspace projects:', error);
+        hasFetchedRef.current = false; // Reset on error
+      } finally {
+        setLoadingProjects(false);
       }
     };
 
@@ -135,8 +186,8 @@ const WorkspaceOverview: React.FC = () => {
   // Calculate stats
   const activeProjects = workspaceProjects.filter(p => p.status === 'active').length;
   const completedProjects = workspaceProjects.filter(p => p.status === 'completed').length;
-  const totalTasks = workspaceProjects.reduce((sum, p) => sum + p.totalTasksCount, 0);
-  const completedTasks = workspaceProjects.reduce((sum, p) => sum + p.completedTasksCount, 0);
+  const totalTasks = workspaceProjects.reduce((sum, p) => sum + (p.totalTasksCount || 0), 0);
+  const completedTasks = workspaceProjects.reduce((sum, p) => sum + (p.completedTasksCount || 0), 0);
   const avgProgress = workspaceProjects.length > 0
     ? Math.round(workspaceProjects.reduce((sum, p) => sum + p.progress, 0) / workspaceProjects.length)
     : 0;
@@ -245,8 +296,8 @@ const WorkspaceOverview: React.FC = () => {
                 </div>
                 <div className="flex items-end justify-between relative z-10">
                   <div>
-                    <div className={`text-3xl font-bold bg-gradient-to-r ${stat.color === 'text-accent-dark' ? 'from-blue-600 to-purple-600' : stat.color === 'text-green-600' ? 'from-green-600 to-emerald-600' : 'from-purple-600 to-pink-600'} bg-clip-text text-transparent`}>{stat.value}</div>
-                    <div className="text-xs text-green-600 mt-1 font-semibold">{stat.change}</div>
+                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{stat.value}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-semibold">{stat.change}</div>
                   </div>
                   {/* Progress bar for some stats */}
                   {stat.key === 'activeProjects' && (
@@ -310,7 +361,11 @@ const WorkspaceOverview: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {t('workspace.overview.projectProgress')}
           </h3>
-          {workspaceProjects.length > 0 ? (
+          {loadingProjects ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : workspaceProjects.length > 0 ? (
             <div className="space-y-4">
               {workspaceProjects.slice(0, 5).map((project) => (
                 <div key={project._id} className="space-y-2">
@@ -377,77 +432,73 @@ const WorkspaceOverview: React.FC = () => {
           )}
         </div>
 
-        {/* AI Notes Widget */}
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-700 p-6">
+        {/* Recent Tasks Widget */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                <CheckCircle className="w-4 h-4 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {t('workspace.overview.aiNotes')}
+                Recent Tasks
               </h3>
             </div>
-            <button
-              onClick={() => navigate('/notes')}
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium"
-            >
-              {t('workspace.overview.viewAll')}
-            </button>
           </div>
 
-          {loadingNotes ? (
+          {loadingTasks ? (
             <div className="flex items-center justify-center h-32">
-              <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : recentNotes.length === 0 ? (
+          ) : recentTasks.length === 0 ? (
             <div className="text-center py-8">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                {t('workspace.overview.noNotesYet')}
+                No pending tasks. Great job!
               </p>
-              <button
-                onClick={() => navigate('/notes')}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm font-medium"
-              >
-                <Plus className="w-4 h-4 inline mr-1" />
-                {t('workspace.overview.createNote')}
-              </button>
             </div>
           ) : (
-            <>
-              <div className="space-y-3 mb-4">
-                {recentNotes.map((note) => (
-                  <div
-                    key={note._id}
-                    onClick={() => navigate('/notes')}
-                    className="bg-white dark:bg-gray-800 rounded-lg p-3 transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div className="flex items-start gap-2">
-                      <Edit3 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
-                          {note.title || 'Untitled'}
-                        </h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
-                          {note.content || 'No content'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {new Date(note.updatedAt).toLocaleDateString()}
-                        </p>
+            <div className="space-y-3">
+              {recentTasks.map((task) => (
+                <div
+                  key={task._id}
+                  className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                      task.priority === 'high' || task.priority === 'urgent' ? 'bg-red-500' :
+                      task.priority === 'medium' ? 'bg-yellow-500' :
+                      'bg-blue-500'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
+                        {task.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-600 dark:text-gray-300">
+                          {task.projectName}
+                        </span>
+                        {task.dueDate && (
+                          <>
+                            <span className="text-xs text-gray-400">•</span>
+                            <span className={`text-xs ${
+                              new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-500'
+                            }`}>
+                              {new Date(task.dueDate).toLocaleDateString()}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
+                    <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${
+                      task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                      'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+                    }`}>
+                      {task.status}
+                    </span>
                   </div>
-                ))}
-              </div>
-              <button
-                onClick={() => navigate('/notes')}
-                className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm font-medium"
-              >
-                <Sparkles className="w-4 h-4 inline mr-1" />
-                {t('workspace.overview.createAINote')}
-              </button>
-            </>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
