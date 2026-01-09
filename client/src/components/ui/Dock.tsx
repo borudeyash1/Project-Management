@@ -280,7 +280,7 @@ const DockComponent: React.FC<DockProps> = ({ children, direction = 'middle', cl
                 // Attach wheel listener directly to support non-passive behavior if needed, 
                 // though React onWheel is usually fine. Native listener gives more control.
                 node.onwheel = (e) => {
-                  if (e.deltaY !== 0) {
+                  if (!isVertical && e.deltaY !== 0) {
                     node.scrollLeft += e.deltaY;
                     e.preventDefault();
                   }
