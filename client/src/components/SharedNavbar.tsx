@@ -126,12 +126,12 @@ const SharedNavbar: React.FC = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden xl:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
             {/* Products Animated Dropdown */}
             <div className="products-select" ref={productsDropdownRef}>
               <div className="products-selected">
                 <Grid size={18} />
-                <span>Products</span>
+                <span className="hidden xl:inline">Products</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   height="1em"
@@ -185,11 +185,11 @@ const SharedNavbar: React.FC = () => {
                   }`}
               >
                 {link.icon}
-                {link.label}
+                <span className="hidden xl:inline">{link.label}</span>
               </Link>
             ))}
           </div>
-          <div className="hidden xl:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
             {/* Language Selector - Hidden on public pages */}
             {!isPublicPage && (
               <div className="relative" ref={languageDropdownRef}>
@@ -242,7 +242,7 @@ const SharedNavbar: React.FC = () => {
               className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-50"
             >
               <LogIn size={18} />
-              Login
+              <span className="hidden xl:inline">Login</span>
             </Link>
             <Link
               to="/register"
@@ -252,12 +252,12 @@ const SharedNavbar: React.FC = () => {
                 }`}
             >
               <UserPlus size={18} />
-              Register
+              <span className="hidden xl:inline">Register</span>
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="xl:hidden flex items-center gap-2">
+          <div className="md:hidden flex items-center gap-2">
             {!isPublicPage && (
               <button
                 onClick={toggleTheme}
@@ -278,7 +278,7 @@ const SharedNavbar: React.FC = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
           } bg-white/95 border-b border-gray-200 shadow-sm`}
       >
         <div className="px-4 pt-2 pb-6 space-y-1">

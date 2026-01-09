@@ -7,7 +7,17 @@ const router = express.Router();
 router.get('/pricing-plans', async (req, res) => {
   try {
     const plans = await PricingPlan.find({ isActive: true }).sort({ order: 1 });
-    res.json({ success: true, data: plans });
+
+    // Convert prices from paise to rupees for display
+    const plansWithRupees = plans.map(plan => {
+      const planObj = plan.toObject();
+      if (typeof planObj.price === 'number') {
+        planObj.price = planObj.price / 100;
+      }
+      return planObj;
+    });
+
+    res.json({ success: true, data: plansWithRupees });
   } catch (error) {
     console.error('Error fetching pricing plans:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch pricing plans' });
@@ -21,7 +31,14 @@ router.get('/pricing-plans/:planKey', async (req, res) => {
     if (!plan) {
       return res.status(404).json({ success: false, message: 'Plan not found' });
     }
-    return res.json({ success: true, data: plan });
+
+    // Convert price from paise to rupees for display
+    const planObj = plan.toObject();
+    if (typeof planObj.price === 'number') {
+      planObj.price = planObj.price / 100;
+    }
+
+    return res.json({ success: true, data: planObj });
   } catch (error) {
     console.error('Error fetching pricing plan:', error);
     return res.status(500).json({ success: false, message: 'Failed to fetch pricing plan' });
@@ -32,7 +49,7 @@ router.get('/pricing-plans/:planKey', async (req, res) => {
 router.get('/admin/subscriptions', async (req, res) => {
   try {
     const plans = await PricingPlan.find().sort({ order: 1 });
-    
+
     // Convert prices from paise to rupees for admin display
     const plansWithRupees = plans.map(plan => {
       const planObj = plan.toObject();
@@ -41,7 +58,7 @@ router.get('/admin/subscriptions', async (req, res) => {
       }
       return planObj;
     });
-    
+
     res.json({ success: true, data: plansWithRupees });
   } catch (error) {
     console.error('Error fetching pricing plans:', error);
@@ -77,12 +94,12 @@ router.put('/admin/subscriptions/:planKey', async (req, res) => {
 router.post('/admin/subscriptions', async (req, res) => {
   try {
     const planData = req.body;
-    
+
     // Convert price from rupees to paise if it's a number
     if (planData.price && typeof planData.price === 'number') {
       planData.price = Math.round(planData.price * 100);
     }
-    
+
     const plan = new PricingPlan(planData);
     await plan.save();
     res.json({ success: true, data: plan, message: 'Plan created successfully' });
@@ -168,8 +185,8 @@ router.post('/admin/subscriptions/initialize', async (req, res) => {
           { text: 'Leaderboard access', included: true },
           { text: 'Role-based access control', included: true },
           { text: 'Workload & deadline management', included: true },
-          { 
-            text: 'Integrations', 
+          {
+            text: 'Integrations',
             included: true,
             integrations: [
               { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
@@ -208,8 +225,8 @@ router.post('/admin/subscriptions/initialize', async (req, res) => {
           { text: 'Leaderboard access', included: true },
           { text: 'Role-based access control', included: true },
           { text: 'Workload & deadline management', included: true },
-          { 
-            text: 'Integrations', 
+          {
+            text: 'Integrations',
             included: true,
             integrations: [
               { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
@@ -241,8 +258,8 @@ router.post('/admin/subscriptions/initialize', async (req, res) => {
           { text: 'All Premium features included', included: true },
           { text: 'Dedicated account manager', included: true },
           { text: 'Priority support 24/7', included: true },
-          { 
-            text: 'Integrations', 
+          {
+            text: 'Integrations',
             included: true,
             integrations: [
               { icon: 'https://img.icons8.com/?size=100&id=pE97I4t7Il9M&format=png&color=000000', name: 'Google Meet' },
