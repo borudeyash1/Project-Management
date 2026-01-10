@@ -948,19 +948,21 @@ export const handleCallback = async (req: Request, res: Response): Promise<void>
     }
 };
 
-// Set active account
+// Set active account for a service
 export const setActiveAccount = async (req: Request, res: Response): Promise<void> => {
     try {
         const { service } = req.params;
         const { accountId } = req.body;
         const userId = (req as any).user._id;
 
-        if (!service || !isValidService(service)) {
-            res.status(400).json({ success: false, message: 'Invalid service' });
+        console.log(`[SetActive] Request to set active ${service} account to ${accountId} for user ${userId}`);
+
+        if (!service || !accountId) {
+            res.status(400).json({ success: false, message: 'Service and account ID are required' });
             return;
         }
 
-        // Verify account belongs to user
+        // Verify account belongs to user and service
         const account = await ConnectedAccount.findOne({
             _id: accountId,
             userId,
@@ -968,6 +970,7 @@ export const setActiveAccount = async (req: Request, res: Response): Promise<voi
         });
 
         if (!account) {
+            console.error(`[SetActive] Account not found: ${accountId} for user ${userId} and service ${service}`);
             res.status(404).json({ success: false, message: 'Account not found' });
             return;
         }
@@ -981,21 +984,32 @@ export const setActiveAccount = async (req: Request, res: Response): Promise<voi
         // Activate the selected account
         account.isActive = true;
         await account.save();
+        console.log(`[SetActive] Updated ConnectedAccount collection. Active: ${account._id}`);
+
 
         // Update user's active account reference
         const user = await User.findById(userId);
-        if (user && user.connectedAccounts) {
+        if (user) {
+            // Ensure connectedAccounts structure exists
+            if (!user.connectedAccounts) {
+                user.connectedAccounts = {};
+            }
+            if (!user.connectedAccounts[service as ServiceType]) {
+                user.connectedAccounts[service as ServiceType] = {
+                    activeAccountId: undefined,
+                    accounts: []
+                };
+            }
+
             const serviceAccounts = user.connectedAccounts[service as ServiceType];
             if (serviceAccounts) {
                 serviceAccounts.activeAccountId = (account._id as mongoose.Types.ObjectId).toString();
 
-                // Sync with legacy modules field for backward compatibility
+                // IMPORTANT: Sync with legacy modules field for backward compatibility
                 if (['mail', 'calendar', 'vault'].includes(service)) {
                     if (!user.modules) user.modules = {};
-
-                    const moduleKey = service as 'mail' | 'calendar' | 'vault';
-                    if (!user.modules[moduleKey]) {
-                        user.modules[moduleKey] = {
+                    if (!user.modules[service as 'mail' | 'calendar' | 'vault']) {
+                        user.modules[service as 'mail' | 'calendar' | 'vault'] = {
                             isEnabled: false,
                             refreshToken: undefined,
                             connectedAt: undefined,
@@ -1003,37 +1017,41 @@ export const setActiveAccount = async (req: Request, res: Response): Promise<voi
                         };
                     }
 
-                    user.modules[moduleKey]!.isEnabled = true;
-                    user.modules[moduleKey]!.refreshToken = account.refreshToken;
+                    const module = user.modules[service as 'mail' | 'calendar' | 'vault'];
+                    if (module) {
+                        module.isEnabled = true;
+                        module.refreshToken = account.refreshToken;
+                        module.connectedAt = account.createdAt;
+                        console.log(`[SetActive] Synced legacy ${service} module with new token`);
+                    }
+                    user.markModified('modules'); // Explicitly mark modules as modified
                 }
 
+                user.markModified('connectedAccounts'); // Explicitly mark connectedAccounts as modified
                 await user.save();
+                console.log(`[SetActive] Updated User profile activeAccountId and synced modules`);
             }
         }
 
         res.json({
             success: true,
-            data: {
-                activeAccount: {
-                    _id: account._id,
-                    providerEmail: account.providerEmail,
-                    providerName: account.providerName,
-                    providerAvatar: account.providerAvatar
-                }
-            }
+            message: 'Active account updated',
+            data: { accountId: account._id }
         });
+
     } catch (error: any) {
         console.error('Set active account error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// Disconnect account
+// Disconnect an account
 export const disconnectAccount = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { accountId } = req.params;
-        const service = req.params.service as string;
+        const { service, accountId } = req.params;
         const userId = (req as any).user._id;
+
+        console.log(`[Disconnect] Request to disconnect ${service} account ${accountId}`);
 
         const account = await ConnectedAccount.findOne({
             _id: accountId,
@@ -1046,46 +1064,64 @@ export const disconnectAccount = async (req: Request, res: Response): Promise<vo
             return;
         }
 
-        const wasActive = account.isActive;
+        // If this was the active account, we need to handle that
+        if (account.isActive) {
+            // Find another account to make active if exists
+            const otherAccount = await ConnectedAccount.findOne({
+                userId,
+                service,
+                _id: { $ne: accountId }
+            });
 
-        // Delete the account
-        await ConnectedAccount.deleteOne({ _id: accountId });
+            const user = await User.findById(userId);
+            if (user && user.connectedAccounts) {
+                const serviceAccounts = user.connectedAccounts[service as ServiceType];
 
-        // Update user's connected accounts
-        const user = await User.findById(userId);
-        if (user && user.connectedAccounts) {
-            const serviceAccounts = user.connectedAccounts[service as ServiceType];
-            if (serviceAccounts && serviceAccounts.accounts) {
-                serviceAccounts.accounts = serviceAccounts.accounts.filter(
-                    (id: any) => id.toString() !== accountId
-                );
+                if (otherAccount && serviceAccounts) {
+                    otherAccount.isActive = true;
+                    await otherAccount.save();
+                    console.log(`[Disconnect] Switched active account to ${otherAccount._id}`);
 
-                // If this was the active account, set another as active
-                if (wasActive && serviceAccounts.accounts.length > 0) {
-                    const newActiveAccount = await ConnectedAccount.findById(serviceAccounts.accounts[0]);
-                    if (newActiveAccount) {
-                        newActiveAccount.isActive = true;
-                        await newActiveAccount.save();
-                        serviceAccounts.activeAccountId = (newActiveAccount._id as mongoose.Types.ObjectId).toString();
+                    serviceAccounts.activeAccountId = (otherAccount._id as mongoose.Types.ObjectId).toString();
+
+                    // Sync legacy modules
+                    if (['mail', 'calendar', 'vault'].includes(service as string)) {
+                        const module = user.modules?.[service as 'mail' | 'calendar' | 'vault'];
+                        if (module) {
+                            module.refreshToken = otherAccount.refreshToken;
+                        }
+                        user.markModified('modules');
                     }
-                } else if (serviceAccounts.accounts.length === 0) {
+                    user.markModified('connectedAccounts');
+                    await user.save();
+                } else if (serviceAccounts) {
+                    // No other accounts, clear the active reference
                     serviceAccounts.activeAccountId = undefined;
 
-                    // Sync with deprecated modules field - disable if no accounts left
-                    if (['mail', 'calendar', 'vault'].includes(service)) {
-                        const moduleService = user.modules?.[service as 'mail' | 'calendar' | 'vault'];
-                        if (moduleService) {
-                            moduleService.isEnabled = false;
-                            moduleService.refreshToken = null;
+                    // Clear legacy modules
+                    if (['mail', 'calendar', 'vault'].includes(service as string)) {
+                        const module = user.modules?.[service as 'mail' | 'calendar' | 'vault'];
+                        if (module) {
+                            module.isEnabled = false;
+                            module.refreshToken = null;
                         }
+                        user.markModified('modules');
                     }
+                    user.markModified('connectedAccounts');
+                    await user.save();
+                    console.log(`[Disconnect] No other accounts left. Cleared activeAccountId.`);
                 }
-
-                await user.save();
             }
         }
 
-        res.json({ success: true, message: 'Account disconnected successfully' });
+        await account.deleteOne();
+        console.log(`[Disconnect] Account deleted: ${accountId}`);
+
+        res.json({
+            success: true,
+            message: 'Account disconnected successfully'
+        });
+
     } catch (error: any) {
         console.error('Disconnect account error:', error);
         res.status(500).json({ success: false, message: error.message });

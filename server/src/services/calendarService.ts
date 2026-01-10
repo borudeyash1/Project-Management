@@ -4,18 +4,30 @@ import User from '../models/User';
 export async function getCalendarClient(userId: string) {
     const user = await User.findById(userId);
 
-    if (!user || !user.modules?.calendar?.refreshToken) {
+    // [MODIFIED] Check connectedAccounts first, fallback to modules
+    let refreshToken = user?.modules?.calendar?.refreshToken;
+
+    if (!refreshToken) {
+        // Check connectedAccounts
+        const activeAccountId = user?.connectedAccounts?.calendar?.activeAccountId;
+        if (activeAccountId) {
+            const account = await import('../models/ConnectedAccount').then(m => m.ConnectedAccount.findById(activeAccountId));
+            if (account) refreshToken = account.refreshToken;
+        }
+    }
+
+    if (!refreshToken) {
         throw new Error('Calendar not connected');
     }
 
     const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        `${process.env.FRONTEND_URL}/api/auth/sartthi/connect-calendar/callback`
+        `${process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/api/sartthi-accounts'}/calendar/callback`
     );
 
     oauth2Client.setCredentials({
-        refresh_token: user.modules.calendar.refreshToken
+        refresh_token: refreshToken
     });
 
     return google.calendar({ version: 'v3', auth: oauth2Client });

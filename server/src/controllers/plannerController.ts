@@ -33,6 +33,28 @@ const collectParticipantIds = (event: IPlannerEvent): string[] => {
   return Array.from(ids);
 };
 
+// [NEW] Helper to transform Google Calendar events to PlannerEvent format
+const transformGoogleEventToPlannerEvent = (gEvent: any): any => {
+  const start = gEvent.start.dateTime || gEvent.start.date;
+  const end = gEvent.end.dateTime || gEvent.end.date;
+  const isAllDay = !gEvent.start.dateTime;
+
+  return {
+    _id: gEvent.id,
+    title: gEvent.summary || '(No Title)',
+    description: gEvent.description || '',
+    start: new Date(start),
+    end: new Date(end),
+    allDay: isAllDay,
+    color: '#4285F4', // Google Blue
+    createdBy: { fullName: 'Google Calendar' }, // Placeholder
+    participants: [],
+    source: 'google-calendar',
+    externalId: gEvent.id,
+    externalUrl: gEvent.htmlLink
+  };
+};
+
 const schedulePlannerEventReminders = async (event: IPlannerEvent) => {
   const userIds = collectParticipantIds(event);
   if (userIds.length === 0) {
@@ -354,6 +376,7 @@ import JiraIssue from '../models/JiraIssue';
 // import NotionTask from '../models/NotionTask';  // TODO: Create NotionTask model
 import User from '../models/User';
 import LinearIssue from '../models/LinearIssue';
+import { listEvents } from '../services/calendarService'; // [NEW] Import calendar service
 
 
 
@@ -483,7 +506,7 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
     // Fetch tasks
     // Include only tasks assigned to the user (not tasks created by or reported by the user)
     const taskQuery: any = { isActive: true };
-    
+
     if (workspaceId) {
       // If workspace is specified, get workspace tasks assigned to user OR user's personal tasks
       taskQuery.$or = [
@@ -494,7 +517,7 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
       // If no workspace specified, get only tasks assigned to the user
       taskQuery.assignee = userId;
     }
-    
+
     if (Object.keys(dateFilter).length > 0) {
       taskQuery.$and = taskQuery.$and || [];
       taskQuery.$and.push({
@@ -611,13 +634,41 @@ export const getAllPlannerData = async (req: AuthenticatedRequest, res: Response
       .populate('participants.user', 'fullName email avatarUrl')
       .sort({ start: 1 });
 
+    // [NEW] Fetch Google Calendar Events if connected
+    let googleEvents: any[] = [];
+    try {
+      const user = await User.findById(userId);
+
+      // Check legacy modules OR connectedAccounts
+      const isCalendarEnabled =
+        user?.modules?.calendar?.isEnabled ||
+        (user?.connectedAccounts?.calendar?.activeAccountId);
+
+      if (isCalendarEnabled && (!workspaceId)) { // Only fetch personal calendar if not filtered by workspace (or decide logic)
+        // Ideally, we fetch for the requested date range
+        const gEvents = await listEvents(
+          userId.toString(),
+          startDate ? (startDate instanceof Date ? startDate.toISOString() : startDate as string) : undefined,
+          endDate ? (endDate instanceof Date ? endDate.toISOString() : endDate as string) : undefined
+        );
+
+        googleEvents = gEvents.map(transformGoogleEventToPlannerEvent);
+        console.log(`[Planner] Fetched ${googleEvents.length} Google Calendar events`);
+      }
+    } catch (error: any) {
+      console.error('[Planner] Failed to fetch Google Calendar events:', error.message);
+    }
+
+    // Merge events
+    const allEvents = [...events, ...googleEvents];
+
     res.json({
       success: true,
       data: {
-        tasks: allTasks,  // Return merged tasks
+        tasks: allTasks,
         reminders,
         milestones,
-        events
+        events: allEvents
       }
     });
   } catch (error) {
@@ -678,6 +729,28 @@ export const getCalendarViewData = async (req: AuthenticatedRequest, res: Respon
         .select('title start end allDay color')
     ]);
 
+    // [NEW] Fetch Google Calendar Events if connected
+    let googleEvents: any[] = [];
+    try {
+      const user = await User.findById(userId);
+
+      // Check legacy modules OR connectedAccounts
+      const isCalendarEnabled =
+        user?.modules?.calendar?.isEnabled ||
+        (user?.connectedAccounts?.calendar?.activeAccountId);
+
+      if (isCalendarEnabled && (!workspaceId)) {
+        const gEvents = await listEvents(
+          userId.toString(),
+          startDate.toISOString(),
+          endDate.toISOString()
+        );
+        googleEvents = gEvents.map(transformGoogleEventToPlannerEvent);
+      }
+    } catch (error: any) {
+      console.error('[Planner] Failed to fetch Google Calendar events for calendar view:', error.message);
+    }
+
     // Format for calendar
     const calendarEvents = [
       ...tasks.map(task => ({
@@ -718,6 +791,16 @@ export const getCalendarViewData = async (req: AuthenticatedRequest, res: Respon
         end: event.end,
         allDay: event.allDay,
         color: event.color
+      })),
+      // [NEW] Map Google Events
+      ...googleEvents.map(event => ({
+        id: event._id,
+        type: 'event',
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        allDay: event.allDay,
+        color: event.color || '#4285F4'
       }))
     ];
 
