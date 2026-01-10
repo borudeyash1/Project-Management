@@ -509,7 +509,7 @@ const DockNavigation: React.FC = () => {
                 dispatch({ type: 'TOGGLE_MODAL', payload: 'spotifyWidget' });
                 setHoveredItem(null);
               }}
-              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-[#282828] flex items-center gap-2 transition-colors"
+              className="w-full text-left px-3 py-2 text-sm text-white hover:bg-[#282828] flex items-center gap-2 transition-colors"
             >
               <SpotifyLogo size={14} />
               Open Player
@@ -520,7 +520,7 @@ const DockNavigation: React.FC = () => {
                 navigate('/music');
                 setHoveredItem(null);
               }}
-              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-[#282828] flex items-center gap-2 transition-colors"
+              className="w-full text-left px-3 py-2 text-sm text-white hover:bg-[#282828] flex items-center gap-2 transition-colors"
             >
               <LayoutGrid size={14} />
               Open Library

@@ -688,7 +688,7 @@ class ContextAnalyzerService {
             const [allTasks, todayEvents, weekEvents, activeReminders, user, jiraIssues, linearIssues] = await Promise.all([
                 // All pending tasks
                 Task.find({
-                    assignees: userId,
+                    assignee: userId,
                     status: { $ne: 'completed' }
                 })
                     .select('title status priority dueDate project')

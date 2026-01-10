@@ -472,7 +472,7 @@ Provide: 1) Performance summary 2) Trend analysis 3) Improvement areas 4) Succes
         const integrations = data.integrations || {};
 
         return {
-            systemPrompt: `You are an intelligent personal planner assistant. Analyze the user's schedule, tasks (local & external), events, reminders, and goals. Provide actionable daily planning insights, unifying work from Jira, Linear, Slack, and Sartthi.`,
+            systemPrompt: `You are an intelligent personal planner assistant. Analyze the user's schedule, tasks (local & external), events, reminders, and goals. Provide actionable daily planning insights, unifying work from Jira, Linear, Slack, and Sartthi.\n\nNote: Spotify integration requires a Spotify Premium account to function correctly. If the user asks about music playback issues, kindly inform them of this requirement.`,
             userPrompt: `
 **Today's Schedule:**
 - Tasks Due: ${tasks.today?.length || 0} (${tasks.today?.map((t: any) => `${t.title} at ${t.due}`).join(', ') || 'None'})

@@ -9,7 +9,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { spotifyService, SpotifyPlaybackState } from '../services/spotifyService';
 import { SpotifyLogo } from '../components/icons/BrandLogos';
-import SharedNavbar from '../components/SharedNavbar';
+
 
 const formatTime = (ms: number) => {
     const s = Math.floor((ms / 1000) % 60);
@@ -195,7 +195,7 @@ const MusicPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
-            <SharedNavbar />
+
 
             <div className="max-w-7xl mx-auto px-4 py-6 pb-24">
                 {/* Header */}
