@@ -872,6 +872,40 @@ export interface ITeam extends Document {
   toJSON(): any;
 }
 
+// Expense Types
+export interface IExpense extends Document {
+  _id: string;
+  project: string;
+  workspace: string;
+  title: string;
+  amount: number;
+  currency: string;
+  category: 'Labor' | 'Materials' | 'Equipment' | 'Software' | 'Travel' | 'Marketing' | 'Utilities' | 'Other';
+  date: Date;
+  createdBy: string;
+  description?: string;
+  attachments?: Array<{
+    filename: string;
+    originalName: string;
+    path: string;
+    size: number;
+    mimeType: string;
+    uploadedAt: Date;
+  }>;
+  status: 'pending' | 'approved' | 'rejected';
+  approvedBy?: string;
+  approvedAt?: Date;
+  rejectedBy?: string;
+  rejectedAt?: Date;
+  rejectionReason?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  approve(approverId: string): Promise<IExpense>;
+  reject(rejecterId: string, reason?: string): Promise<IExpense>;
+  toJSON(): any;
+}
+
 // Payroll Types
 export interface IPayroll extends Document {
   _id: string;

@@ -630,6 +630,37 @@ export interface Attachment {
   uploadedAt: Date;
 }
 
+// Expense Types
+export interface Expense {
+  _id: string;
+  project: string;
+  workspace: string;
+  title: string;
+  amount: number;
+  currency: string;
+  category: 'Labor' | 'Materials' | 'Equipment' | 'Software' | 'Travel' | 'Marketing' | 'Utilities' | 'Other';
+  date: string;
+  createdBy: User;
+  description?: string;
+  attachments?: Array<{
+    filename: string;
+    originalName: string;
+    path: string;
+    size: number;
+    mimeType: string;
+    uploadedAt: string;
+  }>;
+  status: 'pending' | 'approved' | 'rejected';
+  approvedBy?: User;
+  approvedAt?: string;
+  rejectedBy?: User;
+  rejectedAt?: string;
+  rejectionReason?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // API Response Types
 export interface ApiResponse<T = any> {
   success: boolean;

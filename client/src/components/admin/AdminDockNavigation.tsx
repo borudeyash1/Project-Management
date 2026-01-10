@@ -88,7 +88,28 @@ const AdminDockNavigation: React.FC = () => {
   return (
     <AdminDock direction="middle">
       {/* Admin Navigation Items */}
-      {adminNavItems.map((item) => {
+      {adminNavItems.filter(item => {
+        // Get role from localStorage
+        const adminDataString = localStorage.getItem('adminData');
+        let role = '';
+        if (adminDataString) {
+          try {
+            const data = JSON.parse(adminDataString);
+            role = data.role;
+          } catch (e) {
+            console.error('Error parsing admin data', e);
+          }
+        }
+
+        // Super admin sees everything
+        if (role === 'super_admin') return true;
+
+        // Admin sees specific items
+        // Allowed: dashboard, subscriptions, payments, coupons, analytics, releases, docs, content, settings
+        // Excluded: devices, users
+        const allowedIds = ['dashboard', 'subscriptions', 'payments', 'coupons', 'analytics', 'releases', 'docs', 'content', 'settings'];
+        return allowedIds.includes(item.id);
+      }).map((item) => {
         const Icon = item.icon;
         const active = isActive(item.path);
 

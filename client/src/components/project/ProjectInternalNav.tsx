@@ -14,7 +14,8 @@ import {
   Clock,
   Target,
   FileText,
-  Palette
+  Palette,
+  DollarSign
 } from 'lucide-react';
 
 interface ProjectTab {
@@ -108,6 +109,12 @@ const ProjectInternalNav: React.FC = () => {
       label: t('project.tabs.inbox'),
       icon: MessageSquare,
       path: `/project/${projectId}/inbox`
+    },
+    {
+      id: 'accounts',
+      label: t('project.tabs.accounts') || 'Accounts',
+      icon: DollarSign,
+      path: `/project/${projectId}/accounts`
     },
     {
       id: 'settings',

@@ -222,8 +222,8 @@ const AdminDashboard: React.FC = () => {
               <div>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>System Status</p>
                 <p className={`text-3xl font-bold ${loading ? 'text-gray-600' :
-                    dashboardStats.systemStatus === 'Healthy' ? 'text-green-500' :
-                      dashboardStats.systemStatus === 'Warning' ? 'text-yellow-500' : 'text-red-500'
+                  dashboardStats.systemStatus === 'Healthy' ? 'text-green-500' :
+                    dashboardStats.systemStatus === 'Warning' ? 'text-yellow-500' : 'text-red-500'
                   } mt-2`}>
                   {loading ? (
                     <span className="animate-pulse">...</span>
@@ -245,23 +245,27 @@ const AdminDashboard: React.FC = () => {
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button
-              onClick={() => navigate('/admin/users')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
-            >
-              <Users className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'} mb-2`} />
-              <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Manage Users</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>View and edit users</p>
-            </button>
+            {adminData.role === 'super_admin' && (
+              <>
+                <button
+                  onClick={() => navigate('/admin/users')}
+                  className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
+                >
+                  <Users className={`w-6 h-6 ${isDarkMode ? 'text-yellow-500' : 'text-yellow-600'} mb-2`} />
+                  <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Manage Users</p>
+                  <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>View and edit users</p>
+                </button>
 
-            <button
-              onClick={() => navigate('/admin/devices')}
-              className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
-            >
-              <Shield className={`w-6 h-6 ${isDarkMode ? 'text-accent' : 'text-accent-dark'} mb-2`} />
-              <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Security</p>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage devices & access</p>
-            </button>
+                <button
+                  onClick={() => navigate('/admin/devices')}
+                  className={`p-4 rounded-lg border-2 ${isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'} transition-colors text-left`}
+                >
+                  <Shield className={`w-6 h-6 ${isDarkMode ? 'text-accent' : 'text-accent-dark'} mb-2`} />
+                  <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Security</p>
+                  <p className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'} mt-1`}>Manage devices & access</p>
+                </button>
+              </>
+            )}
 
             <button
               onClick={() => navigate('/admin/subscriptions')}

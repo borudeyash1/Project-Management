@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, CheckCircle, Star, Users, Shield, 
+import {
+  ArrowRight, CheckCircle, Star, Users, Shield,
   Clock, Target, Sparkles, ChevronRight,
   BarChart3, Calendar, Zap, TrendingUp,
   Code, Globe, Smartphone,
@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [adminFeatureTab, setAdminFeatureTab] = useState<number>(0);
-  
+
   // Live mockup states for animations
   const [liveTaskIndex, setLiveTaskIndex] = useState(0);
   const [liveChatIndex, setLiveChatIndex] = useState(0);
@@ -31,11 +31,11 @@ const LandingPage: React.FC = () => {
 
   useEffect(() => {
     setIsVisible(true);
-    
+
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -119,48 +119,57 @@ const LandingPage: React.FC = () => {
     {
       icon: <Target className="w-6 h-6" />,
       title: "Project Management",
-      description: "Organize and track your projects with powerful tools and intuitive interfaces that scale with your team."
+      description: "Organize and track your projects with powerful tools and intuitive interfaces that scale with your team.",
+      image: "/projects_view_ui_1764317804293.png"
     },
     {
       icon: <Users className="w-6 h-6" />,
       title: "Team Collaboration",
-      description: "Work together seamlessly with real-time updates, comments, and file sharing capabilities."
+      description: "Work together seamlessly with real-time updates, comments, and file sharing capabilities.",
+      image: "/collaboration_ui_1764317298899.png"
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
       title: "Advanced Analytics",
-      description: "Get deep insights into your team's performance with customizable dashboards and detailed reports."
+      description: "Get deep insights into your team's performance with customizable dashboards and detailed reports.",
+      image: "/analytics_ui_1764317315064.png"
     },
     {
       icon: <Clock className="w-6 h-6" />,
       title: "Time Tracking",
-      description: "Monitor time spent on tasks and projects to improve productivity and billing accuracy."
+      description: "Monitor time spent on tasks and projects to improve productivity and billing accuracy.",
+      image: "/task_management_ui_1764317282097.png"
     },
-      {
-        icon: <Calendar className="w-6 h-6" />,
-        title: "Smart Scheduling",
-        description: "Automated intelligent scheduling based on comprehensive user profiles, availability, and workload patterns."
-      },
+    {
+      icon: <Calendar className="w-6 h-6" />,
+      title: "Smart Scheduling",
+      description: "Automated intelligent scheduling based on comprehensive user profiles, availability, and workload patterns.",
+      image: "/tasks_board_ui_1764317826607.png"
+    },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "Enterprise Security",
-      description: "Your data is protected with enterprise-grade security, encryption, and compliance standards."
+      description: "Your data is protected with enterprise-grade security, encryption, and compliance standards.",
+      image: "/hero_dashboard_mockup_1764317223182.png"
     },
-      {
-        icon: <Zap className="w-6 h-6" />,
-        title: "AI Automation",
-        description: "Integrate your own AI chatbot API and leverage AI-powered automation for smarter workflows."
-      },
-      {
-        icon: <Code className="w-6 h-6" />,
-        title: "Smart Attendance",
-        description: "Face and location-based attendance tracking in workspace for accurate and secure time management."
-      },
-      {
-        icon: <Smartphone className="w-6 h-6" />,
-        title: "Desktop Application",
-        description: "Access your projects with our powerful native desktop application for enhanced productivity."
-      }
+    {
+      icon: <Zap className="w-6 h-6" />,
+      title: "AI Automation",
+      description: "Integrate your own AI chatbot API and leverage AI-powered automation for smarter workflows.",
+      image: "/home_dashboard_ui_1764317785275.png"
+    },
+    {
+      icon: <Code className="w-6 h-6" />,
+      title: "Smart Attendance",
+      description: "Face and location-based attendance tracking in workspace for accurate and secure time management.",
+      image: "/hero_dashboard_mockup_1764317223182.png"
+    },
+    {
+      icon: <Smartphone className="w-6 h-6" />,
+      title: "Desktop Application",
+      description: "Access your projects with our powerful native desktop application for enhanced productivity.",
+      image: "/desktop1.jpeg"
+    }
   ];
 
   // Metrics section is hidden - keeping data for potential future use
@@ -337,7 +346,7 @@ const LandingPage: React.FC = () => {
     { name: "Dropbox", logo: "https://img.icons8.com/?size=100&id=13657&format=png&color=000000", category: "Cloud Storage" },
     { name: "Notion", logo: "https://img.icons8.com/?size=100&id=F6H2fsqXKBwH&format=png&color=000000", category: "Documentation" },
     { name: "Spotify", logo: "https://img.icons8.com/?size=100&id=G9XXzb9XaEKX&format=png&color=000000", category: "Music" },
-    
+
     // 🔜 PENDING INTEGRATIONS (Have API Keys)
     { name: "Slack", logo: "https://img.icons8.com/?size=100&id=19978&format=png&color=000000", category: "Communication" },
     { name: "Jira", logo: "https://img.icons8.com/?size=100&id=oROcPah5ues6&format=png&color=000000", category: "Project Management" },
@@ -353,25 +362,29 @@ const LandingPage: React.FC = () => {
       title: "Software Development",
       description: "Manage sprints, track bugs, and collaborate on code with integrated development tools.",
       icon: <Code className="w-12 h-12" />,
-      color: "from-blue-500 to-cyan-500"
+      color: "from-blue-500 to-cyan-500",
+      image: "/projects_view_ui_1764317804293.png"
     },
     {
       title: "Remote Teams",
       description: "Keep distributed teams aligned with real-time collaboration, smart attendance, and seamless communication.",
       icon: <Users className="w-12 h-12" />,
-      color: "from-purple-600 to-indigo-600"
+      color: "from-purple-600 to-indigo-600",
+      image: "/collaboration_ui_1764317298899.png"
     },
     {
       title: "Design & Creative",
       description: "Collaborate on design projects with feedback tools, asset management, and creative workflows.",
       icon: <Target className="w-12 h-12" />,
-      color: "from-orange-500 to-red-500"
+      color: "from-orange-500 to-red-500",
+      image: "/home_dashboard_ui_1764317785275.png"
     },
     {
       title: "Product Management",
       description: "Coordinate cross-functional teams, track milestones, and deliver successful product launches.",
       icon: <Star className="w-12 h-12" />,
-      color: "from-green-500 to-emerald-500"
+      color: "from-green-500 to-emerald-500",
+      image: "/analytics_ui_1764317315064.png"
     }
   ];
 
@@ -402,7 +415,7 @@ const LandingPage: React.FC = () => {
       answer: "Yes! Sartthi is perfect for remote and distributed teams with features like real-time collaboration, smart attendance tracking with location verification, video integration, and asynchronous communication tools.",
       category: "General"
     },
-    
+
     // Pricing & Plans
     {
       question: "What is the difference between the Free and Pro plans?",
@@ -536,21 +549,21 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F5F8FD] overflow-hidden">
       <SharedNavbar />
-      
+
       {/* Hero Section with Advanced Animations */}
       <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div 
+          <div
             className="absolute top-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
             style={{ transform: `translateY(${scrollY * 0.5}px)` }}
           ></div>
-          <div 
+          <div
             className="absolute top-0 right-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
           ></div>
-          <div 
+          <div
             className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"
             style={{ transform: `translateY(${scrollY * 0.4}px)` }}
           ></div>
@@ -564,7 +577,7 @@ const LandingPage: React.FC = () => {
               <span className="text-sm font-semibold">New: AI-Powered Project Insights</span>
               <ChevronRight className="w-4 h-4" />
             </div>
-            
+
             {/* Main Headline with Gradient */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               Manage Projects Like
@@ -574,7 +587,7 @@ const LandingPage: React.FC = () => {
                   Never Before
                 </span>
                 <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 300 12" fill="none">
-                  <path d="M2 10C50 5, 100 2, 150 3C200 4, 250 7, 298 10" stroke="url(#gradient)" strokeWidth="3" strokeLinecap="round"/>
+                  <path d="M2 10C50 5, 100 2, 150 3C200 4, 250 7, 298 10" stroke="url(#gradient)" strokeWidth="3" strokeLinecap="round" />
                   <defs>
                     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#3B82F6" />
@@ -585,12 +598,12 @@ const LandingPage: React.FC = () => {
                 </svg>
               </span>
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Sartthi is the all-in-one project management platform that helps teams collaborate, 
+              Sartthi is the all-in-one project management platform that helps teams collaborate,
               track progress, and deliver exceptional results faster than ever before.
             </p>
-            
+
             {/* CTA Buttons with Animations */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
@@ -609,7 +622,7 @@ const LandingPage: React.FC = () => {
                 Watch Demo
               </Link>
             </div>
-            
+
             {/* Trust Indicators */}
             <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">
               <div className="flex items-center gap-2 bg-[#F5F8FD] px-4 py-2 rounded-full shadow-sm">
@@ -626,7 +639,7 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Hero Video/Image with Parallax Effect */}
           <div className={`mt-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="relative mx-auto max-w-6xl" style={{ transform: `translateY(${scrollY * 0.1}px)` }}>
@@ -644,7 +657,7 @@ const LandingPage: React.FC = () => {
                     <source src="/demo-video.mp4" type="video/mp4" />
                   </video>
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-20 transition-all">
-                    <button 
+                    <button
                       onClick={async () => {
                         if (videoRef.current) {
                           try {
@@ -749,24 +762,32 @@ const LandingPage: React.FC = () => {
               Powerful features designed to help your team work smarter, not harder.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group relative p-8 bg-[#F5F8FD] rounded-2xl border-2 border-gray-100 hover:border-blue-300 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                className="group relative bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col transform hover:-translate-y-2"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[rgba(0,99,151,0.8)] to-[rgba(0,99,151,0.3)] rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                <div className="w-16 h-16 bg-gradient-to-br from-[rgba(0,99,151,0.9)] via-[rgba(0,99,151,0.6)] to-[rgba(0,99,151,0.2)] rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                  {feature.icon}
+                <div className="p-8 pb-0 flex-1 relative z-10">
+                  {/* Icon & Text */}
+                  <div className="w-12 h-12 bg-[#006397]/10 rounded-xl flex items-center justify-center text-[#006397] mb-6 group-hover:bg-[#006397] group-hover:text-white transition-colors duration-300">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">{feature.description}</p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#006397] transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
+
+                {/* Mockup Image Area */}
+                <div className="relative h-56 w-full mt-auto overflow-hidden bg-gray-50 border-t border-gray-100">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <img
+                    src={feature.image}
+                    alt={feature.title}
+                    className="absolute top-6 left-6 w-[110%] h-[110%] object-cover object-left-top rounded-tl-xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.2)] transform transition-transform duration-700 group-hover:translate-x-[-10px] group-hover:translate-y-[-10px] group-hover:scale-105"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -787,23 +808,32 @@ const LandingPage: React.FC = () => {
               From software development to marketing, Sartthi adapts to your workflow.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {useCases.map((useCase, index) => (
               <div
                 key={index}
-                className="group relative bg-[#F5F8FD] rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden"
+                className="group relative bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col h-[480px]"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[rgba(0,99,151,0.3)] to-[rgba(0,99,151,0.1)] rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                <div className="relative w-20 h-20 bg-gradient-to-br from-[rgba(0,99,151,0.9)] via-[rgba(0,99,151,0.6)] to-[rgba(0,99,151,0.2)] rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg">
-                  {useCase.icon}
+                <div className="p-8 flex-1 relative z-10 flex flex-col">
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${useCase.color} flex items-center justify-center text-white mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                    <div className="transform scale-75">
+                      {useCase.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{useCase.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{useCase.description}</p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {useCase.title}
-                </h3>
-                <p className="text-gray-600">
-                  {useCase.description}
-                </p>
+
+                {/* Skewed Image Mockup */}
+                <div className="relative h-56 w-full mt-auto">
+                  <div className={`absolute inset-0 bg-gradient-to-t ${useCase.color.split(' ')[0]} opacity-5`}></div>
+                  <img
+                    src={useCase.image}
+                    alt={useCase.title}
+                    className="absolute top-8 left-8 w-[120%] h-full object-cover object-left-top rounded-tl-2xl shadow-xl transform -rotate-6 transition-transform duration-700 group-hover:rotate-0 group-hover:translate-x-[-10px] group-hover:translate-y-[-10px] group-hover:scale-105"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -824,26 +854,26 @@ const LandingPage: React.FC = () => {
               Seamlessly integrate with the tools you already use and love.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {integrations.map((integration, index) => (
               <div
-        key={index}
-        className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all cursor-pointer border border-gray-100 hover:border-blue-200"
-      >
-        <div className="flex items-center justify-center mb-3 h-16 w-16 mx-auto group-hover:scale-110 transition-transform">
-          <img src={integration.logo} alt={integration.name} className="w-full h-full object-contain" />
-        </div>
-        <div className="text-sm font-semibold text-gray-700 text-center">
-          {integration.name}
-        </div>
-        <div className="text-xs text-gray-500 text-center mt-1">
-          {integration.category}
-        </div>
-      </div>
+                key={index}
+                className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all cursor-pointer border border-gray-100 hover:border-blue-200"
+              >
+                <div className="flex items-center justify-center mb-3 h-16 w-16 mx-auto group-hover:scale-110 transition-transform">
+                  <img src={integration.logo} alt={integration.name} className="w-full h-full object-contain" />
+                </div>
+                <div className="text-sm font-semibold text-gray-700 text-center">
+                  {integration.name}
+                </div>
+                <div className="text-xs text-gray-500 text-center mt-1">
+                  {integration.category}
+                </div>
+              </div>
             ))}
           </div>
-          
+
           <div className="text-center mt-12">
             <button
               onClick={() => {
@@ -970,17 +1000,17 @@ const LandingPage: React.FC = () => {
           <div className="flex justify-center mb-16 overflow-x-auto">
             <div className="radio-inputs">
               <label className="radio">
-                <input 
-                  type="radio" 
-                  name="admin-feature" 
+                <input
+                  type="radio"
+                  name="admin-feature"
                   checked={adminFeatureTab === 0}
                   onChange={() => setAdminFeatureTab(0)}
                 />
                 <span className="name">Task Management</span>
               </label>
               <label className="radio">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   name="admin-feature"
                   checked={adminFeatureTab === 1}
                   onChange={() => setAdminFeatureTab(1)}
@@ -988,8 +1018,8 @@ const LandingPage: React.FC = () => {
                 <span className="name">Team Collaboration</span>
               </label>
               <label className="radio">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   name="admin-feature"
                   checked={adminFeatureTab === 2}
                   onChange={() => setAdminFeatureTab(2)}
@@ -997,8 +1027,8 @@ const LandingPage: React.FC = () => {
                 <span className="name">AI-Powered Insights</span>
               </label>
               <label className="radio">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   name="admin-feature"
                   checked={adminFeatureTab === 3}
                   onChange={() => setAdminFeatureTab(3)}
@@ -1006,8 +1036,8 @@ const LandingPage: React.FC = () => {
                 <span className="name">Smart Attendance</span>
               </label>
               <label className="radio">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   name="admin-feature"
                   checked={adminFeatureTab === 4}
                   onChange={() => setAdminFeatureTab(4)}
@@ -1035,7 +1065,7 @@ const LandingPage: React.FC = () => {
                           <div className="w-3 h-3 rounded-full bg-red-500"></div>
                         </div>
                       </div>
-                      
+
                       {/* View Tabs */}
                       <div className="flex gap-2 mb-4">
                         {[
@@ -1045,202 +1075,200 @@ const LandingPage: React.FC = () => {
                         ].map((view, idx) => (
                           <div
                             key={idx}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                              liveTaskIndex === idx
-                                ? 'bg-blue-500 text-white shadow-md'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${liveTaskIndex === idx
+                              ? 'bg-blue-500 text-white shadow-md'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              }`}
                           >
                             <span className="mr-1">{view.icon}</span>
                             {view.name}
                           </div>
                         ))}
                       </div>
-                      
+
                       {/* Kanban Board View */}
                       {liveTaskIndex === 0 && (
-                      <div className="grid grid-cols-3 gap-3">
-                        {['To Do', 'In Progress', 'Done'].map((status, idx) => {
-                          // Diverse task types with icons, labels, and assignees
-                          const allTasks = [
-                            { 
-                              id: 1, 
-                              title: 'Fix Login Bug', 
-                              type: 'bug',
-                              due: 'Dec 21', 
-                              priority: 'high', 
-                              dots: 3,
-                              assignee: 'JD',
-                              assigneeColor: '#EF4444',
-                              label: 'Backend',
-                              labelColor: 'bg-red-100 text-red-700'
-                            },
-                            { 
-                              id: 2, 
-                              title: 'API Integration', 
-                              type: 'feature',
-                              due: 'Dec 22', 
-                              priority: 'medium', 
-                              dots: 2,
-                              assignee: 'SM',
-                              assigneeColor: '#3B82F6',
-                              label: 'Feature',
-                              labelColor: 'bg-blue-100 text-blue-700'
-                            },
-                            { 
-                              id: 3, 
-                              title: 'Homepage Design', 
-                              type: 'design',
-                              due: 'Dec 23', 
-                              priority: 'low', 
-                              dots: 1,
-                              assignee: 'AK',
-                              assigneeColor: '#8B5CF6',
-                              label: 'Design',
-                              labelColor: 'bg-purple-100 text-purple-700'
-                            },
-                            { 
-                              id: 4, 
-                              title: 'Database Setup', 
-                              type: 'code',
-                              due: 'Dec 24', 
-                              priority: 'high', 
-                              dots: 3,
-                              assignee: 'MJ',
-                              assigneeColor: '#10B981',
-                              label: 'DevOps',
-                              labelColor: 'bg-green-100 text-green-700'
-                            },
-                            { 
-                              id: 5, 
-                              title: 'User Testing', 
-                              type: 'test',
-                              due: 'Dec 25', 
-                              priority: 'medium', 
-                              dots: 2,
-                              assignee: 'LC',
-                              assigneeColor: '#F59E0B',
-                              label: 'QA',
-                              labelColor: 'bg-yellow-100 text-yellow-700'
-                            },
-                            { 
-                              id: 6, 
-                              title: 'Code Review', 
-                              type: 'code',
-                              due: 'Dec 26', 
-                              priority: 'low', 
-                              dots: 1,
-                              assignee: 'RP',
-                              assigneeColor: '#EC4899',
-                              label: 'Review',
-                              labelColor: 'bg-pink-100 text-pink-700'
-                            }
-                          ];
-                          
-                          // Rotate tasks through columns
-                          const getTasksForColumn = () => {
-                            return idx === 0 ? [allTasks[0], allTasks[1]] : idx === 1 ? [allTasks[2], allTasks[3]] : [allTasks[4], allTasks[5]];
-                          };
-                          
-                          const columnTasks = getTasksForColumn();
-                          
-                          // Task type icons
-                          const getTaskIcon = (type: string) => {
-                            switch(type) {
-                              case 'bug':
-                                return (
-                                  <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                );
-                              case 'feature':
-                                return (
-                                  <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                  </svg>
-                                );
-                              case 'design':
-                                return (
-                                  <svg className="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                                  </svg>
-                                );
-                              case 'code':
-                                return (
-                                  <svg className="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                                  </svg>
-                                );
-                              case 'test':
-                                return (
-                                  <svg className="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                                  </svg>
-                                );
-                              default:
-                                return null;
-                            }
-                          };
-                          
-                          return (
-                            <div 
-                              key={idx} 
-                              className="bg-gray-50 rounded-xl p-3 transition-all duration-500 fade-in-up"
-                              style={{ animationDelay: `${idx * 0.1}s` }}
-                            >
-                              <div className="flex items-center justify-between mb-3">
-                                <div className="text-xs font-bold text-gray-700">{status}</div>
-                                <div className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs font-semibold">
-                                  {columnTasks.length}
+                        <div className="grid grid-cols-3 gap-3">
+                          {['To Do', 'In Progress', 'Done'].map((status, idx) => {
+                            // Diverse task types with icons, labels, and assignees
+                            const allTasks = [
+                              {
+                                id: 1,
+                                title: 'Fix Login Bug',
+                                type: 'bug',
+                                due: 'Dec 21',
+                                priority: 'high',
+                                dots: 3,
+                                assignee: 'JD',
+                                assigneeColor: '#EF4444',
+                                label: 'Backend',
+                                labelColor: 'bg-red-100 text-red-700'
+                              },
+                              {
+                                id: 2,
+                                title: 'API Integration',
+                                type: 'feature',
+                                due: 'Dec 22',
+                                priority: 'medium',
+                                dots: 2,
+                                assignee: 'SM',
+                                assigneeColor: '#3B82F6',
+                                label: 'Feature',
+                                labelColor: 'bg-blue-100 text-blue-700'
+                              },
+                              {
+                                id: 3,
+                                title: 'Homepage Design',
+                                type: 'design',
+                                due: 'Dec 23',
+                                priority: 'low',
+                                dots: 1,
+                                assignee: 'AK',
+                                assigneeColor: '#8B5CF6',
+                                label: 'Design',
+                                labelColor: 'bg-purple-100 text-purple-700'
+                              },
+                              {
+                                id: 4,
+                                title: 'Database Setup',
+                                type: 'code',
+                                due: 'Dec 24',
+                                priority: 'high',
+                                dots: 3,
+                                assignee: 'MJ',
+                                assigneeColor: '#10B981',
+                                label: 'DevOps',
+                                labelColor: 'bg-green-100 text-green-700'
+                              },
+                              {
+                                id: 5,
+                                title: 'User Testing',
+                                type: 'test',
+                                due: 'Dec 25',
+                                priority: 'medium',
+                                dots: 2,
+                                assignee: 'LC',
+                                assigneeColor: '#F59E0B',
+                                label: 'QA',
+                                labelColor: 'bg-yellow-100 text-yellow-700'
+                              },
+                              {
+                                id: 6,
+                                title: 'Code Review',
+                                type: 'code',
+                                due: 'Dec 26',
+                                priority: 'low',
+                                dots: 1,
+                                assignee: 'RP',
+                                assigneeColor: '#EC4899',
+                                label: 'Review',
+                                labelColor: 'bg-pink-100 text-pink-700'
+                              }
+                            ];
+
+                            // Rotate tasks through columns
+                            const getTasksForColumn = () => {
+                              return idx === 0 ? [allTasks[0], allTasks[1]] : idx === 1 ? [allTasks[2], allTasks[3]] : [allTasks[4], allTasks[5]];
+                            };
+
+                            const columnTasks = getTasksForColumn();
+
+                            // Task type icons
+                            const getTaskIcon = (type: string) => {
+                              switch (type) {
+                                case 'bug':
+                                  return (
+                                    <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  );
+                                case 'feature':
+                                  return (
+                                    <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                  );
+                                case 'design':
+                                  return (
+                                    <svg className="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                    </svg>
+                                  );
+                                case 'code':
+                                  return (
+                                    <svg className="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                    </svg>
+                                  );
+                                case 'test':
+                                  return (
+                                    <svg className="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                    </svg>
+                                  );
+                                default:
+                                  return null;
+                              }
+                            };
+
+                            return (
+                              <div
+                                key={idx}
+                                className="bg-gray-50 rounded-xl p-3 transition-all duration-500 fade-in-up"
+                                style={{ animationDelay: `${idx * 0.1}s` }}
+                              >
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="text-xs font-bold text-gray-700">{status}</div>
+                                  <div className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs font-semibold">
+                                    {columnTasks.length}
+                                  </div>
+                                </div>
+                                <div className="space-y-2.5">
+                                  {columnTasks.map((task, taskIdx) => (
+                                    <div
+                                      key={task.id}
+                                      className="task-card-animated bg-white p-3 rounded-lg shadow-sm border-l-4 transition-all hover:shadow-lg cursor-move group"
+                                      style={{
+                                        borderColor: task.priority === 'high' ? '#EF4444' : task.priority === 'medium' ? '#F59E0B' : '#10B981',
+                                        animationDelay: `${taskIdx * 0.15}s`
+                                      }}
+                                    >
+                                      <div className="flex items-start justify-between mb-2">
+                                        <div className="flex items-center gap-1.5 flex-1">
+                                          {getTaskIcon(task.type)}
+                                          <div className="text-xs font-semibold text-gray-900">{task.title}</div>
+                                        </div>
+                                        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${task.priority === 'high' ? 'bg-red-500 status-bounce' :
+                                          task.priority === 'medium' ? 'bg-yellow-500' :
+                                            'bg-green-500'
+                                          }`}></div>
+                                      </div>
+
+                                      <div className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${task.labelColor}`}>
+                                        {task.label}
+                                      </div>
+
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                          </svg>
+                                          {task.due}
+                                        </div>
+                                        <div
+                                          className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                                          style={{ backgroundColor: task.assigneeColor }}
+                                        >
+                                          {task.assignee}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
-                              <div className="space-y-2.5">
-                                {columnTasks.map((task, taskIdx) => (
-                                  <div 
-                                    key={task.id} 
-                                    className="task-card-animated bg-white p-3 rounded-lg shadow-sm border-l-4 transition-all hover:shadow-lg cursor-move group" 
-                                    style={{ 
-                                      borderColor: task.priority === 'high' ? '#EF4444' : task.priority === 'medium' ? '#F59E0B' : '#10B981',
-                                      animationDelay: `${taskIdx * 0.15}s`
-                                    }}
-                                  >
-                                    <div className="flex items-start justify-between mb-2">
-                                      <div className="flex items-center gap-1.5 flex-1">
-                                        {getTaskIcon(task.type)}
-                                        <div className="text-xs font-semibold text-gray-900">{task.title}</div>
-                                      </div>
-                                      <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                                        task.priority === 'high' ? 'bg-red-500 status-bounce' : 
-                                        task.priority === 'medium' ? 'bg-yellow-500' : 
-                                        'bg-green-500'
-                                      }`}></div>
-                                    </div>
-                                    
-                                    <div className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${task.labelColor}`}>
-                                      {task.label}
-                                    </div>
-                                    
-                                    <div className="flex items-center justify-between">
-                                      <div className="text-xs text-gray-500 flex items-center gap-1">
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        {task.due}
-                                      </div>
-                                      <div 
-                                        className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
-                                        style={{ backgroundColor: task.assigneeColor }}
-                                      >
-                                        {task.assignee}
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            );
+                          })}
+                        </div>
                       )}
 
                       {/* Timeline View */}
@@ -1266,9 +1294,9 @@ const LandingPage: React.FC = () => {
                                       <div className="text-xs font-bold" style={{ color: task.color }}>{task.progress}%</div>
                                     </div>
                                     <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                      <div 
+                                      <div
                                         className="h-full transition-all duration-1000"
-                                        style={{ 
+                                        style={{
                                           width: `${task.progress}%`,
                                           backgroundColor: task.color
                                         }}
@@ -1293,17 +1321,17 @@ const LandingPage: React.FC = () => {
                             { title: 'User Testing', status: 'To Do', priority: 'Medium', assignee: 'LC', color: '#F59E0B', progress: 60 },
                             { title: 'Code Review', status: 'Done', priority: 'Low', assignee: 'RP', color: '#EC4899', progress: 100 }
                           ].map((task, idx) => (
-                            <div 
-                              key={idx} 
+                            <div
+                              key={idx}
                               className="bg-white rounded-lg p-3 shadow-sm border-l-4 hover:shadow-md transition-all fade-in-up"
-                              style={{ 
+                              style={{
                                 borderColor: task.color,
                                 animationDelay: `${idx * 0.08}s`
                               }}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3 flex-1">
-                                  <div 
+                                  <div
                                     className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0"
                                     style={{ backgroundColor: task.color }}
                                   >
@@ -1312,18 +1340,16 @@ const LandingPage: React.FC = () => {
                                   <div className="flex-1 min-w-0">
                                     <div className="text-xs font-semibold text-gray-900 mb-0.5">{task.title}</div>
                                     <div className="flex items-center gap-2">
-                                      <span className={`text-xs px-2 py-0.5 rounded ${
-                                        task.status === 'Done' ? 'bg-green-100 text-green-700' :
+                                      <span className={`text-xs px-2 py-0.5 rounded ${task.status === 'Done' ? 'bg-green-100 text-green-700' :
                                         task.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-gray-100 text-gray-700'
-                                      }`}>
+                                          'bg-gray-100 text-gray-700'
+                                        }`}>
                                         {task.status}
                                       </span>
-                                      <span className={`text-xs font-medium ${
-                                        task.priority === 'High' ? 'text-red-600' :
+                                      <span className={`text-xs font-medium ${task.priority === 'High' ? 'text-red-600' :
                                         task.priority === 'Medium' ? 'text-yellow-600' :
-                                        'text-green-600'
-                                      }`}>
+                                          'text-green-600'
+                                        }`}>
                                         {task.priority}
                                       </span>
                                     </div>
@@ -1331,9 +1357,9 @@ const LandingPage: React.FC = () => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div 
+                                    <div
                                       className="h-full transition-all duration-500"
-                                      style={{ 
+                                      style={{
                                         width: `${task.progress}%`,
                                         backgroundColor: task.color
                                       }}
@@ -1367,77 +1393,76 @@ const LandingPage: React.FC = () => {
                       <div className="space-y-2">
                         {(() => {
                           const allMessages = [
-                            { 
-                              name: 'Sarah Chen', 
-                              msg: 'Task "Homepage Redesign" assigned to you', 
+                            {
+                              name: 'Sarah Chen',
+                              msg: 'Task "Homepage Redesign" assigned to you',
                               type: 'notification',
-                              time: '02:58 PM', 
-                              avatar: 'SC', 
-                              color: '#10B981', 
+                              time: '02:58 PM',
+                              avatar: 'SC',
+                              color: '#10B981',
                               isRead: true,
                               icon: '📋'
                             },
-                            { 
-                              name: 'John Doe', 
-                              msg: 'Uploaded design-mockup-v2.fig', 
+                            {
+                              name: 'John Doe',
+                              msg: 'Uploaded design-mockup-v2.fig',
                               type: 'file',
-                              time: '02:59 PM', 
-                              avatar: 'JD', 
-                              color: '#006397', 
+                              time: '02:59 PM',
+                              avatar: 'JD',
+                              color: '#006397',
                               isRead: true,
                               icon: '📎',
                               fileSize: '2.4 MB'
                             },
-                            { 
-                              name: 'Mike Johnson', 
-                              msg: 'Great work on the API integration! 🎉', 
+                            {
+                              name: 'Mike Johnson',
+                              msg: 'Great work on the API integration! 🎉',
                               type: 'message',
-                              time: '03:00 PM', 
-                              avatar: 'MJ', 
-                              color: '#F59E0B', 
+                              time: '03:00 PM',
+                              avatar: 'MJ',
+                              color: '#F59E0B',
                               isRead: false,
                               reactions: ['👍', '🔥']
                             },
-                            { 
-                              name: 'Emma Wilson', 
-                              msg: 'Meeting starts in 15 minutes', 
+                            {
+                              name: 'Emma Wilson',
+                              msg: 'Meeting starts in 15 minutes',
                               type: 'notification',
-                              time: '03:01 PM', 
-                              avatar: 'EW', 
-                              color: '#8B5CF6', 
+                              time: '03:01 PM',
+                              avatar: 'EW',
+                              color: '#8B5CF6',
                               isRead: false,
                               icon: '🔔'
                             },
-                            { 
-                              name: 'Alex Chen', 
-                              msg: 'Code review completed ✓', 
+                            {
+                              name: 'Alex Chen',
+                              msg: 'Code review completed ✓',
                               type: 'message',
-                              time: '03:02 PM', 
-                              avatar: 'AC', 
-                              color: '#EC4899', 
+                              time: '03:02 PM',
+                              avatar: 'AC',
+                              color: '#EC4899',
                               isRead: false,
                               reactions: ['✅']
                             }
                           ];
-                          
+
                           // Show 3 messages at a time, rotating based on liveChatIndex
                           const visibleMessages = [
                             allMessages[liveChatIndex % allMessages.length],
                             allMessages[(liveChatIndex + 1) % allMessages.length],
                             allMessages[(liveChatIndex + 2) % allMessages.length]
                           ];
-                          
+
                           return visibleMessages.map((chat, idx) => (
-                            <div 
+                            <div
                               key={`${chat.avatar}-${idx}`}
-                              className={`fade-in-up flex items-start gap-3 p-2.5 rounded-lg transition-all hover:bg-gray-50 cursor-pointer ${
-                                idx === visibleMessages.length - 1 ? 'bg-blue-50 continuous-pulse ring-1 ring-blue-200' : ''
-                              }`}
+                              className={`fade-in-up flex items-start gap-3 p-2.5 rounded-lg transition-all hover:bg-gray-50 cursor-pointer ${idx === visibleMessages.length - 1 ? 'bg-blue-50 continuous-pulse ring-1 ring-blue-200' : ''
+                                }`}
                               style={{ animationDelay: `${idx * 0.15}s` }}
                             >
                               <div className="relative flex-shrink-0">
-                                <div 
-                                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm" 
+                                <div
+                                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm"
                                   style={{ backgroundColor: chat.color }}
                                 >
                                   {chat.avatar}
@@ -1454,11 +1479,10 @@ const LandingPage: React.FC = () => {
                                     <span className="text-xs text-blue-500 ml-auto">✓✓</span>
                                   )}
                                 </div>
-                                <div className={`text-sm rounded-lg px-3 py-2 shadow-sm border ${
-                                  chat.type === 'notification' ? 'bg-purple-50 border-purple-200 text-purple-900' :
+                                <div className={`text-sm rounded-lg px-3 py-2 shadow-sm border ${chat.type === 'notification' ? 'bg-purple-50 border-purple-200 text-purple-900' :
                                   chat.type === 'file' ? 'bg-blue-50 border-blue-200 text-blue-900' :
-                                  'bg-white border-gray-100 text-gray-700'
-                                }`}>
+                                    'bg-white border-gray-100 text-gray-700'
+                                  }`}>
                                   {chat.icon && <span className="mr-1">{chat.icon}</span>}
                                   {chat.msg}
                                   {chat.fileSize && (
@@ -1516,38 +1540,36 @@ const LandingPage: React.FC = () => {
                         <h3 className="font-bold text-gray-900 text-base">AI Analytics Dashboard</h3>
                         <div className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 rounded-full text-xs font-semibold continuous-pulse flex items-center gap-1.5">
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13 7H7v6h6V7z"/>
-                            <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd"/>
+                            <path d="M13 7H7v6h6V7z" />
+                            <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
                           </svg>
                           AI Powered
                         </div>
                       </div>
-                      
+
                       {/* Metrics Cards */}
                       <div className="grid grid-cols-2 gap-3">
                         {[
                           { label: 'Productivity', value: liveProgress, trend: '+12%', color: 'blue' },
                           { label: 'On-Time Delivery', value: 94, trend: '+5%', color: 'green' }
                         ].map((stat, idx) => (
-                          <div 
-                            key={idx} 
+                          <div
+                            key={idx}
                             className="continuous-pulse bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all"
                           >
                             <div className="flex items-center justify-between mb-2">
                               <div className="text-xs font-medium text-gray-500">{stat.label}</div>
-                              <div className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                                stat.color === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-                              }`}>
+                              <div className={`text-xs font-semibold px-2 py-0.5 rounded-full ${stat.color === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                                }`}>
                                 {stat.trend}
                               </div>
                             </div>
                             <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}%</div>
                             <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className={`absolute top-0 left-0 h-full rounded-full transition-all duration-500 ${
-                                  stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gradient-to-r from-green-500 to-green-600'
-                                }`}
-                                style={{ 
+                              <div
+                                className={`absolute top-0 left-0 h-full rounded-full transition-all duration-500 ${stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gradient-to-r from-green-500 to-green-600'
+                                  }`}
+                                style={{
                                   width: `${stat.value}%`,
                                   boxShadow: `0 0 10px ${stat.color === 'blue' ? 'rgba(59, 130, 246, 0.5)' : 'rgba(34, 197, 94, 0.5)'}`
                                 }}
@@ -1570,47 +1592,47 @@ const LandingPage: React.FC = () => {
                           <svg className="w-full h-full" viewBox="0 0 300 100" preserveAspectRatio="none">
                             <defs>
                               <linearGradient id="aiGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stopColor="#006397" stopOpacity="0.3"/>
-                                <stop offset="100%" stopColor="#006397" stopOpacity="0"/>
+                                <stop offset="0%" stopColor="#006397" stopOpacity="0.3" />
+                                <stop offset="100%" stopColor="#006397" stopOpacity="0" />
                               </linearGradient>
                               <filter id="glow">
-                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
                                 <feMerge>
-                                  <feMergeNode in="coloredBlur"/>
-                                  <feMergeNode in="SourceGraphic"/>
+                                  <feMergeNode in="coloredBlur" />
+                                  <feMergeNode in="SourceGraphic" />
                                 </feMerge>
                               </filter>
                             </defs>
                             {/* Area fill */}
-                            <path 
-                              d="M0,70 L50,55 L100,60 L150,40 L200,45 L250,30 L300,25 L300,100 L0,100 Z" 
+                            <path
+                              d="M0,70 L50,55 L100,60 L150,40 L200,45 L250,30 L300,25 L300,100 L0,100 Z"
                               fill="url(#aiGradient)"
                               className="fade-in-up"
                             />
                             {/* Line */}
-                            <path 
-                              d="M0,70 L50,55 L100,60 L150,40 L200,45 L250,30 L300,25" 
-                              fill="none" 
-                              stroke="#006397" 
+                            <path
+                              d="M0,70 L50,55 L100,60 L150,40 L200,45 L250,30 L300,25"
+                              fill="none"
+                              stroke="#006397"
                               strokeWidth="3"
                               filter="url(#glow)"
                               className="task-card-animated"
                             />
                             {/* Data points */}
                             {[
-                              {x: 0, y: 70},
-                              {x: 50, y: 55},
-                              {x: 100, y: 60},
-                              {x: 150, y: 40},
-                              {x: 200, y: 45},
-                              {x: 250, y: 30},
-                              {x: 300, y: 25}
+                              { x: 0, y: 70 },
+                              { x: 50, y: 55 },
+                              { x: 100, y: 60 },
+                              { x: 150, y: 40 },
+                              { x: 200, y: 45 },
+                              { x: 250, y: 30 },
+                              { x: 300, y: 25 }
                             ].map((point, idx) => (
-                              <circle 
+                              <circle
                                 key={idx}
-                                cx={point.x} 
-                                cy={point.y} 
-                                r="4" 
+                                cx={point.x}
+                                cy={point.y}
+                                r="4"
                                 fill="#006397"
                                 className="continuous-pulse"
                                 style={{ animationDelay: `${idx * 0.1}s` }}
@@ -1655,7 +1677,7 @@ const LandingPage: React.FC = () => {
                           Today: {liveTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </div>
                       </div>
-                      
+
                       {/* Check-in Status Card with Face Scan */}
                       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
@@ -1669,7 +1691,7 @@ const LandingPage: React.FC = () => {
                               <span className="text-xs font-semibold text-green-700">Face Verified</span>
                             </div>
                           </div>
-                          
+
                           {/* Animated Face Scan */}
                           <div className="relative w-20 h-20">
                             {/* Face Icon with Pulse */}
@@ -1678,15 +1700,15 @@ const LandingPage: React.FC = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             </div>
-                            
+
                             {/* Scanning Ring */}
                             <div className="absolute inset-0 rounded-full border-2 border-green-500 opacity-50" style={{
                               animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite'
                             }}></div>
-                            
+
                             {/* Scanning Line */}
                             <div className="absolute inset-0 overflow-hidden rounded-full">
-                              <div 
+                              <div
                                 className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"
                                 style={{
                                   animation: 'scan-vertical 3s ease-in-out infinite',
@@ -1694,7 +1716,7 @@ const LandingPage: React.FC = () => {
                                 }}
                               ></div>
                             </div>
-                            
+
                             {/* Detection Points */}
                             {[
                               { top: '20%', left: '30%' },
@@ -1714,15 +1736,15 @@ const LandingPage: React.FC = () => {
                                 }}
                               ></div>
                             ))}
-                            
+
                             {/* Corner Brackets */}
                             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 80 80">
-                              <path d="M10,20 L10,10 L20,10" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
-                              <path d="M60,10 L70,10 L70,20" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
-                              <path d="M10,60 L10,70 L20,70" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
-                              <path d="M60,70 L70,70 L70,60" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse"/>
+                              <path d="M10,20 L10,10 L20,10" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse" />
+                              <path d="M60,10 L70,10 L70,20" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse" />
+                              <path d="M10,60 L10,70 L20,70" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse" />
+                              <path d="M60,70 L70,70 L70,60" stroke="#10B981" strokeWidth="2" fill="none" className="continuous-pulse" />
                             </svg>
-                            
+
                             {/* Verification Checkmark */}
                             <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg status-bounce">
                               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1738,7 +1760,7 @@ const LandingPage: React.FC = () => {
                             <div className="text-xs text-gray-500 mb-1">Confidence</div>
                             <div className="flex items-center gap-2">
                               <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
+                                <div
                                   className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
                                   style={{ width: `${Math.min(liveProgress + 2, 99)}%` }}
                                 ></div>
@@ -1773,17 +1795,16 @@ const LandingPage: React.FC = () => {
                             ];
 
                             return visibleMembers.map((member, idx) => (
-                              <div 
+                              <div
                                 key={`${member.avatar}-${idx}`}
-                                className={`fade-in-up flex items-center justify-between bg-white rounded-lg p-3 border transition-all hover:shadow-md ${
-                                  member.status === 'Absent' ? 'border-red-200 bg-red-50' : 
-                                  member.status === 'Office' ? 'border-green-200' : 
-                                  'border-blue-200'
-                                }`}
+                                className={`fade-in-up flex items-center justify-between bg-white rounded-lg p-3 border transition-all hover:shadow-md ${member.status === 'Absent' ? 'border-red-200 bg-red-50' :
+                                  member.status === 'Office' ? 'border-green-200' :
+                                    'border-blue-200'
+                                  }`}
                                 style={{ animationDelay: `${idx * 0.1}s` }}
                               >
                                 <div className="flex items-center gap-3">
-                                  <div 
+                                  <div
                                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm"
                                     style={{ backgroundColor: member.color }}
                                   >
@@ -1792,16 +1813,14 @@ const LandingPage: React.FC = () => {
                                   <div>
                                     <div className="text-sm font-semibold text-gray-900">{member.name}</div>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                      <div className={`w-1.5 h-1.5 rounded-full ${
-                                        member.status === 'Office' ? 'bg-green-500 status-bounce' :
+                                      <div className={`w-1.5 h-1.5 rounded-full ${member.status === 'Office' ? 'bg-green-500 status-bounce' :
                                         member.status === 'Remote' ? 'bg-blue-500 status-bounce' :
-                                        'bg-red-500'
-                                      }`}></div>
-                                      <span className={`text-xs font-medium ${
-                                        member.status === 'Office' ? 'text-green-700' :
+                                          'bg-red-500'
+                                        }`}></div>
+                                      <span className={`text-xs font-medium ${member.status === 'Office' ? 'text-green-700' :
                                         member.status === 'Remote' ? 'text-blue-700' :
-                                        'text-red-700'
-                                      }`}>
+                                          'text-red-700'
+                                        }`}>
                                         {member.status}
                                       </span>
                                     </div>
@@ -1851,7 +1870,7 @@ const LandingPage: React.FC = () => {
                             <div className="text-xs text-gray-500 mb-0.5">Signal</div>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4].map((bar) => (
-                                <div 
+                                <div
                                   key={bar}
                                   className={`w-1 rounded-sm ${bar <= 3 ? 'bg-green-500' : 'bg-gray-300'}`}
                                   style={{ height: `${bar * 3}px` }}
@@ -1872,7 +1891,7 @@ const LandingPage: React.FC = () => {
                         <h3 className="font-bold text-gray-900 text-base">Connect Integrations</h3>
                         <div className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Easy Setup</div>
                       </div>
-                      
+
                       {/* Setup Steps */}
                       <div className="space-y-2">
                         {(() => {
@@ -1892,20 +1911,18 @@ const LandingPage: React.FC = () => {
                           ].map((item, idx) => {
                             const status = getStepStatus(item.step);
                             return (
-                              <div 
-                                key={idx} 
-                                className={`fade-in-up flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                                  status === 'complete' ? 'bg-green-50 border-green-300' :
+                              <div
+                                key={idx}
+                                className={`fade-in-up flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${status === 'complete' ? 'bg-green-50 border-green-300' :
                                   status === 'active' ? 'bg-blue-50 border-blue-400 shadow-md continuous-pulse' :
-                                  'bg-gray-50 border-gray-200 opacity-60'
-                                }`}
+                                    'bg-gray-50 border-gray-200 opacity-60'
+                                  }`}
                                 style={{ animationDelay: `${idx * 0.1}s` }}
                               >
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all ${
-                                  status === 'complete' ? 'bg-green-500 text-white' :
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all ${status === 'complete' ? 'bg-green-500 text-white' :
                                   status === 'active' ? 'bg-blue-500 text-white' :
-                                  'bg-gray-300 text-gray-600'
-                                }`}>
+                                    'bg-gray-300 text-gray-600'
+                                  }`}>
                                   {status === 'complete' ? '✓' : item.step}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -1924,33 +1941,33 @@ const LandingPage: React.FC = () => {
                         <div className="text-xs font-semibold text-gray-700 mb-3">OAuth Authorization</div>
                         {(() => {
                           const allIntegrations = [
-                            { 
-                              name: 'GitHub', 
+                            {
+                              name: 'GitHub',
                               desc: 'Code Repository',
                               color: 'bg-gray-900',
                               icon: (
                                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                                 </svg>
                               )
                             },
-                            { 
-                              name: 'Slack', 
+                            {
+                              name: 'Slack',
                               desc: 'Team Communication',
                               color: 'bg-purple-600',
                               icon: (
                                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+                                  <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
                                 </svg>
                               )
                             },
-                            { 
-                              name: 'Dropbox', 
+                            {
+                              name: 'Dropbox',
                               desc: 'Cloud Storage',
                               color: 'bg-blue-600',
                               icon: (
                                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M6 1.807L0 5.629l6 3.822 6-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6-3.822-6-3.822L0 13.274zm12 0l6 3.822 6-3.822-6-3.822-6 3.822zM6 18.371l6 3.822 6-3.822-6-3.822-6 3.822z"/>
+                                  <path d="M6 1.807L0 5.629l6 3.822 6-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6-3.822-6-3.822L0 13.274zm12 0l6 3.822 6-3.822-6-3.822-6 3.822zM6 18.371l6 3.822 6-3.822-6-3.822-6 3.822z" />
                                 </svg>
                               )
                             }
@@ -1990,7 +2007,7 @@ const LandingPage: React.FC = () => {
                                     <span className="font-semibold text-blue-700">{connectionProgress}%</span>
                                   </div>
                                   <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div 
+                                    <div
                                       className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
                                       style={{ width: `${connectionProgress}%` }}
                                     ></div>
@@ -2007,29 +2024,37 @@ const LandingPage: React.FC = () => {
                         <div className="text-xs font-semibold text-gray-600 mb-3">Available Integrations</div>
                         <div className="grid grid-cols-4 gap-2">
                           {[
-                            { name: 'GitHub', color: 'bg-gray-900', icon: (
-                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                              </svg>
-                            )},
-                            { name: 'Dropbox', color: 'bg-blue-600', icon: (
-                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M6 1.807L0 5.629l6 3.822 6-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6-3.822-6-3.822L0 13.274zm12 0l6 3.822 6-3.822-6-3.822-6 3.822zM6 18.371l6 3.822 6-3.822-6-3.822-6 3.822z"/>
-                              </svg>
-                            )},
-                            { name: 'Spotify', color: 'bg-green-500', icon: (
-                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                              </svg>
-                            )},
-                            { name: 'Notion', color: 'bg-gray-800', icon: (
-                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/>
-                              </svg>
-                            )}
+                            {
+                              name: 'GitHub', color: 'bg-gray-900', icon: (
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                                </svg>
+                              )
+                            },
+                            {
+                              name: 'Dropbox', color: 'bg-blue-600', icon: (
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M6 1.807L0 5.629l6 3.822 6-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6-3.822-6-3.822L0 13.274zm12 0l6 3.822 6-3.822-6-3.822-6 3.822zM6 18.371l6 3.822 6-3.822-6-3.822-6 3.822z" />
+                                </svg>
+                              )
+                            },
+                            {
+                              name: 'Spotify', color: 'bg-green-500', icon: (
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                                </svg>
+                              )
+                            },
+                            {
+                              name: 'Notion', color: 'bg-gray-800', icon: (
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z" />
+                                </svg>
+                              )
+                            }
                           ].map((integration, idx) => (
-                            <div 
-                              key={idx} 
+                            <div
+                              key={idx}
                               className="fade-in-up flex flex-col items-center gap-2 p-3 rounded-lg bg-white border border-gray-200 hover:shadow-md hover:border-blue-300 transition-all cursor-pointer"
                               style={{ animationDelay: `${idx * 0.1}s` }}
                             >
@@ -2166,7 +2191,7 @@ const LandingPage: React.FC = () => {
               See what our customers have to say about Sartthi.
             </p>
           </div>
-          
+
           {/* Vertical Marquee Testimonials */}
           <div className="relative flex h-[500px] w-full flex-row items-center justify-center gap-4 overflow-hidden">
             {/* Column 1 */}
@@ -2426,7 +2451,7 @@ const LandingPage: React.FC = () => {
               Choose the plan that fits your team's needs. All plans include core features.
             </p>
           </div>
-          
+
           {/* Pricing Cards */}
           <PricingCards />
         </div>
@@ -2447,7 +2472,7 @@ const LandingPage: React.FC = () => {
               Tips, insights, and best practices for project management.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {blogPosts.map((post, index) => (
               <article
@@ -2497,7 +2522,7 @@ const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="absolute top-0 left-0 w-96 h-96 bg-[#F5F8FD] rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#F5F8FD] rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
-        
+
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Transform Your Workflow?
@@ -2553,11 +2578,10 @@ const LandingPage: React.FC = () => {
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
-                className={`px-6 py-2.5 rounded-lg border font-medium transition-all whitespace-nowrap ${
-                  activeTab === index
-                    ? 'bg-gray-100 border-gray-300 text-gray-900'
-                    : 'bg-[#F5F8FD] border-gray-200 text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`px-6 py-2.5 rounded-lg border font-medium transition-all whitespace-nowrap ${activeTab === index
+                  ? 'bg-gray-100 border-gray-300 text-gray-900'
+                  : 'bg-[#F5F8FD] border-gray-200 text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 {category}
               </button>
@@ -2579,16 +2603,14 @@ const LandingPage: React.FC = () => {
                   <h3 className="text-lg font-semibold pr-8 text-gray-900">
                     {faq.question}
                   </h3>
-                  <ChevronDown 
-                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 text-gray-600 ${
-                      openFaq === index ? 'rotate-180' : ''
-                    }`}
+                  <ChevronDown
+                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 text-gray-600 ${openFaq === index ? 'rotate-180' : ''
+                      }`}
                   />
                 </button>
                 <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    openFaq === index ? 'max-h-96' : 'max-h-0'
-                  }`}
+                  className={`overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-96' : 'max-h-0'
+                    }`}
                 >
                   <div className="px-6 pb-4 text-gray-600">
                     {faq.answer}
@@ -2895,7 +2917,7 @@ const LandingPage: React.FC = () => {
         }
         }
       `}</style>
-      
+
       <SharedFooter />
     </div>
   );

@@ -50,7 +50,10 @@ const ReleaseManagement: React.FC = () => {
     architecture: 'x64' as 'x64' | 'arm64' | 'universal',
     isLatest: true,
     uploadType: 'file' as 'file' | 'url',
-    downloadUrl: ''
+    downloadUrl: '',
+    fileSize: 0,
+    sizeInput: '',
+    sizeUnit: 'MB' as 'KB' | 'MB' | 'GB'
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -155,7 +158,13 @@ const ReleaseManagement: React.FC = () => {
           platform: formData.platform,
           architecture: formData.architecture,
           isLatest: formData.isLatest,
-          downloadUrl: formData.downloadUrl
+          downloadUrl: formData.downloadUrl,
+          fileSize: (() => {
+            const size = parseFloat(formData.sizeInput) || 0;
+            if (formData.sizeUnit === 'KB') return Math.round(size * 1024);
+            if (formData.sizeUnit === 'GB') return Math.round(size * 1024 * 1024 * 1024);
+            return Math.round(size * 1024 * 1024); // Default MB
+          })()
         });
         data = response;
       }
@@ -172,8 +181,12 @@ const ReleaseManagement: React.FC = () => {
           platform: 'windows',
           architecture: 'x64',
           isLatest: true,
+
           uploadType: 'file',
-          downloadUrl: ''
+          downloadUrl: '',
+          fileSize: 0,
+          sizeInput: '',
+          sizeUnit: 'MB'
         });
         setSelectedFile(null);
         fetchReleases();
@@ -366,9 +379,15 @@ const ReleaseManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
+                        <a
+                          href={release.downloadUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`text-sm font-medium hover:underline ${isDarkMode ? 'text-gray-700 hover:text-blue-400' : 'text-gray-900 hover:text-blue-600'}`}
+                          title="Download / Visit Link"
+                        >
                           {release.fileName}
-                        </div>
+                        </a>
                         <div className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
                           {formatFileSize(release.fileSize)}
                         </div>
@@ -535,7 +554,7 @@ const ReleaseManagement: React.FC = () => {
                     className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
                   >
                     <option value="file">File Upload</option>
-                    <option value="url">URL</option>
+                    <option value="url">Drive Link / External URL</option>
                   </select>
                 </div>
 
@@ -573,21 +592,50 @@ const ReleaseManagement: React.FC = () => {
 
                 {/* URL Input */}
                 {formData.uploadType === 'url' && (
-                  <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
-                      Download URL *
-                    </label>
-                    <input
-                      type="url"
-                      placeholder="https://example.com/app-v1.0.0.exe"
-                      value={formData.downloadUrl}
-                      onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
-                      className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
-                    />
-                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                      Enter the URL where the application can be downloaded from
-                    </p>
-                  </div>
+                  <>
+                    <div>
+                      <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
+                        Download URL / Drive Link *
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://drive.google.com/..."
+                        value={formData.downloadUrl}
+                        onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
+                        className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                      />
+                      <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                        Enter the direct download link or Drive link
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-700'} mb-2`}>
+                        File Size (Optional)
+                      </label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            type="number"
+                            placeholder="e.g. 10.5"
+                            step="0.01"
+                            value={formData.sizeInput}
+                            onChange={(e) => setFormData({ ...formData, sizeInput: e.target.value })}
+                            className={`w-full px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                          />
+                        </div>
+                        <select
+                          value={formData.sizeUnit}
+                          onChange={(e) => setFormData({ ...formData, sizeUnit: e.target.value as any })}
+                          className={`w-24 px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                        >
+                          <option value="KB">KB</option>
+                          <option value="MB">MB</option>
+                          <option value="GB">GB</option>
+                        </select>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div className="flex items-center gap-2">
@@ -613,8 +661,8 @@ const ReleaseManagement: React.FC = () => {
                   <button
                     onClick={() => setShowCreateModal(false)}
                     className={`flex-1 px-4 py-3 rounded-xl border-2 ${isDarkMode
-                        ? 'border-gray-600 hover:bg-gray-700 text-white'
-                        : 'border-gray-300 hover:bg-gray-50 text-gray-900'
+                      ? 'border-gray-600 hover:bg-gray-700 text-white'
+                      : 'border-gray-300 hover:bg-gray-50 text-gray-900'
                       } font-semibold transition-colors`}
                   >
                     Cancel
@@ -623,8 +671,8 @@ const ReleaseManagement: React.FC = () => {
                     onClick={handleCreateRelease}
                     disabled={uploading}
                     className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${uploading
-                        ? 'bg-gray-400 cursor-not-allowed text-white'
-                        : 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white'
+                      ? 'bg-gray-400 cursor-not-allowed text-white'
+                      : 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white'
                       }`}
                   >
                     {uploading ? `Uploading... ${uploadProgress}%` : 'Create Release'}
@@ -638,7 +686,7 @@ const ReleaseManagement: React.FC = () => {
 
       {/* Admin Dock Navigation */}
       <AdminDockNavigation />
-    </div>
+    </div >
   );
 };
 

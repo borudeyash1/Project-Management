@@ -78,8 +78,14 @@ const adminSchema = new Schema<IAdmin>({
 adminSchema.index({ email: 1, isActive: 1 });
 
 // Hash password before saving
-adminSchema.pre('save', async function(next) {
+adminSchema.pre('save', async function (next) {
   if (!this.isModified('password') || !this.password) {
+    return next();
+  }
+
+  // Check if password is already hashed (starts with $2a$ or $2b$ and is 60 chars long)
+  // This helps when transferring users to admins with existing hashes
+  if ((this.password.startsWith('$2a$') || this.password.startsWith('$2b$')) && this.password.length === 60) {
     return next();
   }
 
@@ -93,7 +99,7 @@ adminSchema.pre('save', async function(next) {
 });
 
 // Method to compare password
-adminSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+adminSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   if (!this.password) {
     return false;
   }

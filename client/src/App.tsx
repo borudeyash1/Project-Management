@@ -62,6 +62,7 @@ import WorkspaceLinearTab from './components/workspace-detail/WorkspaceLinearTab
 import DiscordPage from './components/chat/DiscordPage'; // [NEW]
 import ProjectLayout from './components/project/ProjectLayout';
 import ProjectOverview from './components/project/ProjectOverview';
+import ProjectAccountsTab from './components/project/ProjectAccountsTab';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
 import ProjectManagementView from './components/ProjectManagementView';
@@ -109,6 +110,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import ShippingPolicy from './components/ShippingPolicy';
 import ContactUs from './components/ContactUs';
 import DropboxBrowser from './components/vault/DropboxBrowser'; // [NEW] Import
+import DesktopPage from './components/DesktopPage';
 import './utils/setDeviceId'; // Make setMyDeviceId available globally
 
 // Import all modals
@@ -322,6 +324,7 @@ const AppContent: React.FC = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/desktop" element={<DesktopPage />} />
         <Route path="/ai" element={<AIInformationPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/apps" element={<SartthiApps />} />
@@ -407,6 +410,7 @@ const AppContent: React.FC = () => {
           <Route path="leaderboard" element={<ProjectViewDetailed />} />
           <Route path="documents" element={<ProjectViewDetailed />} />
           <Route path="inbox" element={<ProjectViewDetailed />} />
+          <Route path="accounts" element={<ProjectAccountsTab />} />
           <Route path="settings" element={<ProjectViewDetailed />} />
           <Route index element={<Navigate to="overview" replace />} />
         </Route>

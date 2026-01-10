@@ -399,3 +399,50 @@ export const getReleaseStats = async (req: AuthenticatedRequest, res: Response):
     });
   }
 };
+
+// Download release by ID (public)
+export const downloadReleaseById = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    console.log('🔍 [RELEASES] Download request for ID:', id);
+
+    const release = await DesktopRelease.findById(id);
+
+    if (!release) {
+      res.status(404).json({
+        success: false,
+        message: 'Release not found'
+      });
+      return;
+    }
+
+    // Increment download count
+    release.downloadCount = (release.downloadCount || 0) + 1;
+    await release.save();
+
+    console.log('✅ [RELEASES] Incrementing count to:', release.downloadCount);
+
+    let redirectUrl = release.downloadUrl;
+
+    // Sanitize localhost URL if the request host is not localhost
+    if (redirectUrl.includes('localhost') && req.get('host') && !req.get('host')?.includes('localhost')) {
+      try {
+        const urlObj = new URL(redirectUrl);
+        redirectUrl = urlObj.pathname + urlObj.search;
+        console.log('🔧 [RELEASES] Sanitized localhost URL to relative path:', redirectUrl);
+      } catch (e) {
+        console.warn('⚠️ [RELEASES] Failed to sanitize URL:', e);
+      }
+    }
+
+    // Redirect to the actual download URL (Release or R2)
+    res.redirect(redirectUrl);
+  } catch (error: any) {
+    console.error('❌ [RELEASES] Error downloading release:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to download release'
+    });
+  }
+};

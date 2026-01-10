@@ -28,13 +28,29 @@ interface User {
   };
   createdAt: string;
   lastLogin?: string;
+
+}
+
+interface AdminUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'super_admin' | 'admin' | 'moderator';
+  isActive: boolean;
+  createdAt: string;
+  lastLogin?: string;
 }
 
 const UserManagement: React.FC = () => {
   const { isDarkMode } = useTheme();
   const { addToast } = useApp();
+  const [currentAdminRole, setCurrentAdminRole] = useState<string>('');
+
+
+  const [viewMode, setViewMode] = useState<'users' | 'admins'>('users');
 
   const [users, setUsers] = useState<User[]>([]);
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -60,10 +76,21 @@ const UserManagement: React.FC = () => {
     if (!adminToken || !validateAdminToken(adminToken)) {
       console.error('❌ [USER MANAGEMENT] No valid admin token found');
       localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminToken');
       localStorage.removeItem('adminData');
       // Redirect without showing toast to avoid loops
       window.location.href = '/my-admin/login';
       return;
+    }
+
+    const adminDataString = localStorage.getItem('adminData');
+    if (adminDataString) {
+      try {
+        const adminData = JSON.parse(adminDataString);
+        setCurrentAdminRole(adminData.role);
+      } catch (e) {
+        console.error('Error parsing admin data', e);
+      }
     }
 
     // Set admin token for API requests
@@ -80,6 +107,33 @@ const UserManagement: React.FC = () => {
       // Optional: cleanup if needed
     };
   }, [page, search, subscriptionFilter, activeFilter]);
+
+  // Fetch admins when view mode changes to admins
+  useEffect(() => {
+    if (viewMode === 'admins') {
+      fetchAdmins();
+    }
+  }, [viewMode]);
+
+  const fetchAdmins = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 [USER MANAGEMENT] Fetching admins...');
+      const response = await api.get('/admin/admins');
+      console.log('🔍 [USER MANAGEMENT] Admins response:', response);
+
+      if (response?.success) {
+        setAdmins(response.data);
+      }
+    } catch (error: any) {
+      console.error('❌ [USER MANAGEMENT] Failed to fetch admins:', error);
+      addToast(error?.message || 'Failed to fetch admins', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   const fetchUsers = async () => {
     try {
@@ -188,6 +242,27 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleMakeAdmin = async (userId: string, userName: string) => {
+    if (!window.confirm(`Are you sure you want to promote ${userName} to Admin? This will remove them from the User list and they will need to log in via the Admin portal.`)) return;
+
+    try {
+      console.log('🔍 [USER MANAGEMENT] Promoting user to admin:', userId);
+      // Use the new endpoint
+      const response = await api.post(`/admin/promote-user/${userId}`);
+      console.log('🔍 [USER MANAGEMENT] Promote user response:', response);
+
+      if (response?.success) {
+        console.log('✅ [USER MANAGEMENT] User promoted successfully');
+        addToast(`${userName} promoted to Admin successfully`, 'success');
+        fetchUsers();
+        fetchStats();
+      }
+    } catch (error: any) {
+      console.error('❌ [USER MANAGEMENT] Failed to promote user:', error);
+      addToast(error?.message || 'Failed to promote user', 'error');
+    }
+  };
+
   const handleUpdateSubscription = async (userId: string, plan: string) => {
     try {
       console.log('🔍 [USER MANAGEMENT] Updating subscription for user:', userId, 'to plan:', plan);
@@ -252,8 +327,30 @@ const UserManagement: React.FC = () => {
           </p>
         </div>
 
-        {/* Stats Cards */}
-        {stats && (
+        {/* View Toggle */}
+        <div className="flex space-x-4 mb-6">
+          <button
+            onClick={() => setViewMode('users')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === 'users'
+              ? 'bg-yellow-500 text-white'
+              : isDarkMode ? 'bg-gray-800 text-gray-400 hover:text-white' : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200'
+              }`}
+          >
+            Users
+          </button>
+          <button
+            onClick={() => setViewMode('admins')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === 'admins'
+              ? 'bg-yellow-500 text-white'
+              : isDarkMode ? 'bg-gray-800 text-gray-400 hover:text-white' : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200'
+              }`}
+          >
+            Admins
+          </button>
+        </div>
+
+        {/* Stats Cards (Only show for Users view for now) */}
+        {viewMode === 'users' && stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4`}>
               <div className="flex items-center justify-between">
@@ -305,221 +402,332 @@ const UserManagement: React.FC = () => {
           </div>
         )}
 
-        {/* Filters */}
-        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4 mb-6`}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={search}
+        {/* Filters (Only for Users view) */}
+        {viewMode === 'users' && (
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl p-4 mb-6`}>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`} />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                  className={`w-full pl-10 pr-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                />
+              </div>
+
+              {/* Subscription Filter */}
+              <select
+                value={subscriptionFilter}
                 onChange={(e) => {
-                  setSearch(e.target.value);
+                  setSubscriptionFilter(e.target.value);
                   setPage(1);
                 }}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
-              />
+                className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+              >
+                <option value="">All Plans</option>
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+                <option value="ultra">Ultra</option>
+              </select>
+
+              {/* Active Filter */}
+              <select
+                value={activeFilter}
+                onChange={(e) => {
+                  setActiveFilter(e.target.value);
+                  setPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+              >
+                <option value="">All Status</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+
+              {/* Reset Filters */}
+              <button
+                onClick={() => {
+                  setSearch('');
+                  setSubscriptionFilter('');
+                  setActiveFilter('');
+                  setPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'border-gray-600 hover:bg-gray-700 text-white' : 'border-gray-300 hover:bg-gray-50 text-gray-900'} transition-colors`}
+              >
+                Reset Filters
+              </button>
             </div>
-
-            {/* Subscription Filter */}
-            <select
-              value={subscriptionFilter}
-              onChange={(e) => {
-                setSubscriptionFilter(e.target.value);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
-            >
-              <option value="">All Plans</option>
-              <option value="free">Free</option>
-              <option value="pro">Pro</option>
-              <option value="ultra">Ultra</option>
-            </select>
-
-            {/* Active Filter */}
-            <select
-              value={activeFilter}
-              onChange={(e) => {
-                setActiveFilter(e.target.value);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-yellow-500`}
-            >
-              <option value="">All Status</option>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-
-            {/* Reset Filters */}
-            <button
-              onClick={() => {
-                setSearch('');
-                setSubscriptionFilter('');
-                setActiveFilter('');
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'border-gray-600 hover:bg-gray-700 text-white' : 'border-gray-300 hover:bg-gray-50 text-gray-900'} transition-colors`}
-            >
-              Reset Filters
-            </button>
           </div>
-        </div>
+        )}
 
         {/* Users Table */}
-        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl overflow-hidden`}>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
-                    User
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
-                    Contact
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
-                    Subscription
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
-                    Status
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
-                    Joined
-                  </th>
-                  <th className={`px-6 py-3 text-right text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className={`${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'} divide-y`}>
-                {users.map((user) => (
-                  <tr key={user._id} className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                          {user.fullName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="ml-4">
-                          <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {user.fullName}
-                          </div>
-                          <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                            @{user.username}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
-                        {user.email}
-                      </div>
-                      {user.contactNumber && (
-                        <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
-                          {user.contactNumber}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getPlanBadgeColor(user.subscription.plan)}`}>
-                        {user.subscription.plan.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {user.isActive ? (
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <XCircle className="w-5 h-5 text-red-500" />
-                        )}
-                        <div title={user.isEmailVerified ? "Email Verified" : "Email Not Verified"}>
-                          <Mail className={`w-5 h-5 ${user.isEmailVerified ? 'text-accent' : 'text-gray-600'}`} />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        {/* Change Subscription */}
-                        <button
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowSubscriptionModal(true);
-                          }}
-                          className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
-                          title="Change Subscription"
-                        >
-                          <CreditCard className="w-5 h-5 text-accent" />
-                        </button>
-
-                        {/* Verify Email */}
-                        {!user.isEmailVerified && (
-                          <button
-                            onClick={() => handleVerifyEmail(user._id)}
-                            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
-                            title="Verify Email"
-                          >
-                            <Mail className="w-5 h-5 text-green-500" />
-                          </button>
-                        )}
-
-                        {/* Toggle Status */}
-                        <button
-                          onClick={() => handleToggleStatus(user._id)}
-                          className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
-                          title={user.isActive ? 'Deactivate' : 'Activate'}
-                        >
-                          {user.isActive ? (
-                            <PowerOff className="w-5 h-5 text-orange-500" />
-                          ) : (
-                            <Power className="w-5 h-5 text-green-500" />
-                          )}
-                        </button>
-
-                        {/* Delete */}
-                        <button
-                          onClick={() => handleDeleteUser(user._id, user.fullName)}
-                          className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
-                          title="Delete User"
-                        >
-                          <Trash2 className="w-5 h-5 text-red-500" />
-                        </button>
-                      </div>
-                    </td>
+        {viewMode === 'users' ? (
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl overflow-hidden`}>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <tr>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      User
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Contact
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Subscription
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Status
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Joined
+                    </th>
+                    <th className={`px-6 py-3 text-right text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className={`${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'} divide-y`}>
+                  {users.map((user) => (
+                    <tr key={user._id} className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {user.fullName.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="ml-4">
+                            <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                              {user.fullName}
+                            </div>
+                            <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
+                              @{user.username}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
+                          {user.email}
+                        </div>
+                        {user.contactNumber && (
+                          <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
+                            {user.contactNumber}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getPlanBadgeColor(user.subscription.plan)}`}>
+                          {user.subscription.plan.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          {user.isActive ? (
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                          ) : (
+                            <XCircle className="w-5 h-5 text-red-500" />
+                          )}
+                          <div title={user.isEmailVerified ? "Email Verified" : "Email Not Verified"}>
+                            <Mail className={`w-5 h-5 ${user.isEmailVerified ? 'text-accent' : 'text-gray-600'}`} />
+                          </div>
+                          {/* Super Admin Indicator if needed, or just keep as is */}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Change Subscription */}
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowSubscriptionModal(true);
+                            }}
+                            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
+                            title="Change Subscription"
+                          >
+                            <CreditCard className="w-5 h-5 text-accent" />
+                          </button>
 
-          {/* Pagination */}
-          <div className={`px-6 py-4 flex items-center justify-between border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-            <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-700'}`}>
-              Page {page} of {totalPages}
+                          {/* Promote to Admin (Super Admin only) */}
+                          {currentAdminRole === 'super_admin' && (
+                            <button
+                              onClick={() => handleMakeAdmin(user._id, user.fullName)}
+                              className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
+                              title="Promote to Admin"
+                            >
+                              <Shield className="w-5 h-5 text-purple-500" />
+                            </button>
+                          )}
+
+                          {/* Verify Email */}
+                          {!user.isEmailVerified && (
+                            <button
+                              onClick={() => handleVerifyEmail(user._id)}
+                              className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
+                              title="Verify Email"
+                            >
+                              <Mail className="w-5 h-5 text-green-500" />
+                            </button>
+                          )}
+
+                          {/* Toggle Status */}
+                          <button
+                            onClick={() => handleToggleStatus(user._id)}
+                            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
+                            title={user.isActive ? 'Deactivate' : 'Activate'}
+                          >
+                            {user.isActive ? (
+                              <PowerOff className="w-5 h-5 text-orange-500" />
+                            ) : (
+                              <Power className="w-5 h-5 text-green-500" />
+                            )}
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            onClick={() => handleDeleteUser(user._id, user.fullName)}
+                            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
+                            title="Delete User"
+                          >
+                            <Trash2 className="w-5 h-5 text-red-500" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className={`p-2 rounded-lg ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className={`p-2 rounded-lg ${page === totalPages ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+
+            {/* Pagination */}
+            <div className={`px-6 py-4 flex items-center justify-between border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-700'}`}>
+                Page {page} of {totalPages}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className={`p-2 rounded-lg ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className={`p-2 rounded-lg ${page === totalPages ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* Admins Table */
+          <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl overflow-hidden`}>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <tr>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Admin
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Role
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Status
+                    </th>
+                    <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Joined
+                    </th>
+                    <th className={`px-6 py-3 text-right text-xs font-medium ${isDarkMode ? 'text-gray-700' : 'text-gray-600'} uppercase tracking-wider`}>
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className={`${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'} divide-y`}>
+                  {admins.map((admin) => (
+                    <tr key={admin._id} className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {admin.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="ml-4">
+                            <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                              {admin.name}
+                            </div>
+                            <div className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-600'}`}>
+                              {admin.email}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${admin.role === 'super_admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
+                          {admin.role.replace('_', ' ').toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {admin.isActive ? (
+                          <span className="flex items-center text-green-500 gap-1 text-sm">
+                            <CheckCircle className="w-4 h-4" /> Active
+                          </span>
+                        ) : (
+                          <span className="flex items-center text-red-500 gap-1 text-sm">
+                            <XCircle className="w-4 h-4" /> Inactive
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-700' : 'text-gray-900'}`}>
+                          {new Date(admin.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        {admin.role !== 'super_admin' ? (
+                          <div className="flex items-center justify-end gap-2">
+                            {/* Placeholder for future admin actions, e.g. delete or demote */}
+                            {currentAdminRole === 'super_admin' && (
+                              <button
+                                className={`p-2 rounded-lg opacity-50 cursor-not-allowed ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'} transition-colors`}
+                                title="Actions disabled for now"
+                                disabled
+                              >
+                                <Edit className="w-4 h-4 text-gray-500" />
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">Protected</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {admins.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                        No admins found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Subscription Modal */}
         {showSubscriptionModal && selectedUser && (

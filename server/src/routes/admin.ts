@@ -13,7 +13,9 @@ import {
   addDevice,
   updateDevice,
   deleteDevice,
-  getRecentSessions
+  getRecentSessions,
+  promoteUserToAdmin,
+  getAllAdmins
 } from '../controllers/adminController';
 import { getAdminAIResponse } from '../controllers/adminAIController';
 import {
@@ -146,5 +148,8 @@ router.get('/analytics/device-security-detail', getDetailedDeviceSecurity);
 
 // Payment management routes
 router.get('/payments/all', getAllPayments);
+router.get('/admins', authenticate, getAllAdmins);
+// Promote user to admin (super_admin only)
+router.post('/promote-user/:userId', authenticate, sensitiveOperationRateLimiter, promoteUserToAdmin);
 
 export default router;

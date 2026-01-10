@@ -11,6 +11,7 @@ import {
   updateRelease,
   deleteRelease,
   downloadRelease,
+  downloadReleaseById,
   getReleaseStats
 } from '../controllers/desktopReleaseController';
 import { authenticate } from '../middleware/auth';
@@ -76,7 +77,36 @@ const updateReleaseValidation = [
 router.get('/', getAllReleases);
 router.get('/latest', getLatestReleases);
 router.get('/download/:filename', downloadRelease);
+router.get('/:id/download', downloadReleaseById);
 router.get('/:id', getReleaseById);
+
+// Auto download latest release
+router.get('/download/latest/auto', async (req: express.Request, res: express.Response) => {
+  try {
+    const platform = req.query.platform as string || 'windows';
+    const DesktopRelease = require('../models/DesktopRelease').default;
+
+    // Find latest active release
+    const release = await DesktopRelease.findOne({
+      platform: platform,
+      isActive: true
+    }).sort({ releaseDate: -1 });
+
+    if (!release) {
+      return res.status(404).send('No release found for this platform');
+    }
+
+    // Increment count
+    release.downloadCount = (release.downloadCount || 0) + 1;
+    await release.save();
+
+    // Redirect to download
+    return res.redirect(release.downloadUrl);
+  } catch (error) {
+    console.error('Auto download error:', error);
+    return res.status(500).send('Download failed');
+  }
+});
 
 // Admin routes - require authentication
 router.post(
@@ -112,7 +142,7 @@ router.post(
   validateRequest,
   async (req: express.Request, res: express.Response) => {
     try {
-      const { version, versionName, description, releaseNotes, platform, architecture, isLatest, downloadUrl } = req.body;
+      const { version, versionName, description, releaseNotes, platform, architecture, isLatest, downloadUrl, fileSize } = req.body;
       const authUser = (req as any).user;
 
       // Import the model
@@ -130,7 +160,8 @@ router.post(
         platform,
         architecture,
         fileName,
-        fileSize: 0, // Unknown for URL-based releases
+        fileSize: fileSize || 0, // Use provided size or default to 0
+        filePath: downloadUrl, // Store URL as path for validation
         downloadUrl,
         isLatest: isLatest || false,
         isActive: true,

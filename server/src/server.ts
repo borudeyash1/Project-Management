@@ -66,6 +66,7 @@ import vercelRoutes from "./routes/vercelRoutes";
 import zendeskRoutes from "./routes/zendeskRoutes";
 import linearRoutes from "./routes/linearRoutes";
 import leaderboardRoutes from "./routes/leaderboard";
+import expenseRoutes from "./routes/expenses";
 
 import spotifyRoutes from "./routes/spotifyRoutes";
 import mediaRoutes from "./routes/mediaRoutes"; // [NEW]
@@ -211,6 +212,7 @@ app.use("/api/storage", storageRoutes); // [NEW] Storage Route Mount
 app.use("/api/chat", chatRoutes); // [NEW] Chat Routes
 app.use("/api/payment", paymentRoutes); // [NEW] Payment Routes
 app.use("/api/leaderboard", leaderboardRoutes); // Leaderboard Routes
+app.use("/api/expenses", expenseRoutes); // Expense Routes
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

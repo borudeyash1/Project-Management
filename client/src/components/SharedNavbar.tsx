@@ -189,90 +189,43 @@ const SharedNavbar: React.FC = () => {
               </Link>
             ))}
           </div>
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-            {/* Language Selector - Hidden on public pages */}
-            {!isPublicPage && (
-              <div className="relative" ref={languageDropdownRef}>
-                <button
-                  onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                  className="p-2 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-yellow-50 hover:text-gray-900"
-                  title="Change Language"
-                >
-                  <Languages size={20} />
-                </button>
+          <div className="h-6 w-px bg-white/30 mx-2"></div>
 
-                {showLanguageMenu && (
-                  <div className={`absolute right-0 mt-2 w-48 rounded-xl shadow-2xl ${effectiveDarkMode && !isPublicPage ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} overflow-hidden z-50`}>
-                    <div className="py-1 max-h-96 overflow-y-auto custom-scrollbar">
-                      {languages.map((lang) => (
-                        <button
-                          key={lang.code}
-                          onClick={() => handleLanguageChange(lang.code)}
-                          className={`w-full px-4 py-2 text-left flex items-center gap-3 ${i18n.language === lang.code
-                            ? 'bg-accent/10 text-accent'
-                            : effectiveDarkMode && !isPublicPage
-                              ? 'text-gray-200 hover:bg-gray-700'
-                              : 'text-gray-800 hover:bg-gray-50'
-                            } transition-colors`}
-                        >
-                          <span className="text-lg">{lang.flag}</span>
-                          <span className="text-sm font-medium">{lang.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+          <Link
+            to="/login"
+            className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-50"
+          >
+            <LogIn size={18} />
+            <span className="hidden xl:inline">Login</span>
+          </Link>
+          <Link
+            to="/register"
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${scrolled
+              ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+              : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
+              }`}
+          >
+            <UserPlus size={18} />
+            <span className="hidden xl:inline">Register</span>
+          </Link>
+        </div>
 
-            {!isPublicPage && (
-              <button
-                onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-colors duration-200 ${effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'}`}
-                title="Toggle Theme"
-              >
-                <Palette size={20} />
-              </button>
-            )}
-
-            <div className="h-6 w-px bg-white/30 mx-2"></div>
-
-            <Link
-              to="/login"
-              className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-50"
-            >
-              <LogIn size={18} />
-              <span className="hidden xl:inline">Login</span>
-            </Link>
-            <Link
-              to="/register"
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 shadow-lg hover:scale-105 transform ${scrolled
-                ? 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
-                : 'bg-[#FFD700] text-gray-900 hover:bg-[#FFC700]'
-                }`}
-            >
-              <UserPlus size={18} />
-              <span className="hidden xl:inline">Register</span>
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
-            {!isPublicPage && (
-              <button
-                onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-colors duration-200 ${effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'}`}
-              >
-                <Palette size={20} />
-              </button>
-            )}
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center gap-2">
+          {!isPublicPage && (
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg transition-colors duration-200 text-white/90 hover:bg-white/10 hover:text-white"
+              onClick={toggleTheme}
+              className={`p-2 rounded-lg transition-colors duration-200 ${effectiveDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'}`}
             >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <Palette size={20} />
             </button>
-          </div>
+          )}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-lg transition-colors duration-200 text-white/90 hover:bg-white/10 hover:text-white"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
 
@@ -424,7 +377,7 @@ const SharedNavbar: React.FC = () => {
           )}
         </div>
       </div>
-    </nav>
+    </nav >
   );
 };
 

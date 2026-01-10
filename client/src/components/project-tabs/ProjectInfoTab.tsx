@@ -62,7 +62,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       budget: {
         amount: parseFloat(formData.budgetAmount) || 0,
-        spent: parseFloat(formData.budgetSpent) || 0,
+        spent: typeof project.budget === 'object' && project.budget ? (project.budget.spent || 0) : 0, // Preserve existing spent value
         currency: 'INR'
       },
       tags: formData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t),
@@ -342,24 +342,17 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, canEdit, onUpd
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <TrendingUp className="w-4 h-4 inline mr-1" />
-                Spent
+                Spent (Auto-calculated)
               </label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={formData.budgetSpent}
-                  onChange={(e) => setFormData({ ...formData, budgetSpent: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  placeholder="0"
-                />
-              ) : (
-                <p className="text-gray-900 dark:text-gray-100 font-medium">
-                  {(() => {
-                    const budgetSpent = typeof project.budget === 'object' && project.budget ? (project.budget.spent || 0) : 0;
-                    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
-                  })()}
-                </p>
-              )}
+              <p className="text-gray-900 dark:text-gray-100 font-medium">
+                {(() => {
+                  const budgetSpent = typeof project.budget === 'object' && project.budget ? (project.budget.spent || 0) : 0;
+                  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(budgetSpent);
+                })()}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Automatically calculated from approved expenses in the Accounts tab
+              </p>
             </div>
           </div>
 

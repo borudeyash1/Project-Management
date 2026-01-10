@@ -40,15 +40,42 @@ const ProjectOverview: React.FC = () => {
 
   const isUserProjectManager = (proj: any, userId: string) => {
     if (!proj || !userId) return false;
+
     // Check if explicitly assigned as PM field
     if (proj.projectManager === userId) return true;
+
     // Check if in team with 'project-manager' role
-    return proj.team?.some((member: any) =>
-      member._id === userId && member.role === 'Project Manager'
+    const inTeam = proj.team?.some((member: any) =>
+      member._id === userId && member.role === 'project-manager'
     );
+
+    // Check if in teamMembers with 'project-manager' role
+    // Handle both populated (member.user._id) and non-populated (member.user) cases
+    const inTeamMembers = proj.teamMembers?.some((member: any) => {
+      const memberId = typeof member.user === 'string' ? member.user : member.user?._id;
+      return memberId === userId && member.role === 'project-manager';
+    });
+
+    return inTeam || inTeamMembers;
   };
 
   const isProjectManager = project && userProfile && isUserProjectManager(project, userProfile._id);
+
+  // Debug logging
+  console.log('[ProjectOverview] Permission Debug:', {
+    userId: userProfile?._id,
+    isOwner,
+    isProjectManager,
+    projectManager: project?.projectManager,
+    teamMembers: project?.teamMembers?.map((m: any) => ({
+      userId: typeof m.user === 'string' ? m.user : m.user?._id,
+      role: m.role
+    })),
+    team: project?.team?.map((m: any) => ({
+      userId: m._id,
+      role: m.role
+    }))
+  });
 
   const handleUnlinkRepo = async (repoId: string) => {
     try {
@@ -70,27 +97,27 @@ const ProjectOverview: React.FC = () => {
   useEffect(() => {
     const fetchProjectData = async () => {
       if (!projectId) return;
-      
+
       try {
         setLoading(true);
-        
+
         // Fetch both project and tasks in parallel
         const [projectResponse, tasksResponse] = await Promise.all([
           apiService.get(`/projects/${projectId}`),
           apiService.get(`/tasks?projectId=${projectId}`).catch(() => ({ success: false, data: [] }))
         ]);
-        
+
         if (projectResponse.success && projectResponse.data) {
           const projectDataFromApi = projectResponse.data;
-          
+
           // Calculate task counts from actual tasks
           const tasks = tasksResponse.success ? (tasksResponse.data || []) : [];
           const totalTasksCount = tasks.length;
           const completedTasksCount = tasks.filter((t: any) => t.status === 'completed' || t.status === 'done').length;
-          
+
           // Calculate team member count
           const teamMemberCount = projectDataFromApi.teamMembers?.length || projectDataFromApi.team?.length || 0;
-          
+
           // Merge calculated counts with project data and store tasks
           setProjectData({
             ...projectDataFromApi,
@@ -268,22 +295,20 @@ const ProjectOverview: React.FC = () => {
             <div className="space-y-3">
               {project.tasks.slice(0, 5).map((task: any) => (
                 <div key={task._id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className={`w-3 h-3 rounded-full ${
-                    task.status === 'completed' || task.status === 'done' ? 'bg-green-500' :
+                  <div className={`w-3 h-3 rounded-full ${task.status === 'completed' || task.status === 'done' ? 'bg-green-500' :
                     task.status === 'in-progress' ? 'bg-blue-500' :
-                    'bg-gray-300'
-                  }`} />
+                      'bg-gray-300'
+                    }`} />
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{task.title}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-200">
                       {task.assignee?.fullName || task.assignee?.name || 'Unassigned'}
                     </div>
                   </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    task.priority === 'high' || task.priority === 'urgent' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                  <span className={`px-2 py-1 text-xs rounded-full ${task.priority === 'high' || task.priority === 'urgent' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
                     task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                    'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
-                  }`}>
+                      'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+                    }`}>
                     {task.priority || 'low'}
                   </span>
                 </div>

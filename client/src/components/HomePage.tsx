@@ -115,11 +115,15 @@ interface RecentFile {
 interface DesktopRelease {
   _id: string;
   version: string;
+  versionName?: string;
   platform: string;
+  architecture?: string;
   downloadUrl: string;
   releaseNotes: string;
   isLatest: boolean;
   createdAt: string;
+  fileSize?: number;
+  downloadCount?: number;
 }
 
 const HomePage: React.FC = () => {
@@ -518,104 +522,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Sartthi Desktop Download Card */}
-        {latestRelease && (
-          <div className={`relative overflow-hidden rounded-2xl border ${isDarkMode
-            ? 'bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border-indigo-500/20'
-            : 'border-gray-200 shadow-sm'
-            }`}
-            style={!isDarkMode ? { background: `linear-gradient(135deg, #ffffff 60%, ${accentColor}15 100%)` } : undefined}>
-            <div className="absolute top-0 right-0 w-64 h-64 opacity-10 rounded-full blur-3xl -mr-32 -mt-32" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }} />
 
-            <div className="relative z-10 p-6">
-              <div className="flex flex-col md:flex-row gap-6">
-                {/* Icon */}
-                <div className="flex-shrink-0">
-                  <div className="p-4 rounded-2xl shadow-xl" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
-                    <Monitor className="w-12 h-12 text-white" />
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      {t('home.sartthiDesktop')}
-                    </h3>
-                    <span className="px-2 py-1 text-xs font-bold text-white rounded-full" style={{ background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)` }}>
-                      v{latestRelease.version}
-                    </span>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
-                      }`}>
-                      Latest
-                    </span>
-                  </div>
-
-                  <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {t('home.downloadSartthiDesktop')}
-                  </p>
-
-                  {/* Features */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
-                      <div className="text-lg mb-1">⚡</div>
-                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Lightning Fast
-                      </div>
-                    </div>
-                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
-                      <div className="text-lg mb-1">📴</div>
-                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Offline Mode
-                      </div>
-                    </div>
-                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
-                      <div className="text-lg mb-1">🔔</div>
-                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Notifications
-                      </div>
-                    </div>
-                    <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'}`}>
-                      <div className="text-lg mb-1">🔒</div>
-                      <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Secure
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Release Notes */}
-                  {latestRelease.releaseNotes && (
-                    <div className={`p-3 rounded-lg mb-4 ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/50'}`}>
-                      <p className={`text-xs font-semibold mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        What's New:
-                      </p>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} line-clamp-2`}>
-                        {latestRelease.releaseNotes}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Download Button */}
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={latestRelease.downloadUrl}
-                      download
-                      className="group relative px-6 py-3 text-gray-900 border border-gray-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold flex items-center gap-2 overflow-hidden"
-                      style={{ background: `linear-gradient(135deg, #ffffff 20%, ${accentColor}15 100%)` }}
-                    >
-                      <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
-                      <Download className="w-5 h-5 relative z-10" />
-                      <span className="relative z-10">{t('home.downloadNow')}</span>
-                    </a>
-                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      <div className="font-medium">Windows 10/11</div>
-                      <div>64-bit</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Sartthi Ecosystem */}
         <section>
@@ -979,7 +886,7 @@ const HomePage: React.FC = () => {
           {/* Right Column - Download, Calendar, Workspaces */}
           <div className="lg:col-span-5 flex flex-col gap-6 min-h-[600px]">
 
-            <DownloadAppWidget />
+            <DownloadAppWidget release={latestRelease} />
 
             {/* Calendar Widget */}
             <div className="h-[600px] shrink-0">

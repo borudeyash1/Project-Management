@@ -179,15 +179,23 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
 
     try {
       if (req.user?.email && resolvedWorkspaceId) {
+        const { generateProjectCreatedEmail } = await import('../utils/emailTemplates');
+
+        // Generate project URL
+        const baseUrl = process.env.CLIENT_URL || 'https://sartthi.com';
+        const projectUrl = `${baseUrl}/project/${project._id}/overview`;
+
+        // Generate HTML email
+        const htmlContent = generateProjectCreatedEmail(
+          project,
+          req.user?.fullName || req.user?.email || 'Unknown User',
+          projectUrl
+        );
+
         await sendEmail({
           to: req.user.email,
-          subject: `New project created: ${project.name}`,
-          html: `
-            <h2>Project Created Successfully</h2>
-            <p>Your project <strong>${project.name}</strong> has been created${resolvedWorkspaceId ? ' in your workspace' : ''}.</p>
-            <p>Status: ${project.status || 'active'} | Priority: ${project.priority || 'medium'}</p>
-            <p>Start: ${project.startDate ? new Date(project.startDate).toLocaleDateString() : 'N/A'} | Due: ${project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'N/A'}</p>
-          `,
+          subject: `🎉 New project created: ${project.name}`,
+          html: htmlContent,
         });
       }
     } catch (emailErr) {
@@ -388,7 +396,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
     const userId = req.user!._id;
     const updateData = req.body;
 
-    // Find project - allow access if user is creator OR has owner/manager role
+    // Find project - allow access if user is creator OR has owner/manager/project-manager role
     const project = await Project.findOne({
       _id: id,
       isActive: true,
@@ -398,7 +406,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
           teamMembers: {
             $elemMatch: {
               user: userId,
-              role: { $in: ['owner', 'manager'] }
+              role: { $in: ['owner', 'manager', 'project-manager'] }
             }
           }
         }
@@ -413,9 +421,38 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
+    // Track changes before saving (deep copy budget to avoid reference issues)
+    const originalValues = {
+      name: project.name,
+      description: project.description,
+      client: typeof project.client === 'string' ? project.client : (project.client as any)?._id,
+      status: project.status,
+      priority: project.priority,
+      startDate: project.startDate,
+      dueDate: project.dueDate,
+      budget: project.budget ? {
+        amount: typeof project.budget === 'object' ? project.budget.amount : project.budget,
+        spent: typeof project.budget === 'object' ? project.budget.spent : 0,
+        currency: typeof project.budget === 'object' ? project.budget.currency : 'INR'
+      } : null,
+      tags: project.tags ? [...project.tags] : []
+    };
+
     // Update project - exclude fields that need special handling
-    const { clientId, projectManager, budget, tags, ...safeUpdateData } = updateData;
+    const { clientId, projectManager, budget, tags, integrations, ...safeUpdateData } = updateData;
     Object.assign(project, safeUpdateData);
+
+    // Handle integrations
+    if (integrations) {
+      if (!project.integrations) project.integrations = {};
+
+      // Merge Slack integration
+      if (integrations.slack) {
+        project.integrations.slack = integrations.slack;
+      }
+
+      // Preserve other integrations if needed, or handle deep merge here
+    }
 
     // Handle clientId explicitly
     if (updateData.clientId !== undefined) {
@@ -428,7 +465,7 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
       // Find existing manager in teamMembers
       const teamMembers = (project as any).teamMembers || [];
       const existingManagerIndex = teamMembers.findIndex((m: any) => m.role === 'manager');
-      
+
       if (updateData.projectManager && updateData.projectManager !== userId.toString()) {
         // Add or update manager
         if (existingManagerIndex !== -1) {
@@ -507,26 +544,34 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
       data: project
     };
 
+    // Send enhanced email notification with change details
     try {
-      const recipients = new Set<string>();
-      if (req.user?.email) recipients.add(req.user.email);
+      const { detectProjectChanges, generateProjectUpdateEmail } = await import('../utils/emailTemplates');
 
-      const projectMembers = Array.isArray((project as any).teamMembers) ? (project as any).teamMembers : [];
-      projectMembers.forEach((member: any) => {
-        const email = member.user?.email || member.user?.emailAddress;
-        if (email) recipients.add(email);
-      });
+      // Send email only to the user who made the update
+      if (req.user?.email) {
+        // Detect what changed
+        const changes = detectProjectChanges(originalValues, project, updateData);
 
-      if (recipients.size > 0) {
+        // Generate project URL
+        const baseUrl = process.env.CLIENT_URL || 'https://sartthi.com';
+        const projectUrl = `${baseUrl}/project/${project._id}/info`;
+
+        // Generate HTML email
+        const htmlContent = generateProjectUpdateEmail(
+          changes,
+          project,
+          req.user?.fullName || req.user?.email || 'Unknown User',
+          projectUrl
+        );
+
+        // Send email
         await sendEmail({
-          to: Array.from(recipients),
-          subject: `Project updated: ${project.name}`,
-          html: `
-            <h2>Project Updated</h2>
-            <p>The project <strong>${project.name}</strong> has new updates.</p>
-            <p>Status: ${project.status || 'active'} | Priority: ${project.priority || 'medium'}</p>
-            <p>Updated by: ${req.user?.fullName || req.user?.email}</p>
-          `,
+          to: req.user.email,
+          subject: changes.length > 0
+            ? `${project.name}: ${changes.length} field${changes.length > 1 ? 's' : ''} updated`
+            : `Project updated: ${project.name}`,
+          html: htmlContent,
         });
       }
     } catch (emailErr) {
@@ -586,7 +631,7 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response): P
     if (project.workspace) {
       const workspaceOwner = (project.workspace as any).owner;
       const isWorkspaceOwner = workspaceOwner && workspaceOwner.toString() === userId.toString();
-      
+
       // Allow deletion if user is workspace owner, project creator, or has owner/manager role
       const isCreator = project.createdBy.toString() === userId.toString();
       const hasOwnerRole = (project as any).teamMembers?.some(

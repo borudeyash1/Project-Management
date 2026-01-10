@@ -24,9 +24,9 @@ export const checkDeviceAccess = async (req: Request, res: Response): Promise<vo
     }
 
     console.log('🔍 [BACKEND] Searching for device in database...');
-    const device = await AllowedDevice.findOne({ 
-      deviceId, 
-      isActive: true 
+    const device = await AllowedDevice.findOne({
+      deviceId,
+      isActive: true
     });
 
     console.log('🔍 [BACKEND] Database query result:', device ? 'Device found' : 'Device not found');
@@ -425,12 +425,18 @@ export const adminGoogleLogin = async (req: Request, res: Response): Promise<voi
 
     // Check if admin uses Google login or both
     if (admin.loginMethod !== 'google' && admin.loginMethod !== 'both') {
-      console.log('❌ [ADMIN GOOGLE LOGIN] Admin uses different login method:', admin.loginMethod);
-      res.status(401).json({
-        success: false,
-        message: 'Please use email/password login for this account'
-      });
-      return;
+      // If admin uses email login, allow them to link Google account
+      if (admin.loginMethod === 'email') {
+        console.log('ℹ️ [ADMIN GOOGLE LOGIN] Upgrading admin login method from email to both');
+        admin.loginMethod = 'both';
+      } else {
+        console.log('❌ [ADMIN GOOGLE LOGIN] Admin uses different login method:', admin.loginMethod);
+        res.status(401).json({
+          success: false,
+          message: 'Please use email/password login for this account'
+        });
+        return;
+      }
     }
 
     // Update Google ID if not set
@@ -446,9 +452,9 @@ export const adminGoogleLogin = async (req: Request, res: Response): Promise<voi
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: admin._id, 
-        email: admin.email, 
+      {
+        id: admin._id,
+        email: admin.email,
         role: admin.role,
         type: 'admin'
       },
@@ -546,9 +552,9 @@ export const verifyAdminLoginOTP = async (req: Request, res: Response): Promise<
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: admin._id, 
-        email: admin.email, 
+      {
+        id: admin._id,
+        email: admin.email,
         role: admin.role,
         type: 'admin'
       },
@@ -627,7 +633,7 @@ export const sendPasswordChangeOTP = async (req: AuthenticatedRequest, res: Resp
 
     // Generate OTP
     const otp = generateOTP();
-    
+
     // Store OTP with expiry (10 minutes)
     admin.loginOtp = otp;
     admin.loginOtpExpiry = new Date(Date.now() + 10 * 60 * 1000);
@@ -855,7 +861,7 @@ export const getDashboardStats = async (req: AuthenticatedRequest, res: Response
     // Determine system status based on metrics
     let systemStatus = 'Healthy';
     const activeSessionsRatio = totalUsers > 0 ? (activeSessions / totalUsers) * 100 : 0;
-    
+
     if (activeSessionsRatio < 10) {
       systemStatus = 'Warning';
     } else if (activeSessionsRatio < 5) {
@@ -1021,6 +1027,117 @@ export const deleteDevice = async (req: AuthenticatedRequest, res: Response): Pr
     res.status(500).json({
       success: false,
       message: 'Failed to delete device'
+    });
+  }
+};
+// Promote User to Admin (Super Admin only)
+export const promoteUserToAdmin = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const adminId = req.user?._id;
+
+    console.log('🔍 [ADMIN] Promote user request:', { userId, adminId });
+
+    // 1. Verify Super Admin status
+    const requestingAdmin = await Admin.findById(adminId);
+    if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
+      console.log('❌ [ADMIN] Unauthorized promotion attempt by:', adminId);
+      res.status(403).json({
+        success: false,
+        message: 'Only Super Admins can promote users'
+      });
+      return;
+    }
+
+    // 2. Find the user
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    // 3. Create Admin record
+    // We try to use the existing password hash if available, otherwise they might need to reset it.
+    // User model has 'password' field, Admin has 'password' field. 
+    // Both use bcrypt (based on Admin.ts and User.ts imports).
+
+    // Check if email already exists in Admin
+    // Check if email already exists in Admin
+    const existingAdmin = await Admin.findOne({ email: user.email });
+    if (existingAdmin) {
+      console.log('⚠️ [ADMIN] Admin already exists with email:', user.email);
+      res.status(400).json({
+        success: false,
+        message: 'An admin with this email already exists'
+      });
+      return;
+    }
+
+    console.log('🔍 [ADMIN] Creating new admin record for:', user.email, 'from user ID:', userId);
+
+    const newAdmin = new Admin({
+      email: user.email,
+      name: user.fullName, // User has fullName, Admin has name
+      password: user.password, // Transfer hashed password
+      role: 'admin', // Default promoted role
+      isActive: true, // Maintain active status or default to true
+      loginMethod: 'email', // Defaulting to email as we are transferring password
+      createdAt: (user as any).createdAt || new Date(), // Preserve join date if desired, or new Date()
+      updatedAt: new Date()
+    });
+
+    try {
+      await newAdmin.validate();
+      await newAdmin.save();
+      console.log('✅ [ADMIN] New admin record created successfully. ID:', newAdmin._id);
+    } catch (saveError: any) {
+      console.error('❌ [ADMIN] Failed to save new admin:', saveError);
+      throw saveError; // Will be caught by outer catch
+    }
+
+    // 4. Do NOT delete User record as per new requirement
+    // await User.findByIdAndDelete(userId);
+    console.log('✅ [ADMIN] User promoted to Admin. User record retained in Users collection.');
+
+    res.status(200).json({
+      success: true,
+      message: 'User successfully promoted to Admin (User record retained)',
+      data: {
+        id: newAdmin._id,
+        email: newAdmin.email,
+        role: newAdmin.role
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Promote user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Get all admins
+export const getAllAdmins = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    console.log('🔍 [ADMIN] Fetching all admins');
+    // Fetch all admins, exluding sensitive info, sorted by creation date
+    const admins = await Admin.find().select('-password -loginOtp -loginOtpExpiry').sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: 'Admins fetched successfully',
+      data: admins
+    });
+  } catch (error: any) {
+    console.error('❌ [ADMIN] Fetch admins error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
     });
   }
 };
