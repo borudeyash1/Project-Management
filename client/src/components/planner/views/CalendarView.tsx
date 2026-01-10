@@ -184,10 +184,10 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`px - 3 py - 2 text - sm font - medium ${mode === m
+                  className={`px-3 py-2 text-sm font-medium ${mode === m
                     ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-700'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200'
-                    } `}
+                    }`}
                 >
                   {t(`planner.calendar.${m}`)}
                 </button>
@@ -216,23 +216,23 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min - h - 32 p - 2 border - r border - b border - gray - 300 dark: border - gray - 600 cursor - pointer hover: bg - blue - 50 dark: hover: bg - gray - 700 hover: shadow - inner transition - colors relative group ${isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                    className={`min-h-32 p-2 border-r border-b border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-inner transition-colors relative group ${isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                       } ${!isCurrentMonth(day) ? 'opacity-40' : ''
-                      } `}
+                      }`}
                   >
                     {/* Add Task Indicator on Hover */}
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Plus className="w-4 h-4 text-accent-dark dark:text-accent-light" />
                     </div>
-                    <div className={`text - sm font - medium mb - 2 ${isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
-                      } `}>
+                    <div className={`text-sm font-medium mb-2 ${isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
+                      }`}>
                       {day.getDate()}
                     </div>
                     <div className="space-y-1">
                       {dayTasks.slice(0, 3).map(task => (
                         <div
                           key={task._id}
-                          className={`text - xs p - 1 rounded truncate border ${getPriorityColor(task.priority)} `}
+                          className={`text-xs p-1 rounded truncate border ${getPriorityColor(task.priority)}`}
                         >
                           {task.title}
                         </div>
@@ -257,8 +257,8 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                   <div className="text-xs text-gray-600 dark:text-gray-200">
                     {day.toLocaleDateString(i18n.language, { weekday: 'short' })}
                   </div>
-                  <div className={`text - lg font - semibold mt - 1 ${isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
-                    } `}>
+                  <div className={`text-lg font-semibold mt-1 ${isToday(day) ? 'text-accent-dark dark:text-accent-light' : 'text-gray-900 dark:text-white'
+                    }`}>
                     {day.getDate()}
                   </div>
                 </div>
@@ -271,8 +271,8 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min - h - 96 p - 3 border - r border - gray - 300 dark: border - gray - 600 cursor - pointer hover: bg - blue - 50 dark: hover: bg - gray - 700 transition - colors relative group ${isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                      } `}
+                    className={`min-h-96 p-3 border-r border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors relative group ${isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                      }`}
                   >
                     {/* Add Task Indicator on Hover */}
                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -282,7 +282,7 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                       {dayTasks.map(task => (
                         <div
                           key={task._id}
-                          className={`text - sm p - 2 rounded border ${getPriorityColor(task.priority)} `}
+                          className={`text-sm p-2 rounded border ${getPriorityColor(task.priority)}`}
                         >
                           <div className="font-medium truncate">{task.title}</div>
                           {task.dueDate && (
@@ -333,7 +333,7 @@ const CalendarView = ({ searchQuery, onDateClick }: CalendarViewProps) => {
                         {tasksAtTime.map(task => (
                           <div
                             key={task._id}
-                            className={`text - sm p - 2 rounded border ${getPriorityColor(task.priority)} `}
+                            className={`text-sm p-2 rounded border ${getPriorityColor(task.priority)}`}
                           >
                             <div className="font-medium">{task.title}</div>
                             {task.estimatedTime && (

@@ -279,6 +279,47 @@ export interface User {
       }>;
     };
   };
+  performanceRatings?: {
+    timeliness?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    quality?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    effort?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    collaboration?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    initiative?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    learning?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    compliance?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    totalPoints?: number;
+    totalTasks?: number;
+    overallAverage?: number;
+    lastUpdated?: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

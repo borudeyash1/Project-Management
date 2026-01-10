@@ -404,6 +404,7 @@ const AppContent: React.FC = () => {
           <Route path="attendance" element={<ProjectViewDetailed />} />
           <Route path="reports" element={<ProjectViewDetailed />} />
           <Route path="design" element={<ProjectDesignHub />} />
+          <Route path="leaderboard" element={<ProjectViewDetailed />} />
           <Route path="documents" element={<ProjectViewDetailed />} />
           <Route path="inbox" element={<ProjectViewDetailed />} />
           <Route path="settings" element={<ProjectViewDetailed />} />

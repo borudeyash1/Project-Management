@@ -14,7 +14,7 @@ interface ListViewProps {
   searchQuery: string;
 }
 
-type SortField = 'title' | 'priority' | 'status' | 'dueDate' | 'assignees';
+type SortField = 'title' | 'priority' | 'status' | 'dueDate' | 'reporter';
 type SortDirection = 'asc' | 'desc';
 type GroupBy = 'none' | 'status' | 'priority' | 'assignee' | 'project';
 
@@ -65,9 +65,10 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
     let aValue: any = a[sortField];
     let bValue: any = b[sortField];
 
-    if (sortField === 'assignees') {
-      aValue = a.assignees.length;
-      bValue = b.assignees.length;
+    if (sortField === 'reporter') {
+      // Sort by reporter name
+      aValue = typeof a.reporter === 'object' ? (a.reporter?.fullName || a.reporter?.username || a.reporter?.email || '') : (a.reporter || '');
+      bValue = typeof b.reporter === 'object' ? (b.reporter?.fullName || b.reporter?.username || b.reporter?.email || '') : (b.reporter || '');
     }
 
     if (sortField === 'dueDate') {
@@ -87,7 +88,7 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
       let key = 'Ungrouped';
       if (groupBy === 'status') key = task.status;
       else if (groupBy === 'priority') key = task.priority;
-      else if (groupBy === 'assignee') key = task.assignees[0] || 'Unassigned';
+      else if (groupBy === 'assignee') key = typeof task.reporter === 'object' ? (task.reporter?.fullName || task.reporter?.username || 'Unassigned') : (task.reporter || 'Unassigned');
       else if (groupBy === 'project') key = task.project || 'No Project';
 
       if (!groups[key]) groups[key] = [];
@@ -272,11 +273,11 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                     </th>
                     <th
                       className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                      onClick={() => handleSort('assignees')}
+                      onClick={() => handleSort('reporter')}
                     >
                       <div className="flex items-center gap-2">
-                        {t('planner.list.columns.assignee')}
-                        <SortIcon field="assignees" />
+                        Assigned By
+                        <SortIcon field="reporter" />
                       </div>
                     </th>
                     <th
@@ -344,22 +345,25 @@ const ListView: React.FC<ListViewProps> = ({ searchQuery }) => {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex -space-x-2">
-                          {task.assignees.slice(0, 3).map((assignee, idx) => (
+                        {task.reporter ? (
+                          <div className="flex items-center gap-2">
                             <div
-                              key={idx}
-                              className="w-7 h-7 rounded-full bg-blue-500 border-2 border-white dark:border-gray-700 flex items-center justify-center text-white text-xs font-medium"
-                              title={typeof assignee === 'object' ? (assignee.fullName || assignee.username) : assignee}
+                              className="w-7 h-7 rounded-full bg-purple-500 border-2 border-white dark:border-gray-700 flex items-center justify-center text-white text-xs font-medium"
+                              title={typeof task.reporter === 'object' ? (task.reporter.fullName || task.reporter.username || task.reporter.email) : task.reporter}
                             >
-                              {typeof assignee === 'string' ? assignee[0].toUpperCase() : (assignee.fullName || assignee.username || 'U')[0].toUpperCase()}
+                              {typeof task.reporter === 'string' 
+                                ? task.reporter[0].toUpperCase() 
+                                : (task.reporter.fullName || task.reporter.username || task.reporter.email || 'U')[0].toUpperCase()}
                             </div>
-                          ))}
-                          {task.assignees.length > 3 && (
-                            <div className="w-7 h-7 rounded-full bg-gray-400 border-2 border-white dark:border-gray-700 flex items-center justify-center text-white text-xs font-medium">
-                              +{task.assignees.length - 3}
-                            </div>
-                          )}
-                        </div>
+                            <span className="text-sm text-gray-900 dark:text-white">
+                              {typeof task.reporter === 'object' 
+                                ? (task.reporter.fullName || task.reporter.username || task.reporter.email)
+                                : task.reporter}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">-</span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         {task.dueDate ? (

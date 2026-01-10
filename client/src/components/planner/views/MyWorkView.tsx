@@ -40,7 +40,6 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
     
     return (
       isAssignedToMe &&
-      task.status !== 'done' &&
       task.status !== 'completed' &&
       (!searchQuery ||
         task.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -88,7 +87,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
     const task = tasks.find(t => t._id === taskId);
     if (task) {
       updateTask(taskId, {
-        status: task.status === 'done' ? 'todo' : 'done'
+        status: task.status === 'completed' ? 'pending' : 'completed'
       });
     }
   };
@@ -122,7 +121,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
         onClick={() => handleToggleComplete(task._id)}
         className="flex-shrink-0"
       >
-        {task.status === 'done' ? (
+        {task.status === 'completed' ? (
           <CheckCircle className="w-5 h-5 text-green-600" />
         ) : (
           <Circle className="w-5 h-5 text-gray-600 hover:text-accent-dark" />
@@ -132,7 +131,7 @@ const MyWorkView: React.FC<MyWorkViewProps> = ({ searchQuery }) => {
       {/* Task Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <h4 className={`font-medium text-gray-900 dark:text-white truncate ${task.status === 'done' ? 'line-through text-gray-500' : ''
+          <h4 className={`font-medium text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'line-through text-gray-500' : ''
             }`}>
             {task.title}
           </h4>

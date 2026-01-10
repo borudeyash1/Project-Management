@@ -91,6 +91,12 @@ const ProjectInternalNav: React.FC = () => {
       icon: Palette,
       path: `/project/${projectId}/design`
     },
+    {
+      id: 'leaderboard',
+      label: t('project.tabs.leaderboard') || 'Leaderboard',
+      icon: Target,
+      path: `/project/${projectId}/leaderboard`
+    },
     // {
     //   id: 'documents',
     //   label: t('project.tabs.documents'),

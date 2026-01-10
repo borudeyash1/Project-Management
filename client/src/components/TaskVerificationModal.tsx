@@ -31,56 +31,44 @@ const TaskVerificationModal: React.FC<TaskVerificationModalProps> = ({
   const [ratings, setRatings] = useState<RatingDimension[]>([
     {
       key: 'timeliness',
-      label: 'Timeliness',
-      description: 'On-time delivery, early completion, or delays',
+      label: 'Timeliness & Reliability',
+      description: 'On-time delivery, meeting deadlines consistently. Regularity and dependability across tasks.',
       rating: 0
     },
     {
       key: 'quality',
-      label: 'Quality of Work',
-      description: 'Defect count, rework required, acceptance criteria met',
+      label: 'Quality & Accuracy',
+      description: 'Meeting acceptance criteria, minimal defects or rework. Deliverables match requirements and specifications.',
       rating: 0
     },
     {
       key: 'effort',
-      label: 'Effort & Complexity',
-      description: 'Perceived effort vs estimate, complexity handling',
-      rating: 0
-    },
-    {
-      key: 'accuracy',
-      label: 'Accuracy to Requirements',
-      description: 'Spec adherence and deliverable completeness',
+      label: 'Effort & Complexity Handling',
+      description: 'Efficiency relative to estimated effort. Ability to manage varying task complexity effectively.',
       rating: 0
     },
     {
       key: 'collaboration',
       label: 'Collaboration & Communication',
-      description: 'Responsiveness, clarity, handoffs',
+      description: 'Team coordination, responsiveness, clarity, and quality of handoffs.',
       rating: 0
     },
     {
       key: 'initiative',
       label: 'Initiative & Problem Solving',
-      description: 'Proactive fixes, blockers resolved',
-      rating: 0
-    },
-    {
-      key: 'reliability',
-      label: 'Reliability & Consistency',
-      description: 'Repeatability across tasks over time',
+      description: 'Proactive approach, ownership, and resolving blockers independently.',
       rating: 0
     },
     {
       key: 'learning',
       label: 'Learning & Improvement',
-      description: 'Adoption of feedback, reduced rework rate',
+      description: 'Incorporates feedback, improves over time, reduces repeated mistakes.',
       rating: 0
     },
     {
       key: 'compliance',
-      label: 'Compliance & Security',
-      description: 'Adherence to process, data handling rules',
+      label: 'Compliance & Security Awareness',
+      description: 'Follows processes, policies, and data/security guidelines.',
       rating: 0
     }
   ]);

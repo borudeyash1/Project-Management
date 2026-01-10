@@ -336,7 +336,7 @@ const taskSchema: Schema<any> = new Schema<any>(
       max: 5,
     },
     ratingDetails: {
-      // 9 Performance Dimensions
+      // 7 Performance Dimensions
       timeliness: {
         type: Number,
         min: 0,
@@ -352,22 +352,12 @@ const taskSchema: Schema<any> = new Schema<any>(
         min: 0,
         max: 5,
       },
-      accuracy: {
-        type: Number,
-        min: 0,
-        max: 5,
-      },
       collaboration: {
         type: Number,
         min: 0,
         max: 5,
       },
       initiative: {
-        type: Number,
-        min: 0,
-        max: 5,
-      },
-      reliability: {
         type: Number,
         min: 0,
         max: 5,

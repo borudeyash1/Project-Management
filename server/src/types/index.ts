@@ -315,6 +315,47 @@ export interface IUser extends Document {
       };
     };
   };
+  performanceRatings?: {
+    timeliness?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    quality?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    effort?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    collaboration?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    initiative?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    learning?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    compliance?: {
+      total: number;
+      count: number;
+      average: number;
+    };
+    totalPoints?: number;
+    totalTasks?: number;
+    overallAverage?: number;
+    lastUpdated?: Date;
+  };
   comparePassword(candidatePassword: string): Promise<boolean>;
   generateRefreshToken(): string;
   removeRefreshToken(token: string): void;
@@ -650,10 +691,8 @@ export interface ITask extends Document {
     timeliness?: number;
     quality?: number;
     effort?: number;
-    accuracy?: number;
     collaboration?: number;
     initiative?: number;
-    reliability?: number;
     learning?: number;
     compliance?: number;
     comments?: string;

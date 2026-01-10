@@ -499,6 +499,18 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     // Notify verification
     if (verifiedBy !== undefined && task.status === 'verified') {
       await notifyTaskVerified(taskId, userId);
+      
+      // Update user performance ratings
+      if (task.assignee && task.ratingDetails) {
+        try {
+          const { updateUserPerformanceRatings } = require('../utils/performanceRatings');
+          await updateUserPerformanceRatings(task.assignee.toString(), taskId);
+          console.log(`✅ [TASK UPDATE] Updated performance ratings for user ${task.assignee}`);
+        } catch (error) {
+          console.error('❌ [TASK UPDATE] Failed to update performance ratings:', error);
+          // Don't fail the task update if rating update fails
+        }
+      }
     }
 
     // Sync status change to Notion if task is synced

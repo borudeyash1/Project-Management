@@ -97,7 +97,8 @@ const BoardView: React.FC<BoardViewProps> = ({ searchQuery }) => {
 
         // Handle legacy statuses mapping to new columns
         if (columnId === 'pending') return task.status === 'pending' || task.status === 'todo';
-        if (columnId === 'review') return task.status === 'review' || task.status === 'in-review';
+        // Map both 'in-progress' and 'review' to the in-progress column
+        if (columnId === 'in-progress') return task.status === 'in-progress' || task.status === 'review' || task.status === 'in-review';
         if (columnId === 'completed') return task.status === 'completed' || task.status === 'done';
         return task.status === columnId;
       })

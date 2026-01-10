@@ -43,6 +43,7 @@ import EmployeeTasksTab from './project-tabs/EmployeeTasksTab';
 import WorkspaceInbox from './workspace/WorkspaceInbox';
 import ProjectAttendanceManagerTab from './project-tabs/ProjectAttendanceManagerTab';
 import ProjectAttendanceEmployeeTab from './project-tabs/ProjectAttendanceEmployeeTab';
+import ProjectLeaderboard from './project-tabs/ProjectLeaderboard';
 import GlassmorphicCard from './ui/GlassmorphicCard';
 import GlassmorphicPageHeader from './ui/GlassmorphicPageHeader';
 import { ContextAIButton } from './ai/ContextAIButton';
@@ -225,6 +226,7 @@ const ProjectViewDetailed: React.FC = () => {
     | 'inbox'
     | 'settings'
     | 'analytics'
+    | 'leaderboard'
   >('overview');
   const [showProjectSelector, setShowProjectSelector] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
@@ -286,6 +288,7 @@ const ProjectViewDetailed: React.FC = () => {
     else if (path.includes('/workload')) setActiveView('workload');
     else if (path.includes('/attendance')) setActiveView('attendance');
     else if (path.includes('/reports')) setActiveView('reports');
+    else if (path.includes('/leaderboard')) setActiveView('leaderboard');
     else if (path.includes('/documents')) setActiveView('documents');
     else if (path.includes('/inbox')) setActiveView('inbox');
     else if (path.includes('/settings')) setActiveView('settings');
@@ -478,6 +481,27 @@ const ProjectViewDetailed: React.FC = () => {
     };
 
     loadTasks();
+  }, [activeProject?._id]);
+
+  // Load requests for active project from backend
+  useEffect(() => {
+    const loadRequests = async () => {
+      if (!activeProject?._id) return;
+      try {
+        console.log('[ProjectViewDetailed] Loading requests for project:', activeProject._id);
+        const response = await apiService.get(`/projects/${activeProject._id}/requests`);
+        if (response.data && response.data.success) {
+          const fetchedRequests = response.data.data || [];
+          console.log('[ProjectViewDetailed] Loaded requests:', fetchedRequests.length);
+          setRequests(fetchedRequests);
+        }
+      } catch (error) {
+        console.error('[ProjectViewDetailed] Failed to load project requests:', error);
+        // Don't show error to user, just log it
+      }
+    };
+
+    loadRequests();
   }, [activeProject?._id]);
 
   // Set projects from state
@@ -2560,6 +2584,9 @@ const ProjectViewDetailed: React.FC = () => {
 
       case 'inbox':
         return <WorkspaceInbox projectId={activeProject?._id} />;
+
+      case 'leaderboard':
+        return <ProjectLeaderboard />;
 
       case 'settings':
         return (

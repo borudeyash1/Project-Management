@@ -141,6 +141,12 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   };
 
   const handleDrop = (newStatus: Task['status']) => {
+    // Prevent employees from setting tasks to 'verified' status
+    if (newStatus === 'verified') {
+      setDraggedTask(null);
+      return;
+    }
+    
     if (draggedTask && draggedTask.status !== newStatus) {
       onUpdateTask(draggedTask._id, { status: newStatus });
     }
@@ -270,22 +276,22 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg border border-gray-300 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{t('project.employeeTasks.title')}</h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('project.employeeTasks.title')}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {activeTasks.length} Active Tasks {verifiedTasks.length > 0 && `• ${verifiedTasks.length} Verified`}
             </p>
           </div>
 
           {/* View Mode Switcher */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 flex-wrap">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex-wrap">
             <button
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'list'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-600 text-accent-dark dark:text-accent-light shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               title={t('project.employeeTasks.views.list')}
             >
@@ -295,8 +301,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <button
               onClick={() => setViewMode('kanban')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'kanban'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-600 text-accent-dark dark:text-accent-light shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               title={t('project.employeeTasks.views.kanban')}
             >
@@ -306,8 +312,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <button
               onClick={() => setViewMode('calendar')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'calendar'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-600 text-accent-dark dark:text-accent-light shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               title={t('project.employeeTasks.views.calendar')}
             >
@@ -317,8 +323,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <button
               onClick={() => setViewMode('table')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'table'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-600 text-accent-dark dark:text-accent-light shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               title={t('project.employeeTasks.views.table')}
             >
@@ -328,8 +334,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <button
               onClick={() => setViewMode('dashboard')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'dashboard'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-600 text-accent-dark dark:text-accent-light shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               title={t('project.employeeTasks.views.dashboard')}
             >
@@ -339,8 +345,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
             <button
               onClick={() => setViewMode('workload')}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors ${viewMode === 'workload'
-                ? 'bg-white text-accent-dark shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-600 text-accent-dark dark:text-accent-light shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               title={t('project.employeeTasks.views.workload')}
             >
@@ -353,25 +359,25 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {/* Task Statistics - Only show in list view */}
         {viewMode === 'list' && (
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-xs text-gray-600 mb-1">{t('project.employeeTasks.stats.total')}</p>
-              <p className="text-2xl font-bold text-gray-900">{myTasks.length}</p>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('project.employeeTasks.stats.total')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{myTasks.length}</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-xs text-accent-dark mb-1">{t('project.employeeTasks.stats.inProgress')}</p>
-              <p className="text-2xl font-bold text-blue-700">
+            <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4">
+              <p className="text-xs text-accent-dark dark:text-accent-light mb-1">{t('project.employeeTasks.stats.inProgress')}</p>
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                 {myTasks.filter(t => t.status === 'in-progress').length}
               </p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <p className="text-xs text-green-600 mb-1">{t('project.employeeTasks.stats.completed')}</p>
-              <p className="text-2xl font-bold text-green-700">
+            <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4">
+              <p className="text-xs text-green-600 dark:text-green-400 mb-1">{t('project.employeeTasks.stats.completed')}</p>
+              <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                 {myTasks.filter(t => t.status === 'completed' || t.status === 'verified').length}
               </p>
             </div>
-            <div className="bg-red-50 rounded-lg p-4">
-              <p className="text-xs text-red-600 mb-1">{t('project.employeeTasks.stats.overdue')}</p>
-              <p className="text-2xl font-bold text-red-700">
+            <div className="bg-red-50 dark:bg-red-900/30 rounded-lg p-4">
+              <p className="text-xs text-red-600 dark:text-red-400 mb-1">{t('project.employeeTasks.stats.overdue')}</p>
+              <p className="text-2xl font-bold text-red-700 dark:text-red-400">
                 {myTasks.filter(t => isOverdue(t.dueDate) && t.status !== 'completed' && t.status !== 'verified').length}
               </p>
             </div>
@@ -382,8 +388,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
         {viewMode === 'list' && (
           <div className="space-y-3">
             {filteredTasks.length === 0 ? (
-              <div className="text-center py-12 text-gray-600">
-                <User className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+              <div className="text-center py-12 text-gray-600 dark:text-gray-300">
+                <User className="w-12 h-12 mx-auto mb-3 text-gray-600 dark:text-gray-400" />
                 <p className="font-medium">{t('project.employeeTasks.noTasks')}</p>
                 <p className="text-sm mt-1">
                   {filterStatus === 'all'
@@ -396,8 +402,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 <div
                   key={task._id}
                   className={`border-2 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 ${isOverdue(task.dueDate) && task.status !== 'completed' && task.status !== 'verified'
-                    ? 'border-red-400 bg-gradient-to-br from-red-50 to-white'
-                    : 'border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:border-accent'
+                    ? 'border-red-400 dark:border-red-600 bg-gradient-to-br from-red-50 to-white dark:from-red-900/20 dark:to-gray-800'
+                    : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:border-accent dark:hover:border-accent-light'
                     }`}
                 >
                   {/* Colored Status Bar */}
@@ -412,7 +418,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h4 className="text-lg font-bold text-gray-900">{task.title}</h4>
+                          <h4 className="text-lg font-bold text-gray-900 dark:text-white">{task.title}</h4>
                           {task.isFinished && (
                             <span className="px-2.5 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm">
                               <CheckCircle className="w-3.5 h-3.5" />
@@ -420,7 +426,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed mb-2">{task.description}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-2">{task.description}</p>
 
                         <div className="flex flex-wrap items-center gap-1.5">
                           {/* Task Type Badge */}
@@ -520,17 +526,20 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                             onChange={(value: number | number[]) => {
                               // Only update local state visually, DO NOT call API
                               const numValue = Array.isArray(value) ? value[0] : value;
-                              setSliderValues(prev => ({ ...prev, [task._id]: numValue }));
+                              // Limit to max 0.66 (Completed) for employees
+                              const limitedValue = Math.min(numValue, 0.66);
+                              setSliderValues(prev => ({ ...prev, [task._id]: limitedValue }));
                             }}
                             onChangeEnd={(value: number | number[]) => {
                               // Snap to nearest mark and CALL API only when released
                               const numValue = Array.isArray(value) ? value[0] : value;
+                              // Limit to max 0.66 (Completed) for employees
+                              const limitedValue = Math.min(numValue, 0.66);
                               let newStatus: Task['status'] = 'pending';
 
-                              if (numValue <= 0.16) newStatus = 'pending';
-                              else if (numValue <= 0.5) newStatus = 'in-progress';
-                              else if (numValue <= 0.83) newStatus = 'completed';
-                              else newStatus = 'verified';
+                              if (limitedValue <= 0.16) newStatus = 'pending';
+                              else if (limitedValue <= 0.5) newStatus = 'in-progress';
+                              else newStatus = 'completed'; // Max status employees can set
 
                               // Clear local override so it falls back to actual status
                               const newSliderValues = { ...sliderValues };
@@ -549,9 +558,9 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                               { value: 1, label: "Verified" }
                             ]}
                             minValue={0}
-                            maxValue={1}
+                            maxValue={0.66}
                             step={0.01}
-                            showTooltip={true}
+                            showTooltip={false}
                             classNames={{
                               base: "gap-3",
                               track: "h-2 bg-gray-300 dark:bg-gray-600",
@@ -562,7 +571,8 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                                 (sliderValues[task._id] !== undefined ? sliderValues[task._id] : (task.status === 'pending' ? 0 : task.status === 'in-progress' ? 0.33 : task.status === 'completed' ? 0.66 : 0)) <= 0.5 ? "w-5 h-5 bg-blue-500 shadow-lg" :
                                   "w-5 h-5 bg-green-500 shadow-lg",
                               label: "text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3",
-                              mark: "text-xs font-medium"
+                              mark: "text-xs font-medium",
+                              value: "hidden opacity-0 invisible"
                             }}
                           />
                         </div>
@@ -995,12 +1005,16 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
               </div>
             </div>
 
-            {/* Verified/Blocked Column */}
+            {/* Verified/Blocked Column - Read Only for Employees */}
             <div
-              className="bg-purple-50 rounded-lg p-4 min-h-[400px]"
-              onDragOver={handleDragOver}
-              onDrop={() => handleDrop('verified')}
+              className="bg-purple-50 rounded-lg p-4 min-h-[400px] relative"
             >
+              {/* Overlay to prevent drops */}
+              <div className="absolute inset-0 bg-purple-100/30 rounded-lg pointer-events-none z-10 flex items-center justify-center">
+                <div className="bg-white/90 px-4 py-2 rounded-lg shadow-sm">
+                  <p className="text-xs font-medium text-purple-700">🔒 Manager Only</p>
+                </div>
+              </div>
               <h3 className="font-semibold text-purple-900 mb-3 flex items-center justify-between">
                 <span>{t('project.employeeTasks.kanban.verified')}</span>
                 <span className="bg-purple-200 text-purple-700 text-xs px-2 py-1 rounded-full">
@@ -1011,8 +1025,7 @@ const EmployeeTasksTab: React.FC<EmployeeTasksTabProps> = ({
                 {filteredTasks.filter(t => t.status === 'verified' || t.status === 'blocked').map(task => (
                   <div
                     key={task._id}
-                    draggable
-                    onDragStart={() => handleDragStart(task)}
+                    draggable={false}
                     onClick={() => handleTaskClick(task)}
                     className={`bg-white border rounded-lg p-3 hover:shadow-md transition-all cursor-move ${draggedTask?._id === task._id ? 'opacity-50' : ''
                       } ${task.status === 'blocked' ? 'border-red-200' : 'border-purple-200'

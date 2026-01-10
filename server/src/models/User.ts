@@ -811,6 +811,50 @@ const userSchema = new Schema<IUser>({
       type: Boolean,
       default: false
     }
+  },
+  // Performance Ratings - Cumulative across all tasks
+  performanceRatings: {
+    // Cumulative ratings for each dimension
+    timeliness: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    quality: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    effort: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    collaboration: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    initiative: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    learning: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    compliance: {
+      total: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      average: { type: Number, default: 0 }
+    },
+    // Overall performance metrics
+    totalPoints: { type: Number, default: 0 },
+    totalTasks: { type: Number, default: 0 },
+    overallAverage: { type: Number, default: 0 },
+    lastUpdated: { type: Date }
   }
 }, {
   timestamps: true
